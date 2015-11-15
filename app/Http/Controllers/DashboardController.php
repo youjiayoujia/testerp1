@@ -10,7 +10,6 @@ class DashboardController extends Controller
 {
 
     protected $car;
-    protected $listColumns;
 
     public function __construct(CarRepository $car)
     {

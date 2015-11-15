@@ -9,6 +9,7 @@ class Helps
     {
         $paginateArray = $paginate->toArray();
         $jGridArray = [
+            "selectPageSize" => '20,50,100',
             "total" => $paginateArray['total'],
             "pageSize" => $paginateArray['per_page'],
             "pageCurrent" => $paginateArray['current_page'],

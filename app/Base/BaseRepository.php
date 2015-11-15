@@ -2,12 +2,28 @@
 
 namespace App\Base;
 
-use Config;
-
 abstract class BaseRepository
 {
 
     protected $model;
+
+    public function jGridColumns()
+    {
+        return json_encode($this->model->jGridColumns);
+    }
+
+    public function filter($request)
+    {
+        $result = $this->model;
+        foreach ($result->filters as $filterColumn) {
+            if ($request->has($filterColumn)) {
+                $filter_operator = $request->input($filterColumn . '_operator');
+                $filter_value = $filter_operator === 'like' ? '%' . trim($request->input($filterColumn)) . '%' : trim($request->input($filterColumn));
+                $result = $result->where($filterColumn, $filter_operator, $filter_value);
+            }
+        }
+        return $result;
+    }
 
     #********
     #* 与资源 REST 相关的接口函数 START
@@ -59,12 +75,6 @@ abstract class BaseRepository
      * @return void
      */
     abstract public function destroy($id, $extra);
-
-    public function toJGrid()
-    {
-
-    }
-
     #********
     #* 与资源 REST 相关的接口函数 END
     #********

@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Repositories\CarRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use App\Helps;
 
 class DashboardController extends Controller
 {
 
     protected $car;
+    protected $listColumns;
 
     public function __construct(CarRepository $car)
     {
@@ -19,7 +19,10 @@ class DashboardController extends Controller
 
     public function index()
     {
-        return view('common.jgrid');
+        $datas = [
+            'columns' => $this->car->jGridColumns(),
+        ];
+        return view('common.jgrid', $datas);
     }
 
     public function test(Request $request)

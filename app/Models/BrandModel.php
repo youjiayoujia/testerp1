@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class Car extends BaseModel
+class BrandModel extends BaseModel
 {
 
     /**
@@ -12,18 +12,13 @@ class Car extends BaseModel
      *
      * @var string
      */
-    protected $table = 'cars';
+    protected $table = 'brands';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'color'];
-
-    public function brand()
-    {
-        return $this->belongsTo('App\Models\Brand');
-    }
+    protected $fillable = ['name'];
 
 }

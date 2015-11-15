@@ -3,14 +3,14 @@
 namespace App\Repositories;
 
 use App\Base\BaseRepository;
-use App\Models\Brand;
-use App\Models\Car;
+use App\Models\BrandModel as Brand;
+use App\Models\CarModel as Car;
 use Config;
 
 /**
  * CarRepository
  *
- * @author Vincent<nyewon@gmail.com>MTOOL
+ * @author Vincent<nyewon@gmail.com>
  */
 class CarRepository extends BaseRepository
 {
@@ -23,9 +23,13 @@ class CarRepository extends BaseRepository
     public function index($request)
     {
         $pageSize = $request->input('pageSize') ? $request->input('pageSize') : Config::get('setting.pageSize');
-        $results = $this->model
-                ->paginate($pageSize);
-        return $results;
+        $result = $this->filter($request);
+        if ($request->has('orderField') AND $request->has('orderDirection')) {
+            $result = $result->orderBy($request->input('orderField'), $request->input('orderDirection'));
+        } else {
+            $result = $result->orderBy('id', 'desc');
+        }
+        return $result->paginate($pageSize);
     }
 
     public function store($inputs, $extra)

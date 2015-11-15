@@ -18,15 +18,15 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $datas = [
-            'columns' => $this->car->jGridColumns(),
+        $data = [
+            'columns' => $this->car->gridColumns(),
         ];
-        return view('common.jgrid', $datas);
+        return view('common.grid', $data);
     }
 
     public function test(Request $request)
     {
-        echo Helps::paginateToJGrid($this->car->index($request));
+        echo Helps::paginateToGrid($this->car->index($request));
     }
 
 }

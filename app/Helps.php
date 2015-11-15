@@ -5,10 +5,10 @@ namespace App;
 class Helps
 {
 
-    public static function paginateToJGrid($paginate)
+    public static function paginateToGrid($paginate)
     {
         $paginateArray = $paginate->toArray();
-        $jGridArray = [
+        $gridArray = [
             "selectPageSize" => '20,50,100',
             "total" => $paginateArray['total'],
             "pageSize" => $paginateArray['per_page'],
@@ -16,7 +16,7 @@ class Helps
             "list" => $paginateArray['data']
         ];
 
-        return json_encode($jGridArray);
+        return json_encode($gridArray);
     }
 
 }

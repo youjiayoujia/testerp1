@@ -22,11 +22,11 @@ class CarModel extends BaseModel
     protected $fillable = ['name', 'color'];
 
     /**
-     * jGrid列表显示字段
+     * grid列表显示字段
      *
      * @var array
      */
-    public $jGridColumns = [
+    public $gridColumns = [
         ['name' => 'size', 'label' => '型号'],
         ['name' => 'color', 'label' => '颜色'],
         ['name' => 'created_at', 'label' => '创建日期', 'type' => 'date']

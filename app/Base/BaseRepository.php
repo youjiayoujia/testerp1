@@ -7,9 +7,9 @@ abstract class BaseRepository
 
     protected $model;
 
-    public function jGridColumns()
+    public function gridColumns()
     {
-        return json_encode($this->model->jGridColumns);
+        return json_encode($this->model->gridColumns);
     }
 
     public function filter($request)

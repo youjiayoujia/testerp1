@@ -9,11 +9,9 @@
         </form>
     </div>
 @show{{-- 列表头部 --}}
-@stop
 
 @section('table_body')
 @show{{-- 列表内容 --}}
-@stop
 
 @section('table_footer')
     <div class="bjui-pageFooter">
@@ -34,4 +32,3 @@
         </div>
     </div>
 @show{{-- 列表底部 --}}
-@stop

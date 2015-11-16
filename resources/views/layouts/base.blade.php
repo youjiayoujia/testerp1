@@ -6,9 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <title>@section('title') 南京快悦ERP @show{{-- 页面标题 --}}</title>
-    <meta name="description" content="{{ isset($description) ? $description : 'YASCMF AdminLTE' }}"/>
-    <meta name="keywords" content="YASCMF,AdminLTE,{{ Cache::get('website_keywords') }}"/>
-    <meta name="author" content="{{ Cache::get('system_author_website') }}"/>
+    <meta name="description" content="{{ isset($description) ? $description : 'NJKY ERP' }}"/>
+    <meta name="keywords" content="NJKY, ERP"/>
+    <meta name="author" content=""/>
     <meta name="renderer" content="webkit">{{-- 360浏览器使用webkit内核渲染页面 --}}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>{{-- IE(内核)浏览器优先使用高版本内核 --}}
@@ -33,9 +33,10 @@
 <body @section('body_attr')class=""@show{{-- 追加类属性 --}}>
 <!--[if lte IE 7]>
 <div id="errorie">
-    <div>您还在使用老掉牙的IE，正常使用系统前请升级您的浏览器到 IE8以上版本 <a target="_blank"
-                                                 href="http://windows.microsoft.com/zh-cn/internet-explorer/ie-8-worldwide-languages">点击升级</a>&nbsp;&nbsp;强烈建议您更改换浏览器：<a
-            href="http://down.tech.sina.com.cn/content/40975.html" target="_blank">谷歌 Chrome</a></div>
+    <div>您还在使用老掉牙的IE，正常使用系统前请升级您的浏览器到
+        IE8以上版本 <a target="_blank" href="http://windows.microsoft.com/zh-cn/internet-explorer/ie-8-worldwide-languages">点击升级</a>
+        强烈建议您更改换浏览器：<a href="http://down.tech.sina.com.cn/content/40975.html" target="_blank">谷歌 Chrome</a>
+    </div>
 </div>
 <![endif]-->
 

@@ -3,15 +3,15 @@
 
 @section('meta')
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
-    @stop
+@stop
 
-    @section('head_css')
-            <!-- bootstrap - css -->
+@section('head_css')
+    {{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('BJUI/themes/css/bootstrap.css') }}" rel="stylesheet">
-    <!-- core - css -->
+    {{-- CORE CSS --}}
     <link href="{{ asset('BJUI/themes/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('BJUI/themes/blue/core.css') }}" id="bjui-link-theme" rel="stylesheet">
-    <!-- plug - css -->
+    {{-- PLUG CSS --}}
     <link href="{{ asset('BJUI/plugins/kindeditor_4.1.10/themes/default/default.css') }}" rel="stylesheet">
     <link href="{{ asset('BJUI/plugins/colorpicker/css/bootstrap-colorpicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('BJUI/plugins/niceValidator/jquery.validator.css') }}" rel="stylesheet">
@@ -21,7 +21,7 @@
     <!--[if lte IE 7]>
     <link href="{{ asset('BJUI/themes/css/ie7.css') }}" rel="stylesheet">
     <![endif]-->
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    {{-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries --}}
     @stop
 
 @section('head_js')
@@ -29,16 +29,16 @@
     <script src="{{ asset('BJUI/other/html5shiv.min.js') }}"></script>
     <script src="{{ asset('BJUI/other/respond.min.js') }}"></script>
     <![endif]-->
-    <!-- jquery -->
+    {{-- JQUERY --}}
     <script src="{{ asset('BJUI/js/jquery-1.7.2.min.js') }}"></script>
     <script src="{{ asset('BJUI/js/jquery.cookie.js') }}"></script>
     <!--[if lte IE 9]>
     <script src="{{ asset('BJUI/other/jquery.iframe-transport.js') }}"></script>
     <![endif]-->
-    <!-- BJUI.all 分模块压缩版 -->
+    {{-- BJUI.all 分模块压缩版 --}}
     <script src="{{ asset('BJUI/js/bjui-all.js') }}"></script>
-    <!-- 以下是B-JUI的分模块未压缩版，建议开发调试阶段使用下面的版本 -->
-    <!--
+    {{-- BJUI.all 以下是B-JUI的分模块未压缩版，建议开发调试阶段使用下面的版本 --}}
+    {{--
 <script src="{{ asset('BJUI/js/bjui-core.js') }}"></script>
 <script src="{{ asset('BJUI/js/bjui-regional.zh-CN.js') }}"></script>
 <script src="{{ asset('BJUI/js/bjui-frag.js') }}"></script>
@@ -65,43 +65,44 @@
 <script src="{{ asset('BJUI/js/bjui-theme.js') }}"></script>
 <script src="{{ asset('BJUI/js/bjui-initui.js') }}"></script>
 <script src="{{ asset('BJUI/js/bjui-plugins.js') }}"></script>
--->
-    <!-- plugins -->
-    <!-- swfupload for uploadify && kindeditor -->
+--}}
+    {{-- PLUGINS --}}
+    {{-- swfupload for uploadify && kindeditor --}}
     <script src="{{ asset('BJUI/plugins/swfupload/swfupload.js') }}"></script>
-    <!-- kindeditor -->
+    {{-- kindeditor --}}
     <script src="{{ asset('BJUI/plugins/kindeditor_4.1.10/kindeditor-all.min.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/kindeditor_4.1.10/lang/zh_CN.js') }}"></script>
-    <!-- colorpicker -->
+    {{-- colorpicker --}}
     <script src="{{ asset('BJUI/plugins/colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
-    <!-- ztree -->
+    {{-- ztree --}}
     <script src="{{ asset('BJUI/plugins/ztree/jquery.ztree.all-3.5.js') }}"></script>
-    <!-- nice validate -->
+    {{-- nice validate --}}
     <script src="{{ asset('BJUI/plugins/niceValidator/jquery.validator.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/niceValidator/jquery.validator.themes.js') }}"></script>
-    <!-- bootstrap plugins -->
+    {{-- bootstrap plugins --}}
     <script src="{{ asset('BJUI/plugins/bootstrap.min.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/bootstrapSelect/bootstrap-select.min.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/bootstrapSelect/defaults-zh_CN.min.js') }}"></script>
-    <!-- icheck -->
+    {{-- icheck --}}
     <script src="{{ asset('BJUI/plugins/icheck/icheck.min.js') }}"></script>
-    <!-- dragsort -->
+    {{-- dragsort --}}
     <script src="{{ asset('BJUI/plugins/dragsort/jquery.dragsort-0.5.1.min.js') }}"></script>
-    <!-- HighCharts -->
+    {{-- HighCharts --}}
     <script src="{{ asset('BJUI/plugins/highcharts/highcharts.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/highcharts/highcharts-3d.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/highcharts/themes/gray.js') }}"></script>
-    <!-- ECharts -->
+    {{-- ECharts --}}
     <script src="{{ asset('BJUI/plugins/echarts/echarts.js') }}"></script>
-    <!-- other plugins -->
+    {{-- other plugins --}}
     <script src="{{ asset('BJUI/plugins/other/jquery.autosize.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/uploadify/scripts/jquery.uploadify.min.js') }}"></script>
     <script src="{{ asset('BJUI/plugins/download/jquery.fileDownload.js') }}"></script>
-    @stop
+@stop
 
-    @section('init')
-            <!-- init -->
+@section('init')
+    {{-- INIT --}}
     <script type="text/javascript">
+        {{-- CSRF token for AJAX --}}
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -109,31 +110,35 @@
         });
         $(function () {
             BJUI.init({
-                JSPATH: 'BJUI/', //[可选]框架路径
-                PLUGINPATH: 'BJUI/plugins/', //[可选]插件路径
-                loginInfo: {url: '#', title: '登录', width: 400, height: 200}, // 会话超时后弹出登录对话框
-                statusCode: {ok: 200, error: 300, timeout: 301}, //[可选]
-                ajaxTimeout: 50000, //[可选]全局Ajax请求超时时间(毫秒)
+                JSPATH: 'BJUI/', {{-- [可选]框架路径 --}}
+                PLUGINPATH: 'BJUI/plugins/', {{-- [可选]插件路径 --}}
+                loginInfo: {url: '#', title: '登录', width: 400, height: 200}, {{-- 会话超时后弹出登录对话框 --}}
+                statusCode: {ok: 200, error: 300, timeout: 301}, {{-- [可选] --}}
+                ajaxTimeout: 50000, {{-- [可选]全局Ajax请求超时时间(毫秒) --}}
                 pageInfo: {
                     total: 'total',
                     pageCurrent: 'page',
                     pageSize: 'pageSize',
                     orderField: 'orderField',
                     orderDirection: 'orderDirection'
-                }, //[可选]分页参数
-                alertMsg: {displayPosition: 'topcenter', displayMode: 'slide', alertTimeout: 3000}, //[可选]信息提示的显示位置，显隐方式，及[info/correct]方式时自动关闭延时(毫秒)
-                keys: {statusCode: 'statusCode', message: 'message'}, //[可选]
+                }, {{-- [可选]分页参数 --}}
+                alertMsg: {
+                    displayPosition: 'topcenter',
+                    displayMode: 'slide',
+                    alertTimeout: 3000
+                }, {{-- [可选]信息提示的显示位置，显隐方式，及[info/correct]方式时自动关闭延时(毫秒) --}}
+                keys: {statusCode: 'statusCode', message: 'message'}, {{-- [可选] --}}
                 ui: {
-                    windowWidth: 0, //框架可视宽度，0=100%宽，> 600为则居中显示
-                    showSlidebar: true, //[可选]左侧导航栏锁定/隐藏
-                    clientPaging: true, //[可选]是否在客户端响应分页及排序参数
-                    overwriteHomeTab: false //[可选]当打开一个未定义id的navtab时，是否可以覆盖主navtab(我的主页)
+                    windowWidth: 0, {{-- 框架可视宽度，0=100%宽，> 600为则居中显示 --}}
+                    showSlidebar: true, {{-- [可选]左侧导航栏锁定/隐藏 --}}
+                    clientPaging: true, {{-- [可选]是否在客户端响应分页及排序参数 --}}
+                    overwriteHomeTab: false {{-- [可选]当打开一个未定义id的navtab时，是否可以覆盖主navtab(我的主页) --}}
                 },
-                debug: true, // [可选]调试模式 [true|false，默认false]
-                theme: 'sky' // 若有Cookie['bjui_theme'],优先选择Cookie['bjui_theme']。皮肤[五种皮肤:default, orange, purple, blue, red, green]
+                debug: true, {{-- [可选]调试模式 [true|false，默认false] --}}
+                theme: 'sky' {{-- 若有Cookie['bjui_theme'],优先选择Cookie['bjui_theme']。皮肤[五种皮肤:default, orange, purple, blue, red, green] --}}
             })
 
-            // main - menu
+            {{-- main - menu --}}
             $('#bjui-accordionmenu')
                     .collapse()
                     .on('hidden.bs.collapse', function (e) {
@@ -180,7 +185,7 @@
                 e.preventDefault()
             })
 
-            //时钟
+            {{-- 时钟 --}}
             var today = new Date(), time = today.getTime()
             $('#bjui-date').html(today.formatDate('yyyy/MM/dd'))
             setInterval(function () {
@@ -189,7 +194,7 @@
             }, 1000)
         })
 
-        //菜单-事件
+        {{-- 菜单-事件 --}}
         function MainMenuClick(event, treeId, treeNode) {
             event.preventDefault()
 
@@ -212,10 +217,10 @@
                 })
         }
     </script>
-    @stop
+@stop
 
-    @section('doc_begin')
-            <!-- for doc begin -->
+@section('doc_begin')
+    {{-- for doc begin --}}
     <link type="text/css" rel="stylesheet" href="{{ asset('/js/syntaxhighlighter-2.1.382/styles/shCore.css') }}"/>
     <link type="text/css" rel="stylesheet"
           href="{{ asset('/js/syntaxhighlighter-2.1.382/styles/shThemeEclipse.css') }}"/>
@@ -229,7 +234,7 @@
             })
         })
     </script>
-    <!-- for doc end -->
+    {{-- for doc end --}}
 @stop
 
 @section('body_attr')

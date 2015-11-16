@@ -14,6 +14,15 @@ use Config;
  */
 class CarRepository extends BaseRepository
 {
+    protected $columns = [
+        ['name' => 'id', 'label' => '#'],
+        ['name' => 'brand_id', 'label' => '品牌'],
+        ['name' => 'size', 'label' => '型号'],
+        ['name' => 'color', 'label' => '颜色'],
+        ['name' => 'created_at', 'label' => '创建日期']
+    ];
+
+    protected $filters = ['size', 'color', 'created_at'];
 
     public function __construct(Car $car)
     {

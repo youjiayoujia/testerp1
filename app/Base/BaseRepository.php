@@ -4,20 +4,24 @@ namespace App\Base;
 
 abstract class BaseRepository
 {
-
+    //仓库调用模型
     protected $model;
+    //仓库Grid展示字段
+    protected $columns;
+    //仓库Grid过滤字段
+    protected $filters;
 
-    public function gridColumns()
+    public function columns()
     {
-        return json_encode($this->model->gridColumns);
+        return $this->columns;
     }
 
     public function filter($request)
     {
         $result = $this->model;
-        foreach ($result->filters as $filterColumn) {
+        foreach ($this->filters as $filterColumn) {
             if ($request->has($filterColumn)) {
-                $filter_operator = $request->input($filterColumn . '_operator');
+                $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
                 $filter_value = $filter_operator === 'like' ? '%' . trim($request->input($filterColumn)) . '%' : trim($request->input($filterColumn));
                 $result = $result->where($filterColumn, $filter_operator, $filter_value);
             }

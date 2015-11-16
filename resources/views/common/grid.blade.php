@@ -3,7 +3,7 @@
         showCheckboxcol: true,
         showEditbtnscol: true,
         filterAll: true,
-//        loadType: 'GET',
+        loadType: 'GET',
 //        showToolbar: true,
 //        editMode: 'dialog',
 //        toolbarItem: ['all', 'add', 'edit', 'cancel', 'save', 'del', 'import', 'export', '|'],

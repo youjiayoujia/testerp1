@@ -16,17 +16,20 @@ class DashboardController extends Controller
         $this->car = $car;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $request->flash();
         $data = [
-            'columns' => $this->car->gridColumns(),
+            'columns' => $this->car->columns(),
+            'brands' => $this->car->getAllBrands(),
+            'datas' => $this->car->index($request),
         ];
-        return view('common.grid', $data);
+        return view('dashboard.test', $data);
     }
 
-    public function test(Request $request)
-    {
-        echo Helps::paginateToGrid($this->car->index($request));
-    }
+//    public function test(Request $request)
+//    {
+//        echo Helps::paginateToGrid($this->car->index($request));
+//    }
 
 }

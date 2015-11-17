@@ -11,10 +11,5 @@
   |
  */
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
-
-Route::get('/', ['as' => 'main.index', 'uses' => 'MainController@index']);
-Route::any('dashboard/index', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
-Route::any('dashboard/test', ['as' => 'dashboard.test', 'uses' => 'DashboardController@test']);
+Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+Route::resource('product', 'productController');

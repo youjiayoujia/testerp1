@@ -1,6 +1,13 @@
 <?php
-
+/**
+ * 基础仓库类
+ *
+ * 进行常规HTTP请求的CURD操作
+ * @author  Vincent<nyewon@gmail.com>
+ */
 namespace App\Base;
+
+use Config;
 
 abstract class BaseRepository
 {
@@ -11,37 +18,69 @@ abstract class BaseRepository
     //仓库Grid过滤字段
     protected $filters;
 
+    /**
+     * 列表展现字段
+     *
+     * @return Array
+     */
     public function columns()
     {
         return $this->columns;
     }
 
-    public function filter($request)
+    /**
+     * 列表数据查询过滤
+     *
+     * @param  object $result 需要查询的Model对象
+     * @param  object $request HTTP请求数据
+     * @return object $result 查询过滤后的Model对象
+     */
+    public function filter($result, $request)
     {
-        $result = $this->model;
         foreach ($this->filters as $filterColumn) {
             if ($request->has($filterColumn)) {
-                $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
+                $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'li';
                 $filter_value = $filter_operator === 'like' ? '%' . trim($request->input($filterColumn)) . '%' : trim($request->input($filterColumn));
                 $result = $result->where($filterColumn, $filter_operator, $filter_value);
             }
         }
+
         return $result;
     }
 
-    #********
-    #* 与资源 REST 相关的接口函数 START
-    #********
+    /**
+     * 列表数据排序
+     *
+     * @param  object $result 需要查询的Model对象
+     * @param  object $request HTTP请求数据
+     * @return object $result 排序后的Model对象
+     */
+    public function sort($result, $request)
+    {
+        if ($request->has('orderField') AND $request->has('orderDirection')) {
+            $result = $result->orderBy($request->input('orderField'), $request->input('orderDirection'));
+        } else {
+            $result = $result->orderBy('id', 'desc');
+        }
+
+        return $result;
+    }
 
     /**
-     * 资源列表
+     * 列表
      *
-     * @param  array $data 必须传入与模型查询相关的数据
-     * @param  string|array $extra 可选额外传入的参数
-     * @param  string $pageSize 分页大小（存在默认值）
+     * @param  object $request HTTP请求数据
      * @return Illuminate\Support\Collection
      */
-    abstract public function index($request);
+    public function index($request)
+    {
+        $pageSize = $request->has('pageSize') ? $request->input('pageSize') : Config::get('setting.pageSize');
+        $result = $this->model;
+        $result = $this->filter($result, $request);
+        $result = $this->sort($result, $request);
+
+        return $result->paginate($pageSize);
+    }
 
     /**
      * 存储资源

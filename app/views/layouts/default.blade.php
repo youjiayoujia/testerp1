@@ -7,14 +7,25 @@
 @section('css')
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
-    <link href="{{ asset('plugins/jqGrid/ui.jqgrid-bootstrap.css') }}" rel="stylesheet">{{-- OUR CSS --}}
+    <link href="{{ asset('plugins/bootstrapTable/bootstrap-table.css') }}" rel="stylesheet">{{-- bootstrapTable CSS --}}
 @stop
 
 @section('js')
-    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>{{-- JQuery --}}
+    {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
+    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
-    <script src="{{ asset('plugins/jqGrid/jquery.jqGrid.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
-    <script src="{{ asset('plugins/jqGrid/grid.locale-en.js') }}"></script>{{-- BOOTSTRAP JS --}}
+    <script src="{{ asset('plugins/bootstrapTable/bootstrap-table.js') }}"></script>{{-- bootstrapTable JS --}}
+    <script src="{{ asset('plugins/bootstrapTable/extensions/export/bootstrap-table-export.js') }}"></script>{{-- bootstrapTable JS --}}
+    <script src="{{ asset('plugins/bootstrapTable/locale/bootstrap-table-zh-CN.js') }}"></script>{{-- bootstrapTable language JS --}}
+    {{-- INIT --}}
+    <script type="text/javascript">
+        {{-- CSRF token for AJAX --}}
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
 @stop
 
 @section('body')

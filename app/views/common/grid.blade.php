@@ -1,30 +1,33 @@
 @extends('layouts.default')
+
 @section('content')
-    <div class="table-responsive">
-        <table id="jqGrid"></table>
-        <div id="jqGridPager"></div>
+    <div id="toolbar">
+        @section('gridToolbar')
+            <button id="remove" class="btn btn-success">
+                <i class="glyphicon glyphicon-plus"></i> 新增
+            </button>
+        @show{{-- 工具栏 --}}
     </div>
+    <table id="table"
+           @section('gridConfig')
+           data-classes="table table-striped table-hover"
+           data-toolbar="#toolbar"
+           data-show-columns="true"
+           data-show-export="true"
+           data-search="true"
+           data-show-refresh="true"
+           data-minimum-count-columns="2"
+           data-pagination="true"
+           data-query-params-type=''
+           data-page-list="[10, 25, 50, 100, ALL]"
+           data-side-pagination="server"
+           data-url="{{ route('product.grid') }}"
+            @show{{-- Bootstarp Table 配置 --}}
+    >
+    </table>
     <script type="text/javascript">
-        $(document).ready(function () {
-
-            $("#jqGrid").jqGrid({
-                url: 'http://trirand.com/blog/phpjqgrid/examples/jsonp/getjsonp.php?callback=?&qwery=longorders',
-                mtype: "GET",
-                styleUI: 'Bootstrap',
-                datatype: "jsonp",
-                colModel: [
-                    {label: 'OrderID', name: 'OrderID', key: true, width: 75},
-                    {label: 'Customer ID', name: 'CustomerID', width: 150},
-                    {label: 'Order Date', name: 'OrderDate', width: 150},
-                    {label: 'Freight', name: 'Freight', width: 150},
-                    {label: 'Ship Name', name: 'ShipName', width: 150}
-                ],
-                viewrecords: true,
-                width: '100%',
-                rowNum: 20,
-                pager: "#jqGridPager"
-            });
+        $('#table').bootstrapTable({
+            columns:{!! $columns !!}{{-- gird 字段 --}},
         });
-
     </script>
 @stop

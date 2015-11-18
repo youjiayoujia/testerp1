@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">{{-- favicon --}}
 
-    <title>@section('title') 南京快悦ERP @show{{-- 页面标题 --}}</title>
+    <title>@section('title') NJKY ERP @show{{-- 页面标题 --}}</title>
 
     @section('meta')
     @show{{-- META申明 --}}

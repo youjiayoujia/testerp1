@@ -1,21 +1,12 @@
-@extends('common.table')
+@extends('common.grid')
 
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
         <li><a href="#">产品</a></li>
-        <li class="active">列表</li>
+        <li class="active"><strong>Jquery列表</strong></li>
     </ol>
 @stop
 
-@section('tableBody')
-    @foreach($data as $product)
-        <tr>
-            <td>{{ $product->id }}</td>
-            <td>{{ $product->brand->name }}</td>
-            <td>{{ $product->size }}</td>
-            <td>{{ $product->color }}</td>
-            <td>{{ $product->created_at }}</td>
-        </tr>
-    @endforeach
-@stop
+@section('gridConfig') @parent @stop
+@section('gridToolbar') @parent @stop

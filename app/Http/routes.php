@@ -12,4 +12,5 @@
  */
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+Route::any('product/grid', ['as' => 'product.grid', 'uses' => 'ProductController@grid']);
 Route::resource('product', 'productController');

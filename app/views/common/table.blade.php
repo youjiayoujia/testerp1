@@ -9,13 +9,13 @@
                 @endforeach
             </tr>
             </thead>
+            <tfoot>
+            {!! $data->render() !!}
+            </tfoot>
             <tbody>
             @section('tableBody')
             @show{{-- 表格数据 --}}
             </tbody>
-            <tfoot>
-            {!! $data->render() !!}
-            </tfoot>
         </table>
     </div>
 @stop

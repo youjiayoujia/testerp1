@@ -21,11 +21,11 @@ abstract class BaseRepository
     /**
      * 列表展现字段
      *
-     * @return Array
+     * @return Json
      */
     public function columns()
     {
-        return $this->columns;
+        return json_encode($this->columns);
     }
 
     /**
@@ -37,11 +37,11 @@ abstract class BaseRepository
      */
     public function filter($result, $request)
     {
-        foreach ($this->filters as $filterColumn) {
-            if ($request->has($filterColumn)) {
-                $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'li';
-                $filter_value = $filter_operator === 'like' ? '%' . trim($request->input($filterColumn)) . '%' : trim($request->input($filterColumn));
-                $result = $result->where($filterColumn, $filter_operator, $filter_value);
+        if ($request->has('searchText')) {
+            foreach ($this->filters as $filterColumn) {
+                $filter_operator = 'like';
+                $filter_value = '%' . trim($request->input('searchText')) . '%';
+                $result = $result->orWhere($filterColumn, $filter_operator, $filter_value);
             }
         }
 
@@ -57,8 +57,8 @@ abstract class BaseRepository
      */
     public function sort($result, $request)
     {
-        if ($request->has('orderField') AND $request->has('orderDirection')) {
-            $result = $result->orderBy($request->input('orderField'), $request->input('orderDirection'));
+        if ($request->has('sortName') AND $request->has('sortOrder')) {
+            $result = $result->orderBy($request->input('sortName'), $request->input('sortOrder'));
         } else {
             $result = $result->orderBy('id', 'desc');
         }
@@ -79,7 +79,7 @@ abstract class BaseRepository
         $result = $this->filter($result, $request);
         $result = $this->sort($result, $request);
 
-        return $result->paginate($pageSize);
+        return $result->paginate($pageSize, ['*'], 'pageNumber');
     }
 
     /**

@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
+use App\Helps;
 
 class ProductController extends Controller
 {
@@ -26,9 +27,17 @@ class ProductController extends Controller
         $request->flash();
         $response = [
             'columns' => $this->product->columns(),
-            'data' => $this->product->index($request),
         ];
-        return view('common.grid');
-//        return view('product.index', $response);
+        return view('product.index', $response);
+    }
+
+    public function grid(Request $request)
+    {
+        echo Helps::toGrid($this->product->index($request));
+    }
+
+    public function show()
+    {
+
     }
 }

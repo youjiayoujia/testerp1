@@ -23,14 +23,23 @@ class ProductRepository extends BaseRepository
 
     protected $filters = ['size', 'color'];
 
+    public $rules = [
+        'size' => 'required|unique:products,size',
+        'color' => 'required',
+    ];
+
     public function __construct(Product $product)
     {
         $this->model = $product;
     }
 
-    public function store($inputs, $extra)
+    public function store($request)
     {
-        return;
+        $this->model->brand_id = $request->input('brand_id');
+        $this->model->size = $request->input('size');
+        $this->model->color = $request->input('color');
+
+        return $this->model->save();
     }
 
     public function edit($id, $extra)

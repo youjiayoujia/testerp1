@@ -9,32 +9,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\ProductRepository;
+use Validator;
 use Illuminate\Http\Request;
-use App\Helps;
+use App\Repositories\ProductRepository;
+
 
 class ProductController extends Controller
 {
     protected $product;
 
-    public function __construct(ProductRepository $product)
+    public function __construct(Request $request, ProductRepository $product)
     {
+        $this->request = $request;
         $this->product = $product;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $request->flash();
+        $this->request->flash();
         $response = [
             'columns' => $this->product->columns(),
-            'data' => $this->product->index($request),
+            'data' => $this->product->index($this->request),
         ];
         return view('product.index', $response);
-    }
-
-    public function grid(Request $request)
-    {
-        echo Helps::toGrid($this->product->index($request));
     }
 
     public function create()
@@ -45,9 +42,12 @@ class ProductController extends Controller
         return view('product.create', $response);
     }
 
-    public function store(Request $request)
+    public function store()
     {
-        var_dump($request->all());
-        EXIT;
+        $this->request->flash();
+        $this->validate($this->request, $this->product->rules);
+        $this->product->store($this->request);
+
+        return redirect(route('product.index'));
     }
 }

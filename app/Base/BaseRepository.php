@@ -11,10 +11,12 @@ abstract class BaseRepository
 {
     //仓库调用模型
     protected $model;
-    //仓库Grid展示字段
+    //仓库展示字段
     protected $columns;
-    //仓库Grid过滤字段
+    //仓库过滤字段
     protected $filters;
+    //仓库验证字段
+    public $rules;
 
     /**
      * 列表展现字段
@@ -49,7 +51,7 @@ abstract class BaseRepository
     /**
      * 列表数据排序
      *
-     * @param  object $result 需要查询的Model对象
+     * @param  object $result 需要排序的Model对象
      * @param  object $request HTTP请求数据
      * @return object $result 排序后的Model对象
      */
@@ -87,7 +89,7 @@ abstract class BaseRepository
      * @param  string|array $extra 可选额外传入的参数
      * @return Illuminate\Database\Eloquent\Model
      */
-    abstract public function store($inputs, $extra);
+    abstract public function store($request);
 
     /**
      * 编辑特定id资源

@@ -6,9 +6,7 @@
             <div class="table-responsive">
                 @section('tableToolbar')
                     <div class="row toolbar">
-                        <form action="" method="post">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
+                        <form action="" method="get">
                             <div class="col-lg-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="查找..."/>

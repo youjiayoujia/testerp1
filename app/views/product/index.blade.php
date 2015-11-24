@@ -1,5 +1,7 @@
 @extends('common.table')
-
+@section('title')
+    产品列表
+@stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>

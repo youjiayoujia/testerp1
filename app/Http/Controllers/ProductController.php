@@ -31,6 +31,7 @@ class ProductController extends Controller
             'columns' => $this->product->columns(),
             'data' => $this->product->index($this->request),
         ];
+
         return view('product.index', $response);
     }
 
@@ -39,6 +40,7 @@ class ProductController extends Controller
         $response = [
             'brands' => $this->product->getAllBrands()
         ];
+
         return view('product.create', $response);
     }
 

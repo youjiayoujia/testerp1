@@ -7,8 +7,6 @@
  */
 namespace App\Base;
 
-use Config;
-
 abstract class BaseRepository
 {
     //仓库调用模型
@@ -74,7 +72,7 @@ abstract class BaseRepository
      */
     public function index($request)
     {
-        $pageSize = $request->has('pageSize') ? $request->input('pageSize') : Config::get('setting.pageSize');
+        $pageSize = $request->has('pageSize') ? $request->input('pageSize') : config('setting.pageSize');
         $result = $this->model;
         $result = $this->filter($result, $request);
         $result = $this->sort($result, $request);

@@ -14,4 +14,3 @@
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 Route::resource('product', 'productController');
-Route::any('product', ['as' => 'product.index', 'uses' => 'ProductController@index']);

@@ -27,6 +27,7 @@ class ProductController extends Controller
         $request->flash();
         $response = [
             'columns' => $this->product->columns(),
+            'data' => $this->product->index($request),
         ];
         return view('product.index', $response);
     }
@@ -36,8 +37,16 @@ class ProductController extends Controller
         echo Helps::toGrid($this->product->index($request));
     }
 
-    public function show()
+    public function create()
     {
+        $response = [
+            'brands' => $this->product->getAllBrands()
+        ];
+        return view('product.create', $response);
+    }
 
+    public function store(Request $request)
+    {
+//        var_dump($request->all());
     }
 }

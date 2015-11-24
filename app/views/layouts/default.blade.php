@@ -7,16 +7,12 @@
 @section('css')
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
-    <link href="{{ asset('plugins/bootstrapTable/bootstrap-table.css') }}" rel="stylesheet">{{-- bootstrapTable CSS --}}
 @stop
 
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
-    <script src="{{ asset('plugins/bootstrapTable/bootstrap-table.js') }}"></script>{{-- bootstrapTable JS --}}
-    <script src="{{ asset('plugins/bootstrapTable/extensions/export/bootstrap-table-export.js') }}"></script>{{-- bootstrapTable JS --}}
-    <script src="{{ asset('plugins/bootstrapTable/locale/bootstrap-table-zh-CN.js') }}"></script>{{-- bootstrapTable language JS --}}
     {{-- INIT --}}
     <script type="text/javascript">
         {{-- CSRF token for AJAX --}}
@@ -32,8 +28,13 @@
     @include('layouts.nav')
     <div class="container-fluid main">
         <div class="row">
-            @section('breadcrumbs')@show{{-- 路径导航 --}}
-            @section('content')@show{{-- 内容 --}}
+            <div class="col-lg-2">
+                @include('layouts.sidebar')
+            </div>
+            <div class="col-lg-10">
+                @section('breadcrumbs')@show{{-- 路径导航 --}}
+                @section('content')@show{{-- 内容 --}}
+            </div>
         </div>
     </div>
 @stop

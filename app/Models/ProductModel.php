@@ -26,4 +26,9 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\BrandModel');
     }
 
+    public function getBrandNameAttribute()
+    {
+        return $this->brand->name;
+    }
+
 }

@@ -14,14 +14,14 @@ use App\Models\ProductModel as Product;
 class ProductRepository extends BaseRepository
 {
     protected $columns = [
-        ['field' => 'id', 'title' => '#'],
-        ['field' => 'brand_id', 'title' => '品牌'],
-        ['field' => 'size', 'title' => '型号'],
-        ['field' => 'color', 'title' => '颜色'],
-        ['field' => 'created_at', 'title' => '创建日期']
+        ['name' => 'id', 'label' => '#'],
+        ['name' => 'brand_id', 'label' => '品牌'],
+        ['name' => 'size', 'label' => '型号'],
+        ['name' => 'color', 'label' => '颜色'],
+        ['name' => 'created_at', 'label' => '创建日期']
     ];
 
-    protected $filters = ['size', 'color',];
+    protected $filters = ['size', 'color'];
 
     public function __construct(Product $product)
     {

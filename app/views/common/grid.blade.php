@@ -3,9 +3,11 @@
 @section('content')
     <div id="toolbar">
         @section('gridToolbar')
-            <button id="remove" class="btn btn-success">
-                <i class="glyphicon glyphicon-plus"></i> 新增
-            </button>
+            <a href="{{ route(Request::segment(1).'.create') }}">
+                <button class="btn btn-success">
+                    <i class="glyphicon glyphicon-plus"></i> 新增
+                </button>
+            </a>
         @show{{-- 工具栏 --}}
     </div>
     <table id="table"
@@ -18,16 +20,17 @@
            data-show-refresh="true"
            data-minimum-count-columns="2"
            data-pagination="true"
+           data-method="post"
            data-query-params-type=''
            data-page-list="[10, 25, 50, 100, ALL]"
            data-side-pagination="server"
-           data-url="{{ route('product.grid') }}"
+           data-url="{{ route(Request::segment(1).'.grid') }}"
             @show{{-- Bootstarp Table 配置 --}}
     >
     </table>
     <script type="text/javascript">
         $('#table').bootstrapTable({
-            columns:{!! $columns !!}{{-- gird 字段 --}},
+            columns:@section('gridColumns')@show{{-- gird 字段 --}},
         });
     </script>
 @stop

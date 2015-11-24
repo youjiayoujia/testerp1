@@ -15,7 +15,7 @@ use App\Helps;
 
 class ProductController extends Controller
 {
-    protected $car;
+    protected $product;
 
     public function __construct(ProductRepository $product)
     {

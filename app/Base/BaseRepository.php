@@ -27,13 +27,15 @@ abstract class BaseRepository
      */
     public function filter($result, $request)
     {
-        foreach ($this->filters as $filterColumn) {
-            if ($request->has('keywords')) {
-                $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
-                $filter_value = $filter_operator === 'like' ? '%' . trim($request->input('keywords')) . '%' : trim($request->input($filterColumn));
-                $result = $result->orWhere($filterColumn, $filter_operator, $filter_value);
+        $result = $result->where(function ($query) use ($request) {
+            foreach ($this->filters as $filterColumn) {
+                if ($request->has('keywords')) {
+                    $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
+                    $filter_value = $filter_operator === 'like' ? '%' . trim($request->input('keywords')) . '%' : trim($request->input($filterColumn));
+                    $query = $query->orWhere($filterColumn, $filter_operator, $filter_value);
+                }
             }
-        }
+        });
 
         return $result;
     }
@@ -87,7 +89,7 @@ abstract class BaseRepository
      * @param  string|array $extra 可选额外传入的参数
      * @return Illuminate\Support\Collection
      */
-    abstract public function edit($id, $extra);
+    abstract public function edit($id);
 
     /**
      * 更新特定id资源
@@ -97,7 +99,7 @@ abstract class BaseRepository
      * @param  string|array $extra 可选额外传入的参数
      * @return void
      */
-    abstract public function update($id, $inputs, $extra);
+    abstract public function update($id, $request);
 
     /**
      * 删除特定id资源

@@ -37,7 +37,7 @@ class ProductController extends Controller
     public function show()
     {
         $response = [
-            'brands' => $this->product->getAllBrands()
+            'brands' => $this->product->getBrands()
         ];
 
         return view('product.create', $response);
@@ -46,7 +46,7 @@ class ProductController extends Controller
     public function create()
     {
         $response = [
-            'brands' => $this->product->getAllBrands()
+            'brands' => $this->product->getBrands()
         ];
 
         return view('product.create', $response);
@@ -57,6 +57,24 @@ class ProductController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->product->rules);
         $this->product->store($this->request);
+
+        return redirect(route('product.index'));
+    }
+
+    public function edit($id)
+    {
+        $response = [
+            'brands' => $this->product->getBrands(),
+            'product' => $this->product->edit($id),
+        ];
+        return view('product.edit', $response);
+    }
+
+    public function update($id)
+    {
+        $this->request->flash();
+        $this->validate($this->request, $this->product->rules);
+        $this->product->update($id, $this->request);
 
         return redirect(route('product.index'));
     }

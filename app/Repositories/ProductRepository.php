@@ -13,7 +13,7 @@ use App\Models\ProductModel as Product;
  */
 class ProductRepository extends BaseRepository
 {
-    public $columns = ['id', 'brand_id', 'size', 'color', 'created_at'];
+    public $columns = ['id', 'brand', 'size', 'color', 'created_at'];
     protected $filters = ['size', 'color'];
     public $rules = [
         'size' => 'required|unique:products,size',
@@ -34,17 +34,22 @@ class ProductRepository extends BaseRepository
         return $this->model->save();
     }
 
-    public function edit($id, $extra)
+    public function edit($id)
     {
-        return;
+        return $this->model->find($id);
     }
 
-    public function update($id, $inputs, $extra)
+    public function update($id, $request)
     {
-        return;
+        $product = $this->model->find($id);
+        $product->brand_id = $request->input('brand_id');
+        $product->size = $request->input('size');
+        $product->color = $request->input('color');
+
+        return $product->save();
     }
 
-    public function getAllBrands()
+    public function getBrands()
     {
         return Brand::all();
     }

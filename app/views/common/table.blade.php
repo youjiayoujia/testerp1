@@ -1,7 +1,7 @@
 @extends('layouts.default')
 @section('content')
     <div class="panel panel-default">
-        <div class="panel-heading"><strong>@section('tableTitle') @show{{-- 列表名称 --}}</strong></div>
+        <div class="panel-heading"><strong>@section('tableTitle')@show{{-- 列表标题 --}}</strong></div>
         <div class="panel-body">
             <div class="table-responsive">
                 @section('tableToolbar')
@@ -14,6 +14,9 @@
                                 <button class="btn btn-default" type="submit">
                                     <i class="glyphicon glyphicon-search"></i>
                                 </button>
+                                <a class="btn btn-default" href="{{ Request::url() }}">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </a>
                             </span>
                                 </div>
                             </div>
@@ -51,8 +54,7 @@
                                 </thead>
                             @show{{-- 列表字段 --}}
                             <tbody>
-                            @section('tableBody')
-                            @show{{-- 列表数据 --}}
+                            @section('tableBody')@show{{-- 列表数据 --}}
                             </tbody>
                         </table>
                     </div>
@@ -60,36 +62,51 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <span>每页&nbsp;</span>
-                        <select>
+                        <select id="pageSize" data-url="{{ Request::url() }}">
                             @foreach(Config::get('setting.pageSizes') as $page)
-                                <option value="{{ $page }}">{{ $page }}</option>
+                                <option value="{{ $page }}" {{ $page == Request::input('pageSize') ? 'selected' : '' }}>
+                                    {{ $page }}
+                                </option>
                             @endforeach
                         </select>
                         <span>&nbsp;条，共 {{ $data->total() }} 条</span>
                     </div>
                     <div class="col-lg-6 text-right">
-                        {!! $data->appends(['keywords' => Request::input('keywords')])->render() !!}
+                        {!!
+                        $data
+                        ->appends([
+                        'keywords' => Request::input('keywords'),
+                        'pageSize' => Request::input('pageSize')
+                        ])
+                        ->render()
+                        !!}
                     </div>
                 </div>
             </div>
         </div>
     </div>
     {{-- 模拟DELETE删除表单 --}}
-    <form method="post" action="" accept-charset="utf-8" id="hiddenDeleteForm">
-        <input name="_method" type="hidden" value="delete"/>
+    <form method="POST" action="" id="hiddenDeleteForm">
+        <input type="hidden" name="_method" value="DELETE"/>
         <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
     </form>
-
+@stop
+@section('pageJs')
     <script type="text/javascript">
         {{-- 提交删除表单  --}}
         $('.delete_item').click(function () {
             if (confirm("确认删除?")) {
                 var url = $(this).data('url');
-                var id = $(this).data('id');
-                var action = url + '/' + id;
-                $('#hiddenDeleteForm').attr('action', action);
+                $('#hiddenDeleteForm').attr('action', url);
                 $('#hiddenDeleteForm').submit();
             }
+        });
+        {{-- 更改显示条数  --}}
+        $('#pageSize').change(function () {
+            var size = $(this).val();
+            var url = $(this).data('url');
+            var action = url + '?pageSize=' + size;
+            location.href = action;
         });
     </script>
 @stop

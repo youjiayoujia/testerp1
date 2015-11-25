@@ -2,7 +2,7 @@
 /**
  * 基础仓库类
  *
- * 进行常规HTTP请求的CURD操作
+ * 常规HTTP请求的CURD方法, 业务逻辑方法
  * @author  Vincent<nyewon@gmail.com>
  */
 namespace App\Base;
@@ -13,17 +13,17 @@ abstract class BaseRepository
     protected $model;
     //列表展示字段
     public $columns;
-    //列表过滤字段
+    //列表过滤字段,用于查找过滤
     protected $filters;
-    //仓库验证字段
+    //验证字段,用于表单提交的数据验证
     public $rules;
 
     /**
-     * 列表数据查询过滤
+     * 列表数据查找过滤
      *
-     * @param  object $result 需要查询的Model对象
-     * @param  object $request HTTP请求数据
-     * @return object $result 查询过滤后的Model对象
+     * @param  object $result 需要查找的Model对象
+     * @param  object $request HTTP请求对象
+     * @return object $result 查找过滤后的Model对象
      */
     public function filter($result, $request)
     {
@@ -44,7 +44,7 @@ abstract class BaseRepository
      * 列表数据排序
      *
      * @param  object $result 需要排序的Model对象
-     * @param  object $request HTTP请求数据
+     * @param  object $request HTTP请求对象
      * @return object $result 排序后的Model对象
      */
     public function sort($result, $request)
@@ -61,7 +61,7 @@ abstract class BaseRepository
     /**
      * 列表
      *
-     * @param  object $request HTTP请求数据
+     * @param  object $request HTTP请求对象
      * @return Illuminate\Support\Collection
      */
     public function index($request)
@@ -75,43 +75,52 @@ abstract class BaseRepository
     }
 
     /**
+     * 产品详情
+     *
+     * @param $id
+     * @return object
+     */
+    public function detail($id)
+    {
+        return $this->model->find($id);
+    }
+
+    /**
      * 存储资源
      *
-     * @param  object $request HTTP请求数据
+     * @param  object $request HTTP请求对象
      * @return bool
      */
     abstract public function store($request);
 
     /**
-     * 编辑特定id资源
+     * 编辑指定id资源
      *
      * @param  int $id 资源id
-     * @param  string|array $extra 可选额外传入的参数
      * @return Illuminate\Support\Collection
      */
-    abstract public function edit($id);
+    public function edit($id)
+    {
+        return $this->detail($id);
+    }
 
     /**
-     * 更新特定id资源
+     * 更新指定id资源
      *
      * @param  int $id 资源id
-     * @param  array $inputs 必须传入与更新模型相关的数据
-     * @param  string|array $extra 可选额外传入的参数
-     * @return void
+     * @param  object $request HTTP请求对象
+     * @return bool
      */
     abstract public function update($id, $request);
 
     /**
-     * 删除特定id资源
+     * 删除指定id资源
      *
      * @param  int $id 资源id
-     * @return void
+     * @return bool
      */
     public function destroy($id)
     {
         return $this->model->destroy($id);
     }
-    #********
-    #* 与资源 REST 相关的接口函数 END
-    #********
 }

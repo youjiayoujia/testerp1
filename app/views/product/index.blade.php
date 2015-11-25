@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="#">产品</a></li>
+        <li><a href="{{ route('product.index') }}">产品</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
@@ -17,6 +17,9 @@
             <td>{{ $product->color }}</td>
             <td>{{ $product->created_at }}</td>
             <td>
+                <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                </a>
                 <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
+ * 产品控制器
  * User: Vincent
  * Date: 15/11/17
  * Time: 下午5:02
@@ -23,6 +23,11 @@ class ProductController extends Controller
         $this->product = $product;
     }
 
+    /**
+     * 产品列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
         $this->request->flash();
@@ -34,15 +39,26 @@ class ProductController extends Controller
         return view('product.index', $response);
     }
 
-    public function show()
+    /**
+     * 产品详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
     {
         $response = [
-            'brands' => $this->product->getBrands()
+            'product' => $this->product->detail($id),
         ];
 
-        return view('product.create', $response);
+        return view('product.show', $response);
     }
 
+    /**
+     * 产品创建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function create()
     {
         $response = [
@@ -52,6 +68,11 @@ class ProductController extends Controller
         return view('product.create', $response);
     }
 
+    /**
+     * 产品存储
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function store()
     {
         $this->request->flash();
@@ -61,6 +82,12 @@ class ProductController extends Controller
         return redirect(route('product.index'));
     }
 
+    /**
+     * 产品编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function edit($id)
     {
         $response = [
@@ -70,6 +97,12 @@ class ProductController extends Controller
         return view('product.edit', $response);
     }
 
+    /**
+     * 产品更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function update($id)
     {
         $this->request->flash();
@@ -79,6 +112,12 @@ class ProductController extends Controller
         return redirect(route('product.index'));
     }
 
+    /**
+     * 产品删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function destroy($id)
     {
         $this->product->destroy($id);

@@ -44,8 +44,9 @@
                                 <thead>
                                 <tr>
                                     @foreach($columns as $column)
-                                        <th>{{ $column['label'] }}</th>
+                                        <th>{{ trans(Request::segment(1).'.'.$column) }}</th>
                                     @endforeach
+                                    <th>操作</th>
                                 </tr>
                                 </thead>
                             @show{{-- 列表字段 --}}
@@ -67,10 +68,28 @@
                         <span>&nbsp;条，共 {{ $data->total() }} 条</span>
                     </div>
                     <div class="col-lg-6 text-right">
-                        {!! $data->render() !!}
+                        {!! $data->appends(['keywords' => Request::input('keywords')])->render() !!}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    {{-- 模拟DELETE删除表单 --}}
+    <form method="post" action="" accept-charset="utf-8" id="hiddenDeleteForm">
+        <input name="_method" type="hidden" value="delete"/>
+        <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
+    </form>
+
+    <script type="text/javascript">
+        {{-- 提交删除表单  --}}
+        $('.delete_item').click(function () {
+            if (confirm("确认删除?")) {
+                var url = $(this).data('url');
+                var id = $(this).data('id');
+                var action = url + '/' + id;
+                $('#hiddenDeleteForm').attr('action', action);
+                $('#hiddenDeleteForm').submit();
+            }
+        });
+    </script>
 @stop

@@ -27,11 +27,20 @@ class ProductController extends Controller
     {
         $this->request->flash();
         $response = [
-            'columns' => $this->product->columns(),
+            'columns' => $this->product->columns,
             'data' => $this->product->index($this->request),
         ];
 
         return view('product.index', $response);
+    }
+
+    public function show()
+    {
+        $response = [
+            'brands' => $this->product->getAllBrands()
+        ];
+
+        return view('product.create', $response);
     }
 
     public function create()
@@ -49,6 +58,12 @@ class ProductController extends Controller
         $this->validate($this->request, $this->product->rules);
         $this->product->store($this->request);
 
+        return redirect(route('product.index'));
+    }
+
+    public function destroy($id)
+    {
+        $this->product->destroy($id);
         return redirect(route('product.index'));
     }
 }

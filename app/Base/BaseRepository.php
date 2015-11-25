@@ -11,22 +11,12 @@ abstract class BaseRepository
 {
     //仓库调用模型
     protected $model;
-    //仓库展示字段
-    protected $columns;
-    //仓库过滤字段
+    //列表展示字段
+    public $columns;
+    //列表过滤字段
     protected $filters;
     //仓库验证字段
     public $rules;
-
-    /**
-     * 列表展现字段
-     *
-     * @return Array
-     */
-    public function columns()
-    {
-        return $this->columns;
-    }
 
     /**
      * 列表数据查询过滤
@@ -39,7 +29,7 @@ abstract class BaseRepository
     {
         foreach ($this->filters as $filterColumn) {
             if ($request->has('keywords')) {
-                $filter_operator = 'like';//$request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
+                $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
                 $filter_value = $filter_operator === 'like' ? '%' . trim($request->input('keywords')) . '%' : trim($request->input($filterColumn));
                 $result = $result->orWhere($filterColumn, $filter_operator, $filter_value);
             }
@@ -85,9 +75,8 @@ abstract class BaseRepository
     /**
      * 存储资源
      *
-     * @param  array $inputs 必须传入与存储模型相关的数据
-     * @param  string|array $extra 可选额外传入的参数
-     * @return Illuminate\Database\Eloquent\Model
+     * @param  object $request HTTP请求数据
+     * @return bool
      */
     abstract public function store($request);
 
@@ -114,10 +103,12 @@ abstract class BaseRepository
      * 删除特定id资源
      *
      * @param  int $id 资源id
-     * @param  string|array $extra 可选额外传入的参数
      * @return void
      */
-    abstract public function destroy($id, $extra);
+    public function destroy($id)
+    {
+        return $this->model->destroy($id);
+    }
     #********
     #* 与资源 REST 相关的接口函数 END
     #********

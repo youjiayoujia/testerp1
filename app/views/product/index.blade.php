@@ -23,6 +23,16 @@
             <td>{{ $product->size }}</td>
             <td>{{ $product->color }}</td>
             <td>{{ $product->created_at }}</td>
+            <td>
+                <a href="" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $product->id }}"
+                   data-url="{{ route('product.index') }}">
+                    <span class="glyphicon glyphicon-trash"></span> 删除
+                </a>
+            </td>
         </tr>
     @endforeach
+
 @stop

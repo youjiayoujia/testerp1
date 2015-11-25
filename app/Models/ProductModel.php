@@ -19,16 +19,11 @@ class ProductModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['size'];
 
     public function brand()
     {
         return $this->belongsTo('App\Models\BrandModel');
-    }
-
-    public function getBrandNameAttribute()
-    {
-        return $this->brand->name;
     }
 
 }

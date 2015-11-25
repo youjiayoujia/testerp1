@@ -2,6 +2,8 @@
 
 /**
  * 产品控制器
+ * 处理产品相关的Request与Response
+ *
  * User: Vincent
  * Date: 15/11/17
  * Time: 下午5:02

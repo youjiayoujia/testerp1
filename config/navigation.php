@@ -57,6 +57,26 @@ return [
         ],
     ],
     [
+        'name' => '品牌',
+        'location' => 'brand',
+        'icon' => 'tags',
+        'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'brand.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'brand.create',
+                'icon' => '',
+            ],
+        ],
+    ],
+    [
         'name' => '订单',
         'location' => '',
         'icon' => 'list-alt',

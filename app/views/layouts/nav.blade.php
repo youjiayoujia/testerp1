@@ -56,7 +56,7 @@
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">{{ Auth::user()->name }}</a></li>
+                        <li><a href="#"></a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="#">修改密码</a></li>
                         <li><a href="/auth/logout">注销</a></li>

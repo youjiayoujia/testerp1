@@ -23,6 +23,9 @@
                 <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                <a href="product/addimage/{{ $product->id }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 添加图片
+                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">

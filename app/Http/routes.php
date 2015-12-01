@@ -13,6 +13,7 @@
 
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+Route::resource('product/addimage', 'productController@addimage');
 Route::resource('product', 'productController');
 Route::resource('brand', 'brandController');
 

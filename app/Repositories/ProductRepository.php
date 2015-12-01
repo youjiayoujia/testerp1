@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Base\BaseRepository;
 use App\Models\BrandModel as Brand;
 use App\Models\ProductModel as Product;
+use App\Models\Product_imageModel as Product_image;
 
 /**
  * 范例: 产品库

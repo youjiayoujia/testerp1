@@ -40,6 +40,20 @@ class ProductController extends Controller
 
         return view('product.index', $response);
     }
+	 /**
+     * 产品图片添加
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function addimage($id)
+    {   
+        $response = [
+            'brands' => $this->product->getBrands(),
+            'product' => $this->product->edit($id),
+        ];
+        return view('product.addimage', $response);
+    }
+
 
     /**
      * 产品详情
@@ -55,8 +69,8 @@ class ProductController extends Controller
 
         return view('product.show', $response);
     }
-
-    /**
+	
+	/**
      * 产品创建
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -69,6 +83,7 @@ class ProductController extends Controller
 
         return view('product.create', $response);
     }
+	
 
     /**
      * 产品存储

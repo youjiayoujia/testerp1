@@ -25,5 +25,10 @@ class ProductModel extends BaseModel
     {
         return $this->belongsTo('App\Models\BrandModel');
     }
+	
+	public function product_image()
+    {
+        return $this->belongsTo('App\Models\Product_imageModel');
+    }
 
 }

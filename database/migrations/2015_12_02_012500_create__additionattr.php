@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePhoto extends Migration
+class CreateAdditionattr extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,10 @@ class CreatePhoto extends Migration
      */
     public function up()
     {
-        Schema::create('createPho', function (Blueprint $table) {
-            $table->integer('FashionSel_id')->comment('对应需求id')->default(NULL);
-            $table->text('photo')->comment('对应的图片')->default(NULL);
+        Schema::create('additionattr', function (Blueprint $table) {
+            $table->integer('FashionSel')->comment('选款的id')->default(NULL);
+            $table->string('name',128)->comment('个性属性名')->default(NULL);
+            $table->string('value')->comment('个性属性值')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +28,6 @@ class CreatePhoto extends Migration
      */
     public function down()
     {
-        Schema::drop('createPho');
+        Schema::drop('additionattr');
     }
 }

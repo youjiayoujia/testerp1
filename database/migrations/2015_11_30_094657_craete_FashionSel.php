@@ -22,22 +22,22 @@ class CraeteFashionSel extends Migration
     {
         Schema::create('FashionSel', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name',128)->default(NULL);
-            $table->string('color',8)->default(NULL);
-            $table->integer('category_id')->default(NULL);
-            $table->string('address')->default(NULL);
-            $table->string('similar_sku')->default(NULL);
-            $table->string('competition_url')->default(NULL);
+            $table->string('name',128)->comment('产品名字')->default(NULL);
+            $table->string('color',8)->comment('产品颜色')->default(NULL);
+            $table->integer('category_id')->comment('产品所属目录')->nullable()->default(NULL);
+            $table->string('address')->comment('货源地')->default(NULL);
+            $table->string('similar_sku')->comment('相似的sku')->nullable()->default(NULL);
+            $table->string('competition_url')->comment('竞争产品的url')->nullable()->default(NULL);
 
-            $table->text('add_des')->default(NULL);
+            $table->text('add_des')->comment('备注信息说明')->nullable()->default(NULL);
             
-            $table->date('expected_date');
-            $table->integer('needer_id')->default(NULL);
-            $table->integer('needer_shopid')->default(NULL);
+            $table->date('expected_date')->comment('希望上传日期');
+            $table->integer('needer_id')->comment('需求人id')->default(NULL);
+            $table->integer('needer_shopid')->comment('需求店铺id')->default(NULL);
             
-            $table->enum('status',['未处理', '未找到', '已找到'])->default('未处理');
-            $table->integer('user_id')->default(NULL);
-            $table->date('handle_time')->default(NULL);
+            $table->enum('status',['未处理', '未找到', '已找到'])->comment('处理状态')->default('未处理');
+            $table->integer('user_id')->comment('处理人id')->nullable()->default(NULL);
+            $table->date('handle_time')->comment('处理时间')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -51,5 +51,6 @@ class CraeteFashionSel extends Migration
     public function down()
     {
         Schema::drop('FashionSel');
+        
     }
 }

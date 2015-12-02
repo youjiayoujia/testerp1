@@ -20,16 +20,22 @@ class CraeteFashionSel extends Migration
      */
     public function up()
     {
-        Schema::create('FashionSel', function (Blueprint $table) {
+        Schema::create('fashion_sel', function (Blueprint $table) {
             $table->increments('id');
+
+            $table->text('img1')->comment('图片1')->nullable()->default(NULL);
+            $table->text('img2')->comment('图片2')->nullable()->default(NULL);
+            $table->text('img3')->comment('图片3')->nullable()->default(NULL);
+            $table->text('img4')->comment('图片4')->nullable()->default(NULL);
+            $table->text('img5')->comment('图片5')->nullable()->default(NULL);
+            $table->text('img6')->comment('图片6')->nullable()->default(NULL);
+
             $table->string('name',128)->comment('产品名字')->default(NULL);
-            $table->string('color',8)->comment('产品颜色')->default(NULL);
-            $table->integer('category_id')->comment('产品所属目录')->nullable()->default(NULL);
             $table->string('address')->comment('货源地')->default(NULL);
             $table->string('similar_sku')->comment('相似的sku')->nullable()->default(NULL);
             $table->string('competition_url')->comment('竞争产品的url')->nullable()->default(NULL);
 
-            $table->text('add_des')->comment('备注信息说明')->nullable()->default(NULL);
+            $table->text('remark')->comment('备注信息说明')->nullable()->default(NULL);
             
             $table->date('expected_date')->comment('希望上传日期');
             $table->integer('needer_id')->comment('需求人id')->default(NULL);

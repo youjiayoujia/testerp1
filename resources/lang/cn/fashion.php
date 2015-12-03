@@ -1,0 +1,22 @@
+<?php
+	return [
+		'id' => 'ID',
+		'img1' => '图片1',
+		'img2' => '图片2',
+		'img3' => '图片3',
+		'img4' => '图片4',
+		'img5' => '图片5',
+		'img6' => '图片6',
+		'name' => '选款名',
+		'address' => '货源地',
+		'similar_sku' => '类似款sku',
+		'competition_url' => '竞争产品url',
+		'remark' => '选款备注',
+		'expected_date' => '期待上传时间',
+		'needer_id' => '需求者id',
+		'needer_shopid' => '需求店铺id',
+		'status' => '处理状态',
+		'user_id' => '处理者id',
+		'handle_time' => '处理时间',
+		'craeted_at' => '创建时间',
+	];

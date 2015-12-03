@@ -77,6 +77,46 @@ return [
         ],
     ],
     [
+        'name' => '供货商',
+        'location' => 'provider',
+        'icon' => 'tags',
+        'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'provider.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'provider.create',
+                'icon' => '',
+            ],
+        ],
+    ],
+    [
+        'name' => '选款需求',
+        'location' => 'fashion',
+        'icon' => 'tags',
+        'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'fashion.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'fashion.create',
+                'icon' => '',
+            ],
+        ],
+    ],
+    [
         'name' => '订单',
         'location' => '',
         'icon' => 'list-alt',

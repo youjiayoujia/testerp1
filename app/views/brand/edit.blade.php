@@ -13,7 +13,7 @@
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group">
         <label for="size">品牌</label>
-        <input class="form-control" id="brand_name" placeholder="国家" name='brand_name' value="{{ old('name') ?  old('name') : $brand->name }}">
+        <input class="form-control" id="brand_name" placeholder="品牌" name='brand_name' value="{{ old('name') ?  old('name') : $brand->name }}">
     </div>
     <div class="form-group">
         <label for="size">国家</label>

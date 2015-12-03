@@ -5,11 +5,17 @@
 @section('css')
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
+    <link href="{{ asset('css/default.css') }}" rel="stylesheet">{{-- FILEOUTPUT CSS --}}
+    <link href="{{ asset('css/fileinput.css') }}" media="all" rel="stylesheet"/> {{-- FILEINPUT CSS --}}
+
 @stop
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
+    <script src="{{ asset('js/fileinput.js') }}"></script> {{-- FILEINPUT JS  --}}
+    <script src="{{ asset('js/fileinput_locale_zh.js') }}"></script>{{-- FILEINPUT JS --}}
+
 @stop
 @section('init')
     <script type="text/javascript">

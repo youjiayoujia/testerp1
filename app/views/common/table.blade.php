@@ -108,5 +108,8 @@
             var action = url + '?pageSize=' + size;
             location.href = action;
         });
+        $("#file-0").fileinput({
+            'allowedFileExtensions' : ['jpg', 'png','gif'],
+        });
     </script>
 @stop

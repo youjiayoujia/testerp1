@@ -20,6 +20,7 @@ class ProductRepository extends BaseRepository
         'size' => 'required|unique:products,size',
         'color' => 'required',
     ];
+	 
 
     public function __construct(Product $product)
     {

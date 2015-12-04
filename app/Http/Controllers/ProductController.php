@@ -13,7 +13,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\ProductRepository;
-
+ 
 
 class ProductController extends Controller
 {
@@ -47,12 +47,73 @@ class ProductController extends Controller
      */
     public function addimage($id)
     {   
+		$image_type=['default','original','choies','aliexpress','amazon','ebay','wish','Lazada'];
         $response = [
-            'brands' => $this->product->getBrands(),
+            'image_type' => $image_type,
             'product' => $this->product->edit($id),
         ];
         return view('product.addimage', $response);
     }
+
+/**
+     * 产品更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function image_update()
+    {  
+		//$zip = $this->request->ZipArchive;
+		/*
+		$zip->open这个方法第一个参数表示处理的zip文件名。
+		第二个参数表示处理模式，ZipArchive::OVERWRITE表示如果zip文件存在，就覆盖掉原来的zip文件。
+		如果参数使用ZIPARCHIVE::CREATE，系统就会往原来的zip文件里添加内容。
+		如果不是为了多次添加内容到zip文件，建议使用ZipArchive::OVERWRITE。
+		使用这两个参数，如果zip文件不存在，系统都会自动新建。
+		如果对zip文件对象操作成功，$zip->open这个方法会返回TRUE
+		*/
+		/*if ($this->request->ZipArchive->open('test.zip', $this->request->ZipArchive->OVERWRITE) === TRUE)
+		{
+		$this->request->ZipArchiveaddFile('image.txt');//假设加入的文件名是image.txt，在当前路径下
+		$this->request->ZipArchiveclose();
+		} */ 
+	
+	
+		$this->request->flash();
+		 $product_id=$this->request->product_id;
+		//echo $product_id;exit;
+	 if($this->request->hasFile('map1')){
+			$file = $this->request->file('map1');
+			
+			$pimagename=time();
+			$path='storage/uploads/'.$pimagename;
+			
+			
+			if(is_dir($path)){
+				 
+				}else{
+				mkdir(iconv("UTF-8", "GBK", $path),0777,true);
+				if(is_dir($path)){
+				$file->move($path);
+				$file=scandir($path);
+				$clientName = $file -> getClientOriginalName();	
+				rename($path.$clientName,$path.$file['2']);		
+				 
+				}else{
+				 
+				}
+			}
+			 
+			}
+		 $file = $this->request->file('map1'); 
+	 
+		 
+		 
+        
+
+        return redirect(route('product.index'));
+    }
+
 
 
     /**

@@ -1,5 +1,12 @@
+ 
 @extends('common.form')
 @section('title') 添加图片 @stop
+@section('meta')
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @stop
+ 
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
@@ -8,20 +15,37 @@
     </ol>
 @stop
 @section('formTitle') 添加图片 @stop
-@section('formAction') {{ route('product.update', ['id' => $product->id]) }} @stop
+@section('formAction')  /product/image_update @stop
 @section('formBody')
-    <input type="hidden" name="_method" value="PUT"/>
+    <!-- <input type="hidden" name="_method" value="POST"/>
+    <input type="hidden" name="_enctype" value="multipart/form-data"/>
+   <input type="hidden" name="_token" value="{{ csrf_token() }}">-->
     <div class="form-group">
-        <label for="brand_id">产品名</label>
-         
+        <label for="brand_id">产品名:{{$product->size}}</label>
+        <input  type="hidden" name='product_id'  value='{{$product->id}}'/>
+    </div>	
+    <div class="form-group">
+        <label for="size">供应商提供的RUL：</label>
+        <input  class="form-control" id="size" placeholder="供应商提供的RUL" name='suppliers_url'  />
     </div>
     <div class="form-group">
-        <label for="size">型号</label>
-        <input class="form-control" id="size" placeholder="型号" name='size' value="{{ old('size') ?  old('size') : $product->size }}">
+        <label for="color">图片类型：</label>
+         <select id="brand_id" class="form-control" name="image_type">
+            @foreach($image_type as $item) 
+                <option value="{{ $item }}" >{{ $item }}</option>
+            @endforeach
+        </select>
+    </div>           
+    <div class="form-group">
+    <label for="color">上传图片：</label>
+        <input  type="file" name='map1'/>
     </div>
     <div class="form-group">
-        <label for="color">颜色</label>
-        <input class="form-control" id="color" placeholder="颜色" name='color' value="{{ old('color') ?  old('color') : $product->color }}">
-    </div>
+    <label for="color">导入压缩包：</label>
+        <input  type="file" name='zip'/>
+    </div>         
 @stop
-  
+ 
+ 
+ 
+ 

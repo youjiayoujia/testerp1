@@ -16,7 +16,7 @@ Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index
 Route::resource('product/addimage', 'productController@addimage');
 Route::resource('product', 'productController');
 Route::resource('brand', 'brandController');
-
+Route::post('product/image_update', 'productController@image_update');
 
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');

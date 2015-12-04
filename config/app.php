@@ -107,7 +107,7 @@ return [
     | this array to grant expanded functionality to your applications.
     |
     */
-
+	'Zipper' => 'Chumper\Zipper\Zipper',
     'providers' => [
 
         /*
@@ -149,7 +149,7 @@ return [
          * Debugbar
          */
         Barryvdh\Debugbar\ServiceProvider::class,
-
+		Chumper\Zipper\ZipperServiceProvider::class,
     ],
 
     /*

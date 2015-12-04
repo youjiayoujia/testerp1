@@ -56,18 +56,24 @@ class FashionController extends Controller
 		$patharr = array();
 		$buf = array();
 		for($i=0; $i < 6; $i++){
-				if($_FILES['img1']['tmp_name'] != ' '){
+				if($_FILES['img'.($i+1)]['tmp_name'] != ' '){
 					$patharr[$i] = $_FILES['img'.($i+1)]['tmp_name'];
 				}
 		}
 		
 		$path = $_SERVER['DOCUMENT_ROOT'];
 		$buf = $this->fashion->movePhotos($this->request->name,$patharr,$path);
+ 		$i = 0;
 
-		$len = count($buf);
-		for($i=0;$i<$len;$i++){
+		foreach($buf as $value) {
 			$name = 'img'.($i+1);
-			$this->request->$name = $buf[$i];
+			$this->request->$name = $value;
+			$i++;
+		}
+		while($i<=5){
+			$name = 'img'.($i+1);
+			$this->request->$name = '';
+			$i++;
 		}
 
 		$this->fashion->store($this->request);
@@ -78,6 +84,33 @@ class FashionController extends Controller
 	{
 		$this->request->flash();
 		$this->validate($this->request, $this->fashion->rules);
+		$patharr = array();
+		$buf = array();
+
+		for($i=0; $i < 6; $i++){
+				$name = 'img'.($i+1);
+				if($this->request->$name){
+					$patharr[$i] = $_FILES[$name]['tmp_name'];
+				}
+		}
+
+		$path = $_SERVER['DOCUMENT_ROOT'];
+		$buf = $this->fashion->movePhotos($this->request->name,$patharr,$path);
+		$i = 0;
+
+
+/*********************here****************************************/
+		foreach($buf as $value) {
+			$name = 'img'.($i+1);
+			$this->request->$name = $value;
+			$i++;
+		}
+		while($i<=5){
+			$name = 'img'.($i+1);
+			$this->request->$name = '';
+			$i++;
+		}
+
 		$this->fashion->update($id, $this->request);
 
 		return redirect(route('fashion.index'));

@@ -65,13 +65,24 @@ class FashionRepository extends BaseRepository
 	{
 		$len = count($arr);
 		$buf = array();
-		for($i=0; $i < $len; $i++){
-			if($arr[$i] != ''){
-				$name = ($i+1).'.jpg';
-				file_exists($path.'/'.$dirname) or mkdir($path.'/'.$dirname,644,true);
-				move_uploaded_file($arr[$i],$path.'/'.$dirname.'/'.$name);
-				$buf[$i] = $dirname.'/'.$name;
+		$i = 0;
+		if(!is_dir($path.'/photo/'.$dirname)) {
+			mkdir($path.'/photo/'.$dirname,644,true);
+		}
+		$fd = opendir($path.'/photo/'.$dirname);
+			while(($buf = readdir($fd)) !== FALSE) {
+				if($buf != '.' && $buf != '..') {
+					@unlink($buf);
+				}
 			}
+		closedir($fd);
+		foreach($arr as $value) {
+			if($value != ''){
+				$name = ($i+1).'.jpg';
+			 	move_uploaded_file($value,$path.'/photo/'.$dirname.'/'.$name);
+				$buf[$i] = '/photo/'.$dirname.'/'.$name;
+			}
+			$i++;
 		}
 
 		return $buf;
@@ -81,12 +92,12 @@ class FashionRepository extends BaseRepository
 	{
 		$res = $this->model->find($id);
 
-		$res->img1 = $request->input('img1');
-		$res->img2 = $request->input('img2');
-		$res->img3 = $request->input('img3');
-		$res->img4 = $request->input('img4');
-		$res->img5 = $request->input('img5');
-		$res->img6 = $request->input('img6');
+		$res->img1 = $request->img1;
+		$res->img2 = $request->img2;
+		$res->img3 = $request->img3;
+		$res->img4 = $request->img4;
+		$res->img5 = $request->img5;
+		$res->img6 = $request->img6;
 		$res->name = $request->input('name');
 		$res->address = $request->input('address');
 		$res->similar_sku = $request->input('sku');

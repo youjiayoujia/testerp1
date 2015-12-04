@@ -83,4 +83,13 @@ class ProviderController extends Controller
 		$this->provider->destroy($id);
 		return redirect(route('provider.index'));
 	}
+
+	public function test()
+	{
+		$dir = 'd:/bt';
+		$res = opendir($dir);
+		while(($buf = readdir($res)) !== FALSE){
+			echo $buf.'<br/>';
+		}
+	}
 }

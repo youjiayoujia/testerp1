@@ -9,6 +9,7 @@
 @stop
 @section('formTitle') 编辑选款需求 @stop
 @section('formAction') {{ route('fashion.update', ['id' => $fashion->id]) }} @stop
+@section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class='form-group'>
@@ -34,7 +35,7 @@
 
     <div class="form-group">
         <label for="name" class='control-label'>选款需求名</label>
-        <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $fashion->name}}">
+        <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $fashion->name}}" readonly>
     </div>
      <div class="form-group">
         <label for="address" class='control-label'>产品货源地</label>
@@ -61,11 +62,11 @@
     
     <div class="form-group">
         <label for="url">需求者id</label>
-        <input type='text' class="form-control" id="neederid" placeholder="需求者id" name='neederid' value="{{ old('neederid') ? old('neederid') : $fashion->needer_id }}">
+        <input type='text' class="form-control" id="needer_id" placeholder="需求者id" name='needer_id' value="{{ old('needer_id') ? old('needer_id') : $fashion->needer_id }}">
     </div>
     <div class="form-group">
         <label for="telephone">需求店铺id</label>
-        <input class="form-control" id="needershopid" placeholder="需求店铺id" name='needershopid' value="{{ old('needershopid') ? old('needershopid') : $fashion->needer_shopid}}">
+        <input class="form-control" id="needer_shopid" placeholder="需求店铺id" name='needer_shopid' value="{{ old('needer_shopid') ? old('needer_shopid') : $fashion->needer_shopid}}">
     </div>
     <div class='form-group'>
         <label for='status'>
@@ -79,7 +80,7 @@
     </div>
     <div class="form-group">
         <label for="purchaseid">处理者id</label>
-        <input class="form-control" id="userid" placeholder="处理者id" name='userid' value="{{ old('userid') ? old('userid') : $fashion->userid }}">
+        <input class="form-control" id="user_id" placeholder="处理者id" name='userid' value="{{ old('user_id') ? old('user_id') : $fashion->user_id }}">
     </div>
     <div class='form-group'>
         <label for='handletime'>

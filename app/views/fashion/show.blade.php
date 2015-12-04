@@ -14,6 +14,32 @@
             <dl class="dl-horizontal">
                 <dt>ID</dt>
                 <dd>{{ $fashion->id }}</dd>
+                
+                @if($fashion->img1)
+                    <dt>图片1{{ $fashion->img1 }}</dt>
+                  <dd><img src="{{ $fashion->img1 }}" alt='' class='img-rounded' width='170px' height='100px'/></dd> 
+                @endif
+                 @if($fashion->img2)
+                    <dt>图片2{{ $fashion->img2 }}</dt>
+                  <dd><img src="{{ $fashion->img2 }}" alt='' class='img-rounded' width='170px' height='100px'/></dd> 
+                @endif
+                @if($fashion->img3)
+                    <dt>图片3{{ $fashion->img3 }}</dt>
+                  <dd><img src="{{ $fashion->img3 }}" alt='' class='img-rounded' width='170px' height='100px'/></dd> 
+                @endif
+                @if($fashion->img4)
+                    <dt>图片4{{ $fashion->img4 }}</dt>
+                  <dd><img src="{{ $fashion->img4 }}" alt='' class='img-rounded' width='170px' height='100px'/></dd> 
+                @endif
+                @if($fashion->img5)
+                    <dt>图片5{{ $fashion->img5 }}</dt>
+                  <dd><img src="{{ $fashion->img5 }}" alt='' class='img-rounded' width='170px' height='100px'/></dd> 
+                @endif
+                @if($fashion->img6)
+                    <dt>图片6{{ $fashion->img6 }}</dt>
+                  <dd><img src="{{ $fashion->img6 }}" alt='' class='img-rounded' width='170px' height='100px'/></dd> 
+                @endif
+
                 <dt>选款需求名</dt>
                 <dd>{{ $fashion->name }}</dd>
                 <dt>货物源地址</dt>

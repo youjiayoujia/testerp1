@@ -13,11 +13,13 @@
 
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
-Route::resource('product/addimage', 'productController@addimage');
+Route::resource('product/addzip', 'productController@addzip');
 Route::resource('product', 'productController');
 Route::resource('brand', 'brandController');
+Route::get('product/addimage/{id}', 'productController@addimage');
+//Route::get('product/addzip/{id}', 'productController@addzip');
 Route::post('product/image_update', 'productController@image_update');
-
+Route::get('product/product_image_ajax', 'productController@product_image_ajax');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');

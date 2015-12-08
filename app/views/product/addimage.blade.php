@@ -25,12 +25,12 @@
         <input  type="hidden" name='product_id'  value='{{$product->id}}'/>
     </div>	
     <div class="form-group">
-        <label for="size">供应商提供的RUL：</label>
+        <label for="size">供应商提供的URL：</label>
         <input  class="form-control" id="size" placeholder="供应商提供的RUL" name='suppliers_url'  />
     </div>
     <div class="form-group">
         <label for="color">图片类型：</label>
-         <select id="brand_id" class="form-control" name="image_type">
+         <select id="brand_id" class="form-control" name="type">
             @foreach($image_type as $item) 
                 <option value="{{ $item }}" >{{ $item }}</option>
             @endforeach
@@ -38,12 +38,19 @@
     </div>           
     <div class="form-group">
     <label for="color">上传图片：</label>
-        <input  type="file" name='map1'/>
+        <input   name='map0' type='file' />
+        <input   name='map1' type='file' />
+        <input   name='map2' type='file' />
+        <input   name='map3' type='file' />
+        <input   name='map4' type='file' />
+        <input   name='map5' type='file' />
     </div>
     <div class="form-group">
     <label for="color">导入压缩包：</label>
         <input  type="file" name='zip'/>
-    </div>         
+    </div>
+     
+             
 @stop
  
  

@@ -54,6 +54,12 @@ return [
                 'url' => 'product.create',
                 'icon' => '',
             ],
+			/*[
+                'name' => '上传压缩包',
+                'location' => 'addzip',
+                'url' => 'product.addzip',
+                'icon' => '',
+            ],*/
         ],
     ],
     [

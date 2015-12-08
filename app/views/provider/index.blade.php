@@ -13,12 +13,14 @@
         <tr>
             <td>{{ $provider->id }}</td>
             <td>{{ $provider->name }}</td>
+            <td>{{ $provider->detail_address}}</td>
             <td>{{ $provider->address }}</td>
-            <td>{{ $provider->isonline_provider }}</td>
+            <td>{{ $provider->type }} </td>
             <td>{{ $provider->url }}</td>
             <td>{{ $provider->telephone }}</td>
             <td>{{ $provider->purchase_id }}</td>
             <td>{{ $provider->level }}</td>
+            <td>{{ $provider->created_by}}</td>
             <td>{{ $provider->created_at }}</td>
             <td>
                 <a href="{{ route('provider.show', ['id'=>$provider->id]) }}" class="btn btn-info btn-xs">

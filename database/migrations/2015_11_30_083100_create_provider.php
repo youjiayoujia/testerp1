@@ -22,13 +22,15 @@ class CreateProvider extends Migration
     {
         Schema::create('providers', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name',128)->comment('供货商名字')->default(NULL);
+            $table->string('name',128)->comment('供货商名称')->default(NULL);
+            $table->string('detail_address')->comment('供货商地址/省/市')->default(NULL);
             $table->string('address')->comment('供货商地址，经纬度')->default(NULL);
-            $table->enum('isonline_provider',[0, 1])->comment('是否是线上供货商')->default(1);
+            $table->enum('type',['online','offline'])->comment('是否是线上供货商')->default('offline');
             $table->string('url',128)->comment('供货商url')->default(NULL);
             $table->string('telephone')->comment('供货商联系方式')->default(NULL);
             $table->integer('purchase_id')->comment('采购员id')->default(NULL);
             $table->enum('level',[1,2,3,4,5])->comment('供货商评级')->default(3);
+            $table->integer('created_by')->comment('创建人id')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

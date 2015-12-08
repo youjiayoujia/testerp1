@@ -98,20 +98,20 @@ return [
     ],
     [
         'name' => '选款需求',
-        'location' => 'fashion',
+        'location' => 'productRequire',
         'icon' => 'tags',
         'url' => '',
         'subnavigations' => [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'fashion.index',
+                'url' => 'productRequire.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增',
                 'location' => 'create',
-                'url' => 'fashion.create',
+                'url' => 'productRequire.create',
                 'icon' => '',
             ],
         ],

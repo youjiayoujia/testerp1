@@ -74,19 +74,22 @@ class productRequireRepository extends BaseRepository
 				$file = $request->file('img'.$i);
 				$path = Config::get('product_require_img_path.dir')."/".$id;
 				file_exists($path) or mkdir($path, 644, true);
-				unlink($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+				if(file_exists($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'))))
+					unlink($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
 				$file->move($path,$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+				$name = 'img'.$i;
+				$res->$name = "/".$path."/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'));
 			}
 		}
-		$this->model->name = $request->input('name');
-		$this->model->address = $request->input('province')." ".$request->input('city');
-		$this->model->similar_sku = $request->input('sku');
-		$this->model->competition_url = $request->input('url');
-		$this->model->remark = $request->input('remark');
-		$this->model->expected_date = $request->input('expdate');
-		$this->model->needer_id = $request->input('needer_id');
-		$this->model->needer_shop_id = $request->input('needer_shop_id');
-		$this->model->created_by = $request->input('created_by');
+		$res->name = $request->input('name');
+		$res->address = $request->input('province')." ".$request->input('city');
+		$res->similar_sku = $request->input('sku');
+		$res->competition_url = $request->input('url');
+		$res->remark = $request->input('remark');
+		$res->expected_date = $request->input('expdate');
+		$res->needer_id = $request->input('needer_id');
+		$res->needer_shop_id = $request->input('needer_shop_id');
+		$res->created_by = $request->input('created_by');
 
 		return $res->save();
 	}

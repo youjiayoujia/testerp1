@@ -53,7 +53,7 @@ class ProviderRepository extends BaseRepository
 	public function store($request)
 	{
 		$this->model->name = $request->input('name');
-		$this->model->detail_address = $request->input('province').$request->input('city');
+		$this->model->detail_address = $request->input('province')." ".$request->input('city');
 		$this->model->address = $request->input('address');
 		$this->model->type = $request->input('online') == '0' ? 'offline' : 'online';
 		$this->model->url = $request->input('url');
@@ -77,7 +77,7 @@ class ProviderRepository extends BaseRepository
 		$res = Provider::find($id);
 
 		$res->name = $request->input('name');
-		$res->detail_address = $request->input('province').$request->input('city');
+		$res->detail_address = $request->input('province').' '.$request->input('city');
 		$res->address = $request->input('address');
 		$res->type = $request->input('online') == '0' ? 'offline' : 'online';
 		$res->url = $request->input('url');

@@ -8,11 +8,7 @@
     </ol>
 @stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
-<script type='text/javascript'>
-    window.onload = function(){
-        init();
-    };
-</script>
+
 @section('formTitle') 编辑供货商 @stop
 @section('formAction') {{ route('provider.update', ['id' => $product->id]) }} @stop
 @section('formAttributes') name='creator' @stop
@@ -37,16 +33,16 @@
         <label for="online">是否是线上供货商(否/是)</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='online' value='0' checked>0
+                <input type='radio' name='online' value='0' {{$product->type  == 'offline' ? 'checked' : ''}}>0
             </label>   
         </div>
         <div class='radio'>
             <label>
-                <input type='radio' name='online' value='1'>1
+                <input type='radio' name='online' value='1' {{$product->type == 'online' ? 'checked' : ''}}>1
             </label>
         </div>
     </div>
-     <div class="form-group">
+     <div class="form-group"
         <label for="url">线上供货商网址</label>
         <input type='text' class="form-control" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $product->url }}">
     </div> 
@@ -59,13 +55,13 @@
         <input type='text' class="form-control" id="purchaseid" placeholder="采购员id" name='purchaseid' value="{{ old('purchaseid') ?  old('purchaseid') : $product->purchase_id }}">
     </div> 
     <div class="form-group">
-        <label for="level">]评级</label>
-        <select name='level' class='form-control'>
-        <option value='1'>1</option>
-        <option value='2'>2</option>
-        <option value='3'>3</option>
-        <option value='4'>4</option>
-        <option value='5'>5</option>
+        <label for="level">评级</label>
+        <select id='level' name='level' class='form-control' >
+        <option value='1' {{ $product->level == '1' ? 'selected' : ''}}>1</option>
+        <option value='2' {{ $product->level == '2' ? 'selected' : ''}}>2</option>
+        <option value='3' {{ $product->level == '3' ? 'selected' : ''}}>3</option>
+        <option value='4' {{ $product->level == '4' ? 'selected' : ''}}>4</option>
+        <option value='5' {{ $product->level == '5' ? 'selected' : ''}}>5</option>
         </select>
    </div>
    <div class='form-group'>
@@ -75,3 +71,10 @@
         <input class='form-control' type='text' value='' name='created_by' id = 'created_by' readonly/>
    </div>
 @stop
+<script type='text/javascript'>
+    window.onload = function(){
+        var buf = new Array();
+        buf = "{{ $product->detail_address }}".split(' ');
+        init(buf[0],buf[1]);
+    };
+</script>

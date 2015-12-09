@@ -8,7 +8,9 @@
         <li class="active"><strong>添加选款需求</strong></li>
     </ol>
 @stop
-    <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
+    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+    <script src="{{ asset('js/pro_city.js') }}"></script>
 
 @section('formTitle') 添加选款需求 @stop
 @section('formAction') {{ route('productRequire.store') }} @stop
@@ -54,10 +56,8 @@
         <input type='text' class="form-control" id="remark" placeholder="需求备注" name='remark' value="{{ old('remark') }}">
     </div>
     <div class='form-group'>
-        <label for='expdate'>
-            期望上传时间
-        </label>
-        <input type='date' name='expdate' id='expdate'>
+        <label for="expdate">期望上传日期</label>
+        <input id="expdate" name='expdate' type="text">
     </div>
     
     <div class="form-group">
@@ -73,6 +73,10 @@
         <input class="form-control" id="created_by" placeholder="创建人" name='created_by' value="{{ old('created_by') }}" readonly>
     </div>
 @stop
+
 <script type='text/javascript'>
-    window.onload = init;
+    $(document).ready(function(){
+        init();
+        $('#expdate').cxCalendar();
+    });
 </script>

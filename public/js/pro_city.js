@@ -63,6 +63,10 @@ function select()
 
 function init() 
 {
+	if(arguments.length == 2) {
+		where[0].loca = arguments[0];
+		where[0].locacity = arguments[1];
+	}
 	with(document.creator.province) 
 	{
 		length = where.length;
@@ -71,11 +75,12 @@ function init()
 			options[k].text = where[k].loca; 
 			options[k].value = where[k].loca; 
 		}
-		options[selectedIndex].text =where[0].loca;
-		options[selectedIndex].value =where[0].loca;
+		options[selectedIndex].text = where[0].loca;
+		options[selectedIndex].value = where[0].loca;
 	}
 	with(document.creator.city) 
 	{
+
 		loca3 = (where[0].locacity).split("|");
 		length = loca3.length;
 		for(l=0;l<length;l++) 
@@ -83,7 +88,7 @@ function init()
 			options[l].text = loca3[l]; 
 			options[l].value = loca3[l]; 
 		}
-		options[selectedIndex].text =loca3[0]; 
-		options[selectedIndex].value =loca3[0];
+		options[selectedIndex].text = loca3[0]; 
+		options[selectedIndex].value = loca3[0];
 	}
 }

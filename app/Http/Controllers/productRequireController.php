@@ -16,132 +16,131 @@ use App\Repositories\productRequireRepository;
 
 class productRequireController extends Controller
 {
-	protected $productRequire;
+    protected $productRequire;
 
-	function __construct(Request $request, productRequireRepository $productRequire)
-	{
-		$this->request = $request;
-		$this->productRequire = $productRequire;
-	}
+    function __construct(Request $request, productRequireRepository $productRequire)
+    {
+        $this->request = $request;
+        $this->productRequire = $productRequire;
+    }
 
-	/*
-	*
-		@ func 显示主界面 
-		@ view/index 传参，columns和data
+    /**
+     *
+     * @ func 显示主界面
+     * @ view/index 传参，columns和data
+     *
+     * @1:50pm
+     *
+     */
+    public function index()
+    {
+        $this->request->flash();
+        $response = [
+            'columns' => $this->productRequire->column,
+            'data' => $this->productRequire->index($this->request),
+        ];
 
-		@1:50pm
-	*
-	*/
-	public function index()
-	{
-		$this->request->flash();
-		$response = [
-			'columns' => $this->productRequire->column,
-			'data' => $this->productRequire->index($this->request),
-		];
+        return view('productRequire.index', $response);
+    }
 
-		return view('productRequire.index', $response);
-	}
+    /**
+     *
+     * @func   显示需求详细信息
+     * @ view/show  传参response
+     *
+     * @ 1:50am
+     *
+     */
 
-	/*
-	*
-		@func   显示需求详细信息
-		@ view/show  传参response 
+    public function show($id)
+    {
+        $response = [
+            'productRequire' => $this->productRequire->detail($id),
+        ];
 
-		@ 1:50am
-	*
-	*/
+        return view('productRequire.show', $response);
+    }
 
-	public function show($id)
-	{
-		$response = [
-			'productRequire' => $this->productRequire->detail($id),
-		];
-
-		return view('productRequire.show', $response);
-	}
-
-	/*
-	*
-		@func 创建记录
-		@retrun view/create
-
-		@1:53pm
-	*
-	*/
-	public function create()
-	{
-		return view('productRequire.create');
-	}
+    /**
+     *
+     * @func 创建记录
+     * @retrun view/create
+     *
+     * @1:53pm
+     *
+     */
+    public function create()
+    {
+        return view('productRequire.create');
+    }
 
 
-	/*
-	*
-		@func 保存记录
-		@转移图片存储位置，返回路径
+    /**
+     *
+     * @func 保存记录
+     * @转移图片存储位置，返回路径
+     *
+     * @ 1:50pm
+     *
+     */
+    public function store()
+    {
+        $this->request->flash();
+        $this->validate($this->request, $this->productRequire->rules);
+        $this->productRequire->store($this->request);
+        
+        return redirect(route('productRequire.index'));
+    }
 
-		@ 1:50pm
-	*
-	*/
-	public function store()
-	{
-		$this->request->flash();
+    /*
+    *
+        @func 更新数据
+        @param $id 数据的id
 
-		$this->validate($this->request, $this->productRequire->rules);
+        @13:57pm
+    *
+    */
 
-		$this->productRequire->store($this->request);
-		return redirect(route('productRequire.index'));
-	}
+    public function update($id)
+    {
+        $this->request->flash();
+        $this->validate($this->request, $this->productRequire->rules);
+        $this->productRequire->update($id, $this->request);
+        return redirect(route('productRequire.index'));
+    }
 
-	/*
-	*
-		@func 更新数据
-		@param $id 数据的id
+    /*
+    *
+        @func 编辑需求
+        @ param id 数据记录的id
 
-		@13:57pm
-	*
-	*/
+        @return view/edit
+        @1:50pm
+    *
+    */
+    public function edit($id)
+    {
+        $response = [
+            'productRequire' => $this->productRequire->edit($id),
+        ];
 
-	public function update($id)
-	{
-		$this->request->flash();
-		$this->validate($this->request, $this->productRequire->rules);
-		$this->productRequire->update($id, $this->request);
-		return redirect(route('productRequire.index'));
-	}
+        return view('productRequire.edit', $response);
+    }
 
-	/*
-	*
-		@func 编辑需求
-		@ param id 数据记录的id
+    /*
+    *
+        @func 删除一条记录
+        @param  $id  记录的id
 
-		@return view/edit
-		@1:50pm
-	*
-	*/
-	public function edit($id)
-	{
-		$response = [
-			'productRequire' => $this->productRequire->edit($id),
-		];
+        @return view/destroy
+    *
+    */
 
-		return view('productRequire.edit', $response);
-	}
+    public function destroy($id)
+    {
+        $this->fashion->destroy($id);
 
-	/*
-	*
-		@func 删除一条记录
-		@param  $id  记录的id
-
-		@return view/destroy
-	*
-	*/
-
-	public function destroy($id)
-	{
-		$this->fashion->destroy($id);
-
-		return redirect(route('productRequire.index'));
-	}
+        return redirect(route('productRequire.index'));
+    }
 
 }

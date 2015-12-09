@@ -13,6 +13,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\ProductRepository;
+use Chumper\Zipper\Zipper;
  
 
 class ProductController extends Controller
@@ -255,22 +256,38 @@ class ProductController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	public function decompression($path){
-		//echo $path;exit;
+		Zipper::extractTo($path);
+		echo $path;exit;
 		$this->request->flash();
-		$zip = $this->request->ZipArchive;//新建一个ZipArchive的对象
+		$zip = new ZipArchiveEx();//新建一个ZipArchive的对象
 		/*
 		通过ZipArchive的对象处理zip文件
 		$zip->open这个方法的参数表示处理的zip文件名。
 		如果对zip文件对象操作成功，$zip->open这个方法会返回TRUE
 		*/
-		if ($this->request->open($path) === TRUE) 
+		///echo 1111;exit;
+		if ($zip->open($path, ZIPARCHIVE::OVERWRITE) === TRUE) 
 		{
-		$this->request->extractTo('storage/uploads/product/');//假设解压缩到在当前路径下images文件夹的子文件夹php
-		$this->request->close();//关闭处理的zip文件
+			$this->request->extractTo('storage/uploads/product/');//假设解压缩到在当前路径下images文件夹的子文件夹php
+			$this->request->close();//关闭处理的zip文件
 		}
 		}
 	public function zip_upload(){
 		$this->request->flash();
-		
+		$type=$this->request->type;
+		$path='storage/uploads/zip/';
+		$file = $this->request->file('zip');
+		if($this->request->hasFile('zip')){
+			$clientName = $file -> getClientOriginalName();
+			$suffix=substr(strrchr($clientName, '.'), 1);
+				if($suffix == 'zip' || $suffix == 'rar' || $suffix == '7z' || $suffix == 'cab'){	
+				 			
+				$nownanme=$product_id.$type.'.'.$suffix; 
+				$file->move($path,$nownanme);
+				$path='storage/uploads/zip/'.$nownanme;	
+				$this->decompression($path);
+				}
+				
+			}
 		}
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class ProductModel extends BaseModel
+class Product extends BaseModel
 {
 
     /**
@@ -19,11 +19,15 @@ class ProductModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['size'];
+    protected $fillable = ['name', 'c_name'];
 
     public function brand()
     {
         return $this->belongsTo('App\Models\BrandModel');
     }
 
+    public function getList()
+    {
+        return $this->paginate(15);
+    }
 }

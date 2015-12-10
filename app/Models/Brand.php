@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class BrandModel extends BaseModel
+class Brand extends BaseModel
 {
 
     /**

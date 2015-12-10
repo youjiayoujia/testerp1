@@ -43,16 +43,11 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <table class="table table-bordered table-striped table-hover">
-                            @section('tableColumns')
-                                <thead>
-                                <tr>
-                                    @foreach($columns as $column)
-                                        <th>{{ trans(Request::segment(1).'.'.$column) }}</th>
-                                    @endforeach
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                            @show{{-- 列表字段 --}}
+                            <thead>
+                            <tr>
+                                @section('tableHeader')@show{{-- 列表字段 --}}
+                            </tr>
+                            </thead>
                             <tbody>
                             @section('tableBody')@show{{-- 列表数据 --}}
                             </tbody>

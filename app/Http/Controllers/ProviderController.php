@@ -120,6 +120,7 @@ class ProviderController extends Controller
 	public function update($id)
 	{
 		$this->request->flash();
+		$this->provider->rules['name'] .= ','.$id;
 		$this->validate($this->request, $this->provider->rules);
 		$this->provider->update($id, $this->request);
 

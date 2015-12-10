@@ -51,7 +51,7 @@
     </div>
     <div class="form-group">
         <label for="purchaseid">采购员</label>
-        <input class="form-control" id="purchaseid" placeholder="采购者id" name='purchaseid' value="{{ old('purchase') }}">
+        <input class="form-control" id="purchaseid" placeholder="采购者id" name='purchaseid' value="{{ old('purchaseid') }}">
     </div>
     <div class="form-group">
         <label for="level">供货商评级</label>

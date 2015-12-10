@@ -31,7 +31,7 @@ class ProviderRepository extends BaseRepository
 	*
 	*/
 	public $rules = [
-		'name' => 'required|max:128|',
+		'name' => 'required|max:128|unique:providers,name',
 		'address' => 'required|max:256',
 		'url' => 'required|max:256|active_url',
 		'telephone' => 'required|max:256|digits_between:8,11',

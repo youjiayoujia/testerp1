@@ -104,6 +104,7 @@ class productRequireController extends Controller
     public function update($id)
     {
         $this->request->flash();
+        $this->productRequire->rules['name'] .= ','.$id;
         $this->validate($this->request, $this->productRequire->rules);
         $this->productRequire->update($id, $this->request);
         return redirect(route('productRequire.index'));

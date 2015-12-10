@@ -17,6 +17,8 @@ Route::resource('product', 'productController');
 Route::resource('brand', 'brandController');
 Route::resource('provider', 'providerController');
 Route::resource('productRequire', 'productRequireController');
+Route::resource('warehouse', 'warehouseController');
+Route::resource('warehousePosition', 'warehousePositionController');
 
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');

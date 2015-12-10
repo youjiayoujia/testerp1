@@ -19,7 +19,7 @@ class productRequireRepository extends BaseRepository
 	protected $filters = ['name'];
 
 	public $rules = [
-		'name' => 'required|max:255,6',
+		'name' => 'required|max:255|unique:product_require,name',
 		'competition_url' => 'active_url',
 		'needer_id' => 'required',
 		'needer_shop_id' => 'required',

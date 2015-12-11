@@ -74,21 +74,34 @@ class ProductRepository extends BaseRepository
 	
 	
 	/**
-     * 更新指定ID产品
+     * 上传产品图片
      *
      * @param int $id 产品ID
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function update_image($image_path,$request)
-    {
-        $this->pmodel->type = $request-> type;
-        $this->pmodel->product_id = $request-> product_id;
+    public function store_image($image_path,$product_id,$type)
+    {	$this->pmodel=new Product_image;
+        $this->pmodel->type = $type;
+        $this->pmodel->product_id = $product_id;
         $this->pmodel->user_id = 1;
         $this->pmodel->image_path = $image_path;
         return $this->pmodel->save();
     }
-
+	    /**
+     * 更新产品图片
+     *
+     * @param int $id 产品ID
+     * @param object $request HTTP请求对象
+     * @return bool
+     */
+    public function update_image($id, $image_path)
+    {	
+        $product_images=$this->pmodel->find($id);
+        $product_images->user_id = 1;
+        $product_images->image_path = $image_path;
+        return $product_images->save();
+    }
 
 
 	 /**

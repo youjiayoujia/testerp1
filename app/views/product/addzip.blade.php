@@ -15,17 +15,9 @@
     </ol>
 @stop
 @section('formTitle') 添加图片 @stop
-@section('formAction')  /product/image_update @stop
+@section('formAction')  /product/zip_upload @stop
 @section('formBody')
-    <div class="form-group">
-        <label for="color">图片类型：</label>
-         <select id="brand_id" class="form-control" name="type">
-            @foreach($image_type as $item) 
-                <option value="{{ $item }}" >{{ $item }}</option>
-            @endforeach
-        </select>
-    </div>           
-     
+ 
     <div class="form-group">
     <label for="color">导入压缩包：</label>
         <input  type="file" name='zip'/>

@@ -152,11 +152,8 @@ class ProductController extends Controller
      */
     public function addzip()
     {   
-		$image_type=['default','original','choies','aliexpress','amazon','ebay','wish','Lazada'];
-        $response = [
-            'image_type' => $image_type,
-        ];
-        return view('product.addzip', $response);
+		
+        return view('product.addzip');
     }
 
 /**
@@ -189,14 +186,16 @@ class ProductController extends Controller
 		 $this->request->flash();
 		 $product_id=$this->request->product_id;
 		 $type=$this->request->type;
-		/* $result=$this->product->getImage($product_id,$type); 
+		 $result=$this->product->getImage($product_id,$type); 
+		 $product_image_id=$result[0]->id;
+		 if($_POST['map1']){
 		 $path='storage/uploads/product/'.$product_id.'/'.$type.'/';
 		 if(!is_dir($path)){	
 		 	mkdir(iconv("UTF-8", "GBK", $path),0777,true);
 		 } 
-		 $image_path='';*/
+		 $image_path='';
 		 
-/*		 if(is_dir($path)){
+		 if(is_dir($path)){
 			 for($i=0;$i<6;$i++){
 			$file = $this->request->file('map'.$i);								
 			if($this->request->hasFile('map'.$i)){
@@ -204,15 +203,9 @@ class ProductController extends Controller
 				$suffix=substr(strrchr($clientName, '.'), 1);
 				if($suffix == 'jpg' || $suffix == 'jpeg' || $suffix == 'png' || $suffix == 'gif'){					
 				$nownanme=$product_id.$type.$i.'.'.$suffix;
-				//echo $nownanme;exit;
-				$is_image_upload=strpos($result['0']->image_path,$nownanme);
-				if($is_image_upload ==false)
-				{
+				 
 					$file->move($path,$nownanme);
-				}else{
-					echo '改图片已经上传过了！';
-					//return redirect(route('product.index')); 	
-				} 
+				 
 				if($i==0){
 				 $image_path=$path.$nownanme;
 				 }else{ 
@@ -224,28 +217,64 @@ class ProductController extends Controller
 				}else{
 					echo '请上传正确的格式！';exit;
 					}
-			}		 
+			}
+			 
+			if($product_image_id>0){
+			 
+			$this->product->update_image($product_image_id,$image_path);	
+			}else{	
+			$this->product->store_image($image_path,$product_id,$type);	
+			} 
 		 }else{
 			echo '文件夹创建失败！';exit; 
-		 }*/
-			$path='storage/uploads/zip/';
-			/*mkdir(iconv("UTF-8", "GBK", $path),0777,true);*/
-			$file = $this->request->file('zip');								
+		 } 
+		 }else{
+			$file = $this->request->file('zip');
+			$zip_path='storage/uploads/zip/';								
 			if($this->request->hasFile('zip')){
 				$clientName = $file -> getClientOriginalName();
-				 
-				$suffix=substr(strrchr($clientName, '.'), 1);
-				if($suffix == 'zip' || $suffix == 'rar' || $suffix == '7z' || $suffix == 'cab'){	
-				 			
+				$suffix=substr(strrchr($clientName, '.'), 1);			 
+				 if($clientName!=$product_id.'.'.$suffix){
+					 echo '请上传正确的文件压缩包！';exit;
+					 }
+				if($suffix == 'zip' || $suffix == 'rar' || $suffix == '7z' || $suffix == 'cab'){					 			
 				$nownanme=$product_id.$type.'.'.$suffix; 
-				$file->move($path,$nownanme);
-				$path='storage/uploads/zip/'.$nownanme;	
-				$this->decompression($path);
+				$file->move($zip_path,$nownanme);
+				$zippath='storage/uploads/zip/'.$nownanme;	
+				$path='storage/uploads/product/';
+				$res=$this->decompression($zippath,$path);
+				
+				  $dir_path=$path.$product_id.'/';
+				  $dir_name=$this->get_dirname($dir_path);
+				  foreach($dir_name as $key=>$value){
+					  $dir_path_type='storage/uploads/product/'.$product_id.'/'.$value.'/';
+					  $image_paths[$value]=$this->get_dirname($dir_path_type);	  
+					  }
+					 
+				 foreach($image_paths as $key=>$val){
+					 $type=$key;
+					 
+					 foreach($val as $k=>$v){
+						 if($k>0){
+						 $image_path=$path.$product_id.'/'.$key.'/'.$v.'#'.$image_path;
+						 }else{
+						 $image_path=$path.$product_id.'/'.$key.'/'.$v; 
+							 }
+						 }
+						 
+						 if($product_image_id>0){
+							$this->product->update_image($product_image_id,$image_path);	
+							}else{
+							$this->product->store_image($image_path,$product_id,$type);	
+							} 
+				 
+				 }
 				}
+				
 				}
 			 
+		 }
 		 
-		//$this->product->update_image($image_path,$this->request);
         return redirect(route('product.index'));
     }
 	
@@ -255,37 +284,68 @@ class ProductController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-	public function decompression($path){
-		Zipper::extractTo($path);
-		echo $path;exit;
+	public function decompression($zippath,$path){
 		$this->request->flash();
-		$zip = new ZipArchiveEx();//新建一个ZipArchive的对象
-		/*
-		通过ZipArchive的对象处理zip文件
-		$zip->open这个方法的参数表示处理的zip文件名。
-		如果对zip文件对象操作成功，$zip->open这个方法会返回TRUE
+		$zipper = new \Chumper\Zipper\Zipper;
+		$zipper->make($zippath)->extractTo($path);
+		//$patha=realpath($zippath);
+		//$root=chmod($patha, 0755);
+		//echo $root;exit;
+	 	//unlink($zippath);	 
+		}
+		/**
+		*获取文件名
+		*
 		*/
-		///echo 1111;exit;
-		if ($zip->open($path, ZIPARCHIVE::OVERWRITE) === TRUE) 
-		{
-			$this->request->extractTo('storage/uploads/product/');//假设解压缩到在当前路径下images文件夹的子文件夹php
-			$this->request->close();//关闭处理的zip文件
-		}
-		}
+	public function get_dirname($dir_path){
+		$dir=opendir($dir_path);
+		$dir_name=array();
+		while (($file = readdir($dir)) !== false)
+		  {
+		   if($file!='.' && $file!='..'){
+			  
+			  $dir_name[]=$file;
+			   }
+		  }
+		  closedir($dir);
+		  return $dir_name;
+		} 
+		
 	public function zip_upload(){
 		$this->request->flash();
-		$type=$this->request->type;
 		$path='storage/uploads/zip/';
 		$file = $this->request->file('zip');
 		if($this->request->hasFile('zip')){
 			$clientName = $file -> getClientOriginalName();
 			$suffix=substr(strrchr($clientName, '.'), 1);
 				if($suffix == 'zip' || $suffix == 'rar' || $suffix == '7z' || $suffix == 'cab'){	
-				 			
-				$nownanme=$product_id.$type.'.'.$suffix; 
-				$file->move($path,$nownanme);
-				$path='storage/uploads/zip/'.$nownanme;	
-				$this->decompression($path);
+				$file->move($path,$clientName);
+				$zippath='storage/uploads/zip/'.$clientName;	
+				$path='storage/uploads/';
+				$res=$this->decompression($zippath,$path);
+				$product_ids=$this->get_dirname($path.'product/');
+				foreach($product_ids as $key=>$value){
+					$product_image_types=$this->get_dirname($path.'product/'.$value.'/');
+			
+					foreach($product_image_types as $key=>$val){
+						$product_image_paths=$this->get_dirname($path.'product/'.$value.'/'.$val.'/');
+						 $result=$this->product->getImage($value,$val); 
+		 				$product_image_id=$result[0]->id;
+						foreach($product_image_paths as $num=>$v){
+							if($num>0){
+						 $image_path=$path.'product/'.$value.'/'.$val.'/'.$v.'#'.$image_path ;
+						}else{
+							$image_path=$path.'product/'.$value.'/'.$val.'/'.$v;
+							}
+						} 
+						if($product_image_id>0){
+							$this->product->update_image($product_image_id,$image_path);	
+							}else{
+							 $res=$this->product->store_image($image_path,$value,$val);	
+							} 
+						}
+					}
+					 
 				}
 				
 			}

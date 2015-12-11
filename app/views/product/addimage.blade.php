@@ -18,8 +18,8 @@
 @section('formAction')  /product/image_update @stop
 @section('formBody')
     <!-- <input type="hidden" name="_method" value="POST"/>
-    <input type="hidden" name="_enctype" value="multipart/form-data"/>
-   <input type="hidden" name="_token" value="{{ csrf_token() }}">-->
+    <input type="hidden" name="_enctype" value="multipart/form-data"/>-->
+   <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <div class="form-group">
         <label for="brand_id">产品名:{{$product->size}}</label>
         <input  type="hidden" name='product_id'  value='{{$product->id}}'/>

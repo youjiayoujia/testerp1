@@ -12,14 +12,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\ProductRepository;
-
+use App\Models\Product;
 
 class ProductController extends Controller
 {
     protected $product;
 
-    public function __construct(Request $request, ProductRepository $product)
+    public function __construct(Request $request, Product $product)
     {
         $this->request = $request;
         $this->product = $product;
@@ -34,8 +33,7 @@ class ProductController extends Controller
     {
         $this->request->flash();
         $response = [
-            'columns' => $this->product->columns,
-            'data' => $this->product->index($this->request),
+            'data' => $this->product->getList(),
         ];
 
         return view('product.index', $response);
@@ -50,7 +48,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $response = [
-            'product' => $this->product->detail($id),
+            'product' => $this->product->findOrFail($id),
         ];
 
         return view('product.show', $response);
@@ -63,11 +61,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $response = [
-            'brands' => $this->product->getBrands()
-        ];
-
-        return view('product.create', $response);
+        return view('product.create');
     }
 
     /**
@@ -78,8 +72,16 @@ class ProductController extends Controller
     public function store()
     {
         $this->request->flash();
-        $this->validate($this->request, $this->product->rules);
-        $this->product->store($this->request);
+
+        $rules = [
+            'name' => 'required',
+        ];
+        $this->validate($this->request, $rules);
+
+        $data = array();
+        $data['name'] = $this->request->input('name');
+        $data['c_name'] = $this->request->input('c_name');
+        $this->product->create($data);
 
         return redirect(route('product.index'));
     }
@@ -93,8 +95,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $response = [
-            'brands' => $this->product->getBrands(),
-            'product' => $this->product->edit($id),
+            'product' => $this->product->findOrFail($id),
         ];
         return view('product.edit', $response);
     }
@@ -108,8 +109,16 @@ class ProductController extends Controller
     public function update($id)
     {
         $this->request->flash();
-        $this->validate($this->request, $this->product->rules);
-        $this->product->update($id, $this->request);
+
+        $rules = [
+            'name' => 'required',
+        ];
+        $this->validate($this->request, $rules);
+        
+        $product = $this->product->findOrFail($id);
+        $product->name = $this->request->input('name');
+        $product->c_name = $this->request->input('c_name');
+        $product->save();
 
         return redirect(route('product.index'));
     }

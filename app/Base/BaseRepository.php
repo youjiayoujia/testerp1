@@ -79,7 +79,7 @@ abstract class BaseRepository
     }
 
     /**
-     * 取得分页记录\
+     * 取得分页记录
      *
      * @return mixed
      */

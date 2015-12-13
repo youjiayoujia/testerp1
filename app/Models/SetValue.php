@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class Product extends BaseModel
+class SetValue extends BaseModel
 {
 
     /**
@@ -12,13 +12,18 @@ class Product extends BaseModel
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'set_values';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'c_name'];
+    protected $fillable = ['set_id', 'name'];
+
+    public function set()
+    {
+        return $this->belongsTo('App\Models\Set');
+    }
 
 }

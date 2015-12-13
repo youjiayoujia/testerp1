@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class Brand extends BaseModel
+class Catalog extends BaseModel
 {
 
     /**
@@ -12,7 +12,7 @@ class Brand extends BaseModel
      *
      * @var string
      */
-    protected $table = 'brands';
+    protected $table = 'catalogs';
 
     /**
      * The attributes that are mass assignable.
@@ -20,5 +20,10 @@ class Brand extends BaseModel
      * @var array
      */
     protected $fillable = ['name'];
+
+    public function sets()
+    {
+        return $this->hasMany('App\Models\Set');
+    }
 
 }

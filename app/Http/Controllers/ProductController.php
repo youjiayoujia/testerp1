@@ -156,7 +156,7 @@ class ProductController extends Controller
         return view('product.addzip');
     }
 
-/**
+	/**
      * 产品更新
      *
      * @param $id
@@ -186,16 +186,58 @@ class ProductController extends Controller
 		 $this->request->flash();
 		 $product_id=$this->request->product_id;
 		 $type=$this->request->type;
-		 $result=$this->product->getImage($product_id,$type); 
-		 $product_image_id=$result[0]->id;
-		 if($_POST['map1']){
-		 $path='storage/uploads/product/'.$product_id.'/'.$type.'/';
+		 $result=$this->product->getImage($product_id,$type);
+		 //var_dump($result);exit;
+		 if(!isset($result)){
+			$product_image_id=$result[0]->id;
+		 }else{
+			$product_image_id=0;
+			 }
+		 
+			 
+		
+		if($this->request->file('map0')){
+		if($type=='default'){
+			$path='storage/uploads/product/'.$product_id.'/';
+			}else{	
+		 	$path='storage/uploads/product/'.$product_id.'/'.$type.'/';
+		 }
 		 if(!is_dir($path)){	
 		 	mkdir(iconv("UTF-8", "GBK", $path),0777,true);
 		 } 
-		 $image_path='';
-		 
+		 $image_path='';	 
 		 if(is_dir($path)){
+			 if($type=='default'){
+			 if($this->request->file('map0')){ 
+		 $file=$this->request->file('map0');
+		 if($this->request->hasFile('map0')){
+				$clientName = $file -> getClientOriginalName();
+				$suffix=substr(strrchr($clientName, '.'), 1);
+				if($suffix == 'jpg' || $suffix == 'jpeg' || $suffix == 'png' || $suffix == 'gif'){					
+				$nownanme=$product_id.$type.'.'.$suffix;
+					$file->move($path,$nownanme);			 
+					}
+					$src_img =$path.$nownanme;
+					$dst_img = $path.$product_id.$type.'s.'.$suffix;
+					$image_path=$src_img.'#'.$dst_img;
+					$stat = $this->img2thumb($src_img, $dst_img, $width = 200, $height = 300, $cut = 0, $proportion = 0);
+					if($stat){
+						echo 'Resize Image Success!<br />';
+						if($product_image_id>0){
+							$this->product->update_image($product_image_id,$image_path);	
+							}else{
+							$this->product->store_image($image_path,$product_id,$type);	
+							}   
+					}else{
+						echo 'Resize Image Fail!';  exit;
+					}
+
+		 }
+		 }
+		 }else{
+			 
+			 
+			 
 			 for($i=0;$i<6;$i++){
 			$file = $this->request->file('map'.$i);								
 			if($this->request->hasFile('map'.$i)){
@@ -203,9 +245,7 @@ class ProductController extends Controller
 				$suffix=substr(strrchr($clientName, '.'), 1);
 				if($suffix == 'jpg' || $suffix == 'jpeg' || $suffix == 'png' || $suffix == 'gif'){					
 				$nownanme=$product_id.$type.$i.'.'.$suffix;
-				 
-					$file->move($path,$nownanme);
-				 
+					$file->move($path,$nownanme);			 
 				if($i==0){
 				 $image_path=$path.$nownanme;
 				 }else{ 
@@ -215,7 +255,7 @@ class ProductController extends Controller
 				echo '上传出错！';exit;
 				}
 				}else{
-					echo '请上传正确的格式！';exit;
+					echo '请上传正确的图片格式！';exit;
 					}
 			}
 			 
@@ -225,9 +265,12 @@ class ProductController extends Controller
 			}else{	
 			$this->product->store_image($image_path,$product_id,$type);	
 			} 
+		 }
 		 }else{
 			echo '文件夹创建失败！';exit; 
 		 } 
+		 
+		 
 		 }else{
 			$file = $this->request->file('zip');
 			$zip_path='storage/uploads/zip/';								
@@ -275,10 +318,19 @@ class ProductController extends Controller
 			 
 		 }
 		 
+		 
         return redirect(route('product.index'));
     }
-	
-/**
+	/**
+     * 文件上传
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	 
+	 
+	 
+	/**
      * 文件解压
      *
      * @param $id
@@ -350,4 +402,132 @@ class ProductController extends Controller
 				
 			}
 		}
+		
+	/**
+     * 图片压缩
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */		
+	public function img2thumb($src_img, $dst_img, $width = 200, $height = 100, $cut = 0, $proportion = 0)
+	{
+		if(!is_file($src_img))
+		{
+			return false;
+		}
+		$ot = $this->fileext($dst_img);
+		$otfunc = 'image' . ($ot == 'jpg' ? 'jpeg' : $ot);
+		$srcinfo = getimagesize($src_img);
+		$src_w = $srcinfo[0];
+		$src_h = $srcinfo[1];
+		$type  = strtolower(substr(image_type_to_extension($srcinfo[2]), 1));
+		$createfun = 'imagecreatefrom' . ($type == 'jpg' ? 'jpeg' : $type);
+	 
+		$dst_h = $height;
+		$dst_w = $width;
+		$x = $y = 0;
+	 
+		/**
+		 * 缩略图不超过源图尺寸（前提是宽或高只有一个）
+		 */
+		if(($width> $src_w && $height> $src_h) || ($height> $src_h && $width == 0) || ($width> $src_w && $height == 0))
+		{
+			$proportion = 1;
+		}
+		if($width> $src_w)
+		{
+			$dst_w = $width = $src_w;
+		}
+		if($height> $src_h)
+		{
+			$dst_h = $height = $src_h;
+		}
+	 
+		if(!$width && !$height && !$proportion)
+		{
+			return false;
+		}
+		if(!$proportion)
+		{
+			if($cut == 0)
+			{
+				if($dst_w && $dst_h)
+				{
+					if($dst_w/$src_w> $dst_h/$src_h)
+					{
+						$dst_w = $src_w * ($dst_h / $src_h);
+						$x = 0 - ($dst_w - $width) / 2;
+					}
+					else
+					{
+						$dst_h = $src_h * ($dst_w / $src_w);
+						$y = 0 - ($dst_h - $height) / 2;
+					}
+				}
+				else if($dst_w xor $dst_h)
+				{
+					if($dst_w && !$dst_h)  //有宽无高
+					{
+						$propor = $dst_w / $src_w;
+						$height = $dst_h  = $src_h * $propor;
+					}
+					else if(!$dst_w && $dst_h)  //有高无宽
+					{
+						$propor = $dst_h / $src_h;
+						$width  = $dst_w = $src_w * $propor;
+					}
+				}
+			}
+			else
+			{
+				if(!$dst_h)  //裁剪时无高
+				{
+					$height = $dst_h = $dst_w;
+				}
+				if(!$dst_w)  //裁剪时无宽
+				{
+					$width = $dst_w = $dst_h;
+				}
+				$propor = min(max($dst_w / $src_w, $dst_h / $src_h), 1);
+				$dst_w = (int)round($src_w * $propor);
+				$dst_h = (int)round($src_h * $propor);
+				$x = ($width - $dst_w) / 2;
+				$y = ($height - $dst_h) / 2;
+			}
+		}
+		else
+		{
+			$proportion = min($proportion, 1);
+			$height = $dst_h = $src_h * $proportion;
+			$width  = $dst_w = $src_w * $proportion;
+		}
+	 
+		$src = $createfun($src_img);
+		$dst = imagecreatetruecolor($width ? $width : $dst_w, $height ? $height : $dst_h);
+		$white = imagecolorallocate($dst, 255, 255, 255);
+		imagefill($dst, 0, 0, $white);
+	 
+		if(function_exists('imagecopyresampled'))
+		{
+			imagecopyresampled($dst, $src, $x, $y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+		}
+		else
+		{
+			imagecopyresized($dst, $src, $x, $y, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+		}
+		$otfunc($dst, $dst_img);
+		imagedestroy($dst);
+		imagedestroy($src);
+		return true;
+	}
+	/**
+     * 图片压缩
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function fileext($file)
+	{
+		return pathinfo($file, PATHINFO_EXTENSION);
+	}		
 }

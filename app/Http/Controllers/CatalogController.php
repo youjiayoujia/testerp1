@@ -1,76 +1,60 @@
 <?php
-
-/*namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-*/
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Repositories\BrandRepository;
+use App\Repositories\CatalogRepository as Catalog;
 
-class BrandController extends Controller
+class CatalogController extends Controller
 {
 
-    protected $brand;
+    protected $catalog;
 
-    public function __construct(Request $request, BrandRepository $brand)
+    public function __construct(Request $request, Catalog $catalog)
     {
         $this->request = $request;
-        $this->brand = $brand;
+        $this->catalog = $catalog;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $this->request->flash();
         $response = [
-            'columns' => $this->brand->columns,
-            'data' => $this->brand->index($this->request),
+            'data' => $this->catalog->paginate(),
         ];
 
-        return view('brand.index', $response);
+        return view('catalog.index', $response);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        $response = [
-
-        ];
-
-        return view('brand.create', $response);
+        return view('catalog.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store()
     {
         $this->request->flash();
-        $this->validate($this->request, $this->brand->rules);
-        $this->brand->store($this->request);
-        return redirect(route('brand.index'));
+        $rules = [
+            'name' => 'required'
+        ];
+        $this->validate($this->request, $rules);
+
+        $data = [];
+        $data['name'] = $this->request->input('name');
+        $data['sets'][1]['name'] = $this->request->input('setName');
+        if ($this->request->has('setValues')) {
+            foreach ($this->request->input('setValues') as $setValue) {
+                $data['sets'][1]['values'][]['name'] = $setValue;
+            }
+        }
+        $this->catalog->store($data);
+
+        return redirect(route('catalog.index'));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -86,7 +70,7 @@ class BrandController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -100,8 +84,8 @@ class BrandController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -109,15 +93,15 @@ class BrandController extends Controller
         $rules = $this->brand->rules;
         $rules['brand_name'] .= $id;
         $this->request->flash();
-        $this->validate($this->request,$rules);
+        $this->validate($this->request, $rules);
         $this->brand->update($id, $this->request);
-        return redirect(route('brand.index'));       
+        return redirect(route('brand.index'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

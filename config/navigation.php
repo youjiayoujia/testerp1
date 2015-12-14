@@ -57,21 +57,21 @@ return [
         ],
     ],
     [
-        'name' => '品牌',
-        'location' => 'brand',
+        'name' => '品类',
+        'location' => 'catalog',
         'icon' => 'tags',
         'url' => '',
         'subnavigations' => [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'brand.index',
+                'url' => 'catalog.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增',
                 'location' => 'create',
-                'url' => 'brand.create',
+                'url' => 'catalog.create',
                 'icon' => '',
             ],
         ],

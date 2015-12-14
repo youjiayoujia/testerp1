@@ -77,6 +77,26 @@ return [
         ],
     ],
     [
+        'name' => '仓库',
+        'location' => 'warehouse',
+        'icon' => 'home',
+        'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'warehouse.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'warehouse.create',
+                'icon' => '',
+            ],
+        ],
+    ],
+    [
         'name' => '订单',
         'location' => '',
         'icon' => 'list-alt',
@@ -90,9 +110,23 @@ return [
     ],
     [
         'name' => '物流',
-        'location' => '',
+        'location' => 'logistics',
         'icon' => 'plane',
         'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'logistics.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'logistics.create',
+                'icon' => '',
+            ],
+        ],
     ],
     [
         'name' => '采购',

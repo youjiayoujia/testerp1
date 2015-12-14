@@ -15,6 +15,8 @@
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 Route::resource('product', 'productController');
 Route::resource('brand', 'brandController');
+Route::resource('warehouse', 'warehouseController');
+Route::resource('logistics', 'logisticsController');
 
 
 // Authentication routes...

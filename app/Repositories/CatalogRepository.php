@@ -14,7 +14,8 @@ class CatalogRepository extends BaseRepository
 {
     protected $searchFields = ['name'];
     public $rules = [
-        'name' => 'required|unique:catalog,name',
+        'create' => ['name' => 'required|unique:catalog,name'],
+        'update' => []
     ];
 
     public function __construct(Catalog $catalog)

@@ -19,6 +19,6 @@ class ProviderModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'address', 'url', 'telephone'];
+    protected $fillable = ['name', 'url', 'detail_address', 'address', 'type', 'telephone', 'purchase_id', 'level'];
 
 }

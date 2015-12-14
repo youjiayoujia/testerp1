@@ -13,11 +13,21 @@ use App\Models\ProductModel as Product;
  */
 class ProductRepository extends BaseRepository
 {
-    public $columns = ['id', 'brand', 'size', 'color', 'created_at'];
-    protected $filters = ['size', 'color'];
+        /*
+    *
+    * @func 用于查询
+    *
+    */
+    protected $searchFields = ['name'];
+
+    /**
+    *
+    * 规则验证
+    *
+    */
     public $rules = [
-        'size' => 'required|unique:products,size',
-        'color' => 'required',
+        'create' => ['name' => 'required|unique:product_require,name'],
+        'update' => []
     ];
 
     public function __construct(Product $product)

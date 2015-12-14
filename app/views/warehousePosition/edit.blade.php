@@ -16,7 +16,7 @@
         <input type='text' class="form-control" id="name" placeholder="库位名字" name='name' value="{{ old('name') ? old('name') : $warehousePosition->name }}">
     </div>
     <div class="form-group">
-        <label for="warehouses_id">仓库id</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name='warehouses_id' class='form-control'>
             @foreach($warehousePositions as $position)
                 <option value="{{ $position->id }}" {{ $position->id == $warehousePosition->warehouses_id ? 'selected' : '' }}>

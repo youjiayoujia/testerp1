@@ -19,6 +19,6 @@ class WarehouseModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'detail_address', 'type', 'volumn'];
+    protected $fillable = ['name', 'detail_address', 'type', 'volumn', 'is_available', 'is_default'];
 
 }

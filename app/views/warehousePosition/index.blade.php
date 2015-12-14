@@ -8,6 +8,16 @@
     </ol>
 @stop
 @section('tableTitle') 供货商列表 @stop
+@section('tableHeader')
+    <th>ID</th>
+    <th>库位名</th>
+    <th>所属仓库名</th>
+    <th>备注信息</th>
+    <th>库位容积</th>
+    <th>是否启用</th>
+    <th>创建时间</th>
+    <th>操作</th>
+@stop
 @section('tableBody')
     @foreach($data as $warehousePosition)
         <tr>

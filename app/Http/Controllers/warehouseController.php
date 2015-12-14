@@ -39,8 +39,7 @@ class warehouseController extends Controller
 		$this->request->flash();
 
 		$response = [
-			'columns' => $this->warehouse->columns,
-			'data' => $this->warehouse->index($this->request),
+			'data' => $this->warehouse->paginate(),
 		];
 
 		return view('warehouse.index', $response);
@@ -87,8 +86,22 @@ class warehouseController extends Controller
 	{
 		$this->request->flash();
 
-		$this->validate($this->request,$this->warehouse->rules);
-		$this->warehouse->store($this->request);
+		$rules = [
+			'name' => 'required|max:128|unique:warehouses,name',
+			'type' => 'required',
+			'volumn' => 'required|digits_between:1,10'
+		];
+		$this->validate($this->request,$rules);
+
+		$data = [];
+		$data['name'] = $this->request->input('name');
+		$data['detail_address'] = $this->request->input('province')." ".$this->request->input('city');
+		$data['type'] = $this->request->input('type');
+		$data['volumn'] = $this->request->input('volumn');
+		$data['is_available'] = $this->request->input('is_available');
+		$data['is_default'] = $this->request->input('is_default');
+		$this->warehouse->store($data);
+
 		return redirect(route('warehouse.index'));
 	}
 
@@ -102,8 +115,7 @@ class warehouseController extends Controller
 	public function edit($id)
 	{
 		$response = [
-			'warehouses' => $this->warehouse->getwarehouses(),
-			'warehouse' => $this->warehouse->edit($id),
+			'warehouse' => $this->warehouse->detail($id),
 		];
 
 		return view('warehouse.edit',$response);
@@ -121,9 +133,15 @@ class warehouseController extends Controller
 	public function update($id)
 	{
 		$this->request->flash();
-		$this->warehouse->rules['name'] .= ','.$id;
-		$this->validate($this->request, $this->warehouse->rules);
-		$this->warehouse->update($id, $this->request);
+		
+		$data = [];
+		$data['name'] = $this->request->input('name');
+		$data['detail_address'] = $this->request->input('province')." ".$this->request->input('city');
+		$data['type'] = $this->request->input('type');
+		$data['volumn'] = $this->request->input('volumn');
+		$data['is_available'] = $this->request->input('is_available');
+		$data['is_default'] = $this->request->input('is_default');
+		$this->warehouse->update($id, $data);
 
 		return redirect(route('warehouse.index'));
 	}

@@ -38,8 +38,7 @@ class warehousePositionController extends Controller
 		$this->request->flash();
 
 		$response = [
-			'columns' => $this->warehousePosition->columns,
-			'data' => $this->warehousePosition->index($this->request),
+			'data' => $this->warehousePosition->paginate(),
 		];
 
 		return view('warehousePosition.index', $response);
@@ -88,8 +87,22 @@ class warehousePositionController extends Controller
 	public function store()
 	{
 		$this->request->flash();
-		$this->validate($this->request,$this->warehousePosition->rules);
-		$this->warehousePosition->store($this->request);
+
+		$rules = [
+			'name' => 'required|max:128|unique:warehouse_positions,name',
+			'warehouses_id' => 'required',
+			'size' => 'required'
+		];
+		$this->validate($this->request,$rules);
+
+		$data = [];
+		$data['name'] = $this->request->input('name');
+		$data['warehouses_id'] = $this->request->input('warehouses_id');
+		$data['remark'] = $this->request->input('remark');
+		$data['size'] = $this->request->input('size');
+		$data['is_available'] = $this->request->input('is_available');
+
+		$this->warehousePosition->store($data);
 		return redirect(route('warehousePosition.index'));
 	}
 
@@ -103,8 +116,8 @@ class warehousePositionController extends Controller
 	public function edit($id)
 	{
 		$response = [
-			'warehousePositions' => $this->warehousePosition->getWarehouse(),
-			'warehousePosition' => $this->warehousePosition->edit($id),
+			'warehousePositions' =>$this->warehousePosition->getwarehouse(),
+			'warehousePosition' => $this->warehousePosition->detail($id),
 		];
 
 		return view('warehousePosition.edit',$response);
@@ -122,9 +135,14 @@ class warehousePositionController extends Controller
 	public function update($id)
 	{
 		$this->request->flash();
-		$this->warehousePosition->rules['name'] .= ','.$id;
-		$this->validate($this->request, $this->warehousePosition->rules);
-		$this->warehousePosition->update($id, $this->request);
+		
+		$data = [];
+		$data['name'] = $this->request->input('name');
+		$data['warehouses_id'] = $this->request->input('warehouses_id');
+		$data['remark'] = $this->request->input('remark');
+		$data['size'] = $this->request->input('size');
+		$data['is_available'] = $this->request->input('is_available');
+		$this->warehousePosition->update($id, $data);
 
 		return redirect(route('warehousePosition.index'));
 	}

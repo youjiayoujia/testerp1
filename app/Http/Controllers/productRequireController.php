@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use Config;
 use Illuminate\Http\Request;
 use App\Repositories\productRequireRepository;
 
@@ -36,8 +37,7 @@ class productRequireController extends Controller
     {
         $this->request->flash();
         $response = [
-            'columns' => $this->productRequire->column,
-            'data' => $this->productRequire->index($this->request),
+            'data' => $this->productRequire->paginate(),
         ];
 
         return view('productRequire.index', $response);
@@ -86,8 +86,45 @@ class productRequireController extends Controller
     public function store()
     {
         $this->request->flash();
-        $this->validate($this->request, $this->productRequire->rules);
-        $this->productRequire->store($this->request);
+        $rules = [
+            'name' => 'required|max:255|unique:product_require,name',
+            'competition_url' => 'active_url',
+            'needer_id' => 'required',
+            'needer_shop_id' => 'required',
+        ];
+        $this->validate($this->request, $rules);
+
+        $data = [];
+
+        $data['name'] = $this->request->input('name');
+        $data['address'] = $this->request->input('province')." ".$this->request->input('city');
+        $data['similar_sku'] = $this->request->input('sku');
+        $data['competition_url'] = $this->request->input('url');
+        $data['remark'] = $this->request->input('remark');
+        $data['expected_date'] = $this->request->input('expdate');
+        $data['needer_id'] = $this->request->input('needer_id');
+        $data['needer_shop_id'] = $this->request->input('needer_shop_id');
+        $data['created_by'] = $this->request->input('created_by');
+        $data['status'] = '未处理';
+        $data['user_id'] = NULL;
+        $data['handle_time'] = NULL;
+
+        $data['id'] = $this->productRequire->store($data);
+
+        $path = '';
+        $i=1;
+        for( ; $i <= 6; $i++) {
+            if($this->request->hasFile('img'.$i)) {
+                $file = $this->request->file('img'.$i);
+                $path = Config::get('product_require_img_path.dir')."/".$data['id'];
+                file_exists($path) or mkdir($path, 644, true);
+                $file->move($path,"/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+                $name = 'img'.$i;
+                $data["{$name}"] = "/".$path."/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'));
+            }
+        }
+
+        $this->productRequire->store($data);
         
         return redirect(route('productRequire.index'));
     }
@@ -104,9 +141,32 @@ class productRequireController extends Controller
     public function update($id)
     {
         $this->request->flash();
-        $this->productRequire->rules['name'] .= ','.$id;
-        $this->validate($this->request, $this->productRequire->rules);
-        $this->productRequire->update($id, $this->request);
+
+        $data = [];
+        $path = '';
+        $i=1;
+        for( ; $i <= 6; $i++) {
+            if($this->request->hasFile('img'.$i)) {
+                $file = $this->request->file('img'.$i);
+                $path = Config::get('product_require_img_path.dir')."/".$id;
+                file_exists($path) or mkdir($path, 644, true);
+                if(file_exists($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'))))
+                    unlink($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+                $file->move($path,$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+                $name = 'img'.$i;
+                $data["{$name}"] = "/".$path."/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'));
+            }
+        }
+        $data['name'] = $this->request->input('name');
+        $data['address'] = $this->request->input('province')." ".$this->request->input('city');
+        $data['similar_sku'] = $this->request->input('sku');
+        $data['competition_url'] = $this->request->input('url');
+        $data['remark'] = $this->request->input('remark');
+        $data['expected_date'] = $this->request->input('expdate');
+        $data['needer_id'] = $this->request->input('needer_id');
+        $data['needer_shop_id'] = $this->request->input('needer_shop_id');
+        $data['created_by'] = $this->request->input('created_by');
+        $this->productRequire->update($id, $data);
         return redirect(route('productRequire.index'));
     }
 
@@ -122,7 +182,7 @@ class productRequireController extends Controller
     public function edit($id)
     {
         $response = [
-            'productRequire' => $this->productRequire->edit($id),
+            'productRequire' => $this->productRequire->detail($id),
         ];
 
         return view('productRequire.edit', $response);

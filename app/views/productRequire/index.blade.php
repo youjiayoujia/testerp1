@@ -8,6 +8,23 @@
     </ol>
 @stop
 @section('tableTitle') 选款需求列表 @stop
+@section('tableHeader')
+    <th>ID</th>
+    <th>选款名</th>
+    <th>货源地</th>
+    <th>类似款sku</th>
+    <th>竞争产品url</th>
+    <th>选款备注</th>
+    <th>期待上传时间</th>
+    <th>需求人</th>
+    <th>需求店铺</th>
+    <th>创建人</th>
+    <th>创建时间</th>
+    <th>处理状态</th>
+    <th>处理者id</th>
+    <th>处理时间</th>
+    <th>操作</th>
+@stop
 @section('tableBody')
     @foreach($data as $productRequire)
         <tr>

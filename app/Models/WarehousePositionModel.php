@@ -19,7 +19,7 @@ class WarehousePositionModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'warehouses_id', 'remark', 'size'];
+    protected $fillable = ['name', 'warehouses_id', 'remark', 'size', 'is_available'];
 
     public function warehouseType(){
        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');

@@ -21,8 +21,14 @@
     </div>
     <div class="form-group">
         <label for="detail_address" class='control-label'>详细地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <p for='province'>省份</p> <select name="province" onChange = "select()" class='form-control'></select>　
-        <p for='city'>城市</p> <select name="city" onChange = "select()" class='form-control'></select>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
+            </div>
+            <div class='col-sm-6'> 
+                <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
+            </div>
+        </div>
     </div>
     <div class="form-group">
         <label for="type">仓库类型</label>
@@ -43,7 +49,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="volumn">仓库体积</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="volumn">仓库体积(m3)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="volumn" placeholder="仓库体积" name='volumn' value="{{ old('volumn') }}">
     </div>
     <div class="form-group">

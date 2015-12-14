@@ -8,6 +8,20 @@
     </ol>
 @stop
 @section('tableTitle') 供货商列表 @stop
+@section('tableHeader')
+    <th>ID</th>
+    <th>名称</th>
+    <th>具体地址</th>
+    <th>经纬度</th>
+    <th>是否是线上供货商</th>
+    <th>线上供货商网址</th>
+    <th>电话</th>
+    <th>采购员</th>
+    <th>评级</th>
+    <th>创建人</th>
+    <th>创建时间</th>
+    <th>操作</th>
+@stop
 @section('tableBody')
     @foreach($data as $provider)
         <tr>

@@ -21,12 +21,18 @@
     </div>
     <div class="form-group">
         <label for="detail_address" class='control-label'>详细地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <p for='province'>省份</p> <select name="province" onChange = "select()" class='form-control'></select>　
-        <p for='city'>城市</p> <select name="city" onChange = "select()" class='form-control'></select>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
+            </div>
+            <div class='col-sm-6'> 
+                <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
+            </div>
+        </div>
     </div>
     <div class="form-group">
-        <label for="address">供货商地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="address" placeholder="供货商地址" name='address' value="{{ old('address') }}">
+        <label for="address">经纬度</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <input type='text' class="form-control" id="address" placeholder="经纬度" name='address' value="{{ old('address') }}">
     </div>
     <div class="form-group">
         <label for="online">是否是线上供货商(否/是)</label>

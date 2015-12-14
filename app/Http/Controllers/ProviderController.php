@@ -37,10 +37,9 @@ class ProviderController extends Controller
 	{
 		$this->request->flash();
 
-		$response = [
-			'columns' => $this->provider->columns,
-			'data' => $this->provider->index($this->request),
-		];
+        $response = [
+            'data' => $this->provider->paginate(),
+        ];
 
 		return view('provider.index', $response);
 	}
@@ -86,8 +85,33 @@ class ProviderController extends Controller
 	{
 		$this->request->flash();
 
-		$this->validate($this->request,$this->provider->rules);
-		$this->provider->store($this->request);
+		$rules = [
+			'name' => 'required|max:128|unique:providers,name',
+			'address' => 'required|max:256',
+			'url' => 'required|max:256|active_url',
+			'telephone' => 'required|max:256|digits_between:8,11',
+		];
+
+		$this->validate($this->request,$rules);
+ 
+
+		$data = [];
+		$data['name'] = $this->request->input('name');
+		$data['detail_address'] = $this->request->input('province')." ".$this->request->input('city');
+		$data['address'] = $this->request->input('address');
+		$data['type'] = $this->request->input('online') == '0' ? 'offline' : 'online';
+		$data['url'] = $this->request->input('url');
+		$data['telephone'] = $this->request->input('telephone');
+		$data['purchase_id'] = $this->request->input('purchaseid');
+		$data['level'] = $this->request->input('level');
+		$data['created_by'] = $this->request->input('created_by');
+		
+        if ($this->request->has('setValues')) {
+            foreach ($this->request->input('setValues') as $setValue) {
+                $data['sets'][1]['values'][]['name'] = $setValue;
+            }
+        }
+		$this->provider->store($data);
 		return redirect(route('provider.index'));
 	}
 
@@ -101,8 +125,7 @@ class ProviderController extends Controller
 	public function edit($id)
 	{
 		$response = [
-			'providers' => $this->provider->getProviders(),
-			'product' => $this->provider->edit($id),
+			'product' => $this->provider->detail($id),
 		];
 
 		return view('provider.edit',$response);
@@ -120,9 +143,18 @@ class ProviderController extends Controller
 	public function update($id)
 	{
 		$this->request->flash();
-		$this->provider->rules['name'] .= ','.$id;
-		$this->validate($this->request, $this->provider->rules);
-		$this->provider->update($id, $this->request);
+
+		$data = [];
+		$data['name'] = $this->request->input('name');
+		$data['detail_address'] = $this->request->input('province').' '.$this->request->input('city');
+		$data['address'] = $this->request->input('address');
+		$data['type'] = $this->request->input('online') == '0' ? 'offline' : 'online';
+		$data['url'] = $this->request->input('url');
+		$data['telephone'] = $this->request->input('telephone');
+		$data['purchase_id'] = $this->request->input('purchaseid');
+		$data['level'] = $this->request->input('level');
+		$data['created_by'] = $this->request->input('created_by');
+		$this->provider->update($id, $data);
 
 		return redirect(route('provider.index'));
 	}

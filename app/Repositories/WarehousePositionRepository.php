@@ -14,28 +14,22 @@ use App\Models\WarehouseModel as Warehouse;
 
 class WarehousePositionRepository extends BaseRepository
 {
-	/**
-	*  @func 用于显示
-	*/
-	public $columns = ['id', 'name', 'warehouse_id', 'remark', 'size', 'is_available', 'created_at'];
-
-	/*
+		/*
 	*
 	* @func 用于查询
 	*
 	*/
-	protected $filters = ['name'];
+	protected $searchFields = ['name'];
 
-	/*
+	/**
 	*
-	* @ 用于验证
+	* 规则验证
 	*
 	*/
-	public $rules = [
-		'name' => 'required|max:128|unique:warehouse_positions,name',
-		'warehouses_id' => 'required',
-		'size' => 'required'
-	];
+    public $rules = [
+        'create' => ['name' => 'required|unique:warehouse_positions,name'],
+        'update' => []
+    ];
 
 	public function __construct(Position $position)
 	{
@@ -50,15 +44,10 @@ class WarehousePositionRepository extends BaseRepository
 	* @ 13:45pm
 	* 
 	*/
-	public function store($request)
+	public function store($data)
 	{
-		$this->model->name = $request->input('name');
-		$this->model->warehouses_id = $request->input('warehouses_id');
-		$this->model->remark = $request->input('remark');
-		$this->model->size = $request->input('size');
-		$this->model->is_available = $request->input('is_available');
-
-		return $this->model->save();
+		$position = Position::create($data);
+		return $position;
 	}
 
  	/*
@@ -68,17 +57,11 @@ class WarehousePositionRepository extends BaseRepository
  		@ 13:45 pm
 	*
  	*/
-	public function update($id, $request)
+	public function update($id, $data)
 	{
-		$res = position::find($id);
+		$position = Position::where('id', '=', "{$id}")->update($data);
 
-		$res->name = $request->input('name');
-		$res->warehouses_id = $request->input('warehouses_id');
-		$res->remark = $request->input('remark');
-		$res->size = $request->input('size');
-		$res->is_available = $request->input('is_available');
-
-		return $res->save();
+		return $position;
 	}
 
 	/*

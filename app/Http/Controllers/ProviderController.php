@@ -23,7 +23,7 @@ class ProviderController extends Controller
 	{
 		$this->provider = $provider;
 		$this->request = $request;
-	}
+	} 
 
 	/*
 	*

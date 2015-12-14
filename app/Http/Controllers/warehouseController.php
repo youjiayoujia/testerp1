@@ -1,0 +1,145 @@
+<?php
+
+/**
+ * 仓库控制器
+ * 处理仓库相关的Request与Response
+ *
+ * User: MC
+ * Date: 15/12/10
+ * Time: 12:02pm
+ */
+
+namespace App\Http\Controllers;
+
+use Mail;
+use Illuminate\Http\Request;
+use App\Repositories\WarehouseRepository;
+
+
+class warehouseController extends Controller
+{
+	protected $warehouse;
+
+	function __construct(Request $request,WarehouseRepository $warehouse)
+	{
+		$this->warehouse = $warehouse;
+		$this->request = $request;
+	}
+
+	/*
+	*
+	* @ 数据一次压session
+	* @ 向index视图传参 columns|data
+	*
+	* @return view
+	* @12:05pm
+	*/
+	public function index()
+	{
+		$this->request->flash();
+
+		$response = [
+			'columns' => $this->warehouse->columns,
+			'data' => $this->warehouse->index($this->request),
+		];
+
+		return view('warehouse.index', $response);
+	}
+
+	/*
+	*
+	* @$response 向show 模板传参
+	*
+	* @retrun view/show
+	* @ 12:7pm
+	* 
+	*/
+	public function show($id)
+	{
+		$response = [
+			'warehouse' => $this->warehouse->detail($id),
+		];
+
+		return view('warehouse.show', $response);
+	}
+
+	/*
+	*
+	* @return view/create
+	* @12:7pm
+	*
+	*/
+	public function create()
+	{
+		return view('warehouse.create');
+	}
+
+	/*
+	*
+	*
+	* @ 数据一次压session
+	* @ 验证规则
+	* @ 数据存储
+	* @ 12:15pm
+	*
+	*/
+	public function store()
+	{
+		$this->request->flash();
+
+		$this->validate($this->request,$this->warehouse->rules);
+		$this->warehouse->store($this->request);
+		return redirect(route('warehouse.index'));
+	}
+
+	/*
+	*
+	* @ param $id 数据的id
+	*
+	* @ return view/edit
+	* @ 12:15pm
+	*/
+	public function edit($id)
+	{
+		$response = [
+			'warehouses' => $this->warehouse->getwarehouses(),
+			'warehouse' => $this->warehouse->edit($id),
+		];
+
+		return view('warehouse.edit',$response);
+	}
+
+	/*
+	*
+	*
+	* @供货商更新
+	* @ param id 记录的数据id
+	* 
+	* @return view
+	* @ 12:17pm
+	*/
+	public function update($id)
+	{
+		$this->request->flash();
+		$this->warehouse->rules['name'] .= ','.$id;
+		$this->validate($this->request, $this->warehouse->rules);
+		$this->warehouse->update($id, $this->request);
+
+		return redirect(route('warehouse.index'));
+	}
+
+	/*
+	*
+	* @ 供货商删除
+	* @ param $id 记录id
+	* @ return view
+	* 
+	* @12:19pm
+	*
+	*/
+	public function destroy($id)
+	{
+		$this->warehouse->destroy($id);
+		return redirect(route('warehouse.index'));
+	}
+}

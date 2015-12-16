@@ -25,25 +25,35 @@ class LogisticsController extends Controller
     {
         $this->request->flash();
         $response = [
-            'columns' => $this->logistics->columns,
-            'data' => $this->logistics->index($this->request),
+            'data' => $this->logistics->paginate(),
         ];
         return view('logistics.index', $response);
     }
 
     public function create()
     {
-        $response = [
-
-        ];
-        return view('logistics.create', $response);
+        return view('logistics.create');
     }
 
-    public function store(Request $request)
+    public function store()
     {
         $this->request->flash();
-        $this->validate($this->request, $this->logistics->rules);
-        $this->logistics->store($this->request);
+        $rules = [
+            'name' => 'required|unique:logistics,name',
+            'customer_id' => 'required',
+        ];
+        $this->validate($this->request, $rules);
+        $data = [];
+        $data['name'] = $this->request->input('name');
+        $data['customer_id'] = $this->request->input('customer_id');
+        $data['secret_key'] = $this->request->input('secret_key');
+        $data['is_api'] = $this->request->input('is_api');
+        $data['client_manager'] = $this->request->input('client_manager');
+        $data['manager_tel'] = $this->request->input('manager_tel');
+        $data['technician'] = $this->request->input('technician');
+        $data['technician_tel'] = $this->request->input('technician_tel');
+        $data['remark'] = $this->request->input('remark');
+        $this->logistics->store($data);
         return redirect(route('logistics.index'));
     }
 
@@ -58,18 +68,25 @@ class LogisticsController extends Controller
     public function edit($id)
     {
         $response = [
-            'logistics' => $this->logistics->edit($id),
+            'logistics' => $this->logistics->detail($id),
         ];
         return view('logistics.edit', $response);
     }
 
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        $rules = $this->logistics->rules;
-        $rules['logistics_name'] .= $id;
         $this->request->flash();
-        $this->validate($this->request, $rules);
-        $this->logistics->update($id, $this->request);
+        $data = [];
+        $data['name'] = $this->request->input('name');
+        $data['customer_id'] = $this->request->input('customer_id');
+        $data['secret_key'] = $this->request->input('secret_key');
+        $data['is_api'] = $this->request->input('is_api');
+        $data['client_manager'] = $this->request->input('client_manager');
+        $data['manager_tel'] = $this->request->input('manager_tel');
+        $data['technician'] = $this->request->input('technician');
+        $data['technician_tel'] = $this->request->input('technician_tel');
+        $data['remark'] = $this->request->input('remark');
+        $this->logistics->update($id, $data);
         return redirect(route('logistics.index'));
     }
 

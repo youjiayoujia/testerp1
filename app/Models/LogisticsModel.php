@@ -15,6 +15,7 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logistics';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'customer_id', 'secret_key', 'is_api',
+        'client_manager', 'manager_tel', 'technician', 'technician_tel', 'remark'];
 
 }

@@ -14,11 +14,10 @@ use App\Models\LogisticsModel as Logistics;
 
 class LogisticsRepository extends BaseRepository
 {
-    public $columns = ['id', 'name', 'country', 'created_at', 'updated_at'];
-    protected $filters = ['name', 'country'];
+    protected $searchFields = ['name'];
     public $rules = [
-        'logistics_name' => 'required|unique:logistics,name,',
-        'country' => 'required',
+        'create' => ['name' => 'required|unique:logistics,name'],
+        'update' => []
     ];
 
     public function __construct(Logistics $logistics)
@@ -26,18 +25,15 @@ class LogisticsRepository extends BaseRepository
         $this->model = $logistics;
     }
 
-    public function store($request)
+    public function store($data)
     {
-        $this->model->name = $request->input('logistics_name');
-        $this->model->country = $request->input('country');
-        return $this->model->save();
+        $logistics = Logistics::create($data);
+        return $logistics;
     }
 
-    public function update($id, $request)
+    public function update($id, $data)
     {
-        $logistics = $this->model->find($id);
-        $logistics->name = $request->input('logistics_name');
-        $logistics->country = $request->input('country');
-        return $logistics->save();
+        $logistics = Logistics::where('id', '=', "{$id}")->update($data);
+        return $logistics;
     }
 }

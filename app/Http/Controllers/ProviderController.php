@@ -11,6 +11,7 @@
 
 namespace App\Http\Controllers;
 
+use Queue;
 use Illuminate\Http\Request;
 use App\Repositories\ProviderRepository;
 
@@ -24,7 +25,6 @@ class ProviderController extends Controller
 		$this->provider = $provider;
 		$this->request = $request;
 	} 
-
 	/*
 	*
 	* @ 数据一次压session

@@ -186,17 +186,16 @@ class ProductController extends Controller
 		 $this->request->flash();
 		 $product_id=$this->request->product_id;
 		 $type=$this->request->type;
-		 $result=$this->product->getImage($product_id,$type);
+		 
+		
+		if($this->request->file('map0')){
+			$result=$this->product->getImage($product_id,$type);
 		 //var_dump($result);exit;
 		 if(!isset($result)){
 			$product_image_id=$result[0]->id;
 		 }else{
 			$product_image_id=0;
 			 }
-		 
-			 
-		
-		if($this->request->file('map0')){
 		if($type=='default'){
 			$path='storage/uploads/product/'.$product_id.'/';
 			}else{	
@@ -234,10 +233,7 @@ class ProductController extends Controller
 
 		 }
 		 }
-		 }else{
-			 
-			 
-			 
+		 }else{	 
 			 for($i=0;$i<6;$i++){
 			$file = $this->request->file('map'.$i);								
 			if($this->request->hasFile('map'.$i)){
@@ -284,27 +280,71 @@ class ProductController extends Controller
 				$nownanme=$product_id.$type.'.'.$suffix; 
 				$file->move($zip_path,$nownanme);
 				$zippath='storage/uploads/zip/'.$nownanme;	
-				$path='storage/uploads/product/';
+				$path='storage/uploads/product/';//临时存放地址
 				$res=$this->decompression($zippath,$path);
 				
 				  $dir_path=$path.$product_id.'/';
 				  $dir_name=$this->get_dirname($dir_path);
+				  //var_dump($dir_name);exit;
 				  foreach($dir_name as $key=>$value){
-					  $dir_path_type='storage/uploads/product/'.$product_id.'/'.$value.'/';
-					  $image_paths[$value]=$this->get_dirname($dir_path_type);	  
+					  if($value=='default.jpg' || $value=='default.jpeg' || $value=='default.png'){
+						  $image_paths[0]=$value;
+						  }else{
+						  $dir_path_type='storage/uploads/product/'.$product_id.'/'.$value.'/';
+						  $image_paths[$value]=$this->get_dirname($dir_path_type);	     
+						  }
 					  }
-					 
-				 foreach($image_paths as $key=>$val){
-					 $type=$key;
-					 
-					 foreach($val as $k=>$v){
-						 if($k>0){
-						 $image_path=$path.$product_id.'/'.$key.'/'.$v.'#'.$image_path;
-						 }else{
-						 $image_path=$path.$product_id.'/'.$key.'/'.$v; 
-							 }
-						 }
+					  if(!is_dir('storage/uploads/product/'.$product_id)){
 						 
+							 mkdir(iconv("UTF-8", "GBK", 'storage/uploads/product/'.$product_id),0777,true);
+							 }
+					  //var_dump($image_paths);exit;
+				 foreach($image_paths as $key=>$val){
+					 //echo $key;exit;
+					 
+							 if($val==0){
+								 $type='default';
+								 
+								 
+								 $now_path='storage/uploads/product/'.$product_id.'/';
+								 $orname='storage/uploads/product/'.$product_id.'/'.$val;
+								  $suffixa=substr(strrchr($val, '.'), 1);
+								  $now_name=$product_id.'default.'.$suffixa;
+								  rename($orname,$now_path.$now_name);
+								 //删除原图片
+								    $src_img =$now_path.$now_name;
+									$dst_img = $now_path.$product_id.'defaults.'.$suffixa;
+									$image_path=$src_img.'#'.$dst_img;
+									$stat = $this->img2thumb($src_img, $dst_img, $width = 200, $height = 300, $cut = 0, $proportion = 0);
+								 }else{
+									 $type=$key;
+								 foreach($val as $k=>$v){
+									 $orname=$path.$product_id.'/'.$key.'/'.$v;
+									 $now_path='storage/uploads/product/'.$product_id.'/'.$key.'/';
+									 
+									 if(!is_dir($now_path)){
+										 mkdir(iconv("UTF-8", "GBK", $now_path),0777,true);
+										 }
+									 $suffixa=substr(strrchr($v, '.'), 1);
+									 $now_name=$product_id.$key.$k.'.'.$suffixa;
+									 
+									 rename($orname,$now_path.$now_name);
+									 //删除图片
+									 if($k>0){
+									 $image_path=$now_path.$now_name.'#'.$image_path;
+									 }else{
+									 $image_path=$now_path.$now_name;
+									 }
+									 }
+							 }
+							 $result=$this->product->getImage($product_id,$type);
+							 //var_dump($result);exit;
+							 if(!isset($result)){
+								$product_image_id=$result[0]->id;
+							 }else{
+								$product_image_id=0;
+								 }
+							 
 						 if($product_image_id>0){
 							$this->product->update_image($product_image_id,$image_path);	
 							}else{
@@ -378,25 +418,55 @@ class ProductController extends Controller
 				$product_ids=$this->get_dirname($path.'product/');
 				foreach($product_ids as $key=>$value){
 					$product_image_types=$this->get_dirname($path.'product/'.$value.'/');
-			
+					 
 					foreach($product_image_types as $key=>$val){
-						$product_image_paths=$this->get_dirname($path.'product/'.$value.'/'.$val.'/');
-						 $result=$this->product->getImage($value,$val); 
-		 				$product_image_id=$result[0]->id;
-						foreach($product_image_paths as $num=>$v){
-							if($num>0){
-						 $image_path=$path.'product/'.$value.'/'.$val.'/'.$v.'#'.$image_path ;
+						//var_dump($val);
+						if($val=='default.jpg' || $val=='default.jpeg' || $val=='default.png'){
+							//var_dump($val);exit;
+							$type='default';
+							$product_id=$value;		
+							$result=$this->product->getImage($value,$type);
+							if(!empty($result)){ 
+								$product_image_id=0;
+							}else{
+								$product_image_id=$result[0]->id;
+								}
+							
+							$suffixa=substr(strrchr($val, '.'), 1);
+							$src_img=$path.'product/'.$value.'/'.$val;
+							$dst_img=$path.'product/'.$value.'/'.$value.'defaults.'.$suffixa;
+							$this->img2thumb($src_img, $dst_img,$width = 200, $height = 100, $cut = 0, $proportion = 0);
+							$image_path=$src_img.'#'.$dst_img;
 						}else{
-							$image_path=$path.'product/'.$value.'/'.$val.'/'.$v;
-							}
-						} 
+							$type=$val;
+							//var_dump($val);exit;
+							$product_image_paths=$this->get_dirname($path.'product/'.$value.'/'.$val.'/');
+							//var_dump($product_image_paths);exit;
+							$result=$this->product->getImage($value,$val);
+							//var_dump($result); echo (empty($result));exit;
+							if(!empty($result)){ 
+								$product_image_id=0;
+							}else{
+								$product_image_id=$result[0]->id;
+								}
+							foreach($product_image_paths as $num=>$v){
+								$suffixa=substr(strrchr($v, '.'), 1);
+								$now_name=$value.$val.$num.'.'.$suffixa;
+								rename($path.'product/'.$value.'/'.$val.'/'.$v,$path.'product/'.$value.'/'.$val.'/'.$now_name);
+								if($num>0){
+									$image_path=$path.'product/'.$value.'/'.$val.'/'.$now_name.'#'.$image_path ;
+								}else{
+									$image_path=$path.'product/'.$value.'/'.$val.'/'.$now_name;
+								}
+							} 
+						}
 						if($product_image_id>0){
 							$this->product->update_image($product_image_id,$image_path);	
 							}else{
-							 $res=$this->product->store_image($image_path,$value,$val);	
+							 $res=$this->product->store_image($image_path,$value,$type);	
 							} 
 						}
-					}
+					}//var_dump($product_image_types);exit;
 					 
 				}
 				

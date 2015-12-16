@@ -55,7 +55,7 @@ class productRequireController extends Controller
     public function show($id)
     {
         $response = [
-            'productRequire' => $this->productRequire->detail($id),
+            'productRequire' => $this->productRequire->get($id),
         ];
 
         return view('productRequire.show', $response);
@@ -182,7 +182,7 @@ class productRequireController extends Controller
     public function edit($id)
     {
         $response = [
-            'productRequire' => $this->productRequire->detail($id),
+            'productRequire' => $this->productRequire->get($id),
         ];
 
         return view('productRequire.edit', $response);

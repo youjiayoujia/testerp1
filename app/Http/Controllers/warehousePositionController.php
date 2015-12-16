@@ -55,7 +55,7 @@ class warehousePositionController extends Controller
 	public function show($id)
 	{
 		$response = [
-			'warehousePosition' => $this->warehousePosition->detail($id),
+			'warehousePosition' => $this->warehousePosition->get($id),
 		];
 
 		return view('warehousePosition.show', $response);
@@ -117,7 +117,7 @@ class warehousePositionController extends Controller
 	{
 		$response = [
 			'warehousePositions' =>$this->warehousePosition->getwarehouse(),
-			'warehousePosition' => $this->warehousePosition->detail($id),
+			'warehousePosition' => $this->warehousePosition->get($id),
 		];
 
 		return view('warehousePosition.edit',$response);

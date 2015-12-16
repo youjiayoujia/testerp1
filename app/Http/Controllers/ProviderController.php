@@ -55,7 +55,7 @@ class ProviderController extends Controller
 	public function show($id)
 	{
 		$response = [
-			'provider' => $this->provider->detail($id),
+			'provider' => $this->provider->get($id),
 		];
 
 		return view('provider.show', $response);
@@ -125,7 +125,7 @@ class ProviderController extends Controller
 	public function edit($id)
 	{
 		$response = [
-			'product' => $this->provider->detail($id),
+			'product' => $this->provider->get($id),
 		];
 
 		return view('provider.edit',$response);

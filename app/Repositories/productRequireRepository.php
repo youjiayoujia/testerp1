@@ -47,10 +47,4 @@ class productRequireRepository extends BaseRepository
 		return $productRequire;
 	}
 
-	public function update($id, $data)
-	{
-		$productRequire = productRequire::where('id','=', "{$id}")->update($data);
-
-		return $productRequire;
-	}
 }

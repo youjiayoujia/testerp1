@@ -36,34 +36,4 @@ class ProviderRepository extends BaseRepository
 		$this->model = $provider;
 	}
 
-	/*
-	*
-	* @ func 保存数据
-	*
-	* @ param $request http:request
-	* @ 13:45pm
-	* 
-	*/
-	public function store($data)
-	{
-		$provider = $this->model->create($data);
-		return $provider;
-
-	}
-
- 	/*
- 	*
-		@func 更新数据
- 		@param $id 数据id  | $request http请求
- 		@ 13:45 pm
-	*
- 	*/
-	public function update($id, $data)
-	{
-		$provider = Provider::where('id', '=', "{$id}")->update($data);
-
-		return $provider;
-	}
-
-
 }

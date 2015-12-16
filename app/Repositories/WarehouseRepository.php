@@ -34,35 +34,5 @@ class WarehouseRepository extends BaseRepository
 	{
 		$this->model = $warehouse;
 	}
-
-	/*
-	*
-	* @ func 保存数据
-	*
-	* @ param $request http:request
-	* @ 13:45pm
-	* 
-	*/
-	public function store($data)
-	{
-		$warehouse = Warehouse::create($data);
-
-		return $warehouse;
-	}
-
- 	/*
- 	*
-		@func 更新数据
- 		@param $id 数据id  | $data http请求
- 		@ 13:45 pm
-	*
- 	*/
-	public function update($id, $data)
-	{
-		$warehouse = Warehouse::where('id', '=', "{$id}")->update($data);
-
-		return $warehouse;
-	}
-
 	
 }

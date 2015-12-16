@@ -11,7 +11,8 @@
 
 namespace App\Http\Controllers;
 
-use Queue;
+use app\jobs\sends;
+
 use Illuminate\Http\Request;
 use App\Repositories\ProviderRepository;
 
@@ -25,6 +26,11 @@ class ProviderController extends Controller
 		$this->provider = $provider;
 		$this->request = $request;
 	} 
+
+	public function test()
+	{
+		$this->dispatch(new sends());
+	}
 	/*
 	*
 	* @ 数据一次压session

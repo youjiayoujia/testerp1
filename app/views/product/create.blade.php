@@ -11,19 +11,11 @@
 @section('formAction') {{ route('product.store') }} @stop
 @section('formBody')
     <div class="form-group">
-        <label for="brand_id">品牌</label>
-        <select id="brand_id" class="form-control" name="brand_id">
-            @foreach($brands as $brand)
-                <option value="{{ $brand->id }}" {{ $brand->id == old('brand_id') ? 'selected' : '' }}>{{ $brand->name }}</option>
-            @endforeach
-        </select>
+        <label for="name">名称</label>
+        <input class="form-control" id="name" placeholder="名称" name='name' value="{{ old('name') }}">
     </div>
     <div class="form-group">
-        <label for="size">型号</label>
-        <input class="form-control" id="size" placeholder="型号" name='size' value="{{ old('size') }}">
-    </div>
-    <div class="form-group">
-        <label for="color">颜色</label>
-        <input class="form-control" id="color" placeholder="颜色" name='color' value="{{ old('color') }}">
+        <label for="c_name">中文名称</label>
+        <input class="form-control" id="c_name" placeholder="中文名称" name='c_name' value="{{ old('c_name') }}">
     </div>
 @stop

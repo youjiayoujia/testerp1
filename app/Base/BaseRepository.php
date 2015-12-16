@@ -10,77 +10,92 @@ namespace App\Base;
 abstract class BaseRepository
 {
     //仓库调用模型
-    protected $model;
-    //列表展示字段
-    public $columns;
+    public $model;
     //列表过滤字段,用于查找过滤
-    protected $filters;
+    protected $searchFields;
     //验证字段,用于表单提交的数据验证
     public $rules;
 
     /**
-     * 列表数据查找过滤
+     * 搜索
      *
-     * @param  object $result 需要查找的Model对象
-     * @param  object $request HTTP请求对象
-     * @return object $result 查找过滤后的Model对象
+     * @param $result
+     * @return mixed
      */
-    public function filter($result, $request)
+    public function search($result)
     {
-        $result = $result->where(function ($query) use ($request) {
-            foreach ($this->filters as $filterColumn) {
-                if ($request->has('keywords')) {
-                    $filter_operator = $request->has($filterColumn . '_operator') ? $request->input($filterColumn . '_operator') : 'like';
-                    $filter_value = $filter_operator === 'like' ? '%' . trim($request->input('keywords')) . '%' : trim($request->input($filterColumn));
-                    $query = $query->orWhere($filterColumn, $filter_operator, $filter_value);
+        if (request()->has('keywords')) {
+            $result = $result->where(function ($query) {
+                foreach ($this->searchFields as $searchField) {
+                    $query = $query->orWhere($searchField, 'like', '%' . trim(request()->input('keywords')) . '%');
                 }
-            }
-        });
-
-        return $result;
-    }
-
-    /**
-     * 列表数据排序
-     *
-     * @param  object $result 需要排序的Model对象
-     * @param  object $request HTTP请求对象
-     * @return object $result 排序后的Model对象
-     */
-    public function sort($result, $request)
-    {
-        if ($request->has('orderField') AND $request->has('orderDirection')) {
-            $result = $result->orderBy($request->input('orderField'), $request->input('orderDirection'));
-        } else {
-            $result = $result->orderBy('id', 'desc');
+            });
         }
 
         return $result;
     }
 
     /**
-     * 列表
+     * 排序
      *
-     * @param  object $request HTTP请求对象
-     * @return Illuminate\Support\Collection
+     * @param $result
+     * @return mixed
      */
-    public function index($request)
+    public function sort($result)
     {
-        $pageSize = $request->has('pageSize') ? $request->input('pageSize') : config('setting.pageSize');
-        $result = $this->model;
-        $result = $this->filter($result, $request);
-        $result = $this->sort($result, $request);
+        if (request()->has('sorts')) {
+            $sorts = explode(',', request()->input('sorts'));
+            foreach ($sorts as $sort) {
+                $sort = explode('.', $sort);
+                $result = $result->orderBy($sort[0], $sort['1']);
+            }
+        }
 
-        return $result->paginate($pageSize);
+        return $result;
     }
 
     /**
-     * 产品详情
+     * 组装
+     *
+     * @return mixed
+     */
+    public function scope()
+    {
+        $result = $this->model;
+        $result = $this->search($result);
+        $result = $this->sort($result);
+
+        return $result;
+    }
+
+    /**
+     *取得所有记录
+     *
+     * @return mixed
+     */
+    public function all()
+    {
+        return $this->scope()->get();
+    }
+
+    /**
+     * 取得分页记录
+     *
+     * @return mixed
+     */
+    public function paginate()
+    {
+        $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
+        return $this->scope()->paginate($pageSize);
+    }
+
+    /**
+     * 获取指定ID资源
      *
      * @param $id
      * @return object
      */
-    public function detail($id)
+    public function get($id)
     {
         return $this->model->find($id);
     }
@@ -88,30 +103,25 @@ abstract class BaseRepository
     /**
      * 存储资源
      *
-     * @param  object $request HTTP请求对象
-     * @return bool
+     * @param $data
+     * @return mixed
      */
-    abstract public function store($request);
-
-    /**
-     * 编辑指定id资源
-     *
-     * @param  int $id 资源id
-     * @return Illuminate\Support\Collection
-     */
-    public function edit($id)
+    public function store($data)
     {
-        return $this->detail($id);
+        return $this->model->create($data);
     }
 
     /**
      * 更新指定id资源
      *
-     * @param  int $id 资源id
-     * @param  object $request HTTP请求对象
-     * @return bool
+     * @param $id
+     * @param $data
+     * @return mixed
      */
-    abstract public function update($id, $request);
+    public function update($id, $data)
+    {
+        return $this->get($id)->update($data);
+    }
 
     /**
      * 删除指定id资源

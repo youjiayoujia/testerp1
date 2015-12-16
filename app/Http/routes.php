@@ -13,10 +13,15 @@
 
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+<<<<<<< HEAD
 Route::resource('product', 'productController');
 Route::resource('brand', 'brandController');
 Route::resource('warehouse', 'warehouseController');
 Route::resource('logistics', 'logisticsController');
+=======
+Route::resource('product', 'ProductController');
+Route::resource('catalog', 'CatalogController');
+>>>>>>> master
 
 
 // Authentication routes...

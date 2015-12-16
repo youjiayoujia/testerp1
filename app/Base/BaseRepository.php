@@ -90,12 +90,12 @@ abstract class BaseRepository
     }
 
     /**
-     * 详情
+     * 获取指定ID资源
      *
      * @param $id
      * @return object
      */
-    public function detail($id)
+    public function get($id)
     {
         return $this->model->find($id);
     }
@@ -106,7 +106,10 @@ abstract class BaseRepository
      * @param $data
      * @return mixed
      */
-    abstract public function store($data);
+    public function store($data)
+    {
+        return $this->model->create($data);
+    }
 
     /**
      * 更新指定id资源
@@ -115,7 +118,10 @@ abstract class BaseRepository
      * @param $data
      * @return mixed
      */
-    abstract public function update($id, $data);
+    public function update($id, $data)
+    {
+        return $this->get($id)->update($data);
+    }
 
     /**
      * 删除指定id资源

@@ -22,27 +22,4 @@ class CatalogRepository extends BaseRepository
     {
         $this->model = $catalog;
     }
-
-    public function store($data)
-    {
-        $catalog = $this->model->create($data);
-        if ($data['sets']) {
-            foreach ($data['sets'] as $setData) {
-                $set = $catalog->sets()->create($setData);
-                if ($setData['values']) {
-                    foreach ($setData['values'] as $setValueData) {
-                        $set->values()->create($setValueData);
-                    }
-                }
-            }
-        }
-
-        return $catalog;
-    }
-
-    public function update($id, $data)
-    {
-
-    }
-
 }

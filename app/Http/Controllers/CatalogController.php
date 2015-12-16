@@ -60,10 +60,10 @@ class CatalogController extends Controller
     public function show($id)
     {
         $response = [
-            'brand' => $this->brand->detail($id),
+            'catalog' => $this->catalog->get($id),
         ];
 
-        return view('brand.show', $response);
+        return view('catalog.show', $response);
 
     }
 
@@ -76,9 +76,9 @@ class CatalogController extends Controller
     public function edit($id)
     {
         $response = [
-            'brand' => $this->brand->edit($id),
+            'catalog' => $this->catalog->get($id),
         ];
-        return view('brand.edit', $response);
+        return view('catalog.edit', $response);
     }
 
     /**
@@ -88,14 +88,11 @@ class CatalogController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        $rules = $this->brand->rules;
-        $rules['brand_name'] .= $id;
-        $this->request->flash();
-        $this->validate($this->request, $rules);
-        $this->brand->update($id, $this->request);
-        return redirect(route('brand.index'));
+        $data = $this->request->all();
+        $this->catalog->update($id, $data);
+        return redirect(route('catalog.index'));
     }
 
     /**
@@ -106,7 +103,7 @@ class CatalogController extends Controller
      */
     public function destroy($id)
     {
-        $this->brand->destroy($id);
-        return redirect(route('brand.index'));
+        $this->catalog->destroy($id);
+        return redirect(route('catalog.index'));
     }
 }

@@ -11,7 +11,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                @foreach(Config::get('navigation') as $navigation)
+                @foreach(config('navigation') as $navigation)
                     @if(isset($navigation['subnavigations']))
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">

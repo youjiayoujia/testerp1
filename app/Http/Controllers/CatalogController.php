@@ -19,7 +19,7 @@ class CatalogController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->catalog->scope()->paginate(),
+            'data' => $this->catalog->auto()->paginate(),
         ];
 
         return view('catalog.index', $response);
@@ -33,21 +33,12 @@ class CatalogController extends Controller
     public function store()
     {
         $this->request->flash();
-        $rules = [
-            'name' => 'required'
-        ];
-        $this->validate($this->request, $rules);
+        $this->validate($this->request, $this->catalog->rules('create'));
         $this->catalog->create($this->request->all());
 
         return redirect(route('catalog.index'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $response = [
@@ -58,12 +49,6 @@ class CatalogController extends Controller
 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $response = [
@@ -73,31 +58,15 @@ class CatalogController extends Controller
         return view('catalog.edit', $response);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function update($id)
     {
         $this->request->flash();
-        $rules = [
-            'name' => 'required'
-        ];
-        $this->validate($this->request, $rules);
+        $this->validate($this->request, $this->catalog->rules('update', $id));
         $this->catalog->update($id, $this->request->all());
 
         return redirect(route('catalog.index'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $this->catalog->destroy($id);

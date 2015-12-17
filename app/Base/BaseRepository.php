@@ -90,8 +90,7 @@ abstract class BaseRepository
 
         if (request()->has('sorts')) {
             $sorts = [];
-            $sortData = explode(',', request()->input('sorts'));
-            foreach ($sortData as $key => $sort) {
+            foreach (explode(',', request()->input('sorts')) as $key => $sort) {
                 $sort = explode('.', $sort);
                 $sorts[$key]['field'] = $sort[0];
                 $sorts[$key]['direction'] = $sort[1];

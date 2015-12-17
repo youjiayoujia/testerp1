@@ -25,6 +25,16 @@ class CatalogController extends Controller
         return view('catalog.index', $response);
     }
 
+    public function show($id)
+    {
+        $response = [
+            'catalog' => $this->catalog->get($id),
+        ];
+
+        return view('catalog.show', $response);
+
+    }
+
     public function create()
     {
         return view('catalog.create');
@@ -37,16 +47,6 @@ class CatalogController extends Controller
         $this->catalog->create($this->request->all());
 
         return redirect(route('catalog.index'));
-    }
-
-    public function show($id)
-    {
-        $response = [
-            'catalog' => $this->catalog->get($id),
-        ];
-
-        return view('catalog.show', $response);
-
     }
 
     public function edit($id)

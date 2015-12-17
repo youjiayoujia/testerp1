@@ -19,7 +19,7 @@ class CatalogController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->catalog->paginate(),
+            'data' => $this->catalog->scope()->paginate(),
         ];
 
         return view('catalog.index', $response);
@@ -37,16 +37,7 @@ class CatalogController extends Controller
             'name' => 'required'
         ];
         $this->validate($this->request, $rules);
-
-        $data = [];
-        $data['name'] = $this->request->input('name');
-        $data['sets'][1]['name'] = $this->request->input('setName');
-        if ($this->request->has('setValues')) {
-            foreach ($this->request->input('setValues') as $setValue) {
-                $data['sets'][1]['values'][]['name'] = $setValue;
-            }
-        }
-        $this->catalog->store($data);
+        $this->catalog->create($this->request->all());
 
         return redirect(route('catalog.index'));
     }
@@ -78,6 +69,7 @@ class CatalogController extends Controller
         $response = [
             'catalog' => $this->catalog->get($id),
         ];
+
         return view('catalog.edit', $response);
     }
 
@@ -90,8 +82,13 @@ class CatalogController extends Controller
      */
     public function update($id)
     {
-        $data = $this->request->all();
-        $this->catalog->update($id, $data);
+        $this->request->flash();
+        $rules = [
+            'name' => 'required'
+        ];
+        $this->validate($this->request, $rules);
+        $this->catalog->update($id, $this->request->all());
+
         return redirect(route('catalog.index'));
     }
 
@@ -104,6 +101,7 @@ class CatalogController extends Controller
     public function destroy($id)
     {
         $this->catalog->destroy($id);
+
         return redirect(route('catalog.index'));
     }
 }

@@ -19,53 +19,61 @@ abstract class BaseRepository
     /**
      * 搜索
      *
-     * @param $result
-     * @return mixed
+     * @return $this
      */
-    public function search($result)
+    public function search()
     {
         if (request()->has('keywords')) {
-            $result = $result->where(function ($query) {
+            $this->model = $this->model->where(function ($query) {
                 foreach ($this->searchFields as $searchField) {
                     $query = $query->orWhere($searchField, 'like', '%' . trim(request()->input('keywords')) . '%');
                 }
             });
         }
 
-        return $result;
+        return $this;
     }
 
     /**
      * 排序
      *
-     * @param $result
-     * @return mixed
+     * @return $this
      */
-    public function sort($result)
+    public function sort()
     {
         if (request()->has('sorts')) {
             $sorts = explode(',', request()->input('sorts'));
             foreach ($sorts as $sort) {
                 $sort = explode('.', $sort);
-                $result = $result->orderBy($sort[0], $sort['1']);
+                $this->model = $this->model->orderBy($sort[0], $sort['1']);
             }
         }
 
-        return $result;
+        return $this;
+    }
+
+    /**
+     * 过滤
+     *
+     * @return $this
+     */
+    public function filter()
+    {
+        return $this;
     }
 
     /**
      * 组装
      *
-     * @return mixed
+     * @return $this
      */
     public function scope()
     {
-        $result = $this->model;
-        $result = $this->search($result);
-        $result = $this->sort($result);
+        $this->search();
+        $this->sort();
+        $this->filter();
 
-        return $result;
+        return $this;
     }
 
     /**
@@ -75,7 +83,7 @@ abstract class BaseRepository
      */
     public function all()
     {
-        return $this->scope()->get();
+        return $this->model->get();
     }
 
     /**
@@ -86,7 +94,8 @@ abstract class BaseRepository
     public function paginate()
     {
         $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
-        return $this->scope()->paginate($pageSize);
+
+        return $this->model->paginate($pageSize);
     }
 
     /**
@@ -97,7 +106,7 @@ abstract class BaseRepository
      */
     public function get($id)
     {
-        return $this->model->find($id);
+        return $this->model->findOrFail($id);
     }
 
     /**
@@ -106,7 +115,7 @@ abstract class BaseRepository
      * @param $data
      * @return mixed
      */
-    public function store($data)
+    public function create($data)
     {
         return $this->model->create($data);
     }

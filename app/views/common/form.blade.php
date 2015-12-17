@@ -12,8 +12,11 @@
     <div class="panel panel-default">
         <div class="panel-heading">@section('formTitle')@show{{-- 表单标题 --}}</div>
         <div class="panel-body">
-            <form method="POST" action="@section('formAction')@show{{-- 表单提交地址 --}}" @section('formAttributes')@show{{-- 表单其它属性 --}}   enctype="multipart/form-data">
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+ 
+
+            <form method="POST" action="@section('formAction')@show{{-- 表单提交地址 --}}" @section('formAttributes')@show{{-- 表单其它属性 --}}  enctype="multipart/form-data">
+                {!! csrf_field() !!}
+
                 @section('formBody')@show{{-- 表单内容 --}}
                 @section('formButton')
                     <button type="submit" class="btn btn-success">提交</button>

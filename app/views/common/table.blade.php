@@ -14,7 +14,7 @@
                                 <button class="btn btn-default" type="submit">
                                     <i class="glyphicon glyphicon-search"></i>
                                 </button>
-                                <a class="btn btn-default" href="{{ Request::url() }}">
+                                <a class="btn btn-default" href="{{ request()->url() }}">
                                     <i class="glyphicon glyphicon-remove"></i>
                                 </a>
                             </span>
@@ -23,10 +23,9 @@
                         </form>
                         <div class="text-right col-lg-9">
                             <div class="btn-group">
-                                <a class="btn btn-success" href="{{ route(Request::segment(1).'.create') }}">
+                                <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
                                     <i class="glyphicon glyphicon-plus"></i> 新增
                                 </a>
-
                                 <a class="btn btn-info dropdown-toggle" data-toggle="dropdown">
                                     导出 <span class="caret"></span>
                                 </a>
@@ -43,16 +42,11 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <table class="table table-bordered table-striped table-hover">
-                            @section('tableColumns')
-                                <thead>
-                                <tr>
-                                    @foreach($columns as $column)
-                                        <th>{{ trans(Request::segment(1).'.'.$column) }}</th>
-                                    @endforeach
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                            @show{{-- 列表字段 --}}
+                            <thead>
+                            <tr>
+                                @section('tableHeader')@show{{-- 列表字段 --}}
+                            </tr>
+                            </thead>
                             <tbody>
                             @section('tableBody')@show{{-- 列表数据 --}}
                             </tbody>
@@ -62,9 +56,9 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <span>每页&nbsp;</span>
-                        <select id="pageSize" data-url="{{ Request::url() }}">
-                            @foreach(Config::get('setting.pageSizes') as $page)
-                                <option value="{{ $page }}" {{ $page == Request::input('pageSize') ? 'selected' : '' }}>
+                        <select id="pageSize" data-url="{{ request()->url() }}">
+                            @foreach(config('setting.pageSizes') as $page)
+                                <option value="{{ $page }}" {{ $page == request()->input('pageSize') ? 'selected' : '' }}>
                                     {{ $page }}
                                 </option>
                             @endforeach
@@ -75,8 +69,9 @@
                         {!!
                         $data
                         ->appends([
-                        'keywords' => Request::input('keywords'),
-                        'pageSize' => Request::input('pageSize')
+                        'keywords' => request()->input('keywords'),
+                        'pageSize' => request()->input('pageSize'),
+                        'sorts' => request()->input('sorts'),
                         ])
                         ->render()
                         !!}
@@ -87,8 +82,8 @@
     </div>
     {{-- 模拟DELETE删除表单 --}}
     <form method="POST" action="" id="hiddenDeleteForm">
+        {!! csrf_field() !!}
         <input type="hidden" name="_method" value="DELETE"/>
-        <input type="hidden" name="_token" value="{{ csrf_token() }}"/>
     </form>
 @stop
 @section('pageJs')

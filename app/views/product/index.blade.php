@@ -8,13 +8,19 @@
     </ol>
 @stop
 @section('tableTitle') 产品列表 @stop
+@section('tableHeader')
+    <th>ID</th>
+    <th>名称</th>
+    <th>中文名称</th>
+    <th>创建时间</th>
+    <th>操作</th>
+@stop
 @section('tableBody')
     @foreach($data as $product)
         <tr>
             <td>{{ $product->id }}</td>
-            <td>{{ $product->brand->name }}</td>
-            <td>{{ $product->size }}</td>
-            <td>{{ $product->color }}</td>
+            <td>{{ $product->name }}</td>
+            <td>{{ $product->c_name }}</td>
             <td>{{ $product->created_at }}</td>
             <td>
                 <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">

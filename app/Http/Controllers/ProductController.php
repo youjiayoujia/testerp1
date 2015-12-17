@@ -12,18 +12,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
 use App\Repositories\ProductRepository;
 use Chumper\Zipper\Zipper;
  
-
 class ProductController extends Controller
 {
     protected $product;
 
-    public function __construct(Request $request, ProductRepository $product)
+    public function __construct(Request $request, Product $product, ProductRepository $productrepository)
     {
         $this->request = $request;
         $this->product = $product;
+		$this->productrepository =$productrepository;
     }
 
     /**
@@ -35,8 +36,7 @@ class ProductController extends Controller
     {
         $this->request->flash();
         $response = [
-            'columns' => $this->product->columns,
-            'data' => $this->product->index($this->request),
+            'data' => $this->product->paginate(),
         ];
 
         return view('product.index', $response);
@@ -50,9 +50,18 @@ class ProductController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show($id)
-    {
+    {	//$this->request->flash();
+		$type='default';
+		$result=$this->productrepository->getImage($id,$type);		 
+		if(isset($result[0])){
+			$default_image=$result[0]->image_path;
+			$default_map=explode("#",$default_image);
+			}
+			
         $response = [
-            'product' => $this->product->detail($id),
+            'product' => $this->product->findOrFail($id),
+			'product_image'=>$default_map[1],
+			'product_image_type'=>$this->productrepository->getImage_types($id),
         ];
 
         return view('product.show', $response);
@@ -65,11 +74,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $response = [
-            'brands' => $this->product->getBrands()
-        ];
-
-        return view('product.create', $response);
+        return view('product.create');
     }
 	
 
@@ -81,8 +86,16 @@ class ProductController extends Controller
     public function store()
     {
         $this->request->flash();
-        $this->validate($this->request, $this->product->rules);
-        $this->product->store($this->request);
+
+        $rules = [
+            'name' => 'required',
+        ];
+        $this->validate($this->request, $rules);
+
+        $data = array();
+        $data['name'] = $this->request->input('name');
+        $data['c_name'] = $this->request->input('c_name');
+        $this->product->create($data);
 
         return redirect(route('product.index'));
     }
@@ -96,8 +109,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $response = [
-            'brands' => $this->product->getBrands(),
-            'product' => $this->product->edit($id),
+            'product' => $this->product->findOrFail($id),
         ];
         return view('product.edit', $response);
     }
@@ -111,8 +123,16 @@ class ProductController extends Controller
     public function update($id)
     {
         $this->request->flash();
-        $this->validate($this->request, $this->product->rules);
-        $this->product->update($id, $this->request);
+
+        $rules = [
+            'name' => 'required',
+        ];
+        $this->validate($this->request, $rules);
+        
+        $product = $this->product->findOrFail($id);
+        $product->name = $this->request->input('name');
+        $product->c_name = $this->request->input('c_name');
+        $product->save();
 
         return redirect(route('product.index'));
     }
@@ -136,12 +156,13 @@ class ProductController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function addimage($id)
-    {   
+    {   $this->request->flash();
 		$image_type=['default','original','choies','aliexpress','amazon','ebay','wish','Lazada'];
         $response = [
             'image_type' => $image_type,
-            'product' => $this->product->edit($id),
+            'product' => $this->product->findOrFail($id),
         ];
+		//var_dump($response);exit;
         return view('product.addimage', $response);
     }
 	
@@ -151,8 +172,7 @@ class ProductController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function addzip()
-    {   
-		
+    {   		
         return view('product.addzip');
     }
 
@@ -189,7 +209,7 @@ class ProductController extends Controller
 		 
 		
 		if($this->request->file('map0')){
-			$result=$this->product->getImage($product_id,$type);
+			$result=$this->productrepository->getImage($product_id,$type);
 		 //var_dump($result);exit;
 		 if(!isset($result)){
 			$product_image_id=$result[0]->id;
@@ -223,9 +243,9 @@ class ProductController extends Controller
 					if($stat){
 						echo 'Resize Image Success!<br />';
 						if($product_image_id>0){
-							$this->product->update_image($product_image_id,$image_path);	
+							$this->productrepository->update_image($product_image_id,$image_path);	
 							}else{
-							$this->product->store_image($image_path,$product_id,$type);	
+							$this->productrepository->store_image($image_path,$product_id,$type);	
 							}   
 					}else{
 						echo 'Resize Image Fail!';  exit;
@@ -257,9 +277,9 @@ class ProductController extends Controller
 			 
 			if($product_image_id>0){
 			 
-			$this->product->update_image($product_image_id,$image_path);	
+			$this->productrepository->update_image($product_image_id,$image_path);	
 			}else{	
-			$this->product->store_image($image_path,$product_id,$type);	
+			$this->productrepository->store_image($image_path,$product_id,$type);	
 			} 
 		 }
 		 }else{
@@ -337,7 +357,7 @@ class ProductController extends Controller
 									 }
 									 }
 							 }
-							 $result=$this->product->getImage($product_id,$type);
+							 $result=$this->productrepository->getImage($product_id,$type);
 							 //var_dump($result);exit;
 							 if(!isset($result)){
 								$product_image_id=$result[0]->id;
@@ -346,9 +366,9 @@ class ProductController extends Controller
 								 }
 							 
 						 if($product_image_id>0){
-							$this->product->update_image($product_image_id,$image_path);	
+							$this->productrepository->update_image($product_image_id,$image_path);	
 							}else{
-							$this->product->store_image($image_path,$product_id,$type);	
+							$this->productrepository->store_image($image_path,$product_id,$type);	
 							} 
 				 
 				 }
@@ -425,7 +445,7 @@ class ProductController extends Controller
 							//var_dump($val);exit;
 							$type='default';
 							$product_id=$value;		
-							$result=$this->product->getImage($value,$type);
+							$result=$this->productrepository->getImage($value,$type);
 							if(!empty($result)){ 
 								$product_image_id=0;
 							}else{
@@ -442,7 +462,7 @@ class ProductController extends Controller
 							//var_dump($val);exit;
 							$product_image_paths=$this->get_dirname($path.'product/'.$value.'/'.$val.'/');
 							//var_dump($product_image_paths);exit;
-							$result=$this->product->getImage($value,$val);
+							$result=$this->productrepository->getImage($value,$val);
 							//var_dump($result); echo (empty($result));exit;
 							if(!empty($result)){ 
 								$product_image_id=0;
@@ -461,9 +481,9 @@ class ProductController extends Controller
 							} 
 						}
 						if($product_image_id>0){
-							$this->product->update_image($product_image_id,$image_path);	
+							$this->productrepository->update_image($product_image_id,$image_path);	
 							}else{
-							 $res=$this->product->store_image($image_path,$value,$type);	
+							 $this->productrepository->store_image($image_path,$value,$type);	
 							} 
 						}
 					}//var_dump($product_image_types);exit;

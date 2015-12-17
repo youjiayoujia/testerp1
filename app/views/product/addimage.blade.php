@@ -17,16 +17,14 @@
 @section('formTitle') 添加图片 @stop
 @section('formAction')  /product/image_update @stop
 @section('formBody')
-    <!-- <input type="hidden" name="_method" value="POST"/>
-    <input type="hidden" name="_enctype" value="multipart/form-data"/>-->
    <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <div class="form-group">
-        <label for="brand_id">产品名:{{$product->size}}</label>
+        <label for="brand_id">产品名:{{$product->name}}</label>
         <input  type="hidden" name='product_id'  value='{{$product->id}}'/>
     </div>	
     <div class="form-group">
-        <label for="size">供应商提供的URL：</label>
-        <input  class="form-control" id="size" placeholder="供应商提供的RUL" name='suppliers_url'  />
+        <label for="URL">供应商提供的URL：</label>
+        <input  class="form-control" id="url" placeholder="供应商提供的RUL" name='suppliers_url'  />
     </div>
     <div class="form-group">
         <label for="color">图片类型：</label>

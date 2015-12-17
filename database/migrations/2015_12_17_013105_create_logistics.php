@@ -13,11 +13,8 @@ class CreateLogistics extends Migration
     public function up()
     {
         Schema::create('logistics', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
-            $table->string('name')->nullable()->default(NULL);
-            $table->string('country')->nullable()->default(NULL);
+            $table->increments('id');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

@@ -19,19 +19,19 @@
                 <dt>客户ID</dt>
                 <dd>{{ $logistics->customer_id }}</dd>
                 <dt>密钥</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
-                <dt>客户ID</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
-                <dt>客户ID</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
-                <dt>客户ID</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
-                <dt>客户ID</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
-                <dt>客户ID</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
-                <dt>客户ID</dt>
-                <dd>{{ $logistics->customer_id }}</dd>
+                <dd>{{ $logistics->secret_key }}</dd>
+                <dt>是否有API</dt>
+                <dd>{{ $logistics->is_api == 'Y' ? '有' : '没有' }}</dd>
+                <dt>客户经理</dt>
+                <dd>{{ $logistics->client_manager }}</dd>
+                <dt>客户经理联系方式</dt>
+                <dd>{{ $logistics->manager_tel }}</dd>
+                <dt>技术人员</dt>
+                <dd>{{ $logistics->technician }}</dd>
+                <dt>技术联系方式</dt>
+                <dd>{{ $logistics->technician_tel }}</dd>
+                <dt>备注</dt>
+                <dd>{{ $logistics->remark }}</dd>
                 <dt>创建时间</dt>
                 <dd>{{ $logistics->created_at }}</dd>
                 <dt>更新时间</dt>

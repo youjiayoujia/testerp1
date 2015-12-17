@@ -60,7 +60,7 @@ class LogisticsController extends Controller
     public function show($id)
     {
         $response = [
-            'logistics' => $this->logistics->detail($id),
+            'logistics' => $this->logistics->get($id),
         ];
         return view('logistics.show', $response);
     }
@@ -68,7 +68,7 @@ class LogisticsController extends Controller
     public function edit($id)
     {
         $response = [
-            'logistics' => $this->logistics->detail($id),
+            'logistics' => $this->logistics->get($id),
         ];
         return view('logistics.edit', $response);
     }

@@ -27,8 +27,18 @@ class productRequireRepository extends BaseRepository
 	*
 	*/
     public $rules = [
-        'create' => ['name' => 'required|unique:product_require,name'],
-        'update' => []
+        'create' => [	
+        		//'name' => 'required|max:255|unique:product_require,name',
+            	'competition_url' => 'active_url',
+            	'needer_id' => 'required',
+            	'needer_shop_id' => 'required'
+        ],
+        'update' => [	
+        		'name' => 'required|max:255|unique:product_require,name,{id}',
+            	'competition_url' => 'active_url',
+            	'needer_id' => 'required',
+            	'needer_shop_id' => 'required',
+        ]
     ];
 
 	function __construct(productRequire $productRequire)
@@ -39,9 +49,12 @@ class productRequireRepository extends BaseRepository
 	public function store($data)
 	{
 		if(!array_key_exists('id', $data)) {
-			$productRequire = $this->model->create($data)->id;
+            $data['address'] = $data['province'].' '.$data['city'];
+			$buf = $this->model->create($data); 
+			$productRequire = $buf->id;
 		} else {
-			$productRequire = productRequire::where('id', '=', $data['id'])->update($data);
+			$buf = $this->model->find($data['id']);
+			$productRequire = $buf->update($data);
 		}
 
 		return $productRequire;

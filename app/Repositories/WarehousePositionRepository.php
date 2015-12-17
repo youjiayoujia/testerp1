@@ -27,8 +27,16 @@ class WarehousePositionRepository extends BaseRepository
 	*
 	*/
     public $rules = [
-        'create' => ['name' => 'required|unique:warehouse_positions,name'],
-        'update' => []
+        'create' => [
+        	'name' => 'required|max:128|unique:warehouse_positions,name',
+			'warehouses_id' => 'required',
+			'size' => 'required'
+			],
+        'update' => [
+        	'name' => 'required|max:128|unique:warehouse_positions,name,{id}',
+			'warehouses_id' => 'required',
+			'size' => 'required'
+			]
     ];
 
 	public function __construct(Position $position)

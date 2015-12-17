@@ -26,8 +26,16 @@ class WarehouseRepository extends BaseRepository
 	*
 	*/
     public $rules = [
-        'create' => ['name' => 'required|unique:warehouses,name'],
-        'update' => []
+        'create' => [
+        	'name' => 'required|max:128|unique:warehouses,name',
+			'type' => 'required',
+			'volumn' => 'required|digits_between:1,10'
+		],
+        'update' => [
+        	'name' => 'required|max:128|unique:warehouses,name,{id}',
+			'type' => 'required',
+			'volumn' => 'required|digits_between:1,10'
+		]
     ];
     
 	public function __construct(Warehouse $warehouse)
@@ -35,4 +43,9 @@ class WarehouseRepository extends BaseRepository
 		$this->model = $warehouse;
 	}
 	
+    public function create($data)
+    {
+        $provider = $this->model->create($data);
+        $provider->update(['detail_address' => $data['province'].' '.$data['city']]);
+    }
 }

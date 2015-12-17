@@ -6,14 +6,6 @@ use App\Base\BaseModel;
 
 class Catalog extends BaseModel
 {
-
-    /**
-     * The database table used by the model.
-     *
-     * @var string
-     */
-    protected $table = 'catalogs';
-
     /**
      * The attributes that are mass assignable.
      *

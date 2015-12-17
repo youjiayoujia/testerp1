@@ -50,20 +50,20 @@
         </div>
     </div>
         <div class="form-group"> 
-        <label for="sku" class='control-label'>类似款sku</label>
-        <input type='text' class="form-control" id="sku" placeholder="类似款sku" name='sku' value="{{ old('sku') }}">
+        <label for="similar_sku" class='control-label'>类似款sku</label>
+        <input type='text' class="form-control" id="similar_sku" placeholder="类似款sku" name='similar_sku' value="{{ old('similar_sku') }}">
     </div>
      <div class="form-group">
-        <label for="url" class='control-label'>竞争产品url</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="url" placeholder="竞争产品url" name='url' value="{{ old('url') }}">
+        <label for="competition_url" class='control-label'>竞争产品url</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <input type='text' class="form-control" id="competition_url" placeholder="竞争产品url" name='competition_url' value="{{ old('competition_url') }}">
     </div>
      <div class="form-group">
         <label for="remark" class='control-label'>需求备注</label>
         <input type='text' class="form-control" id="remark" placeholder="需求备注" name='remark' value="{{ old('remark') }}">
     </div>
     <div class='form-group'>
-        <label for="expdate">期望上传日期</label>
-        <input id="expdate" name='expdate' type="text">
+        <label for="expected_date">期望上传日期</label>
+        <input id="expected_date" name='expected_date' type="text">
     </div>
     
     <div class="form-group">
@@ -83,6 +83,6 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         init();
-        $('#expdate').cxCalendar();
+        $('#expected_date').cxCalendar();
     });
 </script>

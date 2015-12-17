@@ -39,7 +39,7 @@ class warehouseController extends Controller
 		$this->request->flash();
 
 		$response = [
-			'data' => $this->warehouse->paginate(),
+			'data' => $this->warehouse->auto()->paginate(),
 		];
 
 		return view('warehouse.index', $response);
@@ -86,21 +86,8 @@ class warehouseController extends Controller
 	{
 		$this->request->flash();
 
-		$rules = [
-			'name' => 'required|max:128|unique:warehouses,name',
-			'type' => 'required',
-			'volumn' => 'required|digits_between:1,10'
-		];
-		$this->validate($this->request,$rules);
-
-		$data = [];
-		$data['name'] = $this->request->input('name');
-		$data['detail_address'] = $this->request->input('province')." ".$this->request->input('city');
-		$data['type'] = $this->request->input('type');
-		$data['volumn'] = $this->request->input('volumn');
-		$data['is_available'] = $this->request->input('is_available');
-		$data['is_default'] = $this->request->input('is_default');
-		$this->warehouse->store($data);
+		$this->validate($this->request, $this->warehouse->rules('create'));
+		$this->warehouse->create($this->request->all());
 
 		return redirect(route('warehouse.index'));
 	}
@@ -133,15 +120,8 @@ class warehouseController extends Controller
 	public function update($id)
 	{
 		$this->request->flash();
-		
-		$data = [];
-		$data['name'] = $this->request->input('name');
-		$data['detail_address'] = $this->request->input('province')." ".$this->request->input('city');
-		$data['type'] = $this->request->input('type');
-		$data['volumn'] = $this->request->input('volumn');
-		$data['is_available'] = $this->request->input('is_available');
-		$data['is_default'] = $this->request->input('is_default');
-		$this->warehouse->update($id, $data);
+		$this->validate($this->request, $this->warehouse->rules('update', $id));
+		$this->warehouse->update($id, $this->request->all());
 
 		return redirect(route('warehouse.index'));
 	}

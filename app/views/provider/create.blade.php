@@ -38,12 +38,12 @@
         <label for="online">是否是线上供货商(否/是)</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='online' value='0' checked>否
+                <input type='radio' name='type' value='0' checked>否
             </label>   
         </div>
         <div class='radio'>
             <label>
-                <input type='radio' name='online' value='1'>是
+                <input type='radio' name='type' value='1'>是
             </label>
         </div>
     </div>
@@ -56,8 +56,8 @@
         <input class="form-control" id="telephone" placeholder="供货商电话" name='telephone' value="{{ old('telephone') }}">
     </div>
     <div class="form-group">
-        <label for="purchaseid">采购员</label>
-        <input class="form-control" id="purchaseid" placeholder="采购者id" name='purchaseid' value="{{ old('purchaseid') }}">
+        <label for="purchase_id">采购员</label>
+        <input class="form-control" id="purchase_id" placeholder="采购者id" name='purchase_id' value="{{ old('purchase_id') }}">
     </div>
     <div class="form-group">
         <label for="level">供货商评级</label>

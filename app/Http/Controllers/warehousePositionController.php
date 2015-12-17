@@ -38,7 +38,7 @@ class warehousePositionController extends Controller
 		$this->request->flash();
 
 		$response = [
-			'data' => $this->warehousePosition->paginate(),
+			'data' => $this->warehousePosition->auto()->paginate(),
 		];
 
 		return view('warehousePosition.index', $response);
@@ -87,22 +87,8 @@ class warehousePositionController extends Controller
 	public function store()
 	{
 		$this->request->flash();
-
-		$rules = [
-			'name' => 'required|max:128|unique:warehouse_positions,name',
-			'warehouses_id' => 'required',
-			'size' => 'required'
-		];
-		$this->validate($this->request,$rules);
-
-		$data = [];
-		$data['name'] = $this->request->input('name');
-		$data['warehouses_id'] = $this->request->input('warehouses_id');
-		$data['remark'] = $this->request->input('remark');
-		$data['size'] = $this->request->input('size');
-		$data['is_available'] = $this->request->input('is_available');
-
-		$this->warehousePosition->store($data);
+		$this->validate($this->request,$this->warehousePosition->rules('create'));
+		$this->warehousePosition->create($this->request->all());
 		return redirect(route('warehousePosition.index'));
 	}
 
@@ -135,14 +121,8 @@ class warehousePositionController extends Controller
 	public function update($id)
 	{
 		$this->request->flash();
-		
-		$data = [];
-		$data['name'] = $this->request->input('name');
-		$data['warehouses_id'] = $this->request->input('warehouses_id');
-		$data['remark'] = $this->request->input('remark');
-		$data['size'] = $this->request->input('size');
-		$data['is_available'] = $this->request->input('is_available');
-		$this->warehousePosition->update($id, $data);
+		$this->validate($this->request, $this->warehousePosition->rules('update', $id));
+		$this->warehousePosition->update($id, $this->request->all());
 
 		return redirect(route('warehousePosition.index'));
 	}

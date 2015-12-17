@@ -36,6 +36,32 @@ abstract class BaseRepository
     }
 
     /**
+     * 自动组装
+     *
+     * @return $this
+     */
+    public function auto()
+    {
+        if (request()->has('keywords')) {
+            $this->search(request()->input('keywords'));
+        }
+
+        if (request()->has('sorts')) {
+            $sorts = [];
+            foreach (explode(',', request()->input('sorts')) as $key => $sort) {
+                $sort = explode('.', $sort);
+                $sorts[$key]['field'] = $sort[0];
+                $sorts[$key]['direction'] = $sort[1];
+            }
+            $this->sort($sorts);
+        }
+
+        $this->filter();
+
+        return $this;
+    }
+
+    /**
      * 搜索
      *
      * @param $keywords
@@ -74,32 +100,6 @@ abstract class BaseRepository
      */
     public function filter()
     {
-        return $this;
-    }
-
-    /**
-     * 自动组装
-     *
-     * @return $this
-     */
-    public function auto()
-    {
-        if (request()->has('keywords')) {
-            $this->search(request()->input('keywords'));
-        }
-
-        if (request()->has('sorts')) {
-            $sorts = [];
-            foreach (explode(',', request()->input('sorts')) as $key => $sort) {
-                $sort = explode('.', $sort);
-                $sorts[$key]['field'] = $sort[0];
-                $sorts[$key]['direction'] = $sort[1];
-            }
-            $this->sort($sorts);
-        }
-
-        $this->filter();
-
         return $this;
     }
 

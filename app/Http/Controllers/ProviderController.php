@@ -1,21 +1,10 @@
 <?php
-
-/**
- * 供货商控制器
- * 处理供货商相关的Request与Response
- *
- * User: MC
- * Date: 15/12/4
- * Time: 12:02pm
- */
-
 namespace App\Http\Controllers;
 
-use app\jobs\sends;
-
+use App\Commands\ss;
+use Queue;
 use Illuminate\Http\Request;
 use App\Repositories\ProviderRepository;
-
 
 class ProviderController extends Controller
 {
@@ -29,7 +18,8 @@ class ProviderController extends Controller
 
 	public function test()
 	{
-		$this->dispatch(new sends());
+		Queue::later(10, new ss());
+		echo "ok";
 	}
 	/*
 	*
@@ -43,11 +33,11 @@ class ProviderController extends Controller
 	{
 		$this->request->flash();
 
-        $response = [
-            'data' => $this->provider->paginate(),
-        ];
+		$response = [
+			'data' => $this->provider->paginate(),
+		];
 
-		return view('provider.index', $response);
+		//return view('provider.index', $response);
 	}
 
 	/*

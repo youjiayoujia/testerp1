@@ -7,7 +7,7 @@
  */
 namespace App\Base;
 
-abstract class BaseRepository
+class BaseRepository
 {
     //仓库调用模型
     protected $model;

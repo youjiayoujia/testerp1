@@ -109,7 +109,7 @@ return [
         'url' => '',
     ],
     [
-        'name' => '物流',
+        'name' => '物流商',
         'location' => 'logistics',
         'icon' => 'plane',
         'url' => '',
@@ -124,6 +124,26 @@ return [
                 'name' => '新增',
                 'location' => 'create',
                 'url' => 'logistics.create',
+                'icon' => '',
+            ],
+        ],
+    ],
+    [
+        'name' => '物流商物流方式',
+        'location' => 'logisticsType',
+        'icon' => 'plane',
+        'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'logisticsType.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'logisticsType.create',
                 'icon' => '',
             ],
         ],

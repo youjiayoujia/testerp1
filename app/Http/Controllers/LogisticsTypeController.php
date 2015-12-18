@@ -66,7 +66,7 @@ class LogisticsTypeController extends Controller
     public function edit($id)
     {
         $response = [
-            'logisticsType' => $this->logisticsType->getLogistics(),
+            'logisticsTypes' => $this->logisticsType->getLogistics(),
             'logisticsType' => $this->logisticsType->get($id),
         ];
         return view('logisticsType.edit', $response);

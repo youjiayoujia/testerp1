@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
+        <li><a href="{{ route('logisticsType.index') }}">物流方式</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
@@ -18,30 +18,24 @@
     <th>操作</th>
 @stop
 @section('tableBody')
-    @foreach($data as $logistics)
+    @foreach($data as $logisticsType)
         <tr>
-            <td>{{ $logistics->id }}</td>
-            <td>{{ $logistics->name }}</td>
-            <td>{{ $logistics->customer_id }}</td>
-            <td>{{ $logistics->secret_key }}</td>
-            <td>{{ $logistics->is_api == 'Y' ? '有' : '没有' }}</td>
-            <td>{{ $logistics->client_manager }}</td>
-            <td>{{ $logistics->manager_tel }}</td>
-            <td>{{ $logistics->technician }}</td>
-            <td>{{ $logistics->technician_tel }}</td>
-            <td>{{ $logistics->remark }}</td>
-            <td>{{ $logistics->updated_at }}</td>
-            <td>{{ $logistics->created_at }}</td>
+            <td>{{ $logisticsType->id }}</td>
+            <td>{{ $logisticsType->type }}</td>
+            <td>{{ $logisticsType->logisticsType->name ? $logisticsType->logisticsType->name : '' }}</td>
+            <td>{{ $logisticsType->remark }}</td>
+            <td>{{ $logisticsType->created_at }}</td>
+            <td>{{ $logisticsType->updated_at }}</td>
             <td>
-                <a href="{{ route('logistics.show', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('logisticsType.show', ['id'=>$logisticsType->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('logistics.edit', ['id'=>$logistics->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('logisticsType.edit', ['id'=>$logisticsType->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $logistics->id }}"
-                   data-url="{{ route('logistics.destroy', ['id' => $logistics->id]) }}">
+                   data-id="{{ $logisticsType->id }}"
+                   data-url="{{ route('logisticsType.destroy', ['id' => $logisticsType->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

@@ -20,9 +20,9 @@
     <div class="form-group">
         <label for="logistics_id">物流商</label>
         <select name="logistics_id" class="form-control">
-            @foreach($logisticsType as $type)
-                <option value="{{$type->id}}" {{$type->id == $logisticsType->logistics_id ? 'selected' : ''}}>
-                    {{$type->name}}
+            @foreach($logisticsTypes as $type)
+                <option value="{{ $type->id }}" {{$type->id == $logisticsType->logistics_id ? 'selected' : ''}}>
+                    {{ $type->name }}
                 </option>
             @endforeach
         </select>

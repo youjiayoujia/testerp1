@@ -13,9 +13,9 @@ use App\Models\Catalog as Catalog;
 class CatalogRepository extends BaseRepository
 {
     protected $searchFields = ['name'];
-    public $rules = [
-        'create' => ['name' => 'required|unique:catalog,name'],
-        'update' => []
+    protected $rules = [
+        'create' => ['name' => 'required|unique:catalogs,name'],
+        'update' => ['name' => 'required|unique:catalogs,name,{id}'],
     ];
 
     public function __construct(Catalog $catalog)

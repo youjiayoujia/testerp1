@@ -30,7 +30,7 @@
             <td>{{ $logistics->name }}</td>
             <td>{{ $logistics->customer_id }}</td>
             <td>{{ $logistics->secret_key }}</td>
-            <td>{{ $logistics->is_api == 'Y' ? '有' : '没有' }}</td>
+            <td>{{ $logistics->is_api }}</td>
             <td>{{ $logistics->client_manager }}</td>
             <td>{{ $logistics->manager_tel }}</td>
             <td>{{ $logistics->technician }}</td>

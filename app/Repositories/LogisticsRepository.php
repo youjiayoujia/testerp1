@@ -16,8 +16,26 @@ class LogisticsRepository extends BaseRepository
 {
     protected $searchFields = ['name'];
     public $rules = [
-        'create' => ['name' => 'required|unique:logistics,name'],
-        'update' => []
+        'create' => [
+            'name' => 'required|unique:logistics,name',
+            'customer_id' => 'required|numeric',
+            'secret_key' => 'required',
+            'is_api' => 'required',
+            'client_manager' => 'required',
+            'technician' => 'required',
+            'manager_tel' => 'required|digits_between:8,11',
+            'technician_tel' => 'required|digits_between:8,11',
+        ],
+        'update' => [
+            'name' => 'required|unique:logistics,name,{id}',
+            'customer_id' => 'required|numeric',
+            'secret_key' => 'required',
+            'is_api' => 'required',
+            'client_manager' => 'required',
+            'technician' => 'required',
+            'manager_tel' => 'required|digits_between:8,11',
+            'technician_tel' => 'required|digits_between:8,11',
+        ],
     ];
 
     public function __construct(Logistics $logistics)
@@ -25,15 +43,15 @@ class LogisticsRepository extends BaseRepository
         $this->model = $logistics;
     }
 
-    public function store($data)
-    {
-        $logistics = Logistics::create($data);
-        return $logistics;
-    }
-
-    public function update($id, $data)
-    {
-        $logistics = Logistics::where('id', '=', "{$id}")->update($data);
-        return $logistics;
-    }
+//    public function store($data)
+//    {
+//        $logistics = Logistics::create($data);
+//        return $logistics;
+//    }
+//
+//    public function update($id, $data)
+//    {
+//        $logistics = Logistics::where('id', '=', "{$id}")->update($data);
+//        return $logistics;
+//    }
 }

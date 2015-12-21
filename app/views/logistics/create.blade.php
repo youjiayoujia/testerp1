@@ -15,7 +15,7 @@
 @section('formBody')
     <div class="form-group">
         <label for="name" class="control-label">物流商名称</label>
-        <input class="form-control" id="name" placeholder="物流商名称" name='name' value="{{ old('name') }}">
+        <input type="text" class="form-control" id="name" placeholder="物流商名称" name='name' value="{{ old('name') }}">
     </div>
     <div class="form-group">
         <label for="customer_id" class="control-label">客户ID</label>
@@ -29,12 +29,12 @@
         <label for="is_api">是否有API</label>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="Y">有
+                <input type="radio" name="is_api" value="Y" {{old('is_api') ? (old('is_api') == 'Y' ? 'checked' : '') : 'checked'}}>有
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="N">没有
+                <input type="radio" name="is_api" value="N" {{old('is_api') ? (old('is_api') == 'N' ? 'checked' : '') : 'checked'}}>没有
             </label>
         </div>
     </div>

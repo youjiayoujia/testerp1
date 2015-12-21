@@ -26,7 +26,7 @@ class LogisticsTypeController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->logisticsType->paginate(),
+            'data' => $this->logisticsType->auto()->paginate(),
         ];
         return view('logisticsType.index', $response);
     }

@@ -16,7 +16,7 @@
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group">
         <label for="name" class="control-label">物流商名称</label>
-        <input class="form-control" id="name" placeholder="物流商名称" name='name' value="{{ old('name') ?  old('name') : $logistics->name }}">
+        <input type="text" class="form-control" id="name" placeholder="物流商名称" name='name' value="{{ old('name') ?  old('name') : $logistics->name }}">
     </div>
     <div class="form-group">
         <label for="customer_id" class="control-label">客户ID</label>
@@ -30,12 +30,12 @@
         <label for="is_api">是否有API</label>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="Y" {{ $logistics->is_api == 'Y' ? 'checked' : '' }}>有
+                <input type="radio" name="is_api" value="Y" {{old('is_api') ? (old('is_api') == 'Y' ? 'checked' : '') : ($logistics->is_api == 'Y' ? 'checked' : '')}}>1
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="N" {{ $logistics->is_api == 'N' ? 'checked' : '' }}>没有
+                <input type="radio" name="is_api" value="N" {{old('is_api') ? (old('is_api') == 'N' ? 'checked' : '') : ($logistics->is_api == 'N' ? 'checked' : '')}}>0
             </label>
         </div>
     </div>

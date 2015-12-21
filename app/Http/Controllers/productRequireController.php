@@ -4,14 +4,13 @@
  * 选款需求控制器
  * 处理选款需求相关的Request与Response
  *
- * User: MC<178069409@qq.com>
- * Date: 15/12/4
- * Time: 13:49pm
+ * @author: MC<178069409@qq.com>
+ * Date: 15/12/18
+ * Time: 15:21pm
  */
 
 namespace App\Http\Controllers;
 
-use Config;
 use Illuminate\Http\Request;
 use App\Repositories\productRequireRepository;
 
@@ -26,11 +25,10 @@ class productRequireController extends Controller
     }
 
     /**
-     *
-     * @ func 显示主界面
-     * @ view/index 传参，columns和data
-     *
-     * @1:50pm
+     * 列表页显示
+     * 
+     * @param none
+     * @return view
      *
      */
     public function index()
@@ -40,15 +38,14 @@ class productRequireController extends Controller
             'data' => $this->productRequire->auto()->paginate(),
         ];
 
-        return view('productRequire.index', $response);
+        return view('product.require.index', $response);
     }
 
     /**
+     * 详情页
      *
-     * @func   显示需求详细信息
-     * @ view/show  传参response
-     *
-     * @ 1:50am
+     * @param $id integer 记录id
+     * @return view
      *
      */
 
@@ -58,95 +55,104 @@ class productRequireController extends Controller
             'productRequire' => $this->productRequire->get($id),
         ];
 
-        return view('productRequire.show', $response);
+        return view('product.require.show', $response);
     }
 
     /**
+     * 跳转创建页面
      *
-     * @func 创建记录
-     * @retrun view/create
-     *
-     * @1:53pm
+     * @param none
+     * @return view
      *
      */
     public function create()
     {
-        return view('productRequire.create');
+        return view('product.require.create');
     }
 
-
     /**
-     *
-     * @func 保存记录
-     * @转移图片存储位置，返回路径
-     *
-     * @ 1:50pm
+     * 文件移动
+     * @param $fd file 文件指针
+     * @param $name 转移后的文件名
+     * @param $path 转移路径
+     * @return 转以后的文件路径
      *
      */
-    public function store()
+    function move_file($fd, $name, $path)
+    {
+        file_exists($path) or mkdir($path, 644, true);
+        if(file_exists($path.'/'.$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.'))))
+            unlink($path.'/'.$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.')));
+        $fd->move($path,$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.')));
+
+        return "/".$path."/".$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.'));
+    }
+
+    /**
+     * 数据保存
+     *
+     * @param none
+     * @return view
+     *
+     */
+    public function store() 
     {
         $this->request->flash();
         $this->validate($this->request, $this->productRequire->rules('create'));
-        $data = [];
         $data = $this->request->all();
-        $data['id'] = $this->productRequire->store($data);
-        $path = '';
-        $i=1;
-        for( ; $i <= 6; $i++) {
+        $buf = $this->productRequire->store($data);
+        $data['id'] = $buf->id;
+            
+        for($i=1; $i <= 6; $i++) {
             if($this->request->hasFile('img'.$i)) {
                 $file = $this->request->file('img'.$i);
-                $path = Config::get('product_require_img_path.dir')."/".$data['id'];
-                file_exists($path) or mkdir($path, 644, true);
-                $file->move($path,"/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+                $path = Config('product_require_img_path.dir')."/".$data['id'];
+                $dstname = $i;
+                $absolute_path = $this->move_file($file, $dstname, $path);
                 $name = 'img'.$i;
-                $data["{$name}"] = "/".$path."/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'));
+                $data["{$name}"] = $absolute_path;
             }
         }
+        $buf->update($data);
 
-        $this->productRequire->store($data);
         return redirect(route('productRequire.index'));
     }
 
-    /*
+    /**
+    * 数据更新
     *
-        @func 更新数据
-        @param $id 数据的id
-
-        @13:57pm
+    * @param $id integer 记录id
+    * @return view
     *
     */
-
     public function update($id)
     {
         $this->request->flash();
 
-        $data = [];
+        $this->validate($this->request, $this->productRequire->rules('update', $id));
         $data = $this->request->all();
-        $path = '';
-        $i=1;
-        for( ; $i <= 6; $i++) {
+        $buf = $this->productRequire->update($id, $data);
+        
+        for($i=1; $i <= 6; $i++) {
             if($this->request->hasFile('img'.$i)) {
                 $file = $this->request->file('img'.$i);
-                $path = Config::get('product_require_img_path.dir')."/".$id;
-                file_exists($path) or mkdir($path, 644, true);
-                if(file_exists($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'))))
-                    unlink($path.'/'.$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
-                $file->move($path,$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.')));
+                $path = Config('product_require_img_path.dir')."/".$id;
+                $dstname = $i;
+                $absolute_path = $this->move_file($file, $dstname, $path);
                 $name = 'img'.$i;
-                $data["{$name}"] = "/".$path."/".$i.substr($file->getClientOriginalName(),strrpos($file->getClientOriginalName(),'.'));
+                $data["{$name}"] = $absolute_path;
             }
         }
-        $this->productRequire->update($id, $data);
+        $buf->update($data);
+
         return redirect(route('productRequire.index'));
     }
 
-    /*
+    /**
+    * 跳转页面更新页
     *
-        @func 编辑需求
-        @ param id 数据记录的id
-
-        @return view/edit
-        @1:50pm
+    * @param $id integer 记录id
+    * @return view
     *
     */
     public function edit($id)
@@ -155,21 +161,19 @@ class productRequireController extends Controller
             'productRequire' => $this->productRequire->get($id),
         ];
 
-        return view('productRequire.edit', $response);
+        return view('product.require.edit', $response);
     }
 
-    /*
+    /**
+    * 删除一条记录
     *
-        @func 删除一条记录
-        @param  $id  记录的id
-
-        @return view/destroy
+    * @param $id integer 记录id
+    * @return view
     *
     */
-
     public function destroy($id)
     {
-        $this->fashion->destroy($id);
+        $this->productRequire->destroy($id);
 
         return redirect(route('productRequire.index'));
     }

@@ -78,20 +78,20 @@ return [
     ],
     [
         'name' => '供货商',
-        'location' => 'provider',
+        'location' => 'supplier',
         'icon' => 'tags',
         'url' => '',
         'subnavigations' => [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'provider.index',
+                'url' => 'supplier.index',
                 'icon' => '',
             ],
             [
-                'name' => '新增',
+                'name' => '新增', 
                 'location' => 'create',
-                'url' => 'provider.create',
+                'url' => 'supplier.create',
                 'icon' => '',
             ],
         ],
@@ -117,46 +117,6 @@ return [
         ],
     ],
     [
-        'name' => '仓库',
-        'location' => 'warehouse',
-        'icon' => 'tags',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'location' => null,
-                'url' => 'warehouse.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'location' => 'create',
-                'url' => 'warehouse.create',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
-        'name' => '库位',
-        'location' => 'warehousePosition',
-        'icon' => 'tags',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'location' => null,
-                'url' => 'warehousePosition.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'location' => 'create',
-                'url' => 'warehousePosition.create',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
         'name' => '订单',
         'location' => '',
         'icon' => 'list-alt',
@@ -164,9 +124,23 @@ return [
     ],
     [
         'name' => '仓储',
-        'location' => '',
+        'location' => 'warehouse',
         'icon' => 'home',
         'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '仓库',
+                'location' => null,
+                'url' => 'warehouse.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '库位',
+                'location' => 'null',
+                'url' => 'warehousePosition.index',
+                'icon' => '',
+            ],
+        ],
     ],
     [
         'name' => '物流',

@@ -1,13 +1,13 @@
 @extends('common.table')
-@section('title') 供货商列表 @stop
+@section('title') 库位列表 @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('warehousePosition.index') }}">供货商</a></li>
+        <li><a href="{{ route('warehousePosition.index') }}">库位</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
-@section('tableTitle') 供货商列表 @stop
+@section('tableTitle') 库位列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>库位名</th>
@@ -22,9 +22,9 @@
     @foreach($data as $warehousePosition)
         <tr>
             <td>{{ $warehousePosition->id }}</td>
-            <td>{{ $warehousePosition->name }}</td>
-            <td>{{ $warehousePosition->warehouseType->name ? $warehousePosition->warehouseType->name : ''}}</td>
-            <td>{{ $warehousePosition->remark }} </td>
+            <td>{{ $warehousePosition->name }}</td>            
+            <td>{{ $warehousePosition->warehouse->name }}</td>
+            <td>{{ $warehousePosition->remark }} </td>            
             <td>{{ $warehousePosition->size }}</td>
             <td>{{ $warehousePosition->is_available == 'Y' ? '是' : '否'}}</td>
             <td>{{ $warehousePosition->created_at }}</td>
@@ -41,6 +41,6 @@
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>
-        </tr>
+        </tr> 
     @endforeach
 @stop

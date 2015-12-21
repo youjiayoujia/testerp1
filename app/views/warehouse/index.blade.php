@@ -1,17 +1,18 @@
 @extends('common.table')
-@section('title') 供货商列表 @stop
+@section('title') 仓库列表 @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('warehouse.index') }}">供货商</a></li>
+        <li><a href="{{ route('warehouse.index') }}">仓库</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
-@section('tableTitle') 供货商列表 @stop
+@section('tableTitle') 仓库列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>名称</th>
-    <th>详细地址</th>
+    <th>省</th>   
+    <th>市</th>
     <th>类型</th>
     <th>容积</th>
     <th>是否启用</th>
@@ -24,7 +25,8 @@
         <tr>
             <td>{{ $warehouse->id }}</td>
             <td>{{ $warehouse->name }}</td>
-            <td>{{ $warehouse->detail_address}}</td>
+            <td>{{ $warehouse->province}}</td>
+            <td>{{ $warehouse->city}}</td>
             <td>{{ $warehouse->type }} </td>
             <td>{{ $warehouse->volumn }}(m<small>3</small>)</td>
             <td>{{ $warehouse->is_available == 'Y' ? '是' : '否'}}</td>

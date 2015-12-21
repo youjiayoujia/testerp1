@@ -16,8 +16,10 @@
                 <dd>{{ $warehouse->id }}</dd>
                 <dt>名称</dt>
                 <dd>{{ $warehouse->name }}</dd>
-                <dt>详细地址</dt>
-                <dd>{{ $warehouse->detail_address }}</dd>
+                <dt>省</dt>
+                <dd>{{ $warehouse->province }}</dd>
+                <dt>市</dt>
+                <dd>{{ $warehouse->city }}</dd>
                 <dt>类型</dt>
                 <dd>{{ $warehouse->type }}</dd>
                 <dt>容积</dt>

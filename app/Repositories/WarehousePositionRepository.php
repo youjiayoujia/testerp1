@@ -1,31 +1,24 @@
 <?php
+/**
+ * 库位仓库类 
+ * 规则定义与具体操作
+ *
+ * @author MC<178069409@qq.com>
+ * Date:15/12/18
+ * Time:16:21
+ */
 
 namespace App\Repositories;
 
 use App\Base\BaseRepository;
 use App\Models\WarehousePositionModel as Position;
-use App\Models\WarehouseModel as Warehouse;
-
-/**
- * 范例: 库位库
- *
- * @author MC<178069409@qq.com>
- */
 
 class WarehousePositionRepository extends BaseRepository
 {
-		/*
-	*
-	* @func 用于查询
-	*
-	*/
+	// 查询
 	protected $searchFields = ['name'];
 
-	/**
-	*
-	* 规则验证
-	*
-	*/
+	// 用于规则验证
     public $rules = [
         'create' => [
         	'name' => 'required|max:128|unique:warehouse_positions,name',
@@ -42,10 +35,5 @@ class WarehousePositionRepository extends BaseRepository
 	public function __construct(Position $position)
 	{
 		$this->model = $position;
-	}
-
-	public function getWarehouse()
-	{
-		return Warehouse::all();
 	}
 }

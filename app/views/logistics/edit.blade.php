@@ -30,12 +30,12 @@
         <label for="is_api">是否有API</label>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="Y" {{old('is_api') ? (old('is_api') == 'Y' ? 'checked' : '') : ($logistics->is_api == 'Y' ? 'checked' : '')}}>1
+                <input type="radio" name="is_api" value="Y" {{old('is_api') ? (old('is_api') == 'Y' ? 'checked' : '') : ($logistics->is_api == 'Y' ? 'checked' : '')}}>有
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="N" {{old('is_api') ? (old('is_api') == 'N' ? 'checked' : '') : ($logistics->is_api == 'N' ? 'checked' : '')}}>0
+                <input type="radio" name="is_api" value="N" {{old('is_api') ? (old('is_api') == 'N' ? 'checked' : '') : ($logistics->is_api == 'N' ? 'checked' : '')}}>没有
             </label>
         </div>
     </div>

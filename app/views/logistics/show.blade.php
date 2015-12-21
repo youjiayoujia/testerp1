@@ -21,7 +21,7 @@
                 <dt>密钥</dt>
                 <dd>{{ $logistics->secret_key }}</dd>
                 <dt>是否有API</dt>
-                <dd>{{ $logistics->is_api }}</dd>
+                <dd>{{ $logistics->is_api == 'Y' ? '有' : '没有' }}</dd>
                 <dt>客户经理</dt>
                 <dd>{{ $logistics->client_manager }}</dd>
                 <dt>客户经理联系方式</dt>

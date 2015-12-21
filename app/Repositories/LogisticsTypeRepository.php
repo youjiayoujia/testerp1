@@ -18,8 +18,14 @@ class LogisticsTypeRepository extends BaseRepository
     protected $searchFields = ['type'];
 
     public $rules = [
-        'create' => ['type' => 'required|unique:logistics_type,type'],
-        'update' => [],
+        'create' => [
+            'type' => 'required',
+            'logistics_id' => 'required',
+        ],
+        'update' => [
+            'type' => 'required',
+            'logistics_id' => 'required',
+        ],
     ];
 
     public function __construct(LogisticsType $logisticsType)
@@ -27,20 +33,9 @@ class LogisticsTypeRepository extends BaseRepository
         $this->model = $logisticsType;
     }
 
-    public function store($data)
-    {
-        $logisticsType = LogisticsType::create($data);
-        return $logisticsType;
-    }
-
-    public function update($id, $data)
-    {
-        $logisticsType = LogisticsType::where('id', '=', "{$id}")->update($data);
-        return $logisticsType;
-    }
-
     public function getLogistics()
     {
         return Logistics::all();
     }
+
 }

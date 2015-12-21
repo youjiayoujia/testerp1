@@ -43,15 +43,4 @@ class LogisticsRepository extends BaseRepository
         $this->model = $logistics;
     }
 
-//    public function store($data)
-//    {
-//        $logistics = Logistics::create($data);
-//        return $logistics;
-//    }
-//
-//    public function update($id, $data)
-//    {
-//        $logistics = Logistics::where('id', '=', "{$id}")->update($data);
-//        return $logistics;
-//    }
 }

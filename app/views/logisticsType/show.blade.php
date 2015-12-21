@@ -17,7 +17,7 @@
                 <dt>物流商物流方式</dt>
                 <dd>{{ $logisticsType->type }}</dd>
                 <dt>物流商</dt>
-                <dd>{{ $logisticsType->logistics_id }}</dd>
+                <dd>{{ $logisticsType->logisticsType->name }}</dd>
                 <dt>备注</dt>
                 <dd>{{ $logisticsType->remark }}</dd>
                 <dt>创建时间</dt>

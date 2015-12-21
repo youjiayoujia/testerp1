@@ -42,16 +42,8 @@ class LogisticsTypeController extends Controller
     public function store()
     {
         $this->request->flash();
-        $rules = [
-            'type' => 'required|unique:logistics_type,type',
-            'logistics_id' => 'required',
-        ];
-        $this->validate($this->request, $rules);
-        $data = [];
-        $data['type'] = $this->request->input('type');
-        $data['logistics_id'] = $this->request->input('logistics_id');
-        $data['remark'] = $this->request->input('remark');
-        $this->logisticsType->store($data);
+        $this->validate($this->request, $this->logisticsType->rules('create'));
+        $this->logisticsType->create($this->request->all());
         return redirect(route('logisticsType.index'));
     }
 
@@ -75,11 +67,8 @@ class LogisticsTypeController extends Controller
     public function update($id)
     {
         $this->request->flash();
-        $data = [];
-        $data['type'] = $this->request->input('type');
-        $data['logistics_id'] = $this->request->input('logistics_id');
-        $data['remark'] = $this->request->input('remark');
-        $this->logisticsType->update($id, $data);
+        $this->validate($this->request, $this->logisticsType->rules('update', $id));
+        $this->logisticsType->update($id, $this->request->all());
         return redirect(route('logisticsType.index'));
     }
 

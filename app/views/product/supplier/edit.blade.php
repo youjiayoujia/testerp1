@@ -3,14 +3,14 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('supplier.index') }}">供货商</a></li>
+        <li><a href="{{ route('productSupplier.index') }}">供货商</a></li>
         <li class="active"><strong>编辑供货商</strong></li>
     </ol>
 @stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 
 @section('formTitle') 编辑供货商 @stop
-@section('formAction') {{ route('supplier.update', ['id' => $supplier->id]) }} @stop
+@section('formAction') {{ route('productSupplier.update', ['id' => $supplier->id]) }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
@@ -18,12 +18,16 @@
         <label for="name">供货商名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="name" placeholder="供货商名" name='name' value="{{ old('name') ?  old('name') : $supplier->name }}">
     </div>
-        <div class="form-group">
-        <label for="detail_address" class='control-label'>详细地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <p for='province'>省份</p> <select name="province" onChange = "select()" class='form-control'>
-            <option value="{{ old('province') ?  old('province') : $supplier->province }}" checked>{{ $supplier->province }}</option>
-        </select>　
-        <p for='city'>城市</p> <select name="city" onChange = "select()" class='form-control'></select>
+    <div class="form-group">
+        <label for="detail_address" class='control-label'>省市地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
+            </div>
+            <div class='col-sm-6'> 
+                <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
+            </div>
+        </div>
     </div>
      <div class="form-group">
         <label for="address">地址</label>
@@ -33,12 +37,12 @@
         <label for="type">是否是线上供货商(否/是)</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='type' value='offline' {{old('type') ? (old('type') == 'offline' ? 'checked' : '') : ($supplier->type  == 'offline' ? 'checked' : '')}}>0
+                <input type='radio' name='type' value='offline' {{old('type') ? (old('type') == 'offline' ? 'checked' : '') : ($supplier->type  == 'offline' ? 'checked' : '')}}>否
             </label>   
         </div>
         <div class='radio'>
             <label>
-                <input type='radio' name='type' value='online' {{old('type') ? (old('type') == 'online' ? 'checked' : '') : ($supplier->type  == 'online' ? 'checked' : '')}}>1
+                <input type='radio' name='type' value='online' {{old('type') ? (old('type') == 'online' ? 'checked' : '') : ($supplier->type  == 'online' ? 'checked' : '')}}>是
             </label>
         </div>
     </div>

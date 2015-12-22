@@ -8,10 +8,10 @@
  * Time:16:21
  */
 
-namespace App\Repositories;
+namespace App\Repositories\Warehouse;
 
 use App\Base\BaseRepository;
-use App\Models\WarehousePositionModel as Position;
+use App\Models\Warehouse\WarehousePositionModel as Position;
 
 class WarehousePositionRepository extends BaseRepository
 {

@@ -14,8 +14,10 @@
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 Route::resource('product', 'PoductController');
-Route::resource('supplier', 'SupplierController');
-Route::resource('productRequire', 'ProductRequireController');
-Route::resource('warehouse', 'WarehouseController');
-Route::resource('warehousePosition', 'WarehousePositionController');
+Route::resource('productSupplier', 'product\ProductSupplierController');
+Route::resource('productRequire', 'product\ProductRequireController');
+Route::resource('warehouse', 'warehouse\WarehouseController');
+Route::resource('warehousePosition', 'warehouse\warehousePositionController');
 Route::resource('catalog', 'CatalogController');
+Route::resource('itemin', 'item\IteminController');
+Route::resource('itemout', 'item\ItemoutController');

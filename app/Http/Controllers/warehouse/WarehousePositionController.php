@@ -8,11 +8,12 @@
  * Time: 16:15pm
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\warehouse;
 
 use Illuminate\Http\Request;
-use App\Repositories\WarehousePositionRepository;
-use App\Models\WarehouseModel as Warehouse;
+use App\Http\Controllers\Controller;
+use App\Repositories\Warehouse\WarehousePositionRepository;
+use App\Models\Warehouse\WarehouseModel as Warehouse;
 
 class warehousePositionController extends Controller
 {
@@ -39,7 +40,7 @@ class warehousePositionController extends Controller
 			'data' => $this->warehousePosition->auto()->paginate(),
 		];
 	
-		return view('warehousePosition.index', $response);
+		return view('warehouse.position.index', $response);
 	}
 
 	/**
@@ -55,7 +56,7 @@ class warehousePositionController extends Controller
 			'warehousePosition' => $this->warehousePosition->get($id),
 		];
 
-		return view('warehousePosition.show', $response);
+		return view('warehouse.position.show', $response);
 	}
 
 	/**
@@ -70,7 +71,7 @@ class warehousePositionController extends Controller
 		$response = [
 			'warehouses' => $warehouse->all(),
 		];
-		return view('warehousePosition.create', $response);
+		return view('warehouse.position.create', $response);
 	}
 
 	/**
@@ -102,7 +103,7 @@ class warehousePositionController extends Controller
 			'warehousePosition' => $this->warehousePosition->get($id),
 		];
 
-		return view('warehousePosition.edit',$response);
+		return view('warehouse.position.edit',$response);
 	}
 
 	/**

@@ -9,10 +9,10 @@
  * Time:17:26
  */
 
-namespace App\Repositories;
+namespace App\Repositories\Product;
 
 use App\Base\BaseRepository;
-use App\Models\productRequireModel as productRequire;
+use App\Models\Product\productRequireModel as productRequire;
 
 class productRequireRepository extends BaseRepository
 {
@@ -39,33 +39,23 @@ class productRequireRepository extends BaseRepository
 	{
 		$this->model = $productRequire;
 	}
-
+ 
     /**
-     * 数据保存
-     * 
-     * @param $data array
-     * @return Object
+     * 文件移动
+     * @param $fd file 文件指针
+     * @param $name 转移后的文件名
+     * @param $path 转移路径
+     * @return 转以后的文件路径
      *
      */
-	public function store($data)
-	{
-		$buf = $this->model->create($data); 
-		return $buf;
-	}
-
-    /**
-     * 数据更新
-     *
-     * @param $id integer 记录id
-     * @param $data array 数据
-     * @retrun Object 
-     *
-     */
-    public function update($id, $data)
+    function move_file($fd, $name, $path)
     {
-        $buf = $this->get($id);
-        $buf->update($data);
+        $dstname = $name.'.'.$fd->getClientOriginalExtension();
+        file_exists($path) or mkdir($path, 644, true);
+        if(file_exists($path.'/'.$dstname))
+            unlink($path.'/'.$dstname);
+        $fd->move($path,$dstname);
 
-        return $buf;
+        return "/".$path."/".$dstname;
     }
 }

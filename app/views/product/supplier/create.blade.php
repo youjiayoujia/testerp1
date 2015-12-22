@@ -3,14 +3,14 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('supplier.index') }}">供货商</a></li>
+        <li><a href="{{ route('productSupplier.index') }}">供货商</a></li>
         <li class="active"><strong>添加供货商</strong></li>
     </ol>
 @stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 
 @section('formTitle') 添加供货商 @stop
-@section('formAction') {{ route('supplier.store') }} @stop
+@section('formAction') {{ route('productSupplier.store') }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
     <div class="form-group">

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\product;
 
 use App\Base\BaseModel;
 
-class SupplierModel extends BaseModel
+class ProductSupplierModel extends BaseModel
 {
 
     /**

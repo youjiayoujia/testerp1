@@ -9,16 +9,17 @@
  * Time: 15:21pm
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
 use Illuminate\Http\Request;
-use App\Repositories\productRequireRepository;
+use App\Http\Controllers\Controller;
+use App\Repositories\Product\ProductRequireRepository;
 
-class productRequireController extends Controller
+class ProductRequireController extends Controller
 {
     protected $productRequire;
 
-    function __construct(Request $request, productRequireRepository $productRequire)
+    function __construct(Request $request, ProductRequireRepository $productRequire)
     {
         $this->request = $request;
         $this->productRequire = $productRequire;
@@ -71,24 +72,6 @@ class productRequireController extends Controller
     }
 
     /**
-     * 文件移动
-     * @param $fd file 文件指针
-     * @param $name 转移后的文件名
-     * @param $path 转移路径
-     * @return 转以后的文件路径
-     *
-     */
-    function move_file($fd, $name, $path)
-    {
-        file_exists($path) or mkdir($path, 644, true);
-        if(file_exists($path.'/'.$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.'))))
-            unlink($path.'/'.$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.')));
-        $fd->move($path,$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.')));
-
-        return "/".$path."/".$name.substr($fd->getClientOriginalName(),strrpos($fd->getClientOriginalName(),'.'));
-    }
-
-    /**
      * 数据保存
      *
      * @param none
@@ -100,17 +83,17 @@ class productRequireController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->productRequire->rules('create'));
         $data = $this->request->all();
-        $buf = $this->productRequire->store($data);
+        $buf = $this->productRequire->create($data);
         $data['id'] = $buf->id;
-            
+
         for($i=1; $i <= 6; $i++) {
             if($this->request->hasFile('img'.$i)) {
                 $file = $this->request->file('img'.$i);
-                $path = Config('product_require_img_path.dir')."/".$data['id'];
+                $path = config('product_require_img_path.dir')."/".$data['id'];
                 $dstname = $i;
-                $absolute_path = $this->move_file($file, $dstname, $path);
+                $absolute_path = $this->productRequire->move_file($file, $dstname, $path);
                 $name = 'img'.$i;
-                $data["{$name}"] = $absolute_path;
+                $data[$name] = $absolute_path;
             }
         }
         $buf->update($data);
@@ -131,19 +114,18 @@ class productRequireController extends Controller
 
         $this->validate($this->request, $this->productRequire->rules('update', $id));
         $data = $this->request->all();
-        $buf = $this->productRequire->update($id, $data);
         
         for($i=1; $i <= 6; $i++) {
             if($this->request->hasFile('img'.$i)) {
                 $file = $this->request->file('img'.$i);
-                $path = Config('product_require_img_path.dir')."/".$id;
+                $path = config('product_require_img_path.dir')."/".$id;
                 $dstname = $i;
-                $absolute_path = $this->move_file($file, $dstname, $path);
+                $absolute_path = $this->productRequire->move_file($file, $dstname, $path);
                 $name = 'img'.$i;
                 $data["{$name}"] = $absolute_path;
             }
         }
-        $buf->update($data);
+        $buf = $this->productRequire->update($id, $data);
 
         return redirect(route('productRequire.index'));
     }

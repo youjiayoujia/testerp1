@@ -10,16 +10,17 @@
  *
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\product;
 
 use Illuminate\Http\Request;
-use App\Repositories\SupplierRepository;
+use App\Http\Controllers\Controller;
+use App\Repositories\Product\ProductSupplierRepository;
 
-class SupplierController extends Controller
+class ProductSupplierController extends Controller
 {
 	protected $supplier;
 
-	function __construct(Request $request, SupplierRepository $supplier)
+	function __construct(Request $request, ProductSupplierRepository $supplier)
 	{
 		$this->supplier = $supplier;
 		$this->request = $request;
@@ -83,7 +84,7 @@ class SupplierController extends Controller
 		$this->validate($this->request, $this->supplier->rules('create'));
 		$this->supplier->create($this->request->all());
 
-		return redirect(route('supplier.index'));
+		return redirect(route('productSupplier.index'));
 	}
 
 	/**
@@ -115,7 +116,7 @@ class SupplierController extends Controller
 		$this->validate($this->request, $this->supplier->rules('update', $id));
 		$this->supplier->update($id, $this->request->all());
 		
-		return redirect(route('supplier.index'));
+		return redirect(route('productSupplier.index'));
 	}
 
 	/**
@@ -129,6 +130,6 @@ class SupplierController extends Controller
 	{
 		$this->supplier->destroy($id);
 
-		return redirect(route('supplier.index'));
+		return redirect(route('productSupplier.index'));
 	}
 }

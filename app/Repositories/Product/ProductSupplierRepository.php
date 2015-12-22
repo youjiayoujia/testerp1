@@ -8,12 +8,12 @@
  *
  */
      
-namespace App\Repositories;
+namespace App\Repositories\Product;
 
 use App\Base\BaseRepository;
-use App\Models\SupplierModel as Supplier;
+use App\Models\product\ProductSupplierModel as Supplier;
 
-class SupplierRepository extends BaseRepository
+class ProductSupplierRepository extends BaseRepository
 {
 	//用于查询的字段
 	protected $searchFields = ['name'];

@@ -19,9 +19,15 @@
         <input type='text' class="form-control" id="name" placeholder="仓库名字" name='name' value="{{ old('name') ?  old('name') : $warehouse->name }}">
     </div>
     <div class="form-group">
-        <label for="detail_address" class='control-label'>(省/市)地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <p for='province'>省份</p> <select name="province" onChange = "select()" class='form-control'></select>　
-        <p for='city'>城市</p> <select name="city" onChange = "select()" class='form-control'></select>
+        <label for="detail_address" class='control-label'>省市地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
+            </div>
+            <div class='col-sm-6'> 
+                <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
+            </div>
+        </div>
     </div>
     <div class="form-group">
         <label for="type">仓库类型</label>

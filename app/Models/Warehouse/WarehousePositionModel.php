@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Warehouse;
 
 use App\Base\BaseModel;
 
@@ -23,7 +23,7 @@ class WarehousePositionModel extends BaseModel
 
     public function warehouse()
     {
-       return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+       return $this->belongsTo('App\Models\Warehouse\WarehouseModel', 'warehouses_id', 'id');
     }
 
 }

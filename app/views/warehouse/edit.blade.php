@@ -48,7 +48,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="volumn">仓库体积</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="volumn">仓库体积(m3)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="volumn" placeholder="仓库体积" name='volumn' value="{{ old('volumn') ?  old('volumn') : $warehouse->volumn }}">
     </div>
     <div class="form-group">
@@ -81,8 +81,8 @@
 <script type='text/javascript'>
     window.onload = function(){
         var buf = new Array();
-        buf[0] = "{{ $warehouse->province }}";
-        buf[1] = "{{ $warehouse->city }} ";
+        buf[0] = "{{ old('province') ? old('province') : $warehouse->province }}" ;
+        buf[1] = "{{ old('city') ? old('city') : $warehouse->city }}" ;
         init(buf[0],buf[1]);
     };
 </script>

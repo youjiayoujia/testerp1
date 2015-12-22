@@ -10,19 +10,17 @@
 @section('tableTitle') 供货商列表 @stop
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
-
-    <th>ID</th>
     <th>名称</th>
     <th>省</th>
     <th>市</th>
     <th>经纬度</th>
     <th>是否是线上供货商</th>
     <th>线上供货商网址</th>
-    <th>电话</th>
+    <th class="sort" data-url="{{ Sort::url('telephone') }}">电话{!! Sort::label('telephone') !!}</th>
     <th>采购员</th>
-    <th>评级</th>
+    <th class="sort" data-url="{{ Sort::url('level') }}">评级{!! Sort::label('level') !!}</th>
     <th>创建人</th>
-    <th>创建时间</th>
+    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
     <th>操作</th>
 @stop
 @section('tableBody')

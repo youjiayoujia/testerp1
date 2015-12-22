@@ -24,14 +24,14 @@ class SupplierRepository extends BaseRepository
      */
     public $rules = [
             'create' => [   
-                    'name' => 'required|max:128|unique:suppliers,name',
+                    'name' => 'required|max:128|unique:product_suppliers,name',
                     'address' => 'required|max:256',
                     'purchase_id' => 'required|numeric',
                     'url' => 'required|max:256|active_url',
                     'telephone' => 'required|max:256|digits_between:8,11'
             ],
             'update' => [   
-                    'name' => 'required|max:128|unique:suppliers,name, {id}',
+                    'name' => 'required|max:128|unique:product_suppliers,name, {id}',
                     'address' => 'required|max:256',
                     'purchase_id' => 'required|numeric',
                     'url' => 'required|max:256|active_url',

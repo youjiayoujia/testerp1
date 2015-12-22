@@ -111,7 +111,7 @@ class warehouseController extends Controller
 	 *
 	 */
 	public function update($id)
-	{
+	{ 
 		$this->request->flash();
 		$this->validate($this->request, $this->warehouse->rules('update', $id));
 		$this->warehouse->update($id, $this->request->all());

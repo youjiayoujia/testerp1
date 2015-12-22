@@ -9,13 +9,13 @@
 @stop
 @section('tableTitle') 库位列表 @stop
 @section('tableHeader')
-    <th>ID</th>
+    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th>库位名</th>
     <th>所属仓库名</th>
     <th>备注信息</th>
-    <th>库位容积</th>
+    <th class="sort" data-url="{{ Sort::url('volumn') }}">库位容积{!! Sort::label('volumn') !!}</th>
     <th>是否启用</th>
-    <th>创建时间</th>
+    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
     <th>操作</th>
 @stop
 @section('tableBody')

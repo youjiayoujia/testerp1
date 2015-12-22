@@ -18,6 +18,7 @@ Route::resource('brand', 'brandController');
 Route::resource('warehouse', 'warehouseController');
 Route::resource('logistics', 'logisticsController');
 Route::resource('logisticsType', 'logisticsTypeController');
+Route::resource('logisticsShipping', 'logisticsShippingController');
 
 Route::resource('product', 'ProductController');
 Route::resource('catalog', 'CatalogController');

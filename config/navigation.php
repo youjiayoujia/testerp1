@@ -138,6 +138,18 @@ return [
                 'url' => 'logisticsType.create',
                 'icon' => '',
             ],
+            [
+                'name' => '物流方式shippings列表',
+                'location' => null,
+                'url' => 'logisticsShipping.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流方式shippings新增',
+                'location' => 'create',
+                'url' => 'logisticsShipping.create',
+                'icon' => '',
+            ],
         ],
     ],
     [

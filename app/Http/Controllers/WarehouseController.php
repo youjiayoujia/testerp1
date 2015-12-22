@@ -8,11 +8,11 @@
  * Time: 15:22pm
  */
 
-namespace App\Http\Controllers\Warehouse;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Warehouse\WarehouseRepository;
+use App\Repositories\WarehouseRepository;
 
 class warehouseController extends Controller
 {

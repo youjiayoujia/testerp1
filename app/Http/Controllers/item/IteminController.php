@@ -8,11 +8,12 @@
  * Time: 10:45am
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Item;
 
 use Illuminate\Http\Request;
-use App\Repositories\IteminRepository;
-use App\Models\IteminNameModel as iteminName;
+use App\Http\Controllers\Controller;
+use App\Repositories\Item\IteminRepository;
+use App\Models\Item\IteminNameModel as iteminName;
 
 class IteminController extends Controller
 {
@@ -37,6 +38,7 @@ class IteminController extends Controller
 
         $response = [
             'data' => $this->itemin->auto()->paginate(),
+            'iteminname' => config('iteminname'),
         ];
 
         return view('item.in.index', $response);

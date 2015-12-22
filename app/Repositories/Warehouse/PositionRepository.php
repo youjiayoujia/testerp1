@@ -11,9 +11,9 @@
 namespace App\Repositories\Warehouse;
 
 use App\Base\BaseRepository;
-use App\Models\Warehouse\WarehousePositionModel as Position;
+use App\Models\Warehouse\PositionModel as Position;
 
-class WarehousePositionRepository extends BaseRepository
+class PositionRepository extends BaseRepository
 {
 	// 查询
 	protected $searchFields = ['name'];

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProviders extends Migration
+class CreateProductSupplier extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateProviders extends Migration
      */
     public function up()
     {
-        Schema::create('providers', function (Blueprint $table) {
+        Schema::create('product_suppliers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name',128)->comment('供货商名称')->default(NULL);
             $table->string('province')->comment('供货商省')->default(NULL);
@@ -36,6 +36,6 @@ class CreateProviders extends Migration
      */
     public function down()
     {
-        Schema::drop('providers');
+        Schema::drop('product_suppliers');
     }
 }

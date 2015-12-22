@@ -14,13 +14,13 @@ namespace App\Http\Controllers\product;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Product\ProductSupplierRepository;
+use App\Repositories\Product\SupplierRepository;
 
-class ProductSupplierController extends Controller
+class SupplierController extends Controller
 {
 	protected $supplier;
 
-	function __construct(Request $request, ProductSupplierRepository $supplier)
+	function __construct(Request $request, SupplierRepository $supplier)
 	{
 		$this->supplier = $supplier;
 		$this->request = $request;
@@ -40,7 +40,7 @@ class ProductSupplierController extends Controller
 			'data' => $this->supplier->auto()->paginate(),
 		];
 
-		return view('product.supplier.index', $response);
+		return view('Product.Supplier.index', $response);
 	}
 
 	/**
@@ -56,7 +56,7 @@ class ProductSupplierController extends Controller
 			'supplier' => $this->supplier->get($id),
 		];
 
-		return view('product.supplier.show', $response);
+		return view('Product.Supplier.show', $response);
 	}
 
 	/**
@@ -68,7 +68,7 @@ class ProductSupplierController extends Controller
 	 */
 	public function create()
 	{
-		return view('product.supplier.create');
+		return view('Product.Supplier.create');
 	}
 
 	/**
@@ -84,7 +84,7 @@ class ProductSupplierController extends Controller
 		$this->validate($this->request, $this->supplier->rules('create'));
 		$this->supplier->create($this->request->all());
 
-		return redirect(route('productSupplier.index'));
+		return redirect(route('Supplier.index'));
 	}
 
 	/**
@@ -100,7 +100,7 @@ class ProductSupplierController extends Controller
 			'supplier' => $this->supplier->get($id),
 		];
 
-		return view('product.supplier.edit',$response);
+		return view('Product.Supplier.edit',$response);
 	}
 
 	/**
@@ -116,7 +116,7 @@ class ProductSupplierController extends Controller
 		$this->validate($this->request, $this->supplier->rules('update', $id));
 		$this->supplier->update($id, $this->request->all());
 		
-		return redirect(route('productSupplier.index'));
+		return redirect(route('Supplier.index'));
 	}
 
 	/**
@@ -130,6 +130,6 @@ class ProductSupplierController extends Controller
 	{
 		$this->supplier->destroy($id);
 
-		return redirect(route('productSupplier.index'));
+		return redirect(route('Supplier.index'));
 	}
 }

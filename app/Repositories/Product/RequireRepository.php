@@ -12,9 +12,9 @@
 namespace App\Repositories\Product;
 
 use App\Base\BaseRepository;
-use App\Models\Product\productRequireModel as productRequire;
+use App\Models\Product\RequireModel as ProductRequire;
 
-class productRequireRepository extends BaseRepository
+class RequireRepository extends BaseRepository
 {
 	// 用于查询
 	protected $searchFields = ['name'];
@@ -35,9 +35,9 @@ class productRequireRepository extends BaseRepository
         ]
     ];
 
-	function __construct(productRequire $productRequire)
+	function __construct(ProductRequire $require)
 	{
-		$this->model = $productRequire;
+		$this->model = $require;
 	}
  
     /**

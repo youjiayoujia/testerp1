@@ -11,9 +11,9 @@
 namespace App\Repositories\Product;
 
 use App\Base\BaseRepository;
-use App\Models\product\ProductSupplierModel as Supplier;
+use App\Models\product\SupplierModel as Supplier;
 
-class ProductSupplierRepository extends BaseRepository
+class SupplierRepository extends BaseRepository
 {
 	//用于查询的字段
 	protected $searchFields = ['name'];

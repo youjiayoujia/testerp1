@@ -9,10 +9,16 @@
 @stop
 @section('tableTitle') 品类列表 @stop
 @section('tableHeader')
-    <th>ID</th>
-    <th>名称</th>
-    <th>创建时间</th>
-    <th>操作</th>
+    <th class="sort" data-url="{{ App\Helps\Sort::url('id') }}">
+        ID{!! App\Helps\Sort::label('id') !!}
+    </th>
+    <th class="sort" data-url="{{ App\Helps\Sort::url('name') }}">
+        名称{!! App\Helps\Sort::label('name') !!}
+    </th>
+    <th class="sort" data-url="{{ App\Helps\Sort::url('created_at') }}">
+        创建时间{!! App\Helps\Sort::label('created_at') !!}
+    </th>
+    <th data-sort="false">操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $catalog)

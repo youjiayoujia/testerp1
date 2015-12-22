@@ -12,14 +12,14 @@ namespace App\Http\Controllers\warehouse;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Warehouse\WarehousePositionRepository;
-use App\Models\Warehouse\WarehouseModel as Warehouse;
+use App\Repositories\Warehouse\PositionRepository;
+use App\Models\WarehouseModel as Warehouse;
 
-class warehousePositionController extends Controller
+class PositionController extends Controller
 {
 	protected $warehousePosition;
 
-	function __construct(Request $request,warehousePositionRepository $warehousePosition)
+	function __construct(Request $request,PositionRepository $warehousePosition)
 	{
 		$this->warehousePosition = $warehousePosition;
 		$this->request = $request;
@@ -53,7 +53,7 @@ class warehousePositionController extends Controller
 	public function show($id)
 	{
 		$response = [
-			'warehousePosition' => $this->warehousePosition->get($id),
+			'position' => $this->warehousePosition->get($id),
 		];
 
 		return view('warehouse.position.show', $response);
@@ -86,7 +86,7 @@ class warehousePositionController extends Controller
 		$this->request->flash();
 		$this->validate($this->request,$this->warehousePosition->rules('create'));
 		$this->warehousePosition->create($this->request->all());
-		return redirect(route('warehousePosition.index'));
+		return redirect(route('Position.index'));
 	}
 
 	/**
@@ -100,7 +100,7 @@ class warehousePositionController extends Controller
 	{
 		$response = [
 			'warehouses' => $warehouse->all(),
-			'warehousePosition' => $this->warehousePosition->get($id),
+			'position' => $this->warehousePosition->get($id),
 		];
 
 		return view('warehouse.position.edit',$response);
@@ -119,7 +119,7 @@ class warehousePositionController extends Controller
 		$this->validate($this->request, $this->warehousePosition->rules('update', $id));
 		$this->warehousePosition->update($id, $this->request->all());
 
-		return redirect(route('warehousePosition.index'));
+		return redirect(route('Position.index'));
 	}
 
 	/**
@@ -132,6 +132,6 @@ class warehousePositionController extends Controller
 	public function destroy($id)
 	{
 		$this->warehousePosition->destroy($id);
-		return redirect(route('warehousePosition.index'));
+		return redirect(route('Position.index'));
 	}
 }

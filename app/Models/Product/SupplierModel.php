@@ -4,7 +4,7 @@ namespace App\Models\product;
 
 use App\Base\BaseModel;
 
-class ProductSupplierModel extends BaseModel
+class SupplierModel extends BaseModel
 {
 
     /**
@@ -12,7 +12,7 @@ class ProductSupplierModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'suppliers';
+    protected $table = 'product_suppliers';
 
     /**
      * The attributes that are mass assignable.

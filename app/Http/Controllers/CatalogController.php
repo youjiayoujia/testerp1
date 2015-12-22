@@ -19,7 +19,7 @@ class CatalogController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->catalog->auto()->paginate(),
+            'data' => $this->catalog->auto()->paginate(['*'], 1),
         ];
 
         return view('catalog.index', $response);

@@ -1,66 +1,66 @@
 @extends('layouts.default')
-@section('title') 选款需求详情 : {{ $productRequire->name }} {{ $productRequire->url }} @stop
+@section('title') 选款需求详情 : {{ $require->name }} {{ $require->url }} @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
-        <li class="active"><strong>选款需求详情 : {{ $productRequire->name }} {{ $productRequire->address }}</strong></li>
+        <li><a href="{{ route('Require.index') }}">选款需求</a></li>
+        <li class="active"><strong>选款需求详情 : {{ $require->name }} {{ $require->address }}</strong></li>
     </ol>
 @stop
 @section('content')
     <div class='table-responsive'>
         <table class='table table-bordered'>
-        @if($productRequire->img1)
+        @if($require->img1)
         <tr class='info'>
             <td>图片1</td>
-            <td><img src="{{ $productRequire->img1 }}" alt='' class='img-rounded' width='170px' height='100px'/></td>
+            <td><img src="{{ $require->img1 }}" alt='' class='img-rounded' width='170px' height='100px'/></td>
         </tr>
         @endif
-        @if($productRequire->img2)
+        @if($require->img2)
         <tr class='info'>
             <td>图片2</td>
-            <td><img src="{{ $productRequire->img2 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
+            <td><img src="{{ $require->img2 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
         </tr> 
         @endif       
-        @if($productRequire->img3)
+        @if($require->img3)
         <tr class='info'>
             <td>图片3</td>
-            <td><img src="{{ $productRequire->img3 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
+            <td><img src="{{ $require->img3 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
         </tr> 
         @endif
-        @if($productRequire->img4)
+        @if($require->img4)
         <tr class='info'>
             <td>图片4</td>
-            <td><img src="{{ $productRequire->img4 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
+            <td><img src="{{ $require->img4 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
         </tr> 
         @endif 
-        @if($productRequire->img5)
+        @if($require->img5)
         <tr class='info'>
             <td>图片5</td>
-            <td><img src="{{ $productRequire->img5 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
+            <td><img src="{{ $require->img5 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
         </tr>
         @endif
-        @if($productRequire->img6)
+        @if($require->img6)
         <tr class='info'>
             <td>图片6</td>
-            <td><img src="{{ $productRequire->img6 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
+            <td><img src="{{ $require->img6 }}" alt='' class='img-rounded' width='170px' height='100px'/></td> 
         </tr>  
         @endif        
-        <tr ><td>选款需求id</td><td>{{ $productRequire->id }}</td></tr>    
-        <tr ><td>选款需求名</td><td>{{ $productRequire->name }}</td></tr>
-        <tr ><td>货物源省</td><td>{{ $productRequire->province }}</td></tr>
-        <tr ><td>货物源市</td><td>{{ $productRequire->city }}</td></tr>
-        <tr ><td>类似款sku</td><td>{{ $productRequire->similar_sku }}</td></tr>
-        <tr ><td>竞争产品url</td><td>{{ $productRequire->competition_url }}</td></tr>
-        <tr ><td>选款备注</td><td>{{ $productRequire->remark }}</td></tr>
-        <tr ><td>期待上传日期</td><td>{{ $productRequire->expected_date }}</td></tr>
-        <tr ><td>需求人id</td><td>{{ $productRequire->needer_id }}</td></tr>
-        <tr ><td>需求店铺id</td><td>{{ $productRequire->needer_shop_id }}</td></tr>
-        <tr ><td>创建人</td><td>{{ $productRequire->created_by }}</td></tr>
-        <tr ><td>创建时间</td><td>{{ $productRequire->created_at }}</td>
-        <tr ><td>状态</td><td>{{ $productRequire->status }}</td></tr>
-        <tr ><td>处理者id</td><td>{{ $productRequire->user_id }}</td></tr>
-        <tr ><td>处理时间</td><td>{{ $productRequire->handle_time }}</td></tr>  
+        <tr ><td>选款需求id</td><td>{{ $require->id }}</td></tr>    
+        <tr ><td>选款需求名</td><td>{{ $require->name }}</td></tr>
+        <tr ><td>货物源省</td><td>{{ $require->province }}</td></tr>
+        <tr ><td>货物源市</td><td>{{ $require->city }}</td></tr>
+        <tr ><td>类似款sku</td><td>{{ $require->similar_sku }}</td></tr>
+        <tr ><td>竞争产品url</td><td>{{ $require->competition_url }}</td></tr>
+        <tr ><td>选款备注</td><td>{{ $require->remark }}</td></tr>
+        <tr ><td>期待上传日期</td><td>{{ $require->expected_date }}</td></tr>
+        <tr ><td>需求人id</td><td>{{ $require->needer_id }}</td></tr>
+        <tr ><td>需求店铺id</td><td>{{ $require->needer_shop_id }}</td></tr>
+        <tr ><td>创建人</td><td>{{ $require->created_by }}</td></tr>
+        <tr ><td>创建时间</td><td>{{ $require->created_at }}</td>
+        <tr ><td>状态</td><td>{{ $require->status }}</td></tr>
+        <tr ><td>处理者id</td><td>{{ $require->user_id }}</td></tr>
+        <tr ><td>处理时间</td><td>{{ $require->handle_time }}</td></tr>  
         </table> 
     </div>  
 @stop

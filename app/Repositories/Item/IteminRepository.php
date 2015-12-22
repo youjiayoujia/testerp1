@@ -8,10 +8,10 @@
  * Time:10:48
  *
  */
-namespace App\Repositories;
+namespace App\Repositories\Item;
 
 use App\Base\BaseRepository;
-use App\Models\IteminModel as Itemin;
+use App\Models\Item\IteminModel as Itemin;
 
 class IteminRepository extends BaseRepository
 {

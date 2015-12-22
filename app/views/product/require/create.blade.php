@@ -4,7 +4,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
+        <li><a href="{{ route('Require.index') }}">选款需求</a></li>
         <li class="active"><strong>添加选款需求</strong></li>
     </ol>
 @stop
@@ -13,7 +13,7 @@
     <script src="{{ asset('js/pro_city.js') }}"></script>
 
 @section('formTitle') 添加选款需求 @stop
-@section('formAction') {{ route('productRequire.store') }} @stop
+@section('formAction') {{ route('Require.store') }} @stop
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
     <div class='form-group'>

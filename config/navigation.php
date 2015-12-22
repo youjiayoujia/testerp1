@@ -78,40 +78,40 @@ return [
     ],
     [
         'name' => '供货商',
-        'location' => 'productSupplier',
+        'location' => 'Supplier',
         'icon' => 'tags',
         'url' => '',
         'subnavigations' => [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'productSupplier.index',
+                'url' => 'Supplier.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增', 
                 'location' => 'create',
-                'url' => 'productSupplier.create',
+                'url' => 'Supplier.create',
                 'icon' => '',
             ],
         ],
     ],
     [
         'name' => '选款需求',
-        'location' => 'productRequire',
+        'location' => 'Require',
         'icon' => 'tags',
         'url' => '',
         'subnavigations' => [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'productRequire.index',
+                'url' => 'Require.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增',
                 'location' => 'create',
-                'url' => 'productRequire.create',
+                'url' => 'Require.create',
                 'icon' => '',
             ],
         ],
@@ -157,7 +157,7 @@ return [
             [
                 'name' => '库位',
                 'location' => 'null',
-                'url' => 'warehousePosition.index',
+                'url' => 'Position.index',
                 'icon' => '',
             ],
         ],

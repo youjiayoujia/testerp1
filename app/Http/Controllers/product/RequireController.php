@@ -13,16 +13,16 @@ namespace App\Http\Controllers\Product;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Product\ProductRequireRepository;
+use App\Repositories\Product\RequireRepository;
 
-class ProductRequireController extends Controller
+class RequireController extends Controller
 {
-    protected $productRequire;
+    protected $require;
 
-    function __construct(Request $request, ProductRequireRepository $productRequire)
+    function __construct(Request $request, RequireRepository $require)
     {
         $this->request = $request;
-        $this->productRequire = $productRequire;
+        $this->require = $require;
     }
 
     /**
@@ -36,7 +36,7 @@ class ProductRequireController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->productRequire->auto()->paginate(),
+            'data' => $this->require->auto()->paginate(),
         ];
 
         return view('product.require.index', $response);
@@ -53,7 +53,7 @@ class ProductRequireController extends Controller
     public function show($id)
     {
         $response = [
-            'productRequire' => $this->productRequire->get($id),
+            'require' => $this->require->get($id),
         ];
 
         return view('product.require.show', $response);
@@ -81,9 +81,9 @@ class ProductRequireController extends Controller
     public function store() 
     {
         $this->request->flash();
-        $this->validate($this->request, $this->productRequire->rules('create'));
+        $this->validate($this->request, $this->require->rules('create'));
         $data = $this->request->all();
-        $buf = $this->productRequire->create($data);
+        $buf = $this->require->create($data);
         $data['id'] = $buf->id;
 
         for($i=1; $i <= 6; $i++) {
@@ -91,14 +91,14 @@ class ProductRequireController extends Controller
                 $file = $this->request->file('img'.$i);
                 $path = config('product_require_img_path.dir')."/".$data['id'];
                 $dstname = $i;
-                $absolute_path = $this->productRequire->move_file($file, $dstname, $path);
+                $absolute_path = $this->require->move_file($file, $dstname, $path);
                 $name = 'img'.$i;
                 $data[$name] = $absolute_path;
             }
         }
         $buf->update($data);
 
-        return redirect(route('productRequire.index'));
+        return redirect(route('Require.index'));
     }
 
     /**
@@ -112,7 +112,7 @@ class ProductRequireController extends Controller
     {
         $this->request->flash();
 
-        $this->validate($this->request, $this->productRequire->rules('update', $id));
+        $this->validate($this->request, $this->require->rules('update', $id));
         $data = $this->request->all();
         
         for($i=1; $i <= 6; $i++) {
@@ -120,14 +120,14 @@ class ProductRequireController extends Controller
                 $file = $this->request->file('img'.$i);
                 $path = config('product_require_img_path.dir')."/".$id;
                 $dstname = $i;
-                $absolute_path = $this->productRequire->move_file($file, $dstname, $path);
+                $absolute_path = $this->require->move_file($file, $dstname, $path);
                 $name = 'img'.$i;
                 $data["{$name}"] = $absolute_path;
             }
         }
-        $buf = $this->productRequire->update($id, $data);
+        $buf = $this->require->update($id, $data);
 
-        return redirect(route('productRequire.index'));
+        return redirect(route('Require.index'));
     }
 
     /**
@@ -140,7 +140,7 @@ class ProductRequireController extends Controller
     public function edit($id)
     {
         $response = [
-            'productRequire' => $this->productRequire->get($id),
+            'require' => $this->require->get($id),
         ];
 
         return view('product.require.edit', $response);
@@ -155,9 +155,9 @@ class ProductRequireController extends Controller
     */
     public function destroy($id)
     {
-        $this->productRequire->destroy($id);
+        $this->require->destroy($id);
 
-        return redirect(route('productRequire.index'));
+        return redirect(route('require.index'));
     }
 
 }

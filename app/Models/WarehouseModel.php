@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\warehouse;
+namespace App\Models;
 
 use App\Base\BaseModel;
 

@@ -4,7 +4,7 @@ namespace App\Models\Product;
 
 use App\Base\BaseModel;
 
-class productRequireModel extends BaseModel
+class RequireModel extends BaseModel
 {
 	protected $table = 'product_require';
 

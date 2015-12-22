@@ -8,10 +8,10 @@
  * Time:15:30
  *
  */
-namespace App\Repositories\Warehouse;
+namespace App\Repositories;
 
 use App\Base\BaseRepository;
-use App\Models\Warehouse\WarehouseModel as Warehouse;
+use App\Models\WarehouseModel as Warehouse;
 
 class WarehouseRepository extends BaseRepository
 {

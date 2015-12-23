@@ -27,7 +27,7 @@ class RequireController extends Controller
 
     /**
      * 列表页显示
-     * 
+     *
      * @param none
      * @return view
      *
@@ -78,7 +78,7 @@ class RequireController extends Controller
      * @return view
      *
      */
-    public function store() 
+    public function store()
     {
         $this->request->flash();
         $this->validate($this->request, $this->require->rules('create'));
@@ -86,13 +86,13 @@ class RequireController extends Controller
         $buf = $this->require->create($data);
         $data['id'] = $buf->id;
 
-        for($i=1; $i <= 6; $i++) {
-            if($this->request->hasFile('img'.$i)) {
-                $file = $this->request->file('img'.$i);
-                $path = config('product_require_img_path.dir')."/".$data['id'];
+        for ($i = 1; $i <= 6; $i++) {
+            if ($this->request->hasFile('img' . $i)) {
+                $file = $this->request->file('img' . $i);
+                $path = config('product_require_img_path.dir') . "/" . $data['id'];
                 $dstname = $i;
                 $absolute_path = $this->require->move_file($file, $dstname, $path);
-                $name = 'img'.$i;
+                $name = 'img' . $i;
                 $data[$name] = $absolute_path;
             }
         }
@@ -102,26 +102,26 @@ class RequireController extends Controller
     }
 
     /**
-    * 数据更新
-    *
-    * @param $id integer 记录id
-    * @return view
-    *
-    */
+     * 数据更新
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
     public function update($id)
     {
         $this->request->flash();
 
         $this->validate($this->request, $this->require->rules('update', $id));
         $data = $this->request->all();
-        
-        for($i=1; $i <= 6; $i++) {
-            if($this->request->hasFile('img'.$i)) {
-                $file = $this->request->file('img'.$i);
-                $path = config('product_require_img_path.dir')."/".$id;
+
+        for ($i = 1; $i <= 6; $i++) {
+            if ($this->request->hasFile('img' . $i)) {
+                $file = $this->request->file('img' . $i);
+                $path = config('product_require_img_path.dir') . "/" . $id;
                 $dstname = $i;
                 $absolute_path = $this->require->move_file($file, $dstname, $path);
-                $name = 'img'.$i;
+                $name = 'img' . $i;
                 $data["{$name}"] = $absolute_path;
             }
         }
@@ -131,12 +131,12 @@ class RequireController extends Controller
     }
 
     /**
-    * 跳转页面更新页
-    *
-    * @param $id integer 记录id
-    * @return view
-    *
-    */
+     * 跳转页面更新页
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
     public function edit($id)
     {
         $response = [
@@ -147,12 +147,12 @@ class RequireController extends Controller
     }
 
     /**
-    * 删除一条记录
-    *
-    * @param $id integer 记录id
-    * @return view
-    *
-    */
+     * 删除一条记录
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
     public function destroy($id)
     {
         $this->require->destroy($id);

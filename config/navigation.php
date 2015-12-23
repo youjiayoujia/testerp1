@@ -29,7 +29,7 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '新增', 
+                'name' => '新增',
                 'location' => 'create',
                 'url' => 'supplier.create',
                 'icon' => '',

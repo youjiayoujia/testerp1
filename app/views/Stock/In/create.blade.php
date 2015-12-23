@@ -3,12 +3,12 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('itemin.index') }}">入库</a></li>
+        <li><a href="{{ route('In.index') }}">入库</a></li>
         <li class="active"><strong>添加入库信息</strong></li>
     </ol>
 @stop
 @section('formTitle') 添加入库信息 @stop
-@section('formAction') {{ route('itemin.store') }} @stop
+@section('formAction') {{ route('In.store') }} @stop
 @section('formBody')
     <div class="form-group">
         <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -25,6 +25,14 @@
     <div class="form-group">
         <label for="remark">备注</label>
         <input type='text' class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
+    </div>
+    <div class="form-group">
+        <label for="warehouses_id">仓库</label>
+        <input type='text' class="form-control" id="warehouses_id" placeholder="仓库" name='warehouses_id' value="{{ old('warehouses_id') }}">
+    </div>
+    <div class="form-group">
+        <label for="warehouse_positions_id">库位</label>
+        <input type='text' class="form-control" id="warehouse_positions_id" placeholder="库位" name='warehouse_positions_id' value="{{ old('warehouse_positions_id') }}">
     </div>
     <div class="form-group">
         <label for="typeof_itemin">入库类型</label>

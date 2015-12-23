@@ -19,7 +19,7 @@ class RequireController extends Controller
 {
     protected $require;
 
-    function __construct(Request $request, RequireRepository $require)
+    public function __construct(Request $request, RequireRepository $require)
     {
         $this->request = $request;
         $this->require = $require;

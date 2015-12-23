@@ -35,7 +35,7 @@ class RequireRepository extends BaseRepository
         ]
     ];
 
-	function __construct(ProductRequire $require)
+	public function __construct(ProductRequire $require)
 	{
 		$this->model = $require;
 	}
@@ -48,7 +48,7 @@ class RequireRepository extends BaseRepository
      * @return 转以后的文件路径
      *
      */
-    function move_file($fd, $name, $path)
+    public function move_file($fd, $name, $path)
     {
         $dstname = $name.'.'.$fd->getClientOriginalExtension();
         file_exists($path) or mkdir($path, 644, true);

@@ -19,7 +19,7 @@ class PositionController extends Controller
 {
 	protected $warehousePosition;
 
-	function __construct(Request $request,PositionRepository $warehousePosition)
+	public function __construct(Request $request,PositionRepository $warehousePosition)
 	{
 		$this->warehousePosition = $warehousePosition;
 		$this->request = $request;

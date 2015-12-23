@@ -19,5 +19,5 @@ Route::resource('Require', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 Route::resource('Position', 'Warehouse\PositionController');
 Route::resource('catalog', 'CatalogController');
-Route::resource('itemin', 'item\IteminController');
+Route::resource('In', 'Stock\InController');
 Route::resource('itemout', 'item\ItemoutController');

@@ -8,20 +8,19 @@
  * Time: 10:45am
  */
 
-namespace App\Http\Controllers\Item;
+namespace App\Http\Controllers\Stock;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Item\IteminRepository;
-use App\Models\Item\IteminNameModel as iteminName;
+use App\Repositories\Stock\InRepository;
 
-class IteminController extends Controller
+class InController extends Controller
 {
-    protected $itemin;
+    protected $in;
 
-    function __construct(Request $request, IteminRepository $itemin)
+    public function __construct(Request $request, InRepository $in)
     {
-        $this->itemin = $itemin;
+        $this->in = $in;
         $this->request = $request;
     }
 
@@ -37,11 +36,11 @@ class IteminController extends Controller
         $this->request->flash();
 
         $response = [
-            'data' => $this->itemin->auto()->paginate(),
-            'iteminname' => config('iteminname'),
+            'data' => $this->in->auto()->paginate(),
+            'inname' => config('in.name'),
         ];
 
-        return view('item.in.index', $response);
+        return view('Stock.In.index', $response);
     }
 
     /**
@@ -54,10 +53,10 @@ class IteminController extends Controller
     public function show($id)
     {
         $response = [
-            'itemin' => $this->itemin->get($id),
+            'in' => $this->in->get($id),
         ];
 
-        return view('item.in.show', $response);
+        return view('Stock.In.show', $response);
     }
 
     /**
@@ -67,13 +66,13 @@ class IteminController extends Controller
      * @return view
      *
      */
-    public function create(iteminName $iteminname)
+    public function create()
     {
         $response = [
-            'data' => $iteminname->all(),
+            'data' => config('in.name'),
         ];
 
-        return view('item.in.create', $response);
+        return view('Stock.In.create', $response);
     }
 
     /**
@@ -87,10 +86,10 @@ class IteminController extends Controller
     {
         $this->request->flash();
 
-        $this->validate($this->request, $this->itemin->rules('create'));
-        $this->itemin->create($this->request->all());
+        $this->validate($this->request, $this->in->rules('create'));
+        $this->in->create($this->request->all());
 
-        return redirect(route('itemin.index'));
+        return redirect(route('In.index'));
     }
 
     /**
@@ -100,14 +99,14 @@ class IteminController extends Controller
      * @return view
      *
      */
-    public function edit($id, iteminName $iteminname)
+    public function edit($id)
     {
         $response = [
-            'data' => $iteminname->all(),
-            'itemin' => $this->itemin->get($id),
+            'data' => config('in.name'),
+            'in' => $this->in->get($id),
         ];
 
-        return view('item.in.edit', $response);
+        return view('Stock.in.edit', $response);
     }
 
     /**
@@ -120,10 +119,10 @@ class IteminController extends Controller
     public function update($id)
     {
         $this->request->flash();
-        $this->validate($this->request, $this->itemin->rules('update', $id));
-        $this->itemin->update($id, $this->request->all());
+        $this->validate($this->request, $this->in->rules('update', $id));
+        $this->in->update($id, $this->request->all());
 
-        return redirect(route('itemin.index'));
+        return redirect(route('In.index'));
     }
 
     /**
@@ -135,7 +134,7 @@ class IteminController extends Controller
      */
     public function destroy($id)
     {
-        $this->itemin->destroy($id);
-        return redirect(route('itemin.index'));
+        $this->in->destroy($id);
+        return redirect(route('In.index'));
     }
 }

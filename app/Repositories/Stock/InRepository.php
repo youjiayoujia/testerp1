@@ -8,12 +8,12 @@
  * Time:10:48
  *
  */
-namespace App\Repositories\Item;
+namespace App\Repositories\Stock;
 
 use App\Base\BaseRepository;
-use App\Models\Item\IteminModel as Itemin;
+use App\Models\Stock\InModel as Stockin;
 
-class IteminRepository extends BaseRepository
+class InRepository extends BaseRepository
 {
     // 用于查询
     protected $searchFields = ['sku'];
@@ -32,8 +32,8 @@ class IteminRepository extends BaseRepository
         ]
     ];
     
-    public function __construct(Itemin $itemin)
+    public function __construct(Stockin $stockin)
     {
-        $this->model = $itemin;
+        $this->model = $stockin;
     }
 }

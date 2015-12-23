@@ -11,14 +11,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Repositories\WarehouseRepository;
 
 class warehouseController extends Controller
 {
 	protected $warehouse;
 
-	function __construct(Request $request, WarehouseRepository $warehouse)
+	public function __construct(Request $request, WarehouseRepository $warehouse)
 	{
 		$this->warehouse = $warehouse;
 		$this->request = $request;

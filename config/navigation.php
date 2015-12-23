@@ -118,20 +118,20 @@ return [
     ],
     [
         'name' => '入库',
-        'location' => 'Itemin',
+        'location' => 'In',
         'icon' => 'tags',
         'url' => '',
         'subnavigations' => [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'itemin.index',
+                'url' => 'In.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增',
                 'location' => 'create',
-                'url' => 'itemin.create',
+                'url' => 'In.create',
                 'icon' => '',
             ],
         ],

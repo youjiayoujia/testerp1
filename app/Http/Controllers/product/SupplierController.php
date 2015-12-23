@@ -20,7 +20,7 @@ class SupplierController extends Controller
 {
 	protected $supplier;
 
-	function __construct(Request $request, SupplierRepository $supplier)
+	public function __construct(Request $request, SupplierRepository $supplier)
 	{
 		$this->supplier = $supplier;
 		$this->request = $request;

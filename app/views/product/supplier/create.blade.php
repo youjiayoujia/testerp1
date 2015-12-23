@@ -23,7 +23,7 @@
             <div class='col-sm-6'>
                 <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
             </div>
-            <div class='col-sm-6'> 
+            <div class='col-sm-6'>
                 <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
             </div>
         </div>
@@ -37,7 +37,7 @@
         <div class='radio'>
             <label>
                 <input type='radio' name='type' value='offline' {{ old('type') ? (old('type') == 'offline' ? 'checked' : '') : 'checked' }}>否
-            </label>   
+            </label>
         </div>
         <div class='radio'>
             <label>

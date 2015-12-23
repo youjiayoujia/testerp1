@@ -27,10 +27,12 @@
     @include('layouts.nav')
     <div class="container-fluid main">
         <div class="row">
-            <div class="col-lg-2">
-                @include('layouts.sidebar')
-            </div>
-            <div class="col-lg-10">
+            @if(isset($sidebar))
+                <div class="col-lg-2">
+                    @include('layouts.sidebar')
+                </div>
+            @endif
+            <div class="col-lg-{{ isset($sidebar) ? '10' : '12' }}">
                 @section('breadcrumbs')@show{{-- 路径导航 --}}
                 @section('content')@show{{-- 内容 --}}
             </div>

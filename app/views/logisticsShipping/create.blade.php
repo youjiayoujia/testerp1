@@ -7,7 +7,7 @@
         <li class="active"><strong>添加物流方式shippings</strong></li>
     </ol>
 @stop
-<script type="text/javascript" src="{{ asset('js/pro_city.js') }}}"></script>
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 
 @section('formTitle') 添加物流方式shippings @stop
 @section('formAction') {{ route('logisticsShipping.store') }} @stop
@@ -40,18 +40,22 @@
     </div>
     <div class="form-group">
         <label for="logistics_id">物流商</label>
-        <select name="logistics_id" class="form-control">
+        <select name="logistics_id" class="form-control" id="logistics_id">
             @foreach($logisticsShippings as $shipping)
-                <option value="{{$shipping->id}}" {{$shipping->id == old('$shipping->logisticsShipping->id') ? 'selected' : ''}}>{{$shipping->name}}</option>
+                <option value="{{$shipping->id}}" {{$shipping->id == old('$shipping->logisticsShipping->id') ? 'selected' : ''}}>
+                    {{$shipping->name}}
+                </option>
             @endforeach
         </select>
     </div>
     <div class="form-group">
         <label for="type_id">物流商物流方式</label>
-        <select name="type_id" class="form-control">
-            @foreach($logisticsShipping as $shipping)
-                <option value="{{$shipping->id}}" {{$shipping->id == old('$shipping->logisticsShipping->id') ? 'selected' : ''}}>{{$shipping->type}}</option>
-            @endforeach
+        <select name="type_id" class="form-control" id="type_id">
+            {{--@foreach($logisticsShipping as $shipping)--}}
+                {{--<option value="{{$shipping->id}}" {{$shipping->id == old('$shipping->logisticsShipping->id') ? 'selected' : ''}}>--}}
+                    {{--{{$shipping->type}}--}}
+                {{--</option>--}}
+            {{--@endforeach--}}
         </select>
     </div>
     <div class="form-group">
@@ -85,3 +89,18 @@
         </div>
     </div>
 @stop
+<script type='text/javascript'>
+    $(function(){
+        alert(1);
+    $('#logistics_id').change(function(){
+        var buf = $('#logistics_id').val();
+        var arr = new Array();
+        alert({{$logisticsShipping}}.length);
+        {{--alert(arr.length);--}}
+        {{--for(i=0; i< arr.length; i++){--}}
+            {{--if(arr[i].logistics_id == buf)--}}
+                {{--$('<option value='+arr[i].type+'>'+arr[i].type+'</option>').appendTo($('#type_id'));--}}
+        {{--}--}}
+    });
+    });
+</script>

@@ -10,6 +10,8 @@
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
+    <script src="{{ asset('js/jquery.cxcalendar.min.js') }}"></script>
+
 @stop
 @section('init')
     <script type="text/javascript">

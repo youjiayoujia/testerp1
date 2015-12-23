@@ -30,7 +30,7 @@
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="小包">小包
+                <input type="radio" name="species" value="小包" checked>小包
             </label>
         </div>
     </div>
@@ -67,7 +67,7 @@
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="api_docking" value="号码池">号码池
+                <input type="radio" name="api_docking" value="号码池" checked>号码池
             </label>
         </div>
     </div>

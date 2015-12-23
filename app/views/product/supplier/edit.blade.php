@@ -3,14 +3,14 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('Supplier.index') }}">供货商</a></li>
+        <li><a href="{{ route('supplier.index') }}">供货商</a></li>
         <li class="active"><strong>编辑供货商</strong></li>
     </ol>
 @stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 
 @section('formTitle') 编辑供货商 @stop
-@section('formAction') {{ route('Supplier.update', ['id' => $supplier->id]) }} @stop
+@section('formAction') {{ route('supplier.update', ['id' => $supplier->id]) }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
@@ -30,8 +30,8 @@
         </div>
     </div>
      <div class="form-group">
-        <label for="address">地址</label>
-        <input type='text' class="form-control" id="address" placeholder="供货商地址" name='address' value="{{ old('address') ?  old('address') : $supplier->address }}">
+        <label for="address">经纬度</label>
+        <input type='text' class="form-control" id="address" placeholder="经纬度" name='address' value="{{ old('address') ?  old('address') : $supplier->address }}">
     </div>
     <div class="form-group">
         <label for="type">是否是线上供货商(否/是)</label>

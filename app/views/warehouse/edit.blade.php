@@ -3,14 +3,14 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('Warehouse.index') }}">仓库</a></li>
+        <li><a href="{{ route('warehouse.index') }}">仓库</a></li>
         <li class="active"><strong>编辑仓库</strong></li>
     </ol>
 @stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 
 @section('formTitle') 编辑仓库 @stop
-@section('formAction') {{ route('Warehouse.update', ['id' => $warehouse->id]) }} @stop
+@section('formAction') {{ route('warehouse.update', ['id' => $warehouse->id]) }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
    <input type="hidden" name="_method" value="PUT"/>

@@ -3,12 +3,12 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('Position.index') }}">库位</a></li>
+        <li><a href="{{ route('position.index') }}">库位</a></li>
         <li class="active"><strong>添加库位</strong></li>
     </ol>
 @stop
 @section('formTitle') 添加库位 @stop
-@section('formAction') {{ route('Position.store') }} @stop
+@section('formAction') {{ route('position.store') }} @stop
 @section('formBody')
     <div class="form-group">
         <label for="name" class='control-label'>名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>

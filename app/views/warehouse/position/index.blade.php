@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('Position.index') }}">库位</a></li>
+        <li><a href="{{ route('position.index') }}">库位</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
@@ -29,15 +29,15 @@
             <td>{{ $position->is_available == 'Y' ? '是' : '否'}}</td>
             <td>{{ $position->created_at }}</td>
             <td>
-                <a href="{{ route('Position.show', ['id'=>$position->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('position.show', ['id'=>$position->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('Position.edit', ['id'=>$position->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('position.edit', ['id'=>$position->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $position->id }}"
-                   data-url="{{ route('Position.destroy', ['id' => $position->id]) }}">
+                   data-url="{{ route('position.destroy', ['id' => $position->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

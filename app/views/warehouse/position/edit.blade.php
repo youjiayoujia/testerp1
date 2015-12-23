@@ -3,12 +3,12 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('Position.index') }}">库位</a></li>
+        <li><a href="{{ route('position.index') }}">库位</a></li>
         <li class="active"><strong>编辑库位</strong></li>
     </ol>
 @stop
 @section('formTitle') 编辑库位 @stop
-@section('formAction') {{ route('Position.update', ['id' => $position->id]) }} @stop
+@section('formAction') {{ route('position.update', ['id' => $position->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group">

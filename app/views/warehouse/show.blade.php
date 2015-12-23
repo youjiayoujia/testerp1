@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('Warehouse.index') }}">仓库</a></li>
+        <li><a href="{{ route('warehouse.index') }}">仓库</a></li>
         <li class="active"><strong>仓库详情 : {{ $warehouse->name }} {{ $warehouse->type }}</strong></li>
     </ol>
 @stop

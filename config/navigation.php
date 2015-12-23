@@ -17,66 +17,6 @@
  */
 return [
     [
-        'name' => '常用',
-        'location' => 'dashboard',
-        'icon' => 'dashboard',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '工作台',
-                'location' => '',
-                'url' => 'product.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '常用统计',
-                'location' => '',
-                'url' => 'product.index',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
-        'name' => '产品',
-        'location' => 'product',
-        'icon' => 'tags',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'location' => null,
-                'url' => 'product.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'location' => 'create',
-                'url' => 'product.create',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
-        'name' => '品类',
-        'location' => 'catalog',
-        'icon' => 'tags',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'location' => null,
-                'url' => 'catalog.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'location' => 'create',
-                'url' => 'catalog.create',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
         'name' => '供货商',
         'location' => 'Supplier',
         'icon' => 'tags',
@@ -85,13 +25,13 @@ return [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'Supplier.index',
+                'url' => 'supplier.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增', 
                 'location' => 'create',
-                'url' => 'Supplier.create',
+                'url' => 'supplier.create',
                 'icon' => '',
             ],
         ],
@@ -105,33 +45,13 @@ return [
             [
                 'name' => '列表',
                 'location' => null,
-                'url' => 'Require.index',
+                'url' => 'require.index',
                 'icon' => '',
             ],
             [
                 'name' => '新增',
                 'location' => 'create',
-                'url' => 'Require.create',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
-        'name' => '入库',
-        'location' => 'In',
-        'icon' => 'tags',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'location' => null,
-                'url' => 'In.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'location' => 'create',
-                'url' => 'In.create',
+                'url' => 'require.create',
                 'icon' => '',
             ],
         ],
@@ -157,7 +77,7 @@ return [
             [
                 'name' => '库位',
                 'location' => 'null',
-                'url' => 'Position.index',
+                'url' => 'position.index',
                 'icon' => '',
             ],
         ],

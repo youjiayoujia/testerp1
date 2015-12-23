@@ -98,7 +98,7 @@ class RequireController extends Controller
         }
         $buf->update($data);
 
-        return redirect(route('Require.index'));
+        return redirect(route('require.index'));
     }
 
     /**
@@ -127,7 +127,7 @@ class RequireController extends Controller
         }
         $this->require->update($id, $data);
 
-        return redirect(route('Require.index'));
+        return redirect(route('require.index'));
     }
 
     /**

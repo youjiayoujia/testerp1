@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('warehouse.index') }}">仓库</a></li>
+        <li><a href="{{ route('Warehouse.index') }}">仓库</a></li>
         <li class="active"><strong>添加仓库</strong></li>
     </ol>
 @stop
@@ -12,7 +12,7 @@
     window.onload = init;
 </script>
 @section('formTitle') 添加仓库 @stop
-@section('formAction') {{ route('warehouse.store') }} @stop
+@section('formAction') {{ route('Warehouse.store') }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
     <div class="form-group">

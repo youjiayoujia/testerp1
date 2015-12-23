@@ -125,7 +125,7 @@ class RequireController extends Controller
                 $data["{$name}"] = $absolute_path;
             }
         }
-        $buf = $this->require->update($id, $data);
+        $this->require->update($id, $data);
 
         return redirect(route('Require.index'));
     }

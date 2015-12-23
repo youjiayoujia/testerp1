@@ -40,7 +40,7 @@ class InController extends Controller
             'inname' => config('in.name'),
         ];
 
-        return view('Stock.In.index', $response);
+        return view('stock.in.index', $response);
     }
 
     /**
@@ -56,7 +56,7 @@ class InController extends Controller
             'in' => $this->in->get($id),
         ];
 
-        return view('Stock.In.show', $response);
+        return view('stock.in.show', $response);
     }
 
     /**
@@ -72,7 +72,7 @@ class InController extends Controller
             'data' => config('in.name'),
         ];
 
-        return view('Stock.In.create', $response);
+        return view('stock.in.create', $response);
     }
 
     /**
@@ -106,7 +106,7 @@ class InController extends Controller
             'in' => $this->in->get($id),
         ];
 
-        return view('Stock.in.edit', $response);
+        return view('stock.in.edit', $response);
     }
 
     /**

@@ -13,7 +13,7 @@ namespace App\Http\Controllers\warehouse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Warehouse\PositionRepository;
-use App\Models\WarehouseModel as Warehouse;
+use App\Repositories\WarehouseRepository;
 
 class PositionController extends Controller
 {
@@ -66,7 +66,7 @@ class PositionController extends Controller
 	 * @return none
 	 *
 	 */
-	public function create(Warehouse $warehouse)
+	public function create(WarehouseRepository $warehouse)
 	{
 		$response = [
 			'warehouses' => $warehouse->all(),
@@ -96,7 +96,7 @@ class PositionController extends Controller
 	 * @return view
 	 *
 	 */
-	public function edit($id, Warehouse $warehouse)
+	public function edit($id, WarehouseRepository $warehouse)
 	{
 		$response = [
 			'warehouses' => $warehouse->all(),

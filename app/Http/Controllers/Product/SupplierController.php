@@ -40,7 +40,7 @@ class SupplierController extends Controller
 			'data' => $this->supplier->auto()->paginate(),
 		];
 
-		return view('Product.Supplier.index', $response);
+		return view('product.supplier.index', $response);
 	}
 
 	/**
@@ -56,7 +56,7 @@ class SupplierController extends Controller
 			'supplier' => $this->supplier->get($id),
 		];
 
-		return view('Product.Supplier.show', $response);
+		return view('product.supplier.show', $response);
 	}
 
 	/**
@@ -68,7 +68,7 @@ class SupplierController extends Controller
 	 */
 	public function create()
 	{
-		return view('Product.Supplier.create');
+		return view('product.supplier.create');
 	}
 
 	/**
@@ -100,7 +100,7 @@ class SupplierController extends Controller
 			'supplier' => $this->supplier->get($id),
 		];
 
-		return view('Product.Supplier.edit',$response);
+		return view('product.supplier.edit',$response);
 	}
 
 	/**

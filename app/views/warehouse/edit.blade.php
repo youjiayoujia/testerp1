@@ -13,7 +13,7 @@
 @section('formAction') {{ route('warehouse.update', ['id' => $warehouse->id]) }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
-    <input type="hidden" name="_method" value="PUT"/>
+   <input type="hidden" name="_method" value="PUT"/>
    <div class="form-group">
         <label for="name" class='control-label'>名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="name" placeholder="仓库名字" name='name' value="{{ old('name') ?  old('name') : $warehouse->name }}">

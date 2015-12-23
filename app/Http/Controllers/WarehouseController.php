@@ -13,7 +13,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\WarehouseRepository;
 
-class warehouseController extends Controller
+class WarehouseController extends Controller
 {
 	protected $warehouse;
 

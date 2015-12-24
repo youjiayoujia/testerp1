@@ -228,10 +228,10 @@ class ProductController extends Controller
      */
 	
 	public function zipUpload(){
-		echo 111;exit;
-		$request=$this->request->flash();
+	//echo 111;exit;
+		$request=$this->request;
 		$res=$this->productrepository->zipsUpload($request);
-	 	return redirect(route('product.addzip'));
+	 	return redirect(route('product.index'));
 		}
 		
 }

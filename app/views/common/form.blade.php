@@ -16,7 +16,6 @@
 
             <form method="POST" action="@section('formAction')@show{{-- 表单提交地址 --}}" @section('formAttributes')@show{{-- 表单其它属性 --}}  enctype="multipart/form-data">
                 {!! csrf_field() !!}
-				 
                 @section('formBody')@show{{-- 表单内容 --}}
                 @section('formButton')
                     <button type="submit" class="btn btn-success">提交</button>

@@ -1,4 +1,3 @@
- 
 @extends('common.form')
 @section('title') 添加图片 @stop
 @section('meta')
@@ -17,7 +16,6 @@
 @section('formTitle') 添加图片 @stop
 @section('formAction') /product/zipUpload @stop
 @section('formBody')
-
     <div class="form-group">
     <label for="color">导入压缩包：</label>
         <input  type="file" name='zip'/>

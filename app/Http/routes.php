@@ -13,12 +13,12 @@
 
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
-
+Route::any('product/zipUpload', 'productController@zipUpload');
+Route::get('product/addzip', 'productController@addzip');
 Route::resource('product', 'productController');
 Route::get('product/addimage/{id}', 'productController@addimage');
-Route::get('addzip', 'productController@addzip');
 Route::any('product/imageUpdate/{id}', 'productController@imageUpdate');
-Route::post('/product/zipUpload', 'productController@zipUpload');
+
 Route::resource('brand', 'brandController');
 Route::resource('catalog', 'CatalogController');
 // Authentication routes...

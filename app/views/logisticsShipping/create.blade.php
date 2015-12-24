@@ -51,11 +51,11 @@
     <div class="form-group">
         <label for="type_id">物流商物流方式</label>
         <select name="type_id" class="form-control" id="type_id">
-            {{--@foreach($logisticsShipping as $shipping)--}}
-                {{--<option value="{{$shipping->id}}" {{$shipping->id == old('$shipping->logisticsShipping->id') ? 'selected' : ''}}>--}}
-                    {{--{{$shipping->type}}--}}
-                {{--</option>--}}
-            {{--@endforeach--}}
+            @foreach($logisticsShipping as $shipping)
+                <option value="{{$shipping->id}}" {{$shipping->id == old('$shipping->logisticsShipping->id') ? 'selected' : ''}}>
+                    {{$shipping->type}}
+                </option>
+            @endforeach
         </select>
     </div>
     <div class="form-group">
@@ -89,18 +89,29 @@
         </div>
     </div>
 @stop
-<script type='text/javascript'>
-    $(function(){
-        alert(1);
-    $('#logistics_id').change(function(){
-        var buf = $('#logistics_id').val();
-        var arr = new Array();
-        alert({{$logisticsShipping}}.length);
+{{--<script type='text/javascript'>--}}
+    {{--$(function(){--}}
+        {{--alert(1);--}}
+    {{--$('#logistics_id').change(function(){--}}
+        {{--var buf = $('#logistics_id').val();--}}
+        {{--alert(buf);--}}
+        {{--alert({{ $logisticsShipping[0] }});--}}
+        {{--var len = {{ count($logisticsShipping) }};--}}
+        {{--for(i=0; i<len; i++)--}}
+            {{--alert({{ $logisticsShipping[i] }});--}}
+            {{--if({{ $logisticsShipping }}[i]['logistics_id'] == buf)--}}
+                    {{--$('<option value='+{{ $logisticsShipping }}[i]['type']+'>'+{{ $logisticsShipping }}[i]['type']+'</option>').appendTo($('#type_id'));--}}
+        {{--alert({{ count($logisticsShipping) }});--}}
+        {{--var test = {{ $logisticsShipping }};--}}
+        {{--alert(test);--}}
+        {{--var arr = new Array();--}}
+        {{--arr = {{ $$logisticsShipping }};--}}
+        {{--document.write(arr);--}}
         {{--alert(arr.length);--}}
         {{--for(i=0; i< arr.length; i++){--}}
             {{--if(arr[i].logistics_id == buf)--}}
                 {{--$('<option value='+arr[i].type+'>'+arr[i].type+'</option>').appendTo($('#type_id'));--}}
         {{--}--}}
-    });
-    });
-</script>
+    {{--});--}}
+    {{--});--}}
+{{--</script>--}}

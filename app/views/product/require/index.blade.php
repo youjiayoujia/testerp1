@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('require.index') }}">选款需求</a></li>
+        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
@@ -45,10 +45,10 @@
             <td>{{ $productRequire->user_id }}</td>
             <td>{{ $productRequire->handle_time }}</td>
             <td>
-                <a href="{{ route('require.show', ['id'=>$productRequire->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('productRequire.show', ['id'=>$productRequire->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('require.edit', ['id'=>$productRequire->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('productRequire.edit', ['id'=>$productRequire->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href='#' class='btn btn-primary btn-xs'>
@@ -56,7 +56,7 @@
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $productRequire->id }}"
-                   data-url="{{ route('require.destroy', ['id' => $productRequire->id]) }}">
+                   data-url="{{ route('productRequire.destroy', ['id' => $productRequire->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

@@ -3,14 +3,14 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('out.index') }}">出库</a></li>
+        <li><a href="{{ route('stockOut.index') }}">出库</a></li>
         <li class="active"><strong>添加出库信息</strong></li>
     </ol>
 @stop
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 
 @section('formTitle') 添加出库信息 @stop
-@section('formAction') {{ route('out.store') }} @stop
+@section('formAction') {{ route('stockOut.store') }} @stop
 @section('formBody')
     <div class="form-group">
         <label for="item_id" class='control-label'>item号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -32,19 +32,21 @@
     </div>
     <div class="form-group">
         <label for="remark">备注</label>
-        <input type='text' class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
+        <textarea name='remark' id='remark' class='form-control'></textarea>
     </div>
-    <div class="form-group">
-        <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name='warehouses_id' id='warehouses_id' class='form-control'>
-            @foreach($warehouses as $warehouse)
-                <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'></select>
+    <div class='row'>
+        <div class="form-group col-sm-6">
+            <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouses_id' id='warehouses_id' class='form-control'>
+                @foreach($warehouses as $warehouse)
+                    <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-sm-6">
+            <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'></select>
+        </div>
     </div>
     <div class="form-group">
         <label for="type">出库类型</label>

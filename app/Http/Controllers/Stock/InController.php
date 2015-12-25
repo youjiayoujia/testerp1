@@ -95,7 +95,7 @@ class InController extends Controller
         $this->validate($this->request, $this->in->rules('create'));
         $this->in->create($this->request->all());
 
-        return redirect(route('in.index'));
+        return redirect(route('stockIn.index'));
     }
 
     /**
@@ -131,7 +131,7 @@ class InController extends Controller
         $this->validate($this->request, $this->in->rules('update'));
         $this->in->update($id, $this->request->all());
 
-        return redirect(route('in.index'));
+        return redirect(route('stockIn.index'));
     }
 
     /**
@@ -144,6 +144,6 @@ class InController extends Controller
     public function destroy($id)
     {
         $this->in->destroy($id);
-        return redirect(route('in.index'));
+        return redirect(route('stockIn.index'));
     }
 }

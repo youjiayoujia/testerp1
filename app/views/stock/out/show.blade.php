@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('out.index') }}">出库</a></li>
+        <li><a href="{{ route('stockOut.index') }}">出库</a></li>
         <li class="active"><strong>出库详情 : {{ $stockout->sku }} {{ $stockout->typeof_stockout }} </strong></li>
     </ol>
 @stop

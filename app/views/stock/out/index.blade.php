@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('out.index') }}">出库</a></li>
+        <li><a href="{{ route('stockOut.index') }}">出库</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
@@ -37,15 +37,15 @@
             <td>{{ $stockout->relation_id }}</td>
             <td>{{ $stockout->created_at }}</td>
             <td>
-                <a href="{{ route('out.show', ['id'=>$stockout->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('stockOut.show', ['id'=>$stockout->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('out.edit', ['id'=>$stockout->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('stockOut.edit', ['id'=>$stockout->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $stockout->id }}"
-                   data-url="{{ route('out.destroy', ['id' => $stockout->id]) }}">
+                   data-url="{{ route('stockOut.destroy', ['id' => $stockout->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

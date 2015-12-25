@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('require.index') }}">选款需求</a></li>
+        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
         <li class="active"><strong>选款需求详情 : {{ $require->name }} {{ $require->address }}</strong></li>
     </ol>
 @stop

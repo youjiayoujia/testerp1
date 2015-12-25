@@ -3,13 +3,13 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('in.index') }}">入库</a></li>
+        <li><a href="{{ route('stockIn.index') }}">入库</a></li>
         <li class="active"><strong>修改入库信息</strong></li>
     </ol>
 @stop
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formTitle') 修改入库信息 @stop
-@section('formAction') {{ route('in.update', ['id' => $in->id] ) }} @stop
+@section('formAction') {{ route('stockIn.update', ['id' => $in->id] ) }} @stop
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'/>
     <div class="form-group">
@@ -65,10 +65,14 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         var position = {!! $in->warehouse_positions_id !!};
+        var warehouse = {!! $in->warehouses_id !!};
         var buf = {!! $position !!};
         for(var i in buf)
-            if(buf[i]['id'] == position)
-                $('<option value='+position+'>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
+            if(buf[i]['warehouses_id'] == warehouse)
+                if(buf[i]['id'] == position)
+                    $('<option value='+position+' selected>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
+                else
+                    $('<option value='+position+'>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
 
         $('#sku').blur(function(){
             var sku_val = $('#sku').val();

@@ -96,7 +96,7 @@ class OutController extends Controller
         $this->validate($this->request, $this->out->rules('create'));
         $this->out->create($this->request->all());
 
-        return redirect(route('out.index'));
+        return redirect(route('stockOut.index'));
     }
 
     /**
@@ -133,7 +133,7 @@ class OutController extends Controller
         $this->validate($this->request, $this->out->rules('update', $id));
         $this->out->update($id, $this->request->all());
 
-        return redirect(route('out.index'));
+        return redirect(route('stockOut.index'));
     }
 
     /**
@@ -146,6 +146,6 @@ class OutController extends Controller
     public function destroy($id)
     {
         $this->out->destroy($id);
-        return redirect(route('out.index'));
+        return redirect(route('stockOut.index'));
     }
 }

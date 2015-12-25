@@ -3,18 +3,18 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('out.index') }}">出库</a></li>
+        <li><a href="{{ route('stockOut.index') }}">出库</a></li>
         <li class="active"><strong>修改出库信息</strong></li>
     </ol>
 @stop
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 
 @section('formTitle') 修改出库信息 @stop
-@section('formAction') {{ route('out.update', ['id' => $out->id]) }} @stop
+@section('formAction') {{ route('stockOut.update', ['id' => $out->id]) }} @stop
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'/>
     <div class="form-group">
-        <label for="item_id" class='control-label'>item号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="item_id" class='control-label'>item号</label>
         <input type='text' class="form-control" id="item_id" placeholder="item_id" name='item_id' value="{{ old('item_id') ? old('item_id') : $out->item_id }}" readonly>
     </div>
     <div class="form-group">
@@ -33,19 +33,21 @@
     </div>
     <div class="form-group">
         <label for="remark">备注</label>
-        <input type='text' class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ? old('remark') : $out->remark }}">
+        <textarea name='remark' id='remark' class='form-control'>{{ old('remark') ? old('remark') : $out->remark }}</textarea>
     </div>
-    <div class="form-group">
-        <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name='warehouses_id' id='warehouses_id' class='form-control'>
-            @foreach($warehouses as $warehouse)
-                <option value={{ $warehouse->id }} {{ old('warehouses_id') ? (old('warehouses_id') == $warehouse->id ? 'selected' : '') : $out->warehouses_id == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'></select>
+    <div class='row'>
+        <div class="form-group col-sm-6">
+            <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouses_id' id='warehouses_id' class='form-control'>
+                @foreach($warehouses as $warehouse)
+                    <option value={{ $warehouse->id }} {{ old('warehouses_id') ? (old('warehouses_id') == $warehouse->id ? 'selected' : '') : $out->warehouses_id == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-sm-6">
+            <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'></select>
+        </div>
     </div>
     <div class="form-group">
         <label for="type">出库类型</label>
@@ -64,10 +66,14 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         var position = {!! $out->warehouse_positions_id !!};
+        var warehouse = {!! $out->warehouses_id !!};
         var buf = {!! $position !!};
         for(var i in buf)
-            if(buf[i]['id'] == position)
-                $('<option value='+position+'>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
+            if(buf[i]['warehouses_id'] == warehouse)
+                if(buf[i]['id'] == position)
+                    $('<option value='+position+' selected>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
+                else
+                    $('<option value='+position+'>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
 
         $('#sku').blur(function(){
             var sku_val = $('#sku').val();

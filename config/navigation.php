@@ -21,12 +21,12 @@ return [
         'subnavigations' => [
             [
                 'name' => '供货商',
-                'url' => 'supplier.index',
+                'url' => 'productSupplier.index',
                 'icon' => '',
             ],
             [
                 'name' => '选款需求',
-                'url' => 'require.index',
+                'url' => 'productRequire.index',
                 'icon' => '',
             ],
         ],
@@ -48,45 +48,22 @@ return [
             ],
             [
                 'name' => '库位',
-                'url' => 'position.index',
+                'url' => 'warehousePosition.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '入库',
+                'url' => 'stockIn.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '出库',
+                'url' => 'stockOut.index',
                 'icon' => '',
             ],
         ],
     ],
-    [
-        'name' => '入库',
-        'icon' => 'home',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'url' => 'in.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'url' => 'in.create',
-                'icon' => '',
-            ],
-        ],
-    ],
-    [
-        'name' => '出库',
-        'icon' => 'home',
-        'url' => '',
-        'subnavigations' => [
-            [
-                'name' => '列表',
-                'url' => 'out.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'url' => 'out.create',
-                'icon' => '',
-            ],
-        ],
-    ],
+    
     [
         'name' => '库存调整',
         'icon' => 'home',

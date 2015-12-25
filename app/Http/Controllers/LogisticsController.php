@@ -2,11 +2,12 @@
 /**
  * Created by PhpStorm.
  * User: bianhaiwei
- * Date: 15/12/10
- * Time: 下午3:42
+ * Date: 15/12/21
+ * Time: 下午6:28
  */
 
 namespace App\Http\Controllers;
+
 
 use Illuminate\Http\Request;
 use App\Repositories\LogisticsRepository;
@@ -30,9 +31,21 @@ class LogisticsController extends Controller
         return view('logistics.index', $response);
     }
 
+    public function show($id)
+    {
+        $response = [
+          'logistics' => $this->logistics->get($id),
+        ];
+        return view('logistics.show', $response);
+    }
+
     public function create()
     {
-        return view('logistics.create');
+        $response = [
+            'supplier' => $this->logistics->getSupplier(),
+            'warehouse' => $this->logistics->getWarehouse(),
+        ];
+        return view('logistics.create', $response);
     }
 
     public function store()
@@ -43,18 +56,12 @@ class LogisticsController extends Controller
         return redirect(route('logistics.index'));
     }
 
-    public function show($id)
-    {
-        $response = [
-            'logistics' => $this->logistics->get($id),
-        ];
-        return view('logistics.show', $response);
-    }
-
     public function edit($id)
     {
         $response = [
             'logistics' => $this->logistics->get($id),
+            'supplier' => $this->logistics->getSupplier(),
+            'warehouse' => $this->logistics->getWarehouse(),
         ];
         return view('logistics.edit', $response);
     }

@@ -1,62 +1,90 @@
 @extends('common.form')
-@section('title') 编辑物流 @stop
+@section('title') 编辑物流方式shippings @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流</a></li>
-        <li class="active"><strong>编辑物流</strong></li>
+        <li><a href="{{ route('logistics.index') }}">物流方式shippings</a></li>
+        <li class="active"><strong>编辑物流方式shippings</strong></li>
     </ol>
 @stop
-<script type="text/javascript" src="{{ asset('js/pro_city.js') }}}"></script>
 
-@section('formTitle') 编辑物流 @stop
+@section('formTitle') 编辑物流方式shippings @stop
 @section('formAction') {{ route('logistics.update', ['id' => $logistics->id]) }} @stop
-@section('formAttributes') name='creator'@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group">
-        <label for="name" class="control-label">物流商名称</label>
-        <input type="text" class="form-control" id="name" placeholder="物流商名称" name='name' value="{{ old('name') ?  old('name') : $logistics->name }}">
+        <label for="short_code" class="control-label">物流方式简码</label>
+        <input class="form-control" id="short_code" placeholder="物流方式简码" name='short_code' value="{{ old('short_code') ? old('short_code') : $logistics->short_code }}">
     </div>
     <div class="form-group">
-        <label for="customer_id" class="control-label">客户ID</label>
-        <input class="form-control" id="customer_id" placeholder="客户ID" name='customer_id' value="{{ old('customer_id') ?  old('customer_id') : $logistics->customer_id }}">
+        <label for="logistics_type" class="control-label">物流方式名称</label>
+        <input class="form-control" id="logistics_type" placeholder="物流方式名称" name='logistics_type' value="{{ old('logistics_type') ? old('logistics_type') : $logistics->logistics_type}}">
     </div>
     <div class="form-group">
-        <label for="secret_key" class="control-label">密钥</label>
-        <input class="form-control" id="secret_key" placeholder="密钥" name='secret_key' value="{{ old('secret_key') ?  old('secret_key') : $logistics->secret_key }}">
-    </div>
-    <div class="form-group">
-        <label for="is_api">是否有API</label>
+        <label for="species" class="control-label">种类</label>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="Y" {{old('is_api') ? (old('is_api') == 'Y' ? 'checked' : '') : ($logistics->is_api == 'Y' ? 'checked' : '')}}>有
+                <input type="radio" name="species" value="快递" {{ $logistics->species == '快递' ? 'checked' : '' }}>快递
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="is_api" value="N" {{old('is_api') ? (old('is_api') == 'N' ? 'checked' : '') : ($logistics->is_api == 'N' ? 'checked' : '')}}>没有
+                <input type="radio" name="species" value="小包" {{ $logistics->species == '小包' ? 'checked' : '' }}>小包
             </label>
         </div>
     </div>
     <div class="form-group">
-        <label for="client_manager" class="control-label">客户经理</label>
-        <input class="form-control" id="client_manager" placeholder="客户经理" name='client_manager' value="{{ old('client_manager') ?  old('client_manager') : $logistics->client_manager }}">
+        <label for="warehouse_id">仓库</label>
+        <select name="warehouse_id" class="form-control">
+            @foreach($warehouse as $warehouses)
+                <option value="{{$warehouses->id}}" {{$warehouses->id == $logistics->warehouse_id ? 'selected' : ''}}>
+                    {{$warehouses->name}}
+                </option>
+            @endforeach
+        </select>
     </div>
     <div class="form-group">
-        <label for="manager_tel" class="control-label">客户经理联系方式</label>
-        <input class="form-control" id="manager_tel" placeholder="客户经理联系方式" name='manager_tel' value="{{ old('manager_tel') ?  old('manager_tel') : $logistics->manager_tel }}">
+        <label for="logistics_supplier_id">物流商</label>
+        <select name="logistics_supplier_id" class="form-control">
+            @foreach($supplier as $suppliers)
+                <option value="{{$suppliers->id}}" {{$suppliers->id == $logistics->logistics_supplier_id ? 'selected' : ''}}>
+                    {{$suppliers->name}}
+                </option>
+            @endforeach
+        </select>
     </div>
     <div class="form-group">
-        <label for="technician" class="control-label">技术人员</label>
-        <input class="form-control" id="technician" placeholder="技术人员" name='technician' value="{{ old('technician') ?  old('technician') : $logistics->technician }}">
+        <label for="type" class="control-label">物流商物流方式</label>
+        <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') ? old('type') : $logistics->type}}">
     </div>
     <div class="form-group">
-        <label for="technician_tel" class="control-label">技术联系方式</label>
-        <input class="form-control" id="technician_tel" placeholder="技术联系方式" name='technician_tel' value="{{ old('technician_tel') ?  old('technician_tel') : $logistics->technician_tel }}">
+        <label for="url" class="control-label">物流追踪网址</label>
+        <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') ? old('url') : $logistics->url}}">
     </div>
     <div class="form-group">
-        <label for="remark" class="control-label">备注</label>
-        <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $logistics->remark }}">
+        <label for="api_docking" class="control-label">API对接方式</label>
+        <div class="radio">
+            <label>
+                <input type="radio" name="api_docking" value="物流api" {{ $logistics->api_docking == '物流api' ? 'checked' : '' }}>物流api
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="api_docking" value="号码池" {{ $logistics->api_docking == '号码池' ? 'checked' : '' }}>号码池
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="is_enable" class="control-label">是否启用</label>
+        <div class="radio">
+            <label>
+                <input type="radio" name="is_enable" value="Y" {{ $logistics->is_enable == 'Y' ? 'checked' : '' }}>是
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="is_enable" value="N" {{ $logistics->is_enable == 'N' ? 'checked' : '' }}>否
+            </label>
+        </div>
     </div>
 @stop

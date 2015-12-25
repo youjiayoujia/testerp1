@@ -2,20 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: bianhaiwei
- * Date: 15/12/10
- * Time: 下午6:07
+ * Date: 15/12/21
+ * Time: 下午4:35
  */
 return [
     'id' => 'ID',
-    'name' => '物流商名称',
-    'customer_id' => '客户ID',
-    'secret_key' => '密钥',
-    'is_api' => '是否有API',
-    'client_manager' => '客户经理',
-    'manager_tel' => '客户经理联系方式',
-    'technician' => '技术人员',
-    'technician_tel' => '技术联系方式',
-    'remark' => '备注',
+    'short_code' => '物流方式简码',
+    'logistics_type' => '物流方式名称',
+    'species' => '种类',
+    'warehouse_id' => '仓库',
+    'logistics_id' => '物流商',
+    'type' => '物流商物流方式',
+    'url' => '物流追踪网址',
+    'api_docking' => 'API对接方式',
+    'is_enable' => '是否启用',
     'created_at' => '创建时间',
     'updated_at' => '更新时间'
 ];

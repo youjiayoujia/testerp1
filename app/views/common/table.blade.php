@@ -103,7 +103,7 @@
             var action = url + '?pageSize=' + size;
             location.href = action;
         });
-
+        {{-- 排序 --}}
         $('.sort').click(function () {
             location.href = $(this).data('url');
         });

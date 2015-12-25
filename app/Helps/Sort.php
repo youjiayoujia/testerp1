@@ -3,7 +3,7 @@ namespace App\Helps;
 
 class Sort
 {
-    public static function url($field)
+    public function url($field)
     {
         if (request()->getQueryString()) {
             if (request()->has('sorts')) {
@@ -39,7 +39,7 @@ class Sort
         return $url;
     }
 
-    public static function label($field)
+    public function label($field)
     {
         $label = '';
         if (request()->has('sorts')) {

@@ -10,6 +10,8 @@
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
+    <script src="{{ asset('js/jquery.cxcalendar.min.js') }}"></script>
+
 @stop
 @section('init')
     <script type="text/javascript">
@@ -25,10 +27,12 @@
     @include('layouts.nav')
     <div class="container-fluid main">
         <div class="row">
-            <div class="col-lg-2">
-                @include('layouts.sidebar')
-            </div>
-            <div class="col-lg-10">
+            @if(isset($sidebar))
+                <div class="col-lg-2">
+                    @include('layouts.sidebar')
+                </div>
+            @endif
+            <div class="col-lg-{{ isset($sidebar) ? '10' : '12' }}">
                 @section('breadcrumbs')@show{{-- 路径导航 --}}
                 @section('content')@show{{-- 内容 --}}
             </div>

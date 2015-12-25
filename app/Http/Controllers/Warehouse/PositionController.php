@@ -86,7 +86,7 @@ class PositionController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->warehousePosition->rules('create'));
         $this->warehousePosition->create($this->request->all());
-        return redirect(route('position.index'));
+        return redirect(route('warehousePosition.index'));
     }
 
     /**
@@ -119,7 +119,7 @@ class PositionController extends Controller
         $this->validate($this->request, $this->warehousePosition->rules('update', $id));
         $this->warehousePosition->update($id, $this->request->all());
 
-        return redirect(route('position.index'));
+        return redirect(route('warehousePosition.index'));
     }
 
     /**
@@ -132,6 +132,6 @@ class PositionController extends Controller
     public function destroy($id)
     {
         $this->warehousePosition->destroy($id);
-        return redirect(route('position.index'));
+        return redirect(route('warehousePosition.index'));
     }
 }

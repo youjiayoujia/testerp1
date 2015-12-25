@@ -21,12 +21,12 @@ return [
         'subnavigations' => [
             [
                 'name' => '供货商',
-                'url' => 'supplier.index',
+                'url' => 'productSupplier.index',
                 'icon' => '',
             ],
             [
                 'name' => '选款需求',
-                'url' => 'require.index',
+                'url' => 'productRequire.index',
                 'icon' => '',
             ],
         ],
@@ -48,7 +48,7 @@ return [
             ],
             [
                 'name' => '库位',
-                'url' => 'position.index',
+                'url' => 'warehousePosition.index',
                 'icon' => '',
             ],
         ],

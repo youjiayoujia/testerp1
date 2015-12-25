@@ -84,7 +84,7 @@ class SupplierController extends Controller
         $this->validate($this->request, $this->supplier->rules('create'));
         $this->supplier->create($this->request->all());
 
-        return redirect(route('supplier.index'));
+        return redirect(route('productSupplier.index'));
     }
 
     /**
@@ -116,7 +116,7 @@ class SupplierController extends Controller
         $this->validate($this->request, $this->supplier->rules('update', $id));
         $this->supplier->update($id, $this->request->all());
 
-        return redirect(route('supplier.index'));
+        return redirect(route('productSupplier.index'));
     }
 
     /**
@@ -130,6 +130,6 @@ class SupplierController extends Controller
     {
         $this->supplier->destroy($id);
 
-        return redirect(route('supplier.index'));
+        return redirect(route('productSupplier.index'));
     }
 }

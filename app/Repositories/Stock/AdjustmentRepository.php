@@ -26,6 +26,7 @@ class AdjustmentRepository extends BaseRepository
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
             'total_amount' => 'required|integer',
+            'adjust_time' =>'required|date',
         ],
         'update' => [
             'sku' => 'required|max:128',
@@ -33,6 +34,7 @@ class AdjustmentRepository extends BaseRepository
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
             'total_amount' => 'required|integer',
+            'adjust_time' =>'required|date',
         ]
     ];
     

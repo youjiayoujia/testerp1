@@ -13,6 +13,9 @@ namespace App\Http\Controllers\Stock;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\InRepository;
+use App\Models\ItemModel as Item;
+use App\Repositories\WarehouseRepository as warehouse;
+use App\Repositories\Warehouse\PositionRepository as position;
 
 class InController extends Controller
 {
@@ -66,10 +69,13 @@ class InController extends Controller
      * @return view
      *
      */
-    public function create()
+    public function create(warehouse $warehouse, position $position)
     {
         $response = [
             'data' => config('in'),
+            'item' => json_encode(Item::all()->toArray()),
+            'warehouses' => $warehouse->all(),
+            'position' => json_encode($position->all()->toArray()),
         ];
 
         return view('stock.in.create', $response);
@@ -99,11 +105,14 @@ class InController extends Controller
      * @return view
      *
      */
-    public function edit($id)
+    public function edit($id, warehouse $warehouse, position $position)
     {
         $response = [
             'data' => config('in'),
             'in' => $this->in->get($id),
+            'item' => json_encode(Item::all()->toArray()),
+            'warehouses' => $warehouse->all(),
+            'position' => json_encode($position->all()->toArray()),
         ];
 
         return view('stock.in.edit', $response);
@@ -119,9 +128,7 @@ class InController extends Controller
     public function update($id)
     {
         $this->request->flash();
-
         $this->validate($this->request, $this->in->rules('update'));
-
         $this->in->update($id, $this->request->all());
 
         return redirect(route('in.index'));

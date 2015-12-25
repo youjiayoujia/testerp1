@@ -10,9 +10,10 @@
 @section('tableTitle') 入库列表 @stop
 @section('tableHeader')
     <th>ID</th>
+    <th>Item号</th>
     <th>sku</th>
     <th class="sort" data-url="{{ Sort::url('amount') }}">数量{!! Sort::label('amount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('total_amount') }}">总金额{!! Sort::label('total_amount') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('total_amount') }}">总金额(￥){!! Sort::label('total_amount') !!}</th>
     <th>备注</th>
     <th>仓库</th>
     <th>库位</th>
@@ -25,14 +26,15 @@
     @foreach($data as $stockin)
         <tr>
             <td>{{ $stockin->id }}</td>
+            <td>{{ $stockin->item_id }}</td>
             <td>{{ $stockin->sku }}</td>
             <td>{{ $stockin->amount}}</td>
             <td>{{ $stockin->total_amount}}</td>
             <td>{{ $stockin->remark }} </td>
-            <td>{{ $stockin->warehouses_id }}</td>
-            <td>{{ $stockin->warehouse_positions_id }}</td>
-            <td>{{ $stockin->typeof_stockin }}</td>
-            <td>{{ $stockin->typeof_stockin_id }}</td>
+            <td>{{ $stockin->warehouse->name }}</td>
+            <td>{{ $stockin->position->name }}</td>
+            <td>{{ $stockin->type }}</td>
+            <td>{{ $stockin->relation_id }}</td>
             <td>{{ $stockin->created_at }}</td>
             <td>
                 <a href="{{ route('in.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs">

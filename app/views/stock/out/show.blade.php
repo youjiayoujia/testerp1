@@ -23,11 +23,13 @@
                 <dt>备注</dt>
                 <dd>{{ $stockout->remark }}</dd>
                 <dt>仓库</dt>
-                <dd>{{ $stockout->warehouses_id }}</dd>
+                <dd>{{ $stockout->warehouse->name }}</dd>
                 <dt>库位</dt>
-                <dd>{{ $stockout->warehouse_positions_id }}</dd>
+                <dd>{{ $stockout->position->name }}</dd>
                 <dt>出库类型</dt>
-                <dd>{{ $stockout->typeof_stockout }}</dd>
+                <dd>{{ $stockout->type }}</dd>
+                <dt>出库类型id</dt>
+                <dd>{{ $stockout->relation_id }}</dd>
                 <dt>创建时间</dt>
                 <dd>{{ $stockout->created_at }}</dd>
                 <dt>更新时间</dt>

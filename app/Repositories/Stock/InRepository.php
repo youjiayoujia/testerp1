@@ -21,6 +21,7 @@ class InRepository extends BaseRepository
     // 规则验证
     public $rules = [
         'create' => [
+            'item_id' => 'required',
             'sku' => 'required|max:128',
             'amount' => 'required|numeric',
             'warehouses_id' => 'required|integer',
@@ -28,6 +29,7 @@ class InRepository extends BaseRepository
             'total_amount' => 'required|integer',
         ],
         'update' => [
+            'item_id' => 'required',
             'sku' => 'required|max:128',
             'amount' => 'required|integer',
             'warehouses_id' => 'required|integer',

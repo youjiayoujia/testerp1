@@ -10,6 +10,7 @@
 @section('tableTitle') 出库列表 @stop
 @section('tableHeader')
     <th>ID</th>
+    <th>Item号</th>
     <th>sku</th>
     <th class="sort" data-url="{{ Sort::url('amount') }}">数量{!! Sort::label('amount') !!}</th>
     <th class="sort" data-url="{{ Sort::url('total_amount') }}">总金额{!! Sort::label('total_amount') !!}</th>
@@ -25,14 +26,15 @@
     @foreach($data as $stockout)
         <tr>
             <td>{{ $stockout->id }}</td>
+            <td>{{ $stockout->item_id }}</td>
             <td>{{ $stockout->sku }}</td>
             <td>{{ $stockout->amount}}</td>
             <td>{{ $stockout->total_amount}}</td>
             <td>{{ $stockout->remark }} </td>
-            <td>{{ $stockout->warehouses_id }}</td>
-            <td>{{ $stockout->warehouse_positions_id }}</td>
-            <td>{{ $stockout->typeof_stockout }}</td>
-            <td>{{ $stockout->typeof_stockout_id }}</td>
+            <td>{{ $stockout->warehouse->name }}</td>
+            <td>{{ $stockout->position->name }}</td>
+            <td>{{ $stockout->type }}</td>
+            <td>{{ $stockout->relation_id }}</td>
             <td>{{ $stockout->created_at }}</td>
             <td>
                 <a href="{{ route('out.show', ['id'=>$stockout->id]) }}" class="btn btn-info btn-xs">

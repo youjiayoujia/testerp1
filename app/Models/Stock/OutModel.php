@@ -12,12 +12,22 @@ class OutModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stockouts';
+    protected $table = 'stock_outs';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['sku', 'amount', 'total_amount', 'remark', 'warehouses_id', 'warehouse_positions_id', 'typeof_stockout', 'typeof_stockout_id'];
+    protected $fillable = ['item_id', 'sku', 'amount', 'total_amount', 'remark', 'warehouses_id', 'warehouse_positions_id', 'type', 'relation_id'];
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+    }
+
+    public function position()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+    }
 }

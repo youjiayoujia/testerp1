@@ -14,7 +14,9 @@
             <dl class="dl-horizontal">
                 <dt>ID</dt>
                 <dd>{{ $stockin->id }}</dd>
-                <dt>skuk</dt>
+                <dt>item号</dt>
+                <dd>{{ $stockin->item_id }}</dd>
+                <dt>sku</dt>
                 <dd>{{ $stockin->sku }}</dd>
                 <dt>数量</dt>
                 <dd>{{ $stockin->amount }}</dd>
@@ -23,11 +25,13 @@
                 <dt>备注</dt>
                 <dd>{{ $stockin->remark }}</dd>
                 <dt>仓库</dt>
-                <dd>{{ $stockin->warehouses_id }}</dd>
+                <dd>{{ $stockin->warehouse->name }}</dd>
                 <dt>库位</dt>
-                <dd>{{ $stockin->warehouse_positions_id }}</dd>
+                <dd>{{ $stockin->position->name }}</dd>
                 <dt>入库类型</dt>
-                <dd>{{ $stockin->typeof_stockin }}</dd>
+                <dd>{{ $stockin->type }}</dd>
+                <dt>入库类型id</dt>
+                <dd>{{ $stockin->relation_id }}</dd>
                 <dt>创建时间</dt>
                 <dd>{{ $stockin->created_at }}</dd>
                 <dt>更新时间</dt>

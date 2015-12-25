@@ -17,4 +17,6 @@ Route::resource('productSupplier', 'Product\SupplierController');
 Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 Route::resource('warehousePosition', 'Warehouse\PositionController');
+Route::resource('logisticsSupplier', 'Logistics\SupplierController');
+Route::resource('logistics', 'LogisticsController');
 

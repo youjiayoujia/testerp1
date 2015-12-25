@@ -57,6 +57,18 @@ return [
         'name' => '物流',
         'icon' => 'plane',
         'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '物流商',
+                'url' => 'logisticsSupplier.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流方式shippings',
+                'url' => 'logistics.index',
+                'icon' => '',
+            ],
+        ],
     ],
     [
         'name' => '采购',

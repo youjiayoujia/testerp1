@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models\Warehouse;
+
+use App\Base\BaseModel;
+
+class PositionModel extends BaseModel
+{
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'warehouse_positions';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['name', 'warehouses_id', 'remark', 'size', 'is_available'];
+
+    public function warehouse()
+    {
+       return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+    }
+
+}

@@ -2,91 +2,131 @@
 /**
  * 基础仓库类
  *
- * 常规HTTP请求的CURD方法, 业务逻辑方法
+ * 常规CURD, 业务逻辑
  * @author  Vincent<nyewon@gmail.com>
  */
 namespace App\Base;
 
-abstract class BaseRepository
+class BaseRepository
 {
     //仓库调用模型
-    public $model;
+    protected $model;
     //列表过滤字段,用于查找过滤
     protected $searchFields;
     //验证字段,用于表单提交的数据验证
-    public $rules;
+    protected $rules;
+
+    /**
+     * 获取验证规则
+     *
+     * @param $type
+     * @param string $id
+     * @return mixed
+     */
+    public function rules($type, $id = '')
+    {
+        $rules = $this->rules[$type];
+        if ($id) {
+            foreach ($rules as $column => $rule) {
+                $rules[$column] = str_replace('{id}', $id, $rule);
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * 自动组装
+     *
+     * @return $this
+     */
+    public function auto()
+    {
+        if (request()->has('keywords')) {
+            $this->search(request()->input('keywords'));
+        }
+
+        if (request()->has('sorts')) {
+            $sorts = [];
+            foreach (explode(',', request()->input('sorts')) as $key => $sort) {
+                $sort = explode('.', $sort);
+                $sorts[$key]['field'] = $sort[0];
+                $sorts[$key]['direction'] = $sort[1];
+            }
+            $this->sort($sorts);
+        }
+
+        $this->filter();
+
+        return $this;
+    }
 
     /**
      * 搜索
      *
-     * @param $result
-     * @return mixed
+     * @param $keywords
+     * @return $this
      */
-    public function search($result)
+    public function search($keywords)
     {
-        if (request()->has('keywords')) {
-            $result = $result->where(function ($query) {
-                foreach ($this->searchFields as $searchField) {
-                    $query = $query->orWhere($searchField, 'like', '%' . trim(request()->input('keywords')) . '%');
-                }
-            });
-        }
-
-        return $result;
-    }
-
-    /**
-     * 排序
-     *
-     * @param $result
-     * @return mixed
-     */
-    public function sort($result)
-    {
-        if (request()->has('sorts')) {
-            $sorts = explode(',', request()->input('sorts'));
-            foreach ($sorts as $sort) {
-                $sort = explode('.', $sort);
-                $result = $result->orderBy($sort[0], $sort['1']);
+        $this->model = $this->model->where(function ($query) use ($keywords) {
+            foreach ($this->searchFields as $searchField) {
+                $query = $query->orWhere($searchField, 'like', '%' . trim($keywords) . '%');
             }
+        });
+
+        return $this;
+    }
+
+    /**
+     * 多字段排序
+     *
+     * @param $sorts
+     * @return $this
+     */
+    public function sort($sorts)
+    {
+        foreach ($sorts as $sort) {
+            $this->model = $this->model->orderBy($sort['field'], $sort['direction']);
         }
 
-        return $result;
+        return $this;
     }
 
     /**
-     * 组装
+     * 过滤
      *
-     * @return mixed
+     * @return $this
      */
-    public function scope()
+    public function filter()
     {
-        $result = $this->model;
-        $result = $this->search($result);
-        $result = $this->sort($result);
-
-        return $result;
+        return $this;
     }
 
     /**
-     *取得所有记录
+     * 取得所有记录
      *
+     * @param array $fields
      * @return mixed
      */
-    public function all()
+    public function all($fields = ['*'])
     {
-        return $this->scope()->get();
+        return $this->model->get($fields);
     }
 
     /**
      * 取得分页记录
      *
+     * @param string $pageSize
      * @return mixed
      */
-    public function paginate()
+    public function paginate($fields = ['*'], $pageSize = '')
     {
-        $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
-        return $this->scope()->paginate($pageSize);
+        if (!$pageSize) {
+            $pageSize = request()->has('pageSize') ? request()->input('pageSize') : config('setting.pageSize');
+        }
+
+        return $this->model->paginate($pageSize, $fields);
     }
 
     /**
@@ -97,7 +137,7 @@ abstract class BaseRepository
      */
     public function get($id)
     {
-        return $this->model->find($id);
+        return $this->model->findOrFail($id);
     }
 
     /**
@@ -106,7 +146,7 @@ abstract class BaseRepository
      * @param $data
      * @return mixed
      */
-    public function store($data)
+    public function create($data)
     {
         return $this->model->create($data);
     }

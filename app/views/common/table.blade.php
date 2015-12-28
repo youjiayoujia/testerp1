@@ -41,7 +41,7 @@
                 @show{{-- 列表工具栏 --}}
                 <div class="row">
                     <div class="col-lg-12">
-                        <table class="table table-bordered table-striped table-hover">
+                        <table class="table table-bordered table-striped table-hover sortable">
                             <thead>
                             <tr>
                                 @section('tableHeader')@show{{-- 列表字段 --}}
@@ -102,6 +102,10 @@
             var url = $(this).data('url');
             var action = url + '?pageSize=' + size;
             location.href = action;
+        });
+        {{-- 排序 --}}
+        $('.sort').click(function () {
+            location.href = $(this).data('url');
         });
     </script>
 @stop

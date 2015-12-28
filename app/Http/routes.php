@@ -11,13 +11,13 @@
   |
  */
 
-
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
-Route::any('product/zipUpload', 'productController@zipUpload');
-Route::get('product/addzip', 'productController@addzip');
+Route::any('product/update', 'product\ImageController@update');
+Route::any('productZipUpload', 'Product\ImageController@zipUpload');
+Route::get('productAddzip', 'Product\ImageController@addzip');
 Route::resource('product', 'productController');
 Route::get('product/addimage/{id}', 'productController@addimage');
-Route::any('product/imageUpdate/{id}', 'productController@imageUpdate');
+
 
 Route::resource('brand', 'brandController');
 Route::resource('catalog', 'CatalogController');
@@ -28,3 +28,10 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 // Registration routes...
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
+
+Route::resource('productImage', 'Product\ImageController');
+Route::resource('productSupplier', 'Product\SupplierController');
+Route::resource('productRequire', 'Product\RequireController');
+Route::resource('warehouse', 'WarehouseController');
+Route::resource('warehousePosition', 'Warehouse\PositionController');
+

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\helps;
 
-use Chumper\Zipper\Zipper;
+
 class Helpers
 {
 	 
@@ -13,16 +13,7 @@ class Helpers
          
     }
     
-		/**
-     * 文件解压
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function decompression($zippath,$path){
-		$zipper = new \Chumper\Zipper\Zipper;
-		$zipper->make($zippath)->extractTo($path); 
-		}
+		 
 	/**
 	*获取文件名
 	*

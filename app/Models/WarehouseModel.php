@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class Product_imageModel extends BaseModel
+class WarehouseModel extends BaseModel
 {
 
     /**
@@ -12,13 +12,13 @@ class Product_imageModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'product_images';
+    protected $table = 'warehouses';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['product_id'];
+    protected $fillable = ['name', 'province', 'city', 'type', 'volumn', 'is_available', 'is_default'];
 
 }

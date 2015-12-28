@@ -3,6 +3,15 @@
 Homestead.yaml
 Homestead.json
 .env
+config.php
+routes.php
+compiled.php
+services.json
+events.scanned.php
+routes.scanned.php
+down
 
-/vendor
-/storage
+/vendor/
+/storage/
+/.idea/
+

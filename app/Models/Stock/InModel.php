@@ -21,13 +21,35 @@ class InModel extends BaseModel
      */
     protected $fillable = ['item_id', 'sku', 'amount', 'total_amount', 'remark', 'warehouses_id', 'warehouse_positions_id', 'type', 'relation_id'];
 
+    /**
+     * get the relationship between the two module 
+     *
+     * @param none
+     */
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
     }
 
+    /**
+     * get the relationship between the two module 
+     *
+     * @param none
+     */
     public function position()
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+    }
+
+    /**
+     *  make the accessor. 
+     *  get the name by key in config.
+     *
+     *  @return name(by type)
+     */
+    public function getTypeNameAttribute()
+    {
+        $buf = config('in');
+        return $buf[$this->type];
     }
 }

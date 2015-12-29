@@ -13,9 +13,8 @@ namespace App\Http\Controllers\Stock;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\InRepository;
-use App\Models\ItemModel as Item;
-use App\Repositories\WarehouseRepository as warehouse;
-use App\Repositories\Warehouse\PositionRepository as position;
+use App\Repositories\WarehouseRepository;
+use App\Repositories\Warehouse\PositionRepository;
 
 class InController extends Controller
 {
@@ -37,10 +36,8 @@ class InController extends Controller
     public function index()
     {
         $this->request->flash();
-
         $response = [
             'data' => $this->in->auto()->paginate(),
-            'inname' => config('in'),
         ];
 
         return view('stock.in.index', $response);
@@ -69,13 +66,11 @@ class InController extends Controller
      * @return view
      *
      */
-    public function create(warehouse $warehouse, position $position)
+    public function create(WarehouseRepository $warehouse)
     {
         $response = [
             'data' => config('in'),
-            'item' => json_encode(Item::all()->toArray()),
             'warehouses' => $warehouse->all(),
-            'position' => json_encode($position->all()->toArray()),
         ];
 
         return view('stock.in.create', $response);
@@ -91,7 +86,6 @@ class InController extends Controller
     public function store()
     {
         $this->request->flash();
-
         $this->validate($this->request, $this->in->rules('create'));
         $this->in->create($this->request->all());
 
@@ -105,14 +99,12 @@ class InController extends Controller
      * @return view
      *
      */
-    public function edit($id, warehouse $warehouse, position $position)
+    public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
             'data' => config('in'),
             'in' => $this->in->get($id),
-            'item' => json_encode(Item::all()->toArray()),
             'warehouses' => $warehouse->all(),
-            'position' => json_encode($position->all()->toArray()),
         ];
 
         return view('stock.in.edit', $response);
@@ -144,6 +136,37 @@ class InController extends Controller
     public function destroy($id)
     {
         $this->in->destroy($id);
+
         return redirect(route('stockIn.index'));
+    }
+
+    /**
+     * 获取itemid，返回
+     *
+     * @param none 
+     * @return json
+     *
+     */
+    public function getItemId()
+    { 
+        $sku_val = $_GET['sku_val']; 
+        $id = $this->in->getitemid($sku_val);
+
+        echo json_encode($id);
+    }
+
+    /**
+     * 获取库位信息,return 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function getPosition()
+    {
+        $warehouses_id = $_GET['val'];
+        $arr = $this->in->getPosition($warehouses_id);
+
+        echo json_encode($arr);
     }
 }

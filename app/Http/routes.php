@@ -13,11 +13,43 @@
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
-Route::resource('productSupplier', 'Product\SupplierController');
-Route::resource('productRequire', 'Product\RequireController');
-Route::resource('warehouse', 'WarehouseController');
+/**
+ *  InController  controller  route
+ */
+Route::get('getitemid', ['uses' => 'Stock\InController@getItemId', 'as'=>'getitemid']);
+Route::get('getposition', ['uses' => 'Stock\InController@getPosition', 'as'=>'getposition']);
 Route::resource('stockIn', 'Stock\InController');
+
+/**
+ * OutController controller route
+ */
 Route::resource('stockOut', 'Stock\OutController');
-Route::resource('adjustment', 'Stock\AdjustmentController');
+
+/**
+ * productSupplier controller route
+ */
+Route::resource('productSupplier', 'Product\SupplierController');
+
+/**
+ * productRequire controller route
+ */
+Route::resource('productRequire', 'Product\RequireController');
+
+/**
+ * warehouse controller route
+ */
+Route::resource('warehouse', 'WarehouseController');
+
+/**
+ * stockAdjustment controller route
+ */
+Route::resource('stockAdjustment', 'Stock\AdjustmentController');
+
+/**
+ * warehousePosition controller route
+ */
 Route::resource('warehousePosition', 'Warehouse\PositionController');
+
+
+
 

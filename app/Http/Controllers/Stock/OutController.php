@@ -13,9 +13,8 @@ namespace App\Http\Controllers\Stock;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\OutRepository;
-use App\Models\ItemModel as Item;
-use App\Repositories\WarehouseRepository as warehouse;
-use App\Repositories\Warehouse\PositionRepository as position;
+use App\Repositories\WarehouseRepository;
+use App\Repositories\Warehouse\PositionRepository;
 
 class OutController extends Controller
 {
@@ -40,7 +39,6 @@ class OutController extends Controller
 
         $response = [
             'data' => $this->out->auto()->paginate(),
-            'outname' => config('out'),
         ];
 
         return view('stock.out.index', $response);
@@ -69,14 +67,11 @@ class OutController extends Controller
      * @return view
      *
      */
-    public function create(warehouse $warehouse, position $position)
+    public function create(WarehouseRepository $warehouse)
     {
         $response = [
             'data' => config('out'),
-            'item' => json_encode(Item::all()->toArray()),
             'warehouses' => $warehouse->all(),
-            'position' => json_encode($position->all()->toArray()),
-
         ];
 
         return view('stock.out.create', $response);
@@ -106,15 +101,12 @@ class OutController extends Controller
      * @return view
      *
      */
-    public function edit($id, warehouse $warehouse, position $position)
+    public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
             'data' => config('out'),
             'out' => $this->out->get($id),
-            'item' => json_encode(Item::all()->toArray()),
             'warehouses' => $warehouse->all(),
-            'position' => json_encode($position->all()->toArray()),
-
         ];
 
         return view('stock.out.edit', $response);

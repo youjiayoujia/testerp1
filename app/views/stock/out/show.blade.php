@@ -20,16 +20,16 @@
                 <dd>{{ $stockout->amount }}</dd>
                 <dt>总金额</dt>
                 <dd>{{ $stockout->total_amount }}</dd>
-                <dt>备注</dt>
-                <dd>{{ $stockout->remark }}</dd>
                 <dt>仓库</dt>
                 <dd>{{ $stockout->warehouse->name }}</dd>
                 <dt>库位</dt>
                 <dd>{{ $stockout->position->name }}</dd>
                 <dt>出库类型</dt>
-                <dd>{{ $stockout->type }}</dd>
+                <dd>{{ $stockout->type_name }}</dd>
                 <dt>出库类型id</dt>
                 <dd>{{ $stockout->relation_id }}</dd>
+                <dt>备注</dt>
+                <dd>{{ $stockout->remark }}</dd>
                 <dt>创建时间</dt>
                 <dd>{{ $stockout->created_at }}</dd>
                 <dt>更新时间</dt>

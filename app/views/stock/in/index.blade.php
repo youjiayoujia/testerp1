@@ -9,16 +9,16 @@
 @stop
 @section('tableTitle') 入库列表 @stop
 @section('tableHeader')
-    <th>ID</th>
-    <th>Item号</th>
+    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('item_id') }}">Item号{!! Sort::label('item_id') !!}</th>
     <th>sku</th>
     <th class="sort" data-url="{{ Sort::url('amount') }}">数量{!! Sort::label('amount') !!}</th>
     <th class="sort" data-url="{{ Sort::url('total_amount') }}">总金额(￥){!! Sort::label('total_amount') !!}</th>
-    <th>备注</th>
     <th>仓库</th>
     <th>库位</th>
     <th>入库类型</th>
     <th>入库来源</th>
+    <th>备注</th>
     <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
     <th>操作</th>
 @stop
@@ -30,11 +30,11 @@
             <td>{{ $stockin->sku }}</td>
             <td>{{ $stockin->amount}}</td>
             <td>{{ $stockin->total_amount}}</td>
-            <td>{{ $stockin->remark }} </td>
             <td>{{ $stockin->warehouse->name }}</td>
             <td>{{ $stockin->position->name }}</td>
-            <td>{{ $stockin->type }}</td>
+            <td>{{ $stockin->type_name }}</td>
             <td>{{ $stockin->relation_id }}</td>
+            <td>{{ $stockin->remark }} </td>
             <td>{{ $stockin->created_at }}</td>
             <td>
                 <a href="{{ route('stockIn.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs">

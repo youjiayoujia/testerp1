@@ -22,16 +22,16 @@
                 <dd>{{ $stockin->amount }}</dd>
                 <dt>总金额</dt>
                 <dd>{{ $stockin->total_amount }}</dd>
-                <dt>备注</dt>
-                <dd>{{ $stockin->remark }}</dd>
                 <dt>仓库</dt>
                 <dd>{{ $stockin->warehouse->name }}</dd>
                 <dt>库位</dt>
                 <dd>{{ $stockin->position->name }}</dd>
                 <dt>入库类型</dt>
-                <dd>{{ $stockin->type }}</dd>
+                <dd>{{ $stockin->type_name }}</dd>
                 <dt>入库类型id</dt>
                 <dd>{{ $stockin->relation_id }}</dd>
+                <dt>备注</dt>
+                <dd>{{ $stockin->remark }}</dd>
                 <dt>创建时间</dt>
                 <dd>{{ $stockin->created_at }}</dd>
                 <dt>更新时间</dt>

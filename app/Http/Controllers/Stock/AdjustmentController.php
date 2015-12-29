@@ -13,6 +13,9 @@ namespace App\Http\Controllers\Stock;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\AdjustmentRepository;
+use App\Models\ItemModel as Item;
+use App\Repositories\WarehouseRepository as warehouse;
+use App\Repositories\Warehouse\PositionRepository as position;
 
 class AdjustmentController extends Controller
 {
@@ -65,9 +68,15 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function create()
+    public function create(warehouse $warehouse, position $position)
     {
-        return view('stock.adjustment.create');
+        $response = [
+            'item' => json_encode(Item::all()->toArray()),
+            'warehouses' => $warehouse->all(),
+            'position' => json_encode($position->all()->toArray()),
+        ];
+
+        return view('stock.adjustment.create', $response);
     }
 
     /**
@@ -84,7 +93,7 @@ class AdjustmentController extends Controller
         $this->validate($this->request, $this->adjustment->rules('create'));
         $this->adjustment->create($this->request->all());
 
-        return redirect(route('adjustment.index'));
+        return redirect(route('stockAdjustment.index'));
     }
 
     /**
@@ -116,7 +125,7 @@ class AdjustmentController extends Controller
         $this->validate($this->request, $this->adjustment->rules('update'));
         $this->adjustment->update($id, $this->request->all());
 
-        return redirect(route('adjustment.index'));
+        return redirect(route('stockAdjustment.index'));
     }
 
     /**
@@ -129,6 +138,6 @@ class AdjustmentController extends Controller
     public function destroy($id)
     {
         $this->adjustment->destroy($id);
-        return redirect(route('adjustment.index'));
+        return redirect(route('stockAdjustment.index'));
     }
 }

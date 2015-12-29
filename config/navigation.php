@@ -61,22 +61,9 @@ return [
                 'url' => 'stockOut.index',
                 'icon' => '',
             ],
-        ],
-    ],
-    
-    [
-        'name' => '库存调整',
-        'icon' => 'home',
-        'url' => '',
-        'subnavigations' => [
             [
-                'name' => '列表',
-                'url' => 'adjustment.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '新增',
-                'url' => 'adjustment.create',
+                'name' => '库存调整',
+                'url' => 'stockAdjustment.index',
                 'icon' => '',
             ],
         ],

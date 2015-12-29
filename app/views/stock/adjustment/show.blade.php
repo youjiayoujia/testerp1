@@ -3,7 +3,7 @@
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('adjustment.index') }}">库存调整</a></li>
+        <li><a href="{{ route('stockAdjustment.index') }}">库存调整</a></li>
         <li class="active"><strong>库存调整详情 : {{ $adjustment->sku }} {{ $adjustment->type }} </strong></li>
     </ol>
 @stop

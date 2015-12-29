@@ -3,9 +3,10 @@
 namespace App\Repositories\Product;
 
 use App\Base\BaseRepository;
-use App\Models\product\Product_imageModel as Product_image;
-use App\helps\Helpers;
+use App\Models\product\Product_imageModel;
+use App\helps\Sort;
 use Chumper\Zipper\Zipper;
+use Folklore\Image\Facades\Image;
 /**
  * 范例: 产品库
  *
@@ -13,28 +14,26 @@ use Chumper\Zipper\Zipper;
  */
 class ImageRepository extends BaseRepository
 {
-	protected $searchFields = ['id','product_id', 'user_id', 'type', 'image_path'];
+	protected $searchFields = ['id','product_id', 'user_id', 'type'];
     public $rules = [
         'create' => [
-					'product_id' => 'required|unique:product_images,product_id',
+					'product_id' => 'required',
 					'type' => 'required',
+					'user_id'=>'required',
 		],
         'update' => [
-					'product_id' => 'required|unique:products,product_id',
+					'product_id' => 'required',
 					'type' => 'required',
+					'user_id'=>'required',
 		]
     ];
 	 
 
-    public function __construct(Product_image $product_image)
+    public function __construct(Product_imageModel $product_image)
     {
 		$this->model= $product_image;
     }
 
-   
-  
-	
-	
 	/**
      * 上传产品图片
      *
@@ -42,27 +41,27 @@ class ImageRepository extends BaseRepository
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function store($image_path,$product_id,$type)
-    {	$this->model=new Product_image;
-        $this->model->type = $type;
-        $this->model->product_id = $product_id;
-        $this->model->user_id = 1;
-        $this->model->image_path = $image_path;
-        return $this->model->save();
+    public function store($imagePath,$productId,$type)
+    {	
+        $data['type'] = $type;
+        $data['product_id'] = $productId;
+        $data['user_id'] = 1;
+        $data['image_path'] = $imagePath;
+        return $this->create($data);
     }
-	    /**
+	
+	/**
      * 更新产品图片
      *
      * @param int $id 产品ID
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function update($id, $image_path)
-    {	
-        $product_images=$this->model->find($id);
-        $product_images->user_id = 1;
-        $product_images->image_path = $image_path;
-        return $product_images->save();
+    public function update($id, $imagePath)
+    {	echo $imagePath;
+       $data['user_id']= 1;
+       $data['image_path'] = $imagePath;
+       return $this->update($id, $data);exit;
     }
  
 	/**
@@ -70,19 +69,19 @@ class ImageRepository extends BaseRepository
      *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getImageTypes($product_id)
+    public function getImageTypes($productId)
     {
 		 
-        return Product_image::whereRaw('product_id='.$product_id)->get();
+        return $this->model->whereRaw('product_id='.$productId)->get();
     }
 	 /**
      * 查询图片是否已上传
      *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public function getImage($product_id,$type)
+    public function getImage($productId,$type)
     {
-        return Product_image::whereRaw('product_id=? and type=?',[$product_id,$type])->get();
+        return $this->model->whereRaw('product_id=? and type=?',[$productId,$type])->get();
     }
 
 	/**
@@ -91,25 +90,25 @@ class ImageRepository extends BaseRepository
      * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
 	public function imageUpdate($request){
-		$product_id=$request->id;
-		echo $product_id;
+		$productId=$request->id;
+		//echo $productId;
 		$type=$request->type; 
-		$result=$this->getImage($product_id,$type);
+		$result=$this->getImage($productId,$type);
 		$count=count($result); 
 		 if($count==0){
 			$productImageId=0;
 		 }else{
 			$productImageId=$result[0]->id;
 			 }
-		 $path='storage/uploads/product/'.$product_id.'/'.$type.'/';
+		 $path='storage/uploads/product/'.$productId.'/'.$type.'/';
 		 if(!is_dir($path)){	
 		 	mkdir(iconv("UTF-8", "GBK", $path),0777,true);
 		 } 	 
 		 if(is_dir($path)){
 			 if($type=='default'){
-			 $this->defaultImageUpload($request,$product_id,$type,$productImageId,$path);
+			 $this->defaultImageUpload($request,$productId,$type,$productImageId,$path);
 		 }else{	 
-			 $this->UploadImage($request,$product_id,$type,$productImageId,$path);
+			 $this->UploadImage($request,$productId,$type,$productImageId,$path);
 		 }
 		 }else{
 			echo '文件夹创建失败！';exit; 
@@ -120,31 +119,24 @@ class ImageRepository extends BaseRepository
 	*
 	*
 	*/
-	public function defaultImageUpload($request,$product_id,$type,$productImageId,$path){
-		$image_path='';
+	public function defaultImageUpload($request,$productId,$type,$productImageId,$path){
+		$imagePath='';
 		 $file=$request->file('map0');
 		 if($request->hasFile('map0')){
 				$suffix = $file -> getClientOriginalExtension();	
 				if($suffix == 'jpg' || $suffix == 'jpeg' || $suffix == 'png' || $suffix == 'gif'){					
-				$nownanme=$product_id.$type.'.'.$suffix;
+				$nownanme=$productId.$type.'.'.$suffix;
 					$file->move($path,$nownanme);			 
 					}
-					$src_img =$path.$nownanme;
-					$dst_img = $path.$product_id.$type.'s.'.$suffix;
-					$image_path=$src_img.'#'.$dst_img;
-					$helper= new Helpers;
-					$stat = $helper->img2thumb($src_img, $dst_img, $width = 200, $height = 300, $cut = 0, $proportion = 0);
-					if($stat){
-						echo 'Resize Image Success!<br/>';
+					$srcImg =$path.$nownanme;
+					$dstImg = $path.$productId.$type.'s.'.$suffix;
+					$imagePath=$srcImg.'#'.$dstImg;	 
+					Image::make($srcImg,array('width' => 200,'height' => 300,))->save($dstImg); 
 						if($productImageId>0){
-							$this->update($productImageId,$image_path);	
-							}else{
-							$this->store($image_path,$product_id,$type);	
-							}   
-					}else{
-						echo 'Resize Image Fail!';  exit;
-					}
-
+							$this->update($productImageId,$imagePath);	
+						}else{
+							$this->store($imagePath,$productId,$type);	
+						}   
 		 }
 		
 		}	
@@ -153,19 +145,19 @@ class ImageRepository extends BaseRepository
 	*
 	*
 	*/
-	public function UploadImage($request,$product_id,$type,$productImageId,$path){
-		$image_path='';
+	public function UploadImage($request,$productId,$type,$productImageId,$path){
+		$imagePath='';
 		 for($i=0;$i<6;$i++){
 			$file = $request->file('map'.$i);								
 			if($request->hasFile('map'.$i)){
 				$suffix=$file -> getClientOriginalExtension();
 					if($suffix == 'jpg' || $suffix == 'jpeg' || $suffix == 'png' || $suffix == 'gif'){					
-						$nownanme=$product_id.$type.$i.'.'.$suffix;
+						$nownanme=$productId.$type.$i.'.'.$suffix;
 						$file->move($path,$nownanme);			 
 						if($i==0){
-							$image_path=$path.$nownanme;
+							$imagePath=$path.$nownanme;
 						 }else{ 
-							$image_path=$path.$nownanme.'#'.$image_path;
+							$imagePath=$path.$nownanme.'#'.$imagePath;
 						}			
 					}else{
 						echo '请上传正确的图片格式！';exit;
@@ -174,10 +166,11 @@ class ImageRepository extends BaseRepository
 					echo '上传出错！';exit;
 			}
 		}	 
-		if($productImageId>0){ 
-		$this->update($productImageId,$image_path);	
-		}else{	
-		$this->store($image_path,$product_id,$type);	
+		if($productImageId>0){
+			//echo '产品'.$productId.'的'.$type.'类型图片已上传过！'; 
+			$this->update($productImageId,$imagePath);	
+		}else{
+			$this->store($imagePath,$productId,$type);	
 		} 
 	}
 		
@@ -188,55 +181,55 @@ class ImageRepository extends BaseRepository
      * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */
 	public function zipUpdate($request){
-		$product_id=$request->id; 
-		$helper= new Helpers;
+		$productId=$request->id; 
+		$helper= new Sort;
 		$type=$request->type;
 		$file = $request->file('zip');
-			$zip_path='storage/uploads/zip/';								
+			$zipPath='storage/uploads/zip/';								
 			if($request->hasFile('zip')){
 				$clientName = $file -> getClientOriginalName();
 				$suffix=substr(strrchr($clientName, '.'), 1);			 
-				 if($clientName!=$product_id.'.'.$suffix){
+				 if($clientName!=$productId.'.'.$suffix){
 					 echo '请上传正确的文件压缩包！';exit;
 					 }
 				if($suffix == 'zip' || $suffix == 'rar' || $suffix == '7z' || $suffix == 'cab'){					 			
-				$nownanme=$product_id.$type.'.'.$suffix; 
-				$file->move($zip_path,$nownanme);
+				$nownanme=$productId.$type.'.'.$suffix; 
+				$file->move($zipPath,$nownanme);
 				$zippath='storage/uploads/zip/'.$nownanme;	
 				$path='storage/uploads/product/';
 				$zipper = new Zipper;
 				$zipper->make($zippath)->extractTo($path); 
-				  $dir_path=$path.$product_id.'/';				 
+				  $dir_path=$path.$productId.'/';				 
 				  $dir_name=$helper->get_dirname($dir_path);
 				  foreach($dir_name as $key=>$value){
-						  $dir_path_type='storage/uploads/product/'.$product_id.'/'.$value.'/';
-						  $image_paths[$value]=$helper->get_dirname($dir_path_type);	 
+						  $dirPathType='storage/uploads/product/'.$productId.'/'.$value.'/';
+						  $imagePaths[$value]=$helper->get_dirname($dirPathType);	 
 					  }
-				 foreach($image_paths as $key=>$val){
+				 foreach($imagePaths as $key=>$val){
 						 $type=$key;
 						 foreach($val as $k=>$v){
-						 $orname=$path.$product_id.'/'.$key.'/'.$v;
-						 $now_path='storage/uploads/product/'.$product_id.'/'.$key.'/';
+						 $orname=$path.$productId.'/'.$key.'/'.$v;
+						 $nowPath='storage/uploads/product/'.$productId.'/'.$key.'/';
 						 if($key=='default'){
 							  $suffixa=substr(strrchr($v, '.'), 1);
-							  $now_name=$product_id.'default.'.$suffixa;
-							  rename($orname,$now_path.$now_name);
-								$src_img =$now_path.$now_name;
-								$dst_img = $now_path.$product_id.'defaults.'.$suffixa;
-								$image_path=$src_img.'#'.$dst_img;
-								$stat = $helper->img2thumb($src_img, $dst_img, $width = 200, $height = 300, $cut = 0, $proportion = 0);
+							  $nowName=$productId.'default.'.$suffixa;
+							  rename($orname,$nowPath.$nowName);
+								$srcImg =$nowPath.$nowName;
+								$dstImg = $nowPath.$productId.'defaults.'.$suffixa;
+								$imagePath=$srcImg.'#'.$dstImg;
+								Image::make($srcImg,array('width' => 200,'height' => 300,))->save($dstImg); 
 							 }else{ 
 								 $suffixa=substr(strrchr($v, '.'), 1);
-								 $now_name=$product_id.$key.$k.'.'.$suffixa;
-								 rename($orname,$now_path.$now_name);
+								 $nowName=$productId.$key.$k.'.'.$suffixa;
+								 rename($orname,$nowPath.$nowName);
 									 if($k>0){
-									 	$image_path=$now_path.$now_name.'#'.$image_path;
+									 	$imagePath=$nowPath.$nowName.'#'.$imagePath;
 									 }else{
-									 	$image_path=$now_path.$now_name;
+									 	$imagePath=$nowPath.$nowName;
 									 }
 								 }
 						 }
-						 $result=$this->getImage($product_id,$type);
+						 $result=$this->getImage($productId,$type);
 						 $count=count($result); 
 		 				 if($count==0){
 							$productImageId=0;
@@ -244,9 +237,10 @@ class ImageRepository extends BaseRepository
 							$productImageId=$result[0]->id;
 						 }	 
 						 if($productImageId>0){
-							$this->update($productImageId,$image_path);	
-							}else{
-							$this->store($image_path,$product_id,$type);	
+							 echo '产品'.$productId.'的'.$type.'类型图片已上传过！';
+							//$this->update($productImageId,$imagePath);	
+							}else{	
+							$this->store($imagePath,$productId,$type);	
 						} 
 				 
 				 }
@@ -260,7 +254,7 @@ class ImageRepository extends BaseRepository
      * @return \Illuminate\Database\Eloquent\Collection|static[]
 	 */		
 	public function zipsUpload($request){
-		$helper= new Helpers;
+		$helper= new Sort;
 		$path='storage/uploads/zip/';
 		$file = $request->file('zip');
 		if($request->hasFile('zip')){
@@ -272,12 +266,12 @@ class ImageRepository extends BaseRepository
 			$path='storage/uploads/';
 			$zipper = new Zipper;
 			$zipper->make($zippath)->extractTo($path); 
-			$product_ids=$helper->get_dirname($path.'product/');
-			foreach($product_ids as $key=>$value){
-				$product_image_types=$helper->get_dirname($path.'product/'.$value.'/');	 
-				foreach($product_image_types as $key=>$val){
+			$productIds=$helper->get_dirname($path.'product/');
+			foreach($productIds as $key=>$value){
+				$productImageTypes=$helper->get_dirname($path.'product/'.$value.'/');	 
+				foreach($productImageTypes as $key=>$val){
 					$type=$val;
-					$product_image_paths=$helper->get_dirname($path.'product/'.$value.'/'.$val.'/');
+					$productImagePaths=$helper->get_dirname($path.'product/'.$value.'/'.$val.'/');
 					$result=$this->getImage($value,$val);
 					$count=count($result); 
 		 			if($count==0){
@@ -285,29 +279,30 @@ class ImageRepository extends BaseRepository
 					}else{
 						$productImageId=$result[0]->id;
 					}
-						foreach($product_image_paths as $num=>$v){							
+						foreach($productImagePaths as $num=>$v){							
 						if($val=='default'){
-							$product_id=$value;		 
+							$productId=$value;		 
 							$suffixa=substr(strrchr($v, '.'), 1);
-							$src_img=$path.'product/'.$value.'/'.$val.'/'.$v;
-							$dst_img=$path.'product/'.$value.'/'.$val.'/'.$value.'defaults.'.$suffixa;
-							$helper->img2thumb($src_img, $dst_img,$width = 200, $height = 100, $cut = 0, $proportion = 0);
-							$image_path=$src_img.'#'.$dst_img;
+							$srcImg=$path.'product/'.$value.'/'.$val.'/'.$v;
+							$dstImg=$path.'product/'.$value.'/'.$val.'/'.$value.'defaults.'.$suffixa;
+							Image::make($srcImg,array('width' => 200,'height' => 300,))->save($dstImg); 
+							$imagePath=$srcImg.'#'.$dstImg;
 						}else{
 							$suffixa=substr(strrchr($v, '.'), 1);
-							$now_name=$value.$val.$num.'.'.$suffixa;
-							rename($path.'product/'.$value.'/'.$val.'/'.$v,$path.'product/'.$value.'/'.$val.'/'.$now_name);
+							$nowName=$value.$val.$num.'.'.$suffixa;
+							rename($path.'product/'.$value.'/'.$val.'/'.$v,$path.'product/'.$value.'/'.$val.'/'.$nowName);
 							if($num>0){
-								$image_path=$path.'product/'.$value.'/'.$val.'/'.$now_name.'#'.$image_path ;
+								$imagePath=$path.'product/'.$value.'/'.$val.'/'.$nowName.'#'.$imagePath ;
 							}else{
-								$image_path=$path.'product/'.$value.'/'.$val.'/'.$now_name;
+								$imagePath=$path.'product/'.$value.'/'.$val.'/'.$nowName;
 							}
 						} 
 					  }
 					if($productImageId>0){
-						$this->update($productImageId,$image_path);	
+						echo '产品'.$value.'的'.$type.'类型图片已上传过！';
+						//$this->update($productImageId,$imagePath);	
 					}else{
-						 $this->store($image_path,$value,$type);	
+						 $this->store($imagePath,$value,$type);
 					} 
 				}
 			}				 

@@ -144,7 +144,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+		
         /*
          * Coffee Providers
          */
@@ -155,6 +155,7 @@ return [
          */
         Barryvdh\Debugbar\ServiceProvider::class,
 		Chumper\Zipper\ZipperServiceProvider::class,
+		Folklore\Image\ImageServiceProvider::class,
     ],
 
     /*
@@ -205,7 +206,7 @@ return [
 
         'View'      => Illuminate\Support\Facades\View::class,
 		'Zipper' => 'Chumper\Zipper\Zipper',
- 
+ 		'Image' => 'Folklore\Image\Facades\Image',
 
         /*
          * Coffee

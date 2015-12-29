@@ -12,9 +12,9 @@
  */
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
-Route::any('product/update', 'product\ImageController@update');
+Route::any('productUpload', 'product\ImageController@store');
 Route::any('productZipUpload', 'Product\ImageController@zipUpload');
-Route::get('productAddzip', 'Product\ImageController@addzip');
+ 
 Route::resource('product', 'productController');
 Route::get('product/addimage/{id}', 'productController@addimage');
 

@@ -31,7 +31,7 @@ return [
             ],
 			[
                 'name' => '产品图片',
-                'url' => 'productImage.index',
+                'url' => 'productImage.create',
                 'icon' => '',
             ],
         ],

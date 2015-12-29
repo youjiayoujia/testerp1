@@ -53,4 +53,26 @@ class Sort
 
         return $label;
     }
+	
+	/**
+	*获取文件名
+	*
+	* @param $dir_path
+	* @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
+	
+	public function get_dirname($dir_path){
+		$dir=opendir($dir_path);
+		$dir_name=array();
+		while (($file = readdir($dir)) !== false)
+		  {
+		   if($file!='.' && $file!='..'){
+			  
+			  $dir_name[]=$file;
+			   }
+		  }
+		  closedir($dir);
+		  return $dir_name;
+		} 
+	
 }

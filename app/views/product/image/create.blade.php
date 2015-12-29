@@ -15,7 +15,7 @@
     </ol>
 @stop
 @section('formTitle') 添加图片 @stop
-@section('formAction')  /product/update @stop
+@section('formAction')  /productUpload @stop
 @section('formBody')
    <input type="hidden" name="_token" value="{{ csrf_token() }}">
     <div class="form-group">

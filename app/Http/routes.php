@@ -15,7 +15,7 @@ Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index
 Route::any('productUpload', 'product\ImageController@store');
 Route::any('productUpdate', 'product\ImageController@update');
 Route::any('productZipUpload', 'Product\ImageController@zipUpload');
- 
+Route::get('/imageDelete/{id}/{$imageName}', 'productController@addimage'); 
 Route::resource('product', 'productController');
 Route::get('product/addimage/{id}', 'productController@addimage');
 

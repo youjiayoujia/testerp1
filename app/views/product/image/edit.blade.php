@@ -39,7 +39,10 @@
      <div class="form-group"  >
     <label for="color">已有图片：</label></br>
      @foreach($images as $item) 
-         <img src="/{{$image->image_path}}{{$item}}" width="300px" height="200px" style="float:left">
+     <div style="float:left">
+        <img src="/{{$image->image_path}}{{$item}}" width="300px" height="200px" ></br>
+     	<a href="/imageDelete/{{$image->id}}/{{$item}}">删除该图</a>
+     </div>
      @endforeach
      <p style="clear:both"></p>      
     </div>           

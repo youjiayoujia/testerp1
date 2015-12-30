@@ -71,9 +71,8 @@ class ImageController extends Controller
      */
     public function create()
     {
-		$image_type=['default','original','choies','aliexpress','amazon','ebay','wish','Lazada'];
         $response = [
-            'image_type' => $image_type,
+            'image_type' =>  config('imageType.imageType'),
         ];
         return view('product.image.create', $response);
     }

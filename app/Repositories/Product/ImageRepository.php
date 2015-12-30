@@ -77,7 +77,11 @@ class ImageRepository extends BaseRepository
 			$suffix=substr(strrchr($image, '.'), 1);	
 			$name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
 			rename($path.$image,$path.$name);
+			if($key>0){
 			$data['image_name'] = $name.'#'.$data['image_name'];
+			}else{
+			$data['image_name'] = $name;	
+				}
 		}
 		if($res>0){	
 		$this->update($res, $data);

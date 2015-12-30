@@ -142,7 +142,18 @@ class ImageController extends Controller
         $this->imageRepository->destroyImage($id);
         return redirect(route('productImage.index'));
     }
-	
+
+    /**
+     * 删除单个图片
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function imageDelete($id,$imageName)
+    {
+        $this->imageRepository->deleteImage($id,$imageName);
+        return redirect(route('productImage.index'));
+    }	
 	/**
      * 压缩包批量上传图片
      *

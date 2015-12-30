@@ -87,55 +87,30 @@ class ImageRepository extends BaseRepository
     }
 
     /**
-     * 更新产品图片
+     * 单个产品图片删除
      *
      * @param int $id 产品ID
      * @param object $request HTTP请求对象
      * @return bool
      */
-/*   public function updateImage($data, $files)
+   public function deleteImage($id,$imageName)
     {
-		$id=$data['id'];
 		$imageOringalNames=$this->get($id);
-		$data['image_path']='';
+		$path=$imageOringalNames['image_path'];
+		unlink($path.$imageName);
 		$data['image_name']='';
-        switch ($data['uploadType']) {
-            case 'image':
-                foreach ($files as $key=>$file) {
-                    if ($file->isValid()) {
-						$suffix = $file -> getClientOriginalExtension();
-                        $name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
-                        $filePath = $file->move($path, $name);     
-                    }
-                }
-                break;
-            case 'zip':
-                foreach ($files as $key=>$file) {
-                    if ($file->isValid() && $key=='zip') {
-						$suffix = $file -> getClientOriginalExtension();
-						$name=$data['product_id'].$data['type'].'.'.$suffix;
-						$filePath = $file->move('zip/', $name);
-						$file->getTargetFile('product/'.$data['product_id'].'/');
-						$zipper = new Zipper;
-						$res=$zipper->make('zip/'.$name)->extractTo('product/'.$data['product_id'].'/');
-                    }
-                }
-                break;
-        }
 		$helper=new Sort;
 		$images=$helper->get_dirname($path);
 		foreach ($images as $key=>$image) {
-			$suffix=substr(strrchr($image, '.'), 1);	
-			$name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
-			rename($path.$image,$path.$name);
 			if($key>0){
-				$data['image_name'] = $name.'#'.$data['image_name'];
+				$data['image_name'] = $image.'#'.$data['image_name'];
 			}else{
-				$data['image_name'] = $name;
+				$data['image_name'] = $image;
 				}
 		}
         return $this->update($id, $data);
-    }*/
+    }
+	
   /**
      * 删除产品图片
      *

@@ -42,9 +42,10 @@ class ImageRepository extends BaseRepository
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function store($data, $files)
-    {
+    public function uploadImage($data, $files)
+    {	
         $path = 'product/'.$data['product_id'].'/'.$data['type'].'/';
+		$res=$this->model->isImageUpload($data);
 		$data['image_path']=$path;
 		$data['image_name']='';
         switch ($data['uploadType']) {
@@ -53,11 +54,9 @@ class ImageRepository extends BaseRepository
                     if ($file->isValid()) {
 						$suffix = $file -> getClientOriginalExtension();
                         $name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
-                        $filePath = $file->move($path, $name);
-                        $data['image_name'] = $name.'#'.$data['image_name'];      
+                        $filePath = $file->move($path, $name);     
                     }
                 }
-				$this->create($data);
                 break;
             case 'zip':
                 foreach ($files as $key=>$file) {
@@ -68,19 +67,23 @@ class ImageRepository extends BaseRepository
 						$file->getTargetFile('product/'.$data['product_id'].'/');
 						$zipper = new Zipper;
 						$res=$zipper->make('zip/'.$name)->extractTo('product/'.$data['product_id'].'/');
-						$helper=new Sort;
-						$images=$helper->get_dirname($path);
-                        foreach ($images as $key=>$image) {
-							$suffix=substr(strrchr($image, '.'), 1);	
-                            $name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
-                            rename($path.$image,$path.$name);
-                            $data['image_name'] = $name.'#'.$data['image_name'];
-                        }
-                    }
+		            }
                 }
-				$this->create($data);
                 break;
         }
+		$helper=new Sort;
+		$images=$helper->get_dirname($path);
+		foreach ($images as $key=>$image) {
+			$suffix=substr(strrchr($image, '.'), 1);	
+			$name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
+			rename($path.$image,$path.$name);
+			$data['image_name'] = $name.'#'.$data['image_name'];
+		}
+		if($res>0){	
+		$this->update($res, $data);
+		}else{
+		$this->create($data);	
+			}
     }
 
     /**
@@ -90,12 +93,11 @@ class ImageRepository extends BaseRepository
      * @param object $request HTTP请求对象
      * @return bool
      */
-   public function updateImage($data, $files)
+/*   public function updateImage($data, $files)
     {
-        $path = 'product/'.$data['product_id'].'/'.$data['type'].'/';
 		$id=$data['id'];
 		$imageOringalNames=$this->get($id);
-		$data['image_path']=$path;
+		$data['image_path']='';
 		$data['image_name']='';
         switch ($data['uploadType']) {
             case 'image':
@@ -126,12 +128,21 @@ class ImageRepository extends BaseRepository
 			$suffix=substr(strrchr($image, '.'), 1);	
 			$name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
 			rename($path.$image,$path.$name);
-			$data['image_name'] = $name.'#'.$data['image_name'];
+			if($key>0){
+				$data['image_name'] = $name.'#'.$data['image_name'];
+			}else{
+				$data['image_name'] = $name;
+				}
 		}
-		$data['image_name']=$data['image_name'].'#'.$imageOringalNames['image_name'];
         return $this->update($id, $data);
-    }
- 
+    }*/
+  /**
+     * 删除产品图片
+     *
+     * @param int $id 产品ID
+     * @param object $request HTTP请求对象
+     * @return bool
+     */
     public function destroyImage($id)
     {
         $result = $this->get($id);

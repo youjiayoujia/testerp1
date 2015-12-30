@@ -89,7 +89,7 @@ class ImageController extends Controller
        if($this->request->isMethod('post')){
 			$data=$this->request->all();
 			$files=$this->request->file();
-			$this->imageRepository->store($data,$files);	 
+			$this->imageRepository->uploadImage($data,$files);	 
 		}
         return redirect(route('productImage.index'));
     }
@@ -105,7 +105,7 @@ class ImageController extends Controller
         if($this->request->isMethod('post')){
 			$data=$this->request->all();
 			$files=$this->request->file();
-			$this->imageRepository->updateImage($data,$files);	 
+			$this->imageRepository->uploadImage($data,$files);	 
 		}
         return redirect(route('productImage.index'));
     }

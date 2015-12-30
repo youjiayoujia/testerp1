@@ -1,111 +1,80 @@
+ 
 @extends('common.form')
-@section('title') 编辑选款需求 @stop
+@section('title') 修改图片 @stop
+@section('meta')
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @stop
+ 
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
-        <li class="active"><strong>编辑选款需求</strong></li>
+        <li><a href="{{ route('productImage.index') }}">产品图片</a></li>
+        <li class="active"><strong>修改图片</strong></li>
     </ol>
 @stop
-    <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-    <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
-
-@section('formTitle') 编辑选款需求 @stop
-@section('formAction') {{ route('productRequire.update', ['id' => $require->id]) }} @stop
-@section('formAttributes') name='creator' enctype="multipart/form-data" @stop
+@section('formTitle') 添加图片 @stop
+@section('formAction')  /productUpdate @stop
 @section('formBody')
-    <input type="hidden" name="_method" value="PUT"/>
-    @if($require->img1)
-        <img src="{{ $require->img1 }}" width='170px' height='100px'/> 
-    @endif
-    <div class='form-group'>
-        <input id="img1" name='img1' class="file" type="file" multiple>
-    </div><hr>
-    @if($require->img2)
-        <img src="{{ $require->img2 }}" width='170px' height='100px'/>
-    @endif  
-    <div class='form-group'>
-        <input id="img2" name='img2' class="file" type="file" multiple>
-    </div><hr>
-    
-    @if($require->img3)
-        <img src="{{ $require->img3 }}" width='170px' height='100px'/>
-    @endif
-    <div class='form-group'>
-        <input id="img3" name='img3' class="file" type="file" multiple>
-    </div><hr>
-    
-    @if($require->img4)
-        <img src="{{ $require->img4 }}" width='170px' height='100px'/>
-    @endif
-    <div class='form-group'>
-        <input id="img4" name='img4' class="file" type="file" multiple>
-    </div><hr>
-    
-    @if($require->img5)
-        <img src="{{ $require->img5 }}" width='170px' height='100px'/>
-    @endif
-    <div class='form-group'>
-        <input id="img5" name='img5' class="file" type="file" multiple>
-    </div><hr>
-
-     @if($require->img6)
-        <img src="{{ $require->img6 }}" width='170px' height='100px'/>
-    @endif
-    <div class='form-group'>
-        <input id="img6" name='img6' class="file" type="file" multiple>
-    </div><hr>
-
+   <input type="hidden" name="_token" value="{{ csrf_token() }}">
+   <input  type="hidden" name='id'  value='{{$image->id}}'/>
     <div class="form-group">
-        <label for="name" class='control-label'>选款需求名</label>
-        <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $require->name}}" readonly>
-    </div>
+        <label for="brand_id">产品ID:</label>
+        <input  type="text" name='product_id'  value='{{$image->product_id}}'/>
+    </div>	
     <div class="form-group">
-        <label for="detail_address" class='control-label'>(省/市)地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <div class='row'>
-            <div class='col-sm-6'>
-                <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
-            </div>
-            <div class='col-sm-6'> 
-                <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
-            </div>
-        </div>
+        <label for="URL">供应商提供的URL：</label>
+        <input  class="form-control" id="url" placeholder="供应商提供的RUL" name='suppliers_url'  />
     </div>
-     <div class="form-group">
-        <label for="sku" class='control-label'>类似款sku</label>
-        <input type='text' class="form-control" id="sku" placeholder="类似款sku" name='sku' value="{{ old('sku') ? old('sku') : $require->similar_sku}}">
+     <div class="form-group" id='checktype'>
+        <label for="brand_id">选择上传类型:</label>
+        <input  type="radio" name='uploadType'  value='image' checked onClick="checktype();"/>上传图片
+        <input  type="radio" name='uploadType'  value='zip' onClick="checktype();"/>上传压缩包
     </div>
-     <div class="form-group">
-        <label for="competition_url" class='control-label'>竞争产品url</label>
-        <input type='text' class="form-control" id="competition_url" placeholder="竞争产品url" name='competition_url' value="{{ old('competition_url') ? old('competition_url') : $require->competition_url }}">
+    <div class="form-group"  >
+    <label for="color">修改图片类型：</label>
+    <input  class="form-control" id="url" placeholder="图片类型" name="type" value='{{$image->type}}' />      
     </div>
-     <div class="form-group">
-        <label for="remark" class='control-label'>需求备注</label>
-        <input type='text' class="form-control" id="remark" placeholder="需求备注" name='remark' value="{{ old('remark') ? old('remark') : $require->remark }}">
-    </div>
-    <div class='form-group'>
-        <label for="expected_date">期待上传日期</label>
-        <input id="expected_date" name='expected_date' type="text" value=" {{ old('expected_date') ? old('expected_date') : $require->expected_date }}">
-    </div>
+     <div class="form-group"  >
+    <label for="color">已有图片：</label></br>
+     @foreach($images as $item) 
+         <img src="/{{$image->image_path}}{{$item}}" width="300px" height="200px" style="float:left">
+     @endforeach
+     <p style="clear:both"></p>      
+    </div>           
+   <div id='imagediv'>          
     <div class="form-group">
-        <label for="needer_id">需求者id</label>
-        <input type='text' class="form-control" id="needer_id" placeholder="需求者id" name='needer_id' value="{{ old('needer_id') ? old('needer_id') : $require->needer_id }}">
+    <label for="color">上传图片：</label>
+        <input   name='map0' type='file' />
+        <input   name='map1' type='file' />
+        <input   name='map2' type='file' />
+        <input   name='map3' type='file' />
+        <input   name='map4' type='file' />
+        <input   name='map5' type='file' />
     </div>
+    </div>
+    <div style="display:none" id='zipdiv'>
     <div class="form-group">
-        <label for="needer_shop_id">需求店铺id</label>
-        <input type='text' class="form-control" id="needer_shop_id" placeholder="需求店铺id" name='needer_shop_id' value="{{ old('needer_shop_id') ? old('needer_shop_id') : $require->needer_shop_id}}">
+    <label for="color">导入压缩包：</label>
+        <input  type="file" name='zip'/>
     </div>
-    <div class='form-group'>
-        <label for='created_by'>创建人</label>
-        <input type='text' class='form-control' id='created_by' placeholder='创建人' name='created_by' value="{{ old('created_by') ? old('craeted_by') : $require->created_by }}">
     </div>
+  <script type="text/javascript">
+  function checktype(){
+  var uploadType=$("#checktype [name='uploadType']:checked").val();
+ 	if(uploadType == 'image'){
+		$('#zipdiv').hide();
+		$('#imagediv').show();
+		}else{
+		$('#imagediv').hide();
+		$('#zipdiv').show();		
+			}
+  //alert (uploadType);
+  }
+  </script>       
 @stop
-<script type='text/javascript'>
-    window.onload = function(){
-        var buf = new Array();
-        buf[0] = "{{ old('province') ? old('province') : $require->province }}";
-        buf[1] = "{{ old('city') ? old('city') : $require->city }}";
-        init(buf[0],buf[1]);
-        $('#expected_date').cxCalendar();
-    };
-</script>
+ 
+ 
+ 
+ 

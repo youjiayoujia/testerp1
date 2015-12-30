@@ -18,7 +18,7 @@ use Chumper\Zipper\Zipper;
 
 class ImageController extends Controller
 {
-    protected $product;
+    protected $image;
 
     public function __construct(Request $request, ImageRepository $imageRepository)
     {
@@ -43,24 +43,22 @@ class ImageController extends Controller
 	
 	
     /**
-     * 产品详情
+     * 图片详情
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show($id)
-    {	//$this->request->flash();
-		$type='default';
-		$result=$this->imageRepository->getImage($id,$type);		 
-		if(isset($result[0])){
-			$default_image=$result[0]->image_path;
-			$default_map=explode("#",$default_image);
-			}
-			
+    {	
+		$result=$this->imageRepository->get($id); 	 
+		if(isset($result['image_name'])){
+			$imageName=$result['image_name'];
+			$images=explode("#",$imageName);
+			}	
+			//var_dump($images);exit;	
         $response = [
-            'product' => $this->product->findOrFail($id),
-			'product_image'=>$default_map[1],
-			'product_image_type'=>$this->imageRepository->getImageTypes($id),
+            'image' =>$this->imageRepository->get($id),
+			'images'=>$images,
         ];
 
         return view('product.image.show', $response);
@@ -89,14 +87,10 @@ class ImageController extends Controller
     public function store()
     {
        if($this->request->isMethod('post')){
-			$request=$this->request;
-			if($request->uploadType =='1'){
-				$res=$this->imageRepository->imageUpdate($request);
-				}elseif($request->uploadType =='2'){
-				$res=$this->imageRepository->zipUpdate($request);
-			}
+			$data=$this->request->all();
+			$files=$this->request->file();
+			$this->imageRepository->store($data,$files);	 
 		}
- 		$request=$this->request->flash();
         return redirect(route('productImage.index'));
     }
 	
@@ -106,9 +100,14 @@ class ImageController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function update($id)
+    public function update()
     {
-        
+        if($this->request->isMethod('post')){
+			$data=$this->request->all();
+			$files=$this->request->file();
+			$this->imageRepository->updateImage($data,$files);	 
+		}
+        return redirect(route('productImage.index'));
     }
 
     /**
@@ -118,8 +117,17 @@ class ImageController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit($id)
-    {
-         
+    { 
+		$result=$this->imageRepository->get($id); 	 
+		if(isset($result['image_name'])){
+			$imageName=$result['image_name'];
+			$images=explode("#",$imageName);
+			}
+        $response = [
+            'image' =>$this->imageRepository->get($id),
+			'images'=>$images,
+        ];
+        return view('product.image.edit', $response); 
     }
 
    
@@ -132,8 +140,8 @@ class ImageController extends Controller
      */
     public function destroy($id)
     {
-        $this->destroy($id);
-        return redirect(route('product.image.index'));
+        $this->imageRepository->destroyImage($id);
+        return redirect(route('productImage.index'));
     }
 	
 	/**

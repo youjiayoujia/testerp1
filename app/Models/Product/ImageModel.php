@@ -4,7 +4,7 @@ namespace App\Models\product;
 
 use App\Base\BaseModel;
 
-class Product_imageModel extends BaseModel
+class ImageModel extends BaseModel
 {
 
     /**
@@ -19,6 +19,6 @@ class Product_imageModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['product_id'];
+    protected $fillable = ['product_id', 'user_id', 'type','image_path','image_name'];
 
 }

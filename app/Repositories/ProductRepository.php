@@ -166,19 +166,12 @@ class ProductRepository extends BaseRepository
 					$src_img =$path.$nownanme;
 					$dst_img = $path.$product_id.$type.'s.'.$suffix;
 					$image_path=$src_img.'#'.$dst_img;
-					$helper= new Helpers;
-					$stat = $helper->img2thumb($src_img, $dst_img, $width = 200, $height = 300, $cut = 0, $proportion = 0);
-					if($stat){
-						echo 'Resize Image Success!<br/>';
+					Image::make($src_img,array('width' => 200,'height' => 300,))->save($dst_img); 
 						if($product_image_id>0){
 							$this->update_image($product_image_id,$image_path);	
 							}else{
 							$this->store_image($image_path,$product_id,$type);	
 							}   
-					}else{
-						echo 'Resize Image Fail!';  exit;
-					}
-
 		 }
 		
 		}	
@@ -226,7 +219,7 @@ class ProductRepository extends BaseRepository
 		$helper= new Helpers;
 		$type=$request->type;
 		$file = $request->file('zip');
-			$zip_path='storage/uploads/zip/';								
+			$zipPath='storage/uploads/zip/';								
 			if($request->hasFile('zip')){
 				$clientName = $file -> getClientOriginalName();
 				$suffix=substr(strrchr($clientName, '.'), 1);			 
@@ -235,15 +228,15 @@ class ProductRepository extends BaseRepository
 					 }
 				if($suffix == 'zip' || $suffix == 'rar' || $suffix == '7z' || $suffix == 'cab'){					 			
 				$nownanme=$product_id.$type.'.'.$suffix; 
-				$file->move($zip_path,$nownanme);
+				$file->move($zipPath,$nownanme);
 				$zippath='storage/uploads/zip/'.$nownanme;	
 				$path='storage/uploads/product/';
 				$res=$helper->decompression($zippath,$path);
 				  $dir_path=$path.$product_id.'/';				 
 				  $dir_name=$helper->get_dirname($dir_path);
 				  foreach($dir_name as $key=>$value){
-						  $dir_path_type='storage/uploads/product/'.$product_id.'/'.$value.'/';
-						  $image_paths[$value]=$helper->get_dirname($dir_path_type);	 
+						  $dirPathType='storage/uploads/product/'.$product_id.'/'.$value.'/';
+						  $image_paths[$value]=$helper->get_dirname($dirPathType);	 
 					  }
 				 foreach($image_paths as $key=>$val){
 						 $type=$key;
@@ -257,7 +250,7 @@ class ProductRepository extends BaseRepository
 								$src_img =$now_path.$now_name;
 								$dst_img = $now_path.$product_id.'defaults.'.$suffixa;
 								$image_path=$src_img.'#'.$dst_img;
-								$stat = $helper->img2thumb($src_img, $dst_img, $width = 200, $height = 300, $cut = 0, $proportion = 0);
+								Image::make($src_img,array('width' => 200,'height' => 300,))->save($dst_img); 
 							 }else{ 
 								 $suffixa=substr(strrchr($v, '.'), 1);
 								 $now_name=$product_id.$key.$k.'.'.$suffixa;

@@ -18,9 +18,10 @@
 @section('formAction')  /productUpload @stop
 @section('formBody')
    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+   <input type="hidden" name="user_id" value="1">
     <div class="form-group">
         <label for="brand_id">产品ID:</label>
-        <input  type="text" name='id'  value=''/>
+        <input  type="text" name='product_id'  value=''/>
     </div>	
     <div class="form-group">
         <label for="URL">供应商提供的URL：</label>
@@ -28,10 +29,10 @@
     </div>
     <div class="form-group" id='checktype'>
         <label for="brand_id">选择上传类型:</label>
-        <input  type="radio" name='uploadType'  value='1' checked onClick="checktype();"/>上传图片
-        <input  type="radio" name='uploadType'  value='2' onClick="checktype();"/>上传压缩包
+        <input  type="radio" name='uploadType'  value='image' checked onClick="checktype();"/>上传图片
+        <input  type="radio" name='uploadType'  value='zip' onClick="checktype();"/>上传压缩包
     </div>
-    <div id='imagediv'>
+    
     <div class="form-group"  >
         <label for="color">图片类型：</label>
          <select id="brand_id" class="form-control" name="type">
@@ -39,7 +40,8 @@
                 <option value="{{ $item }}" >{{ $item }}</option>
             @endforeach
         </select>
-    </div>           
+    </div>
+    <div id='imagediv'>          
     <div class="form-group">
     <label for="color">上传图片：</label>
         <input   name='map0' type='file' />
@@ -59,7 +61,7 @@
   <script type="text/javascript">
   function checktype(){
   var uploadType=$("#checktype [name='uploadType']:checked").val();
- 	if(uploadType == 1){
+ 	if(uploadType == 'image'){
 		$('#zipdiv').hide();
 		$('#imagediv').show();
 		}else{

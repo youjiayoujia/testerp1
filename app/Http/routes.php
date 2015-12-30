@@ -17,6 +17,7 @@ Route::resource('productSupplier', 'Product\SupplierController');
 Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 Route::resource('warehousePosition', 'Warehouse\PositionController');
+//物流需求路由
 Route::resource('logisticsSupplier', 'Logistics\SupplierController');
 Route::resource('logistics', 'LogisticsController');
-
+Route::resource('logisticsCode', 'Logistics\CodeController');

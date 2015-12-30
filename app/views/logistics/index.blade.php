@@ -1,13 +1,14 @@
 @extends('common.table')
-@section('title') 物流方式shippings列表 @stop
+@section('title') 物流方式列表 @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式shippings</a></li>
+        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
         <li class="active">列表</li>
     </ol>
 @stop
-@section('tableTitle') 物流方式shippings列表 @stop
+
+@section('tableTitle') 物流方式列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>物流方式简码</th>
@@ -19,8 +20,8 @@
     <th>物流追踪网址</th>
     <th>API对接方式</th>
     <th>是否启用</th>
-    <th>创建时间</th>
-    <th>更新时间</th>
+    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -29,7 +30,7 @@
             <td>{{ $logistics->id }}</td>
             <td>{{ $logistics->short_code }}</td>
             <td>{{ $logistics->logistics_type }}</td>
-            <td>{{ $logistics->species }}</td>
+            <td>{{ $logistics->species == 'express' ? '快递' : '小包' }}</td>
             <td>{{ $logistics->warehouse->name }}</td>
             <td>{{ $logistics->supplier->name }}</td>
             <td>{{ $logistics->type }}</td>

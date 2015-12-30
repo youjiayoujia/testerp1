@@ -8,7 +8,6 @@
 
 namespace App\Models\Logistics;
 
-
 use App\Base\BaseModel;
 
 class SupplierModel extends BaseModel

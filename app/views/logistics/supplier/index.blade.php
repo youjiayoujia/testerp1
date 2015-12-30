@@ -7,11 +7,12 @@
         <li class="active">列表</li>
     </ol>
 @stop
+
 @section('tableTitle') 物流商列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>物流商名称</th>
-    <th>客户ID</th>
+    <th class="sort" data-url="{{ Sort::url('customer_id') }}">客户ID{!! Sort::label('customer_id') !!}</th>
     <th>密钥</th>
     <th>是否有API</th>
     <th>客户经理</th>
@@ -19,8 +20,8 @@
     <th>技术人员</th>
     <th>技术联系方式</th>
     <th>备注</th>
-    <th>创建时间</th>
-    <th>更新时间</th>
+    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>
     <th>操作</th>
 @stop
 @section('tableBody')

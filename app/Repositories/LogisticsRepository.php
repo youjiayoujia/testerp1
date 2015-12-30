@@ -1,5 +1,6 @@
 <?php
 /**
+ * 物流方式库类
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/21
@@ -8,11 +9,8 @@
 
 namespace App\Repositories;
 
-
 use App\Base\BaseRepository;
-use App\Models\Logistics\SupplierModel as Supplier;
 use App\Models\LogisticsModel as Logistics;
-use App\Models\WarehouseModel as Warehouse;
 
 class LogisticsRepository extends BaseRepository
 {
@@ -46,16 +44,6 @@ class LogisticsRepository extends BaseRepository
     public function __construct(Logistics $logistics)
     {
         $this->model = $logistics;
-    }
-
-    public function getSupplier()
-    {
-        return Supplier::all();
-    }
-
-    public function getWarehouse()
-    {
-        return Warehouse::all();
     }
 
 }

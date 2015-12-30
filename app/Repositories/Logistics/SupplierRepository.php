@@ -1,5 +1,6 @@
 <?php
 /**
+ * 物流商库类
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/10
@@ -7,7 +8,6 @@
  */
 
 namespace App\Repositories\Logistics;
-
 
 use App\Base\BaseRepository;
 use App\Models\Logistics\SupplierModel as Supplier;

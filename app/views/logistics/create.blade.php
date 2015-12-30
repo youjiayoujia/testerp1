@@ -1,15 +1,14 @@
 @extends('common.form')
-@section('title') 添加物流方式shippings @stop
+@section('title') 添加物流方式 @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式shippings</a></li>
-        <li class="active"><strong>添加物流方式shippings</strong></li>
+        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
+        <li class="active"><strong>添加物流方式</strong></li>
     </ol>
 @stop
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 
-@section('formTitle') 添加物流方式shippings @stop
+@section('formTitle') 添加物流方式 @stop
 @section('formAction') {{ route('logistics.store') }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
@@ -25,12 +24,12 @@
         <label for="species" class="control-label">种类</label>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="快递">快递
+                <input type="radio" name="species" value="express">快递
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="小包" checked>小包
+                <input type="radio" name="species" value="surface" checked>小包
             </label>
         </div>
     </div>

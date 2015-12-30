@@ -64,8 +64,13 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '物流方式shippings',
+                'name' => '物流方式',
                 'url' => 'logistics.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '跟踪号',
+                'url' => 'logisticsCode.index',
                 'icon' => '',
             ],
         ],

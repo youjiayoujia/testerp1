@@ -1,15 +1,16 @@
 @extends('layouts.default')
-@section('title') 物流方式shippings详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }} @stop
+@section('title') 物流方式详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }} @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式shippings</a></li>
-        <li class="active"><strong>物流方式shippings详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }}</strong></li>
+        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
+        <li class="active"><strong>物流方式详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }}</strong></li>
     </ol>
 @stop
+
 @section('content')
     <div class="panel panel-default">
-        <div class="panel-heading">物流方式shippings详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }}</div>
+        <div class="panel-heading">物流方式详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }}</div>
         <div class="panel-body">
             <dl class="dl-horizontal">
                 <dt>ID</dt>
@@ -19,7 +20,7 @@
                 <dt>物流方式名称</dt>
                 <dd>{{ $logistics->logistics_type }}</dd>
                 <dt>种类</dt>
-                <dd>{{ $logistics->species }}</dd>
+                <dd>{{ $logistics->species == 'express' ? '快递' : '小包' }}</dd>
                 <dt>仓库</dt>
                 <dd>{{ $logistics->warehouse->name }}</dd>
                 <dt>物流商</dt>

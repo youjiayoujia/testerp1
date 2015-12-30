@@ -1,14 +1,14 @@
 @extends('common.form')
-@section('title') 编辑物流方式shippings @stop
+@section('title') 编辑物流方式 @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式shippings</a></li>
-        <li class="active"><strong>编辑物流方式shippings</strong></li>
+        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
+        <li class="active"><strong>编辑物流方式</strong></li>
     </ol>
 @stop
 
-@section('formTitle') 编辑物流方式shippings @stop
+@section('formTitle') 编辑物流方式 @stop
 @section('formAction') {{ route('logistics.update', ['id' => $logistics->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
@@ -24,12 +24,12 @@
         <label for="species" class="control-label">种类</label>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="快递" {{ $logistics->species == '快递' ? 'checked' : '' }}>快递
+                <input type="radio" name="species" value="express" {{ $logistics->species == 'express' ? 'checked' : '' }}>快递
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="小包" {{ $logistics->species == '小包' ? 'checked' : '' }}>小包
+                <input type="radio" name="species" value="surface" {{ $logistics->species == 'surface' ? 'checked' : '' }}>小包
             </label>
         </div>
     </div>

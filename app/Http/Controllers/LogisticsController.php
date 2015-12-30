@@ -1,5 +1,6 @@
 <?php
 /**
+ * 物流方式控制器
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/21
@@ -8,8 +9,9 @@
 
 namespace App\Http\Controllers;
 
-
 use Illuminate\Http\Request;
+use App\Repositories\Logistics\SupplierRepository;
+use App\Repositories\WarehouseRepository;
 use App\Repositories\LogisticsRepository;
 
 class LogisticsController extends Controller
@@ -39,11 +41,11 @@ class LogisticsController extends Controller
         return view('logistics.show', $response);
     }
 
-    public function create()
+    public function create(SupplierRepository $supplier, WarehouseRepository $warehouse)
     {
         $response = [
-            'supplier' => $this->logistics->getSupplier(),
-            'warehouse' => $this->logistics->getWarehouse(),
+            'supplier' => $supplier->all(),
+            'warehouse' => $warehouse->all(),
         ];
         return view('logistics.create', $response);
     }
@@ -56,12 +58,12 @@ class LogisticsController extends Controller
         return redirect(route('logistics.index'));
     }
 
-    public function edit($id)
+    public function edit($id, SupplierRepository $supplier, WarehouseRepository $warehouse)
     {
         $response = [
             'logistics' => $this->logistics->get($id),
-            'supplier' => $this->logistics->getSupplier(),
-            'warehouse' => $this->logistics->getWarehouse(),
+            'supplier' => $supplier->all(),
+            'warehouse' => $warehouse->all(),
         ];
         return view('logistics.edit', $response);
     }

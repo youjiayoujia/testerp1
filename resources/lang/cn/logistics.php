@@ -5,6 +5,7 @@
  * Date: 15/12/21
  * Time: 下午4:35
  */
+
 return [
     'id' => 'ID',
     'short_code' => '物流方式简码',

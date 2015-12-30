@@ -25,4 +25,5 @@ class LogisticsModel extends BaseModel
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
+
 }

@@ -1,5 +1,6 @@
 <?php
 /**
+ * 物流商控制器
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/10
@@ -28,12 +29,12 @@ class SupplierController extends Controller
         $response = [
             'data' => $this->supplier->auto()->paginate(),
         ];
-        return view('logistics.logisticsSupplier.index', $response);
+        return view('logistics.supplier.index', $response);
     }
 
     public function create()
     {
-        return view('logistics.logisticsSupplier.create');
+        return view('logistics.supplier.create');
     }
 
     public function store()
@@ -49,7 +50,7 @@ class SupplierController extends Controller
         $response = [
             'supplier' => $this->supplier->get($id),
         ];
-        return view('logistics.logisticsSupplier.show', $response);
+        return view('logistics.supplier.show', $response);
     }
 
     public function edit($id)
@@ -57,7 +58,7 @@ class SupplierController extends Controller
         $response = [
             'supplier' => $this->supplier->get($id),
         ];
-        return view('logistics.logisticsSupplier.edit', $response);
+        return view('logistics.supplier.edit', $response);
     }
 
     public function update($id)

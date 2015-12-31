@@ -20,10 +20,10 @@ class ImageController extends Controller
 {
     protected $image;
 
-    public function __construct(Request $request, ImageRepository $imageRepository)
+    public function __construct(Request $request, ImageRepository $image)
     {
         $this->request = $request;
-		$this->imageRepository =$imageRepository;
+		$this->image =$image;
     }
 
     /**
@@ -35,7 +35,7 @@ class ImageController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->imageRepository->auto()->paginate(),
+            'data' => $this->image->auto()->paginate(),
         ];
 
         return view('product.image.index', $response);
@@ -50,17 +50,9 @@ class ImageController extends Controller
      */
     public function show($id)
     {	
-		$result=$this->imageRepository->get($id); 	 
-		if(isset($result['image_name'])){
-			$imageName=$result['image_name'];
-			$images=explode("#",$imageName);
-			}	
-			//var_dump($images);exit;	
         $response = [
-            'image' =>$this->imageRepository->get($id),
-			'images'=>$images,
+            'image' =>$this->image->get($id),
         ];
-
         return view('product.image.show', $response);
     }
 	
@@ -78,7 +70,7 @@ class ImageController extends Controller
     }
 	
 	 /**
-     * 图片上传
+     * 新增图片上传
      *
      * 
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -88,7 +80,7 @@ class ImageController extends Controller
        if($this->request->isMethod('post')){
 			$data=$this->request->all();
 			$files=$this->request->file();
-			$this->imageRepository->uploadImage($data,$files);	 
+			$this->image->createImage($data,$files);	 
 		}
         return redirect(route('productImage.index'));
     }
@@ -103,8 +95,8 @@ class ImageController extends Controller
     {
         if($this->request->isMethod('post')){
 			$data=$this->request->all();
-			$files=$this->request->file();
-			$this->imageRepository->uploadImage($data,$files);	 
+			$file=$this->request->file('map');
+			$this->image->updateImage($data,$file);	 
 		}
         return redirect(route('productImage.index'));
     }
@@ -117,14 +109,9 @@ class ImageController extends Controller
      */
     public function edit($id)
     { 
-		$result=$this->imageRepository->get($id); 	 
-		if(isset($result['image_name'])){
-			$imageName=$result['image_name'];
-			$images=explode("#",$imageName);
-			}
         $response = [
-            'image' =>$this->imageRepository->get($id),
-			'images'=>$images,
+            'image' =>$this->image->get($id),
+			'imageType' =>  config('imageType.imageType'),
         ];
         return view('product.image.edit', $response); 
     }
@@ -139,21 +126,10 @@ class ImageController extends Controller
      */
     public function destroy($id)
     {
-        $this->imageRepository->destroyImage($id);
+        $this->image->destroyImage($id);
         return redirect(route('productImage.index'));
     }
-
-    /**
-     * 删除单个图片
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function imageDelete($id,$imageName)
-    {
-        $this->imageRepository->deleteImage($id,$imageName);
-        return redirect(route('productImage.index'));
-    }	
+		
 	/**
      * 压缩包批量上传图片
      *
@@ -165,7 +141,7 @@ class ImageController extends Controller
 	{
 		if($this->request->isMethod('post')){
 			$request=$this->request;
-			$res=$this->imageRepository->zipsUpload($request);
+			$res=$this->image->zipsUpload($request);
 			return redirect(route('productImage.index'));
 		}else{
 			return view('product.image.addzip');

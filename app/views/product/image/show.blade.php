@@ -21,13 +21,8 @@
                 <dd>{{ $image->updated_at }}</dd>
                 <dt>图片类型</dt>
                 <dd>{{$image ->type }}</dd>
-                <dt>已上传类型</dt>
-                
-                @foreach($images as $item) 
-                <dd><img src="/{{$image->image_path}}{{$item}}" width="300px" height="200px"></dd>
-            	@endforeach
-                
-               
+                <dt>已上传图片</dt>
+                <dd><img src="/{{$image->image_path}}{{$image->image_name}}" width="300px" height="200px"></dd>               
             </dl>
         </div>
     </div>

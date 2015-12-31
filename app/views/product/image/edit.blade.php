@@ -23,59 +23,28 @@
         <label for="brand_id">产品ID:</label>
         <input  type="text" name='product_id'  value='{{$image->product_id}}'/>
     </div>	
-    <div class="form-group">
-        <label for="URL">供应商提供的URL：</label>
-        <input  class="form-control" id="url" placeholder="供应商提供的RUL" name='suppliers_url'  />
-    </div>
-     <div class="form-group" id='checktype'>
-        <label for="brand_id">选择上传类型:</label>
-        <input  type="radio" name='uploadType'  value='image' checked onClick="checktype();"/>上传图片
-        <input  type="radio" name='uploadType'  value='zip' onClick="checktype();"/>上传压缩包
-    </div>
-    <div class="form-group"  >
-    <label for="color">修改图片类型：</label>
-    <input  class="form-control" id="url" placeholder="图片类型" name="type" value='{{$image->type}}' />      
+   <div class="form-group"  >
+        <label for="color">图片类型：</label>
+         <select id="brand_id" class="form-control" name="type">
+            @foreach($imageType as $item) 
+                <option value="{{ $item }}" {{ $item == $image->type ? 'selected' : ''}}>{{ $item }}</option>
+            @endforeach
+        </select>
     </div>
      <div class="form-group"  >
     <label for="color">已有图片：</label></br>
-     @foreach($images as $item) 
      <div style="float:left">
-        <img src="/{{$image->image_path}}{{$item}}" width="300px" height="200px" ></br>
-     	<a href="/imageDelete/{{$image->id}}/{{$item}}">删除该图</a>
+        <img src="/{{$image->image_path}}{{$image->image_name}}" width="300px" height="200px" ></br>
      </div>
-     @endforeach
+ 
      <p style="clear:both"></p>      
-    </div>           
-   <div id='imagediv'>          
+    </div>                   
     <div class="form-group">
-    <label for="color">上传图片：</label>
-        <input   name='map0' type='file' />
-        <input   name='map1' type='file' />
-        <input   name='map2' type='file' />
-        <input   name='map3' type='file' />
-        <input   name='map4' type='file' />
-        <input   name='map5' type='file' />
+    <label for="color">更改图片：</label>
+        <input   name='map' type='file' />
     </div>
-    </div>
-    <div style="display:none" id='zipdiv'>
-    <div class="form-group">
-    <label for="color">导入压缩包：</label>
-        <input  type="file" name='zip'/>
-    </div>
-    </div>
-  <script type="text/javascript">
-  function checktype(){
-  var uploadType=$("#checktype [name='uploadType']:checked").val();
- 	if(uploadType == 'image'){
-		$('#zipdiv').hide();
-		$('#imagediv').show();
-		}else{
-		$('#imagediv').hide();
-		$('#zipdiv').show();		
-			}
-  //alert (uploadType);
-  }
-  </script>       
+   
+       
 @stop
  
  

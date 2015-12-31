@@ -42,10 +42,9 @@ class ImageRepository extends BaseRepository
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function uploadImage($data, $files)
+    public function createImage($data, $files)
     {	
         $path = 'product/'.$data['product_id'].'/'.$data['type'].'/';
-		$res=$this->model->isImageUpload($data);
 		$data['image_path']=$path;
 		$data['image_name']='';
         switch ($data['uploadType']) {
@@ -54,7 +53,9 @@ class ImageRepository extends BaseRepository
                     if ($file->isValid()) {
 						$suffix = $file -> getClientOriginalExtension();
                         $name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
-                        $filePath = $file->move($path, $name);     
+                        $filePath = $file->move($path, $name);
+						$data['image_name'] = $name; 
+						$this->create($data);    
                     }
                 }
                 break;
@@ -64,58 +65,79 @@ class ImageRepository extends BaseRepository
 						$suffix = $file -> getClientOriginalExtension();
 						$name=$data['product_id'].$data['type'].'.'.$suffix;
 						$filePath = $file->move('zip/', $name);
-						$file->getTargetFile('product/'.$data['product_id'].'/');
+						$file->getTargetFile('producttemporary/'.$data['product_id'].'/');
+						$file->getTargetFile('product/'.$data['product_id'].'/'.$data['type'].'/');
 						$zipper = new Zipper;
-						$res=$zipper->make('zip/'.$name)->extractTo('product/'.$data['product_id'].'/');
+						$res=$zipper->make('zip/'.$name)->extractTo('producttemporary/'.$data['product_id'].'/');
+						$helper=new Sort;
+						$images=$helper->get_dirname('producttemporary/'.$data['product_id'].'/'.$data['type'].'/');
+						foreach ($images as $key=>$image) {
+						$suffix=substr(strrchr($image, '.'), 1);	
+						$name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
+						$from='producttemporary/'.$data['product_id'].'/'.$data['type'].'/'.$image;
+						$to=$path.$name;
+						copy($from,$to);
+						unlink($from);
+						$data['image_name'] = $name;		
+						$this->create($data); 
 		            }
+					
                 }
                 break;
         }
-		$helper=new Sort;
-		$images=$helper->get_dirname($path);
-		foreach ($images as $key=>$image) {
-			$suffix=substr(strrchr($image, '.'), 1);	
-			$name = $data['product_id'].$data['type'].$key.time().'.'.$suffix;
-			rename($path.$image,$path.$name);
-			if($key>0){
-			$data['image_name'] = $name.'#'.$data['image_name'];
-			}else{
-			$data['image_name'] = $name;	
-				}
+		
 		}
-		if($res>0){	
-		$this->update($res, $data);
-		}else{
-		$this->create($data);	
-			}
     }
-
-    /**
-     * 单个产品图片删除
+	/**
+     * 更新产品图片
      *
      * @param int $id 产品ID
      * @param object $request HTTP请求对象
      * @return bool
      */
-   public function deleteImage($id,$imageName)
-    {
-		$imageOringalNames=$this->get($id);
-		$path=$imageOringalNames['image_path'];
-		unlink($path.$imageName);
-		$data['image_name']='';
-		$helper=new Sort;
-		$images=$helper->get_dirname($path);
-		foreach ($images as $key=>$image) {
-			if($key>0){
-				$data['image_name'] = $image.'#'.$data['image_name'];
+    public function updateImage($data, $file)
+    {	//print_r($file);exit;
+		$id=$data['id'];
+        $imageOringinal = $this->get($id);
+		if($data['type']==$imageOringinal['type']){
+			if($file->isValid()) {
+				//更改单张图片
+				unlink($imageOringinal['image_path'].$imageOringinal['image_name']);
+				$suffix = $file -> getClientOriginalExtension();
+				$name = $imageOringinal['product_id'].$imageOringinal['type'].time().'.'.$suffix;
+				$filePath = $file->move($imageOringinal['image_path'], $name);
+				$data['image_name'] = $name;
+				$this->update($id, $data);
+			}
+		}else{
+			if(isset($file)){
+				echo '操作错误！';
 			}else{
-				$data['image_name'] = $image;
-				}
+				//更改图片类型
+				$suffix=substr(strrchr($imageOringinal['image_name'], '.'), 1);
+				$name=$data['product_id'].$data['type'].time().'.'.$suffix;
+				$path='product/'.$data['product_id'].'/'.$data['type'].'/';
+				if (!is_dir($path)) {
+					if (false === @mkdir($path, 0777, true) && !is_dir($path)) {
+						throw new FileException(sprintf('Unable to create the "%s" directory', $path));
+					}
+				} elseif (!is_writable($path)) {
+					throw new FileException(sprintf('Unable to write in the "%s" directory', $path));
+				}			
+				$from=$imageOringinal['image_path'].$imageOringinal['image_name'];
+				$to=$path.$name;
+				copy($from,$to);
+				unlink($from);
+				$data['image_path']=$path;
+				$data['image_name'] = $name;
+				$this->update($id, $data);	
+			}	
+				
 		}
-        return $this->update($id, $data);
     }
+ 
 	
-  /**
+	/**
      * 删除产品图片
      *
      * @param int $id 产品ID
@@ -124,16 +146,8 @@ class ImageRepository extends BaseRepository
      */
     public function destroyImage($id)
     {
-        $result = $this->get($id);
-		if(isset($result['image_name'])){
-			$imageName=$result['image_name'];
-			$images=explode("#",$imageName);
-			}
-		foreach($images as $image){
-			if(!empty($image)){		
-			unlink('product/'.$result['product_id'].'/'.$result['type'].'/'.$image);
-			}
-			}
+        $result = $this->get($id);	
+		unlink($result['image_path'].$result['image_name']);
         $this->destroy($id);
     } 
 

@@ -6,6 +6,7 @@ use App\Base\BaseModel;
 
 class CatalogModel extends BaseModel
 {
+    protected $table = 'catalogs';
     /**
      * The attributes that are mass assignable.
      *

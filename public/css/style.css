@@ -50,3 +50,10 @@ th:not([data-sort=false]) {
 th:hover:not([data-sort=false]) {
     background: #efefef;
 }
+
+.ajaxinput{
+    margin-left:5px;
+}
+.ajaxi{
+    margin-left: 3px;
+}

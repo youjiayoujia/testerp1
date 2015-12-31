@@ -22,7 +22,7 @@ class SetModel extends BaseModel
 
     public function Catalog()
     {
-        return $this->belongsTo('App\Models\Catalog\CatalogModel','catalog_id');
+        return $this->belongsTo('App\Models\CatalogModel','catalog_id');
     }
 
     public function values()

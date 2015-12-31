@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Base\BaseRepository;
-use App\Models\Catalog\CatalogModel;
+use App\Models\CatalogModel;
 use Illuminate\Support\Facades\DB;
 /**
  * 品类库

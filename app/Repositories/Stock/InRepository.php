@@ -11,9 +11,9 @@
 namespace App\Repositories\Stock;
 
 use App\Base\BaseRepository;
-use App\Models\Stock\InModel as Stockin;
-use App\Models\ItemModel as Item;
-use App\Models\Warehouse\PositionModel as Position;
+use App\Models\Stock\InModel;
+use App\Models\ItemModel;
+use App\Models\Warehouse\PositionModel;
 
 class InRepository extends BaseRepository
 {
@@ -40,7 +40,7 @@ class InRepository extends BaseRepository
         ]
     ];
     
-    public function __construct(Stockin $stockin)
+    public function __construct(InModel $stockin)
     {
         $this->model = $stockin;
     }
@@ -54,7 +54,7 @@ class InRepository extends BaseRepository
      */
     public function getItemId($sku)
     {
-        $buf = Item::all()->toArray();
+        $buf = ItemModel::all()->toArray();
         foreach($buf as $item)
             if($item['sku'] == $sku)
                 return $item['id'];
@@ -70,7 +70,7 @@ class InRepository extends BaseRepository
      */
     public function getPosition($id)
     {
-        $buf =  Position::all()->toArray();
+        $buf =  PositionModel::all()->toArray();
         $arr = [];
         $i = 0;
         foreach($buf as $line)

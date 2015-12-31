@@ -52,6 +52,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '库存',
+                'url' => 'stock.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '入库',
                 'url' => 'stockIn.index',
                 'icon' => '',

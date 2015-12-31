@@ -25,7 +25,7 @@ class CreateStockAdjustment extends Migration
             $table->text('remark')->comment('备注')->default(NULL);
             $table->integer('adjust_man_id')->comment('调整人')->default(NULL);
             $table->date('adjust_time')->comment('调整时间')->default(NULL);
-            $table->enum('status', ['未审核', '已审核'])->comment("审核状态")->default('未审核');
+            $table->enum('status', ['N', 'Y'])->comment("审核状态")->default('N');
             $table->integer('check_man_id')->comment('审核人')->default(NULL);
             $table->date('check_time')->comment('审核时间')->default(NULL);
             $table->timestamps();

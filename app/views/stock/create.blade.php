@@ -1,16 +1,16 @@
 @extends('common.form')
-@section('title') 添加入库信息 @stop
+@section('title') 添加库存信息 @stop
 @section('breadcrumbs')
     <ol class="breadcrumb">
         <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockIn.index') }}">入库</a></li>
-        <li class="active"><strong>添加入库信息</strong></li>
+        <li><a href="{{ route('stock.index') }}">库存</a></li>
+        <li class="active"><strong>添加库存信息</strong></li>
     </ol>
 @stop
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 
-@section('formTitle') 添加入库信息 @stop
-@section('formAction') {{ route('stockIn.store') }} @stop
+@section('formTitle') 添加库存信息 @stop
+@section('formAction') {{ route('stock.store') }} @stop
 @section('formBody')
     <div class="form-group">
         <label for="item_id" class='control-label'>item号</label> 
@@ -19,16 +19,6 @@
     <div class="form-group">
         <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
-    </div>
-    <div class='row'>
-        <div class="form-group col-sm-6">
-            <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="amount" placeholder="数量" name='amount' value="{{ old('amount') }}">
-        </div>
-        <div class="form-group col-sm-6">
-            <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') }}">
-        </div>
     </div>
     <div class='row'>
         <div class="form-group col-sm-6">
@@ -45,21 +35,23 @@
             <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'><option>请选择库位</option></select>
         </div>
     </div>
-    <div class="form-group">
-        <label for="type">入库类型</label>
-        <select name='type' class='form-control'>
-            @foreach($data as $stockin_key => $stockin_val)
-                <option value={{ $stockin_key }} {{ old('type') == $stockin_key ? 'selected' : '' }}>{{ $stockin_val }}</option>   
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="relation_id">入库来源id</label>
-        <input type='text' class="form-control" id="relation_id" placeholder="入库来源id" name='relation_id' value="{{ old('relation_id') }}">
-    </div>
-    <div class="form-group">
-        <label for="remark">备注</label>
-        <textarea name='remark' id='remark' class='form-control'>{{ old('remark') }}</textarea>
+    <div class='row'>
+        <div class="form-group col-sm-3">
+            <label for="all_amount" class='control-label'>总数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control all_amount" id="all_amount" placeholder="总数量" name='all_amount' value="{{ old('all_amount') }}">
+        </div>
+        <div class="form-group col-sm-3">
+            <label for="available_amount" class='control-label'>可用数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control available_amount" id="available_amount" placeholder="可用数量" name='available_amount' value="{{ old('available_amount') }}">
+        </div>
+        <div class="form-group col-sm-3">
+            <label for="hold_amount" class='control-label'>hold数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control hold_amount" id="hold_amount" placeholder="hold数量" name='hold_amount' value="{{ old('hold_amount') }}">
+        </div>
+        <div class="form-group col-sm-3">
+            <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control total_amount" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') }}">
+        </div>
     </div>
 @stop
 <script type='text/javascript'>
@@ -81,6 +73,14 @@
                     }
                 });
         }
+
+        $('.all_amount,.available_amount,.hold_amount').blur(function(){
+            if(parseInt($('.all_amount').val()) != parseInt($('.available_amount').val()) + parseInt($('.hold_amount').val())) {
+                $(':button[type=submit]').attr('disabled', true);
+            } else {
+                $(':button[type=submit]').attr('disabled', false);
+            }
+        });
 
         $('#sku').blur(function(){
             var sku_val = $('#sku').val();

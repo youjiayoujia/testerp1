@@ -61,7 +61,7 @@
     </div>
     <div class="form-group">
         <label for="remark">备注</label>
-        <textarea name='remark' id='remark' class='form-control'>{{ old('remark') ? old('remark') : '' }}</textarea>
+        <textarea name='remark' id='remark' class='form-control'>{{ old('remark') }}</textarea>
     </div>
 @stop
 <script type='text/javascript'>

@@ -50,6 +50,14 @@ Route::resource('stockAdjustment', 'Stock\AdjustmentController');
  */
 Route::resource('warehousePosition', 'Warehouse\PositionController');
 
+/**
+ * stock controller route
+ */
+Route::get('getunitcost', ['uses'=>'StockController@getUnitCost','as'=>'getunitcost']);
+Route::resource('stock', 'StockController');
+
+
+
 
 
 

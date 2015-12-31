@@ -15,7 +15,7 @@
     <input type='hidden' name='_method' value='PUT'/>
     <div class="form-group">
         <label for="item_id" class='control-label'>item号</label>
-        <input type='text' class="form-control" id="item_id" placeholder="item_id" name='item_id' value="{{ old('item_id') ? old('item_id') : $out->item_id }}" readonly>
+        <input type='text' class="form-control" id="item_id" placeholder="item号" name='item_id' value="{{ old('item_id') ? old('item_id') : $out->item_id }}" readonly>
     </div>
     <div class="form-group">
         <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>

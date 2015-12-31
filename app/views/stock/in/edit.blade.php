@@ -55,7 +55,7 @@
     </div>
     <div class="form-group"> 
         <label for="relation_id">入库来源id</label>
-        <input type='text' class="form-control" id="relation_id" placeholder="入库来源id" name='relation_id' value="{{ old('relation_id') ? old('relation_id') : $in->relation_id }}">
+        <input name='relation_id' id="relation_id" type='text' class="form-control" placeholder="入库来源id" value="{{ old('relation_id') ? old('relation_id') : $in->relation_id }}">
     </div>
     <div class="form-group">
         <label for="remark">备注</label>

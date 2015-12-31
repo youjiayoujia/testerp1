@@ -13,103 +13,205 @@
 @section('formAction') {{ route('stockAdjustment.store') }} @stop
 @section('formBody')
     <div class='form-group'>
-        <label 
+        <label for='adjust_form_id'>调整单号</label>
+        <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : 'CD'.time() }}" readonly>
     </div>
     <div class="form-group">
-        <label for="item_id" class='control-label'>item号</label> 
-        <input type='text' class="form-control" id="item_id" placeholder="item号" name='item_id' value="{{ old('item_id') }}" readonly>
-    </div>
-    <div class="form-group">
-        <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
-    </div>
-    <div class='form-group'>
-        <label>出入库类型</label>
-        <div class='radio'>
-            <label>
-                <input type='radio' name='type' value='入库' {{ old('type') ? old('type') == '入库' ? 'checked' : '' : 'checked'}}>入库
-            </label>
-        </div>
-        <div class='radio'>
-            <label>
-                <input type='radio' name='type' value='出库' {{ old('type') ? old('type') == '入库' ? 'checked' : '' : ''}}>出库
-            </label>
-        </div>
+        <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <select name='warehouses_id' id='warehouses_id' class='form-control'>
+            <option>请选择仓库</option>
+            @foreach($warehouses as $warehouse)
+                <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
+            @endforeach
+        </select>
     </div>
     <div class='row'>
         <div class="form-group col-sm-6">
-            <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouses_id' id='warehouses_id' class='form-control'>
-                @foreach($warehouses as $warehouse)
-                    <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
-                @endforeach
-            </select>
+            <label for="adjust_man_id">调整人</label>
+            <input type='text' class="form-control" id="adjust_man_id" placeholder="调整人" name='adjust_man_id' value="{{ old('adjust_man_id') }}" readonly>
         </div>
         <div class="form-group col-sm-6">
-            <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'></select>
+            <label for="adjust_time">调整时间</label>
+            <input type='text' class="form-control" id="adjust_time" placeholder="调整时间" name='adjust_time' value="{{ old('adjust_time') }}">
         </div>
     </div>
-    <div class='row'>
-        <div class="form-group col-sm-6">
-            <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="amount" placeholder="数量" name='amount' value="{{ old('amount') }}">
+    <a href='javascript:' class='btn btn-info col-sm-12'>sku1</a>
+    <div>
+        <div class='row'>
+            <div class="form-group col-sm-6">
+                <label for="item_id" class='control-label'>item号</label> 
+                <input type='text' class="form-control item_id" id="arr[item_id][0]" placeholder="item号" name='arr[item_id][0]' value="{{ old('arr[item_id][0]') }}" readonly>
+            </div>
+            <div class="form-group col-sm-6">
+                <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+            </div>
         </div>
-        <div class="form-group col-sm-6">
-            <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') }}">
+        <div class='row'>
+            <div class='form-group col-sm-3'>
+                <label>出入库类型</label>
+                <div class='radio type'>
+                    <label>
+                        <input type='radio' name='arr[type][0]' value='入库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : 'checked'}}>入库
+                    </label>
+                </div>
+                <div class='radio type'>
+                    <label>
+                        <input type='radio' name='arr[type][0]' value='出库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : ''}}>出库
+                    </label>
+                </div>
+            </div>
+            <div class="form-group col-sm-3">
+                <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
+                    <option>请选择库位</option>
+                </select>
+            </div>
+            <div class="form-group col-sm-3">
+                <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="数量" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
+            </div>
+            <div class="form-group col-sm-3">
+                <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <input type='text' class="form-control total_amount" id="arr[total_amount][0]" placeholder="总金额" name='arr[total_amount][0]' value="{{ old('arr[total_amount][0]') }}" readonly>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label for='label'>备注(原因)</label>
+            <textarea class='form-control remark' name='arr[remark][]' id='arr[remark][0]'>{{ old('arr[remark][0]') }}</textarea>
         </div>
     </div>
     <div class='form-group'>
-        <label for='label'>备注(原因)</label>
-        <textarea class='form-control' name='remark' id='remark'>{{ old('remark') }}</textarea>
-    </div>
-    <div class="form-group">
-        <label for="adjust_man_id">调整人</label>
-        <input type='text' class="form-control" id="adjust_man_id" placeholder="调整人" name='adjust_man_id' value="{{ old('adjust_man_id') }}" readonly>
-    </div>
-    <div class="form-group">
-        <label for="adjust_time">调整时间</label>
-        <input type='text' class="form-control" id="adjust_time" placeholder="调整时间" name='adjust_time' value="{{ old('adjust_time') }}">
+        <a href='javascript:' class='btn btn-info col-sm-12' id='create_form'>
+            <span class='glyphicon glyphicon-plus'>新增</span>
+        </a>
     </div>
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
-        // var buf = new XMLHttpRequest();
-        // if(buf)
-        //     alert('ajax对象创建成功');
+        var current = 1;
+        $('#create_form').click(function(){
+              $('#create_form').before("<div class='form-group append'></div>");
+              var appendhtml = "\
+    <a href='javascript:' class='btn btn-info col-sm-10'>sku"+(current+1)+"</a><a href='javascript:' class='btn btn-info div_del col-sm-1'><span class='glyphicon glyphicon-remove'></span></a>\
+    <div>\
+        <div class='row'>\
+            <div class='form-group col-sm-6'>\
+                <label for='item_id' class='control-label'>item号</label> \
+                <input type='text' class='form-control item_id' id='arr[item_id]["+current+"]' placeholder='item号' name='arr[item_id]["+current+"]' value='{{ old('arr[item_id]["+current+"]') }}' readonly>\
+            </div>\
+            <div class='form-group col-sm-6'>\
+                <label for='sku' class='control-label'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                <input type='text' class='form-control sku' id='arr[sku]["+current+"]' placeholder='sku' name='arr[sku]["+current+"]' value='{{ old('arr[sku]["+current+"]') }}'>\
+            </div>\
+        </div>\
+        <div class='row'>\
+            <div class='form-group col-sm-3'>\
+                <label>出入库类型</label>\
+                <div class='radio type'>\
+                    <label>\
+                        <input type='radio' name='arr[type]["+current+"]' value='入库' {{ old('arr[type]["+current+"]') ? old('arr[type]["+current+"]') == '入库' ? 'checked' : '' : 'checked'}}>入库\
+                    </label>\
+                </div>\
+                <div class='radio type'>\
+                    <label>\
+                        <input type='radio' name='arr[type]["+current+"]' value='出库' {{ old('arr[type]["+current+"]') ? old('arr[type]["+current+"]') == '入库' ? 'checked' : '' : ''}}>出库\
+                    </label>\
+                </div>\
+            </div>\
+            <div class='form-group col-sm-3'>\
+                <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                <select name='arr[warehouse_positions_id]["+current+"]' id='arr[warehouse_positions_id]["+current+"]' class='form-control warehouse_positions_id'></select>\
+            </div>\
+            <div class='form-group col-sm-3'>\
+                <label for='amount' class='control-label'>数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                <input type='text' class='form-control amount' id='arr[amount]["+current+"]' placeholder='数量' name='arr[amount]["+current+"]' value='{{ old('arr[amount]["+current+"]') }}'>\
+            </div>\
+            <div class='form-group col-sm-3'>\
+                <label for='total_amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                <input type='text' class='form-control total_amount' id='arr[total_amount]["+current+"]' placeholder='总金额' name='arr[total_amount]["+current+"]' value='{{ old('arr[total_amount]["+current+"]') }}' readonly>\
+            </div>\
+        </div>\
+        <div class='form-group'>\
+            <label for='label'>备注(原因)</label>\
+            <textarea class='form-control remark' name='arr[remark]["+current+"]' id='arr[remark]["+current+"]'>{{ old('arr[remark]["+current+"]') }}</textarea>\
+        </div>\
+    </div>";
+            $('.append:last').html(appendhtml);
 
-        var warehouse = $('#warehouses_id').val();
-        var buf = {!! $position !!};
-        for(var i in buf)
-            if(buf[i]['warehouses_id'] == warehouse)
-                $('<option value='+buf[i]['id']+'>'+buf[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
-
-        $('#sku').blur(function(){
-            var sku_val = $('#sku').val();
-            var flag = 0;
-            var buf = new Array();
-            buf = {!! $item !!};
-            for(var test in buf)
-                if(buf[test]['sku'] == sku_val) {
-                    $('#item_id').val(buf[test]['id']);
-                    flag = 1;
+            val = $('#warehouses_id').val();
+            $.ajax({
+                url: "{{ route('getposition') }}",
+                data: {val:val},
+                dataType:'json',
+                type:'get',
+                success:function(result){
+                    $('.warehouse_positions_id').empty();
+                    for(var i=0;i<result.length;i++)
+                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));
                 }
-            if(flag == 0) {
-                $('#sku').val('');
-                $('#item_id').val('');
-                alert('sku不存在');
+            });
+
+            current++;
+        });
+
+        $(document).on('blur', '.amount', function(){
+            var sku = $(this).parent().parent().prev().find('.sku').val();
+            var tmp = $(this);
+            if(tmp.val()) {
+                $.ajax({
+                    url:"{{ route('getunitcost') }}",
+                    data:{sku:sku},
+                    dataType:'json',
+                    'type':'get',
+                    success:function(result){
+                        tmp.parent().next().children('.total_amount').val(result*tmp.val());
+                    }
+                });
             }
         });
 
-        $('#warehouses_id').change(function(){
-            $('#warehouse_positions_id').empty();
-            var warehouse_value = $('#warehouses_id').val();
-            var buf = {!! $position !!};
-            for(var current in buf)
-                if(buf[current]['warehouses_id'] == warehouse_value)
-                    $('<option value='+buf[current]['id']+'>'+buf[current]['name']+'</option>').appendTo($('#warehouse_positions_id'));
+        $(document).on('click','.div_del',function(){
+            $(this).parent().parent().remove(); 
         });
+
+        $(document).on('blur', '.sku', function(){
+            var tmp = $(this);
+            var sku_val = $(this).val();
+            var test = $(this).val();
+            if(sku_val){
+            $.ajax({
+                url: "{{route('getitemid')}}",
+                data: {sku_val:sku_val},
+                dataType: 'json',
+                type: 'get',
+                success: function(result){
+                    tmp.parent().prev().children(':text').val(result);
+                    if(!result) {
+                        $('#sku').val('');
+                        alert('sku不存在');
+                    }
+                } 
+            });
+            }
+            
+        });
+
+        $(document).on('change', '#warehouses_id', function(){
+            val = $(this).val();
+            $.ajax({
+                url: "{{ route('getposition') }}",
+                data: {val:val},
+                dataType:'json',
+                type:'get',
+                success:function(result){
+                    $('.warehouse_positions_id').empty();
+                    for(var i=0;i<result.length;i++)
+                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));
+                }
+            });
+        });
+        
         $('#adjust_time').cxCalendar();
         $('#check_time').cxCalendar();
     });

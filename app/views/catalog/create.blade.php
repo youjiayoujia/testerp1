@@ -25,7 +25,7 @@
         <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加attribute</button>
     </div>
     <div class="panel panel-info">
-        <div class="panel-heading">Feature属性<i class="glyphicon glyphicon-plus" id='featureadd'></i></div>
+        <div class="panel-heading">Feature属性</div>
         <div class="panel-body featurefirst"></div>
         <button type="button" class="btn btn-primary btn-lg btn-block" id='featureadd'>添加feature</button>
     </div>

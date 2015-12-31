@@ -21,15 +21,11 @@ class CodeRepository extends BaseRepository
             'logistics_id' => 'required',
             'code' => 'required',
             'status' => 'required',
-            'package_id' => 'required',
-            'used_at' => 'required',
         ],
         'update' => [
             'logistics_id' => 'required',
             'code' => 'required',
             'status' => 'required',
-            'package_id' => 'required',
-            'used_at' => 'required',
         ],
     ];
 

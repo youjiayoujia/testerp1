@@ -10,7 +10,7 @@
 namespace App\Repositories\Logistics;
 
 use App\Base\BaseRepository;
-use App\Models\Logistics\CodeModel as Code;
+use App\Models\Logistics\CodeModel;
 
 class CodeRepository extends BaseRepository
 {
@@ -33,7 +33,7 @@ class CodeRepository extends BaseRepository
         ],
     ];
 
-    public function __construct(Code $code)
+    public function __construct(CodeModel $code)
     {
         $this->model = $code;
     }

@@ -10,7 +10,7 @@
 namespace App\Repositories\Logistics;
 
 use App\Base\BaseRepository;
-use App\Models\Logistics\SupplierModel as Supplier;
+use App\Models\Logistics\SupplierModel;
 
 class SupplierRepository extends BaseRepository
 {
@@ -38,7 +38,7 @@ class SupplierRepository extends BaseRepository
         ],
     ];
 
-    public function __construct(Supplier $supplier)
+    public function __construct(SupplierModel $supplier)
     {
         $this->model = $supplier;
     }

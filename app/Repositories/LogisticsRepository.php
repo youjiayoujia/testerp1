@@ -10,7 +10,7 @@
 namespace App\Repositories;
 
 use App\Base\BaseRepository;
-use App\Models\LogisticsModel as Logistics;
+use App\Models\LogisticsModel;
 
 class LogisticsRepository extends BaseRepository
 {
@@ -41,7 +41,7 @@ class LogisticsRepository extends BaseRepository
         ],
     ];
 
-    public function __construct(Logistics $logistics)
+    public function __construct(LogisticsModel $logistics)
     {
         $this->model = $logistics;
     }

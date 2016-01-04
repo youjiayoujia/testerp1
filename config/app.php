@@ -212,7 +212,7 @@ return [
          * Coffee
          */
         'Sort' => App\Facades\Sort::class,
- 
+        'Tool' => App\Facades\Tool::class,
 
     ],
 

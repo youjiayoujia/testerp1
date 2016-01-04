@@ -36,3 +36,5 @@ Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 Route::resource('warehousePosition', 'Warehouse\PositionController');
 
+//品类路由
+Route::resource('catalog', 'CatalogController');

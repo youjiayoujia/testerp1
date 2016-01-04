@@ -21,7 +21,7 @@ class CreateStockAdjustment extends Migration
             $table->integer('warehouses_id')->comment('仓库')->default(NULL);
             $table->integer('warehouse_positions_id')->comment('库位')->default(NULL);
             $table->integer('amount')->comment('调整数量')->default(NULL);
-            $table->integer('total_amount')->comment('调整金额')->default(NULL);
+            $table->float('total_amount')->comment('调整金额')->default(NULL);
             $table->text('remark')->comment('备注')->default(NULL);
             $table->integer('adjust_man_id')->comment('调整人')->default(NULL);
             $table->date('adjust_time')->comment('调整时间')->default(NULL);

@@ -11,12 +11,12 @@
 namespace App\Repositories\Stock;
 
 use App\Base\BaseRepository;
-use App\Models\Stock\AdjustmentModel as Adjustment;
+use App\Models\Stock\AdjustmentModel;
 
 class AdjustmentRepository extends BaseRepository
 {
     // 用于查询
-    protected $searchFields = ['sku'];
+    protected $searchFields = ['adjust_form_id', 'sku'];
 
     // 规则验证
     public $rules = [
@@ -25,7 +25,7 @@ class AdjustmentRepository extends BaseRepository
             'amount' => 'required|numeric',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|integer',
+            'total_amount' => 'required|numeric',
             'adjust_time' =>'required|date',
         ],
         'update' => [
@@ -33,13 +33,14 @@ class AdjustmentRepository extends BaseRepository
             'amount' => 'required|integer',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|integer',
+            'total_amount' => 'required|numeric',
             'adjust_time' =>'required|date',
         ]
     ];
     
-    public function __construct(Adjustment $adjustment)
+    public function __construct(AdjustmentModel $adjustment)
     {
         $this->model = $adjustment;
     }
+
 }

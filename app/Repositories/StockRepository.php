@@ -53,6 +53,12 @@ class StockRepository extends BaseRepository
     {
         $stock = $this->model->where('sku', '=', $sku)->first();
     
-        return ($stock->unit_cost);
+        return $stock->unit_cost;
+    }
+
+
+    public function getObj($arr)
+    {
+        return $this->model->where($arr)->get();
     }
 }

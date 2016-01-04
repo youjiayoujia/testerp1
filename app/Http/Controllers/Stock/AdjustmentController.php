@@ -13,18 +13,27 @@ namespace App\Http\Controllers\Stock;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\AdjustmentRepository;
-use App\Models\ItemModel as Item;
-use App\Repositories\WarehouseRepository as warehouse;
-use App\Repositories\Warehouse\PositionRepository as position;
+use App\Models\ItemModel;
+use App\Repositories\WarehouseRepository;
+use App\Repositories\Warehouse\PositionRepository;
+use App\Repositories\Stock\InRepository;
+use App\Repositories\Stock\OutRepository;
+use App\Repositories\StockRepository;
 
 class AdjustmentController extends Controller
 {
     protected $adjustment;
+    protected $out;
+    protected $in;
+    protected $stock;
 
-    public function __construct(Request $request, AdjustmentRepository $adjustment)
+    public function __construct(Request $request, AdjustmentRepository $adjustment, InRepository $in, OutRepository $out, StockRepository $stock)
     {
         $this->adjustment = $adjustment;
         $this->request = $request;
+        $this->out = $out;
+        $this->in = $in;
+        $this->stock = $stock;
     }
 
     /**
@@ -68,12 +77,10 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function create(warehouse $warehouse, position $position)
+    public function create(WarehouseRepository $warehouse)
     {
         $response = [
-            'item' => json_encode(Item::all()->toArray()),
             'warehouses' => $warehouse->all(),
-            'position' => json_encode($position->all()->toArray()),
         ];
 
         return view('stock.adjustment.create', $response);
@@ -89,10 +96,19 @@ class AdjustmentController extends Controller
     public function store()
     {
         $this->request->flash();
-
-        $this->validate($this->request, $this->adjustment->rules('create'));
-        $this->adjustment->create($this->request->all());
-
+        $buf = [];
+        $len = count($this->request->input('arr')['sku']);
+        $buf = $this->request->all();
+        unset($buf['_token']);
+        unset($buf['arr']);
+        for($i=0; $i<$len; $i++)
+        {   
+            $arr = $this->request->input('arr');
+            $arr_len = count($arr);
+            foreach($arr as $key => $val)
+                $buf[$key] = $val[$i];
+           $this->adjustment->create($buf);
+        }
         return redirect(route('stockAdjustment.index'));
     }
 
@@ -103,10 +119,11 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function edit($id)
+    public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
             'adjustment' => $this->adjustment->get($id),
+            'warehouses' => $warehouse->all(),
         ];
 
         return view('stock.adjustment.edit', $response);
@@ -139,5 +156,44 @@ class AdjustmentController extends Controller
     {
         $this->adjustment->destroy($id);
         return redirect(route('stockAdjustment.index'));
+    }
+
+    public function check()
+    {
+        $id = $_GET['id'];
+        $time = date('Y-m-d',time());       
+        $obj = $this->adjustment->get($id);
+        $obj->update(['status'=>'Y', 'check_time'=>$time]); 
+        echo json_encode($time);
+
+        $obj->relation_id = $obj->adjust_form_id;
+        $buf = $this->stock->getObj(['warehouses_id'=> $obj->warehouses_id, 'warehouse_positions_id'=>$obj->warehouse_positions_id])->first();
+
+        if($buf) {
+            if($obj->type == '入库') {
+                $buf->all_amount +=$obj->amount;
+                $buf->available_amount +=$obj->amount;
+                $buf->total_amount +=$obj->total_amount;
+                $buf->save();
+            } else {
+                $buf->all_amount -=$obj->amount;
+                $buf->available_amount -=$obj->amount;
+                $buf->total_amount-=$obj->total_amount;
+                $buf->save();
+            }
+        } else {
+            $obj->all_amount = $obj->amount;
+            $obj->available_amount = $obj->amount;
+            $obj->hold_amount = 0;
+            $this->stock->create($obj->toArray());
+        }
+
+        if($obj->type == '入库') {
+            $obj->type = 'ADJUSTMENT';
+            $this->in->create($obj->toArray());
+        } else {
+            $obj->type = 'ADJUSTMENT';
+            $this->out->create($obj->toArray());
+        }
     }
 }

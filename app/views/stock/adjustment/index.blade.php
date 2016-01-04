@@ -7,10 +7,12 @@
         <li class="active">列表</li>
     </ol>
 @stop
+    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+
 @section('tableTitle') 库存调整列表 @stop
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
-    <th>调整单号</th>
+    <th class="sort" data-url="{{ Sort::url('adjust_form_id') }}">调整单号{!! Sort::label('adjust_form_id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('item_id') }}">Item号{!! Sort::label('item_id') !!}</th>
     <th>sku</th>
     <th>类型</th>
@@ -35,14 +37,14 @@
             <td>{{ $adjustment->item_id }}</td>
             <td>{{ $adjustment->sku }}</td>
             <td>{{ $adjustment->type }}</td>
-            <td>{{ $adjustment->warehouses_id }}</td>
-            <td>{{ $adjustment->warehouse_positions_id }}</td>
+            <td>{{ $adjustment->warehouse->name }}</td>
+            <td>{{ $adjustment->position->name }}</td>
             <td>{{ $adjustment->amount}}</td>
             <td>{{ $adjustment->total_amount}}</td>
             <td>{{ $adjustment->remark }}</td>
             <td>{{ $adjustment->adjust_man_id }} </td>
             <td>{{ $adjustment->adjust_time }}</td>
-            <td>{{ $adjustment->status }}</td>
+            <td>{{ $adjustment->status == 'Y' ? '已审核' : '未审核' }}</td>
             <td>{{ $adjustment->check_man_id }}</td>
             <td>{{ $adjustment->check_time }}</td>
             <td>{{ $adjustment->created_at }}</td>
@@ -53,7 +55,7 @@
                 <a href="{{ route('stockAdjustment.edit', ['id'=>$adjustment->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="javascript:" class="btn btn-info btn-xs">
+                <a href="javascript:"  class="btn btn-info btn-xs check_time" data-id="{{ $adjustment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>审核
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
@@ -65,3 +67,29 @@
         </tr>
     @endforeach
 @stop
+
+<script type='text/javascript'>
+$(document).ready(function(){    
+    $('.check_time').click(function(){
+        if($(this).parent().prev().prev().prev().prev().text() == '未审核') {
+            if(confirm('确认审核?')) {
+                tmp = $(this);
+                id = tmp.data('id');
+                $.ajax({
+                    url:"{{ route('check') }}",
+                    data:{id:id},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        check = tmp.parent().prev().prev();
+                        check.text(result);
+                        check.prev().prev().text('已审核');
+                    }
+                });
+            }
+        } else {
+            alert('已审核');
+        }
+    });
+});
+</script>

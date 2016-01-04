@@ -12,77 +12,83 @@
 @section('formTitle') 添加库存调整信息 @stop
 @section('formAction') {{ route('stockAdjustment.store') }} @stop
 @section('formBody')
-    <div class='form-group'>
-        <label for='adjust_form_id'>调整单号</label>
-        <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : 'CD'.time() }}" readonly>
-    </div>
-    <div class="form-group">
-        <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name='warehouses_id' id='warehouses_id' class='form-control'>
-            <option>请选择仓库</option>
-            @foreach($warehouses as $warehouse)
-                <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
-            @endforeach
-        </select>
-    </div>
     <div class='row'>
-        <div class="form-group col-sm-6">
+        <div class='form-group col-sm-2'>
+            <label for='adjust_form_id'>调整单号</label>
+            <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : 'CD'.time() }}" readonly>
+        </div>
+        <div class="form-group col-sm-2">
+            <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouses_id' id='warehouses_id' class='form-control'>
+                <option>请选择仓库</option>
+                @foreach($warehouses as $warehouse)
+                    <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-sm-2">
             <label for="adjust_man_id">调整人</label>
             <input type='text' class="form-control" id="adjust_man_id" placeholder="调整人" name='adjust_man_id' value="{{ old('adjust_man_id') }}" readonly>
         </div>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-2">
             <label for="adjust_time">调整时间</label>
             <input type='text' class="form-control" id="adjust_time" placeholder="调整时间" name='adjust_time' value="{{ old('adjust_time') }}">
         </div>
-    </div>
-    <a href='javascript:' class='btn btn-info col-sm-12'>sku1</a>
-    <div>
-        <div class='row'>
-            <div class="form-group col-sm-6">
-                <label for="item_id" class='control-label'>item号</label> 
-                <input type='text' class="form-control item_id" id="arr[item_id][0]" placeholder="item号" name='arr[item_id][0]' value="{{ old('arr[item_id][0]') }}" readonly>
-            </div>
-            <div class="form-group col-sm-6">
-                <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
-            </div>
-        </div>
-        <div class='row'>
-            <div class='form-group col-sm-3'>
-                <label>出入库类型</label>
-                <div class='radio type'>
-                    <label>
-                        <input type='radio' name='arr[type][0]' value='入库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : 'checked'}}>入库
-                    </label>
-                </div>
-                <div class='radio type'>
-                    <label>
-                        <input type='radio' name='arr[type][0]' value='出库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : ''}}>出库
-                    </label>
-                </div>
-            </div>
-            <div class="form-group col-sm-3">
-                <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
-                    <option>请选择库位</option>
-                </select>
-            </div>
-            <div class="form-group col-sm-3">
-                <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="数量" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
-            </div>
-            <div class="form-group col-sm-3">
-                <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input type='text' class="form-control total_amount" id="arr[total_amount][0]" placeholder="总金额" name='arr[total_amount][0]' value="{{ old('arr[total_amount][0]') }}" readonly>
-            </div>
-        </div>
-        <div class='form-group'>
+        <div class='form-group col-sm-4'>
             <label for='label'>备注(原因)</label>
-            <textarea class='form-control remark' name='arr[remark][]' id='arr[remark][0]'>{{ old('arr[remark][0]') }}</textarea>
+            <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') }}</textarea>
         </div>
     </div>
-    <div class='form-group'>
-        <a href='javascript:' class='btn btn-info col-sm-12' id='create_form'>
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            sku1
+            <button type='button' class='btn btn-primary div_del bt_right'><span class='glyphicon glyphicon-remove'></span></button>
+        </div>
+        <div class='panel-body'>
+            <div class='row'>
+                <div class="form-group col-sm-6">
+                    <label for="item_id" class='control-label'>item号</label> 
+                    <input type='text' class="form-control item_id" id="arr[item_id][0]" placeholder="item号" name='arr[item_id][0]' value="{{ old('arr[item_id][0]') }}" readonly>
+                </div>
+                <div class="form-group col-sm-6">
+                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+                </div>
+            </div>
+            <div class='row'>
+                <div class='form-group col-sm-3'>
+                    <label>出入库类型</label>
+                    <div class='radio type'>
+                        <label>
+                            <input type='radio' name='arr[type][0]' value='入库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : 'checked'}}>入库
+                        </label>
+                    </div>
+                    <div class='radio type'>
+                        <label>
+                            <input type='radio' name='arr[type][0]' value='出库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : ''}}>出库
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
+                        <option>请选择库位</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="数量" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control total_amount" id="arr[total_amount][0]" placeholder="总金额" name='arr[total_amount][0]' value="{{ old('arr[total_amount][0]') }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class='form-group addpanel'>
+        <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>
             <span class='glyphicon glyphicon-plus'>新增</span>
         </a>
     </div>
@@ -93,51 +99,51 @@
         $('#create_form').click(function(){
               $('#create_form').before("<div class='form-group append'></div>");
               var appendhtml = "\
-    <a href='javascript:' class='btn btn-info col-sm-10'>sku"+(current+1)+"</a><a href='javascript:' class='btn btn-info div_del col-sm-1'><span class='glyphicon glyphicon-remove'></span></a>\
-    <div>\
-        <div class='row'>\
-            <div class='form-group col-sm-6'>\
-                <label for='item_id' class='control-label'>item号</label> \
-                <input type='text' class='form-control item_id' id='arr[item_id]["+current+"]' placeholder='item号' name='arr[item_id]["+current+"]' value='{{ old('arr[item_id]["+current+"]') }}' readonly>\
+        <div class='panel panel-primary'>\
+            <div class='panel-heading'> sku"+(current+1)+"\
+                <button type='button' class='btn btn-primary div_del bt_right'><span class='glyphicon glyphicon-remove'></span></button>\
             </div>\
-            <div class='form-group col-sm-6'>\
-                <label for='sku' class='control-label'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                <input type='text' class='form-control sku' id='arr[sku]["+current+"]' placeholder='sku' name='arr[sku]["+current+"]' value='{{ old('arr[sku]["+current+"]') }}'>\
-            </div>\
-        </div>\
-        <div class='row'>\
-            <div class='form-group col-sm-3'>\
-                <label>出入库类型</label>\
-                <div class='radio type'>\
-                    <label>\
-                        <input type='radio' name='arr[type]["+current+"]' value='入库' {{ old('arr[type]["+current+"]') ? old('arr[type]["+current+"]') == '入库' ? 'checked' : '' : 'checked'}}>入库\
-                    </label>\
+            <div class='panel-body'>\
+                <div class='row'>\
+                    <div class='form-group col-sm-6'>\
+                        <label for='item_id' class='control-label'>item号</label> \
+                        <input type='text' class='form-control item_id' id='arr[item_id]["+current+"]' placeholder='item号' name='arr[item_id]["+current+"]' value='{{ old('arr[item_id]["+current+"]') }}' readonly>\
+                    </div>\
+                    <div class='form-group col-sm-6'>\
+                        <label for='sku' class='control-label'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <input type='text' class='form-control sku' id='arr[sku]["+current+"]' placeholder='sku' name='arr[sku]["+current+"]' value='{{ old('arr[sku]["+current+"]') }}'>\
+                    </div>\
                 </div>\
-                <div class='radio type'>\
-                    <label>\
-                        <input type='radio' name='arr[type]["+current+"]' value='出库' {{ old('arr[type]["+current+"]') ? old('arr[type]["+current+"]') == '入库' ? 'checked' : '' : ''}}>出库\
-                    </label>\
+                <div class='row'>\
+                    <div class='form-group col-sm-3'>\
+                        <label>出入库类型</label>\
+                        <div class='radio type'>\
+                            <label>\
+                                <input type='radio' name='arr[type]["+current+"]' value='入库' {{ old('arr[type]["+current+"]') ? old('arr[type]["+current+"]') == '入库' ? 'checked' : '' : 'checked'}}>入库\
+                            </label>\
+                        </div>\
+                        <div class='radio type'>\
+                            <label>\
+                                <input type='radio' name='arr[type]["+current+"]' value='出库' {{ old('arr[type]["+current+"]') ? old('arr[type]["+current+"]') == '入库' ? 'checked' : '' : ''}}>出库\
+                            </label>\
+                        </div>\
+                    </div>\
+                    <div class='form-group col-sm-3'>\
+                        <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <select name='arr[warehouse_positions_id]["+current+"]' id='arr[warehouse_positions_id]["+current+"]' class='form-control warehouse_positions_id'></select>\
+                    </div>\
+                    <div class='form-group col-sm-3'>\
+                        <label for='amount' class='control-label'>数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <input type='text' class='form-control amount' id='arr[amount]["+current+"]' placeholder='数量' name='arr[amount]["+current+"]' value='{{ old('arr[amount]["+current+"]') }}'>\
+                    </div>\
+                    <div class='form-group col-sm-3'>\
+                        <label for='total_amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <input type='text' class='form-control total_amount' id='arr[total_amount]["+current+"]' placeholder='总金额' name='arr[total_amount]["+current+"]' value='{{ old('arr[total_amount]["+current+"]') }}' readonly>\
+                    </div>\
                 </div>\
             </div>\
-            <div class='form-group col-sm-3'>\
-                <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                <select name='arr[warehouse_positions_id]["+current+"]' id='arr[warehouse_positions_id]["+current+"]' class='form-control warehouse_positions_id'></select>\
-            </div>\
-            <div class='form-group col-sm-3'>\
-                <label for='amount' class='control-label'>数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                <input type='text' class='form-control amount' id='arr[amount]["+current+"]' placeholder='数量' name='arr[amount]["+current+"]' value='{{ old('arr[amount]["+current+"]') }}'>\
-            </div>\
-            <div class='form-group col-sm-3'>\
-                <label for='total_amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                <input type='text' class='form-control total_amount' id='arr[total_amount]["+current+"]' placeholder='总金额' name='arr[total_amount]["+current+"]' value='{{ old('arr[total_amount]["+current+"]') }}' readonly>\
-            </div>\
-        </div>\
-        <div class='form-group'>\
-            <label for='label'>备注(原因)</label>\
-            <textarea class='form-control remark' name='arr[remark]["+current+"]' id='arr[remark]["+current+"]'>{{ old('arr[remark]["+current+"]') }}</textarea>\
-        </div>\
-    </div>";
-            $('.append:last').html(appendhtml);
+        </div>";
+            $('.addpanel').before(appendhtml);
 
             val = $('#warehouses_id').val();
             $.ajax({
@@ -154,6 +160,8 @@
 
             current++;
         });
+
+    
 
         $(document).on('blur', '.amount', function(){
             var sku = $(this).parent().parent().prev().find('.sku').val();
@@ -178,7 +186,6 @@
         $(document).on('blur', '.sku', function(){
             var tmp = $(this);
             var sku_val = $(this).val();
-            var test = $(this).val();
             if(sku_val){
             $.ajax({
                 url: "{{route('getitemid')}}",

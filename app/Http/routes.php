@@ -43,6 +43,7 @@ Route::resource('warehouse', 'WarehouseController');
 /**
  * stockAdjustment controller route
  */
+Route::get('check', ['uses'=>'Stock\AdjustmentController@check', 'as'=>'check']);
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
 /**

@@ -19,19 +19,19 @@
                 <dt>类型</dt>
                 <dd>{{ $adjustment->type }}</dd>
                 <dt>仓库</dt>
-                <dd>{{ $adjustment->warehouses_id }}</dd>
+                <dd>{{ $adjustment->warehouse->name }}</dd>
                 <dt>库位</dt>
-                <dd>{{ $adjustment->warehouse_positions_id }}</dd>
+                <dd>{{ $adjustment->position->name }}</dd>
                 <dt>数量</dt>
                 <dd>{{ $adjustment->amount }}</dd>
-                <dt>金额</dt>
+                <dt>金额(￥)</dt>
                 <dd>{{ $adjustment->total_amount }}</dd>
                 <dt>调整人</dt>
                 <dd>{{ $adjustment->adjust_man_id }}</dd>
                 <dt>调整时间</dt>
                 <dd>{{ $adjustment->adjust_time }}</dd>
                 <dt>审核状态</dt>
-                <dd>{{ $adjustment->status }}</dd>
+                <dd>{{ $adjustment->status == 'Y' ? '已审核' : '未审核' }}</dd>
                 <dt>审核人</dt>
                 <dd>{{ $adjustment->check_man_id }}</dd>
                 <dt>审核时间</dt>

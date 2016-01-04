@@ -1,5 +1,4 @@
 <?php
-
 /*
   |--------------------------------------------------------------------------
   | Application Routes
@@ -20,3 +19,9 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 
 //品类路由
 Route::resource('catalog', 'CatalogController');
+
+//渠道路由
+Route::resource('channel', 'ChannelController');
+
+//渠道账号路由
+Route::resource('channelAccount', 'Channel\AccountController');

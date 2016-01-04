@@ -16,8 +16,10 @@
                 {!! csrf_field() !!}
                 @section('formBody')@show{{-- 表单内容 --}}
                 @section('formButton')
-                    <button type="submit" class="btn btn-success">提交</button>
-                    <button type="reset" class="btn btn-default">取消</button>
+                    <div class="col-lg-12">
+                        <button type="submit" class="btn btn-success">提交</button>
+                        <button type="reset" class="btn btn-default">取消</button>
+                    </div>
                 @show{{-- 表单按钮 --}}
             </form>
         </div>

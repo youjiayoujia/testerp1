@@ -1,13 +1,4 @@
 @extends('common.form')
-@section('title') 添加渠道账号 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('channelAccount.index') }}">渠道账号</a></li>
-        <li class="active"><strong>添加渠道账号</strong></li>
-    </ol>
-@stop
-@section('formTitle') 添加渠道账号 @stop
 @section('formAction') {{ route('channelAccount.store') }} @stop
 @section('formBody')
     <div class="form-group col-lg-6">

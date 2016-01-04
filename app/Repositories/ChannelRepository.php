@@ -1,16 +1,16 @@
 <?php
-
-namespace App\Repositories;
-
-use App\Base\BaseRepository;
-use App\Models\ChannelModel;
-
 /**
  * 渠道库
  *
  * 2016-01-04
  * @author Vincent<nyewon@gmail.com>
  */
+
+namespace App\Repositories;
+
+use App\Base\BaseRepository;
+use App\Models\ChannelModel;
+
 class ChannelRepository extends BaseRepository
 {
     protected $searchFields = ['name'];

@@ -21,6 +21,8 @@ class AccountController extends Controller
     {
         $this->request = $request;
         $this->account = $account;
+        $this->mainIndex = route('channelAccount.index');
+        $this->mainTitle = '渠道账号';
     }
 
     /**
@@ -31,8 +33,8 @@ class AccountController extends Controller
     public function index()
     {
         $this->request->flash();
-
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->account->auto()->paginate(),
         ];
 
@@ -48,6 +50,7 @@ class AccountController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'account' => $this->account->get($id),
         ];
 
@@ -62,6 +65,7 @@ class AccountController extends Controller
     public function create(ChannelRepository $channel)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'channels' => $channel->all(),
         ];
 
@@ -77,13 +81,9 @@ class AccountController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->account->rules('create'));
+        $this->account->create($this->request->all());
 
-        $data = $this->request->all();
-        $data['created_by'] = 1; //todo user_id
-        $data['updated_by'] = 1; //todo user_id
-        $this->account->create($data);
-
-        return redirect(route('channelAccount.index'));
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -95,6 +95,7 @@ class AccountController extends Controller
     public function edit($id, ChannelRepository $channel)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'channels' => $channel->all(),
             'account' => $this->account->get($id),
         ];
@@ -112,12 +113,9 @@ class AccountController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->account->rules('update', $id));
+        $this->account->update($id, $this->request->all());
 
-        $data = $this->request->all();
-        $data['updated_by'] = 1; //todo user_id
-        $this->account->update($id, $data);
-
-        return redirect(route('channelAccount.index'));
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -129,6 +127,6 @@ class AccountController extends Controller
     public function destroy($id)
     {
         $this->account->destroy($id);
-        return redirect(route('channelAccount.index'));
+        return redirect($this->mainIndex);
     }
 }

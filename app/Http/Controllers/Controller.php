@@ -13,4 +13,19 @@ abstract class Controller extends BaseController
     use AuthorizesRequests,
         DispatchesJobs,
         ValidatesRequests;
+
+    protected $request;
+    protected $mainIndex;
+    protected $mainTitle;
+
+    public function metas($action)
+    {
+        $metas = [
+            'mainIndex' => $this->mainIndex,
+            'mainTitle' => $this->mainTitle,
+            'title' => $this->mainTitle . config('setting.titles.' . $action),
+        ];
+
+        return $metas;
+    }
 }

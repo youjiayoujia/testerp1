@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">{{-- favicon --}}
-    <title>@section('title') Coffee @show{{-- 页面标题 --}} - Coffee</title>
+    <title>{{ $metas['title'] or 'Coffee' }} - Coffee</title>
     @section('meta')@show{{-- META申明 --}}
     @section('css')@show{{-- CSS样式表 --}}
     @section('js')@show{{-- JS脚本 --}}

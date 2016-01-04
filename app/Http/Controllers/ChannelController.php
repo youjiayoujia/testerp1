@@ -19,6 +19,8 @@ class ChannelController extends Controller
     {
         $this->request = $request;
         $this->channel = $channel;
+        $this->mainIndex = route('channel.index');
+        $this->mainTitle = '渠道';
     }
 
     /**
@@ -29,8 +31,8 @@ class ChannelController extends Controller
     public function index()
     {
         $this->request->flash();
-
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->channel->auto()->paginate(),
         ];
 
@@ -46,6 +48,7 @@ class ChannelController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'channel' => $this->channel->get($id),
         ];
 
@@ -59,7 +62,11 @@ class ChannelController extends Controller
      */
     public function create()
     {
-        return view('channel.create');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view('channel.create', $response);
     }
 
     /**
@@ -71,13 +78,9 @@ class ChannelController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->channel->rules('create'));
+        $this->channel->create($this->request->all());
 
-        $data = $this->request->all();
-        $data['created_by'] = 1; //todo user_id
-        $data['updated_by'] = 1; //todo user_id
-        $this->channel->create($data);
-
-        return redirect(route('channel.index'));
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -89,6 +92,7 @@ class ChannelController extends Controller
     public function edit($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'channel' => $this->channel->get($id),
         ];
 
@@ -105,12 +109,9 @@ class ChannelController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->channel->rules('update', $id));
+        $this->channel->update($id, $this->request->all());
 
-        $data = $this->request->all();
-        $data['updated_by'] = 1; //todo user_id
-        $this->channel->update($id, $data);
-
-        return redirect(route('channel.index'));
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -122,6 +123,6 @@ class ChannelController extends Controller
     public function destroy($id)
     {
         $this->channel->destroy($id);
-        return redirect(route('channel.index'));
+        return redirect($this->mainIndex);
     }
 }

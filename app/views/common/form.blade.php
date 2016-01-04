@@ -10,7 +10,7 @@
         </div>
     @endif
     <div class="panel panel-default">
-        <div class="panel-heading">@section('formTitle')@show{{-- 表单标题 --}}</div>
+        <div class="panel-heading">@section('formTitle') {{ $metas['title'] }} @show{{-- 表单标题 --}}</div>
         <div class="panel-body">
             <form method="POST" action="@section('formAction')@show{{-- 表单提交地址 --}}" @section('formAttributes')@show{{-- 表单其它属性 --}}>
                 {!! csrf_field() !!}

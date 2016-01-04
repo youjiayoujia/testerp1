@@ -1,13 +1,4 @@
 @extends('common.form')
-@section('title') 编辑渠道 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('channel.index') }}">渠道</a></li>
-        <li class="active"><strong>编辑渠道</strong></li>
-    </ol>
-@stop
-@section('formTitle') 编辑渠道 @stop
 @section('formAction') {{ route('channel.update', ['id' => $channel->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>

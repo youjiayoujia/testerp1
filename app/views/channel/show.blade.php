@@ -1,12 +1,4 @@
 @extends('layouts.default')
-@section('title') 渠道详情 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-            <li><a href="{{ route('channel.index') }}">渠道</a></li>
-        <li class="active"><strong>渠道详情</strong></li>
-    </ol>
-@stop
 @section('content')
     <div class="panel panel-default">
         <div class="panel-heading">渠道详情</div>

@@ -33,7 +33,13 @@
                 </div>
             @endif
             <div class="col-lg-{{ isset($sidebar) ? '10' : '12' }}">
-                @section('breadcrumbs')@show{{-- 路径导航 --}}
+                <ol class="breadcrumb">
+                    <li><a href="/">主页</a></li>
+                    @section('breadcrumbs')
+                        <li><a href="{{ $metas['mainIndex'] }}">{{ $metas['mainTitle'] }}</a></li>
+                        <li class="active">{{ $metas['title'] }}</li>
+                    @show{{-- 路径导航 --}}
+                </ol>
                 @section('content')@show{{-- 内容 --}}
             </div>
         </div>

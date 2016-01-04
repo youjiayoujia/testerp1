@@ -1,7 +1,9 @@
 @extends('layouts.default')
 @section('content')
     <div class="panel panel-default">
-        <div class="panel-heading"><strong>@section('tableTitle')@show{{-- 列表标题 --}}</strong></div>
+        <div class="panel-heading">
+            <strong>@section('tableTitle') {{ $metas['title'] }} @show{{-- 列表标题 --}}</strong>
+        </div>
         <div class="panel-body">
             <div class="table-responsive">
                 @section('tableToolbar')

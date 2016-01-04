@@ -36,8 +36,12 @@
                 <ol class="breadcrumb">
                     <li><a href="/">主页</a></li>
                     @section('breadcrumbs')
-                        <li><a href="{{ $metas['mainIndex'] }}">{{ $metas['mainTitle'] }}</a></li>
-                        <li class="active">{{ $metas['title'] }}</li>
+                        @if(isset($metas['mainTitle']))
+                            <li><a href="{{ $metas['mainIndex'] }}">{{ $metas['mainTitle'] }}</a></li>
+                        @endif
+                        @if(isset($metas['title']))
+                            <li class="active">{{ $metas['title'] }}</li>
+                        @endif
                     @show{{-- 路径导航 --}}
                 </ol>
                 @section('content')@show{{-- 内容 --}}

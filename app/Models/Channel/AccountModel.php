@@ -32,9 +32,7 @@ class AccountModel extends BaseModel
         'prefix',
         'title',
         'brief',
-        'token',
-        'created_by',
-        'updated_by'
+        'token'
     ];
 
     public function channel()

@@ -23,6 +23,6 @@ class ChannelModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'alias', 'created_by', 'updated_by'];
+    protected $fillable = ['name', 'alias'];
 
 }

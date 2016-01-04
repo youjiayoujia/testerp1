@@ -22,8 +22,6 @@ class CreateChannelAccounts extends Migration
             $table->string('title')->comment('账号名称');
             $table->text('brief')->comment('账号简介');
             $table->text('token')->comment('账号接口');
-            $table->integer('created_by')->comment('创建者');
-            $table->integer('updated_by')->comment('更新者');
             $table->timestamps();
             $table->softDeletes();
         });

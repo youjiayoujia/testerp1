@@ -96,7 +96,7 @@ class RequireController extends Controller
         for ($i = 1; $i <= 6; $i++) {
             if ($this->request->hasFile('img' . $i)) {
                 $file = $this->request->file('img' . $i);
-                $path = config('product.dir') . "/" . $data['id'];
+                $path = config('product.requireimage') . "/" . $data['id'];
                 $dstname = $i;
                 $absolute_path = $this->require->move_file($file, $dstname, $path);
                 $name = 'img' . $i;
@@ -125,7 +125,7 @@ class RequireController extends Controller
         for ($i = 1; $i <= 6; $i++) {
             if ($this->request->hasFile('img' . $i)) {
                 $file = $this->request->file('img' . $i);
-                $path = config('product.dir') . "/" . $id;
+                $path = config('product.requireimage') . "/" . $id;
                 $dstname = $i;
                 $absolute_path = $this->require->move_file($file, $dstname, $path);
                 $name = 'img' . $i;

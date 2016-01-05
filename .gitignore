@@ -9,3 +9,4 @@ down
 /vendor/
 /storage/
 /.idea/
+.env

@@ -19,9 +19,7 @@
             <td>{{ $account->account }}</td>
             <td>{{ $account->prefix }}</td>
             <td>{{ $account->brief }}</td>
-            <td>{{ $account->created_by }}</td>
             <td>{{ $account->created_at }}</td>
-            <td>{{ $account->updated_by }}</td>
             <td>{{ $account->updated_at }}</td>
             <td>
                 <a href="{{ route('channelAccount.show', ['id'=>$account->id]) }}" class="btn btn-info btn-xs">

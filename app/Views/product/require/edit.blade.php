@@ -1,16 +1,6 @@
 @extends('common.form')
-@section('title') 编辑选款需求 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
-        <li class="active"><strong>编辑选款需求</strong></li>
-    </ol>
-@stop
-    <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-    <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
-
-@section('formTitle') 编辑选款需求 @stop
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
+<script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 @section('formAction') {{ route('productRequire.update', ['id' => $require->id]) }} @stop
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
@@ -58,7 +48,7 @@
 
     <div class="form-group">
         <label for="name" class='control-label'>选款需求名</label>
-        <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $require->name}}" readonly>
+        <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $require->name}}">
     </div>
     <div class="form-group">
         <label for="detail_address" class='control-label'>(省/市)地址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -97,7 +87,7 @@
     </div>
     <div class='form-group'>
         <label for='created_by'>创建人</label>
-        <input type='text' class='form-control' id='created_by' placeholder='创建人' name='created_by' value="{{ old('created_by') ? old('craeted_by') : $require->created_by }}">
+        <input type='text' class='form-control' id='created_by' placeholder='创建人' name='created_by' value="{{ old('created_by') ? old('craeted_by') : $require->created_by }}" readonly>
     </div>
 @stop
 <script type='text/javascript'>

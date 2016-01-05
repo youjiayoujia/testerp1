@@ -1,9 +1,10 @@
 <?php
 return [
+	'requireimage' => 'uploads/require' ,
     'image' => [
         'types' => ['default', 'original', 'choies', 'aliexpress', 'amazon', 'ebay', 'wish', 'Lazada'],
-        'uploadPath' => 'product/',
-        'temporaryPath' => 'producttemporary/',
-        'uploadZip' => 'zip/'
+        'uploadPath' => 'uploads/product/',
+        'temporaryPath' => 'uploads/temporary/',
+        'uploadZip' => 'uploads/zip/'
     ],
 ];

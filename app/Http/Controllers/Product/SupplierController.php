@@ -1,5 +1,4 @@
 <?php
-
 /**
  *  供货商控制器
  *  处理与供货商相关的操作
@@ -24,6 +23,9 @@ class SupplierController extends Controller
     {
         $this->supplier = $supplier;
         $this->request = $request;
+        $this->mainIndex = route('productSupplier.index');
+        $this->mainTitle = '供货商';
+
     }
 
     /**
@@ -37,7 +39,8 @@ class SupplierController extends Controller
     {
         $this->request->flash();
         $response = [
-           
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->supplier->auto()->paginate(),
         ];
 
         return view('product.supplier.index', $response);
@@ -53,6 +56,7 @@ class SupplierController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'supplier' => $this->supplier->get($id),
         ];
 
@@ -68,7 +72,11 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        return view('product.supplier.create');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view('product.supplier.create', $response);
     }
 
     /**
@@ -97,6 +105,7 @@ class SupplierController extends Controller
     public function edit($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'supplier' => $this->supplier->get($id),
         ];
 

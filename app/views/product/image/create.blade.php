@@ -1,6 +1,4 @@
- 
 @extends('common.form')
-@section('title') 添加图片 @stop
 @section('meta')
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
@@ -8,11 +6,10 @@
     @stop
  
 @section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
+     
         <li><a href="{{ route('product.index') }}">产品</a></li>
         <li class="active"><strong>添加图片</strong></li>
-    </ol>
+     
 @stop
 @section('formTitle') 添加图片 @stop
 @section('formAction')  /productUpload @stop

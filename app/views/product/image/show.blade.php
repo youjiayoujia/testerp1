@@ -1,11 +1,7 @@
 @extends('layouts.default')
-@section('title') 产品ID : {{ $image->product_id }} @stop
 @section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
         <li><a href="{{ route('product.index') }}">产品</a></li>
-        <li class="active"><strong>产品ID : {{ $image->product_id }} </strong></li>
-    </ol>
+        <li class="active"><strong>图片详情</strong></li>
 @stop
 @section('content')
     <div class="panel panel-default">

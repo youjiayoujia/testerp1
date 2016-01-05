@@ -23,6 +23,8 @@ class ImageController extends Controller
     {
         $this->request = $request;
 		$this->image =$image;
+		$this->mainIndex = route('productImage.index');
+        $this->mainTitle = '图片';
     }
 
     /**
@@ -34,6 +36,7 @@ class ImageController extends Controller
     {
         $this->request->flash();
         $response = [
+			'metas' => $this->metas(__FUNCTION__),
             'data' => $this->image->auto()->paginate(),
         ];
 
@@ -50,6 +53,7 @@ class ImageController extends Controller
     public function show($id)
     {	
         $response = [
+			'metas' => $this->metas(__FUNCTION__),
             'image' =>$this->image->get($id),
         ];
         return view('product.image.show', $response);
@@ -63,6 +67,7 @@ class ImageController extends Controller
     public function create()
     {
         $response = [
+			'metas' => $this->metas(__FUNCTION__),
             'imageType' =>  config('product.image.types'),
         ];
         return view('product.image.create', $response);
@@ -109,6 +114,7 @@ class ImageController extends Controller
     public function edit($id)
     { 
         $response = [
+			'metas' => $this->metas(__FUNCTION__),
             'image' =>$this->image->get($id),
 			'imageType' =>  config('product.image.types'),
         ];

@@ -8,13 +8,10 @@
     @stop
  
 @section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productImage.index') }}">产品图片</a></li>
+        <li><a href="{{ route('productImage.index') }}">产品</a></li>
         <li class="active"><strong>修改图片</strong></li>
-    </ol>
 @stop
-@section('formTitle') 添加图片 @stop
+@section('formTitle') 修改图片 @stop
 @section('formAction')  /productUpdate @stop
 @section('formBody')
    <input type="hidden" name="_token" value="{{ csrf_token() }}">

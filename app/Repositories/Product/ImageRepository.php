@@ -1,4 +1,9 @@
 <?php
+/**
+ * 图片库
+ *
+ * @author Vincent<nyewon@gmail.com>
+ */
 
 namespace App\Repositories\Product;
 
@@ -7,11 +12,6 @@ use App\Models\product\ImageModel;
 use App\helps\Tool;
 use Chumper\Zipper\Zipper;
 
-/**
- * 图片库
- *
- * @author Vincent<nyewon@gmail.com>
- */
 class ImageRepository extends BaseRepository
 {
     protected $searchFields = ['id', 'product_id', 'user_id', 'type'];

@@ -1,13 +1,9 @@
 @extends('common.table')
-@section('title') 产品列表 @stop
 @section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
         <li><a href="{{ route('productImage.index') }}">产品</a></li>
-        <li class="active">列表</li>
-    </ol>
+        <li class="active">图片列表</li>
 @stop
-@section('tableTitle') 产品列表 @stop
+@section('tableTitle') 图片列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>产品ID</th>

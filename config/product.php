@@ -6,7 +6,7 @@
 			'temporaryPath'=>'producttemporary/',
 			'uploadZip'=>'zip/'
 		],
-		'reportMissing'=>[
+		'reportedMissing'=>[
 			'sizes'=>['','S','M','L','XL','XXL','XXXL','XXXXL'],
 		]
     ];

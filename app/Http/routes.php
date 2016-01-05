@@ -15,8 +15,11 @@ Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index
 Route::any('productUpload', 'product\ImageController@store');
 Route::any('productUpdate', 'product\ImageController@update');
 Route::resource('productImage', 'Product\ImageController');
-//reported smissing
+//reported smissing  reportedMissingCreate
+Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
+
+
 Route::resource('product', 'productController');
 
 Route::resource('brand', 'brandController');

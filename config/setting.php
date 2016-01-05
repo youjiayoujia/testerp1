@@ -22,5 +22,14 @@ return [
      * 默认排列顺序
      */
     'orderDirection' => 'desc',
+    /**
+     * 默认标题
+     */
+    'titles' => [
+        'index' => '列表',
+        'show' => '详情',
+        'create' => '新增',
+        'edit' => '编辑',
+    ],
 ];
 

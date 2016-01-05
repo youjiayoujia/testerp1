@@ -36,7 +36,17 @@
                 </div>
             @endif
             <div class="col-lg-{{ isset($sidebar) ? '10' : '12' }}">
-                @section('breadcrumbs')@show{{-- 路径导航 --}}
+                <ol class="breadcrumb">
+                    <li><a href="/">主页</a></li>
+                    @section('breadcrumbs')
+                        @if(isset($metas['mainTitle']))
+                            <li><a href="{{ $metas['mainIndex'] }}">{{ $metas['mainTitle'] }}</a></li>
+                        @endif
+                        @if(isset($metas['title']))
+                            <li class="active">{{ $metas['title'] }}</li>
+                        @endif
+                    @show{{-- 路径导航 --}}
+                </ol>
                 @section('content')@show{{-- 内容 --}}
             </div>
         </div>

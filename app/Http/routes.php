@@ -11,6 +11,7 @@
   |
  */
 
+Route::get('test', 'TestController@test');
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 /**
@@ -54,11 +55,11 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 /**
  * stock controller route
  */
+Route::get('getavailableamount', ['uses'=>'StockController@getAvailableAmount', 'as'=>'getavailableamount']);
+Route::get('getsku', ['uses'=>'StockController@getSku', 'as'=>'getsku']);
 Route::get('getunitcost', ['uses'=>'StockController@getUnitCost','as'=>'getunitcost']);
 Route::resource('stock', 'StockController');
 
-
-
-
-
+//品类路由
+Route::resource('catalog', 'CatalogController');
 

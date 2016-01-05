@@ -20,6 +20,11 @@ return [
         'url' => '',
         'subnavigations' => [
             [
+                'name' => '品类',
+                'url' => 'catalog.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '供货商',
                 'url' => 'productSupplier.index',
                 'icon' => '',

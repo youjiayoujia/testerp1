@@ -97,17 +97,21 @@ class AdjustmentController extends Controller
     {
         $this->request->flash();
         $buf = [];
-        $len = count($this->request->input('arr')['sku']);
+        $len = count(array_keys($this->request->input('arr')['sku']));
         $buf = $this->request->all();
         unset($buf['_token']);
         unset($buf['arr']);
         for($i=0; $i<$len; $i++)
         {   
             $arr = $this->request->input('arr');
-            $arr_len = count($arr);
+            var_dump($arr);
             foreach($arr as $key => $val)
-                $buf[$key] = $val[$i];
-           $this->adjustment->create($buf);
+            {
+                $val = array_values($val);
+                $buf[$key] = $val[$i];      
+            }
+            $this->adjustment->create($buf);
+
         }
         return redirect(route('stockAdjustment.index'));
     }
@@ -171,14 +175,14 @@ class AdjustmentController extends Controller
 
         if($buf) {
             if($obj->type == '入库') {
-                $buf->all_amount +=$obj->amount;
-                $buf->available_amount +=$obj->amount;
-                $buf->total_amount +=$obj->total_amount;
+                $buf->all_amount += $obj->amount;
+                $buf->available_amount += $obj->amount;
+                $buf->total_amount+= $obj->total_amount;
                 $buf->save();
             } else {
-                $buf->all_amount -=$obj->amount;
-                $buf->available_amount -=$obj->amount;
-                $buf->total_amount-=$obj->total_amount;
+                $buf->all_amount -= $obj->amount;
+                $buf->available_amount -= $obj->amount;
+                $buf->total_amount-= $obj->total_amount;
                 $buf->save();
             }
         } else {

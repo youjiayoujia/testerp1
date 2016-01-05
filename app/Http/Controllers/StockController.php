@@ -147,6 +147,30 @@ class StockController extends Controller
         $sku = $_GET['sku'];
         $unit = $this->stock->getunitcost($sku);
 
-        echo json_encode($unit);
+        if($unit) {
+            echo json_encode($unit);
+        } else {
+            echo json_encode('1');
+        }
+    }
+
+    public function getSku()
+    {
+        $val_position = $_GET['val_position'];
+        $obj = $this->stock->getObj(['warehouse_positions_id'=>$val_position])->first();
+
+        if($obj)
+            echo json_encode([$obj->sku, $obj->available_amount]);
+        else
+            echo json_encode('none');
+    }
+
+    public function getAvailableAmount()
+    {
+        $position = $_GET['position'];
+        $obj = $this->stock->getObj(['warehouse_positions_id'=>$position])->first();
+
+        if($obj)
+            echo json_encode($obj->available_amount);
     }
 }

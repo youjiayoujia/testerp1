@@ -1,50 +1,56 @@
-@extends('layouts.default')
-@section('title') 分类详情 : @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('catalog.index') }}">分类</a></li>
-        <li class="active"><strong>分类详情 : </strong></li>
-    </ol>
-@stop
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">分类详情 : </div>
+        <div class="panel-heading">基础信息 :</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $catalog->id }}</dd>
-                <dt>分类名称</dt>
-                <dd>{{ $catalog->name }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $catalog->created_at }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $catalog->updated_at }}</dd>
-                
-
-                @foreach($catalog->sets as $set)
-                    <dt>{{ $set->name }}</dt>                    
-                        @foreach($set->values as $setvalue)
-                            <dd>{{ $setvalue->name }}</dd>
-                        @endforeach
-                @endforeach
-                
-                @foreach($catalog->attributes as $attr)
-                    <dt>{{ $attr->name }}</dt>
-                    @foreach($attr->values as $attrvalue)
-                        <dd>{{ $attrvalue->name }}</dd>
-                    @endforeach
-                @endforeach
-                
-                @foreach($catalog->features as $feature)
-                    <dt>{{ $feature->name }}</dt>
-                    @foreach($feature->values as $featurevalue)
-                        <dd>{{ $featurevalue->name }}</dd>
-                    @endforeach
-                @endforeach
-
-            </dl>
+            <div class="col-lg-3">
+                <strong>ID</strong>: {{ $catalog->id }}
+            </div>
+            <div class="col-lg-3">
+                <strong>品类名称</strong>: {{ $catalog->name }}
+            </div>
+            <div class="col-lg-3">
+                <strong>创建时间</strong>: {{ $catalog->created_at }}
+            </div>
         </div>
     </div>
-
+    <div class="panel panel-default">
+        <div class="panel-heading">set属性:</div>
+        <div class="panel-body">
+            @foreach($catalog->sets as $set)
+                <div class="col-lg-12">
+                    <div class="col-lg-1"><strong>{{ $set->name }}</strong>:</div>
+                    @foreach($set->values as $setvalue)
+                        <div class="col-lg-1">{{ $setvalue->name }}</div>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">attribute属性 :</div>
+        <div class="panel-body">
+            @foreach($catalog->attributes as $attr)
+                <div class="col-lg-12">
+                    <div class="col-lg-1"><strong>{{ $attr->name }}</strong>:</div>
+                    @foreach($attr->values as $attrvalue)
+                        <div class="col-lg-1">{{ $attrvalue->name }}</div>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">feature属性 :</div>
+        <div class="panel-body">
+            @foreach($catalog->features as $feature)
+                <div class="col-lg-12">
+                    <div class="col-lg-1"><strong>{{ $feature->name }}</strong>:</div>
+                    @foreach($feature->values as $featurevalue)
+                        <div class="col-lg-1">{{ $featurevalue->name }}</div>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+    </div>
 @stop

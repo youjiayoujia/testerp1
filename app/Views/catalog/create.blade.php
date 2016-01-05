@@ -1,13 +1,4 @@
 @extends('common.form')
-@section('title') 添加品类 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('catalog.index') }}">品类</a></li>
-        <li class="active"><strong>添加品类</strong></li>
-    </ol>
-@stop
-@section('formTitle') 添加品类 @stop
 @section('formAction') {{ route('catalog.store') }} @stop
 @section('formBody')
     <div class="form-group">

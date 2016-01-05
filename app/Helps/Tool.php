@@ -3,8 +3,25 @@ namespace App\Helps;
 
 class Tool
 {
-    public function getDirName()
+	
+	/**
+	*获取文件名
+	*
+	* @param $dirPath
+	* @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
+    public function getDirName($dirPath)
     {
-        return;
+		$dir=opendir($dirPath);
+		$dirName=array();
+		while (($file = readdir($dir)) !== false)
+		  {
+		   if($file!='.' && $file!='..'){
+			  
+			  $dirName[]=$file;
+			   }
+		  }
+		  closedir($dir);
+		  return $dirName;	
     }
 }

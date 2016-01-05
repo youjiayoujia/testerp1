@@ -11,6 +11,27 @@
  */
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+//Image routes
+Route::any('productUpload', 'product\ImageController@store');
+Route::any('productUpdate', 'product\ImageController@update');
+Route::resource('productImage', 'Product\ImageController');
+//reported smissing  reportedMissingCreate
+Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
+Route::resource('reportedMissing', 'Product\ReportedMissingController');
+
+
+Route::resource('product', 'productController');
+
+Route::resource('brand', 'brandController');
+Route::resource('catalog', 'CatalogController');
+// Authentication routes...
+Route::get('auth/login', 'Auth\AuthController@getLogin');
+Route::post('auth/login', 'Auth\AuthController@postLogin');
+Route::get('auth/logout', 'Auth\AuthController@getLogout');
+// Registration routes...
+Route::get('auth/register', 'Auth\AuthController@getRegister');
+Route::post('auth/register', 'Auth\AuthController@postRegister');
+
 
 Route::resource('productSupplier', 'Product\SupplierController');
 Route::resource('productRequire', 'Product\RequireController');

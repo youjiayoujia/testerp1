@@ -22,7 +22,7 @@
                 <dt>图片类型</dt>
                 <dd>{{$image ->type }}</dd>
                 <dt>已上传图片</dt>
-                <dd><img src="/{{$image->image_path}}{{$image->image_name}}" width="300px" height="200px"></dd>               
+                <dd><img src="/{{$image->path}}{{$image->name}}" width="300px" height="200px"></dd>               
             </dl>
         </div>
     </div>

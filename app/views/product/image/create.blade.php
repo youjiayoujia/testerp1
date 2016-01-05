@@ -36,7 +36,7 @@
     <div class="form-group"  >
         <label for="color">图片类型：</label>
          <select id="brand_id" class="form-control" name="type">
-            @foreach($image_type as $item) 
+            @foreach($imageType as $item) 
                 <option value="{{ $item }}" >{{ $item }}</option>
             @endforeach
         </select>

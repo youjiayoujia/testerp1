@@ -16,7 +16,7 @@ class ProductimageRepository extends BaseRepository
     public $columns = ['id','product_id','suppliers_url','type'];
     protected $filters = ['product_id'];
     public $rules = [
-        'product_id' => 'required|unique:product_id,suppliers_url,type,image_path'
+        'product_id' => 'required|unique:product_id,suppliers_url,type,path'
     ];
 	 
 
@@ -36,7 +36,7 @@ class ProductimageRepository extends BaseRepository
         $this->model->product_id = $request->input('product_id');
         $this->model->user_id = $request->input('user_id');
         $this->model->type = $request->input('type');
-		$this->model->type = $request->input('image_path');
+		$this->model->type = $request->input('path');
         return $this->model->save();
     }
 
@@ -53,7 +53,7 @@ class ProductimageRepository extends BaseRepository
         $this->model->product_id = $request->input('product_id');
         $this->model->user_id = $request->input('user_id');
         $this->model->type = $request->input('type');
-		$this->model->type = $request->input('image_path');
+		$this->model->type = $request->input('path');
         return $product->save();
     }
 

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * 产品控制器
- * 处理产品相关的Request与Response
+ * 图片控制器
+ * 处理图片相关的Request与Response
  *
- * User: Vincent
- * Date: 15/11/17
+ * User: tup
+ * Date: 16/1/4
  * Time: 下午5:02
  */
 
@@ -14,7 +14,6 @@ namespace App\Http\Controllers\product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Product\ImageRepository;
-use Chumper\Zipper\Zipper;
 
 class ImageController extends Controller
 {
@@ -27,7 +26,7 @@ class ImageController extends Controller
     }
 
     /**
-     * 产品列表
+     * 图片列表
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -57,20 +56,20 @@ class ImageController extends Controller
     }
 	
 	/**
-     * 新图上传
+     * 添加产品图片
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function create()
     {
         $response = [
-            'image_type' =>  config('imageType.imageType'),
+            'imageType' =>  config('product.image.types'),
         ];
         return view('product.image.create', $response);
     }
 	
 	 /**
-     * 新增图片上传
+     * 图片上传
      *
      * 
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -87,7 +86,7 @@ class ImageController extends Controller
 	
 
     /**
-     * 跟新
+     * 图片更新
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -111,7 +110,7 @@ class ImageController extends Controller
     { 
         $response = [
             'image' =>$this->image->get($id),
-			'imageType' =>  config('imageType.imageType'),
+			'imageType' =>  config('product.image.types'),
         ];
         return view('product.image.edit', $response); 
     }
@@ -129,24 +128,6 @@ class ImageController extends Controller
         $this->image->destroyImage($id);
         return redirect(route('productImage.index'));
     }
-		
-	/**
-     * 压缩包批量上传图片
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function zipUpload()
-	{
-		if($this->request->isMethod('post')){
-			$request=$this->request;
-			$res=$this->image->zipsUpload($request);
-			return redirect(route('productImage.index'));
-		}else{
-			return view('product.image.addzip');
-			}
-		}
 		
 }
 

@@ -51,7 +51,7 @@ class ImageRepository extends BaseRepository
                     if ($file->isValid()) {
                         $name = 'name';
                         $filePath = $file->move($path, $name);
-                        $data['image_path'] = $filePath;
+                        $data['path'] = $filePath;
                         $this->create($data);
                     }
                 }
@@ -63,7 +63,7 @@ class ImageRepository extends BaseRepository
                         foreach ($images as $image) {
                             $name = 'name';
                             $filePath = $file->move($path, $name);
-                            $data['image_path'] = $filePath;
+                            $data['path'] = $filePath;
                             $this->create($data);
                         }
                     }

@@ -12,13 +12,13 @@
  */
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+//Image routes
 Route::any('productUpload', 'product\ImageController@store');
 Route::any('productUpdate', 'product\ImageController@update');
-//Route::any('productZipUpload', 'Product\ImageController@zipUpload');
-
+Route::resource('productImage', 'Product\ImageController');
+//reported smissing
+Route::resource('reportedMissing', 'Product\ReportedMissingController');
 Route::resource('product', 'productController');
-Route::get('product/addimage/{id}', 'productController@addimage');
-
 
 Route::resource('brand', 'brandController');
 Route::resource('catalog', 'CatalogController');
@@ -30,7 +30,7 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
-Route::resource('productImage', 'Product\ImageController');
+
 Route::resource('productSupplier', 'Product\SupplierController');
 Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');

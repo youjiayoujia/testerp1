@@ -23,7 +23,7 @@
                 <dd><img src="{{ asset('storage/uploads/product/4/4defaults.jpg')}}"></dd>
                 <dt>已上传类型</dt>
                 
-                @foreach($product_image_type as $item) 
+                @foreach($product_imageType as $item) 
                 <dd>{{ $item ->type}}</dd>
             	@endforeach
                 

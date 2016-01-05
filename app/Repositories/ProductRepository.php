@@ -77,12 +77,12 @@ class ProductRepository extends BaseRepository
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function store_image($image_path,$product_id,$type)
+    public function store_image($path,$product_id,$type)
     {	$this->pmodel=new Product_image;
         $this->pmodel->type = $type;
         $this->pmodel->product_id = $product_id;
         $this->pmodel->user_id = 1;
-        $this->pmodel->image_path = $image_path;
+        $this->pmodel->path = $path;
         return $this->pmodel->save();
     }
 	    /**
@@ -92,11 +92,11 @@ class ProductRepository extends BaseRepository
      * @param object $request HTTP请求对象
      * @return bool
      */
-    public function update_image($id, $image_path)
+    public function update_image($id, $path)
     {	
         $product_images=$this->pmodel->find($id);
         $product_images->user_id = 1;
-        $product_images->image_path = $image_path;
+        $product_images->path = $path;
         return $product_images->save();
     }
  
@@ -155,7 +155,7 @@ class ProductRepository extends BaseRepository
 	*
 	*/
 	public function defaultImageUpload($request,$product_id,$type,$product_image_id,$path){
-		$image_path='';
+		$path='';
 		 $file=$request->file('map0');
 		 if($request->hasFile('map0')){
 				$suffix = $file -> getClientOriginalExtension();	
@@ -165,12 +165,12 @@ class ProductRepository extends BaseRepository
 					}
 					$src_img =$path.$nownanme;
 					$dst_img = $path.$product_id.$type.'s.'.$suffix;
-					$image_path=$src_img.'#'.$dst_img;
+					$path=$src_img.'#'.$dst_img;
 					Image::make($src_img,array('width' => 200,'height' => 300,))->save($dst_img); 
 						if($product_image_id>0){
-							$this->update_image($product_image_id,$image_path);	
+							$this->update_image($product_image_id,$path);	
 							}else{
-							$this->store_image($image_path,$product_id,$type);	
+							$this->store_image($path,$product_id,$type);	
 							}   
 		 }
 		
@@ -181,7 +181,7 @@ class ProductRepository extends BaseRepository
 	*
 	*/
 	public function UploadImage($request,$product_id,$type,$product_image_id,$path){
-		$image_path='';
+		$path='';
 		 for($i=0;$i<6;$i++){
 			$file = $request->file('map'.$i);								
 			if($request->hasFile('map'.$i)){
@@ -190,9 +190,9 @@ class ProductRepository extends BaseRepository
 						$nownanme=$product_id.$type.$i.'.'.$suffix;
 						$file->move($path,$nownanme);			 
 						if($i==0){
-							$image_path=$path.$nownanme;
+							$path=$path.$nownanme;
 						 }else{ 
-							$image_path=$path.$nownanme.'#'.$image_path;
+							$path=$path.$nownanme.'#'.$path;
 						}			
 					}else{
 						echo '请上传正确的图片格式！';exit;
@@ -202,9 +202,9 @@ class ProductRepository extends BaseRepository
 			}
 		}	 
 		if($product_image_id>0){ 
-		$this->update_image($product_image_id,$image_path);	
+		$this->update_image($product_image_id,$path);	
 		}else{	
-		$this->store_image($image_path,$product_id,$type);	
+		$this->store_image($path,$product_id,$type);	
 		} 
 	}
 		
@@ -236,9 +236,9 @@ class ProductRepository extends BaseRepository
 				  $dir_name=$helper->get_dirname($dir_path);
 				  foreach($dir_name as $key=>$value){
 						  $dirPathType='storage/uploads/product/'.$product_id.'/'.$value.'/';
-						  $image_paths[$value]=$helper->get_dirname($dirPathType);	 
+						  $paths[$value]=$helper->get_dirname($dirPathType);	 
 					  }
-				 foreach($image_paths as $key=>$val){
+				 foreach($paths as $key=>$val){
 						 $type=$key;
 						 foreach($val as $k=>$v){
 						 $orname=$path.$product_id.'/'.$key.'/'.$v;
@@ -249,16 +249,16 @@ class ProductRepository extends BaseRepository
 							  rename($orname,$now_path.$now_name);
 								$src_img =$now_path.$now_name;
 								$dst_img = $now_path.$product_id.'defaults.'.$suffixa;
-								$image_path=$src_img.'#'.$dst_img;
+								$path=$src_img.'#'.$dst_img;
 								Image::make($src_img,array('width' => 200,'height' => 300,))->save($dst_img); 
 							 }else{ 
 								 $suffixa=substr(strrchr($v, '.'), 1);
 								 $now_name=$product_id.$key.$k.'.'.$suffixa;
 								 rename($orname,$now_path.$now_name);
 									 if($k>0){
-									 	$image_path=$now_path.$now_name.'#'.$image_path;
+									 	$path=$now_path.$now_name.'#'.$path;
 									 }else{
-									 	$image_path=$now_path.$now_name;
+									 	$path=$now_path.$now_name;
 									 }
 								 }
 						 }
@@ -270,9 +270,9 @@ class ProductRepository extends BaseRepository
 							$product_image_id=$result[0]->id;
 						 }	 
 						 if($product_image_id>0){
-							$this->update_image($product_image_id,$image_path);	
+							$this->update_image($product_image_id,$path);	
 							}else{
-							$this->store_image($image_path,$product_id,$type);	
+							$this->store_image($path,$product_id,$type);	
 						} 
 				 
 				 }
@@ -299,10 +299,10 @@ class ProductRepository extends BaseRepository
 			$res=$helper->decompression($zippath,$path);
 			$product_ids=$helper->get_dirname($path.'product/');
 			foreach($product_ids as $key=>$value){
-				$product_image_types=$helper->get_dirname($path.'product/'.$value.'/');	 
-				foreach($product_image_types as $key=>$val){
+				$product_imageTypes=$helper->get_dirname($path.'product/'.$value.'/');	 
+				foreach($product_imageTypes as $key=>$val){
 					$type=$val;
-					$product_image_paths=$helper->get_dirname($path.'product/'.$value.'/'.$val.'/');
+					$product_paths=$helper->get_dirname($path.'product/'.$value.'/'.$val.'/');
 					$result=$this->getImage($value,$val);
 					$count=count($result); 
 		 			if($count==0){
@@ -310,32 +310,32 @@ class ProductRepository extends BaseRepository
 					}else{
 						$product_image_id=$result[0]->id;
 					}
-						foreach($product_image_paths as $num=>$v){							
+						foreach($product_paths as $num=>$v){							
 						if($val=='default'){
 							$product_id=$value;		 
 							$suffixa=substr(strrchr($v, '.'), 1);
 							$src_img=$path.'product/'.$value.'/'.$val.'/'.$v;
 							$dst_img=$path.'product/'.$value.'/'.$val.'/'.$value.'defaults.'.$suffixa;
 							$helper->img2thumb($src_img, $dst_img,$width = 200, $height = 100, $cut = 0, $proportion = 0);
-							$image_path=$src_img.'#'.$dst_img;
+							$path=$src_img.'#'.$dst_img;
 						}else{
 							$suffixa=substr(strrchr($v, '.'), 1);
 							$now_name=$value.$val.$num.'.'.$suffixa;
 							rename($path.'product/'.$value.'/'.$val.'/'.$v,$path.'product/'.$value.'/'.$val.'/'.$now_name);
 							if($num>0){
-								$image_path=$path.'product/'.$value.'/'.$val.'/'.$now_name.'#'.$image_path ;
+								$path=$path.'product/'.$value.'/'.$val.'/'.$now_name.'#'.$path ;
 							}else{
-								$image_path=$path.'product/'.$value.'/'.$val.'/'.$now_name;
+								$path=$path.'product/'.$value.'/'.$val.'/'.$now_name;
 							}
 						} 
 					  }
 					if($product_image_id>0){
-						$this->update_image($product_image_id,$image_path);	
+						$this->update_image($product_image_id,$path);	
 					}else{
-						 $this->store_image($image_path,$value,$type);	
+						 $this->store_image($path,$value,$type);	
 					} 
 				}
-			}//var_dump($product_image_types);exit;					 
+			}//var_dump($product_imageTypes);exit;					 
 		}			
 	 }
 	}

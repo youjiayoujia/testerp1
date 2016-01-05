@@ -34,7 +34,7 @@
      <div class="form-group"  >
     <label for="color">已有图片：</label></br>
      <div style="float:left">
-        <img src="/{{$image->image_path}}{{$image->image_name}}" width="300px" height="200px" ></br>
+        <img src="/{{$image->path}}{{$image->name}}" width="300px" height="200px" ></br>
      </div>
  
      <p style="clear:both"></p>      

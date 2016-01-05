@@ -39,6 +39,11 @@ return [
                 'url' => 'productImage.create',
                 'icon' => '',
             ],
+			[
+                'name' => '产品报缺',
+                'url' => 'reportedMissing.create',
+                'icon' => '',
+            ],
         ],
     ],
     [

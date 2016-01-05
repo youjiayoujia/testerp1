@@ -5,5 +5,8 @@
 			'uploadPath'=>'product/',
 			'temporaryPath'=>'producttemporary/',
 			'uploadZip'=>'zip/'
+		],
+		'reportMissing'=>[
+			'sizes'=>['','S','M','L','XL','XXL','XXXL','XXXXL'],
 		]
     ];

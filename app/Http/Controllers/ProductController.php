@@ -54,14 +54,14 @@ class ProductController extends Controller
 		$type='default';
 		$result=$this->productrepository->getImage($id,$type);		 
 		if(isset($result[0])){
-			$default_image=$result[0]->image_path;
+			$default_image=$result[0]->path;
 			$default_map=explode("#",$default_image);
 			}
 			
         $response = [
             'product' => $this->product->findOrFail($id),
 			'product_image'=>$default_map[1],
-			'product_image_type'=>$this->productrepository->getImage_types($id),
+			'product_imageType'=>$this->productrepository->getImage_types($id),
         ];
 
         return view('product.show', $response);
@@ -157,9 +157,9 @@ class ProductController extends Controller
      */
     public function addimage($id)
     {   $this->request->flash();
-		$image_type=['default','original','choies','aliexpress','amazon','ebay','wish','Lazada'];
+		$imageType=['default','original','choies','aliexpress','amazon','ebay','wish','Lazada'];
         $response = [
-            'image_type' => $image_type,
+            'imageType' => $imageType,
             'product' => $this->product->findOrFail($id),
         ];
 		//var_dump($response);exit;

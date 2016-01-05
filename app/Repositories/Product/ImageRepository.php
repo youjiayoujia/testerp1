@@ -70,8 +70,7 @@ class ImageRepository extends BaseRepository
                         $file->getTargetFile($uploadPath);
                         $zipper = new Zipper;
                         $zipper->make($uploadZip . $name)->extractTo($temporaryPath);
-						$help=new Tool;
-                        $images = $help->getDirName($temporaryPath . $data['type'] . '/');
+                        $images = Tool::getDirName($temporaryPath . $data['type'] . '/');
                         foreach ($images as $key => $image) {
                             $suffix = substr(strrchr($image, '.'), 1);
                             $name = $data['product_id'] . $data['type'] . $key . time() . '.' . $suffix;

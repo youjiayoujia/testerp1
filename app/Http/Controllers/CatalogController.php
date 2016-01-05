@@ -1,11 +1,11 @@
 <?php
-
 /**
  * 产品品类控制器
  * 产品品类CURD
  * @author: youjia
  * Date: 2015-12-28 17:57:09
  */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -21,6 +21,8 @@ class CatalogController extends Controller
     {
         $this->request = $request;
         $this->catalog = $catalog;
+        $this->mainIndex = route('catalog.index');
+        $this->mainTitle = '品类';
     }
 
     /**
@@ -32,6 +34,7 @@ class CatalogController extends Controller
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->catalog->auto()->paginate(),
         ];
 
@@ -45,7 +48,10 @@ class CatalogController extends Controller
      */
     public function create()
     {
-        return view('catalog.create');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view('catalog.create', $response);
     }
 
     /**
@@ -75,6 +81,7 @@ class CatalogController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'catalog' => $this->catalog->get($id),
         ];
 
@@ -91,6 +98,7 @@ class CatalogController extends Controller
     public function edit($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'catalog' => $this->catalog->get($id),
         ];
 

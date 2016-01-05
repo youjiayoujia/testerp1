@@ -92,6 +92,18 @@ return [
         'name' => '渠道',
         'icon' => 'transfer',
         'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '渠道',
+                'url' => 'channel.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '账号',
+                'url' => 'channelAccount.index',
+                'icon' => '',
+            ],
+        ],
     ],
     [
         'name' => '财务',

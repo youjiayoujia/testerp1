@@ -1,13 +1,4 @@
 @extends('common.table')
-@section('title') 库位列表 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('warehousePosition.index') }}">库位</a></li>
-        <li class="active">列表</li>
-    </ol>
-@stop
-@section('tableTitle') 库位列表 @stop
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th>库位名</th>

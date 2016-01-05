@@ -1,13 +1,4 @@
 @extends('common.table')
-@section('title') 供货商列表 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productSupplier.index') }}">供货商</a></li>
-        <li class="active">列表</li>
-    </ol>
-@stop
-@section('tableTitle') 供货商列表 @stop
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th>名称</th>

@@ -1,15 +1,5 @@
 @extends('common.form')
-@section('title') 编辑供货商 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productSupplier.index') }}">供货商</a></li>
-        <li class="active"><strong>编辑供货商</strong></li>
-    </ol>
-@stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
-
-@section('formTitle') 编辑供货商 @stop
 @section('formAction') {{ route('productSupplier.update', ['id' => $supplier->id]) }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')

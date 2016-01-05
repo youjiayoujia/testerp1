@@ -1,18 +1,7 @@
 @extends('common.form')
-@section('title') 添加选款需求 @stop
-
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productRequire.index') }}">选款需求</a></li>
-        <li class="active"><strong>添加选款需求</strong></li>
-    </ol>
-@stop
-    <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-    <script src="{{ asset('js/pro_city.js') }}"></script>
-
-@section('formTitle') 添加选款需求 @stop
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+<script src="{{ asset('js/pro_city.js') }}"></script>
 @section('formAction') {{ route('productRequire.store') }} @stop
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
@@ -79,7 +68,6 @@
         <input class="form-control" id="created_by" placeholder="创建人" name='created_by' value="{{ old('created_by') }}" readonly>
     </div>
 @stop
-
 <script type='text/javascript'>
     $(document).ready(function(){
         var buf = new Array();

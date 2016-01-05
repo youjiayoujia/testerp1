@@ -66,14 +66,13 @@
                     </div>
                     <div class='radio type'>
                         <label>
-                            <input type='radio' name='arr[type][0]' value='出库' {{ old('arr[type][0]') ? old('arr[type][0]') == '入库' ? 'checked' : '' : ''}}>出库
+                            <input type='radio' name='arr[type][0]' value='出库' {{ old('arr[type][0]') ? old('arr[type][0]') == '出库' ? 'checked' : '' : ''}}>出库
                         </label>
                     </div>
                 </div>
                 <div class="form-group col-sm-3">
                     <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
-                        <option>请选择库位</option>
                     </select>
                 </div>
                 <div class="form-group col-sm-3">
@@ -96,8 +95,61 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         var current = 1;
+        $(document).on('blur', '.type,.warehouse_positions_id,.sku', function(){
+            tmp = $(this).parent().parent().parent();
+            val_sku = tmp.find('.sku').val();
+            val_type = tmp.find('.type :radio:checked').val();
+            val_position = tmp.find('.warehouse_positions_id').val();
+            if(val_sku && val_type && val_position) {
+                $.ajax({
+                    url:"{{ route('getsku') }}",
+                    data:{val_position:val_position},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result) {
+                        if(val_type == '入库') {
+                            if(result[0] != 'none') {
+                                if(result[0] != val_sku) {
+                                    alert('sku 和 库位不匹配');
+                                    tmp.find('.sku').val('');
+                                }
+                            }
+                        } else {
+                            if(result[0] == 'none') {
+                                alert('无此库位，不可出库');
+                                tmp.find('.sku').val('');
+                            } else {
+                                if(result[0] != val_sku) {
+                                    alert('sku 和 库位不匹配');
+                                    tmp.find('.sku').val('');
+                                } else {
+                                    buf = tmp.find('.amount');
+                                    if(buf.val()) {
+                                        if(parseInt(buf.val()) > result[1]) {
+                                            alert('数量超出可用库存，最大可用数量'+result[1]);
+                                            buf.val('');
+                                        } else {
+                                            $.ajax({
+                                                url:"{{ route('getunitcost') }}",
+                                                data:{sku:val_sku},
+                                                dataType:'json',
+                                                'type':'get',
+                                                success:function(result){
+                                                    buf.parent().next().children('.total_amount').val(result*buf.val());
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+
         $('#create_form').click(function(){
-              $('#create_form').before("<div class='form-group append'></div>");
               var appendhtml = "\
         <div class='panel panel-primary'>\
             <div class='panel-heading'> sku"+(current+1)+"\
@@ -164,7 +216,9 @@
     
 
         $(document).on('blur', '.amount', function(){
-            var sku = $(this).parent().parent().prev().find('.sku').val();
+            var rowline = $(this).parent().parent();
+            var sku = rowline.prev().find('.sku').val();
+            var position = rowline.find('.warehouse_positions_id').val();
             var tmp = $(this);
             if(tmp.val()) {
                 $.ajax({
@@ -176,6 +230,23 @@
                         tmp.parent().next().children('.total_amount').val(result*tmp.val());
                     }
                 });
+
+                if(rowline.find(':radio:checked').val() == '出库') {
+                    $.ajax({
+                        url:"{{ route('getavailableamount') }}",
+                        data:{position:position},
+                        dataType:'json',
+                        type:'get',
+                        success:function(result){
+                            if(sku && position) {
+                                if(result < tmp.val()) {
+                                    alert('超出可用库存，最大可用量'+result);
+                                    tmp.val('');
+                                }
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -195,7 +266,7 @@
                 success: function(result){
                     tmp.parent().prev().children(':text').val(result);
                     if(!result) {
-                        $('#sku').val('');
+                        tmp.val('');
                         alert('sku不存在');
                     }
                 } 

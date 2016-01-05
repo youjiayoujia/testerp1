@@ -9,24 +9,26 @@
  */
 
 namespace App\Http\Controllers;
+use App\Repositories\Stock\AdjustmentRepository;
+use App\Models\Stock\AdjustmentModel;
 
 
 class TestController extends Controller
 {
+    public function __construct(AdjustmentRepository $adjustment)
+    {
+        $this->adjustment = $adjustment;
+    }
+
+
     public function test()
     {
-        $test = [
-            'ok' => 'name',
-            'test' => 'test1',
-            'test2' => 'test3',
-        ];
+        $arr['name'][0] = 'test';
+        $arr['name'][2] = 'ok';
 
-        $buf = json_encode($test);
-        var_dump($buf);
+        $arr['sku'][0] = 'mc';
+        $arr['sku'][1] = 'dj';
 
-        $buf1 = '{"ok":"name","test":"test1","test2":"test3"}';
-        $buf2 = json_decode($buf, true);
-
-        var_dump($buf2);
+        var_dump(array_values($arr['name']));
     }
 }

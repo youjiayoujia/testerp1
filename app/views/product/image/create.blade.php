@@ -1,44 +1,32 @@
 @extends('common.form')
-@section('meta')
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @stop
- 
-@section('breadcrumbs')
-     
-        <li><a href="{{ route('product.index') }}">产品</a></li>
-        <li class="active"><strong>添加图片</strong></li>
-     
-@stop
-@section('formTitle') 添加图片 @stop
-@section('formAction')  /productUpload @stop
+@section('formAction') /productUpload @stop
 @section('formBody')
-   <input type="hidden" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
    <input type="hidden" name="user_id" value="1">
     <div class="form-group">
-        <label for="brand_id">产品ID:</label>
-        <input  type="text" name='product_id'  value=''/>
-    </div>	
-    <div class="form-group">
-        <label for="URL">供应商提供的URL：</label>
-        <input  class="form-control" id="url" placeholder="供应商提供的RUL" name='suppliers_url'  />
+        <label  class='control-label'>产品ID</label>
+        <input  class="form-control" type="text" name='product_id'  value=''/>
     </div>
-    <div class="form-group" id='checktype'>
-        <label for="brand_id">选择上传类型:</label>
+    <div class="form-group">
+    	<div style='display:none' id='Surl'>
+        <label  class='control-label'>供应商提供的URL：</label>
+        <input  class="form-control" id="url" placeholder="供应商提供的RUL" name='suppliers_url'  />
+    	</div>
+    </div>
+    <div class="form-group">
+    	<label for="brand_id">选择上传类型:</label>
         <input  type="radio" name='uploadType'  value='image' checked onClick="checktype();"/>上传图片
         <input  type="radio" name='uploadType'  value='zip' onClick="checktype();"/>上传压缩包
-    </div>
-    
-    <div class="form-group"  >
-        <label for="color">图片类型：</label>
-         <select id="brand_id" class="form-control" name="type">
+	</div>
+    <div class="form-group">
+    	 <label for="color">图片类型：</label>
+         <select id="selectImageType" class="form-control" name="type" >
             @foreach($imageType as $item) 
-                <option value="{{ $item }}" >{{ $item }}</option>
+                <option id='imageType' value="{{ $item }}" onClick="checkImagetype();">{{ $item }}</option>
             @endforeach
         </select>
-    </div>
-    <div id='imagediv'>          
+	</div>
+     <div id='imagediv'>          
     <div class="form-group">
     <label for="color">上传图片：</label>
         <input   name='map0' type='file' />
@@ -55,7 +43,10 @@
         <input  type="file" name='zip'/>
     </div>
     </div>
-  <script type="text/javascript">
+    
+    
+    
+     <script type="text/javascript">
   function checktype(){
   var uploadType=$("#checktype [name='uploadType']:checked").val();
  	if(uploadType == 'image'){
@@ -67,9 +58,17 @@
 			}
   //alert (uploadType);
   }
-  </script>           
+  function checkImagetype(){
+  var imageType=$('select[name=type] option:selected').val();
+ 	if(imageType == 'original'){
+		$('#Surl').show();
+		}else{
+		$('#Surl').hide();		
+			}
+  //alert (uploadType);
+  }
+  </script>   
+
 @stop
- 
- 
  
  

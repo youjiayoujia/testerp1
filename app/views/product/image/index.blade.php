@@ -1,9 +1,4 @@
 @extends('common.table')
-@section('breadcrumbs')
-        <li><a href="{{ route('productImage.index') }}">产品</a></li>
-        <li class="active">图片列表</li>
-@stop
-@section('tableTitle') 图片列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>产品ID</th>

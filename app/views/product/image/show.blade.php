@@ -1,25 +1,28 @@
-@extends('layouts.default')
-@section('breadcrumbs')
-        <li><a href="{{ route('product.index') }}">产品</a></li>
-        <li class="active"><strong>图片详情</strong></li>
-@stop
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">产品ID : {{ $image->product_id }}</div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $image->id }}</dd>
-                
-                <dt>创建时间</dt>
-                <dd>{{ $image->created_at }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $image->updated_at }}</dd>
-                <dt>图片类型</dt>
-                <dd>{{$image ->type }}</dd>
-                <dt>已上传图片</dt>
-                <dd><img src="/{{$image->path}}{{$image->name}}" width="300px" height="200px"></dd>               
-            </dl>
+            <div class="col-lg-4">
+                <strong>ID</strong>: {{ $image->id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>图片类型</strong>: {{$image ->type }}
+            </div>
+            <div class="col-lg-4">
+                <strong>上传的图片</strong>: <img src="/{{$image->path}}{{$image->name}}" width="100px" height="70px">
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <strong>创建时间</strong>: {{ $image->created_at }}
+            </div>
+            <div class="col-lg-6">
+                <strong>更新时间</strong>: {{ $image->updated_at }}
+            </div>
         </div>
     </div>
 @stop

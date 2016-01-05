@@ -34,14 +34,9 @@ return [
                 'url' => 'productRequire.index',
                 'icon' => '',
             ],
-			[
+            [
                 'name' => '产品图片',
-                'url' => 'productImage.create',
-                'icon' => '',
-            ],
-			[
-                'name' => '产品报缺',
-                'url' => 'reportedMissing.create',
+                'url' => 'productImage.index',
                 'icon' => '',
             ],
         ],
@@ -50,7 +45,7 @@ return [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => '',
- 
+
         'subnavigations' => [
             [
                 'name' => '列表',

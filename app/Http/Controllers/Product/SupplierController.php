@@ -37,7 +37,7 @@ class SupplierController extends Controller
     {
         $this->request->flash();
         $response = [
-            'data' => $this->supplier->auto()->paginate(),
+           
         ];
 
         return view('product.supplier.index', $response);

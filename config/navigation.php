@@ -34,12 +34,32 @@ return [
                 'url' => 'productRequire.index',
                 'icon' => '',
             ],
+            [
+                'name' => '产品图片',
+                'url' => 'productImage.index',
+                'icon' => '',
+            ],
         ],
     ],
     [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => '',
+
+        'subnavigations' => [
+            [
+                'name' => '列表',
+                'location' => null,
+                'url' => 'product.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '新增',
+                'location' => 'create',
+                'url' => 'product.create',
+                'icon' => '',
+            ],
+        ],
     ],
     [
         'name' => '仓储',

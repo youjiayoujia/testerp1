@@ -88,22 +88,6 @@ class ImageController extends Controller
 		}
         return redirect(route('productImage.index'));
     }
-	
-
-    /**
-     * 图片更新
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function update()
-    {
-        if($this->request->isMethod('post')){
-			$data=$this->request->all();
-			$file=$this->request->file('map');
-			$this->image->updateImage($data,$file);	 
-		}
-        return redirect(route('productImage.index'));
-    }
 
     /**
      * 编辑
@@ -119,9 +103,22 @@ class ImageController extends Controller
 			'imageType' =>  config('product.image.types'),
         ];
         return view('product.image.edit', $response); 
-    }
+    }	
 
-   
+    /**
+     * 图片更新
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update()
+    {
+        if($this->request->isMethod('post')){
+			$data=$this->request->all();
+			$file=$this->request->file('map');
+			$this->image->updateImage($data,$file);	 
+		}
+        return redirect(route('productImage.index'));
+    } 
 
     /**
      * 删除

@@ -24,6 +24,8 @@ class InController extends Controller
     {
         $this->in = $in;
         $this->request = $request;
+        $this->mainIndex = route('stock.index');
+        $this->mainTitle = '库存';
     }
 
     /**
@@ -37,6 +39,7 @@ class InController extends Controller
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->in->auto()->paginate(),
         ];
 
@@ -53,6 +56,7 @@ class InController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'stockin' => $this->in->get($id),
         ];
 
@@ -69,6 +73,7 @@ class InController extends Controller
     public function create(WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => config('in'),
             'warehouses' => $warehouse->all(),
         ];
@@ -102,6 +107,7 @@ class InController extends Controller
     public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => config('in'),
             'in' => $this->in->get($id),
             'warehouses' => $warehouse->all(),

@@ -1,15 +1,5 @@
 @extends('common.form')
-@section('title') 添加库存信息 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stock.index') }}">库存</a></li>
-        <li class="active"><strong>添加库存信息</strong></li>
-    </ol>
-@stop
-    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-
-@section('formTitle') 添加库存信息 @stop
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stock.store') }} @stop
 @section('formBody')
     <div class="form-group">

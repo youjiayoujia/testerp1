@@ -22,6 +22,8 @@ class StockController extends Controller
     {
         $this->stock = $stock;
         $this->request = $request;
+        $this->mainIndex = route('stock.index');
+        $this->mainTitle = '库存';
     }
 
     /**
@@ -35,6 +37,7 @@ class StockController extends Controller
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->stock->auto()->paginate(),
         ];
 
@@ -51,6 +54,7 @@ class StockController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'stock' => $this->stock->get($id),
         ];
 
@@ -67,6 +71,7 @@ class StockController extends Controller
     public function create(WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'warehouses' => $warehouse->all(),
         ];
 
@@ -99,6 +104,7 @@ class StockController extends Controller
     public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'stock' => $this->stock->get($id),
             'warehouses' => $warehouse->all(),
         ];

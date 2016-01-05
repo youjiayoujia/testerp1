@@ -1,42 +1,49 @@
-@extends('layouts.default')
-@section('title') 入库信息详情 : {{ $stockin->sku }} {{ $stockin->typeof_stockin }}  @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockIn.index') }}">入库</a></li>
-        <li class="active"><strong>入库详情 : {{ $stockin->sku }} {{ $stockin->typeof_stockin }} </strong></li>
-    </ol>
-@stop
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">入库详情 : {{ $stockin->sku }} {{ $stockin->typeof_stockin }} </div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $stockin->id }}</dd>
-                <dt>item号</dt>
-                <dd>{{ $stockin->item_id }}</dd>
-                <dt>sku</dt>
-                <dd>{{ $stockin->sku }}</dd>
-                <dt>数量</dt>
-                <dd>{{ $stockin->amount }}</dd>
-                <dt>总金额</dt>
-                <dd>{{ $stockin->total_amount }}</dd>
-                <dt>仓库</dt>
-                <dd>{{ $stockin->warehouse->name }}</dd>
-                <dt>库位</dt>
-                <dd>{{ $stockin->position->name }}</dd>
-                <dt>入库类型</dt>
-                <dd>{{ $stockin->type_name }}</dd>
-                <dt>入库类型id</dt>
-                <dd>{{ $stockin->relation_id }}</dd>
-                <dt>备注</dt>
-                <dd>{{ $stockin->remark }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $stockin->created_at }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $stockin->updated_at }}</dd>
-            </dl>
+            <div class="col-lg-2">
+                <strong>ID</strong>: {{ $stockin->id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>item号</strong>: {{ $stockin->item_id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>sku</strong>: {{ $stockin->sku }}
+            </div>
+            <div class="col-lg-2">
+                <strong>数量</strong>: {{ $stockin->amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>总金额(￥)</strong>: {{ $stockin->total_amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>仓库</strong>: {{ $stockin->warehouse->name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>库位</strong>: {{ $stockin->position->name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库类型</strong>: {{ $stockin->type_name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库类型id</strong>: {{ $stockin->relation_id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>remark</strong>: {{ $stockin->remark }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-4">
+                <strong>创建时间</strong>: {{ $stockin->created_at }}
+            </div>
+            <div class="col-lg-4">
+                <strong>更新时间</strong>: {{ $stockin->updated_at }}
+            </div>
         </div>
     </div>
 @stop

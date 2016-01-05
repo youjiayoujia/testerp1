@@ -1,26 +1,37 @@
-@extends('layouts.default')
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">跟踪号号码池详情 : {{ $code->logistics_id }} {{ $code->code }}</div>
+        <div class="panel-heading">基本信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $code->id }}</dd>
-                <dt>物流方式</dt>
-                <dd>{{ $code->logistics_id }}</dd>
-                <dt>跟踪号</dt>
-                <dd>{{ $code->code }}</dd>
-                <dt>包裹ID</dt>
-                <dd>{{ $code->package_id }}</dd>
-                <dt>状态</dt>
-                <dd>{{ $code->status == 'Y' ? '启用' : '未启用'}}</dd>
-                <dt>使用时间</dt>
-                <dd>{{ $code->used_at }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $code->created_at }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $code->updated_at }}</dd>
-            </dl>
+            <div class="col-lg-4">
+                <strong>ID</strong>: {{ $code->id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>物流方式</strong>: {{ $code->logistics_id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>跟踪号</strong>: {{ $code->code }}
+            </div>
+            <div class="col-lg-4">
+                <strong>包裹ID</strong>: {{ $code->package_id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>状态</strong>: {{ $code->status == 'Y' ? '启用' : '未启用' }}
+            </div>
+            <div class="col-lg-4">
+                <strong>使用时间</strong>: {{ $code->used_at }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <strong>创建时间</strong>: {{ $code->created_at }}
+            </div>
+            <div class="col-lg-6">
+                <strong>更新时间</strong>: {{ $code->updated_at }}
+            </div>
         </div>
     </div>
 @stop

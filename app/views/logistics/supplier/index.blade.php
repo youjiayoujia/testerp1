@@ -1,6 +1,6 @@
 @extends('common.table')
 @section('tableHeader')
-    <th>ID</th>
+    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th>物流商名称</th>
     <th class="sort" data-url="{{ Sort::url('customer_id') }}">客户ID{!! Sort::label('customer_id') !!}</th>
     <th>密钥</th>

@@ -1,34 +1,43 @@
-@extends('layouts.default')
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">渠道账号详情</div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $account->id }}</dd>
-                <dt>渠道</dt>
-                <dd>{{ $account->channel->name }}</dd>
-                <dt>名称</dt>
-                <dd>{{ $account->title }}</dd>
-                <dt>账号</dt>
-                <dd>{{ $account->account }}</dd>
-                <dt>前缀</dt>
-                <dd>{{ $account->prefix }}</dd>
-                <dt>国家</dt>
-                <dd>{{ $account->country }}</dd>
-                <dt>币种</dt>
-                <dd>{{ $account->currency }}</dd>
-                <dt>简介</dt>
-                <dd>{{ $account->brief }}</dd>
-                <dt>创建者</dt>
-                <dd>{{ $account->created_by }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $account->created_at }}</dd>
-                <dt>更新者</dt>
-                <dd>{{ $account->updated_by }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $account->updated_at }}</dd>
-            </dl>
+            <div class="col-lg-3">
+                <strong>ID</strong>: {{ $account->id }}
+            </div>
+            <div class="col-lg-3">
+                <strong>渠道</strong>: {{ $account->channel->name }}
+            </div>
+            <div class="col-lg-3">
+                <strong>账号</strong>: {{ $account->account }}
+            </div>
+            <div class="col-lg-3">
+                <strong>名称</strong>: {{ $account->title }}
+            </div>
+            <div class="col-lg-3">
+                <strong>前缀</strong>: {{ $account->prefix }}
+            </div>
+            <div class="col-lg-3">
+                <strong>国家</strong>: {{ $account->country }}
+            </div>
+            <div class="col-lg-3">
+                <strong>币种</strong>: {{ $account->currency }}
+            </div>
+            <div class="col-lg-12">
+                <strong>简介</strong>: {{ $account->brief }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <strong>创建时间</strong>: {{ $account->created_at }}
+            </div>
+            <div class="col-lg-6">
+                <strong>更新时间</strong>: {{ $account->updated_at }}
+            </div>
         </div>
     </div>
 @stop

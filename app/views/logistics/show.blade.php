@@ -1,13 +1,4 @@
 @extends('layouts.default')
-@section('title') 物流方式详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }} @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
-        <li class="active"><strong>物流方式详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }}</strong></li>
-    </ol>
-@stop
-
 @section('content')
     <div class="panel panel-default">
         <div class="panel-heading">物流方式详情 : {{ $logistics->short_code }} {{ $logistics->logistics_type }}</div>

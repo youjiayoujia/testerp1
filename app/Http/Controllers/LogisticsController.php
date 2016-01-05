@@ -1,6 +1,7 @@
 <?php
 /**
  * 物流方式控制器
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/21
@@ -22,12 +23,15 @@ class LogisticsController extends Controller
     {
         $this->request = $request;
         $this->logistics = $logistics;
+        $this->mainIndex = route('logistics.index');
+        $this->mainTitle = '物流方式';
     }
 
     public function index()
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->logistics->auto()->paginate(),
         ];
         return view('logistics.index', $response);
@@ -36,7 +40,8 @@ class LogisticsController extends Controller
     public function show($id)
     {
         $response = [
-          'logistics' => $this->logistics->get($id),
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => $this->logistics->get($id),
         ];
         return view('logistics.show', $response);
     }
@@ -44,6 +49,7 @@ class LogisticsController extends Controller
     public function create(SupplierRepository $supplier, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'supplier' => $supplier->all(),
             'warehouse' => $warehouse->all(),
         ];
@@ -55,12 +61,13 @@ class LogisticsController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->logistics->rules('create'));
         $this->logistics->create($this->request->all());
-        return redirect(route('logistics.index'));
+        return redirect($this->mainIndex);
     }
 
     public function edit($id, SupplierRepository $supplier, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'logistics' => $this->logistics->get($id),
             'supplier' => $supplier->all(),
             'warehouse' => $warehouse->all(),
@@ -73,13 +80,13 @@ class LogisticsController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->logistics->rules('update', $id));
         $this->logistics->update($id, $this->request->all());
-        return redirect(route('logistics.index'));
+        return redirect($this->mainIndex);
     }
 
     public function destroy($id)
     {
         $this->logistics->destroy($id);
-        return redirect(route('logistics.index'));
+        return redirect($this->mainIndex);
     }
 
 }

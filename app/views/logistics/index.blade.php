@@ -1,14 +1,4 @@
 @extends('common.table')
-@section('title') 物流方式列表 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logistics.index') }}">物流方式</a></li>
-        <li class="active">列表</li>
-    </ol>
-@stop
-
-@section('tableTitle') 物流方式列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>物流方式简码</th>

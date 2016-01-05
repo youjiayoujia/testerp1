@@ -1,5 +1,7 @@
 <?php
 /**
+ * 物流方式模型
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/21
@@ -14,7 +16,17 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
-    protected $fillable = ['short_code', 'logistics_type', 'species', 'warehouse_id', 'logistics_supplier_id', 'type', 'url', 'api_docking', 'is_enable'];
+    protected $fillable = [
+        'short_code',
+        'logistics_type',
+        'species',
+        'warehouse_id',
+        'logistics_supplier_id',
+        'type',
+        'url',
+        'api_docking',
+        'is_enable'
+    ];
 
     public function supplier()
     {

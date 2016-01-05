@@ -1,6 +1,7 @@
 <?php
 /**
  * 物流商控制器
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/10
@@ -21,12 +22,15 @@ class SupplierController extends Controller
     {
         $this->request = $request;
         $this->supplier = $supplier;
+        $this->mainIndex = route('logisticsSupplier.index');
+        $this->mainTitle = '物流商';
     }
 
     public function index()
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->supplier->auto()->paginate(),
         ];
         return view('logistics.supplier.index', $response);
@@ -34,7 +38,10 @@ class SupplierController extends Controller
 
     public function create()
     {
-        return view('logistics.supplier.create');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view('logistics.supplier.create', $response);
     }
 
     public function store()
@@ -42,12 +49,13 @@ class SupplierController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->supplier->rules('create'));
         $this->supplier->create($this->request->all());
-        return redirect(route('logisticsSupplier.index'));
+        return redirect($this->mainIndex);
     }
 
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'supplier' => $this->supplier->get($id),
         ];
         return view('logistics.supplier.show', $response);
@@ -56,6 +64,7 @@ class SupplierController extends Controller
     public function edit($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'supplier' => $this->supplier->get($id),
         ];
         return view('logistics.supplier.edit', $response);
@@ -66,13 +75,13 @@ class SupplierController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->supplier->rules('update', $id));
         $this->supplier->update($id, $this->request->all());
-        return redirect(route('logisticsSupplier.index'));
+        return redirect($this->mainIndex);
     }
 
     public function destroy($id)
     {
         $this->supplier->destroy($id);
-        return redirect(route('logisticsSupplier.index'));
+        return redirect($this->mainIndex);
     }
 
 }

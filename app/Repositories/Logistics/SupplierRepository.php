@@ -1,6 +1,7 @@
 <?php
 /**
- * 物流商库类
+ * 物流商库
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/10

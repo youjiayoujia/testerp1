@@ -1,13 +1,4 @@
 @extends('layouts.default')
-@section('title') 物流商详情 : {{ $supplier->name }} {{ $supplier->customer_id }} @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logisticsSupplier.index') }}">物流商</a></li>
-        <li class="active"><strong>物流商详情 : {{ $supplier->name }} {{ $supplier->customer_id }}</strong></li>
-    </ol>
-@stop
-
 @section('content')
     <div class="panel panel-default">
         <div class="panel-heading">物流商详情 : {{ $supplier->name }} {{ $supplier->customer_id }}</div>

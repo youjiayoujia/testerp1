@@ -1,14 +1,4 @@
 @extends('common.table')
-@section('title') 跟踪号号码池列表 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logisticsCode.index') }}">跟踪号号码池</a></li>
-        <li class="active">列表</li>
-    </ol>
-@stop
-
-@section('tableTitle') 跟踪号号码池列表 @stop
 @section('tableHeader')
     <th>ID</th>
     <th>物流方式</th>

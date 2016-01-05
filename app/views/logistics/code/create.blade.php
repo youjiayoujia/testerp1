@@ -1,14 +1,4 @@
 @extends('common.form')
-@section('title') 添加跟踪号号码池 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logisticsCode.index') }}">跟踪号号码池</a></li>
-        <li class="active"><strong>添加跟踪号号码池</strong></li>
-    </ol>
-@stop
-
-@section('formTitle') 添加跟踪号号码池 @stop
 @section('formAction') {{ route('logisticsCode.store') }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')

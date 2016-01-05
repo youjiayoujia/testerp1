@@ -1,5 +1,7 @@
 <?php
 /**
+ * 跟踪号模型
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/25
@@ -14,7 +16,13 @@ class CodeModel extends BaseModel
 {
     protected $table = 'logistics_codes';
 
-    protected $fillable = ['logistics_id', 'code', 'package_id', 'status', 'used_at'];
+    protected $fillable = [
+        'logistics_id',
+        'code',
+        'package_id',
+        'status',
+        'used_at'
+    ];
 
     public function logistics()
     {

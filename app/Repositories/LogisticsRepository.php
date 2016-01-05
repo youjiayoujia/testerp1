@@ -1,6 +1,7 @@
 <?php
 /**
- * 物流方式库类
+ * 物流方式库
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/21

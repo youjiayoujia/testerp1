@@ -1,6 +1,7 @@
 <?php
 /**
- * 跟踪号库类
+ * 跟踪号库
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/28

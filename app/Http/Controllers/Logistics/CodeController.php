@@ -1,6 +1,7 @@
 <?php
 /**
  * 跟踪号控制器
+ *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/28
@@ -22,12 +23,15 @@ class CodeController extends Controller
     {
         $this->request = $request;
         $this->code = $code;
+        $this->mainIndex = route('logisticsCode.index');
+        $this->mainTitle = '跟踪号';
     }
 
     public function index()
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->code->auto()->paginate(),
         ];
         return view('logistics.code.index', $response);
@@ -36,6 +40,7 @@ class CodeController extends Controller
     public function create(LogisticsRepository $logistics)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'logistics' => $logistics->all(),
         ];
         return view('logistics.code.create', $response);
@@ -46,12 +51,13 @@ class CodeController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->code->rules('create'));
         $this->code->create($this->request->all());
-        return redirect(route('logisticsCode.index'));
+        return redirect($this->mainIndex);
     }
 
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'code' => $this->code->get($id),
         ];
         return view('logistics.code.show', $response);
@@ -60,6 +66,7 @@ class CodeController extends Controller
     public function edit($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'code' => $this->code->get($id),
         ];
         return view('logistics.code.edit', $response);
@@ -70,13 +77,13 @@ class CodeController extends Controller
         $this->request->flash();
         $this->validate($this->request, $this->code->rules('update', $id));
         $this->code->update($id, $this->request->all());
-        return redirect(route('logisticsCode.index'));
+        return redirect($this->mainIndex);
     }
 
     public function destroy($id)
     {
         $this->code->destroy($id);
-        return redirect(route('logisticsCode.index'));
+        return redirect($this->mainIndex);
     }
 
 }

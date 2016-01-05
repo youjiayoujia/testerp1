@@ -1,14 +1,4 @@
 @extends('common.form')
-@section('title') 编辑物流商 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logisticsSupplier.index') }}">物流商</a></li>
-        <li class="active"><strong>编辑物流商</strong></li>
-    </ol>
-@stop
-
-@section('formTitle') 编辑物流商 @stop
 @section('formAction') {{ route('logisticsSupplier.update', ['id' => $supplier->id]) }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')

@@ -1,13 +1,4 @@
 @extends('layouts.default')
-@section('title') 跟踪号号码池详情 : {{ $code->logistics_id }} {{ $code->code }} @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('logisticsCode.index') }}">跟踪号号码池</a></li>
-        <li class="active"><strong>跟踪号号码池详情 : {{ $code->logistics_id }} {{ $code->code }}</strong></li>
-    </ol>
-@stop
-
 @section('content')
     <div class="panel panel-default">
         <div class="panel-heading">跟踪号号码池详情 : {{ $code->logistics_id }} {{ $code->code }}</div>

@@ -1,11 +1,11 @@
 <?php
-
 /**
  * 产品品类控制器
  * 产品品类CURD
  * @author: youjia
  * Date: 2015-12-28 17:57:09
  */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;

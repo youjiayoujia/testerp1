@@ -1,7 +1,7 @@
 @extends('layouts.default')
 @section('content')
     <div class="panel panel-default">
-        <div class="panel-heading">分类详情 : </div>
+        <div class="panel-heading">品类详情 : </div>
         <div class="panel-body">
             <dl class="dl-horizontal">
                 <dt>ID</dt>

@@ -1,24 +1,28 @@
-@extends('layouts.default')
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">渠道详情</div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $channel->id }}</dd>
-                <dt>名称</dt>
-                <dd>{{ $channel->name }}</dd>
-                <dt>别名</dt>
-                <dd>{{ $channel->alias }}</dd>
-                <dt>创建者</dt>
-                <dd>{{ $channel->created_by }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $channel->created_at }}</dd>
-                <dt>更新者</dt>
-                <dd>{{ $channel->updated_by }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $channel->updated_at }}</dd>
-            </dl>
+            <div class="col-lg-4">
+                <strong>ID</strong>: {{ $channel->id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>名称</strong>: {{ $channel->name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>别名</strong>: {{ $channel->alias }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-6">
+                <strong>创建时间</strong>: {{ $channel->created_at }}
+            </div>
+            <div class="col-lg-6">
+                <strong>更新时间</strong>: {{ $channel->updated_at }}
+            </div>
         </div>
     </div>
 @stop

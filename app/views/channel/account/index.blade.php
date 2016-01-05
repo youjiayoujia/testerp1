@@ -6,9 +6,7 @@
     <th>账户</th>
     <th>前缀</th>
     <th>简介</th>
-    <th>创建者</th>
     <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
-    <th>更新者</th>
     <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>
     <th>操作</th>
 @stop

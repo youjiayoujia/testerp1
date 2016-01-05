@@ -1,15 +1,16 @@
 <?php
+/**
+ * 品类库
+ *
+ * @author youjia 2016-1-5 11:47:27
+ */
 
 namespace App\Repositories;
 
 use App\Base\BaseRepository;
 use App\Models\CatalogModel;
 use Illuminate\Support\Facades\DB;
-/**
- * 品类库
- *
- * @author youjia
- */
+
 class CatalogRepository extends BaseRepository
 {
     protected $searchFields = ['name'];

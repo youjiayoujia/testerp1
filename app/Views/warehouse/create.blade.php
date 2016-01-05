@@ -1,17 +1,8 @@
 @extends('common.form')
-@section('title') 添加仓库 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('warehouse.index') }}">仓库</a></li>
-        <li class="active"><strong>添加仓库</strong></li>
-    </ol>
-@stop
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 <script type='text/javascript'>
     window.onload = init;
 </script>
-@section('formTitle') 添加仓库 @stop
 @section('formAction') {{ route('warehouse.store') }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')

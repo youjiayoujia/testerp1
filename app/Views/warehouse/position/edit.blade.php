@@ -1,13 +1,4 @@
 @extends('common.form')
-@section('title') 编辑库位 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('warehousePosition.index') }}">库位</a></li>
-        <li class="active"><strong>编辑库位</strong></li>
-    </ol>
-@stop
-@section('formTitle') 编辑库位 @stop
 @section('formAction') {{ route('warehousePosition.update', ['id' => $position->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>

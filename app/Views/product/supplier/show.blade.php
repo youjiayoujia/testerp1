@@ -1,44 +1,49 @@
-@extends('layouts.default')
-@section('title') 供应商详情 : {{ $supplier->name }} {{ $supplier->url }} @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('productSupplier.index') }}">供应商</a></li>
-        <li class="active"><strong>供应商详情 : {{ $supplier->name }} {{ $supplier->url }}</strong></li>
-    </ol>
-@stop
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">供应商详情 : {{ $supplier->name }} {{ $supplier->url }}</div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $supplier->id }}</dd>
-                <dt>名称</dt>
-                <dd>{{ $supplier->name }}</dd>
-                <dt>省</dt>
-                <dd>{{ $supplier->province }}</dd>
-                <dt>市</dt>
-                <dd>{{ $supplier->city }}</dd>
-                <dt>地址</dt>
-                <dd>{{ $supplier->address }}</dd>
-                <dt>是否是线上供货商</dt>
-                <dd>{{ $supplier->type }}</dd>
-                <dt>上线供货商网址</dt>
-                <dd>{{ $supplier->url }}</dd>
-                <dt>电话</dt>
-                <dd>{{ $supplier->telephone }}</dd>
-                <dt>采购员</dt>
-                <dd>{{ $supplier->purchase_id }}</dd>
-                <dt>评级</dt>
-                <dd>{{ $supplier->level }}</dd>
-                <dt>创建人</dt>
-                <dd>{{ $supplier->created_by }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $supplier->created_at }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $supplier->updated_at }}</dd>
-            </dl>
+            <div class="col-lg-2">
+                <strong>ID</strong>: {{ $supplier->id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>名称</strong>: {{ $supplier->name }}
+            </div>
+            <div class="col-lg-1">
+                <strong>省</strong>: {{ $supplier->province }}
+            </div>
+            <div class="col-lg-1">
+                <strong>市</strong>: {{ $supplier->city }}
+            </div>
+            <div class="col-lg-2">
+                <strong>是否是线上供货商</strong>: {{ $supplier->type }}
+            </div>
+            <div class="col-lg-2">
+                <strong>线上供货商地址</strong>: {{ $supplier->url }}
+            </div>
+            <div class="col-lg-2">
+                <strong>电话</strong>: {{ $supplier->telephone }}
+            </div>
+            <div class="col-lg-2">
+                <strong>采购员</strong>: {{ $supplier->purchase_id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>评级</strong>: {{ $supplier->level }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-4">
+                <strong>创建人</strong>: {{ $supplier->created_by }}
+            </div>
+            <div class="col-lg-4">
+                <strong>创建时间</strong>: {{ $supplier->created_at }}
+            </div>
+            <div class="col-lg-4">
+                <strong>更新时间</strong>: {{ $supplier->updated_at }}
+            </div>
         </div>
     </div>
 @stop

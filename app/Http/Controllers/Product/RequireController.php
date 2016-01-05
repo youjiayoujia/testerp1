@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 选款需求控制器
  * 处理选款需求相关的Request与Response
@@ -23,6 +22,8 @@ class RequireController extends Controller
     {
         $this->request = $request;
         $this->require = $require;
+        $this->mainIndex = route('productRequire.index');
+        $this->mainTitle = '选款需求';
     }
 
     /**
@@ -36,6 +37,7 @@ class RequireController extends Controller
     {
         $this->request->flash();
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->require->auto()->paginate(),
         ];
 
@@ -53,6 +55,7 @@ class RequireController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'require' => $this->require->get($id),
         ];
 
@@ -68,7 +71,11 @@ class RequireController extends Controller
      */
     public function create()
     {
-        return view('product.require.create');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view('product.require.create', $response);
     }
 
     /**
@@ -89,7 +96,7 @@ class RequireController extends Controller
         for ($i = 1; $i <= 6; $i++) {
             if ($this->request->hasFile('img' . $i)) {
                 $file = $this->request->file('img' . $i);
-                $path = config('product_require_img_path.dir') . "/" . $data['id'];
+                $path = config('product.requireimage') . "/" . $data['id'];
                 $dstname = $i;
                 $absolute_path = $this->require->move_file($file, $dstname, $path);
                 $name = 'img' . $i;
@@ -118,7 +125,7 @@ class RequireController extends Controller
         for ($i = 1; $i <= 6; $i++) {
             if ($this->request->hasFile('img' . $i)) {
                 $file = $this->request->file('img' . $i);
-                $path = config('product_require_img_path.dir') . "/" . $id;
+                $path = config('product.requireimage') . "/" . $id;
                 $dstname = $i;
                 $absolute_path = $this->require->move_file($file, $dstname, $path);
                 $name = 'img' . $i;
@@ -140,6 +147,7 @@ class RequireController extends Controller
     public function edit($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'require' => $this->require->get($id),
         ];
 

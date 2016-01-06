@@ -1,44 +1,56 @@
-@extends('layouts.default')
-@section('title') 库存调整信息详情 : {{ $adjustment->sku }} {{ $adjustment->type }}  @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockAdjustment.index') }}">库存调整</a></li>
-        <li class="active"><strong>库存调整详情 : {{ $adjustment->sku }} {{ $adjustment->type }} </strong></li>
-    </ol>
-@stop
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">库存调整详情 : {{ $adjustment->sku }} {{ $adjustment->type }} </div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $adjustment->id }}</dd>
-                <dt>sku</dt>
-                <dd>{{ $adjustment->sku }}</dd>
-                <dt>类型</dt>
-                <dd>{{ $adjustment->type }}</dd>
-                <dt>仓库</dt>
-                <dd>{{ $adjustment->warehouse->name }}</dd>
-                <dt>库位</dt>
-                <dd>{{ $adjustment->position->name }}</dd>
-                <dt>数量</dt>
-                <dd>{{ $adjustment->amount }}</dd>
-                <dt>金额(￥)</dt>
-                <dd>{{ $adjustment->total_amount }}</dd>
-                <dt>调整人</dt>
-                <dd>{{ $adjustment->adjust_man_id }}</dd>
-                <dt>调整时间</dt>
-                <dd>{{ $adjustment->adjust_time }}</dd>
-                <dt>审核状态</dt>
-                <dd>{{ $adjustment->status == 'Y' ? '已审核' : '未审核' }}</dd>
-                <dt>审核人</dt>
-                <dd>{{ $adjustment->check_man_id }}</dd>
-                <dt>审核时间</dt>
-                <dd>{{ $adjustment->check_time }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $adjustment->created_at }}</dd>
-            </dl>
+            <div class="col-lg-2">
+                <strong>ID</strong>: {{ $adjustment->id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>item号</strong>: {{ $adjustment->item_id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>sku</strong>: {{ $adjustment->sku }}
+            </div>
+            <div class="col-lg-2">
+                <strong>类型</strong>: {{ $adjustment->type }}
+            </div>
+
+            <div class="col-lg-2">
+                <strong>仓库</strong>: {{ $adjustment->warehouse->name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>库位</strong>: {{ $adjustment->position->name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>数量</strong>: {{ $adjustment->amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>金额(￥)</strong>: {{ $adjustment->total_amount }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-4">
+                <strong>调整人</strong>: {{ $adjustment->adjust_man_id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>调整时间</strong>: {{ $adjustment->adjust_time }}
+            </div>
+            <div class="col-lg-4">
+                <strong>审核状态</strong>: {{ $adjustment->status == 'Y' ? '已审核' : '未审核' }}
+            </div>
+            <div class="col-lg-4">
+                <strong>审核人</strong>: {{ $adjustment->check_man_id }}
+            </div>
+            <div class="col-lg-4">
+                <strong>审核时间</strong>: {{ $adjustment->check_time }}
+            </div>
+            <div class="col-lg-4">
+                <strong>创建时间</strong>: {{ $adjustment->created_at }}
+            </div>
         </div>
     </div>
 @stop

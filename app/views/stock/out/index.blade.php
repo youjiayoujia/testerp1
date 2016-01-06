@@ -1,13 +1,4 @@
 @extends('common.table')
-@section('title') 出库信息列表 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockOut.index') }}">出库</a></li>
-        <li class="active">列表</li>
-    </ol>
-@stop
-@section('tableTitle') 出库列表 @stop
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('item_id') }}">Item号{!! Sort::label('item_id') !!}</th>

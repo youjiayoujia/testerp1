@@ -24,8 +24,8 @@ class InController extends Controller
     {
         $this->in = $in;
         $this->request = $request;
-        $this->mainIndex = route('stock.index');
-        $this->mainTitle = '库存';
+        $this->mainIndex = route('stockIn.index');
+        $this->mainTitle = '入库';
     }
 
     /**

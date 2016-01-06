@@ -24,6 +24,8 @@ class OutController extends Controller
     {
         $this->out = $out;
         $this->request = $request;
+        $this->mainIndex = route('stockOut.index');
+        $this->mainTitle = '出库';
     }
 
     /**
@@ -38,6 +40,7 @@ class OutController extends Controller
         $this->request->flash();
 
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->out->auto()->paginate(),
         ];
 
@@ -54,6 +57,7 @@ class OutController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'stockout' => $this->out->get($id),
         ];
 
@@ -70,6 +74,7 @@ class OutController extends Controller
     public function create(WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => config('out'),
             'warehouses' => $warehouse->all(),
         ];
@@ -104,6 +109,7 @@ class OutController extends Controller
     public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => config('out'),
             'out' => $this->out->get($id),
             'warehouses' => $warehouse->all(),

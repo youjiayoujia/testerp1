@@ -1,40 +1,46 @@
-@extends('layouts.default')
-@section('title') 出库信息详情 : {{ $stockout->sku }} {{ $stockout->typeof_stockout }}  @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockOut.index') }}">出库</a></li>
-        <li class="active"><strong>出库详情 : {{ $stockout->sku }} {{ $stockout->typeof_stockout }} </strong></li>
-    </ol>
-@stop
-@section('content')
+@extends('common.detail')
+@section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">出库详情 : {{ $stockout->sku }} {{ $stockout->typeof_stockout }} </div>
+        <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <dl class="dl-horizontal">
-                <dt>ID</dt>
-                <dd>{{ $stockout->id }}</dd>
-                <dt>skuk</dt>
-                <dd>{{ $stockout->sku }}</dd>
-                <dt>数量</dt>
-                <dd>{{ $stockout->amount }}</dd>
-                <dt>总金额</dt>
-                <dd>{{ $stockout->total_amount }}</dd>
-                <dt>仓库</dt>
-                <dd>{{ $stockout->warehouse->name }}</dd>
-                <dt>库位</dt>
-                <dd>{{ $stockout->position->name }}</dd>
-                <dt>出库类型</dt>
-                <dd>{{ $stockout->type_name }}</dd>
-                <dt>出库类型id</dt>
-                <dd>{{ $stockout->relation_id }}</dd>
-                <dt>备注</dt>
-                <dd>{{ $stockout->remark }}</dd>
-                <dt>创建时间</dt>
-                <dd>{{ $stockout->created_at }}</dd>
-                <dt>更新时间</dt>
-                <dd>{{ $stockout->updated_at }}</dd>
-            </dl>
+            <div class="col-lg-2">
+                <strong>ID</strong>: {{ $stockout->id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>sku</strong>: {{ $stockout->sku }}
+            </div>
+            <div class="col-lg-2">
+                <strong>数量</strong>: {{ $stockout->amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>总金额(￥)</strong>: {{ $stockout->total_amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>仓库</strong>: {{ $stockout->warehouse->name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>库位</strong>: {{ $stockout->position->name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>出库类型</strong>: {{ $stockout->type_name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>出库类型id</strong>: {{ $stockout->relation_id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>备注</strong>: {{ $stockout->remark }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">日志信息</div>
+        <div class="panel-body">
+            <div class="col-lg-4">
+                <strong>创建时间</strong>: {{ $stockout->created_at }}
+            </div>
+            <div class="col-lg-4">
+                <strong>更新时间</strong>: {{ $stockout->updated_at }}
+            </div>
         </div>
     </div>
 @stop

@@ -34,6 +34,8 @@ class AdjustmentController extends Controller
         $this->out = $out;
         $this->in = $in;
         $this->stock = $stock;
+        $this->mainIndex = route('stockAdjustment.index');
+        $this->mainTitle = '库存调整';
     }
 
     /**
@@ -48,6 +50,7 @@ class AdjustmentController extends Controller
         $this->request->flash();
 
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->adjustment->auto()->paginate(),
         ];
 
@@ -64,6 +67,7 @@ class AdjustmentController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'adjustment' => $this->adjustment->get($id),
         ];
 
@@ -80,6 +84,7 @@ class AdjustmentController extends Controller
     public function create(WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'warehouses' => $warehouse->all(),
         ];
 
@@ -126,6 +131,7 @@ class AdjustmentController extends Controller
     public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'adjustment' => $this->adjustment->get($id),
             'warehouses' => $warehouse->all(),
         ];

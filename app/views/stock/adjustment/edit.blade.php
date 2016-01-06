@@ -1,15 +1,6 @@
 @extends('common.form')
-@section('title') 修改入库信息 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockAdjustment.index') }}">入库</a></li>
-        <li class="active"><strong>修改入库信息</strong></li>
-    </ol>
-@stop
-    <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-@section('formTitle') 修改入库信息 @stop
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockAdjustment.update', ['id' => $adjustment->id] ) }} @stop
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'/>

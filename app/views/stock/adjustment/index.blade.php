@@ -1,15 +1,5 @@
 @extends('common.table')
-@section('title') 库存调整信息列表 @stop
-@section('breadcrumbs')
-    <ol class="breadcrumb">
-        <li><a href="/">主页</a></li>
-        <li><a href="{{ route('stockAdjustment.index') }}">库存调整</a></li>
-        <li class="active">列表</li>
-    </ol>
-@stop
-    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-
-@section('tableTitle') 库存调整列表 @stop
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('adjust_form_id') }}">调整单号{!! Sort::label('adjust_form_id') !!}</th>

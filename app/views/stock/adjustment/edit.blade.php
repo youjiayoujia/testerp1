@@ -31,7 +31,6 @@
             <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') ? old('remark') : $adjustment->remark }}</textarea>
         </div>
     </div>
-
     <div class="panel panel-primary">
         <div class="panel-heading">
             sku1
@@ -73,7 +72,7 @@
                 </div>
                 <div class="form-group col-sm-3">
                     <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control total_amount" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') ? old('total_amount') : $adjustment->total_amount }}" readonly>
+                    <input type='text' class="form-control total_amount" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') ? old('total_amount') : $adjustment->total_amount }}">
                 </div>
             </div>
         </div>
@@ -110,14 +109,33 @@
                     type:'get',
                     success:function(result) {
                         if(val_type == '入库') {
-                            if(result[0] != 'none') {
+                            if(result != 'none') {
                                 if(result[0] != val_sku) {
                                     alert('sku 和 库位不匹配');
                                     tmp.find('.sku').val('');
+                                } else {
+                                    $.ajax({
+                                        url:"{{ route('getunitcost') }}",
+                                        data:{sku:val_sku},
+                                        dataType:'json',
+                                        'type':'get',
+                                        success:function(result){
+                                            total_amount = tmp.find('.total_amount').val();
+                                            amount = tmp.find('.amount').val();
+                                            if(total_amount && amount) {
+                                                form_cost = total_amount/amount;
+                                                if((form_cost > result*1.3) || (form_cost < result*0.6)) {
+                                                    alert('调整单价有误不在单价*0.6-1.3变动范围内');
+                                                    tmp.find('.amount').val('');
+                                                    tmp.find('.total_amount').val('');
+                                                }
+                                            }
+                                        }
+                                    });
                                 }
                             }
                         } else {
-                            if(result[0] == 'none') {
+                            if(result == 'none') {
                                 alert('无此库位，不可出库');
                                 tmp.find('.sku').val('');
                             } else {
@@ -150,7 +168,7 @@
             }
         });
 
-        $(document).on('blur', '.amount', function(){
+        $(document).on('blur', '.amount,.total_amount', function(){
             var rowline = $(this).parent().parent();
             var sku = rowline.prev().find('.sku').val();
             var position = rowline.find('.warehouse_positions_id').val();
@@ -162,29 +180,47 @@
                     dataType:'json',
                     'type':'get',
                     success:function(result){
-                        tmp.parent().next().children('.total_amount').val(result*tmp.val());
-                    }
-                });
-
-                if(rowline.find(':radio:checked').val() == '出库') {
-                    $.ajax({
-                        url:"{{ route('getavailableamount') }}",
-                        data:{position:position},
-                        dataType:'json',
-                        type:'get',
-                        success:function(result){
-                            if(sku && position) {
-                                if(result < tmp.val()) {
-                                    alert('超出可用库存，最大可用量'+result);
-                                    tmp.val('');
+                        if(rowline.find(':radio:checked').val() == '出库') {
+                            $.ajax({
+                                url:"{{ route('getavailableamount') }}",
+                                data:{position:position},
+                                dataType:'json',
+                                type:'get',
+                                success:function(result){
+                                    if(sku && position) {
+                                        if(result[0] < tmp.val()) {
+                                            alert('超出可用库存，最大可用量'+result);
+                                            tmp.val('');
+                                        } else {
+                                            tmp.parent().next().children('.total_amount').val(result[1]*tmp.val());
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            total_amount = rowline.find('.total_amount').val();
+                            amount = rowline.find('.amount').val();
+                            if(total_amount && amount) {
+                                form_cost = total_amount/amount;
+                                if((form_cost > result*1.3) || (form_cost < result*0.6)) {
+                                    alert('调整单价有误不在单价*0.6-1.3变动范围内');
+                                    rowline.find('.amount').val('');
+                                    rowline.find('.total_amount').val('');
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
             }
         });
 
+        $(document).on('blur', '.type', function(){
+            if($(this).parent().find(':radio:checked').val() == '入库')
+                $(this).parent().parent().find('.total_amount').attr('readonly', false);
+            else
+                $(this).parent().parent().find('.total_amount').attr('readonly', true);
+        });
+        
         $(document).on('blur', '.sku', function(){
             var tmp = $(this);
             var sku_val = $(this).val();

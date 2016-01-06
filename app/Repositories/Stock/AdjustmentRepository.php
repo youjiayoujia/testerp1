@@ -8,6 +8,7 @@
  * Time:14:25
  *
  */
+
 namespace App\Repositories\Stock;
 
 use App\Base\BaseRepository;
@@ -20,20 +21,10 @@ class AdjustmentRepository extends BaseRepository
 
     // 规则验证
     public $rules = [
-        'create' => [
-            'sku' => 'required|max:128',
-            'amount' => 'required|numeric',
-            'warehouses_id' => 'required|integer',
-            'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|numeric',
-            'adjust_time' =>'required|date',
-        ],
         'update' => [
-            'sku' => 'required|max:128',
+            'sku' => 'required',
             'amount' => 'required|integer',
-            'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|numeric',
             'adjust_time' =>'required|date',
         ]
     ];

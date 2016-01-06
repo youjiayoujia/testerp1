@@ -10,8 +10,11 @@
  */
 namespace App\Repositories;
 
+use DB;
 use App\Base\BaseRepository;
 use App\Models\StockModel;
+use App\Models\Stock\InModel;
+use App\Models\Stock\OutModel;
 
 class StockRepository extends BaseRepository
 {
@@ -56,9 +59,88 @@ class StockRepository extends BaseRepository
         return $stock->unit_cost;
     }
 
-
+    /**
+     * get the array of object by the param $arr 
+     * 
+     * @return object array
+     *
+     */
     public function getObj($arr)
     {
         return $this->model->where($arr)->get();
+    }
+
+    /**
+     * the api of stock in
+     *  
+     * @param $arr 
+     * the keys in order
+     * 'item_id'=>item号,
+     * 'sku' => sku,
+     * 'amount' => '数量',
+     * 'total_amount' => '总金额',
+     * 'warehouses_id' => '仓库id',
+     * 'warehouse_positions_id' => '库位id',
+     * 'type' => '入库类型',
+     * 'relation_id' => '入库来源id',
+     * 'remark' => '备注'
+     * @return which the stock object
+     *
+     */
+    public function in($arr)
+    {
+        $in = new InModel;
+        $stock = new StockModel;
+        DB::beginTransaction();
+        try {
+            $in->create($arr);
+            $obj = $stock->where(['warehouse_positions_id'=>$arr['warehouse_positions_id']])->get()->first();
+            $obj->all_amount += $arr['amount'];
+            $obj->available_amount +=$arr['amount'];
+            $obj->total_amount +=$arr['total_amount'];
+            $obj->save();
+        } catch (Exception $e) {
+            DB::rollback();
+        }
+        DB::commit();
+
+        return $obj;
+    }
+
+    /**
+     * the api of stock out | similar to the stock in
+     *  
+     * @param $arr 
+     * the keys in order
+     * 'item_id'=>item号,
+     * 'sku' => sku,
+     * 'amount' => '数量',
+     * 'total_amount' => '总金额',
+     * 'warehouses_id' => '仓库id',
+     * 'warehouse_positions_id' => '库位id',
+     * 'type' => '入库类型',
+     * 'relation_id' => '入库来源id',
+     * 'remark' => '备注'
+     * @return which the stock object
+     *
+     */
+    public function out($arr)
+    {
+        $out = new OutModel;
+        $stock = new StockModel;
+        DB::beginTransaction();
+        try {
+            $out->create($arr);
+            $obj = $stock->where(['warehouse_positions_id'=>$arr['warehouse_positions_id']])->get()->first();
+            $obj->all_amount -=$arr['amount'];
+            $obj->available_amount -= $arr['amount'];
+            $obj->total_amount -= $arr['total_amount'];
+            $obj->save();
+        } catch (Exception $e) {
+            DB::rollback();
+        }
+        DB::commit();
+
+        return $obj;
     }
 }

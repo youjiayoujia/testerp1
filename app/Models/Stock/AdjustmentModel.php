@@ -21,11 +21,23 @@ class AdjustmentModel extends BaseModel
      */
     protected $fillable = ['adjust_form_id', 'item_id', 'sku', 'type', 'warehouses_id', 'warehouse_positions_id', 'amount', 'total_amount', 'remark', 'adjust_man_id', 'adjust_time', 'status', 'check_man_id', 'check_time', 'created_at'];
 
+    /**
+     * get the relationship between the two module 
+     *
+     * @return 
+     *
+     */
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
     }
 
+    /**
+     * get the relationship between the two module 
+     *
+     * @return
+     *
+     */
     public function position()
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');

@@ -2,26 +2,26 @@
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockOut.store') }} @stop
 @section('formBody')
-    <div class="form-group">
-        <label for="item_id" class='control-label'>item号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="item_id" placeholder="item_id" name='item_id' value="{{ old('item_id') }}" readonly>
-    </div>
-    <div class="form-group">
-        <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
+    <div class='row'>
+        <div class="form-group col-lg-6">
+            <label for="item_id" class='control-label'>item号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="item_id" placeholder="item_id" name='item_id' value="{{ old('item_id') }}" readonly>
+        </div>
+        <div class="form-group col-lg-6">
+            <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
+        </div>
     </div>
     <div class='row'>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-3">
             <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="amount" placeholder="数量" name='amount' value="{{ old('amount') }}">
         </div>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-3">
             <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') }}">
         </div>
-    </div>
-    <div class='row'>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-3">
             <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouses_id' id='warehouses_id' class='form-control'>
                 <option>请选择仓库</option>
@@ -30,24 +30,26 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-3">
             <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'>
                 <option>请选择库位</option>
             </select>
         </div>
     </div>
-    <div class="form-group">
-        <label for="type">出库类型</label>
-        <select name='type' class='form-control'>
-            @foreach($data as $stockout_key => $stockout_val)
-                <option value={{ $stockout_key }} {{ old('type') == $stockout_key ? 'selected' : '' }}>{{ $stockout_val }}</option>   
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="relation_id">出库类型id</label>
-        <input type='text' class="form-control" id="relation_id" placeholder="出库类型id" name='relation_id' value="{{ old('relation_id') }}">
+    <div class='row'>
+        <div class="form-group col-lg-6">
+            <label for="type">出库类型</label>
+            <select name='type' class='form-control'>
+                @foreach($data as $stockout_key => $stockout_val)
+                    <option value={{ $stockout_key }} {{ old('type') == $stockout_key ? 'selected' : '' }}>{{ $stockout_val }}</option>   
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-6">
+            <label for="relation_id">出库类型id</label>
+            <input type='text' class="form-control" id="relation_id" placeholder="出库类型id" name='relation_id' value="{{ old('relation_id') }}">
+        </div>
     </div>
     <div class="form-group">
         <label for="remark">备注</label>

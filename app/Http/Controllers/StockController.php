@@ -160,6 +160,13 @@ class StockController extends Controller
         }
     }
 
+    /**
+     * 获取sku
+     * 
+     * @param none
+     * @return 'none' or json
+     *
+     */
     public function getSku()
     {
         $val_position = $_GET['val_position'];
@@ -171,12 +178,19 @@ class StockController extends Controller
             echo json_encode('none');
     }
 
+    /**
+     * 获取product 可用数量 
+     *
+     * @param none
+     * @return json|可用数量
+     *
+     */
     public function getAvailableAmount()
     {
         $position = $_GET['position'];
         $obj = $this->stock->getObj(['warehouse_positions_id'=>$position])->first();
-
+        $cost = $this->stock->getunitcost($obj->sku);
         if($obj)
-            echo json_encode($obj->available_amount);
+            echo json_encode([$obj->available_amount,$cost]);
     }
 }

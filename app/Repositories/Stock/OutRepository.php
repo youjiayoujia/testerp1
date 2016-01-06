@@ -8,6 +8,7 @@
  * Time:11:07
  *
  */
+
 namespace App\Repositories\Stock;
 
 use App\Base\BaseRepository;

@@ -101,6 +101,7 @@ class AdjustmentController extends Controller
     public function store()
     {
         $this->request->flash();
+        $this->validate($this->request, $this->rules($this->request));
         $buf = [];
         $len = count(array_keys($this->request->input('arr')['sku']));
         $buf = $this->request->all();
@@ -116,7 +117,6 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $this->adjustment->create($buf);
-
         }
         return redirect(route('stockAdjustment.index'));
     }
@@ -168,6 +168,13 @@ class AdjustmentController extends Controller
         return redirect(route('stockAdjustment.index'));
     }
 
+    /**
+     * 处理ajax请求参数 
+     *
+     * @param none
+     * @return json|time
+     *
+     */
     public function check()
     {
         $id = $_GET['id'];
@@ -177,33 +184,49 @@ class AdjustmentController extends Controller
         echo json_encode($time);
 
         $obj->relation_id = $obj->adjust_form_id;
-        $buf = $this->stock->getObj(['warehouses_id'=> $obj->warehouses_id, 'warehouse_positions_id'=>$obj->warehouse_positions_id])->first();
-
-        if($buf) {
-            if($obj->type == '入库') {
-                $buf->all_amount += $obj->amount;
-                $buf->available_amount += $obj->amount;
-                $buf->total_amount+= $obj->total_amount;
-                $buf->save();
-            } else {
-                $buf->all_amount -= $obj->amount;
-                $buf->available_amount -= $obj->amount;
-                $buf->total_amount-= $obj->total_amount;
-                $buf->save();
-            }
-        } else {
-            $obj->all_amount = $obj->amount;
-            $obj->available_amount = $obj->amount;
-            $obj->hold_amount = 0;
-            $this->stock->create($obj->toArray());
-        }
-
+        $arr = $obj->toArray();
         if($obj->type == '入库') {
-            $obj->type = 'ADJUSTMENT';
-            $this->in->create($obj->toArray());
+            $arr['type'] = 'ADJUSTMENT';
+            $this->stock->in($arr);
         } else {
-            $obj->type = 'ADJUSTMENT';
-            $this->out->create($obj->toArray());
+            $arr['type'] = 'ADJUSTMENT';
+            $this->stock->out($arr);
         }
+    }
+
+    /**
+     * 返回create的验证规则 
+     *
+     * @param $request
+     * @return $arr
+     *
+     */
+    public function rules($request)
+    {
+        $arr = [
+            'adjust_time' => 'date|required',
+        ];
+        $buf = $request->all();
+        $buf = $buf['arr'];
+        foreach($buf as $key => $val) 
+        {
+            if($key == 'sku')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.sku.'.$k] ='required';
+                }
+            if($key == 'amount')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.amount.'.$k] ='required|numeric';
+                }
+            if($key == 'warehouse_positions_id')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.warehouse_positions_id.'.$k] = 'required|numeric';
+                }
+        }
+
+        return $arr;
     }
 }

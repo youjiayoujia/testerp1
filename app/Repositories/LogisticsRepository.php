@@ -49,13 +49,17 @@ class LogisticsRepository extends BaseRepository
 
     /**
      * 批量倒入号码池
+     *
      * @param $file 导入所需的Excel文件
-     * @param $id 物流方式ID
-     * @param $status 状态
+     *
      */
-    public function batchImport($file, $id, $status)
+    public function batchImport($file)
     {
-
+        $filePath = '' . $file;
+        Excel::load($filePath, function($reader) {
+            $data = $reader->all();
+            dd($data);
+        });
     }
 
 }

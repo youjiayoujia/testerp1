@@ -28,15 +28,6 @@
                                 <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
                                     <i class="glyphicon glyphicon-plus"></i> 新增
                                 </a>
-                                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-                                    导出 <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">CSV</a></li>
-                                    <li><a href="#">PDF</a></li>
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="#">亚马逊模版</a></li>
-                                </ul>
                             </div>
                         </div>
                     </div>

@@ -4,13 +4,13 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
+                <img src="{{ asset($image->src) }}" width="100px">
+            </div>
+            <div class="col-lg-4">
                 <strong>ID</strong>: {{ $image->id }}
             </div>
             <div class="col-lg-4">
                 <strong>图片类型</strong>: {{$image ->type }}
-            </div>
-            <div class="col-lg-4">
-                <strong>上传的图片</strong>: <img src="/{{$image->path}}{{$image->name}}" width="100px" height="70px">
             </div>
         </div>
     </div>

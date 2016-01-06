@@ -24,14 +24,14 @@
     </div>
     <div class="form-group col-lg-4">
         <label for="package_id" class="control-label">包裹ID</label>
-        <input class="form-control" id="package_id" placeholder="包裹ID" name='package_id' value="{{ old('package_id') }}">
+        <input class="form-control" id="package_id" placeholder="包裹ID" name='package_id' value="{{ old('package_id') }}" disabled>
     </div>
     <div class="form-group col-lg-4">
         <label for="status" class="control-label">状态</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>
-                <input type="radio" name="status" value="Y">启用
+                <input type="radio" name="status" value="Y" disabled>启用
             </label>
         </div>
         <div class="radio">
@@ -42,7 +42,7 @@
     </div>
     <div class="form-group col-lg-4">
         <label for="used_at" class="control-label">使用时间</label>
-        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') }}">
+        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') }}" disabled>
     </div>
 @stop
 <script type='text/javascript'>

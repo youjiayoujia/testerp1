@@ -78,6 +78,11 @@ return [
                 'url' => 'logisticsCode.index',
                 'icon' => '',
             ],
+            [
+                'name' => '物流分区',
+                'url' => 'logisticsZone.index',
+                'icon' => '',
+            ],
         ],
     ],
     [

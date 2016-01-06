@@ -1,30 +1,30 @@
 <?php
 /**
- * 跟踪号控制器
+ * 物流分区控制器
  *
  * Created by PhpStorm.
  * User: bianhaiwei
- * Date: 15/12/28
- * Time: 上午10:50
+ * Date: 16/1/6
+ * Time: 上午11:46
  */
 
 namespace App\Http\Controllers\Logistics;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Logistics\CodeRepository;
+use App\Repositories\Logistics\ZoneRepository;
 use App\Repositories\LogisticsRepository;
+use Illuminate\Http\Request;
 
-class CodeController extends Controller
+class ZoneController extends Controller
 {
-    protected $code;
+    protected $zone;
 
-    public function __construct(Request $request, CodeRepository $code)
+    public function __construct(Request $request, ZoneRepository $zone)
     {
         $this->request = $request;
-        $this->code = $code;
-        $this->mainIndex = route('logisticsCode.index');
-        $this->mainTitle = '跟踪号';
+        $this->zone = $zone;
+        $this->mainIndex = route('logisticsZone.index');
+        $this->mainTitle = '物流分区';
     }
 
     public function index()
@@ -32,9 +32,9 @@ class CodeController extends Controller
         $this->request->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->code->auto()->paginate(),
+            'data' => $this->zone->auto()->paginate(),
         ];
-        return view('logistics.code.index', $response);
+        return view('logistics.zone.index', $response);
     }
 
     public function create(LogisticsRepository $logistics)
@@ -43,14 +43,14 @@ class CodeController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'logistics' => $logistics->all(),
         ];
-        return view('logistics.code.create', $response);
+        return view('logistics.zone.create', $response);
     }
 
     public function store()
     {
         $this->request->flash();
-        $this->validate($this->request, $this->code->rules('create'));
-        $this->code->create($this->request->all());
+        $this->validate($this->request, $this->zone->rules('create'));
+        $this->zone->create($this->request->all());
         return redirect($this->mainIndex);
     }
 
@@ -58,33 +58,32 @@ class CodeController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'code' => $this->code->get($id),
+            'zone' => $this->zone->get($id),
         ];
-        return view('logistics.code.show', $response);
+        return view('logistics.zone.show', $response);
     }
 
     public function edit($id, LogisticsRepository $logistics)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'code' => $this->code->get($id),
+            'zone' => $this->zone->get($id),
             'logistics' => $logistics->all(),
         ];
-        return view('logistics.code.edit', $response);
+        return view('logistics.zone.edit', $response);
     }
 
     public function update($id)
     {
         $this->request->flash();
-        $this->validate($this->request, $this->code->rules('update', $id));
-        $this->code->update($id, $this->request->all());
+        $this->validate($this->request, $this->zone->rules('update', $id));
+        $this->zone->update($id, $this->request->all());
         return redirect($this->mainIndex);
     }
 
     public function destroy($id)
     {
-        $this->code->destroy($id);
+        $this->zone->destroy($id);
         return redirect($this->mainIndex);
     }
-
 }

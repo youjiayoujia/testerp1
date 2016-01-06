@@ -8,9 +8,15 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group col-lg-4">
-        <label for="logistics_id" class="control-label">物流方式</label>
+        <label for="logistics_id">物流方式</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="logistics_id" placeholder="物流方式" name='logistics_id' value="{{ old('logistics_id') ? old('logistics_id') : $code->logistics_id }}">
+        <select name="logistics_id" class="form-control">
+            @foreach($logistics as $logisticses)
+                <option value="{{$logisticses->id}}" {{$logisticses->id == $code->logistics_id ? 'selected' : ''}}>
+                    {{$logisticses->logistics_type}}
+                </option>
+            @endforeach
+        </select>
     </div>
     <div class="form-group col-lg-4">
         <label for="code" class="control-label">跟踪号</label>

@@ -4,22 +4,16 @@
         <div class="panel-heading">基本信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>ID</strong>: {{ $code->id }}
+                <strong>ID</strong>: {{ $zone->id }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式</strong>: {{ $code->logistics->logistics_type }}
+                <strong>物流分区</strong>: {{ $zone->name }}
             </div>
             <div class="col-lg-4">
-                <strong>跟踪号</strong>: {{ $code->code }}
+                <strong>物流方式</strong>: {{ $zone->logistics->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>包裹ID</strong>: {{ $code->package_id }}
-            </div>
-            <div class="col-lg-4">
-                <strong>状态</strong>: {{ $code->status == 'Y' ? '启用' : '未启用' }}
-            </div>
-            <div class="col-lg-4">
-                <strong>使用时间</strong>: {{ $code->used_at }}
+                <strong>国家</strong>: {{ $zone->countries }}
             </div>
         </div>
     </div>
@@ -27,10 +21,10 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">
-                <strong>创建时间</strong>: {{ $code->created_at }}
+                <strong>创建时间</strong>: {{ $zone->created_at }}
             </div>
             <div class="col-lg-6">
-                <strong>更新时间</strong>: {{ $code->updated_at }}
+                <strong>更新时间</strong>: {{ $zone->updated_at }}
             </div>
         </div>
     </div>

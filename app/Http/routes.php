@@ -21,6 +21,7 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 Route::resource('logisticsSupplier', 'Logistics\SupplierController');
 Route::resource('logistics', 'LogisticsController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
+Route::resource('logisticsZone', 'Logistics\ZoneController');
 
 //品类路由
 Route::resource('catalog', 'CatalogController');

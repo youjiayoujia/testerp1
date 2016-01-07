@@ -22,6 +22,40 @@
     <div class="form-group col-lg-4">
         <label for="countries" class="control-label">国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="countries" placeholder="国家" name='countries' value="{{ old('countries') }}">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="GLOBAL">GLOBAL
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="US">US
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="UK">UK
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="CN">CN
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="DE">DE
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="FR">FR
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="countries" value="JP">JP
+            </label>
+        </div>
     </div>
 @stop

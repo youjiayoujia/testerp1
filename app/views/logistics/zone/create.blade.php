@@ -24,37 +24,37 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="GLOBAL">GLOBAL
+                <input type="checkbox" id="countries" name="countries" value="GLOBAL" {{old('countries') ? (old('countries') == 'GLOBAL' ? 'checked' : '') : ''}}>GLOBAL
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="US">US
+                <input type="checkbox" id="countries" name="countries" value="US" {{old('countries') ? (old('countries') == 'US' ? 'checked' : '') : ''}}>US
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="UK">UK
+                <input type="checkbox" id="countries" name="countries" value="UK" {{old('countries') ? (old('countries') == 'UK' ? 'checked' : '') : ''}}>UK
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="CN">CN
+                <input type="checkbox" id="countries" name="countries" value="CN" {{old('countries') ? (old('countries') == 'CN' ? 'checked' : '') : ''}}>CN
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="DE">DE
+                <input type="checkbox" id="countries" name="countries" value="DE" {{old('countries') ? (old('countries') == 'DE' ? 'checked' : '') : ''}}>DE
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="FR">FR
+                <input type="checkbox" id="countries" name="countries" value="FR" {{old('countries') ? (old('countries') == 'FR' ? 'checked' : '') : ''}}>FR
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" id="countries" value="JP">JP
+                <input type="checkbox" id="countries" name="countries" value="JP" {{old('countries') ? (old('countries') == 'JP' ? 'checked' : '') : ''}}>JP
             </label>
         </div>
     </div>

@@ -107,7 +107,7 @@ return [
     | this array to grant expanded functionality to your applications.
     |
     */
-	'Zipper' => 'Chumper\Zipper\Zipper',
+    'Zipper' => 'Chumper\Zipper\Zipper',
     'providers' => [
 
         /*
@@ -144,18 +144,18 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-		
+
         /*
          * Coffee Providers
          */
         App\Providers\HelpServiceProvider::class,
+        Chumper\Zipper\ZipperServiceProvider::class,
 
         /*
          * Debugbar
          */
         Barryvdh\Debugbar\ServiceProvider::class,
-		Chumper\Zipper\ZipperServiceProvider::class,
-		Folklore\Image\ImageServiceProvider::class,
+
     ],
 
     /*
@@ -203,16 +203,14 @@ return [
         'Storage' => Illuminate\Support\Facades\Storage::class,
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
-
-        'View'      => Illuminate\Support\Facades\View::class,
-		'Zipper' => 'Chumper\Zipper\Zipper',
- 		'Image' => 'Folklore\Image\Facades\Image',
+        'View' => Illuminate\Support\Facades\View::class,
 
         /*
          * Coffee
          */
         'Sort' => App\Facades\Sort::class,
         'Tool' => App\Facades\Tool::class,
+        'Zipper' => Chumper\Zipper\Facades\Zipper::class,
 
     ],
 

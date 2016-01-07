@@ -8,7 +8,7 @@
  * Time: 下午5:02
  */
 
-namespace App\Http\Controllers\product;
+namespace App\Http\Controllers\Product;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -23,7 +23,7 @@ class ImageController extends Controller
         $this->request = $request;
         $this->image = $image;
         $this->mainIndex = route('productImage.index');
-        $this->mainTitle = '图片';
+        $this->mainTitle = '产品图片';
     }
 
     /**
@@ -55,6 +55,7 @@ class ImageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'image' => $this->image->get($id),
         ];
+
         return view('product.image.show', $response);
     }
 
@@ -67,8 +68,8 @@ class ImageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'imageType' => config('product.image.types'),
         ];
+
         return view('product.image.create', $response);
     }
 
@@ -80,11 +81,10 @@ class ImageController extends Controller
      */
     public function store()
     {
-        if ($this->request->isMethod('post')) {
-            $data = $this->request->all();
-            $files = $this->request->file();
-            $this->image->createImage($data, $files);
-        }
+        $this->request->flash();
+        $this->validate($this->request, $this->image->rules('create'));
+        $this->image->create($this->request->all(), $this->request->files);
+
         return redirect($this->mainIndex);
     }
 
@@ -99,7 +99,6 @@ class ImageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'image' => $this->image->get($id),
-            'imageType' => config('product.image.types'),
         ];
         return view('product.image.edit', $response);
     }
@@ -109,13 +108,12 @@ class ImageController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function update()
+    public function update($id)
     {
-        if ($this->request->isMethod('post')) {
-            $data = $this->request->all();
-            $file = $this->request->file('map');
-            $this->image->updateImage($data, $file);
-        }
+        $this->request->flash();
+        $this->validate($this->request, $this->image->rules('update'));
+        $this->image->updateImage($id, $this->request->file('image'));
+
         return redirect($this->mainIndex);
     }
 
@@ -127,7 +125,7 @@ class ImageController extends Controller
      */
     public function destroy($id)
     {
-        $this->image->destroyImage($id);
+        $this->image->destroy($id);
         return redirect($this->mainIndex);
     }
 

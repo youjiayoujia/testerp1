@@ -26,7 +26,7 @@ class HelpServiceProvider extends ServiceProvider
         $this->app->singleton('sort', function () {
             return new \App\Helps\Sort;
         });
-        
+
         $this->app->singleton('tool', function () {
             return new \App\Helps\Tool;
         });

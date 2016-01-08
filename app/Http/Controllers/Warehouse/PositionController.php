@@ -23,6 +23,8 @@ class PositionController extends Controller
     {
         $this->warehousePosition = $warehousePosition;
         $this->request = $request;
+        $this->mainIndex = route('warehousePosition.index');
+        $this->mainTitle = '库位';
     }
 
     /**
@@ -37,6 +39,7 @@ class PositionController extends Controller
         $this->request->flash();
 
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->warehousePosition->auto()->paginate(),
         ];
 
@@ -53,6 +56,7 @@ class PositionController extends Controller
     public function show($id)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'position' => $this->warehousePosition->get($id),
         ];
 
@@ -69,6 +73,7 @@ class PositionController extends Controller
     public function create(WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'warehouses' => $warehouse->all(),
         ];
         return view('warehouse.position.create', $response);
@@ -99,6 +104,7 @@ class PositionController extends Controller
     public function edit($id, WarehouseRepository $warehouse)
     {
         $response = [
+            'metas' => $this->metas(__FUNCTION__),
             'warehouses' => $warehouse->all(),
             'position' => $this->warehousePosition->get($id),
         ];

@@ -11,7 +11,8 @@
  */
 
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
-
+//产品图片路由
+Route::resource('productImage', 'Product\ImageController');
 Route::resource('productSupplier', 'Product\SupplierController');
 Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');

@@ -14,6 +14,7 @@
  * @author Vincent <nyewon@gmail.com>
  */
 return [
+    //产品导航
     [
         'name' => '产品',
         'icon' => 'tags',
@@ -34,13 +35,20 @@ return [
                 'url' => 'productRequire.index',
                 'icon' => '',
             ],
+            [
+                'name' => '产品图片',
+                'url' => 'productImage.index',
+                'icon' => '',
+            ],
         ],
     ],
+    //订单导航
     [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => '',
     ],
+    //仓储导航
     [
         'name' => '仓储',
         'icon' => 'home',
@@ -58,6 +66,7 @@ return [
             ],
         ],
     ],
+    //物流导航
     [
         'name' => '物流',
         'icon' => 'plane',
@@ -85,11 +94,13 @@ return [
             ],
         ],
     ],
+    //采购导航
     [
         'name' => '采购',
         'icon' => 'shopping-cart',
         'url' => '',
     ],
+    //渠道导航
     [
         'name' => '渠道',
         'icon' => 'transfer',
@@ -107,11 +118,13 @@ return [
             ],
         ],
     ],
+    //财务导航
     [
         'name' => '财务',
         'icon' => 'piggy-bank',
         'url' => '',
     ],
+    //客户导航
     [
         'name' => '客户',
         'icon' => 'user',

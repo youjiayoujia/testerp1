@@ -2,7 +2,7 @@
     return [
         'PURCHASE' => '采购入库',
         'PRODUCE' => '做货入库',
-        'ALLOCATE' => '调拨入库',
+        'ALLOTMENT' => '调拨入库',
         'BOUNCE' => '退件入库',
         'PACKAGE_CANCLE' => 'package取消入库',
         'INVENTORY_PROFIT' => '盘盈入库',

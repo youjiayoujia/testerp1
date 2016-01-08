@@ -29,6 +29,6 @@ class TestController extends Controller
         $arr['sku'][0] = 'mc';
         $arr['sku'][1] = 'dj';
 
-        var_dump(array_values($arr['name']));
+        var_dump(array_keys($arr['name']));
     }
 }

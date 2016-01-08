@@ -3,14 +3,8 @@
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('adjust_form_id') }}">调整单号{!! Sort::label('adjust_form_id') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('item_id') }}">Item号{!! Sort::label('item_id') !!}</th>
-    <th>sku</th>
-    <th>类型</th>
     <th>仓库</th>
-    <th>库位</th>
-    <th class="sort" data-url="{{ Sort::url('amount') }}">数量{!! Sort::label('amount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('total_amount') }}">总金额(￥){!! Sort::label('total_amount') !!}</th>
-    <th>备注(原因)</th>
+    <th>备注</th>
     <th>调整人</th>
     <th>调整时间</th>
     <th>状态</th>
@@ -20,37 +14,31 @@
     <th>操作</th>
 @stop
 @section('tableBody')
-    @foreach($data as $adjustment)
+    @foreach($adjusts as $adjust)
         <tr>
-            <td>{{ $adjustment->id }}</td>
-            <td>{{ $adjustment->adjust_form_id }}</td>
-            <td>{{ $adjustment->item_id }}</td>
-            <td>{{ $adjustment->sku }}</td>
-            <td>{{ $adjustment->type }}</td>
-            <td>{{ $adjustment->warehouse->name }}</td>
-            <td>{{ $adjustment->position->name }}</td>
-            <td>{{ $adjustment->amount}}</td>
-            <td>{{ $adjustment->total_amount}}</td>
-            <td>{{ $adjustment->remark }}</td>
-            <td>{{ $adjustment->adjust_man_id }} </td>
-            <td>{{ $adjustment->adjust_time }}</td>
-            <td>{{ $adjustment->status == 'Y' ? '已审核' : '未审核' }}</td>
-            <td>{{ $adjustment->check_man_id }}</td>
-            <td>{{ $adjustment->check_time }}</td>
-            <td>{{ $adjustment->created_at }}</td>
+            <td>{{ $adjust->id }}</td>
+            <td>{{ $adjust->adjust_form_id }}</td>
+            <td>{{ $adjust->warehouse->name }}</td>
+            <td>{{ $adjust->remark }}</td>
+            <td>{{ $adjust->adjust_man_id }} </td>
+            <td>{{ $adjust->adjust_time }}</td>
+            <td>{{ $adjust->status == 'Y' ? '已审核' : '未审核' }}</td>
+            <td>{{ $adjust->check_man_id }}</td>
+            <td>{{ $adjust->check_time }}</td>
+            <td>{{ $adjust->created_at }}</td>
             <td>
-                <a href="{{ route('stockAdjustment.show', ['id'=>$adjustment->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('stockAdjustment.show', ['id'=>$adjust->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('stockAdjustment.edit', ['id'=>$adjustment->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('stockAdjustment.edit', ['id'=>$adjust->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="javascript:"  class="btn btn-info btn-xs check_time" data-id="{{ $adjustment->id }}">
+                <a href="javascript:"  class="btn btn-info btn-xs check_time" data-id="{{ $adjust->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>审核
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $adjustment->id }}"
-                   data-url="{{ route('stockAdjustment.destroy', ['id' => $adjustment->id]) }}">
+                   data-id="{{ $adjust->id }}"
+                   data-url="{{ route('stockAdjustment.destroy', ['id' => $adjust->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

@@ -43,4 +43,19 @@ class SupplierRepository extends BaseRepository
 	{
 		$this->model = $supplier;
 	}
+
+    /**
+     * 获取供应商信息
+     * @param $type
+     * 
+     * @return $obj
+     */
+    public function getSupplier($arr = '')
+    {
+        if($arr) {
+            return Supplier::where($arr)->get();
+        }
+
+        return Supplier::all();
+    }
 }

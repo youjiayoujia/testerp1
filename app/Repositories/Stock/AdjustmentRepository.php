@@ -13,6 +13,7 @@ namespace App\Repositories\Stock;
 
 use App\Base\BaseRepository;
 use App\Models\Stock\AdjustmentModel;
+use App\Models\Stock\AdjustFormModel;
 
 class AdjustmentRepository extends BaseRepository
 {
@@ -33,5 +34,4 @@ class AdjustmentRepository extends BaseRepository
     {
         $this->model = $adjustment;
     }
-
 }

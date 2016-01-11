@@ -54,7 +54,7 @@
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="surface" {{ $logistics->species == 'surface' ? 'checked' : '' }}>小包
+                <input type="radio" name="species" value="packet" {{ $logistics->species == 'packet' ? 'checked' : '' }}>小包
             </label>
         </div>
     </div>

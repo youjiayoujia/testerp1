@@ -49,12 +49,12 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="express">快递
+                <input type="radio" name="species" value="express" {{ old('species') ? (old('species') == 'express' ? 'checked' : '') : '' }}>快递
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="surface" checked>小包
+                <input type="radio" name="species" value="packet" {{ old('species') ? (old('species') == 'packet' ? 'checked' : '') : 'checked' }}>小包
             </label>
         </div>
     </div>

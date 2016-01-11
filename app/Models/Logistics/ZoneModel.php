@@ -19,12 +19,17 @@ class ZoneModel extends BaseModel
     protected $fillable = [
         'name',
         'logistics_id',
-        'countries'
+        'country_id'
     ];
 
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountryModel', 'country_id', 'id');
     }
 
 }

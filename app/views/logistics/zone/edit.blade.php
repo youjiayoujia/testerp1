@@ -21,8 +21,14 @@
         </select>
     </div>
     <div class="form-group col-lg-4">
-        <label for="countries" class="control-label">国家</label>
+        <label for="country_id">国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="countries" placeholder="国家" name='countries' value="{{ old('countries') ? old('countries') : $zone->countries }}">
+        <select name="country_id" class="form-control">
+            @foreach($country as $countries)
+                <option value="{{$countries->id}}" {{$countries->id == $zone->country_id ? 'selected' : ''}}>
+                    {{$countries->name}}
+                </option>
+            @endforeach
+        </select>
     </div>
 @stop

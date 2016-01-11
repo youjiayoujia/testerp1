@@ -13,7 +13,7 @@
                 <strong>物流方式</strong>: {{ $zone->logistics->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>国家</strong>: {{ $zone->countries }}
+                <strong>国家</strong>: {{ $zone->country->name }}
             </div>
         </div>
     </div>

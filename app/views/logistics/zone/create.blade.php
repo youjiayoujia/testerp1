@@ -20,42 +20,14 @@
         </select>
     </div>
     <div class="form-group col-lg-4">
-        <label for="countries" class="control-label">国家</label>
+        <label for="country_id" class="control-label">国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="GLOBAL" {{old('countries') ? (old('countries') == 'GLOBAL' ? 'checked' : '') : ''}}>GLOBAL
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="US" {{old('countries') ? (old('countries') == 'US' ? 'checked' : '') : ''}}>US
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="UK" {{old('countries') ? (old('countries') == 'UK' ? 'checked' : '') : ''}}>UK
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="CN" {{old('countries') ? (old('countries') == 'CN' ? 'checked' : '') : ''}}>CN
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="DE" {{old('countries') ? (old('countries') == 'DE' ? 'checked' : '') : ''}}>DE
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="FR" {{old('countries') ? (old('countries') == 'FR' ? 'checked' : '') : ''}}>FR
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="countries" name="countries" value="JP" {{old('countries') ? (old('countries') == 'JP' ? 'checked' : '') : ''}}>JP
-            </label>
-        </div>
+        <select name="country_id" class="form-control" id="country_id">
+            @foreach($country as $countries)
+                <option value="{{ $countries->id }}" {{ $countries->id == old('$countries->country->id') ? 'selected' : '' }}>
+                    {{ $countries->name }}
+                </option>
+            @endforeach
+        </select>
     </div>
 @stop

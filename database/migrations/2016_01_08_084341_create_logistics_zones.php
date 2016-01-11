@@ -16,7 +16,7 @@ class CreateLogisticsZones extends Migration
             $table->increments('id');
             $table->string('name')->comment('物流分区');
             $table->integer('logistics_id')->comment('物流方式');
-            $table->string('countries')->comment('国家');
+            $table->string('country_id')->comment('国家');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -14,7 +14,7 @@
             <td>{{ $zone->id }}</td>
             <td>{{ $zone->name }}</td>
             <td>{{ $zone->logistics->logistics_type}}</td>
-            <td>{{ $zone->countries }}</td>
+            <td>{{ $zone->country->name }}</td>
             <td>{{ $zone->updated_at }}</td>
             <td>{{ $zone->created_at }}</td>
             <td>

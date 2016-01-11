@@ -11,6 +11,7 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\CountryRepository;
 use App\Repositories\Logistics\ZoneRepository;
 use App\Repositories\LogisticsRepository;
 use Illuminate\Http\Request;
@@ -37,11 +38,12 @@ class ZoneController extends Controller
         return view('logistics.zone.index', $response);
     }
 
-    public function create(LogisticsRepository $logistics)
+    public function create(LogisticsRepository $logistics, CountryRepository $country)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logistics' => $logistics->all(),
+            'country' => $country->all(),
         ];
         return view('logistics.zone.create', $response);
     }
@@ -63,12 +65,13 @@ class ZoneController extends Controller
         return view('logistics.zone.show', $response);
     }
 
-    public function edit($id, LogisticsRepository $logistics)
+    public function edit($id, LogisticsRepository $logistics, CountryRepository $country)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'zone' => $this->zone->get($id),
             'logistics' => $logistics->all(),
+            'country' => $country->all(),
         ];
         return view('logistics.zone.edit', $response);
     }

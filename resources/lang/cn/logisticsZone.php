@@ -10,7 +10,7 @@ return [
     'id' => 'ID',
     'name' => '物流分区',
     'logistics_id' => '物流方式',
-    'countries' => '国家',
+    'country_id' => '国家',
     'created_at' => '创建时间',
     'updated_at' => '更新时间'
 ];

@@ -11,7 +11,7 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Request;
+use Illuminate\Http\Request;
 use App\Repositories\Logistics\ZonePricePacketRepository;
 use App\Repositories\LogisticsRepository;
 

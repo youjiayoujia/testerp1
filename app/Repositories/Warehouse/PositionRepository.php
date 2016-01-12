@@ -37,8 +37,8 @@ class PositionRepository extends BaseRepository
 		$this->model = $position;
 	}
 
-    public function get_position($arr)
+    public function get_position($arr,$field = ['*'])
     {
-        return $this->model->where($arr)->get();
+        return $this->model->where($arr)->get($field);
     }
 }

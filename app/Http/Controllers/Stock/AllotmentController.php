@@ -1,48 +1,51 @@
 <?php
 /**
- * 库存调整控制器
+ * 库存调拨控制器
  * 处理库存调整相关的Request与Response
  *
  * @author: MC<178069409@qq.com>
- * Date: 15/12/24
- * Time: 14:22
+ * Date: 15/1/11
+ * Time: 11:09
  */
 
 namespace App\Http\Controllers\Stock;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Stock\AdjustmentRepository;
+use App\Repositories\Stock\AllotmentRepository;
 use App\Models\ItemModel;
 use App\Repositories\WarehouseRepository;
 use App\Repositories\Warehouse\PositionRepository;
-use App\Repositories\Stock\InRepository;
+use App\Repositories\Stock\AllotmentFormRepository;
 use App\Repositories\Stock\OutRepository;
 use App\Repositories\StockRepository;
-use App\Repositories\Stock\AdjustFormRepository;
 
-class AdjustmentController extends Controller
+
+class AllotmentController extends Controller
 {
-    protected $adjustment;
+    protected $allotment;
+    protected $warehouse;
+    protected $allotmentform;
     protected $out;
-    protected $in;
     protected $stock;
 
     public function __construct(Request $request, 
-                                AdjustmentRepository $adjustment, 
-                                InRepository $in, 
-                                OutRepository $out, 
-                                StockRepository $stock,
-                                AdjustFormRepository $adjust)
+                                AllotmentRepository $allotment,
+                                WarehouseRepository $warehouse,
+                                PositionRepository $position,
+                                AllotmentFormRepository $allotmentform,
+                                OutRepository $out,
+                                StockRepository $stock)
     {
-        $this->adjustment = $adjustment;
+        $this->allotment = $allotment;
         $this->request = $request;
+        $this->warehouse = $warehouse;
+        $this->position = $position;
+        $this->allotmentform = $allotmentform;
         $this->out = $out;
-        $this->in = $in;
         $this->stock = $stock;
-        $this->adjust = $adjust;
-        $this->mainIndex = route('stockAdjustment.index');
-        $this->mainTitle = '库存调整';
+        $this->mainIndex = route('stockAllotment.index');
+        $this->mainTitle = '库存调拨';
     }
 
     /**
@@ -57,11 +60,11 @@ class AdjustmentController extends Controller
         $this->request->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjusts' => $this->adjust->all(),
-            'data' => $this->adjustment->auto()->paginate(),
+            'warehouses' => $this->warehouse->all(),
+            'data' => $this->allotment->auto()->paginate(),
         ];
 
-        return view('stock.adjustment.index', $response);
+        return view('stock.allotment.index', $response);
     }
 
     /**
@@ -75,11 +78,11 @@ class AdjustmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjustments' => $this->adjust->get($id)->adjustment,
-            'adjust' => $this->adjust->get($id),
+            'allotment' => $this->allotment->get($id),
+            'allotmentforms' => $this->allotment->get($id)->allotmentform,
         ];
         
-        return view('stock.adjustment.show', $response);
+        return view('stock.allotment.show', $response);
     }
 
     /**
@@ -89,14 +92,14 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function create(WarehouseRepository $warehouse)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $warehouse->all(),
+            'warehouses' => $this->warehouse->all(),
         ];
 
-        return view('stock.adjustment.create', $response);
+        return view('stock.allotment.create', $response);
     }
 
     /**
@@ -110,10 +113,9 @@ class AdjustmentController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->rules($this->request));
-        $buf = [];
         $len = count(array_keys($this->request->input('arr')['sku']));
         $buf = $this->request->all();
-        $obj = $this->adjust->create($buf);
+        $obj = $this->allotment->create($buf);
         for($i=0; $i<$len; $i++)
         {   
             $arr = $this->request->input('arr');
@@ -122,11 +124,11 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['adjust_forms_id'] = $obj->id;
-            $this->adjustment->create($buf);
+            $buf['stock_allotments_id'] = $obj->id;
+            $this->allotmentform->create($buf);
         }
 
-        return redirect(route('stockAdjustment.index'));
+        return redirect(route('stockAllotment.index'));
     }
 
     /**
@@ -136,17 +138,17 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function edit($id, WarehouseRepository $warehouse, PositionRepository $position)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjust' => $this->adjust->get($id),
-            'adjustments' => $this->adjust->get($id)->adjustment,
-            'warehouses' => $warehouse->all(),
-            'positions' =>$position->get_position(['warehouses_id' => $this->adjust->get($id)->warehouses_id])->toArray(),
+            'allotment' => $this->allotment->get($id),
+            'warehouses' => $this->warehouse->all(),
+            'positions' => $this->position->get_position(['warehouses_id'=>$this->allotment->get($id)->out_warehouses_id]),
+            'allotmentforms' => $this->allotment->get($id)->allotmentform, 
         ];
 
-        return view('stock.adjustment.edit', $response);
+        return view('stock.allotment.edit', $response);
     }
 
     /**
@@ -163,12 +165,12 @@ class AdjustmentController extends Controller
         $buf = [];
         $len = count(array_keys($this->request->input('arr')['sku']));
         $buf = $this->request->all();
-        $obj = $this->adjust->get($id)->adjustment;
+        $obj = $this->allotment->get($id)->allotmentform;
         $obj_len = count($obj);
         unset($buf['_token']);
+        unset($buf['_method']);
         unset($buf['arr']);
-
-        $this->adjust->update($id, $buf);
+        $this->allotment->update($id, $buf);
         for($i=0; $i<$len; $i++)
         {   
             unset($buf);
@@ -178,8 +180,7 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['adjust_forms_id'] = $id;
-
+            $buf['stock_allotments_id'] = $id;
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {
@@ -187,7 +188,7 @@ class AdjustmentController extends Controller
             $i++;
         }
 
-        return redirect(route('stockAdjustment.index'));
+        return redirect(route('stockAllotment.index'));
     }
 
     /**
@@ -199,8 +200,9 @@ class AdjustmentController extends Controller
      */
     public function destroy($id)
     {
-        $this->adjust->destroy($id);
-        return redirect(route('stockAdjustment.index'));
+        $this->allotment->destroy($id);
+
+        return redirect(route('stockAllotment.index'));
     }
 
     /**
@@ -210,32 +212,28 @@ class AdjustmentController extends Controller
      * @return json|time
      *
      */
-    public function check()
+    public function allotmentcheck()
     {
         $id = $_GET['id'];
         $time = date('Y-m-d',time());       
-        $obj = $this->adjust->get($id);
-        $obj->update(['status'=>'Y', 'check_time'=>$time]); 
+        $obj = $this->allotment->get($id);
+        $obj->update(['check_status'=>'Y', 'check_time'=>$time]); 
         echo json_encode($time);
 
-        $obj->relation_id = $obj->adjust_form_id;
+        $obj->relation_id = $obj->allotment_id;
         $arr = $obj->toArray();
-        $buf = $obj->adjustment->toArray();
+        $buf = $obj->allotmentform->toArray();
         for($i=0;$i<count($buf);$i++) {
             $tmp = [];
             $tmp = array_merge($arr,$buf[$i]);
-            if($tmp['type'] == '入库') {
-                $tmp['type'] = 'ADJUSTMENT';
-                $this->stock->in($tmp);
-            } else {
-                $tmp['type'] = 'ADJUSTMENT';
-                $this->stock->out($tmp);
-            }
+            $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
+            $tmp['type'] = 'ALLOTMENT';
+            $this->stock->out($tmp);
         }
     }
 
     /**
-     * 返回验证规则 
+     * 返回create的验证规则 
      *
      * @param $request
      * @return $arr
@@ -244,7 +242,9 @@ class AdjustmentController extends Controller
     public function rules($request)
     {
         $arr = [
-            'adjust_time' => 'date|required',
+            'allotment_time' => 'date|required',
+            'out_warehouses_id' => 'required|numeric',
+            'in_warehouses_id' => 'required|numeric',
         ];
         $buf = $request->all();
         $buf = $buf['arr'];
@@ -264,6 +264,11 @@ class AdjustmentController extends Controller
                 foreach($val as $k => $v)
                 {
                     $arr['arr.warehouse_positions_id.'.$k] = 'required|numeric';
+                }
+            if($key == 'total_amount')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.total_amount.'.$k] = 'required';
                 }
         }
 

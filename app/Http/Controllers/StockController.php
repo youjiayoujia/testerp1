@@ -13,14 +13,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\StockRepository;
 use App\Repositories\WarehouseRepository;
+use App\Repositories\Warehouse\PositionRepository;
 
 class StockController extends Controller
 {
     protected $stock;
+    protected $position;
 
-    public function __construct(Request $request, StockRepository $stock)
+    public function __construct(Request $request, StockRepository $stock, PositionRepository $position)
     {
         $this->stock = $stock;
+        $this->position = $position;
         $this->request = $request;
         $this->mainIndex = route('stock.index');
         $this->mainTitle = '库存';
@@ -173,7 +176,7 @@ class StockController extends Controller
         $obj = $this->stock->getObj(['warehouse_positions_id'=>$val_position])->first();
 
         if($obj)
-            echo json_encode([$obj->sku, $obj->available_amount]);
+            echo json_encode([$obj->sku, $obj->available_amount, $obj->item_id]);
         else
             echo json_encode('none');
     }
@@ -192,5 +195,26 @@ class StockController extends Controller
         $cost = $this->stock->getunitcost($obj->sku);
         if($obj)
             echo json_encode([$obj->available_amount,$cost]);
+    }
+
+    /**
+     * 
+     */
+    public function getpsi()
+    {
+        $warehouse = $_GET['warehouse'];
+
+        $arr[] = $this->position->get_position(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
+        
+
+        $obj = $this->stock->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku'])->first();
+        if($obj) {
+            $arr[1][] = $obj ->toArray();
+        }
+
+        if($arr)
+            echo json_encode($arr);
+        else
+            echo 'none';
     }
 }

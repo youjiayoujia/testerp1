@@ -75,6 +75,7 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 /**
  * stock controller route
  */
+Route::get('getpsi', ['uses'=>'StockController@getpsi', 'as'=>'getpsi']);
 Route::get('getavailableamount', ['uses'=>'StockController@getAvailableAmount', 'as'=>'getavailableamount']);
 Route::get('getsku', ['uses'=>'StockController@getSku', 'as'=>'getsku']);
 Route::get('getunitcost', ['uses'=>'StockController@getUnitCost','as'=>'getunitcost']);
@@ -88,4 +89,10 @@ Route::resource('channel', 'ChannelController');
 
 //渠道账号路由
 Route::resource('channelAccount', 'Channel\AccountController');
+
+/**
+ *  stock allotment route
+ */
+Route::get('allotmentcheck', ['uses' => 'Stock\AllotmentController@allotmentcheck', 'as'=>'allotmentcheck']);
+Route::resource('stockAllotment', 'Stock\AllotmentController');
 

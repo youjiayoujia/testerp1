@@ -212,9 +212,9 @@
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    $('.warehouse_positions_id').empty();
+                    $('.addpanel').prev().find('warehouse_positions_id').empty();
                     for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));
+                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.addpanel').prev().find('.warehouse_positions_id'));
                 }
             });
 

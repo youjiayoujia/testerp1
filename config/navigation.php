@@ -84,6 +84,11 @@ return [
                 'url' => 'stockAdjustment.index',
                 'icon' => '',
             ],
+            [
+                'name' => '库存调拨',
+                'url' => 'stockAllotment.index',
+                'icon' => '',
+            ],
         ],
     ],
     //物流导航

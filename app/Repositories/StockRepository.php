@@ -65,9 +65,9 @@ class StockRepository extends BaseRepository
      * @return object array
      *
      */
-    public function getObj($arr)
+    public function getObj($arr, $field=['*'])
     {
-        return $this->model->where($arr)->get();
+        return $this->model->where($arr)->get($field);
     }
 
     /**

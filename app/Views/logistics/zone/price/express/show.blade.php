@@ -10,7 +10,7 @@
                 <strong>物流分区价格</strong>: {{ $zonePriceExpress->name }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $zonePriceExpress->logistics->species }}
+                <strong>种类</strong>: {{ $zonePriceExpress->shipping }}
             </div>
             <div class="col-lg-4">
                 <strong>首重</strong>: {{ $zonePriceExpress->fixed_weight }}

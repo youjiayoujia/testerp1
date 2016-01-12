@@ -13,7 +13,6 @@ namespace App\Http\Controllers\Logistics;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Repositories\Logistics\ZonePriceExpressRepository;
-use App\Repositories\LogisticsRepository;
 
 class ZonePriceExpressController extends Controller
 {
@@ -37,11 +36,10 @@ class ZonePriceExpressController extends Controller
         return view('logistics.zone.price.express.index', $response);
     }
 
-    public function create(LogisticsRepository $logistics)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logistics' => $logistics->all(),
         ];
         return view('logistics.zone.price.express.create', $response);
     }
@@ -63,12 +61,11 @@ class ZonePriceExpressController extends Controller
         return view('logistics.zone.price.express.show', $response);
     }
 
-    public function edit($id, LogisticsRepository $logistics)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'zonePriceExpress' => $this->zonePriceExpress->get($id),
-            'logistics' => $logistics->all(),
         ];
         return view('logistics.zone.price.express.edit', $response);
     }

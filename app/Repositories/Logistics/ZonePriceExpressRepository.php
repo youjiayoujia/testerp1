@@ -15,12 +15,12 @@ use App\Models\Logistics\ZonePriceExpressModel;
 
 class ZonePriceExpressRepository extends BaseRepository
 {
-    protected $searchFields = ['name', 'species_id', 'fixed_weight', 'continued_weight'];
+    protected $searchFields = ['name', 'fixed_weight', 'continued_weight'];
 
     public $rules = [
         'create' => [
             'name' => 'required',
-            'species_id' => 'required',
+            'shipping' => 'required',
             'fixed_weight' => 'required',
             'fixed_price' => 'required',
             'continued_weight' => 'required',
@@ -31,7 +31,7 @@ class ZonePriceExpressRepository extends BaseRepository
         ],
         'update' => [
             'name' => 'required',
-            'species_id' => 'required',
+            'shipping' => 'required',
             'fixed_weight' => 'required',
             'fixed_price' => 'required',
             'continued_weight' => 'required',

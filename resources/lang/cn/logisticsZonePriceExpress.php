@@ -9,7 +9,7 @@
 return [
     'id' => 'ID',
     'name' => '物流分区报价',
-    'species_id' => '种类',
+    'shipping' => '种类',
     'fixed_weight' => '首重',
     'fixed_price' => '首重价格',
     'continued_weight' => '续重',

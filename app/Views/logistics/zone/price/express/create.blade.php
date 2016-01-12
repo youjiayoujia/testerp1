@@ -8,15 +8,9 @@
         <input class="form-control" id="name" placeholder="物流分区报价名称" name='name' value="{{ old('name') }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="species_id">种类</label>
+        <label for="shipping" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="species_id" class="form-control" id="species_id">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
-                    {{ $logisticses->species }}
-                </option>
-            @endforeach
-        </select>
+        <input class="form-control" id="shipping" placeholder="种类" name="shipping" value="express" readonly>
     </div>
     <div class="form-group col-lg-4">
         <label for="fixed_weight" class="control-label">首重</label>

@@ -9,15 +9,9 @@
         <input class="form-control" id="name" placeholder="物流分区报价名称" name='name' value="{{ old('name') ? old('name') : $zonePricePacket->name }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="species_id">种类</label>
+        <label for="shipping" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="species_id" class="form-control">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == $zonePricePacket->species_id ? 'selected' : '' }}>
-                    {{ $logisticses->species }}
-                </option>
-            @endforeach
-        </select>
+        <input class="form-control" id="shipping" placeholder="种类" name="shipping" value="{{ old('shipping') ? old('shipping') : $zonePricePacket->shipping }}" readonly>
     </div>
     <div class="form-group col-lg-4">
         <label for="price" class="control-label">价格</label>

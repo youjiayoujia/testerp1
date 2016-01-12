@@ -9,7 +9,7 @@
 return [
     'id' => 'ID',
     'name' => '物流分区报价',
-    'species_id' => '种类',
+    'shipping' => '种类',
     'price' => '价格',
     'other_price' => '其他费用',
     'discount' => '最后折扣',

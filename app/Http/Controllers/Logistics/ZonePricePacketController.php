@@ -13,7 +13,6 @@ namespace App\Http\Controllers\Logistics;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Repositories\Logistics\ZonePricePacketRepository;
-use App\Repositories\LogisticsRepository;
 
 class ZonePricePacketController extends Controller
 {
@@ -37,11 +36,10 @@ class ZonePricePacketController extends Controller
         return view('logistics.zone.price.packet.index', $response);
     }
 
-    public function create(LogisticsRepository $logistics)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logistics' => $logistics->all(),
         ];
         return view('logistics.zone.price.packet.create', $response);
     }
@@ -63,12 +61,11 @@ class ZonePricePacketController extends Controller
         return view('logistics.zone.price.packet.show', $response);
     }
 
-    public function edit($id, LogisticsRepository $logistics)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'zonePricePacket' => $this->zonePricePacket->get($id),
-            'logistics' => $logistics->all(),
         ];
         return view('logistics.zone.price.packet.edit', $response);
     }

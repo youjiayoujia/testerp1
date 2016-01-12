@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('logisticsZonePriceExpress.update', ['id' => $zone->id]) }} @stop
+@section('formAction') {{ route('logisticsZonePriceExpress.update', ['id' => $zonePriceExpress->id]) }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
@@ -9,15 +9,9 @@
         <input class="form-control" id="name" placeholder="物流分区报价名称" name='name' value="{{ old('name') ? old('name') : $zonePriceExpress->name }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="species_id">种类</label>
+        <label for="shipping" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="species_id" class="form-control">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == $zonePriceExpress->species_id ? 'selected' : '' }}>
-                    {{ $logisticses->species }}
-                </option>
-            @endforeach
-        </select>
+        <input class="form-control" id="shipping" placeholder="种类" name="shipping" value="{{ old('shipping') ? old('shipping') : $zonePriceExpress->shipping }}" readonly>
     </div>
     <div class="form-group col-lg-4">
         <label for="fixed_weight" class="control-label">首重</label>

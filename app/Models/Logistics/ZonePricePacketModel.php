@@ -18,15 +18,10 @@ class ZonePricePacketModel extends BaseModel
 
     protected $fillable = [
         'name',
-        'species_id',
+        'shipping',
         'price',
         'other_price',
         'discount',
     ];
-
-    public function logistics()
-    {
-        return $this->belongsTo('App\Models\LogisticsModel', 'species_id', 'id');
-    }
 
 }

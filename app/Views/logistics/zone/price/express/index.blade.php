@@ -2,7 +2,7 @@
 @section('tableHeader')
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('name') }}">物流分区报价{!! Sort::label('name') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('species_id') }}">种类{!! Sort::label('species_id') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('shipping') }}">种类{!! Sort::label('shipping') !!}</th>
     <th class="sort" data-url="{{ Sort::url('fixed_weight') }}">首重{!! Sort::label('fixed_weight') !!}</th>
     <th class="sort" data-url="{{ Sort::url('fixed_price') }}">首重价格{!! Sort::label('fixed_price') !!}</th>
     <th class="sort" data-url="{{ Sort::url('continued_weight') }}">续重{!! Sort::label('continued_weight') !!}</th>
@@ -19,7 +19,7 @@
         <tr>
             <td>{{ $zonePriceExpress->id }}</td>
             <td>{{ $zonePriceExpress->name }}</td>
-            <td>{{ $zonePriceExpress->logistics->species}}</td>
+            <td>{{ $zonePriceExpress->shipping}}</td>
             <td>{{ $zonePriceExpress->fixed_weight }}</td>
             <td>{{ $zonePriceExpress->fixed_price }}</td>
             <td>{{ $zonePriceExpress->continued_weight }}</td>

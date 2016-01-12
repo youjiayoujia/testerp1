@@ -18,7 +18,7 @@ class ZonePriceExpressModel extends BaseModel
 
     protected $fillable = [
         'name',
-        'species_id',
+        'shipping',
         'fixed_weight',
         'fixed_price',
         'continued_weight',
@@ -27,10 +27,5 @@ class ZonePriceExpressModel extends BaseModel
         'other_scale_price',
         'discount',
     ];
-
-    public function logistics()
-    {
-        return $this->belongsTo('App\Models\LogisticsModel', 'species_id', 'id');
-    }
 
 }

@@ -19,7 +19,7 @@
         <tr>
             <td>{{ $zonePriceExpress->id }}</td>
             <td>{{ $zonePriceExpress->name }}</td>
-            <td>{{ $zonePriceExpress->shipping}}</td>
+            <td>{{ $zonePriceExpress->shipping == 'express' ? '快递' : ''}}</td>
             <td>{{ $zonePriceExpress->fixed_weight }}</td>
             <td>{{ $zonePriceExpress->fixed_price }}</td>
             <td>{{ $zonePriceExpress->continued_weight }}</td>

@@ -15,7 +15,7 @@
         <tr>
             <td>{{ $zonePricePacket->id }}</td>
             <td>{{ $zonePricePacket->name }}</td>
-            <td>{{ $zonePricePacket->shipping }}</td>
+            <td>{{ $zonePricePacket->shipping == 'packet' ? '小包' : '' }}</td>
             <td>{{ $zonePricePacket->price }}</td>
             <td>{{ $zonePricePacket->other_price }}</td>
             <td>{{ $zonePricePacket->discount }}</td>

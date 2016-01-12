@@ -10,7 +10,7 @@
                 <strong>物流分区价格</strong>: {{ $zonePricePacket->name }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $zonePricePacket->shipping }}
+                <strong>种类</strong>: {{ $zonePricePacket->shipping == 'packet' ? '小包' : '' }}
             </div>
             <div class="col-lg-4">
                 <strong>价格</strong>: {{ $zonePricePacket->price }}

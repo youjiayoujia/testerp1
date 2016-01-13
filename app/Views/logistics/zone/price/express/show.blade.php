@@ -13,22 +13,22 @@
                 <strong>种类</strong>: {{ $zonePriceExpress->shipping == 'express' ? '快递' : '' }}
             </div>
             <div class="col-lg-4">
-                <strong>首重</strong>: {{ $zonePriceExpress->fixed_weight }}
+                <strong>首重(kg)</strong>: {{ $zonePriceExpress->fixed_weight }}
             </div>
             <div class="col-lg-4">
-                <strong>首重价格</strong>: {{ $zonePriceExpress->fixed_price }}
+                <strong>首重价格(/kg)</strong>: {{ $zonePriceExpress->fixed_price }}
             </div>
             <div class="col-lg-4">
-                <strong>续重</strong>: {{ $zonePriceExpress->continued_weight }}
+                <strong>续重(kg)</strong>: {{ $zonePriceExpress->continued_weight }}
             </div>
             <div class="col-lg-4">
-                <strong>续重价格</strong>: {{ $zonePriceExpress->continued_price }}
+                <strong>续重价格(/kg)</strong>: {{ $zonePriceExpress->continued_price }}
             </div>
             <div class="col-lg-4">
                 <strong>其他固定费用</strong>: {{ $zonePriceExpress->other_fixed_price }}
             </div>
             <div class="col-lg-4">
-                <strong>其他比例费用</strong>: {{ $zonePriceExpress->other_scale_price }}
+                <strong>其他比例费用(%)</strong>: {{ $zonePriceExpress->other_scale_price }}
             </div>
             <div class="col-lg-4">
                 <strong>最后折扣</strong>: {{ $zonePriceExpress->discount }}

@@ -13,7 +13,7 @@
                 <strong>种类</strong>: {{ $zonePricePacket->shipping == 'packet' ? '小包' : '' }}
             </div>
             <div class="col-lg-4">
-                <strong>价格</strong>: {{ $zonePricePacket->price }}
+                <strong>价格(/kg)</strong>: {{ $zonePricePacket->price }}
             </div>
             <div class="col-lg-4">
                 <strong>其他费用</strong>: {{ $zonePricePacket->other_price }}

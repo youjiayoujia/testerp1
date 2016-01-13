@@ -3,12 +3,12 @@
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('name') }}">物流分区报价{!! Sort::label('name') !!}</th>
     <th class="sort" data-url="{{ Sort::url('shipping') }}">种类{!! Sort::label('shipping') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('fixed_weight') }}">首重{!! Sort::label('fixed_weight') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('fixed_price') }}">首重价格{!! Sort::label('fixed_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('continued_weight') }}">续重{!! Sort::label('continued_weight') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('continued_price') }}">续重价格{!! Sort::label('continued_price') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('fixed_weight') }}">首重(kg){!! Sort::label('fixed_weight') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('fixed_price') }}">首重价格(/kg){!! Sort::label('fixed_price') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('continued_weight') }}">续重(kg){!! Sort::label('continued_weight') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('continued_price') }}">续重价格(/kg){!! Sort::label('continued_price') !!}</th>
     <th class="sort" data-url="{{ Sort::url('other_fixed_price') }}">其他固定费用{!! Sort::label('other_fixed_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('other_scale_price') }}">其他比例费用{!! Sort::label('other_scale_price') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('other_scale_price') }}">其他比例费用(%){!! Sort::label('other_scale_price') !!}</th>
     <th class="sort" data-url="{{ Sort::url('discount') }}">最后折扣{!! Sort::label('discount') !!}</th>
     <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
     <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>

@@ -3,7 +3,7 @@
     <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
     <th class="sort" data-url="{{ Sort::url('name') }}">物流分区报价{!! Sort::label('name') !!}</th>
     <th class="sort" data-url="{{ Sort::url('shipping') }}">种类{!! Sort::label('shipping') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('price') }}">价格{!! Sort::label('price') !!}</th>
+    <th class="sort" data-url="{{ Sort::url('price') }}">价格(/kg){!! Sort::label('price') !!}</th>
     <th class="sort" data-url="{{ Sort::url('other_price') }}">其他费用{!! Sort::label('other_price') !!}</th>
     <th class="sort" data-url="{{ Sort::url('discount') }}">最后折扣{!! Sort::label('discount') !!}</th>
     <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>

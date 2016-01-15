@@ -53,9 +53,10 @@
 
 <script type="text/javascript">
     function select() {
+
+        alert(document.getElementById('name').value());
         alert(null);
-        var value = document.getElementById('name').value();
-        alert(value);
+
     }
 
     $('country_id').multiselect({

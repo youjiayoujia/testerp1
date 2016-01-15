@@ -25,6 +25,7 @@ Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::resource('logisticsZonePricePacket', 'Logistics\ZonePricePacketController');
 Route::resource('logisticsZonePriceExpress', 'Logistics\ZonePriceExpressController');
+Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
 
 //品类路由
 Route::resource('catalog', 'CatalogController');

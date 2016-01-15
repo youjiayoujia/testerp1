@@ -46,6 +46,8 @@ class LogisticsController extends Controller
         return view('logistics.show', $response);
     }
 
+
+
     public function create(SupplierRepository $supplier, WarehouseRepository $warehouse)
     {
         $response = [
@@ -87,6 +89,12 @@ class LogisticsController extends Controller
     {
         $this->logistics->destroy($id);
         return redirect($this->mainIndex);
+    }
+
+    public function zone()
+    {
+        $id = $_GET['id'];
+        echo json_encode($id);
     }
 
 }

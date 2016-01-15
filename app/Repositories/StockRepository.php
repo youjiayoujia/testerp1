@@ -95,10 +95,17 @@ class StockRepository extends BaseRepository
         try {
             $in->create($arr);
             $obj = $stock->where(['warehouse_positions_id'=>$arr['warehouse_positions_id']])->get()->first();
-            $obj->all_amount += $arr['amount'];
-            $obj->available_amount +=$arr['amount'];
-            $obj->total_amount +=$arr['total_amount'];
-            $obj->save();
+            if($obj) {
+                $obj->all_amount += $arr['amount'];
+                $obj->available_amount +=$arr['amount'];
+                $obj->total_amount +=$arr['total_amount'];
+                $obj->save();
+            } else {
+                $tmp = $stock->create($arr);
+                $tmp->all_amount = $arr['amount'];
+                $tmp->available_amount = $arr['amount'];
+                $tmp->save();
+            }
         } catch (Exception $e) {
             DB::rollback();
         }

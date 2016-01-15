@@ -49,7 +49,7 @@ class InModel extends BaseModel
      */
     public function getTypeNameAttribute()
     {
-        $buf = config('in');
+        $buf = config('in.in');
         return $buf[$this->type];
     }
 }

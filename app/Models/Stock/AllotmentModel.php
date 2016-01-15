@@ -19,7 +19,7 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_man_id', 'allotment_time', 'allotment_status', 'check_man_id', 'check_status', 'check_time', 'created_at'];
+    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_man_id', 'allotment_time', 'allotment_status', 'check_man_id', 'check_status', 'check_time', 'checkform_man_id', 'checkform_time', 'created_at'];
 
     /**
      * get the relationship between the two module 
@@ -66,14 +66,25 @@ class AllotmentModel extends BaseModel
     }
 
     /**
-     * 
+     * get the accessAttribute by the allotment_status
      *
+     * @return
      */
     public function getStatusNameAttribute()
     {
         $buf = config('in.allotment');
         
         return $buf[$this->allotment_status];
+    }
+
+    /**
+     * get the allotmentlogistics-$this model relationship
+     * 
+     * @return
+     */
+    public function logistics()
+    {
+        return $this->hasMany('App\Models\Stock\AllotmentLogisticsModel', 'allotments_id', 'id');
     }
 
 }

@@ -198,7 +198,11 @@ class StockController extends Controller
     }
 
     /**
-     * 
+     * 根据仓库获取position,根据第一个Position获取item_id,sku,available_amount 
+     *
+     * @param none
+     * @return json
+     *
      */
     public function getpsi()
     {
@@ -207,7 +211,7 @@ class StockController extends Controller
         $arr[] = $this->position->get_position(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
         
 
-        $obj = $this->stock->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku'])->first();
+        $obj = $this->stock->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
         if($obj) {
             $arr[1][] = $obj ->toArray();
         }
@@ -216,5 +220,25 @@ class StockController extends Controller
             echo json_encode($arr);
         else
             echo 'none';
+    }
+
+    /**
+     * 根据仓库库位定sku 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function stockposition()
+    {
+        $warehouse = $_GET['warehouse'];
+        $position = $_GET['position'];
+
+        $buf = $this->stock->getObj(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position], ['sku'])->first();
+
+        if($buf->toArray())
+            echo json_encode($buf);
+        else
+            echo json_encode('none');
     }
 }

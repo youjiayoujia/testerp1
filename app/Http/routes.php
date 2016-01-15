@@ -32,7 +32,6 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
-
 /**
  *  InController  controller  route
  */
@@ -75,6 +74,7 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 /**
  * stock controller route
  */
+Route::get('stockposition', ['uses'=>'StockController@stockposition', 'as'=>'stockposition']);
 Route::get('getpsi', ['uses'=>'StockController@getpsi', 'as'=>'getpsi']);
 Route::get('getavailableamount', ['uses'=>'StockController@getAvailableAmount', 'as'=>'getavailableamount']);
 Route::get('getsku', ['uses'=>'StockController@getSku', 'as'=>'getsku']);
@@ -93,6 +93,9 @@ Route::resource('channelAccount', 'Channel\AccountController');
 /**
  *  stock allotment route
  */
+Route::post('checkformupdate/{id}', ['uses'=>'Stock\AllotmentController@checkformupdate', 'as'=>'checkformupdate']);
+Route::get('checkform/{id}', ['uses'=>'Stock\AllotmentController@checkform', 'as'=>'checkform']);
+Route::get('allotmentpick', ['uses'=>'Stock\AllotmentController@allotmentpick', 'as'=>'allotmentpick']);
 Route::get('allotmentcheck', ['uses' => 'Stock\AllotmentController@allotmentcheck', 'as'=>'allotmentcheck']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 

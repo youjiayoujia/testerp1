@@ -27,6 +27,26 @@
             <div class="col-lg-2">
                 <strong>调拨状态</strong>: {{ $allotment->status_name }}
             </div>
+            <div class="col-lg-2">
+                <strong>对单人</strong>: {{ $allotment->checkform_man_id }}
+            </div>
+            <div class="col-lg-2">
+                <strong>对单时间</strong>: {{ $allotment->checkform_time }}
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">物流信息</div>
+        <div class="panel-body">
+            <div class="col-lg-2">
+                <strong>物流名称</strong>: {{ isset($allotment->logistics->type) ? $allotment->logistics->type : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>物流号</strong>: {{ isset($allotment->logistics->code) ? $allotment->logistics->code : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>物流费</strong>: {{ isset($allotment->logistics->fee) ? $allotment->logistics->fee : ''}}
+            </div>
         </div>
     </div>
     @foreach($allotmentforms as $allotmentform)
@@ -47,6 +67,12 @@
             </div>
             <div class="col-lg-2">
                 <strong>金额(￥)</strong>: {{ $allotmentform->total_amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库数量</strong>: {{ isset($allotmentform->receive_amount) ? $allotmentform->receive_amount : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库库位</strong>: {{ isset($allotmentform->inposition->name) ? $allotmentform->inposition->name : '' }}
             </div>
         </div>
     </div>

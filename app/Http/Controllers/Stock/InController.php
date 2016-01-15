@@ -74,7 +74,7 @@ class InController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => config('in'),
+            'data' => config('in.in'),
             'warehouses' => $warehouse->all(),
         ];
 

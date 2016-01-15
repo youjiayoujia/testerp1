@@ -51,4 +51,16 @@ class AllotmentRepository extends BaseRepository
 
         return $this->model->destroy($id);
     }
+
+    /**
+     * 通过$arr获取指定的记录的指定列
+     *
+     * @param $arr ,$field那些列
+     * @return 数组
+     *
+     */
+    public function getObj($arr, $field=['*'])
+    {
+        return $this->model->where($arr)->get($field);
+    }
 }

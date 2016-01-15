@@ -19,7 +19,7 @@ class AllotmentFormModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['stock_allotments_id', 'warehouse_positions_id', 'item_id', 'sku', 'amount', 'total_amount', 'created_at'];
+    protected $fillable = ['stock_allotments_id', 'warehouse_positions_id', 'item_id', 'sku', 'amount', 'total_amount', 'receive_amount', 'in_warehouse_positions_id', 'created_at'];
 
     /**
      * return the relationship between the two Model 
@@ -41,5 +41,14 @@ class AllotmentFormModel extends BaseModel
     public function position()
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+    }
+
+    /**
+     * 
+     *
+     */
+    public function inposition()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'in_warehouse_positions_id', 'id');
     }
 }

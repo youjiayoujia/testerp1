@@ -31,9 +31,9 @@
         </select>
     </div>
     <div class="form-group col-lg-4">
-        <label for="shipping" class="control-label">种类</label>
+        <label for="shipping_id" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="shipping" placeholder="种类" name="shipping" value="{{ old('shipping') ? old('shipping') : $zone->shipping }}">
+        <input class="form-control" id="shipping_id" placeholder="种类" name="shipping_id" value="{{ old('shipping_id') ? old('shipping_id') : $zone->shipping_id }}">
     </div>
     <div class="form-group col-lg-4">
         <label for="fixed_weight" class="control-label">首重(kg)</label>

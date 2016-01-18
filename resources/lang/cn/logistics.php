@@ -10,7 +10,7 @@ return [
     'id' => 'ID',
     'short_code' => '物流方式简码',
     'logistics_type' => '物流方式名称',
-    'species' => '种类',
+    'shipping' => '种类',
     'warehouse_id' => '仓库',
     'logistics_id' => '物流商',
     'type' => '物流商物流方式',

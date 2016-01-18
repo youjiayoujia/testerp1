@@ -16,7 +16,7 @@ class CreateLogisticses extends Migration
             $table->increments('id');
             $table->string('short_code')->comment('物流方式简码')->default(NULL);
             $table->string('logistics_type')->comment('物流方式名称')->default(NULL);
-            $table->string('species')->comment('种类')->default(NULL);
+            $table->string('shipping')->comment('种类')->default(NULL);
             $table->integer('warehouse_id')->comment('仓库')->default(NULL);
             $table->integer('logistics_supplier_id')->comment('物流商')->default(NULL);
             $table->string('type')->comment('物流商物流方式')->default(NULL);

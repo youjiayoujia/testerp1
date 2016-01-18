@@ -16,7 +16,7 @@
                 <strong>国家</strong>: {{ $zone->country->name }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $zone->shipping == 'express' ? '快递' : '' }}
+                <strong>种类</strong>: {{ $zone->shipping_id == 'express' ? '快递' : '' }}
             </div>
             <div class="col-lg-4">
                 <strong>首重(kg)</strong>: {{ $zone->fixed_weight }}

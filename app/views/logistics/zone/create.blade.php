@@ -1,6 +1,5 @@
 @extends('common.form')
 
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 
 @section('formAction') {{ route('logisticsZone.store') }} @stop
@@ -33,53 +32,69 @@
             @endforeach
         </select>
     </div>
-    <div class="form-group col-lg-4">
-        <label for="shipping_id">种类</label>
+    {{--<div class="form-group col-lg-4">--}}
+        {{--<label for="shipping_id">种类</label>--}}
+        {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
+        {{--<select name="shipping_id" class="form-control" id="shipping_id">--}}
+            {{--@foreach($logistics as $logisticses)--}}
+                {{--<option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>--}}
+                    {{--{{ $logisticses->shipping }}--}}
+                {{--</option>--}}
+            {{--@endforeach--}}
+        {{--</select>--}}
+    {{--</div>--}}
+
+    <div class="form-group col-lg-12" id="shipping_id">
+        <label for="shipping_id" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="shipping_id" class="form-control" id="shipping_id">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
-                    {{ $logisticses->shipping }}
-                </option>
-            @endforeach
-        </select>
+        <div class="radio">
+            <label>
+                <input type="radio" name="shipping_id" value="express" onclick="checkShipping()" {{ old('shipping_id') ? (old('shipping_id') == 'express' ? 'checked' : '') : '' }}>快递
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="shipping_id" value="packet" onclick="checkShipping()" {{ old('shipping_id') ? (old('shipping_id') == 'packet' ? 'checked' : '') : '' }} >小包
+            </label>
+        </div>
     </div>
-    <div class="form-group col-lg-4">
+
+    <div class="form-group col-lg-4" id="express">
         <label for="fixed_weight" class="control-label">首重(kg)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="fixed_weight" placeholder="首重(kg)" name='fixed_weight' value="{{ old('fixed_weight') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="express">
         <label for="fixed_price" class="control-label">首重价格(/kg)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="fixed_price" placeholder="首重价格(/kg)" name='fixed_price' value="{{ old('fixed_price') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="express">
         <label for="continued_weight" class="control-label">续重(kg)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="continued_weight" placeholder="续重(kg)" name='continued_weight' value="{{ old('continued_weight') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="express">
         <label for="continued_price" class="control-label">续重价格(/kg)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="continued_price" placeholder="续重价格(/kg)" name='continued_price' value="{{ old('continued_price') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="express">
         <label for="other_fixed_price" class="control-label">其他固定费用</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="other_fixed_price" placeholder="其他固定费用" name='other_fixed_price' value="{{ old('other_fixed_price') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="express">
         <label for="other_scale_price" class="control-label">其他比例费用(%)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="other_scale_price" placeholder="其他比例费用(%)" name='other_scale_price' value="{{ old('other_scale_price') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="packet">
         <label for="price" class="control-label">价格(/kg)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="price" placeholder="价格(/kg)" name='price' value="{{ old('price') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" id="packet">
         <label for="other_price" class="control-label">其他费用</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="other_price" placeholder="其他费用" name='other_price' value="{{ old('other_price') }}">
@@ -94,14 +109,7 @@
 <script type="text/javascript">
     function select() {
         alert(null);
-
-        alert(document.getElementById('name').value());
-
     }
-
-    $('country_id').multiselect({
-
-    });
 
     $.ajax({
         url : "{{ route('zone') }}",
@@ -112,4 +120,22 @@
             alert(result);
         }
     });
+
+    $(document).find(function(){
+        alert($('#shipping_id').val());
+    });
+
+    function checkShipping() {
+        alert('bhw');
+        var shipping_id = $("#shipping_id").val();
+        alert(shipping_id);
+        if (shipping_id == 'express') {
+            $('#packet').hide();
+            $('#express').show();
+        }else {
+            $('#express').hide();
+            $('#packet').show();
+        }
+    }
+
 </script>

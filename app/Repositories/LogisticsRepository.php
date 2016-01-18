@@ -21,7 +21,7 @@ class LogisticsRepository extends BaseRepository
         'create' => [
             'short_code' => 'required',
             'logistics_type' => 'required',
-            'species' => 'required',
+            'shipping' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
@@ -32,7 +32,7 @@ class LogisticsRepository extends BaseRepository
         'update' => [
             'short_code' => 'required',
             'logistics_type' => 'required',
-            'species' => 'required',
+            'shipping' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',

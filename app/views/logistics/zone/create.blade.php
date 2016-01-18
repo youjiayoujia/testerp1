@@ -9,7 +9,7 @@
         <label for="name" class="control-label">物流分区</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="name" placeholder="命名建议:shipping+数字(1区取1,2区取2,其他区取99)"
-               name='name' value="{{ old('name') }}">
+               name='name' value="{{ old('name') }}" onclick="select();">
     </div>
     <div class="form-group col-lg-4">
         <label for="logistics_id">物流方式</label>
@@ -53,9 +53,9 @@
 
 <script type="text/javascript">
     function select() {
+        alert(null);
 
         alert(document.getElementById('name').value());
-        alert(null);
 
     }
 

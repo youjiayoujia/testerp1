@@ -45,16 +45,16 @@
         <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="species" class="control-label">种类</label>
+        <label for="shipping" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="express" {{ old('species') ? (old('species') == 'express' ? 'checked' : '') : '' }}>快递
+                <input type="radio" name="shipping" value="express" {{ old('shipping') ? (old('shipping') == 'express' ? 'checked' : '') : '' }}>快递
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="species" value="packet" {{ old('species') ? (old('species') == 'packet' ? 'checked' : '') : 'checked' }}>小包
+                <input type="radio" name="shipping" value="packet" {{ old('shipping') ? (old('shipping') == 'packet' ? 'checked' : '') : 'checked' }}>小包
             </label>
         </div>
     </div>

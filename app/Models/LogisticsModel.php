@@ -19,7 +19,7 @@ class LogisticsModel extends BaseModel
     protected $fillable = [
         'short_code',
         'logistics_type',
-        'species',
+        'shipping',
         'warehouse_id',
         'logistics_supplier_id',
         'type',

@@ -20,7 +20,7 @@
             <td>{{ $logistics->id }}</td>
             <td>{{ $logistics->short_code }}</td>
             <td>{{ $logistics->logistics_type }}</td>
-            <td>{{ $logistics->species == 'express' ? '快递' : '小包' }}</td>
+            <td>{{ $logistics->shipping == 'express' ? '快递' : '小包' }}</td>
             <td>{{ $logistics->warehouse->name }}</td>
             <td>{{ $logistics->supplier->name }}</td>
             <td>{{ $logistics->type }}</td>

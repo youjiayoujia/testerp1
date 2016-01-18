@@ -88,18 +88,8 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '物流分区',
+                'name' => '物流分区报价',
                 'url' => 'logisticsZone.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '物流分区报价(小包)',
-                'url' => 'logisticsZonePricePacket.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '物流分区报价(快递)',
-                'url' => 'logisticsZonePriceExpress.index',
                 'icon' => '',
             ],
         ],

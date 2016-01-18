@@ -15,18 +15,20 @@ use App\Models\Logistics\ZoneModel;
 
 class ZoneRepository extends BaseRepository
 {
-    protected $searchFields = ['name', 'logistics_id', 'country_id'];
+    protected $searchFields = ['zone', 'logistics_id', 'country_id', 'shipping_id'];
 
     public $rules = [
         'create' => [
-            'name' => 'required',
+            'zone' => 'required',
             'logistics_id' => 'required',
             'country_id' => 'required',
+            'shipping_id' => 'required',
         ],
         'update' => [
-            'name' => 'required',
+            'zone' => 'required',
             'logistics_id' => 'required',
             'country_id' => 'required',
+            'shipping_id' => 'required',
         ],
     ];
 

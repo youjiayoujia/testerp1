@@ -17,9 +17,19 @@ class ZoneModel extends BaseModel
     protected $table = 'logistics_zones';
 
     protected $fillable = [
-        'name',
+        'zone',
         'logistics_id',
-        'country_id'
+        'country_id',
+        'shipping_id',
+        'price',
+        'other_price',
+        'fixed_weight',
+        'fixed_price',
+        'continued_weight',
+        'continued_price',
+        'other_fixed_price',
+        'other_scale_price',
+        'discount',
     ];
 
     public function logistics()

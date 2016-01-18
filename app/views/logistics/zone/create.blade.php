@@ -32,17 +32,17 @@
             @endforeach
         </select>
     </div>
-    {{--<div class="form-group col-lg-4">--}}
-        {{--<label for="shipping_id">种类</label>--}}
-        {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
-        {{--<select name="shipping_id" class="form-control" id="shipping_id">--}}
-            {{--@foreach($logistics as $logisticses)--}}
-                {{--<option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>--}}
-                    {{--{{ $logisticses->shipping }}--}}
-                {{--</option>--}}
-            {{--@endforeach--}}
-        {{--</select>--}}
-    {{--</div>--}}
+    <div class="form-group col-lg-4">
+        <label for="shipping_id">种类</label>
+        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <select name="shipping_id" class="form-control" id="shipping_id">
+            @foreach($logistics as $logisticses)
+                <option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
+                    {{ $logisticses->shipping }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
     <div class="form-group col-lg-12" id="shipping_id">
         <label for="shipping_id" class="control-label">种类</label>
@@ -121,12 +121,12 @@
         }
     });
 
-    $(document).find(function(){
-        alert($('#shipping_id').val());
+    $(document).ready(function(){
+        var shipping_id = "{{ old('shipping_id') ? old('shipping_id') : '' }}";
+        alert(shipping_id);
     });
 
     function checkShipping() {
-        alert('bhw');
         var shipping_id = $("#shipping_id").val();
         alert(shipping_id);
         if (shipping_id == 'express') {

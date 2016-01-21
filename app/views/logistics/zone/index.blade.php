@@ -25,7 +25,7 @@
             <td>{{ $zone->zone }}</td>
             <td>{{ $zone->logistics->logistics_type}}</td>
             <td>{{ $zone->country->name }}</td>
-            <td>{{ $zone->shipping_id == 'express' ? '快递' : ''}}</td>
+            <td>{{ $zone->shipping_id == 'express' ? '快递' : '小包'}}</td>
             <td>{{ $zone->fixed_weight }}</td>
             <td>{{ $zone->fixed_price }}</td>
             <td>{{ $zone->continued_weight }}</td>
@@ -44,6 +44,16 @@
                 <a href="{{ route('logisticsZone.edit', ['id'=>$zone->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                @if($zone->shipping_id == 'packet')
+                    <a href="{{ route('countPacket', ['id'=>$zone->id]) }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-plus"></span> 运费
+                    </a>
+                @endif
+                @if($zone->shipping_id == 'express')
+                    <a href="{{ route('countExpress', ['id'=>$zone->id]) }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-plus"></span> 运费
+                    </a>
+                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $zone->id }}"
                    data-url="{{ route('logisticsZone.destroy', ['id' => $zone->id]) }}">

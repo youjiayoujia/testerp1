@@ -94,7 +94,8 @@ class LogisticsController extends Controller
     public function zone()
     {
         $id = $_GET['id'];
-        echo json_encode($id);
+        $buf = $this->logistics->get($id)->shipping;
+        echo json_encode($buf);
     }
 
 }

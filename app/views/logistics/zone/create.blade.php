@@ -13,9 +13,9 @@
     <div class="form-group col-lg-4">
         <label for="logistics_id">物流方式</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="logistics_id" class="form-control" id="logistics_id">
+        <select name="logistics_id" class="form-control" id="logistics_id" onclick="checkShipping()">
             @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
+                <option value="{{ $logisticses->id }}" {{ old('logistics_id') ? old('logistics_id') == $logisticses->id ? 'selected' : '' : ''}}>
                     {{ $logisticses->logistics_type }}
                 </option>
             @endforeach
@@ -26,39 +26,17 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="country_id" class="form-control" id="country_id">
             @foreach($country as $countries)
-                <option class="checkbox" value="{{ $countries->id }}" {{ $countries->id == old('$countries->country->id') ? 'selected' : '' }}>
+                <option class="checkbox" value="{{ $countries->id }}" {{ old('country_id') ? old('country_id') == $countries->id ? 'selected' : '' : ''}}>
                     {{ $countries->name }}
                 </option>
             @endforeach
         </select>
     </div>
-    <div class="form-group col-lg-4">
-        <label for="shipping_id">种类</label>
-        <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="shipping_id" class="form-control" id="shipping_id">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
-                    {{ $logisticses->shipping }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-
-    <div class="form-group col-lg-12" id="shipping_id">
+    <div class="form-group col-lg-12">
         <label for="shipping_id" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <div class="radio">
-            <label>
-                <input type="radio" name="shipping_id" value="express" onclick="checkShipping()" {{ old('shipping_id') ? (old('shipping_id') == 'express' ? 'checked' : '') : '' }}>快递
-            </label>
-        </div>
-        <div class="radio">
-            <label>
-                <input type="radio" name="shipping_id" value="packet" onclick="checkShipping()" {{ old('shipping_id') ? (old('shipping_id') == 'packet' ? 'checked' : '') : '' }} >小包
-            </label>
-        </div>
+        <input class="form-control" id="shipping_id" placeholder="种类" name='shipping_id' value="{{ old('shipping_id') }}" readonly>
     </div>
-
     <div class="form-group col-lg-4" id="express">
         <label for="fixed_weight" class="control-label">首重(kg)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -105,37 +83,44 @@
         <input class="form-control" id="discount" placeholder="最后折扣(八折录入0.8)" name='discount' value="{{ old('discount') }}">
     </div>
 @stop
-
 <script type="text/javascript">
-    function select() {
-        alert(null);
-    }
-
-    $.ajax({
-        url : "{{ route('zone') }}",
-        data : {id:4},
-        dataType : 'json',
-        type : 'get',
-        success : function(result) {
-            alert(result);
-        }
-    });
-
-    $(document).ready(function(){
-        var shipping_id = "{{ old('shipping_id') ? old('shipping_id') : '' }}";
-        alert(shipping_id);
+    $(document).ready(function() {
+        var logistics_id = $("#logistics_id").val();
+        $.ajax({
+            url : "{{ route('zone') }}",
+            data : { id : logistics_id },
+            dataType : 'json',
+            type : 'get',
+            success : function(result) {
+                $('#shipping_id').val(result);
+                if (result == 'express') {
+                    $("div#express").show();
+                    $("div#packet").hide();
+                }else {
+                    $("div#packet").show();
+                    $("div#express").hide();
+                }
+            }
+        });
     });
 
     function checkShipping() {
-        var shipping_id = $("#shipping_id").val();
-        alert(shipping_id);
-        if (shipping_id == 'express') {
-            $('#packet').hide();
-            $('#express').show();
-        }else {
-            $('#express').hide();
-            $('#packet').show();
-        }
+        var logistics_id = $("#logistics_id").val();
+        $.ajax({
+            url : "{{ route('zone') }}",
+            data : { id : logistics_id },
+            dataType : 'json',
+            type : 'get',
+            success : function(result) {
+                $('#shipping_id').val(result);
+                if (result == 'express') {
+                    $('div#express').show();
+                    $('div#packet').hide();
+                }else {
+                    $('div#packet').show();
+                    $('div#express').hide();
+                }
+            }
+        });
     }
-
 </script>

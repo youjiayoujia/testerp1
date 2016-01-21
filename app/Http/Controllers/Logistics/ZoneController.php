@@ -89,4 +89,36 @@ class ZoneController extends Controller
         $this->zone->destroy($id);
         return redirect($this->mainIndex);
     }
+
+    public function countExpress($id, LogisticsRepository $logistics, CountryRepository $country)
+    {
+        $obj = $this->zone->get($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'zone' => $obj,
+            'logistics' => $logistics->all(),
+            'country' => $country->all(),
+        ];
+        return view('logistics.zone.countExpress', $response);
+    }
+
+    public function countPacket($id, LogisticsRepository $logistics, CountryRepository $country)
+    {
+        $obj = $this->zone->get($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'zone' => $obj,
+            'logistics' => $logistics->all(),
+            'country' => $country->all(),
+        ];
+        return view('logistics.zone.countPacket', $response);
+    }
+
+    public function zoneShipping()
+    {
+        $id = $_GET['id'];
+        $buf = $this->zone->get($id)->shipping_id;
+        echo json_encode($buf);
+    }
+
 }

@@ -24,6 +24,10 @@ Route::resource('logistics', 'LogisticsController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
+Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
+Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);
+Route::get('countExpress/{id}', ['uses' => 'Logistics\ZoneController@countExpress', 'as' => 'countExpress']);
+Route::get('countPacket/{id}', ['uses' => 'Logistics\ZoneController@countPacket', 'as' => 'countPacket']);
 
 //品类路由
 Route::resource('catalog', 'CatalogController');

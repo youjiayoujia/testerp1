@@ -32,7 +32,7 @@
             @endforeach
         </select>
     </div>
-    <div class="form-group col-lg-12">
+    <div class="form-group col-lg-4">
         <label for="shipping_id" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="shipping_id" placeholder="种类" name='shipping_id' value="{{ old('shipping_id') }}" readonly>

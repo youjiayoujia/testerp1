@@ -54,7 +54,7 @@ class StockRepository extends BaseRepository
      */
     public function getUnitCost($sku)
     {
-        $stock = $this->model->where('sku', '=', $sku)->first();
+        $stock = $this->model->where('sku', $sku)->first();
     
         return $stock->unit_cost;
     }
@@ -139,10 +139,12 @@ class StockRepository extends BaseRepository
         try {
             $out->create($arr);
             $obj = $stock->where(['warehouse_positions_id'=>$arr['warehouse_positions_id']])->get()->first();
-            $obj->all_amount -=$arr['amount'];
-            $obj->available_amount -= $arr['amount'];
-            $obj->total_amount -= $arr['total_amount'];
-            $obj->save();
+            if($obj) {
+                $obj->all_amount -=$arr['amount'];
+                $obj->available_amount -= $arr['amount'];
+                $obj->total_amount -= $arr['total_amount'];
+                $obj->save();
+            }
         } catch (Exception $e) {
             DB::rollback();
         }

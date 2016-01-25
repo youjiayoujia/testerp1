@@ -10,6 +10,7 @@
 
 namespace App\Http\Controllers\Stock;
 
+use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\AllotmentRepository;
@@ -63,7 +64,6 @@ class AllotmentController extends Controller
         $this->request->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $this->warehouse->all(),
             'data' => $this->allotment->auto()->paginate(),
         ];
 
@@ -322,48 +322,55 @@ class AllotmentController extends Controller
         $this->request->flash();
         $arr = $this->request->all();
         $obj = $this->allotment->get($id)->allotmentform;
-        $buf[] = $arr['arr']['receive_amount'];
-        $buf[] = $arr['arr']['warehouse_positions_id'];
-        $buf[] = $arr['arr']['old_receive_amount'];
-        for($i=0; $i<count($buf[0]); $i++)
-        {   
-            $obj[$i]->update(['receive_amount'=>($buf[0][$i]+$buf[2][$i]), 'in_warehouse_positions_id'=>$buf[1][$i]]);
-        }
-        $flag = 1;
-        $buf[] = $arr['arr']['amount'];
-        $buf[] = $arr['arr']['receive_amount'];
-        for($i=0;$i<count($buf[3]);$i++)
-        {
-            if($buf[3][$i] != ($buf[4][$i] + $buf[2][$i]))
-                $flag = 0;
-        }
-        if($flag == 1)
-        {
-            $arr['allotment_status'] = 'over';
-        } else {
-            $arr['allotment_status'] = 'check';
-        }
-
-        $arr['checkform_time'] = date('Y-m-d',time());
-        $this->allotment->get($id)->update(['allotment_status'=>$arr['allotment_status'], 'checkform_time'=>$arr['checkform_time'], 'remark'=>$arr['remark']]);
-
-        $len = count($arr['arr']['item_id']);
-        for($i=0; $i<$len; $i++)
-        {
-            $buf = [];
-            foreach($arr['arr'] as $key => $value)
-            {
-                $buf[$key] = $value[$i];
+        
+        DB::beginTransaction();
+        try {
+            $buf[] = $arr['arr']['receive_amount'];
+            $buf[] = $arr['arr']['warehouse_positions_id'];
+            $buf[] = $arr['arr']['old_receive_amount'];
+            for($i=0; $i<count($buf[0]); $i++)
+            {   
+                $obj[$i]->update(['receive_amount'=>($buf[0][$i]+$buf[2][$i]), 'in_warehouse_positions_id'=>$buf[1][$i]]);
             }
-             $buf = array_merge($buf,$arr);
-             $buf['type'] = "ALLOTMENT";
-             $buf['warehouses_id'] = $this->allotment->get($id)->in_warehouses_id;
-             $buf['relation_id'] = $buf['allotment_id'];
-             $buf['total_amount'] = round($buf['total_amount']/$buf['amount']*$buf['receive_amount'],3);
-             $buf['amount'] = $buf['receive_amount'];
-             if($buf['amount'] != 0)
-                $this->stock->in($buf);
+            $flag = 1;
+            $buf[] = $arr['arr']['amount'];
+            $buf[] = $arr['arr']['receive_amount'];
+            for($i=0;$i<count($buf[3]);$i++)
+            {
+                if($buf[3][$i] != ($buf[4][$i] + $buf[2][$i]))
+                    $flag = 0;
+            }
+            if($flag == 1)
+            {
+                $arr['allotment_status'] = 'over';
+            } else {
+                $arr['allotment_status'] = 'check';
+            }
+
+            $arr['checkform_time'] = date('Y-m-d',time());
+            $this->allotment->get($id)->update(['allotment_status'=>$arr['allotment_status'], 'checkform_time'=>$arr['checkform_time'], 'remark'=>$arr['remark']]);
+
+            $len = count($arr['arr']['item_id']);
+            for($i=0; $i<$len; $i++)
+            {
+                $buf = [];
+                foreach($arr['arr'] as $key => $value)
+                {
+                    $buf[$key] = $value[$i];
+                }
+                 $buf = array_merge($buf,$arr);
+                 $buf['type'] = "ALLOTMENT";
+                 $buf['warehouses_id'] = $this->allotment->get($id)->in_warehouses_id;
+                 $buf['relation_id'] = $buf['allotment_id'];
+                 $buf['total_amount'] = round($buf['total_amount']/$buf['amount']*$buf['receive_amount'],3);
+                 $buf['amount'] = $buf['receive_amount'];
+                 if($buf['amount'] != 0)
+                    $this->stock->in($buf);
+            }
+        } catch(Exception $e) {
+            DB::rollback();
         }
+        DB::commit();
       
         return redirect(route('stockAllotment.index'));
     }

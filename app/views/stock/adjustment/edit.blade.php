@@ -199,7 +199,6 @@
                             total_amount = rowline.find('.total_amount').val();
                             amount = rowline.find('.amount').val();
                             if(total_amount && amount) {
-                                // alert(form_cost+' '+result*1.3+' '+result*0.6);
                                 form_cost = total_amount/amount;
                                 if((form_cost > result*1.3) || (form_cost < result*0.6)) {
                                     alert('调整单价有误不在单价*0.6-1.3变动范围内');

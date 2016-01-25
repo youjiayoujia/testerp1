@@ -91,7 +91,7 @@ $(document).ready(function(){
         old_amount = parseInt(obj.parent().parent().find('.old_receive_amount').val());
         amount = parseInt(obj.val());
         if(all_amount < (old_amount + amount)) {
-            alert('想干嘛，超出数量了');
+            alert('fuck,超出数量了');
             $(this).val('');
         }
     });

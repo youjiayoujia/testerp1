@@ -14,7 +14,7 @@
     <th>操作</th>
 @stop
 @section('tableBody')
-    @foreach($adjusts as $adjust)
+    @foreach($data as $adjust)
         <tr>
             <td>{{ $adjust->id }}</td>
             <td>{{ $adjust->adjust_form_id }}</td>

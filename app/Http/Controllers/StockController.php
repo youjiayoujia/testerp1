@@ -20,7 +20,9 @@ class StockController extends Controller
     protected $stock;
     protected $position;
 
-    public function __construct(Request $request, StockRepository $stock, PositionRepository $position)
+    public function __construct(Request $request, 
+                                StockRepository $stock, 
+                                PositionRepository $position)
     {
         $this->stock = $stock;
         $this->position = $position;
@@ -195,6 +197,8 @@ class StockController extends Controller
         $cost = $this->stock->getunitcost($obj->sku);
         if($obj)
             echo json_encode([$obj->available_amount,$cost]);
+        else
+            echo json_encode('none');
     }
 
     /**
@@ -207,10 +211,7 @@ class StockController extends Controller
     public function getpsi()
     {
         $warehouse = $_GET['warehouse'];
-
         $arr[] = $this->position->get_position(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
-        
-
         $obj = $this->stock->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
         if($obj) {
             $arr[1][] = $obj ->toArray();

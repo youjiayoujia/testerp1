@@ -1,7 +1,6 @@
-{{ $name = 'ok'}}
-{{ var_dump($name) }}
-{{ "<script>var test =\"$name\";</script>" }}
 <script type='text/javascript'>
-alert(1);
-alert(test);
+  var test = "aaa100";
+  var ld = /(a.\d)/gi;
+  buf = ld.exec(test);
+  alert(buf);
 </script>

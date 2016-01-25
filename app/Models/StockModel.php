@@ -44,6 +44,13 @@ class StockModel extends BaseModel
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
     }
 
+    /**
+     * add additional attribute according to sku ,get the goods unit cost 
+     *
+     * @param none
+     * @return json
+     *
+     */
     public function getUnitCostAttribute()
     {
         $obj = StockModel::where('sku', $this->sku)->get()->toArray();

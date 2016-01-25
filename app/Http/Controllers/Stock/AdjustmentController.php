@@ -27,6 +27,7 @@ class AdjustmentController extends Controller
     protected $out;
     protected $in;
     protected $stock;
+    protected $adjust;
 
     public function __construct(Request $request, 
                                 AdjustmentRepository $adjustment, 
@@ -57,8 +58,7 @@ class AdjustmentController extends Controller
         $this->request->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjusts' => $this->adjust->all(),
-            'data' => $this->adjustment->auto()->paginate(),
+            'data' => $this->adjust->auto()->paginate(),
         ];
 
         return view('stock.adjustment.index', $response);
@@ -165,8 +165,6 @@ class AdjustmentController extends Controller
         $buf = $this->request->all();
         $obj = $this->adjust->get($id)->adjustment;
         $obj_len = count($obj);
-        unset($buf['_token']);
-        unset($buf['arr']);
 
         $this->adjust->update($id, $buf);
         for($i=0; $i<$len; $i++)

@@ -85,6 +85,7 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         var current = 1;
+        position_buf = '';
         $(document).on('blur', '.type,.warehouse_positions_id,.sku', function(){
             tmp = $(this).parent().parent().parent();
             val_sku = tmp.find('.sku').val();
@@ -204,19 +205,11 @@
             </div>\
         </div>";
             $('.addpanel').before(appendhtml);
-
-            val = $('#warehouses_id').val();
-            $.ajax({
-                url: "{{ route('getposition') }}",
-                data: {val:val},
-                dataType:'json',
-                type:'get',
-                success:function(result){
-                    $('.addpanel').prev().find('warehouse_positions_id').empty();
-                    for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.addpanel').prev().find('.warehouse_positions_id'));
-                }
-            });
+            if(position_buf) {
+                $('.addpanel').prev().find('warehouse_positions_id').empty();
+                for(var i=0;i<position_buf.length;i++)
+                    $('<option value='+position_buf[i]['id']+'>'+position_buf[i]['name']+'</option>').appendTo($('.addpanel').prev().find('.warehouse_positions_id'));
+            }
 
             current++;
         });
@@ -307,6 +300,7 @@
                 dataType:'json',
                 type:'get',
                 success:function(result){
+                    position_buf = result;
                     $('.warehouse_positions_id').empty();
                     for(var i=0;i<result.length;i++)
                         $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));

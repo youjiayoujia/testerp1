@@ -83,10 +83,7 @@ class ImageController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->image->rules('create'));
-
-        $data = $this->request->all();
-        $files = $this->request->files;
-        $this->image->createImage($data, $files);
+        $this->image->create($this->request->all(), $this->request->files);
 
         return redirect($this->mainIndex);
     }
@@ -115,11 +112,7 @@ class ImageController extends Controller
     {
         $this->request->flash();
         $this->validate($this->request, $this->image->rules('update'));
-
-        $file = $this->request->file('image');
-        if ($file->isValid()) {
-            $this->image->updateImage($id, $file);
-        }
+        $this->image->updateImage($id, $this->request->file('image'));
 
         return redirect($this->mainIndex);
     }

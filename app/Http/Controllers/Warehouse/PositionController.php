@@ -23,9 +23,8 @@ class PositionController extends Controller
     {
         $this->warehousePosition = $warehousePosition;
         $this->request = $request;
-        $this->mainIndex = route('warehouse.index');
-        $this->mainTitle = '仓库';
-
+        $this->mainIndex = route('warehousePosition.index');
+        $this->mainTitle = '库位';
     }
 
     /**

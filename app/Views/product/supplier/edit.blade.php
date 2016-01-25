@@ -4,6 +4,10 @@
 @section('formAttributes') name='creator' @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+<<<<<<< HEAD
+=======
+    <div class="row">
+>>>>>>> master
     <div class="form-group col-lg-2">
         <label for="name">供货商名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="name" placeholder="供货商名" name='name' value="{{ old('name') ?  old('name') : $supplier->name }}">
@@ -12,7 +16,11 @@
         <label for='province'>省份</label> 
         <select name="province" onChange = "select()" class='form-control'></select>　
     </div>
+<<<<<<< HEAD
     <div class="form-group col-lg-2"> 
+=======
+    <div class='form-group col-lg-2'> 
+>>>>>>> master
         <label for='city'>城市</label> 
         <select name="city" onChange = "select()" class='form-control'></select>
     </div>
@@ -25,14 +33,17 @@
         <div class='radio'>
             <label>
                 <input type='radio' name='type' value='offline' {{old('type') ? (old('type') == 'offline' ? 'checked' : '') : ($supplier->type  == 'offline' ? 'checked' : '')}}>否
-            </label>   
-        </div>
-        <div class='radio'>
+            </label>
             <label>
                 <input type='radio' name='type' value='online' {{old('type') ? (old('type') == 'online' ? 'checked' : '') : ($supplier->type  == 'online' ? 'checked' : '')}}>是
             </label>
         </div>
     </div>
+<<<<<<< HEAD
+=======
+       </div>
+      <div class="row"> 
+>>>>>>> master
      <div class="form-group col-lg-4">
         <label for="url">线上供货商网址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $supplier->url }}">
@@ -45,6 +56,11 @@
         <label for="purchase_id">采购员</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="purchase_id" placeholder="采购员id" name='purchase_id' value="{{ old('purchase_id') ?  old('purchase_id') : $supplier->purchase_id }}">
     </div> 
+<<<<<<< HEAD
+=======
+    </div>
+    <div class="row">
+>>>>>>> master
     <div class="form-group col-lg-6">
         <label for="level">评级</label>
         <select id='level' name='level' class='form-control' >
@@ -60,6 +76,7 @@
             创建人
         </label>
         <input class='form-control' type='text' value='' name='created_by' id = 'created_by' readonly/>
+   </div>
    </div>
 @stop
 <script type='text/javascript'>

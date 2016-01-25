@@ -1,27 +1,23 @@
 <?php
 namespace App\Helps;
 
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+
 class Tool
 {
-	
-	/**
-	*获取文件名
-	*
-	* @param $dirPath
-	* @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
-    public function getDirName($dirPath)
+    public function dir($directory)
     {
-		$dir=opendir($dirPath);
-		$dirName=array();
-		while (($file = readdir($dir)) !== false)
-		  {
-		   if($file!='.' && $file!='..'){
-			  
-			  $dirName[]=$file;
-			   }
-		  }
-		  closedir($dir);
-		  return $dirName;	
+        if (!is_dir($directory)) {
+            if (false === @mkdir($directory, 0777, true) && !is_dir($directory)) {
+                throw new FileException(sprintf('Unable to create the "%s" directory', $directory));
+            }
+        } elseif (!is_writable($directory)) {
+            throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
+        }
+    }
+
+    public function getFileExtension($fileName)
+    {
+        return pathinfo($fileName, PATHINFO_EXTENSION);
     }
 }

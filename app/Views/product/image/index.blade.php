@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th>ID</th>
     <th>图片</th>
+    <th>SPU ID</th>
     <th>产品ID</th>
     <th>图片类型</th>
     <th>上传时间</th>
@@ -11,7 +12,8 @@
     @foreach($data as $image)
         <tr>
             <td>{{ $image->id }}</td>
-            <td><img src="{{ asset($image->src) }}" width="50px"></td>
+            <td><img src="{{ asset($image->src) }}" height="50px"></td>
+            <td>{{ $image->spu_id}}</td>
             <td>{{ $image->product_id}}</td>
             <td>{{ $image->type }}</td>
             <td>{{ $image->created_at }}</td>

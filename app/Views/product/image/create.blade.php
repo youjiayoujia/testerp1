@@ -3,8 +3,12 @@
 @section('formBody')
     <input type="hidden" name="user_id" value="1">
     <div class="form-group col-lg-12">
+        <label class='control-label'>SPU ID</label>
+        <input class="form-control" type="text" name='spu_id' value='1'/>
+    </div>
+    <div class="form-group col-lg-12">
         <label class='control-label'>产品ID</label>
-        <input class="form-control" type="text" name='product_id' value=''/>
+        <input class="form-control" type="text" name='product_id' value='1'/>
     </div>
     <div class="form-group col-lg-12">
         <label for="color">图片类型：</label>

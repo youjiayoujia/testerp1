@@ -18,7 +18,7 @@ class ImageModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['product_id', 'user_id', 'type', 'path', 'name'];
+    protected $fillable = ['spu_id', 'product_id', 'type', 'path', 'name'];
 
     public function getSrcAttribute()
     {

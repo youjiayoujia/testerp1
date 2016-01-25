@@ -5,24 +5,30 @@
 @section('formAction') {{ route('productRequire.store') }} @stop
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
-    <div class='form-group'>
+    <div class='row'>
+    <div class='form-group col-lg-2'>
         <input id="img1" name='img1' class="file" type="file">
     </div>
-    <div class='form-group'>
+    <div class='form-group col-lg-2'>
         <input id="img2" name='img2' class="file" type="file">
     </div>
-    <div class='form-group'>
+    <div class='form-group col-lg-2'>
         <input id="img3" name='img3' class="file" type="file">
     </div>
-    <div class='form-group'>
+    <div class='form-group col-lg-2'>
         <input id="img4" name='img4' class="file" type="file">
     </div>
-    <div class='form-group'>
+    <div class='form-group col-lg-2'>
         <input id="img5" name='img5' class="file" type="file">
     </div>
-    <div class='form-group'>
+    <div class='form-group col-lg-2'>
         <input id="img6" name='img6' class="file" type="file">
     </div>    
+<<<<<<< HEAD
+=======
+    </div>
+    <div class='row'>
+>>>>>>> master
     <div class="form-group col-lg-4">
         <label for="name" class='control-label'>需求名</label>
         <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') }}">
@@ -31,15 +37,28 @@
         <label for='province'>省份</label> 
         <select name="province" onChange = "select()" class='form-control'></select>　
     </div>
+<<<<<<< HEAD
     <div class='form-group col-lg-4'> 
         <label for='city'>城市</label> 
         <select name="city" onChange = "select()" class='form-control'></select>
     </div>
+=======
+    <div class=' form-group col-lg-4'> 
+        <label for='city'>城市</label> 
+        <select name="city" onChange = "select()" class='form-control'></select>
+    </div>
+    </div>
+    <div class='row'>
+>>>>>>> master
     <div class="form-group col-lg-3"> 
         <label for="similar_sku" class='control-label'>类似款sku</label>
         <input type='text' class="form-control" id="similar_sku" placeholder="类似款sku" name='similar_sku' value="{{ old('similar_sku') }}">
     </div>
+<<<<<<< HEAD
      <div class="form-group col-lg-3">
+=======
+    <div class="form-group col-lg-3">
+>>>>>>> master
         <label for="competition_url" class='control-label'>竞争产品url</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="competition_url" placeholder="竞争产品url" name='competition_url' value="{{ old('competition_url') }}">
     </div>
@@ -47,10 +66,19 @@
         <label for="remark" class='control-label'>需求备注</label>
         <input type='text' class="form-control" id="remark" placeholder="需求备注" name='remark' value="{{ old('remark') }}">
     </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     <div class='form-group col-lg-3'>
         <label for="expected_date">期望上传日期</label>
-        <input id="expected_date" name='expected_date' type="text" placeholder='期望上传日期' value="{{ old('expected_date') }}">
+        <input id="expected_date" class='form-control' name='expected_date' type="text" placeholder='期望上传日期' value="{{ old('expected_date') }}">
     </div>
+    </div>
+<<<<<<< HEAD
+=======
+    <div class='row'>
+>>>>>>> master
     <div class="form-group col-lg-4">
         <label for="needer_id">需求人</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="needer_id" placeholder="需求者id" name='needer_id' value="{{ old('needer_id') }}">
@@ -62,6 +90,7 @@
     <div class="form-group col-lg-4">
         <label for="created_by">创建人</label>
         <input class="form-control" id="created_by" placeholder="创建人" name='created_by' value="{{ old('created_by') }}" readonly>
+    </div>
     </div>
 @stop
 <script type='text/javascript'>

@@ -34,16 +34,17 @@ class DataList
         }
         if (request()->getQueryString()) {
             if (request()->has('filters')) {
-                $urlFilters = [];
-                foreach (explode(',', request()->input('filters')) as $urlFilter) {
-                    $urlFilter = explode('.', $urlFilter);
-                    $urlFilters[$urlFilter[0]]['field'] = $urlFilter[0];
-                    $urlFilters[$urlFilter[0]]['oprator'] = $urlFilter[1];
-                    $urlFilters[$urlFilter[0]]['value'] = $urlFilter[2];
-                    $urlFilters[$urlFilter[0]] = implode('.', $urlFilters[$urlFilter[0]]);
+                if ($clear == false and request()->input('filterClear') != 'yes') {
+                    $urlFilters = [];
+                    foreach (explode(',', request()->input('filters')) as $urlFilter) {
+                        $urlFilter = explode('.', $urlFilter);
+                        $urlFilters[$urlFilter[0]]['field'] = $urlFilter[0];
+                        $urlFilters[$urlFilter[0]]['oprator'] = $urlFilter[1];
+                        $urlFilters[$urlFilter[0]]['value'] = $urlFilter[2];
+                        $urlFilters[$urlFilter[0]] = implode('.', $urlFilters[$urlFilter[0]]);
+                    }
+                    $filters = array_merge($urlFilters, $filters);
                 }
-                $filters = $clear == true ? $filters : array_merge($urlFilters, $filters);
-
                 $queries = [];
                 foreach (explode('&', request()->getQueryString()) as $query) {
                     $query = explode('=', $query);
@@ -60,7 +61,7 @@ class DataList
         } else {
             $url = request()->fullUrl() . '?filters=' . implode(',', $filters);
         }
-        return $clear == true ? $url . '&filterClear=true' : '';
+        return $clear == true ? $url . '&filterClear=yes' : $url;
     }
 
     public function filtersDecode($filtersQuery)

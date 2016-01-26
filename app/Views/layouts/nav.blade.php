@@ -32,7 +32,7 @@
                         </li>
                     @else
                         <li>
-                            <a href="{{ $navigation['url'] }}">
+                            <a href="{{ route($navigation['url']) }}">
                                 <span class="glyphicon glyphicon-{{ $navigation['icon'] }}"></span>
                                 {{ $navigation['name'] }}
                             </a>
@@ -56,8 +56,6 @@
                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li></li>
-                        <li role="separator" class="divider"></li>
                         <li><a href="#">修改密码</a></li>
                         <li><a href="/auth/logout">注销</a></li>
                     </ul>

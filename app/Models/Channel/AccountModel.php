@@ -35,6 +35,23 @@ class AccountModel extends BaseModel
         'token'
     ];
 
+    protected $searchFields = ['account', 'title'];
+
+    protected $rules = [
+        'create' => [
+            'account' => 'required',
+            'prefix' => 'required',
+            'title' => 'required',
+            'brief' => 'required',
+        ],
+        'update' => [
+            'account' => 'required',
+            'prefix' => 'required',
+            'title' => 'required',
+            'brief' => 'required',
+        ]
+    ];
+
     public function channel()
     {
         return $this->belongsTo('App\Models\ChannelModel');

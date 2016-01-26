@@ -121,4 +121,11 @@ class ZoneController extends Controller
         echo json_encode($buf);
     }
 
+    public function country(CountryRepository $country)
+    {
+        $id = $_GET['id'];
+        $buf = $country->get($id)->name;
+        echo json_encode($buf);
+    }
+
 }

@@ -74,7 +74,7 @@
     <div class="form-group col-lg-12">
         <label for="country_id" class="control-label">国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="country_id" class="form-control" id="country_id">
+        <select name="country_id" class="form-control" id="country_id" onclick="selectCountry()">
             @foreach($country as $countries)
                 <option class="checkbox" value="{{ $countries->id }}" {{ old('country_id') ? old('country_id') == $countries->id ? 'selected' : '' : ''}}>
                     {{ $countries->name }}
@@ -92,7 +92,6 @@
                 all += $(this).attr("value")+",";
             });
             var sel = $("select[name = 'country_id']").val();
-            $("textarea[name = 'country_id']").val(sel);
             alert("多选列表所有的value值:"+all);
             alert("其中被选中的是:"+sel);
         });
@@ -134,6 +133,19 @@
                     $('div#packet').show();
                     $('div#express').hide();
                 }
+            }
+        });
+    }
+
+    function selectCountry() {
+        var country_id = $("#country_id").val();
+        $.ajax({
+            url : "{{ route('country') }}",
+            data : { id : country_id},
+            dataType : 'json',
+            type : 'get',
+            success : function(result) {
+                $("textarea[name = 'country_id']").val(result);
             }
         });
     }

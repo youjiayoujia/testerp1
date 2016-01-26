@@ -22,17 +22,6 @@
         </select>
     </div>
     <div class="form-group col-lg-4">
-        <label for="country_id" class="control-label">国家</label>
-        <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="country_id" class="form-control" id="country_id">
-            @foreach($country as $countries)
-                <option class="checkbox" value="{{ $countries->id }}" {{ old('country_id') ? old('country_id') == $countries->id ? 'selected' : '' : ''}}>
-                    {{ $countries->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group col-lg-4">
         <label for="shipping_id" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="shipping_id" placeholder="种类" name='shipping_id' value="{{ old('shipping_id') }}" readonly>
@@ -82,8 +71,33 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="discount" placeholder="最后折扣(八折录入0.8)" name='discount' value="{{ old('discount') }}">
     </div>
+    <div class="form-group col-lg-12">
+        <label for="country_id" class="control-label">国家</label>
+        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <select name="country_id" class="form-control" id="country_id">
+            @foreach($country as $countries)
+                <option class="checkbox" value="{{ $countries->id }}" {{ old('country_id') ? old('country_id') == $countries->id ? 'selected' : '' : ''}}>
+                    {{ $countries->name }}
+                </option>
+            @endforeach
+        </select>
+        <textarea class="form-control" rows="3" id="country_id" placeholder="国家" name='country_id'>{{ old('country_id') }}</textarea>
+    </div>
 @stop
 <script type="text/javascript">
+    $(function(){
+        $("select[name = 'country_id']").click(function() {
+            var all = "";
+            $("select option").each(function() {
+                all += $(this).attr("value")+",";
+            });
+            var sel = $("select[name = 'country_id']").val();
+            $("textarea[name = 'country_id']").val(sel);
+            alert("多选列表所有的value值:"+all);
+            alert("其中被选中的是:"+sel);
+        });
+    });
+
     $(document).ready(function() {
         var logistics_id = $("#logistics_id").val();
         $.ajax({

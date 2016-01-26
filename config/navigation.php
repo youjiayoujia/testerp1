@@ -46,7 +46,7 @@ return [
     [
         'name' => '订单',
         'icon' => 'list-alt',
-        'url' => '',
+        'url' => 'dashboard.index',
     ],
     //仓储导航
     [
@@ -95,13 +95,13 @@ return [
     [
         'name' => '物流',
         'icon' => 'plane',
-        'url' => '',
+        'url' => 'dashboard.index',
     ],
     //采购导航
     [
         'name' => '采购',
         'icon' => 'shopping-cart',
-        'url' => '',
+        'url' => 'dashboard.index',
     ],
     //渠道导航
     [
@@ -125,13 +125,13 @@ return [
     [
         'name' => '财务',
         'icon' => 'piggy-bank',
-        'url' => '',
+        'url' => 'dashboard.index',
     ],
     //客户导航
     [
         'name' => '客户',
         'icon' => 'user',
-        'url' => '',
+        'url' => 'dashboard.index',
     ],
 ];
 

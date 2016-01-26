@@ -9,6 +9,7 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+  
 Route::get('test','TestController@test');
 Route::get('test1','TestController@test1');
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);

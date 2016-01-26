@@ -208,7 +208,7 @@ return [
         /*
          * Coffee
          */
-        'Sort' => App\Facades\Sort::class,
+        'DataList' => App\Facades\DataList::class,
         'Tool' => App\Facades\Tool::class,
         'Zipper' => Chumper\Zipper\Facades\Zipper::class,
 

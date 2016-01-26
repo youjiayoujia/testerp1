@@ -5,12 +5,13 @@
 @section('css')
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
-    
+
 @stop
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
+    <script src="{{ asset('js/uri.min.js') }}"></script>{{-- JS URI --}}
 
     <script src="{{ asset('js/jquery.cxcalendar.min.js') }}"></script>
 
@@ -24,17 +25,19 @@
             }
         });
     </script>
-    
+
 @stop
 @section('body')
     @include('layouts.nav')
     <div class="container-fluid main">
-        <div class="row">
-            @if(isset($sidebar))
+        @if(isset($sidebar))
+            <div class="row">
                 <div class="col-lg-2">
                     @include('layouts.sidebar')
                 </div>
-            @endif
+            </div>
+        @endif
+        <div class="row">
             <div class="col-lg-{{ isset($sidebar) ? '10' : '12' }}">
                 <ol class="breadcrumb">
                     <li><a href="/">主页</a></li>
@@ -47,6 +50,9 @@
                         @endif
                     @show{{-- 路径导航 --}}
                 </ol>
+                @if(session('alert'))
+                    {!! session('alert') !!}
+                @endif
                 @section('content')@show{{-- 内容 --}}
             </div>
         </div>

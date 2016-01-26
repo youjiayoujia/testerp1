@@ -4,13 +4,13 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>ID</strong>: {{ $channel->id }}
+                <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>名称</strong>: {{ $channel->name }}
+                <strong>名称</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-4">
-                <strong>别名</strong>: {{ $channel->alias }}
+                <strong>别名</strong>: {{ $model->alias }}
             </div>
         </div>
     </div>
@@ -18,10 +18,10 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">
-                <strong>创建时间</strong>: {{ $channel->created_at }}
+                <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
             <div class="col-lg-6">
-                <strong>更新时间</strong>: {{ $channel->updated_at }}
+                <strong>更新时间</strong>: {{ $model->updated_at }}
             </div>
         </div>
     </div>

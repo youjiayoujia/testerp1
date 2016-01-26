@@ -25,4 +25,10 @@ class ChannelModel extends BaseModel
      */
     protected $fillable = ['name', 'alias'];
 
+    protected $searchFields = ['name'];
+
+    protected $rules = [
+        'create' => ['name' => 'required|unique:channels,name'],
+        'update' => ['name' => 'required|unique:channels,name,{id}']
+    ];
 }

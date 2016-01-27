@@ -10,57 +10,21 @@
 
 namespace App\Http\Controllers\warehouse;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Warehouse\PositionRepository;
-use App\Repositories\WarehouseRepository;
+use App\Models\Warehouse\PositionModel;
+use App\Models\WarehouseModel;
 
 class PositionController extends Controller
 {
-    protected $warehousePosition;
+    protected $warehouse;
 
-    public function __construct(Request $request, PositionRepository $warehousePosition)
+    public function __construct(PositionModel $position, WarehouseModel $warehouse)
     {
-        $this->warehousePosition = $warehousePosition;
-        $this->request = $request;
+        $this->model = $position;
+        $this->warehouse = $warehouse;
         $this->mainIndex = route('warehousePosition.index');
         $this->mainTitle = '库位';
-    }
-
-    /**
-     * 数据列表显示页
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function index()
-    {
-        $this->request->flash();
-
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->warehousePosition->auto()->paginate(),
-        ];
-
-        return view('warehouse.position.index', $response);
-    }
-
-    /**
-     * 库位详情页
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'position' => $this->warehousePosition->get($id),
-        ];
-
-        return view('warehouse.position.show', $response);
+        $this->viewPath = 'warehouse.position.';
     }
 
     /**
@@ -70,28 +34,13 @@ class PositionController extends Controller
      * @return none
      *
      */
-    public function create(WarehouseRepository $warehouse)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $warehouse->all(),
+            'warehouses' => $this->warehouse->all(),
         ];
-        return view('warehouse.position.create', $response);
-    }
-
-    /**
-     * 数据保存
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function store()
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->warehousePosition->rules('create'));
-        $this->warehousePosition->create($this->request->all());
-        return redirect(route('warehousePosition.index'));
+        return view($this->viewPath.'create', $response);
     }
 
     /**
@@ -101,43 +50,14 @@ class PositionController extends Controller
      * @return view
      *
      */
-    public function edit($id, WarehouseRepository $warehouse)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $warehouse->all(),
-            'position' => $this->warehousePosition->get($id),
+            'warehouses' => $this->warehouse->all(),
+            'model' => $this->model->find($id),
         ];
 
-        return view('warehouse.position.edit', $response);
-    }
-
-    /**
-     * 数据更新
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->warehousePosition->rules('update', $id));
-        $this->warehousePosition->update($id, $this->request->all());
-
-        return redirect(route('warehousePosition.index'));
-    }
-
-    /**
-     * 记录删除
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function destroy($id)
-    {
-        $this->warehousePosition->destroy($id);
-        return redirect(route('warehousePosition.index'));
+        return view($this->viewPath.'edit', $response);
     }
 }

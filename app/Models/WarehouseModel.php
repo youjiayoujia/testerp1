@@ -21,4 +21,20 @@ class WarehouseModel extends BaseModel
      */
     protected $fillable = ['name', 'province', 'city', 'type', 'volumn', 'is_available', 'is_default'];
 
+    // 规则验证
+    public $rules = [
+        'create' => [
+            'name' => 'required|max:128|unique:warehouses,name',
+            'type' => 'required',
+            'volumn' => 'required|digits_between:1,10'
+        ],
+        'update' => [
+            'name' => 'required|max:128|unique:warehouses,name,{id}',
+            'type' => 'required',
+            'volumn' => 'required|digits_between:1,10'
+        ]
+    ];
+
+    //查询
+    protected $searchField=['name, type, is_available, is_default'];
 }

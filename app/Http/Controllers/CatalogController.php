@@ -32,7 +32,7 @@ class CatalogController extends Controller
         //封装数据
         $data = request()->all();
         $extra['sets'] = request()->input('sets');
-        $extra['attributes'] = request()->input('attributes');
+        $extra['Attributes'] = request()->input('attributes');
         $extra['features'] = request()->input('features');
         //创建品类
         $this->model->createCatalog($data,$extra);
@@ -57,7 +57,7 @@ class CatalogController extends Controller
         //封装数据
         $data = request()->all();
         $extra['sets'] = request()->input('sets');
-        $extra['attributes'] = request()->input('attributes');
+        $extra['Attributes'] = request()->input('attributes');
         $extra['features'] = request()->input('features');
         //更新品类信息
         $this->model->updateCatalog($catalogModel,$data,$extra);

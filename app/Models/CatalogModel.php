@@ -67,8 +67,6 @@ class CatalogModel extends BaseModel
     public function updateCatalog($catalogModel,$data,$extra=[])
     {
         DB::beginTransaction();
-        //echo '<pre>';
-        //print_r($extra);exit;
         //更新分类信息
         $catalogModel->update($data);
         //更新分类属性

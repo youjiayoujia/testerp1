@@ -55,7 +55,7 @@ class PositionController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => $this->warehouse->all(),
-            'position' => $this->model->find($id),
+            'model' => $this->model->find($id),
         ];
 
         return view($this->viewPath.'edit', $response);

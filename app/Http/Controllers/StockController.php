@@ -10,60 +10,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Repositories\StockRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\Warehouse\PositionRepository;
+use App\Models\StockModel;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 
 class StockController extends Controller
 {
-    protected $stock;
-    protected $position;
-
-    public function __construct(Request $request, 
-                                StockRepository $stock, 
-                                PositionRepository $position)
+    public function __construct(StockModel $stock)
     {
-        $this->stock = $stock;
-        $this->position = $position;
-        $this->request = $request;
+        $this->model = $stock;
         $this->mainIndex = route('stock.index');
         $this->mainTitle = '库存';
-    }
-
-    /**
-     * 列表显示页
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->stock->auto()->paginate(),
-        ];
-
-        return view('stock.index', $response);
-    }
-
-    /**
-     * 信息详情页
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'stock' => $this->stock->get($id),
-        ];
-
-        return view('stock.show', $response);
+        $this->viewPath = 'stock.';
     }
 
     /**
@@ -73,30 +31,14 @@ class StockController extends Controller
      * @return view
      *
      */
-    public function create(WarehouseRepository $warehouse)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $warehouse->all(),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.create', $response);
-    }
-
-    /**
-     * 数据保存
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function store()
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->stock->rules('create'));
-        $this->stock->create($this->request->all());
-
-        return redirect(route('stock.index'));
+        return view($this->viewPath.'create', $response);
     }
 
     /**
@@ -106,44 +48,15 @@ class StockController extends Controller
      * @return view
      *
      */
-    public function edit($id, WarehouseRepository $warehouse)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'stock' => $this->stock->get($id),
-            'warehouses' => $warehouse->all(),
+            'stock' => $this->model->find($id),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.edit', $response);
-    }
-
-    /**
-     * 数据更新
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->stock->rules('update', $id));
-        $this->stock->update($id, $this->request->all());
-
-        return redirect(route('stock.index'));
-    }
-
-    /**
-     * 记录删除
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function destroy($id)
-    {
-        $this->stock->destroy($id);
-        return redirect(route('stock.index'));
+        return view($this->viewPath.'edit', $response);
     }
 
     /**
@@ -156,7 +69,7 @@ class StockController extends Controller
     public function getUnitCost()
     {  
         $sku = $_GET['sku'];
-        $unit = $this->stock->getunitcost($sku);
+        $unit = $this->model->getunitcost($sku);
 
         if($unit) {
             echo json_encode($unit);
@@ -175,7 +88,7 @@ class StockController extends Controller
     public function getSku()
     {
         $val_position = $_GET['val_position'];
-        $obj = $this->stock->getObj(['warehouse_positions_id'=>$val_position])->first();
+        $obj = $this->model->getObj(['warehouse_positions_id'=>$val_position])->first();
 
         if($obj)
             echo json_encode([$obj->sku, $obj->available_amount, $obj->item_id]);
@@ -193,8 +106,8 @@ class StockController extends Controller
     public function getAvailableAmount()
     {
         $position = $_GET['position'];
-        $obj = $this->stock->getObj(['warehouse_positions_id'=>$position])->first();
-        $cost = $this->stock->getunitcost($obj->sku);
+        $obj = $this->model->getObj(['warehouse_positions_id'=>$position])->first();
+        $cost = $this->model->getunitcost($obj->sku);
         if($obj)
             echo json_encode([$obj->available_amount,$cost]);
         else
@@ -211,8 +124,8 @@ class StockController extends Controller
     public function getpsi()
     {
         $warehouse = $_GET['warehouse'];
-        $arr[] = $this->position->get_position(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
-        $obj = $this->stock->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
+        $arr[] = PositionModel::get_position(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
+        $obj = $this->model->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
         if($obj) {
             $arr[1][] = $obj ->toArray();
         }
@@ -235,7 +148,7 @@ class StockController extends Controller
         $warehouse = $_GET['warehouse'];
         $position = $_GET['position'];
 
-        $buf = $this->stock->getObj(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position], ['sku'])->first();
+        $buf = $this->model->getObj(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position], ['sku'])->first();
 
         if($buf->toArray())
             echo json_encode($buf);

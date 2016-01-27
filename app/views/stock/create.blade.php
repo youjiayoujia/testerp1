@@ -46,23 +46,6 @@
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
-        var warehouses_id = "{{ old('warehouses_id') ? old('warehouses_id') : ''}}" ;
-        if(warehouses_id) {
-            $.ajax({
-                    url: "{{ route('getposition') }}",
-                    data: {val:warehouses_id},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){
-                        $('#warehouse_positions_id').empty();
-                        for(var i=0;i<result.length;i++)
-                            if(result[i]['id'] == "{{ old('warehouse_positions_id') ? old('warehouse_positions_id') : '' }}")
-                                $('<option value='+result[i]['id']+' selected>'+result[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
-                            else
-                                $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
-                    }
-                });
-        }
 
         $('.all_amount,.available_amount,.hold_amount').blur(function(){
             if(parseInt($('.all_amount').val()) != parseInt($('.available_amount').val()) + parseInt($('.hold_amount').val())) {

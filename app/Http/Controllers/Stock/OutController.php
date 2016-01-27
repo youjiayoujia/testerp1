@@ -10,58 +10,19 @@
 
 namespace App\Http\Controllers\Stock;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Stock\OutRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\Warehouse\PositionRepository;
+use App\Models\Stock\OutModel;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 
 class OutController extends Controller
 {
-    protected $out;
-
-    public function __construct(Request $request, OutRepository $out)
+    public function __construct(OutModel $out)
     {
-        $this->out = $out;
-        $this->request = $request;
+        $this->model = $out;
         $this->mainIndex = route('stockOut.index');
         $this->mainTitle = '出库';
-    }
-
-    /**
-    * 列表显示页
-    *
-    * @param none
-    * @return view
-    *
-    */
-    public function index()
-    {
-        $this->request->flash();
-
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->out->auto()->paginate(),
-        ];
-
-        return view('stock.out.index', $response);
-    }
-
-    /**
-     * 信息详情页 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'stockout' => $this->out->get($id),
-        ];
-
-        return view('stock.out.show', $response);
+        $this->viewPath = 'stock.out.';
     }
 
     /**
@@ -71,34 +32,16 @@ class OutController extends Controller
      * @return view
      *
      */
-    public function create(WarehouseRepository $warehouse)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => config('out'),
-            'warehouses' => $warehouse->all(),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.out.create', $response);
+        return view($this->viewPath.'create', $response);
     }
-
-    /**
-     * 数据保存 
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function store()
-    {
-        $this->request->flash();
-
-        $this->validate($this->request, $this->out->rules('create'));
-        $this->out->create($this->request->all());
-
-        return redirect(route('stockOut.index'));
-    }
-
     /**
      * 跳转数据编辑页 
      *
@@ -106,44 +49,15 @@ class OutController extends Controller
      * @return view
      *
      */
-    public function edit($id, WarehouseRepository $warehouse)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => config('out'),
-            'out' => $this->out->get($id),
-            'warehouses' => $warehouse->all(),
+            'out' => $this->model->find($id),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.out.edit', $response);
-    }
-
-    /**
-     * 数据更新 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->out->rules('update', $id));
-        $this->out->update($id, $this->request->all());
-
-        return redirect(route('stockOut.index'));
-    }
-
-    /**
-     * 记录删除 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function destroy($id)
-    {
-        $this->out->destroy($id);
-        return redirect(route('stockOut.index'));
+        return view($this->viewPath.'edit', $response);
     }
 }

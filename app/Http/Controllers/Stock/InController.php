@@ -12,55 +12,18 @@ namespace App\Http\Controllers\Stock;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Stock\InRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\Warehouse\PositionRepository;
+use App\Models\Stock\InModel;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 
 class InController extends Controller
 {
-    protected $in;
-
-    public function __construct(Request $request, InRepository $in)
+    public function __construct(InModel $in)
     {
-        $this->in = $in;
-        $this->request = $request;
+        $this->model = $in;
         $this->mainIndex = route('stockIn.index');
         $this->mainTitle = '入库';
-    }
-
-    /**
-    * 列表显示页
-    *
-    * @param none
-    * @return view
-    *
-    */
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->in->auto()->paginate(),
-        ];
-
-        return view('stock.in.index', $response);
-    }
-
-    /**
-     * 信息详情页 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'stockin' => $this->in->get($id),
-        ];
-
-        return view('stock.in.show', $response);
+        $this->viewPath = 'stock.in.';
     }
 
     /**
@@ -70,31 +33,15 @@ class InController extends Controller
      * @return view
      *
      */
-    public function create(WarehouseRepository $warehouse)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => config('in.in'),
-            'warehouses' => $warehouse->all(),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.in.create', $response);
-    }
-
-    /**
-     * 数据保存 
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function store()
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->in->rules('create'));
-        $this->in->create($this->request->all());
-
-        return redirect(route('stockIn.index'));
+        return view($this->viewPath.'create', $response);
     }
 
     /**
@@ -104,48 +51,18 @@ class InController extends Controller
      * @return view
      *
      */
-    public function edit($id, WarehouseRepository $warehouse)
+    public function edit($id)
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => config('in'),
-            'in' => $this->in->get($id),
-            'warehouses' => $warehouse->all(),
+            'in' => $this->model->get($id),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.in.edit', $response);
+        return view($this->viewPath.'edit', $response);
     }
-
-    /**
-     * 数据更新 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->in->rules('update'));
-        $this->in->update($id, $this->request->all());
-
-        return redirect(route('stockIn.index'));
-    }
-
-    /**
-     * 记录删除 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function destroy($id)
-    {
-        $this->in->destroy($id);
-
-        return redirect(route('stockIn.index'));
-    }
-
+    
     /**
      * 获取itemid，返回
      *

@@ -10,7 +10,6 @@
 
 namespace App\Http\Controllers\Stock;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Stock\AdjustmentRepository;
 use App\Models\ItemModel;

@@ -1,15 +1,15 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('item_id') }}">Item号{!! Sort::label('item_id') !!}</th>
+    <th class='sort' data-field='id'>ID</th>
+    <th class='sort' data-field='item_id'>item号</th>
     <th>sku</th>  
     <th>仓库</th>
     <th>库位</th>
-    <th class="sort" data-url="{{ Sort::url('all_amount') }}">总数量{!! Sort::label('all_amount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('available_amount') }}">可用数量{!! Sort::label('available_amount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('hold_amount') }}">hold数量{!! Sort::label('hold_amount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('total_amount') }}">总金额(￥){!! Sort::label('total_amount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
+    <th class='sort' data-field='all_amount'>总数量</th>
+    <th class='sort' data-field='available_amount'>可用数量</th>
+    <th class='sort' data-field='hold_amount'>hold数量</th>
+    <th class='sort' data-field='total_amount'>总金额</th>
+    <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

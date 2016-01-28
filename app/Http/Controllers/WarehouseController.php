@@ -21,9 +21,6 @@ class WarehouseController extends Controller
     {
         $this->warehouse = $warehouse;
         $this->request = $request;
-        $this->mainIndex = route('warehouse.index');
-        $this->mainTitle = '仓库';
-
     }
 
     /**
@@ -38,7 +35,6 @@ class WarehouseController extends Controller
         $this->request->flash();
 
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
             'data' => $this->warehouse->auto()->paginate(),
         ];
 
@@ -55,7 +51,6 @@ class WarehouseController extends Controller
     public function show($id)
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
             'warehouse' => $this->warehouse->get($id),
         ];
 
@@ -71,11 +66,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-
-        return view('warehouse.create', $response);
+        return view('warehouse.create');
     }
 
     /**
@@ -105,7 +96,6 @@ class WarehouseController extends Controller
     public function edit($id)
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
             'warehouse' => $this->warehouse->get($id),
         ];
 

@@ -5,13 +5,11 @@
 @section('css')
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
-    
 @stop
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
-
     <script src="{{ asset('js/jquery.cxcalendar.min.js') }}"></script>
 
 @stop
@@ -24,7 +22,6 @@
             }
         });
     </script>
-    
 @stop
 @section('body')
     @include('layouts.nav')
@@ -36,17 +33,7 @@
                 </div>
             @endif
             <div class="col-lg-{{ isset($sidebar) ? '10' : '12' }}">
-                <ol class="breadcrumb">
-                    <li><a href="/">主页</a></li>
-                    @section('breadcrumbs')
-                        @if(isset($metas['mainTitle']))
-                            <li><a href="{{ $metas['mainIndex'] }}">{{ $metas['mainTitle'] }}</a></li>
-                        @endif
-                        @if(isset($metas['title']))
-                            <li class="active">{{ $metas['title'] }}</li>
-                        @endif
-                    @show{{-- 路径导航 --}}
-                </ol>
+                @section('breadcrumbs')@show{{-- 路径导航 --}}
                 @section('content')@show{{-- 内容 --}}
             </div>
         </div>

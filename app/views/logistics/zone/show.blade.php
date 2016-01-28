@@ -16,7 +16,7 @@
                 <strong>物流方式</strong>: {{ $zone->logistics->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>国家</strong>: {{ $zone->country->name }}
+                <strong>国家</strong>: {{ $zone->country_id }}
             </div>
             <div class="col-lg-4">
                 <strong>种类</strong>: {{ $zone->shipping_id == 'express' ? '快递' : '小包' }}

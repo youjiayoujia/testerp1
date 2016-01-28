@@ -2,13 +2,15 @@
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stock.store') }} @stop
 @section('formBody')
-    <div class="form-group">
-        <label for="item_id" class='control-label'>item号</label> 
-        <input type='text' class="form-control" id="item_id" placeholder="item号" name='item_id' value="{{ old('item_id') }}" readonly>
-    </div>
-    <div class="form-group">
-        <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
+    <div class='row'>
+        <div class="form-group col-lg-6">
+            <label for="item_id" class='control-label'>item号</label> 
+            <input type='text' class="form-control" id="item_id" placeholder="item号" name='item_id' value="{{ old('item_id') }}" readonly>
+        </div>
+        <div class="form-group col-lg-6">
+            <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
+        </div>
     </div>
     <div class='row'>
         <div class="form-group col-sm-6">
@@ -46,7 +48,6 @@
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
-
         $('.all_amount,.available_amount,.hold_amount').blur(function(){
             if(parseInt($('.all_amount').val()) != parseInt($('.available_amount').val()) + parseInt($('.hold_amount').val())) {
                 $(':button[type=submit]').attr('disabled', true);

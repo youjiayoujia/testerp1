@@ -36,7 +36,7 @@ class OutModel extends BaseModel
         'update' => [
             'sku' => 'required|max:128',
             'amount' => 'required|integer',
-            'warehouses_id' => 'requiraed|integer',
+            'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
             'total_amount' => 'required|integer',
         ]

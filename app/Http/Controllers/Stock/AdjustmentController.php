@@ -11,56 +11,23 @@
 namespace App\Http\Controllers\Stock;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\Stock\AdjustmentRepository;
+use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\Warehouse\PositionRepository;
-use App\Repositories\Stock\InRepository;
-use App\Repositories\Stock\OutRepository;
-use App\Repositories\StockRepository;
-use App\Repositories\Stock\AdjustFormRepository;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
+use App\Models\Stock\InModel;
+use App\Models\Stock\OutModel;
+use App\Models\StockModel;
+use App\Models\Stock\AdjustFormModel;
 
 class AdjustmentController extends Controller
 {
-    protected $adjustment;
-    protected $out;
-    protected $in;
-    protected $stock;
-    protected $adjust;
-
-    public function __construct(Request $request, 
-                                AdjustmentRepository $adjustment, 
-                                InRepository $in, 
-                                OutRepository $out, 
-                                StockRepository $stock,
-                                AdjustFormRepository $adjust)
+    public function __construct(AdjustFormModel $adjust)
     {
-        $this->adjustment = $adjustment;
-        $this->request = $request;
-        $this->out = $out;
-        $this->in = $in;
-        $this->stock = $stock;
-        $this->adjust = $adjust;
+        $this->model = $adjust;
         $this->mainIndex = route('stockAdjustment.index');
         $this->mainTitle = '库存调整';
-    }
-
-    /**
-    * 列表显示页
-    *
-    * @param none
-    * @return view
-    *
-    */
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->adjust->auto()->paginate(),
-        ];
-
-        return view('stock.adjustment.index', $response);
+        $this->viewPath = 'stock.adjustment.';
     }
 
     /**
@@ -74,11 +41,11 @@ class AdjustmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjustments' => $this->adjust->get($id)->adjustment,
-            'adjust' => $this->adjust->get($id),
+            'adjustments' => $this->model->find($id)->adjustment,
+            'adjust' => $this->model->find($id),
         ];
         
-        return view('stock.adjustment.show', $response);
+        return view($this->viewPath.'show', $response);
     }
 
     /**
@@ -88,14 +55,14 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function create(WarehouseRepository $warehouse)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $warehouse->all(),
+            'warehouses' => WarehouseModel::all(),
         ];
 
-        return view('stock.adjustment.create', $response);
+        return view($this->viewPath.'create', $response);
     }
 
     /**
@@ -107,25 +74,24 @@ class AdjustmentController extends Controller
      */
     public function store()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->rules($this->request));
-        $buf = [];
-        $len = count(array_keys($this->request->input('arr')['sku']));
-        $buf = $this->request->all();
-        $obj = $this->adjust->create($buf);
+        request()->flash();
+        $this->validate(request(), $this->rules(request()));
+        $len = count(array_keys(request()->input('arr')['sku']));
+        $buf = request()->all();
+        $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
         {   
-            $arr = $this->request->input('arr');
+            $arr = request()->input('arr');
             foreach($arr as $key => $val)
             {
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $obj->id;
-            $this->adjustment->create($buf);
+            AdjustmentModel::create($buf);
         }
 
-        return redirect(route('stockAdjustment.index'));
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -135,17 +101,18 @@ class AdjustmentController extends Controller
      * @return view
      *
      */
-    public function edit($id, WarehouseRepository $warehouse, PositionRepository $position)
+    public function edit($id)
     {
+        $position = new PositionModel;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjust' => $this->adjust->get($id),
-            'adjustments' => $this->adjust->get($id)->adjustment,
-            'warehouses' => $warehouse->all(),
-            'positions' =>$position->get_position(['warehouses_id' => $this->adjust->get($id)->warehouses_id])->toArray(),
+            'model' => $this->model->find($id),
+            'adjustments' => $this->model->find($id)->adjustment,
+            'warehouses' => WarehouseModel::all(),
+            'positions' =>$position->getObj(['warehouses_id' => $this->model->find($id)->warehouses_id])->toArray(),
         ];
 
-        return view('stock.adjustment.edit', $response);
+        return view($this->viewPath.'edit', $response);
     }
 
     /**
@@ -157,19 +124,17 @@ class AdjustmentController extends Controller
      */
     public function update($id)
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->rules($this->request));
-        $buf = [];
-        $len = count(array_keys($this->request->input('arr')['sku']));
-        $buf = $this->request->all();
-        $obj = $this->adjust->get($id)->adjustment;
+        request()->flash();
+        $this->validate(request(), $this->rules(request()));
+        $len = count(array_keys(request()->input('arr')['sku']));
+        $buf = request()->all();
+        $obj = $this->model->find($id)->adjustment;
         $obj_len = count($obj);
-
-        $this->adjust->update($id, $buf);
+        $this->model->find($id)->update($buf);
         for($i=0; $i<$len; $i++)
         {   
             unset($buf);
-            $arr = $this->request->input('arr');
+            $arr = request()->input('arr');
             foreach($arr as $key => $val)
             {
                 $val = array_values($val);
@@ -184,7 +149,7 @@ class AdjustmentController extends Controller
             $i++;
         }
 
-        return redirect(route('stockAdjustment.index'));
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -196,8 +161,9 @@ class AdjustmentController extends Controller
      */
     public function destroy($id)
     {
-        $this->adjust->destroy($id);
-        return redirect(route('stockAdjustment.index'));
+        $this->model->destroy($id);
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -211,22 +177,23 @@ class AdjustmentController extends Controller
     {
         $id = $_GET['id'];
         $time = date('Y-m-d',time());       
-        $obj = $this->adjust->get($id);
+        $obj = $this->model->find($id);
         $obj->update(['status'=>'Y', 'check_time'=>$time]); 
         echo json_encode($time);
 
         $obj->relation_id = $obj->adjust_form_id;
         $arr = $obj->toArray();
         $buf = $obj->adjustment->toArray();
+        $stock = new StockModel;
         for($i=0;$i<count($buf);$i++) {
             $tmp = [];
             $tmp = array_merge($arr,$buf[$i]);
             if($tmp['type'] == '入库') {
                 $tmp['type'] = 'ADJUSTMENT';
-                $this->stock->in($tmp);
+                $stock->in($tmp);
             } else {
                 $tmp['type'] = 'ADJUSTMENT';
-                $this->stock->out($tmp);
+                $stock->out($tmp);
             }
         }
     }

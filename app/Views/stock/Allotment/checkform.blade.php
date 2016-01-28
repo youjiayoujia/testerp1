@@ -28,7 +28,6 @@
         <div class="panel-heading">
             列表
         </div>  
-
         <div class='panel-body'>
             @foreach($allotmentforms as $key => $allotmentform)
                 <div class='row'>

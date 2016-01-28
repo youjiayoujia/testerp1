@@ -52,7 +52,7 @@ class StockController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'stock' => $this->model->find($id),
+            'model' => $this->model->find($id),
             'warehouses' => WarehouseModel::all(),
         ];
 
@@ -123,17 +123,18 @@ class StockController extends Controller
      */
     public function getpsi()
     {
+        $position = new PositionModel;
         $warehouse = $_GET['warehouse'];
-        $arr[] = PositionModel::get_position(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
-        $obj = $this->model->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
-        if($obj) {
-            $arr[1][] = $obj ->toArray();
-        }
-
-        if($arr)
+        $arr[] = $position->getObj(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
+        if(!empty($arr[0])) {
+            $obj = $this->model->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
+            if($obj) {
+                $arr[1][] = $obj ->toArray();
+            }
             echo json_encode($arr);
-        else
-            echo 'none';
+        } else {
+            echo json_encode('none');
+        }
     }
 
     /**

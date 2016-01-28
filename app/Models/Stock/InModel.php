@@ -4,6 +4,7 @@ namespace App\Models\Stock;
 
 use App\Base\BaseModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\ItemModel;
 
 class InModel extends BaseModel
 {

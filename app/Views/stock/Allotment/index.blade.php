@@ -1,17 +1,17 @@
 @extends('common.table')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('tableHeader')
-    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('allotment_id') }}">调拨单号{!! Sort::label('allotment_id') !!}</th>
+    <th class='sort' data-field='id'>ID</th>
+    <th class='sort' data-field='allotment_id'>调拨单号</th>
     <th>调出仓库</th>
     <th>调入仓库</th>
     <th>备注</th>  
     <th>调拨人</th>
     <th>调拨时间</th>
     <th>调拨状态</th>
-    <th class="sort" data-url="{{ Sort::url('available_amount') }}">审核人{!! Sort::label('available_amount') !!}</th>
+    <th class='sort' data-field='check_man_id'>审核人</th>
     <th>审核状态</th>
-    <th class="sort" data-url="{{ Sort::url('hold_amount') }}">审核时间{!! Sort::label('hold_amount') !!}</th>
+    <th class='sort' data-field='check_time'>审核时间</th>
     <th>物流方式</th>
     <th>物流号</th>
     <th>物流方式</th>
@@ -83,7 +83,7 @@
 
 <script type='text/javascript'>
 $(document).ready(function(){   
-    $('.check_time').click(function(){
+    $(document).on('click', '.check_time', function(){
         obj = $(this).parent().parent();
         tmp = $(this);
         if(obj.find('td:eq(9)').text() == '未审核') {
@@ -122,12 +122,7 @@ $(document).ready(function(){
                 success:function(result){
                     tmp.before("<a href='javascript:' class='btn btn-success btn-xs check_time' data-id='{{ $allotment->id }}'>\
                     <span class='glyphicon glyphicon-pencil'></span>\
-                    @if($allotment->check_status == 'N')\
-                        未审核\
-                    @else\
-                        已审核\
-                    @endif\
-                </a>");
+                        未审核</a>");
                     obj.find('td:eq(7)').text('拣货中');
                     tmp.hide();
                 }

@@ -4,31 +4,31 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>ID</strong>: {{ $stockout->id }}
+                <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $stockout->sku }}
+                <strong>sku</strong>: {{ $model->sku }}
             </div>
             <div class="col-lg-2">
-                <strong>数量</strong>: {{ $stockout->amount }}
+                <strong>数量</strong>: {{ $model->amount }}
             </div>
             <div class="col-lg-2">
-                <strong>总金额(￥)</strong>: {{ $stockout->total_amount }}
+                <strong>总金额(￥)</strong>: {{ $model->total_amount }}
             </div>
             <div class="col-lg-2">
-                <strong>仓库</strong>: {{ $stockout->warehouse->name }}
+                <strong>仓库</strong>: {{ $model->warehouse->name }}
             </div>
             <div class="col-lg-2">
-                <strong>库位</strong>: {{ $stockout->position->name }}
+                <strong>库位</strong>: {{ $model->position->name }}
             </div>
             <div class="col-lg-2">
-                <strong>出库类型</strong>: {{ $stockout->type_name }}
+                <strong>出库类型</strong>: {{ $model->type_name }}
             </div>
             <div class="col-lg-2">
-                <strong>出库类型id</strong>: {{ $stockout->relation_id }}
+                <strong>出库类型id</strong>: {{ $model->relation_id }}
             </div>
             <div class="col-lg-2">
-                <strong>备注</strong>: {{ $stockout->remark }}
+                <strong>备注</strong>: {{ $model->remark }}
             </div>
         </div>
     </div>
@@ -36,10 +36,10 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>创建时间</strong>: {{ $stockout->created_at }}
+                <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
             <div class="col-lg-4">
-                <strong>更新时间</strong>: {{ $stockout->updated_at }}
+                <strong>更新时间</strong>: {{ $model->updated_at }}
             </div>
         </div>
     </div>

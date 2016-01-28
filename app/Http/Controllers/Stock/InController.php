@@ -55,8 +55,8 @@ class InController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => config('in'),
-            'in' => $this->model->get($id),
+            'data' => config('in.in'),
+            'model' => $this->model->find($id),
             'warehouses' => WarehouseModel::all(),
         ];
 
@@ -73,7 +73,7 @@ class InController extends Controller
     public function getItemId()
     { 
         $sku_val = $_GET['sku_val']; 
-        $id = $this->in->getitemid($sku_val);
+        $id = $this->model->getitemid($sku_val);
 
         echo json_encode($id);
     }
@@ -88,7 +88,7 @@ class InController extends Controller
     public function getPosition()
     {
         $warehouses_id = $_GET['val'];
-        $arr = $this->in->getPosition($warehouses_id);
+        $arr = $this->model->getPosition($warehouses_id);
 
         echo json_encode($arr);
     }

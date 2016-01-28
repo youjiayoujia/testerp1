@@ -21,6 +21,9 @@ class AdjustmentModel extends BaseModel
      */
     protected $fillable = ['adjust_forms_id', 'item_id', 'sku', 'type', 'warehouse_positions_id', 'amount', 'total_amount', 'created_at'];
 
+    // 用于查询
+    protected $searchFields = ['adjust_form_id', 'sku'];
+
     /**
      * get the relationship between the two module 
      *

@@ -4,34 +4,34 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>ID</strong>: {{ $allotment->id }}
+                <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>调拨单号</strong>: {{ $allotment->allotment_id }}
+                <strong>调拨单号</strong>: {{ $model->allotment_id }}
             </div>
             <div class="col-lg-2">
-                <strong>调出仓库</strong>: {{ $allotment->outwarehouse->name }}
+                <strong>调出仓库</strong>: {{ $model->outwarehouse->name }}
             </div>
             <div class="col-lg-2">
-                <strong>调入仓库</strong>: {{ $allotment->inwarehouse->name }}
+                <strong>调入仓库</strong>: {{ $model->inwarehouse->name }}
             </div>
             <div class="col-lg-2">
-                <strong>备注</strong>: {{ $allotment->remark }}
+                <strong>备注</strong>: {{ $model->remark }}
             </div>
             <div class="col-lg-2">
-                <strong>调拨人</strong>: {{ $allotment->allotment_man_id }}
+                <strong>调拨人</strong>: {{ $model->allotment_man_id }}
             </div>
             <div class="col-lg-2">
-                <strong>调拨时间</strong>: {{ $allotment->allotment_time }}
+                <strong>调拨时间</strong>: {{ $model->allotment_time }}
             </div>
             <div class="col-lg-2">
-                <strong>调拨状态</strong>: {{ $allotment->status_name }}
+                <strong>调拨状态</strong>: {{ $model->status_name }}
             </div>
             <div class="col-lg-2">
-                <strong>对单人</strong>: {{ $allotment->checkform_man_id }}
+                <strong>对单人</strong>: {{ $model->checkform_man_id }}
             </div>
             <div class="col-lg-2">
-                <strong>对单时间</strong>: {{ $allotment->checkform_time }}
+                <strong>对单时间</strong>: {{ $model->checkform_time }}
             </div>
         </div>
     </div>
@@ -39,13 +39,13 @@
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>物流名称</strong>: {{ isset($allotment->logistics->type) ? $allotment->logistics->type : '' }}
+                <strong>物流名称</strong>: {{ isset($model->logistics->type) ? $model->logistics->type : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>物流号</strong>: {{ isset($allotment->logistics->code) ? $allotment->logistics->code : '' }}
+                <strong>物流号</strong>: {{ isset($model->logistics->code) ? $model->logistics->code : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>物流费</strong>: {{ isset($allotment->logistics->fee) ? $allotment->logistics->fee : ''}}
+                <strong>物流费</strong>: {{ isset($model->logistics->fee) ? $model->logistics->fee : ''}}
             </div>
         </div>
     </div>
@@ -81,19 +81,19 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>审核人</strong>: {{ $allotment->check_man_id }}
+                <strong>审核人</strong>: {{ $model->check_man_id }}
             </div>
             <div class="col-lg-2">
-                <strong>审核状态</strong>: {{ $allotment->check_status == 'N' ? '未审核' : '已审核' }}
+                <strong>审核状态</strong>: {{ $model->check_status == 'N' ? '未审核' : '已审核' }}
             </div>
             <div class="col-lg-2">
-                <strong>审核时间</strong>: {{ $allotment->check_time }}
+                <strong>审核时间</strong>: {{ $model->check_time }}
             </div>
             <div class="col-lg-2">
-                <strong>创建时间</strong>: {{ $allotment->created_at }}
+                <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
             <div class="col-lg-2">
-                <strong>更新时间</strong>: {{ $allotment->updated_at }}
+                <strong>更新时间</strong>: {{ $model->updated_at }}
             </div>
         </div>
     </div>

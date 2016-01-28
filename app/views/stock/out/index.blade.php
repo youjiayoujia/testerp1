@@ -4,7 +4,7 @@
     <th class='sort' data-field='item_id'>item号</th>
     <th>sku</th>
     <th class='sort' data-field='amount'>数量</th>
-    <th class='sort' data-field='total_amount'>总数量</th>
+    <th class='sort' data-field='total_amount'>总金额</th>
     <th>仓库</th>
     <th>库位</th>
     <th>出库类型</th>

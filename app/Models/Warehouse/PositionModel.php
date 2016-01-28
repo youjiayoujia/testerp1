@@ -42,5 +42,16 @@ class PositionModel extends BaseModel
     {
        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
     }
+    /**
+     *  获取库位信息 
+     *  @param $arr 
+     *  @param $field 获取的字段
+     *
+     *  @return mes
+     */
+    public function getObj($arr,$field = ['*'])
+    {
+        return $this->where($arr)->get($field);
+    }
 
 }

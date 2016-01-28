@@ -54,7 +54,7 @@ class OutController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => config('out'),
-            'out' => $this->model->find($id),
+            'model' => $this->model->find($id),
             'warehouses' => WarehouseModel::all(),
         ];
 

@@ -121,4 +121,24 @@ class CatalogModel extends BaseModel
         $catalog->delete();
     }
 
+    /**
+     * 查询品类
+     * @author YJ 2016-1-7 14:57:26
+     * @param int   $id   查询的品类对应id
+     * @param where   $string   查询条件
+     * @return array
+     */
+    public function getCatalog($id,$where='')
+    {
+        if($id!=''){
+            return $this->find($id);
+        }else{
+            if($where=='1'){
+                return $this->get()->first();
+            }
+            return $this->all();
+        }
+        
+    }
+
 }

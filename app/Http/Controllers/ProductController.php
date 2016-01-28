@@ -8,15 +8,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductModel;
+use App\Models\Product\SupplierModel;
 
 class ProductController extends Controller
 {
 
     protected $product;
 
-    public function __construct(ProductModel $product)
+    public function __construct(ProductModel $product,SupplierModel $supplier)
     {
         $this->model = $product;
+        $this->supplier = $supplier;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '产品';
         $this->viewPath = 'product.';
@@ -29,7 +31,7 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    /*public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -39,7 +41,18 @@ class ProductController extends Controller
         ];
 
         return view('product.create',$response);
-    }
+    }*/
+
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'catalogs' => $this->model->getCatalogs(),
+            'models' => $this->model->getModels(),
+            'suppliers' => $this->supplier->all(),
+        ];
+        return view($this->viewPath . 'create', $response);
+    }    
 
     /**
      * Store a newly created resource in storage.
@@ -78,7 +91,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    /*public function edit($id)
     {
         $product = $this->product->get($id);
         $response = [
@@ -92,7 +105,7 @@ class ProductController extends Controller
         ];
 
         return view('product.edit', $response);
-    }
+    }*/
 
     /**
      * Update the specified resource in storage.
@@ -132,7 +145,7 @@ class ProductController extends Controller
     {   
         $catalog_id = $_GET['catalog_id'];
         $product_id = isset($_GET['product_id'])?$_GET['product_id']:0;
-        $data = $this->product->getCatalogProperty($catalog_id,$product_id);
+        $data = $this->model->getCatalogProperty($catalog_id,$product_id);
 
         echo json_encode($data);
     }

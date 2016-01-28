@@ -152,14 +152,14 @@
 
     function fun() {
         var select = document.getElementById("country_id");
-        var str = [];
-        var arr = '';
-        for(i = 1; i < select.length; i++) {
+        //var str = [];
+        var arr = [];
+        for(i = 0; i < select.length; i++) {
             if(select.options[i].selected) {
-                str.push(select[i].value);
+                //str.push(select[i].value);
                 $.ajax({
                     url : "{{ route('country') }}",
-                    data : { id : i},
+                    data : { id : select[i].value},
                     dataType : 'json',
                     type : 'get',
                     success : function(result) {
@@ -169,7 +169,5 @@
                 });
             }
         }
-
-//        $("textarea[name = 'country_id']").val(str);
     }
 </script>

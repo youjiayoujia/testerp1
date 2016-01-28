@@ -24,7 +24,7 @@
             <td>{{ $zone->id }}</td>
             <td>{{ $zone->zone }}</td>
             <td>{{ $zone->logistics->logistics_type}}</td>
-            <td>{{ $zone->country->name }}</td>
+            <td>{{ $zone->country_id }}</td>
             <td>{{ $zone->shipping_id == 'express' ? '快递' : '小包'}}</td>
             <td>{{ $zone->fixed_weight }}</td>
             <td>{{ $zone->fixed_price }}</td>

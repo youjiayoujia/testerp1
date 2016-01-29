@@ -93,9 +93,8 @@ $(document).ready(function(){
                 tmp.prev().hide();
                 tmp.next().next().hide();
                 id = $(this).data('id');
-                url = "{{ route('checkform')}}";
-                url +="?id="+id;
-                tmp.after(" <a href="+url+" class='btn btn-success btn-xs'>\
+                url = "{{ route('checkform',['id' =>''])}}/"+id;
+                tmp.after(" <a href='"+url+"' class='btn btn-success btn-xs'>\
                 <span class='glyphicon glyphicon-eye-open'></span> 对单</a>");
                 $.ajax({
                     url:"{{ route('allotmentcheck') }}",

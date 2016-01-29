@@ -110,7 +110,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $this->model->find($id),
             'warehouses' => WarehouseModel::all(),
-            'positions' => $position->get_position(['warehouses_id'=>$this->model->find($id)->out_warehouses_id]),
+            'positions' => $position->getObj(['warehouses_id'=>$this->model->find($id)->out_warehouses_id]),
             'allotmentforms' => $this->model->find($id)->allotmentform, 
         ];
 
@@ -126,13 +126,14 @@ class AllotmentController extends Controller
      */
     public function update($id)
     {
+
         request()->flash();
         $this->validate(request(), $this->rules(request()));
         $len = count(array_keys(request()->input('arr')['sku']));
         $buf = request()->all();
         $obj = $this->model->find($id)->allotmentform;
         $obj_len = count($obj);
-        $this->model->update($buf);
+        $this->model->find($id)->update($buf);
         $arr = request()->input('arr');
         for($i=0; $i<$len; $i++)
         {   
@@ -150,7 +151,7 @@ class AllotmentController extends Controller
             $i++;
         }
 
-        return redirect(route($this->mainIndex));
+        return redirect($this->mainIndex);
     }
 
     /**

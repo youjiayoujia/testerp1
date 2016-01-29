@@ -71,11 +71,13 @@
                     </a>
                     @endif
                 @endif
+                @if($allotment->check_status == 'N')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $allotment->id }}"
                    data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                @endif
             </td>
         </tr>
     @endforeach
@@ -89,7 +91,12 @@ $(document).ready(function(){
         if(obj.find('td:eq(9)').text() == '未审核') {
             if(confirm('确认审核?')) {
                 tmp.prev().hide();
+                tmp.next().next().hide();
                 id = $(this).data('id');
+                url = "{{ route('checkform')}}";
+                url +="?id="+id;
+                tmp.after(" <a href="+url+" class='btn btn-success btn-xs'>\
+                <span class='glyphicon glyphicon-eye-open'></span> 对单</a>");
                 $.ajax({
                     url:"{{ route('allotmentcheck') }}",
                     data:{id:id},
@@ -100,8 +107,6 @@ $(document).ready(function(){
                         obj.find('td:eq(10)').text(result);
                         obj.find('td:eq(9)').text('已审核');
                         obj.find('td:eq(7)').text('已出库');
-                        tmp.after(" <a href={{ route('checkform', ['id'=>"+id+"]) }} class='btn btn-success btn-xs'>\
-                        <span class='glyphicon glyphicon-eye-open'></span> 对单</a>");
                     }
                 });
             }

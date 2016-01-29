@@ -212,15 +212,7 @@
                         obj.find('.access_amount').val(result[1]);
                         obj.find('.item_id').val(result[2]);
                         if(obj.find('.amount').val()) {
-                            $.ajax({
-                                url:"{{ route('getavailableamount') }}",
-                                data:{position:val_position},
-                                dataType:'json',
-                                'type':'get',
-                                success:function(result){
-                                    obj.find('.total_amount').val(result[1]*obj.find('.amount').val());
-                                }
-                            });
+                            obj.find('.total_amount').val(result[1]*obj.find('.amount').val());
                         }
                     } else {
                         obj.find('.sku').val('');

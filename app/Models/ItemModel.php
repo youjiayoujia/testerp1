@@ -13,6 +13,13 @@ class ItemModel extends BaseModel
      */
     protected $table = 'items';
 
+	protected $searchFields = ['sku'];
+
+    public $rules = [
+        'create' => ['sku' => 'required|unique:items,sku'],
+        'update' => ['sku' => 'required|unique:items,sku,{id}']
+    ];
+
 	protected $fillable = [
         'product_id','sku','weight'
         ];

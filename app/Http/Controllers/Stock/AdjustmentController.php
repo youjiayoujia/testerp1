@@ -39,10 +39,14 @@ class AdjustmentController extends Controller
      */
     public function show($id)
     {
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjustments' => $this->model->find($id)->adjustment,
-            'adjust' => $this->model->find($id),
+            'adjustments' => $model->adjustment,
+            'adjust' => $model,
         ];
         
         return view($this->viewPath.'show', $response);
@@ -103,13 +107,17 @@ class AdjustmentController extends Controller
      */
     public function edit($id)
     {
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $position = new PositionModel;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'model' => $this->model->find($id),
-            'adjustments' => $this->model->find($id)->adjustment,
+            'model' => $model,
+            'adjustments' => $model->adjustment,
             'warehouses' => WarehouseModel::all(),
-            'positions' =>$position->getObj(['warehouses_id' => $this->model->find($id)->warehouses_id])->toArray(),
+            'positions' =>$position->getObj(['warehouses_id' => $model->warehouses_id])->toArray(),
         ];
 
         return view($this->viewPath.'edit', $response);

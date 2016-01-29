@@ -58,7 +58,7 @@
                     <div class='form-group col-sm-2'>
                         <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
                         <select name='arr[warehouse_positions_id][{{$key}}]' id='arr[warehouse_positions_id][{{$key}}]' class='form-control warehouse_positions_id'>
-                        <option>请输入库位</option>
+                        <option value=''>请输入库位</option>
                         @foreach($positions as $position)
                             <option value="{{$position->id}}" {{$allotmentform->in_warehouse_positions_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
                         @endforeach
@@ -75,6 +75,11 @@
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){
+    $.each($('.warehouse_positions_id'), function(){
+        if($(this).val() == '')
+            $('button:submit').attr('disabled', true);
+    });
+    
     $('.receive_amount').blur(function(){
         obj = $(this);
         var reg=/-(\d)+/gi;
@@ -105,16 +110,27 @@ $(document).ready(function(){
             dataType:'json',
             type:'get',
             success:function(result) {
-                if(result != 'none')
+                if(result != 'none') {
                     if(result['sku'] != sku) {
                         alert('库位与sku不匹配');
                         obj.empty();
                         arr = {!! $positions !!};
-                        str = '<option>请选择仓库</option>';
+                        str = "<option value=''>请选择仓库</option>";
                         for(i=0;i<arr.length;i++)
                             str +="<option value="+arr[i].id+">"+arr[i].name+"</option>";
                         $(str).appendTo(obj);
+                        $('button:submit').attr('disabled', true);
+                        return;
                     }
+                    $.each($('.warehouse_positions_id'), function(){
+                        if($(this).val() == '') {
+                            $('button:submit').attr('disabled', 'disabled');
+                            return;
+                        } else {
+                            $('button:submit').attr('disabled', false);
+                        }
+                    });
+                }
             }
         });
     });

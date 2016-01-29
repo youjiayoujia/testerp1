@@ -126,7 +126,6 @@ class AllotmentController extends Controller
      */
     public function update($id)
     {
-
         request()->flash();
         $this->validate(request(), $this->rules(request()));
         $len = count(array_keys(request()->input('arr')['sku']));
@@ -185,6 +184,7 @@ class AllotmentController extends Controller
         $obj = $this->model->find($id);
         $obj->update(['check_status'=>'Y', 'check_time'=>$time, 'allotment_status'=>'out']); 
         echo json_encode($time);
+        
         $stock = new StockModel;
         $obj->relation_id = $obj->allotment_id;
         $arr = $obj->toArray();

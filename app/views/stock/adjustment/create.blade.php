@@ -220,7 +220,7 @@
                         if(rowline.find(':radio:checked').val() == '出库') {
                             if(sku && position) {
                                 if(result[0] < tmp.val()) {
-                                    alert('超出可用库存，最大可用量'+result);
+                                    alert('超出可用库存，最大可用量'+result[0]);
                                     tmp.val('');
                                 } else {
                                     tmp.parent().next().children('.total_amount').val(result[1]*tmp.val());

@@ -44,8 +44,9 @@ class AllotmentFormModel extends BaseModel
     }
 
     /**
-     * 
+     * return the relationship between the two Model
      *
+     * @return 
      */
     public function inposition()
     {

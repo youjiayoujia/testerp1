@@ -1,7 +1,5 @@
 <?php
 /**
- * 物流方式控制器
- *
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 15/12/21
@@ -10,91 +8,61 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Repositories\Logistics\SupplierRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\LogisticsRepository;
+use App\Models\LogisticsModel;
+use App\Models\WarehouseModel as Warehouse;
+use App\Models\Logistics\SupplierModel as Supplier;
+
 
 class LogisticsController extends Controller
 {
-    protected $logistics;
 
-    public function __construct(Request $request, LogisticsRepository $logistics)
+    public function __construct(LogisticsModel $channel)
     {
-        $this->request = $request;
-        $this->logistics = $logistics;
+        $this->model = $channel;
         $this->mainIndex = route('logistics.index');
-        $this->mainTitle = '物流方式';
+        $this->mainTitle = '物流';
+        $this->viewPath = 'logistics.';
     }
 
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->logistics->auto()->paginate(),
-        ];
-        return view('logistics.index', $response);
-    }
-
-    public function show($id)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logistics' => $this->logistics->get($id),
+            'warehouses'=>$this->getWarehouses(),
+            'suppliers'=>$this->getSuppliers(),
         ];
-        return view('logistics.show', $response);
+        return view($this->viewPath . 'create', $response);
     }
 
-
-
-    public function create(SupplierRepository $supplier, WarehouseRepository $warehouse)
+    public function edit($id)
     {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'supplier' => $supplier->all(),
-            'warehouse' => $warehouse->all(),
+            'model' => $model,
+            'warehouses'=>$this->getWarehouses(),
+            'suppliers'=>$this->getSuppliers(),
         ];
-        return view('logistics.create', $response);
+        return view($this->viewPath . 'edit', $response);
     }
 
-    public function store()
+    public function getSuppliers()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->logistics->rules('create'));
-        $this->logistics->create($this->request->all());
-        return redirect($this->mainIndex);
+        return Supplier::all();
     }
 
-    public function edit($id, SupplierRepository $supplier, WarehouseRepository $warehouse)
+    public function getWarehouses()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'logistics' => $this->logistics->get($id),
-            'supplier' => $supplier->all(),
-            'warehouse' => $warehouse->all(),
-        ];
-        return view('logistics.edit', $response);
-    }
-
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->logistics->rules('update', $id));
-        $this->logistics->update($id, $this->request->all());
-        return redirect($this->mainIndex);
-    }
-
-    public function destroy($id)
-    {
-        $this->logistics->destroy($id);
-        return redirect($this->mainIndex);
+        return Warehouse::all();
     }
 
     public function zone()
     {
         $id = $_GET['id'];
-        $buf = $this->logistics->get($id)->shipping;
+        $buf = $this->model->get($id)->shipping;
         echo json_encode($buf);
     }
 

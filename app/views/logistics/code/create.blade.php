@@ -10,9 +10,9 @@
         <label for="logistics_id">物流方式</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="logistics_id" class="form-control" id="logistics_id">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ $logisticses->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
-                    {{ $logisticses->logistics_type }}
+            @foreach($logisticses as $logistics)
+                <option value="{{ $logistics->id }}" {{ $logistics->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
+                    {{ $logistics->logistics_type }}
                 </option>
             @endforeach
         </select>

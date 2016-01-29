@@ -16,6 +16,8 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
+    protected $searchFields = ['short_code', 'logistics_type', 'logistics_supplier_id', 'type'];
+
     protected $fillable = [
         'short_code',
         'logistics_type',
@@ -27,6 +29,48 @@ class LogisticsModel extends BaseModel
         'api_docking',
         'is_enable'
     ];
+
+
+    public $rules = [
+        'create' => [
+            'short_code' => 'required',
+            'logistics_type' => 'required',
+            'shipping' => 'required',
+            'warehouse_id' => 'required',
+            'logistics_supplier_id' => 'required',
+            'type' => 'required',
+            'url' => 'required',
+            'api_docking' => 'required',
+            'is_enable' => 'required',
+        ],
+        'update' => [
+            'short_code' => 'required',
+            'logistics_type' => 'required',
+            'shipping' => 'required',
+            'warehouse_id' => 'required',
+            'logistics_supplier_id' => 'required',
+            'type' => 'required',
+            'url' => 'required',
+            'api_docking' => 'required',
+            'is_enable' => 'required',
+        ],
+    ];
+
+
+    /**
+     * 批量倒入号码池
+     *
+     * @param $file 导入所需的Excel文件
+     *
+     */
+    public function batchImport($file)
+    {
+        $filePath = '' . $file;
+        Excel::load($filePath, function($reader) {
+            $data = $reader->all();
+            dd($data);
+        });
+    }
 
     public function supplier()
     {

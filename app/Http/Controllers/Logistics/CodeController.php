@@ -10,81 +10,46 @@
 
 namespace App\Http\Controllers\Logistics;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Logistics\CodeRepository;
-use App\Repositories\LogisticsRepository;
+use App\Models\Logistics\CodeModel as CodeModel;
+use App\Models\LogisticsModel as LogisticsModel;
 
 class CodeController extends Controller
 {
-    protected $code;
-
-    public function __construct(Request $request, CodeRepository $code)
+    public function __construct(CodeModel $channel)
     {
-        $this->request = $request;
-        $this->code = $code;
+        $this->model = $channel;
         $this->mainIndex = route('logisticsCode.index');
         $this->mainTitle = '跟踪号';
+        $this->viewPath = 'logistics.code.';
     }
 
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->code->auto()->paginate(),
-        ];
-        return view('logistics.code.index', $response);
-    }
 
-    public function create(LogisticsRepository $logistics)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logistics' => $logistics->all(),
+            'logisticses'=>$this->getLogistics(),
         ];
-        return view('logistics.code.create', $response);
+        return view($this->viewPath . 'create', $response);
     }
 
-    public function store()
+    public function edit($id)
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->code->rules('create'));
-        $this->code->create($this->request->all());
-        return redirect($this->mainIndex);
-    }
-
-    public function show($id)
-    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'code' => $this->code->get($id),
+            'model' => $model,
+            'logisticses'=>$this->getLogistics(),
         ];
-        return view('logistics.code.show', $response);
+        return view($this->viewPath . 'edit', $response);
     }
 
-    public function edit($id, LogisticsRepository $logistics)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'code' => $this->code->get($id),
-            'logistics' => $logistics->all(),
-        ];
-        return view('logistics.code.edit', $response);
-    }
+    public function getLogistics(){
 
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->code->rules('update', $id));
-        $this->code->update($id, $this->request->all());
-        return redirect($this->mainIndex);
+        return LogisticsModel::all();
     }
-
-    public function destroy($id)
-    {
-        $this->code->destroy($id);
-        return redirect($this->mainIndex);
-    }
-
 }

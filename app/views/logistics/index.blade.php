@@ -1,6 +1,6 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
+    <th class="sort">ID</th>
     <th>物流方式简码</th>
     <th>物流方式名称</th>
     <th>种类</th>
@@ -10,8 +10,8 @@
     <th>物流追踪网址</th>
     <th>API对接方式</th>
     <th>是否启用</th>
-    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>
+    <th class="sort">创建时间</th>
+    <th class="sort">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

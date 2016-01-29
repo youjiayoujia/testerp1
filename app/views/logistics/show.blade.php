@@ -4,34 +4,34 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>ID</strong>: {{ $logistics->id }}
+                <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式简码</strong>: {{ $logistics->short_code }}
+                <strong>物流方式简码</strong>: {{ $model->short_code }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式名称</strong>: {{ $logistics->logistics_type }}
+                <strong>物流方式名称</strong>: {{ $model->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $logistics->shipping == 'express' ? '快递' : '小包' }}
+                <strong>种类</strong>: {{ $model->shipping == 'express' ? '快递' : '小包' }}
             </div>
             <div class="col-lg-4">
-                <strong>仓库</strong>: {{ $logistics->warehouse->name }}
+                <strong>仓库</strong>: {{ $model->warehouse->name }}
             </div>
             <div class="col-lg-4">
-                <strong>物流商</strong>: {{ $logistics->supplier->name }}
+                <strong>物流商</strong>: {{ $model->supplier->name }}
             </div>
             <div class="col-lg-4">
-                <strong>物流商物流方式</strong>: {{ $logistics->type }}
+                <strong>物流商物流方式</strong>: {{ $model->type }}
             </div>
             <div class="col-lg-4">
-                <strong>物流追踪网址</strong>: {{ $logistics->url }}
+                <strong>物流追踪网址</strong>: {{ $model->url }}
             </div>
             <div class="col-lg-4">
-                <strong>API对接方式</strong>: {{ $logistics->api_docking }}
+                <strong>API对接方式</strong>: {{ $model->api_docking }}
             </div>
             <div class="col-lg-4">
-                <strong>是否启用</strong>: {{ $logistics->is_enable == 'Y' ? '是' : '否' }}
+                <strong>是否启用</strong>: {{ $model->is_enable == 'Y' ? '是' : '否' }}
             </div>
         </div>
     </div>
@@ -39,10 +39,10 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">
-                <strong>创建时间</strong>: {{ $logistics->created_at }}
+                <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
             <div class="col-lg-6">
-                <strong>更新时间</strong>: {{ $logistics->updated_at }}
+                <strong>更新时间</strong>: {{ $model->updated_at }}
             </div>
         </div>
     </div>

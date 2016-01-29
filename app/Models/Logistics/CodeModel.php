@@ -24,6 +24,21 @@ class CodeModel extends BaseModel
         'used_at'
     ];
 
+    protected $searchFields = ['logistics_id', 'code', 'status', 'package_id'];
+
+    public $rules = [
+        'create' => [
+            'logistics_id' => 'required',
+            'code' => 'required',
+            'status' => 'required',
+        ],
+        'update' => [
+            'logistics_id' => 'required',
+            'code' => 'required',
+            'status' => 'required',
+        ],
+    ];
+
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');

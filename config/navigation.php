@@ -66,12 +66,36 @@ return [
             ],
         ],
     ],
+
     //物流导航
     [
         'name' => '物流',
         'icon' => 'plane',
         'url' => 'dashboard.index',
+        'subnavigations' => [
+            [
+                'name' => '物流方式',
+                'url' => 'logistics.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流商',
+                'url' => 'logisticsSupplier.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '跟踪号',
+                'url' => 'logisticsCode.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流分区报价',
+                'url' => 'logisticsZone.index',
+                'icon' => '',
+            ],
+        ],
     ],
+
     //采购导航
     [
         'name' => '采购',

@@ -11,83 +11,41 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\CountryRepository;
-use App\Repositories\Logistics\ZoneRepository;
-use App\Repositories\LogisticsRepository;
-use Illuminate\Http\Request;
+use App\Models\Logistics\ZoneModel as ZoneModel;
+use App\Models\LogisticsModel as LogisticsModel;
+use App\Models\CountryModel as CountryModel;
 
 class ZoneController extends Controller
 {
     protected $zone;
 
-    public function __construct(Request $request, ZoneRepository $zone)
+    public function __construct(ZoneModel $zoneModel)
     {
-        $this->request = $request;
-        $this->zone = $zone;
+        $this->model = $zoneModel;
         $this->mainIndex = route('logisticsZone.index');
-        $this->mainTitle = '物流分区';
+        $this->mainTitle = '物流';
+        $this->viewPath = 'logistics.zone.';
     }
 
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->zone->auto()->paginate(),
-        ];
-        return view('logistics.zone.index', $response);
-    }
 
-    public function create(LogisticsRepository $logistics, CountryRepository $country)
+    public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logistics' => $logistics->all(),
-            'country' => $country->all(),
+            'logisticses'=>$this->getLogisticses(),
+            'countries'=>$this->getCountries(),
         ];
-        return view('logistics.zone.create', $response);
+        return view($this->viewPath . 'create', $response);
     }
 
-    public function store()
+    public function getLogisticses()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->zone->rules('create'));
-        $this->zone->create($this->request->all());
-        return redirect($this->mainIndex);
+        return LogisticsModel::all();
     }
 
-    public function show($id)
+    public function getCountries()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'zone' => $this->zone->get($id),
-        ];
-        return view('logistics.zone.show', $response);
-    }
-
-    public function edit($id, LogisticsRepository $logistics, CountryRepository $country)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'zone' => $this->zone->get($id),
-            'logistics' => $logistics->all(),
-            'country' => $country->all(),
-        ];
-        return view('logistics.zone.edit', $response);
-    }
-
-    public function update($id)
-    {
-        $this->request->flash();
-        $this->validate($this->request, $this->zone->rules('update', $id));
-        $this->zone->update($id, $this->request->all());
-        return redirect($this->mainIndex);
-    }
-
-    public function destroy($id)
-    {
-        $this->zone->destroy($id);
-        return redirect($this->mainIndex);
+        return CountryModel::all();
     }
 
     public function countExpress($id, LogisticsRepository $logistics, CountryRepository $country)

@@ -1,21 +1,21 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('zone') }}">物流分区{!! Sort::label('zone') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('logistics_id') }}">物流方式{!! Sort::label('logistics_id') !!}</th>
+    <th class="sort">ID</th>
+    <th class="sort">物流分区</th>
+    <th class="sort">物流方式</th>
     <th>国家</th>
-    <th class="sort" data-url="{{ Sort::url('shipping') }}">种类{!! Sort::label('shipping') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('fixed_weight') }}">首重(kg){!! Sort::label('fixed_weight') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('fixed_price') }}">首重价格(/kg){!! Sort::label('fixed_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('continued_weight') }}">续重(kg){!! Sort::label('continued_weight') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('continued_price') }}">续重价格(/kg){!! Sort::label('continued_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('other_fixed_price') }}">其他固定费用{!! Sort::label('other_fixed_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('other_scale_price') }}">其他比例费用(%){!! Sort::label('other_scale_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('price') }}">价格(/kg){!! Sort::label('price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('other_price') }}">其他费用{!! Sort::label('other_price') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('discount') }}">最后折扣{!! Sort::label('discount') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>
+    <th class="sort">种类</th>
+    <th class="sort">首重(kg)</th>
+    <th class="sort">首重价格(/kg)</th>
+    <th class="sort">续重(kg)</th>
+    <th class="sort">续重价格(/kg)</th>
+    <th class="sort">其他固定费用</th>
+    <th class="sort">其他比例费用(%)</th>
+    <th class="sort">价格(/kg)</th>
+    <th class="sort">其他费用</th>
+    <th class="sort">最后折扣</th>
+    <th class="sort">创建时间</th>
+    <th class="sort"></th>
     <th>操作</th>
 @stop
 @section('tableBody')

@@ -1,13 +1,13 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('logistics_id') }}">物流方式{!! Sort::label('logistics_id') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('code') }}">跟踪号{!! Sort::label('code') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('package_id') }}">包裹ID{!! Sort::label('package_id') !!}</th>
+    <th class="sort">ID</th>
+    <th class="sort">物流方式</th>
+    <th class="sort">跟踪号</th>
+    <th class="sort">包裹ID</th>
     <th>状态</th>
-    <th class="sort" data-url="{{ Sort::url('used_at') }}">使用时间{!! Sort::label('used_at') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('updated_at') }}">更新时间{!! Sort::label('updated_at') !!}</th>
+    <th class="sort">使用时间</th>
+    <th class="sort">创建时间</th>
+    <th class="sort">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

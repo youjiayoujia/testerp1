@@ -32,6 +32,23 @@ class ZoneModel extends BaseModel
         'discount',
     ];
 
+    protected $searchFields = ['zone', 'logistics_id', 'country_id', 'shipping_id'];
+
+    public $rules = [
+        'create' => [
+            'zone' => 'required',
+            'logistics_id' => 'required',
+            'country_id' => 'required',
+            'shipping_id' => 'required',
+        ],
+        'update' => [
+            'zone' => 'required',
+            'logistics_id' => 'required',
+            'country_id' => 'required',
+            'shipping_id' => 'required',
+        ],
+    ];
+
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');

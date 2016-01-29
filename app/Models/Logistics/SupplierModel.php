@@ -16,6 +16,8 @@ class SupplierModel extends BaseModel
 {
     protected $table = 'logistics_suppliers';
 
+    protected $searchFields = ['name', 'customer_id'];
+
     protected $fillable = [
         'name',
         'customer_id',
@@ -26,6 +28,29 @@ class SupplierModel extends BaseModel
         'technician',
         'technician_tel',
         'remark'
+    ];
+
+    public $rules = [
+        'create' => [
+            'name' => 'required|unique:logistics_suppliers,name',
+            'customer_id' => 'required|numeric',
+            'secret_key' => 'required',
+            'is_api' => 'required',
+            'client_manager' => 'required',
+            'technician' => 'required',
+            'manager_tel' => 'required|digits_between:8,11',
+            'technician_tel' => 'required|digits_between:8,11',
+        ],
+        'update' => [
+            'name' => 'required|unique:logistics_suppliers,name,{id}',
+            'customer_id' => 'required|numeric',
+            'secret_key' => 'required',
+            'is_api' => 'required',
+            'client_manager' => 'required',
+            'technician' => 'required',
+            'manager_tel' => 'required|digits_between:8,11',
+            'technician_tel' => 'required|digits_between:8,11',
+        ],
     ];
 
 }

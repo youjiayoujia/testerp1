@@ -35,7 +35,7 @@
             <div class="form-group col-lg-4">
                 <label for="shipping_id" class="control-label">种类</label>
                 <input class="form-control" id="shipping_id" placeholder="种类" name="shipping_id" value="{{ old('shipping_id') ? old('shipping_id') : $zone->shipping_id }}" readonly>
-            </div>
+            </div>n
             <div class="form-group col-lg-4">
                 <label for="price" class="control-label">价格(/kg)</label>
                 <input class="form-control" id="price" placeholder="价格" name='price' value="{{ old('price') ? old('price') : $zone->price }}" readonly>

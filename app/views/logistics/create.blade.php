@@ -16,9 +16,9 @@
         <label for="warehouse_id">仓库</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="warehouse_id" class="form-control" id="warehouse_id">
-            @foreach($warehouse as $warehouses)
-                <option value="{{$warehouses->id}}" {{$warehouses->id == old('$warehouses->warehouse->id') ? 'selected' : ''}}>
-                    {{$warehouses->name}}
+            @foreach($warehouses as $warehouse)
+                <option value="{{$warehouse->id}}" {{$warehouse->id == old('$warehouses->warehouse->id') ? 'selected' : ''}}>
+                    {{$warehouse->name}}
                 </option>
             @endforeach
         </select>
@@ -27,9 +27,9 @@
         <label for="logistics_supplier_id">物流商</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
-            @foreach($supplier as $suppliers)
-                <option value="{{$suppliers->id}}" {{$suppliers->id == old('$suppliers->supplier->id') ? 'selected' : ''}}>
-                    {{$suppliers->name}}
+            @foreach($suppliers as $supplier)
+                <option value="{{$supplier->id}}" {{$supplier->id == old('$suppliers->supplier->id') ? 'selected' : ''}}>
+                    {{$supplier->name}}
                 </option>
             @endforeach
         </select>

@@ -14,9 +14,9 @@
         <label for="logistics_id">物流方式</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="logistics_id" class="form-control" id="logistics_id" onclick="checkShipping()">
-            @foreach($logistics as $logisticses)
-                <option value="{{ $logisticses->id }}" {{ old('logistics_id') ? old('logistics_id') == $logisticses->id ? 'selected' : '' : ''}}>
-                    {{ $logisticses->logistics_type }}
+            @foreach($logisticses as $logistics)
+                <option value="{{ $logistics->id }}" {{ old('logistics_id') ? old('logistics_id') == $logistics->id ? 'selected' : '' : ''}}>
+                    {{ $logistics->logistics_type }}
                 </option>
             @endforeach
         </select>
@@ -75,9 +75,9 @@
         <label for="country_id" class="control-label">国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="country_id" class="form-control" id="country_id" multiple onclick="fun()">
-            @foreach($country as $countries)
-                <option class="form-control" value="{{ $countries->id }}" {{ old('country_id') ? old('country_id') == $countries->id ? 'selected' : '' : ''}}>
-                    {{ $countries->name }}
+            @foreach($countries as $country)
+                <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}}>
+                    {{ $country->name }}
                 </option>
             @endforeach
         </select>

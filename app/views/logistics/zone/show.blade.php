@@ -7,46 +7,46 @@
         <div class="panel-heading">基本信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>ID</strong>: {{ $zone->id }}
+                <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>物流分区</strong>: {{ $zone->zone }}
+                <strong>物流分区</strong>: {{ $model->zone }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式</strong>: {{ $zone->logistics->logistics_type }}
+                <strong>物流方式</strong>: {{ $model->logistics->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>国家</strong>: {{ $zone->country_id }}
+                <strong>国家</strong>: {{ $model->country_id }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $zone->shipping_id == 'express' ? '快递' : '小包' }}
+                <strong>种类</strong>: {{ $model->shipping_id == 'express' ? '快递' : '小包' }}
             </div>
             <div class="col-lg-4" id="express">
-                <strong>首重(kg)</strong>: {{ $zone->fixed_weight }}
+                <strong>首重(kg)</strong>: {{ $model->fixed_weight }}
             </div>
             <div class="col-lg-4" id="express">
-                <strong>首重价格(/kg)</strong>: {{ $zone->fixed_price }}
+                <strong>首重价格(/kg)</strong>: {{ $model->fixed_price }}
             </div>
             <div class="col-lg-4" id="express">
-                <strong>续重(kg)</strong>: {{ $zone->continued_weight }}
+                <strong>续重(kg)</strong>: {{ $model->continued_weight }}
             </div>
             <div class="col-lg-4" id="express">
-                <strong>续重价格(/kg)</strong>: {{ $zone->continued_price }}
+                <strong>续重价格(/kg)</strong>: {{ $model->continued_price }}
             </div>
             <div class="col-lg-4" id="express">
-                <strong>其他固定费用</strong>: {{ $zone->other_fixed_price }}
+                <strong>其他固定费用</strong>: {{ $model->other_fixed_price }}
             </div>
             <div class="col-lg-4" id="express">
-                <strong>其他比例费用(%)</strong>: {{ $zone->other_scale_price }}
+                <strong>其他比例费用(%)</strong>: {{ $model->other_scale_price }}
             </div>
             <div class="col-lg-4" id="packet">
-                <strong>价格(/kg)</strong>: {{ $zone->price }}
+                <strong>价格(/kg)</strong>: {{ $model->price }}
             </div>
             <div class="col-lg-4" id="packet">
-                <strong>其他费用</strong>: {{ $zone->other_price }}
+                <strong>其他费用</strong>: {{ $model->other_price }}
             </div>
             <div class="col-lg-4">
-                <strong>最后折扣</strong>: {{ $zone->discount }}
+                <strong>最后折扣</strong>: {{ $model->discount }}
             </div>
         </div>
     </div>
@@ -54,10 +54,10 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">
-                <strong>创建时间</strong>: {{ $zone->created_at }}
+                <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
             <div class="col-lg-6">
-                <strong>更新时间</strong>: {{ $zone->updated_at }}
+                <strong>更新时间</strong>: {{ $model->updated_at }}
             </div>
         </div>
     </div>

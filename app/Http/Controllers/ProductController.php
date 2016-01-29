@@ -9,6 +9,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ProductModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Product\ProductAttributeValueModel;
+use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
 {
@@ -23,25 +25,6 @@ class ProductController extends Controller
         $this->mainTitle = '产品';
         $this->viewPath = 'product.';
     }
-
-
-
-    /**
-     * 新增产品界面
-     *
-     * @return \Illuminate\Http\Response
-     */
-    /*public function create()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'catalogs' => $this->product->getCatalogs(),
-            'models' => $this->product->getModels(),
-            'suppliers' => $this->supplier->getSupplier(),
-        ];
-
-        return view('product.create',$response);
-    }*/
 
     public function create()
     {
@@ -60,52 +43,34 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    /*public function store(Request $request)
+    public function store()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->product->rules('create'));   
-        $this->product->create($this->request->all(),$this->request->files);
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $this->model->createProduct(request()->all(),request()->files);
 
         return redirect($this->mainIndex);
-    }*/
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'product' => $this->product->get($id),
-        ];
-
-        return view('product.show', $response);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    /*public function edit($id)
+    public function edit($id)
     {
-        $product = $this->product->get($id);
+        $product = $this->model->find($id);
+        $productAttributeValueModel = new ProductAttributeValueModel();
+        $ProductFeatureValueModel = new ProductFeatureValueModel();
+        if (!$product) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'catalogs' => $this->product->getCatalogs(),
+            'catalogs' => $this->model->getCatalogs(),
             'product' => $product,
-            'second_supplier_id' => $this->product->getSecondSupplier($product->second_supplier_id),
-            'suppliers' => $this->supplier->getSupplier(),
-            'attributes' => $this->product->getAttributes($id,'Attribute'),
-            'features' => $this->product->getAttributes($product->spu_id,'Feature'),
+            'second_supplier_id' => $this->model->getSecondSupplier($product->second_supplier_id),
+            'suppliers' => $this->supplier->all(),
+            'attributes' => json_encode($productAttributeValueModel->where('product_id',$id)->get()->toArray()),
+            'features' => json_encode($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get()->toArray()),
         ];
-
-        return view('product.edit', $response);
-    }*/
+        return view($this->viewPath . 'edit', $response);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -116,22 +81,10 @@ class ProductController extends Controller
      */
     public function update($id)
     {   
-        $this->request->flash();
-        $this->validate($this->request, $this->product->rules('update',$id));
-        $this->product->update($id,$this->request->all(),$this->request->files);
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update',$id));
+        $this->model->updateProduct($id,request()->all(),request()->files);
 
-        return redirect($this->mainIndex);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $this->product->destroy($id);
         return redirect($this->mainIndex);
     }
 
@@ -160,7 +113,7 @@ class ProductController extends Controller
     {   
         $product_ids = isset($_GET['product_ids'])?$_GET['product_ids']:'';
         $product_id_arr = explode(',', $product_ids);
-        $this->product->createItem($product_id_arr);
+        $this->model->createItem($product_id_arr);
 
         echo json_encode(1);
     }

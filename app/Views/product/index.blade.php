@@ -86,7 +86,7 @@
                     success:function(result){
                         //$("#examine").text("已审核");
                         $(this).text("已审核");
-                    }                    
+                    }                  
                 })
             }
         });

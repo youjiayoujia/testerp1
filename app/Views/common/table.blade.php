@@ -139,5 +139,5 @@
             });
         });
     </script>
+    @section('childJs')@show
 @stop
-@section('childJs')@show

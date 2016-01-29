@@ -21,6 +21,9 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 //品类路由
 Route::resource('catalog', 'CatalogController');
 
+//item路由
+Route::resource('item', 'ItemController');
+
 //渠道路由
 Route::resource('channel', 'ChannelController');
 

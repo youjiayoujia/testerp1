@@ -4,6 +4,11 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use App\Models\CatalogModel;
+use App\Models\SpuModel;
+use App\Models\ItemModel;
+use App\Models\Product\ProductAttributeValueModel;
+use App\Models\Product\ProductFeatureValueModel;
+use Illuminate\Support\Facades\DB;
 
 class ProductModel extends BaseModel
 {
@@ -13,6 +18,30 @@ class ProductModel extends BaseModel
      * @var string
      */
     protected $table = 'products';
+
+    public $rules = [
+        'create' => [
+            'name' => 'required|unique:products,name',
+            'c_name' => 'required|unique:products,name',
+            'purchase_price' => 'required|numeric',
+            'purchase_carriage' => 'required|numeric',
+            'purchase_url' => 'url',
+            'supplier_id' => 'required',
+            'product_size' => 'required',
+            'weight' => 'required|numeric',
+            'upload_user' => 'required',
+        ],
+        'update' => [
+            'name' => 'required|unique:products,name,{id}',
+            'c_name' => 'required|unique:products,c_name,{id}',
+            'purchase_price' => 'required',
+            'purchase_carriage' => 'required|numeric',
+            'purchase_url' => 'url',
+            'product_size' => 'required',
+            'weight' => 'required|numeric',
+            'upload_user' => 'required',
+        ]
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -172,9 +201,216 @@ class ProductModel extends BaseModel
             }  
         }
         $data['models'] = $modelSet;
-echo '<pre>';
-        print_r($data);exit;
+        //修改key值
+        $data['attributes'] = $data['Attributes'];
+        unset($data['Attributes']);
         return $data;
+    }
+
+    /**
+     * 获得辅供应商
+     * 2016-1-11 14:00:41 YJ
+     * @param string $second_supplier_str 辅助供应商字符串
+     * @return array
+     */
+    function getSecondSupplier($second_supplier_str) {  
+        $second_arr[0] = '';
+        $second_arr[1] = '';
+        $second_arr[2] = '';
+        $second_arr[3] = '';
+        if(strlen($second_supplier_str)>1){
+            $arr = implode(',', $second_supplier_str);
+            for($i=0;$i<count($arr);$i++){
+                $second_arr[$i] = $arr[$i];
+            }
+        }else{
+            $second_arr[0] = $second_supplier_str;
+        }
+        return $second_arr; 
+    }
+
+    function createProduct($data='',$files=''){
+        DB::beginTransaction();
+        try {       
+            //创建spu，,并插入数据
+            $spumodel = new SpuModel();
+            $spu = $this->createSku();
+            $spuarr['spu'] = $spu;
+            $spuobj = $spumodel->create($spuarr);
+            $data['spu_id'] = $spuobj->id;
+            $second_supplier_id_str = '';
+            //拼接辅助供应商id
+            foreach($data['second_supplier_id_arr'] as $supplier_id){
+                if($supplier_id!=0)$second_supplier_id_str .= $supplier_id.",";
+            }
+            $second_supplier_id_str = substr($second_supplier_id_str, 0,strlen($second_supplier_id_str)-1);
+            $data['second_supplier_id'] = $second_supplier_id_str;
+            //获取catalog对象,将关联catalog的属性插入数据表
+            $catalog = $this->getCatalogs($data['catalog_id']);
+            foreach($data['modelSet'] as $model){
+                if(count($model)==1)continue;
+                $data['model'] = $spu."-".$model['model'];;
+                $product = $this->create($data);
+                //获得productID,插入产品图片
+                $data['product_id'] = $product->id;
+                //默认s图片id为0
+                $default_image_id = 0;
+                /*foreach($model['image'] as $key=>$file){
+                    if($file!=''){
+                        $image_id = $this->imageRepository->singleCreate($data,$file,$key);
+                        //获得首图的product_image_id
+                        if($key=='image0'){
+                            $default_image_id = $image_id;
+                        }
+                    }
+                }*/
+                //更新产品首图
+                $product->update(['default_image'=>$default_image_id]);
+                //插入产品attribute属性
+                if(array_key_exists('attributes',$model)){
+                    foreach($model['attributes'] as $attribute=>$attributeValues){              
+                        $attributeModel = $catalog->Attributes()->where('name','=',$attribute)->get()->first();
+                        foreach($attributeValues as $attributeValue){
+                            $attributeValueModel = $attributeModel->values()->where('name','=',$attributeValue)->get()->first();   
+                            $attributeArray['attribute_id'] =$attributeModel->id;
+                            $attributeArray['attribute_value'] = $attributeValueModel->name;
+                            $attributeArray['product_id'] = $product->id;
+                            $productAttributeValueModel = new ProductAttributeValueModel();
+                            $productAttributeValueModel->create($attributeArray);              
+                        }
+                    }                    
+                }
+            }
+            //插入feature属性
+            $keyset = ['featureradio','featurecheckbox','featureinput'];
+            foreach($keyset as $key){
+                if(array_key_exists($key, $data)){
+                    foreach($data[$key] as $feature_id=>$feature_value){
+                        $featureArray['feature_id'] = $feature_id;
+                        $featureArray['spu_id'] = $spuobj->id;
+                        if($key!='featureinput'){
+                            foreach($feature_value as $value){
+                                $featureArray['feature_value'] = $value;
+                                $productFeatureValueModel = new ProductFeatureValueModel();
+                                $productFeatureValueModel->create($featureArray);                        
+                            }                        
+                        }else{
+                            $featureArray['feature_value'] = $feature_value;
+                            $productFeatureValueModel = new ProductFeatureValueModel();
+                            $productFeatureValueModel->create($featureArray);
+                        }
+                    }
+                }
+            }
+        }catch (Exception $e) {
+            DB::rollBack();
+        }
+        DB::commit();
+    }
+
+    function updateProduct($id,$data,$files = null){
+        $product = $this->find($id);
+        $spu_id = $product->spu_id;
+        DB::beginTransaction();
+        try {     
+            //更新产品attribute属性
+            if(array_key_exists('attributes',$data)){
+                $productAttributeValueModel = new ProductAttributeValueModel();
+                $attributes = $productAttributeValueModel->where('product_id',$id)->delete(); 
+                foreach($data['attributes'] as $attribute_id=>$attribute_values){
+                    $tmp = [];
+                    $tmp['product_id'] = $id;
+                    $tmp['attribute_id'] = $attribute_id;
+                    foreach($attribute_values as $attribute_value){
+                        $tmp['attribute_value'] = $attribute_value;
+                        $model = new ProductAttributeValueModel();
+                        $model->create($tmp);
+                    }            
+                }
+            }
+            //更新产品feature属性
+            if(array_key_exists('features',$data)){
+                $ProductFeatureValueModel = new ProductFeatureValueModel();
+                $ProductFeatureValueModel->where('spu_id',$spu_id)->delete();
+                foreach($data['features'] as $feature_id=>$feature_values){
+                    $tmp = [];
+                    $tmp['spu_id'] = $spu_id;
+                    $tmp['feature_id'] = $feature_id;
+                    if(is_array($feature_values)){
+                        foreach($feature_values as $feature_value){
+                            $tmp['feature_value'] = $feature_value;
+                            $model = new ProductFeatureValueModel();
+                            $model->create($tmp);
+                        }                    
+                    }else{
+                        $tmp['feature_value'] = $feature_values;
+                        $model = new ProductFeatureValueModel();
+                        $model->create($tmp);
+                    }
+                     
+                }             
+            }
+            $second = $data['second_supplier_id_arr'];
+            $second_supp = '';
+            foreach($second as $_second){
+                if($_second!=0)$second_supp .= $_second.",";
+            }
+            //主供应商
+            $second_supp = substr($second_supp,0,strlen($second_supp)-1);
+            $data['second_supplier_id'] = $second_supp;
+            //更新图片
+            $data['product_id'] = $id;
+            $data['spu_id'] = $spu_id;
+            $data['type'] = 'original';
+            $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
+            
+            /*foreach($files as $key=>$file){
+                if($file!=''){
+                    $image_id = $this->imageRepository->singleCreate($data,$file,$key);
+                    if($key=='image0'){
+                        $default_image_id = $image_id;
+                    }
+                }
+                $data['default_image'] = $default_image_id;
+            }*/           
+            //更新基础信息
+            $product->update($data);
+        }catch (Exception $e) {
+            DB::rollBack(); 
+        }
+        DB::commit();
+    }
+
+    /**
+     * 创建item
+     * 2016-1-13 17:48:26 YJ
+     * @param array product_id_array 产品id字符串
+     * @return array
+     */
+    function createItem($product_id_array) {
+        foreach($product_id_array as $product_id){
+            $productModel = $this->find($product_id);
+            $attributes = $productModel->productAttributeValue;
+            $brr = [];
+            foreach($attributes as $attribute){
+                $brr[$attribute->attribute_id][] = $attribute->attribute_value;
+            } 
+            $brr = array_values($brr);
+            $result = $this->createDikaer($brr);
+            $model = $productModel->model;
+            foreach($result as $_result){
+                $item = $model;
+                foreach($_result as $__result){
+                    $item .="-".$__result;
+                }
+                $data['product_id'] = $product_id;
+                $data['sku'] = $item;
+                $item = new ItemModel();
+                $item->create($data);          
+            }
+            $productModel->status = 1;
+            $productModel->save();           
+        }      
     }
 
 }

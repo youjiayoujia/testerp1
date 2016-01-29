@@ -80,7 +80,7 @@
         </tr>
     @endforeach
 @stop
-
+@section('childJs')
 <script type='text/javascript'>
 $(document).ready(function(){   
     $(document).on('click', '.check_time', function(){
@@ -100,7 +100,7 @@ $(document).ready(function(){
                         obj.find('td:eq(10)').text(result);
                         obj.find('td:eq(9)').text('已审核');
                         obj.find('td:eq(7)').text('已出库');
-                        tmp.after(" <a href={{ route('checkform', ['id'=>$allotment->id]) }} class='btn btn-success btn-xs'>\
+                        tmp.after(" <a href={{ route('checkform', ['id'=>"+id+"]) }} class='btn btn-success btn-xs'>\
                         <span class='glyphicon glyphicon-eye-open'></span> 对单</a>");
                     }
                 });
@@ -120,7 +120,7 @@ $(document).ready(function(){
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    tmp.before("<a href='javascript:' class='btn btn-success btn-xs check_time' data-id='{{ $allotment->id }}'>\
+                    tmp.before("<a href='javascript:' class='btn btn-success btn-xs check_time' data-id='"+id+"'>\
                     <span class='glyphicon glyphicon-pencil'></span>\
                         未审核</a>");
                     obj.find('td:eq(7)').text('拣货中');
@@ -130,3 +130,4 @@ $(document).ready(function(){
     });
 });
 </script>
+@stop

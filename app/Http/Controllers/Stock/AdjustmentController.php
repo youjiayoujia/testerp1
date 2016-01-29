@@ -79,9 +79,9 @@ class AdjustmentController extends Controller
         $len = count(array_keys(request()->input('arr')['sku']));
         $buf = request()->all();
         $obj = $this->model->create($buf);
+        $arr = request()->input('arr');
         for($i=0; $i<$len; $i++)
         {   
-            $arr = request()->input('arr');
             foreach($arr as $key => $val)
             {
                 $val = array_values($val);
@@ -161,7 +161,10 @@ class AdjustmentController extends Controller
      */
     public function destroy($id)
     {
-        $this->model->destroy($id);
+        $obj = $this->model->find($id)->adjustment;
+        foreach($obj as $val)
+            $val->delete();
+        $this->destroy($id);
 
         return redirect($this->mainIndex);
     }
@@ -186,7 +189,6 @@ class AdjustmentController extends Controller
         $buf = $obj->adjustment->toArray();
         $stock = new StockModel;
         for($i=0;$i<count($buf);$i++) {
-            $tmp = [];
             $tmp = array_merge($arr,$buf[$i]);
             if($tmp['type'] == '入库') {
                 $tmp['type'] = 'ADJUSTMENT';

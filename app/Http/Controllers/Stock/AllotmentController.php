@@ -128,16 +128,15 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->rules(request()));
-        $buf = [];
         $len = count(array_keys(request()->input('arr')['sku']));
         $buf = request()->all();
         $obj = $this->model->find($id)->allotmentform;
         $obj_len = count($obj);
         $this->model->update($buf);
+        $arr = request()->input('arr');
         for($i=0; $i<$len; $i++)
         {   
             unset($buf);
-            $arr = request()->input('arr');
             foreach($arr as $key => $val)
             {
                 $val = array_values($val);
@@ -325,13 +324,13 @@ class AllotmentController extends Controller
                 {
                     $buf[$key] = $value[$i];
                 }
-                 $buf = array_merge($buf,$arr);
-                 $buf['type'] = "ALLOTMENT";
-                 $buf['warehouses_id'] = $this->model->find($id)->in_warehouses_id;
-                 $buf['relation_id'] = $buf['allotment_id'];
-                 $buf['total_amount'] = round($buf['total_amount']/$buf['amount']*$buf['receive_amount'],3);
-                 $buf['amount'] = $buf['receive_amount'];
-                 if($buf['amount'] != 0)
+                $buf = array_merge($buf,$arr);
+                $buf['type'] = "ALLOTMENT";
+                $buf['warehouses_id'] = $this->model->find($id)->in_warehouses_id;
+                $buf['relation_id'] = $buf['allotment_id'];
+                $buf['total_amount'] = round($buf['total_amount']/$buf['amount']*$buf['receive_amount'],3);
+                $buf['amount'] = $buf['receive_amount'];
+                if($buf['amount'] != 0)
                     $stock->in($buf);
             }
         } catch(Exception $e) {

@@ -41,16 +41,18 @@
                     @else未审核
                     @endif
                 </a>
+                @if($adjust->status == 'N')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $adjust->id }}"
                    data-url="{{ route('stockAdjustment.destroy', ['id' => $adjust->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                @endif
             </td>
         </tr>
     @endforeach
 @stop
-
+@section('childJs')
 <script type='text/javascript'>
 $(document).ready(function(){    
     $('.check_time').click(function(){
@@ -64,6 +66,7 @@ $(document).ready(function(){
                     dataType:'json',
                     type:'get',
                     success:function(result){
+                        tmp.next().hide();
                         tmp.html("<span class='glyphicon glyphicon-pencil'></span> 已审核");
                         check = tmp.parent().prev().prev();
                         tmp.prev().remove();
@@ -78,3 +81,4 @@ $(document).ready(function(){
     });
 });
 </script>
+@stop

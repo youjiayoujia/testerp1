@@ -23,8 +23,8 @@ class HelpServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('sort', function () {
-            return new \App\Helps\Sort;
+        $this->app->singleton('datalist', function () {
+            return new \App\Helps\DataList;
         });
     }
 }

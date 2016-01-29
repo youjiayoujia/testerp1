@@ -21,6 +21,23 @@ class PositionModel extends BaseModel
      */
     protected $fillable = ['name', 'warehouses_id', 'remark', 'size', 'is_available'];
 
+    // 用于规则验证
+    public $rules = [
+        'create' => [
+            'name' => 'required|max:128|unique:warehouse_positions,name',
+            'warehouses_id' => 'required',
+            'size' => 'required'
+            ],
+        'update' => [
+            'name' => 'required|max:128|unique:warehouse_positions,name,{id}',
+            'warehouses_id' => 'required',
+            'size' => 'required'
+            ]
+    ];
+
+    //查询
+    protected $searchField = ['name, size, is_available'];
+    
     public function warehouse()
     {
        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');

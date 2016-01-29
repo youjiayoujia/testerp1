@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 选款需求控制器
  * 处理选款需求相关的Request与Response
@@ -11,64 +10,17 @@
 
 namespace App\Http\Controllers\Product;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Product\RequireRepository;
+use App\Models\Product\RequireModel;
 
 class RequireController extends Controller
 {
-    protected $require;
-
-    public function __construct(Request $request, RequireRepository $require)
+    public function __construct(RequireModel $require)
     {
-        $this->request = $request;
-        $this->require = $require;
-    }
-
-    /**
-     * 列表页显示
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'data' => $this->require->auto()->paginate(),
-        ];
-
-        return view('product.require.index', $response);
-    }
-
-    /**
-     * 详情页
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-
-    public function show($id)
-    {
-        $response = [
-            'require' => $this->require->get($id),
-        ];
-
-        return view('product.require.show', $response);
-    }
-
-    /**
-     * 跳转创建页面
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function create()
-    {
-        return view('product.require.create');
+        $this->model = $require;
+        $this->mainIndex = route('productRequire.index');
+        $this->mainTitle = '选款需求';
+        $this->viewPath = 'product.require.';
     }
 
     /**
@@ -80,25 +32,23 @@ class RequireController extends Controller
      */
     public function store()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->require->rules('create'));
-        $data = $this->request->all();
-        $buf = $this->require->create($data);
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $data = request()->all();
+        $buf = $this->model->create($data);
         $data['id'] = $buf->id;
-
         for ($i = 1; $i <= 6; $i++) {
-            if ($this->request->hasFile('img' . $i)) {
-                $file = $this->request->file('img' . $i);
-                $path = config('product_require_img_path.dir') . "/" . $data['id'];
+            if (request()->hasFile('img' . $i)) {
+                $file = request()->file('img' . $i);
+                $path = config('product.requireimage') . "/" . $data['id'];
                 $dstname = $i;
-                $absolute_path = $this->require->move_file($file, $dstname, $path);
-                $name = 'img' . $i;
-                $data[$name] = $absolute_path;
+                $absolute_path = $this->model->move_file($file, $dstname, $path);
+                $data['img'.$i] = $absolute_path;
             }
         }
         $buf->update($data);
 
-        return redirect(route('require.index'));
+        return redirect(route('productRequire.index'));
     }
 
     /**
@@ -110,54 +60,25 @@ class RequireController extends Controller
      */
     public function update($id)
     {
-        $this->request->flash();
-
-        $this->validate($this->request, $this->require->rules('update', $id));
-        $data = $this->request->all();
-
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $model->rules('update', $id));
+        $data = request()->all();
         for ($i = 1; $i <= 6; $i++) {
-            if ($this->request->hasFile('img' . $i)) {
-                $file = $this->request->file('img' . $i);
-                $path = config('product_require_img_path.dir') . "/" . $id;
+            if (request()->hasFile('img' . $i)) {
+                $file = request()->file('img' . $i);
+                $path = config('product.requireimage') . "/" . $id;
                 $dstname = $i;
-                $absolute_path = $this->require->move_file($file, $dstname, $path);
-                $name = 'img' . $i;
-                $data["{$name}"] = $absolute_path;
+                $absolute_path = $this->model->move_file($file, $dstname, $path);
+                $data['img'.$i] = $absolute_path;
             }
         }
-        $this->require->update($id, $data);
+        $model->update($data);
 
-        return redirect(route('require.index'));
-    }
-
-    /**
-     * 跳转页面更新页
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function edit($id)
-    {
-        $response = [
-            'require' => $this->require->get($id),
-        ];
-
-        return view('product.require.edit', $response);
-    }
-
-    /**
-     * 删除一条记录
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function destroy($id)
-    {
-        $this->require->destroy($id);
-
-        return redirect(route('require.index'));
+        return redirect(route('productRequire.index'));
     }
 
 }

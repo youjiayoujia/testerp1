@@ -24,11 +24,13 @@
                             </div>
                         </form>
                         <div class="text-right col-lg-9">
-                            <div class="btn-group">
-                                <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
-                                    <i class="glyphicon glyphicon-plus"></i> 新增
-                                </a>
-                            </div>
+                            @section('tableToolButtons')
+                                <div class="btn-group">
+                                    <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+                                        <i class="glyphicon glyphicon-plus"></i> 新增
+                                    </a>
+                                </div>
+                            @show{{-- 工具按钮 --}}
                         </div>
                     </div>
                 @show{{-- 列表工具栏 --}}
@@ -98,7 +100,44 @@
         });
         {{-- 排序 --}}
         $('.sort').click(function () {
-            location.href = $(this).data('url');
+            var field = $(this).data('field');
+            var uri = new URI();
+            uri.hasQuery('sorts', function (value) {
+                var hasField = 0;
+                var sortsNew;
+                if (value) {
+                    var srotsQuery = value.split(',');
+                    $.each(srotsQuery, function (sortsKey, sortsValue) {
+                        var sort = sortsValue.split('.');
+                        if (sort[0] == field) {
+                            hasField = 1;
+                            sortsNew = sort[1] == 'asc' ? value.replace(field + '.asc', field + '.desc') : value.replace(field + '.desc', field + '.asc');
+                        }
+                    });
+                    if (hasField == 0) {
+                        sortsNew = value + "," + field + '.asc';
+                    }
+                } else {
+                    sortsNew = field + '.asc';
+                }
+                window.location.href = uri.setQuery('sorts', sortsNew);
+            });
+        });
+        $('.sort').each(function (k, obj) {
+            var field = $(obj).data('field');
+            var uri = new URI();
+            uri.hasQuery('sorts', function (value) {
+                if (value) {
+                    var srotsQuery = value.split(',');
+                    $.each(srotsQuery, function (sortsKey, sortsValue) {
+                        var sort = sortsValue.split('.');
+                        if (sort[0] == field) {
+                            sort[1] == 'asc' ? $(obj).append('<span class="sign arrow up"></span>') : $(obj).append('<span class="sign arrow"></span>');
+                        }
+                    });
+                }
+            });
         });
     </script>
 @stop
+@section('childJs')@show

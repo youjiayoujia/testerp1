@@ -8,50 +8,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Helps;
-use App\Repositories\CatalogRepository;
+use App\Models\CatalogModel;
 
 class CatalogController extends Controller
 {
-
-    protected $catalog;
-
-    public function __construct(Request $request, CatalogRepository $catalog)
+    public function __construct(CatalogModel $catalog)
     {
-        $this->request = $request;
-        $this->catalog = $catalog;
+        $this->model = $catalog;
         $this->mainIndex = route('catalog.index');
-        $this->mainTitle = '品类';
-    }
-
-    /**
-     * 品类列表
-     * 2015-12-18 14:53:01 YJ
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
-    {
-        $this->request->flash();
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->catalog->auto()->paginate(),
-        ];
-
-        return view('catalog.index', $response);
-    }
-
-    /**
-     * 新增分类界面
-     * 2015-12-18 14:38:20 YJ
-     * @return Illuminate\View\View Object
-     */
-    public function create()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-        return view('catalog.create', $response);
+        $this->mainTitle = '分类';
+        $this->viewPath = 'catalog.';
     }
 
     /**
@@ -61,48 +27,16 @@ class CatalogController extends Controller
      */
     public function store()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->catalog->rules('create'));             
-        $data = $this->request->all();
-        $extra['sets'] = $this->request->input('sets');
-        $extra['attributes'] = $this->request->input('attributes');
-        $extra['features'] = $this->request->input('features');
-        $this->catalog->create($data,$extra);
-
-        return redirect(route('catalog.index'));
-    }
-
-    /**
-     * 品类查看
-     * 2015-12-18 14:47:25 YJ
-     * @param  int $id
-     * @return Illuminate\View\View Object
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'catalog' => $this->catalog->get($id),
-        ];
-
-        return view('catalog.show', $response);
-
-    }
-
-    /**
-     * 编辑品类
-     * 2015-12-18 14:47:18 YJ
-     * @param  int $id
-     * @return Illuminate\View\View Object
-     */
-    public function edit($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'catalog' => $this->catalog->get($id),
-        ];
-
-        return view('catalog.edit', $response);
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        //封装数据
+        $data = request()->all();
+        $extra['sets'] = request()->input('sets');
+        $extra['Attributes'] = request()->input('attributes');
+        $extra['features'] = request()->input('features');
+        //创建品类
+        $this->model->createCatalog($data,$extra);
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -114,15 +48,20 @@ class CatalogController extends Controller
      */
     public function update($id)
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->catalog->rules('update',$id));
-        $data = $this->request->all();
-        $extra['sets'] = $this->request->input('sets');
-        $extra['attributes'] = $this->request->input('attributes');
-        $extra['features'] = $this->request->input('features');
-        $this->catalog->update($id,$data,$extra);
-
-        return redirect(route('catalog.index'));
+        $catalogModel = $this->model->find($id);
+        if (!$catalogModel) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        //封装数据
+        $data = request()->all();
+        $extra['sets'] = request()->input('sets');
+        $extra['Attributes'] = request()->input('attributes');
+        $extra['features'] = request()->input('features');
+        //更新品类信息
+        $this->model->updateCatalog($catalogModel,$data,$extra);
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -133,7 +72,7 @@ class CatalogController extends Controller
      */
     public function destroy($id)
     {
-        $this->catalog->destroy($id);
+        $this->model->destoryCatalog($id);
         return redirect(route('catalog.index'));
     }
 }

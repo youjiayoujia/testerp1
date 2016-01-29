@@ -107,7 +107,7 @@ return [
     | this array to grant expanded functionality to your applications.
     |
     */
-
+    'Zipper' => 'Chumper\Zipper\Zipper',
     'providers' => [
 
         /*
@@ -149,6 +149,7 @@ return [
          * Coffee Providers
          */
         App\Providers\HelpServiceProvider::class,
+        Chumper\Zipper\ZipperServiceProvider::class,
 
         /*
          * Debugbar
@@ -207,7 +208,9 @@ return [
         /*
          * Coffee
          */
-        'Sort' => App\Facades\Sort::class,
+        'DataList' => App\Facades\DataList::class,
+        'Tool' => App\Facades\Tool::class,
+        'Zipper' => Chumper\Zipper\Facades\Zipper::class,
 
     ],
 

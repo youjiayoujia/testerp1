@@ -165,7 +165,7 @@ class AllotmentController extends Controller
         $obj = $this->model->find($id)->allotmentform;
         foreach($obj as $val)
             $val->delete();
-        $this->destroy($id);
+        $this->model->destroy($id);
 
         return redirect($this->mainIndex);
     }
@@ -223,12 +223,12 @@ class AllotmentController extends Controller
             if($key == 'amount')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.amount.'.$k] ='required|numeric';
+                    $arr['arr.amount.'.$k] ='required|integer';
                 }
             if($key == 'warehouse_positions_id')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.warehouse_positions_id.'.$k] = 'required|numeric';
+                    $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
                 }
             if($key == 'total_amount')
                 foreach($val as $k => $v)
@@ -300,10 +300,9 @@ class AllotmentController extends Controller
             }
             $flag = 1;
             $buf[] = $arr['arr']['amount'];
-            $buf[] = $arr['arr']['receive_amount'];
             for($i=0;$i<count($buf[3]);$i++)
             {
-                if($buf[3][$i] != ($buf[4][$i] + $buf[2][$i]))
+                if($buf[3][$i] != ($buf[0][$i] + $buf[2][$i]))
                     $flag = 0;
             }
             if($flag == 1)

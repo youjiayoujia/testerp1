@@ -133,6 +133,12 @@
         });
 
         $(document).on('blur', '.amount', function(){
+            var reg = /-(\d)+/gi;
+            if(reg.test($(this).val())) {
+                alert('fuck,数量是负的了');
+                $(this).val('');
+                return;
+            }
             obj = $(this).parent().parent();
             position = obj.find('.warehouse_positions_id').val();
             $.ajax({

@@ -224,6 +224,12 @@
         });
 
         $(document).on('blur', '.amount', function(){
+            var reg = /-(\d)+/gi;
+            if(reg.test($(this).val())) {
+                alert('fuck,数量是负的了');
+                $(this).val('');
+                return;
+            }
             obj = $(this).parent().parent();
             position = obj.find('.warehouse_positions_id').val();
             $.ajax({
@@ -236,7 +242,7 @@
                         alert('超出可用数量');
                         obj.find('.amount').val('');
                     } else {
-                        obj.find('.total_amount').val(result[1]*obj.find('.amount').val());
+                        obj.find('.total_amount').val((result[1]*obj.find('.amount').val()).toFixed('3'));
                     }
                 }
             });

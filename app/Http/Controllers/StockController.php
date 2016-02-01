@@ -89,7 +89,7 @@ class StockController extends Controller
     {
         $val_position = $_GET['val_position'];
         $obj = $this->model->getObj(['warehouse_positions_id'=>$val_position])->first();
-        $cost = $this->model->getunitcost($obj->sku);
+        $cost = $obj->unit_cost;
         if($obj)
             echo json_encode([$obj->sku, $obj->available_amount, $obj->item_id, $cost]);
         else
@@ -107,7 +107,7 @@ class StockController extends Controller
     {
         $position = $_GET['position'];
         $obj = $this->model->getObj(['warehouse_positions_id'=>$position])->first();
-        $cost = $this->model->getunitcost($obj->sku);
+        $cost = $obj->unit_cost;
         if($obj)
             echo json_encode([$obj->available_amount,$cost]);
         else

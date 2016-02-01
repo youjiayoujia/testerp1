@@ -82,14 +82,16 @@ $(document).ready(function(){
     
     $('.receive_amount').blur(function(){
         obj = $(this);
-        var reg=/-(\d)+/gi;
-        if(reg.test(obj.val())) {
-            alert('fuck,数量负的了!');
-            obj.val('0');
+        var reg=/^(\d)+$/gi;
+        if(!reg.test(obj.val())) {
+            alert('fuck,你输入的是整数吗？');
+            obj.val('');
+            return;
         }
-        if(parseInt(obj.val()) > parseInt(obj.parent().prev().prev().children('.amount').val())) {
+        if(parseInt(obj.val()) > parseInt(obj.parent().prev().prev().prev().children('.amount').val())) {
             alert('超出数量');
-            obj.val(obj.parent().prev().prev().children('.amount').val());
+            obj.val('');
+            return;
         }
         all_amount = parseInt(obj.parent().parent().find('.amount').val());
         old_amount = parseInt(obj.parent().parent().find('.old_receive_amount').val());
@@ -97,6 +99,7 @@ $(document).ready(function(){
         if(all_amount < (old_amount + amount)) {
             alert('fuck,超出数量了');
             $(this).val('');
+            return;
         }
     });
 

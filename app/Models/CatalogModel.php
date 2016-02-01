@@ -15,9 +15,9 @@ class CatalogModel extends BaseModel
      */
     protected $fillable = ['name'];
 
-    protected $searchFields = ['name'];
+    public $searchFields = ['name'];
 
-    protected $rules = [
+    public $rules = [
         'create' => ['name' => 'required|unique:catalogs,name'],
         'update' => ['name' => 'required|unique:catalogs,name,{id}']
     ];

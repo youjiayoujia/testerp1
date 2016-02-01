@@ -14,13 +14,13 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th>ID</th>
-    <th class="sort">MODEL</th>
+    <th class="sort" data-field="model">MODEL</th>
     <th>图片</th>
     <th>分类</th>
-    <th class="sort">名称</th>
-    <th class="sort">中文名称</th>
+    <th class="sort" data-field="name">名称</th>
+    <th class="sort" data-field="c_name">中文名称</th>
     <th>供应商</th>
-    <th class="sort">创建时间</th>
+    <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

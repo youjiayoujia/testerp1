@@ -74,13 +74,18 @@ return [
         'url' => 'dashboard.index',
         'subnavigations' => [
             [
-                'name' => '物流方式',
-                'url' => 'logistics.index',
+                'name' => '物流商',
+                'url' => 'logisticsSupplier.index',
                 'icon' => '',
             ],
             [
-                'name' => '物流商',
-                'url' => 'logisticsSupplier.index',
+                'name' => '物流商物流方式',
+                'url' => 'supplierShipping.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '我们的物流方式',
+                'url' => 'logistics.index',
                 'icon' => '',
             ],
             [

@@ -31,6 +31,7 @@ Route::resource('channelAccount', 'Channel\AccountController');
 //物流路由
 Route::resource('logistics', 'LogisticsController');
 Route::resource('logisticsSupplier', 'Logistics\SupplierController');
+Route::resource('supplierShipping', 'Logistics\SuppliershippingController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);

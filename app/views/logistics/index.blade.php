@@ -37,7 +37,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 @if($logistics->api_docking == '号码池')
-                    <a href="{{ route('logisticsCode.create', ['id'=>$logistics->id]) }}" class="btn btn-success btn-xs">
+                    <a href="/batchAddTrCode/{{ $logistics->id }}" class="btn btn-success btn-xs">
                         <span class="glyphicon glyphicon-plus"></span> 号码池
                     </a>
                 @endif

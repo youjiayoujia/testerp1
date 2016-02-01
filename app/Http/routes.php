@@ -31,7 +31,6 @@ Route::resource('channelAccount', 'Channel\AccountController');
 //物流路由
 Route::resource('logistics', 'LogisticsController');
 Route::resource('logisticsSupplier', 'Logistics\SupplierController');
-Route::resource('supplierShipping', 'Logistics\SuppliershippingController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
@@ -40,3 +39,4 @@ Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', '
 Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);
 Route::get('countExpress/{id}', ['uses' => 'Logistics\ZoneController@countExpress', 'as' => 'countExpress']);
 Route::get('countPacket/{id}', ['uses' => 'Logistics\ZoneController@countPacket', 'as' => 'countPacket']);
+Route::get('batchAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@batchAddTrCode', 'as' => 'batchcreate']);

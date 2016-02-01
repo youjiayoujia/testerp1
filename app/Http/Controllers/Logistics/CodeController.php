@@ -52,4 +52,25 @@ class CodeController extends Controller
 
         return LogisticsModel::all();
     }
+
+    public function batchAddTrCode($logistic_id)
+    {
+        $logistic = LogisticsModel::find($logistic_id);
+        $meta = [
+            "mainIndex" => "string 'http://www.chenxuewenerp.com/logisticsCode'",
+            "mainTitle" => "物流方式列表",
+            "title" => "导入号码池",
+        ];
+        $response = [
+            'metas' => $meta,
+            'logistic' => $logistic,
+        ];
+        return view($this->viewPath . 'batchadd', $response);
+    }
+
+    public function batchAddTrCodeFn()
+    {
+
+        
+    }
 }

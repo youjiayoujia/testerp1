@@ -13,7 +13,7 @@
                 <strong>物流方式名称</strong>: {{ $model->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $model->shipping == 'express' ? '快递' : '小包' }}
+                <strong>种类</strong>: {{ $model->species == 'express' ? '快递' : '小包' }}
             </div>
             <div class="col-lg-4">
                 <strong>仓库</strong>: {{ $model->warehouse->name }}

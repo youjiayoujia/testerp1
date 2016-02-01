@@ -79,12 +79,7 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '物流商物流方式',
-                'url' => 'supplierShipping.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '我们的物流方式',
+                'name' => '物流方式',
                 'url' => 'logistics.index',
                 'icon' => '',
             ],

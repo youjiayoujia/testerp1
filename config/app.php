@@ -156,6 +156,8 @@ return [
          */
         Barryvdh\Debugbar\ServiceProvider::class,
 
+        'Maatwebsite\Excel\ExcelServiceProvider',
+
     ],
 
     /*
@@ -211,6 +213,8 @@ return [
         'DataList' => App\Facades\DataList::class,
         'Tool' => App\Facades\Tool::class,
         'Zipper' => Chumper\Zipper\Facades\Zipper::class,
+
+        'Excel' => 'Maatwebsite\Excel\Facades\Excel',
 
     ],
 

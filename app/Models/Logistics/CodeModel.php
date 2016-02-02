@@ -30,7 +30,6 @@ class CodeModel extends BaseModel
         'create' => [
             'logistics_id' => 'required',
             'code' => 'required',
-            'status' => 'required',
         ],
         'update' => [
             'logistics_id' => 'required',

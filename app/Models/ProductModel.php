@@ -43,7 +43,7 @@ class ProductModel extends BaseModel
         ]
     ];
 
-    public $searchFields = ['name','id'];
+    public $searchFields = ['name','id','c_name','model'];
 
     /**
      * The attributes that are mass assignable.

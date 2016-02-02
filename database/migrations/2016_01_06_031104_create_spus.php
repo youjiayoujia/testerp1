@@ -14,8 +14,8 @@ class CreateSpus extends Migration
     {
         Schema::create('spus', function (Blueprint $table) {
             $table->increments('id');
+            $table->tinyInteger('spu')->comment('spu')->nullable()->default(NULL);
             $table->tinyInteger('status')->comment('状态')->nullable()->default(0);
-            $table->string('image')->comment('图片地址')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +28,6 @@ class CreateSpus extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('spus');
     }
 }

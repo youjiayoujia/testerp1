@@ -21,8 +21,8 @@ class ProductModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'name' => 'required|unique:products,name',
-            'c_name' => 'required|unique:products,name',
+            'name' => 'required',
+            'c_name' => 'required',
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
             'purchase_url' => 'url',
@@ -32,9 +32,9 @@ class ProductModel extends BaseModel
             'upload_user' => 'required',
         ],
         'update' => [
-            'name' => 'required|unique:products,name,{id}',
-            'c_name' => 'required|unique:products,c_name,{id}',
-            'purchase_price' => 'required',
+            'name' => 'required',
+            'c_name' => 'required',
+            'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
             'purchase_url' => 'url',
             'product_size' => 'required',

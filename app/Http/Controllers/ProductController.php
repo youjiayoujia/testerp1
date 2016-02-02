@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductModel;
+use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductFeatureValueModel;
@@ -17,10 +18,11 @@ class ProductController extends Controller
 
     protected $product;
 
-    public function __construct(ProductModel $product,SupplierModel $supplier)
+    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog)
     {
         $this->model = $product;
         $this->supplier = $supplier;
+        $this->catalog = $catalog;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '产品';
         $this->viewPath = 'product.';
@@ -30,7 +32,7 @@ class ProductController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'catalogs' => $this->model->getCatalogs(),
+            'catalogs' => $this->catalog->all(),
             'models' => $this->model->getModels(),
             'suppliers' => $this->supplier->all(),
         ];
@@ -62,7 +64,7 @@ class ProductController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'catalogs' => $this->model->getCatalogs(),
+            'catalogs' => $this->catalog->all(),
             'product' => $product,
             'second_supplier_id' => $this->model->getSecondSupplier($product->second_supplier_id),
             'suppliers' => $this->supplier->all(),

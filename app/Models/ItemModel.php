@@ -13,7 +13,7 @@ class ItemModel extends BaseModel
      */
     protected $table = 'items';
 
-	protected $searchFields = ['sku'];
+	public $searchFields = ['sku'];
 
     public $rules = [
         'create' => ['sku' => 'required|unique:items,sku'],

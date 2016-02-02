@@ -405,10 +405,10 @@ class ProductModel extends BaseModel
                 foreach($_result as $__result){
                     $item .="-".$__result;
                 }
-                $data['product_id'] = $product_id;
-                $data['sku'] = $item;
+                $product_data = $this->find($product_id)->toArray();
+                $product_data['sku'] = $item;
                 $item = new ItemModel();
-                $item->create($data);          
+                $item->create($product_data);         
             }
             $productModel->status = 1;
             $productModel->save();           

@@ -77,7 +77,7 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">其他信息:</div>
-        <!--<div class="panel-body">
+        <div class="panel-body">
             <div class="col-lg-3">
                 <strong>物流限制</strong>: {{ $model->carriage_limit }}
             </div>
@@ -90,7 +90,7 @@
             <div class="col-lg-3">
                 <strong>包装限制1</strong>: {{ $model->package_limit1 }}
             </div>
-        </div>--> 
+        </div>
         <div class="panel-body">
             <div class="col-lg-3">
                 <strong>上传人</strong>: {{ $model->upload_user }}
@@ -104,7 +104,11 @@
     <div class="panel panel-default">
         <div class="panel-heading">产品图片 :</div>
         <div class="panel-body">
+            <?php if(isset($model->image->name)){ ?>
             <img src="{{ asset($model->image->path) }}/{{$model->image->name}}" width="600px" >
+            <?php }else{ ?>
+                无图片
+            <?php } ?>
         </div>
     </div>
 @stop

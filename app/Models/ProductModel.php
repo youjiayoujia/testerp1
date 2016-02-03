@@ -412,6 +412,7 @@ class ProductModel extends BaseModel
                 }
                 $product_data = $this->find($product_id)->toArray();
                 $product_data['sku'] = $item;
+                $product_data['product_id'] = $product_id;
                 $item = new ItemModel();
                 $item->create($product_data);         
             }

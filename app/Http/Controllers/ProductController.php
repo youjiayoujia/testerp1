@@ -91,6 +91,26 @@ class ProductController extends Controller
     }
 
     /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        foreach ($model->item as $item) {
+            $item->delete();
+        }
+        
+        $model->destroy($id);
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * ajax获得品类属性
      *
      * @param  int  $id

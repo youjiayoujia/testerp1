@@ -81,6 +81,11 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\Product\ProductAttributeValueModel','product_id');
     }
 
+    public function item()
+    {      
+        return $this->hasMany('App\Models\ItemModel','product_id');
+    }
+
     public function getCatalogs($id='',$where='')
     {      
         $catalog = new CatalogModel();

@@ -1,12 +1,25 @@
 @extends('common.form')
 @section('formAction') {{ route('item.update', ['id' => $model->id]) }} @stop
 @section('formBody')
-<div class="form-group col-md-3">
-        <label for="size">产品name</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+    <div class="form-group col-md-3">
+        <label for="size">item</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <input class="form-control" id="name" placeholder="sku" name='sku' value="{{ old('sku') ?  old('sku') : $model->sku }}">
+    </div> 
+
+    <div class="form-group col-md-3">
+        <label for="size">item名英文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="name" placeholder="产品name" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
     </div>
     <div class="form-group col-md-3">
-        <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="color">item名中文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+    </div>
+    <div class="form-group col-md-3">
+        <label for="color">item别名中文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+    </div>
+    <div class="form-group col-md-3">
+        <label for="color">item别名英文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
     </div>
     <div class="form-group col-md-3">
@@ -53,6 +66,11 @@
                 @endforeach
             </select>          
         </div>
+
+    <div class="form-group col-md-3">
+        <label for="color">供应商sku</label>
+        <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
+    </div>
     <div class="form-group col-md-3">
         <label for="color">采购链接</label>
         <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
@@ -66,36 +84,24 @@
         <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $model->purchase_carriage }}">
     </div>
     <div class="form-group col-md-1">
-        <label for="size">产品尺寸</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="size">item尺寸</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="product_size" placeholder="产品尺寸" name='product_size' value="{{ old('product_size') ?  old('product_size') : $model->product_size }}">
     </div>
     <div class="form-group col-md-1">
-        <label for="color">产品包装尺寸</label>
+        <label for="color">item包装尺寸</label>
         <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $model->package_size }}">
     </div>
     <div class="form-group col-md-1">
-        <label for="size">产品重量</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="size">item重量</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
-    </div>
-    <div class="form-group col-md-1">
-        <label for="color">更新人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="upload_user" placeholder="上传人" name='upload_user' value="{{ old('upload_user') ?  old('upload_user') : $model->upload_user }}">
     </div>
     <div class="form-group col-md-3">
         <label for="color">物流限制</label>
         <input class="form-control" id="carriage_limit" placeholder="物流限制" name='carriage_limit' value="{{ old('carriage_limit') ?  old('carriage_limit') : $model->carriage_limit }}">
     </div>
     <div class="form-group col-md-3">
-        <label for="size">物流限制1</label>
-        <input class="form-control" id="carriage_limit_1" placeholder="物流限制1" name='carriage_limit_1' value="{{ old('carriage_limit_1') ?  old('carriage_limit_1') : $model->carriage_limit_1 }}">
-    </div>
-    <div class="form-group col-md-3">
         <label for="color">包装限制</label>
         <input class="form-control" id="package_limit" placeholder="包装限制" name='package_limit' value="{{ old('package_limit') ?  old('package_limit') : $model->package_limit }}">
-    </div>
-    <div class="form-group col-md-3">
-        <label for="size">包装限制1</label>
-        <input class="form-control" id="package_limit_1" placeholder="包装限制1" name='package_limit_1' value="{{ old('package_limit_1') ?  old('package_limit_1') : $model->package_limit_1 }}">
     </div>
     <div class="form-group col-md-3">
         <label for="color">备注</label>

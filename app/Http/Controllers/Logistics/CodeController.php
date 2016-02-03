@@ -80,6 +80,7 @@ class CodeController extends Controller
         return LogisticsModel::all();
     }
 
+    //导入
     public function batchAddTrCode($logistic_id)
     {
         $logistic = LogisticsModel::find($logistic_id);
@@ -98,8 +99,8 @@ class CodeController extends Controller
     public function batchAddTrCodeFn()
     {
 
-//        public_path();
-//        app_path();
+        //public_path();
+        //app_path();
 
         $logistic_id = Input::get('logistic_id', '');
         if(!$logistic_id){
@@ -121,22 +122,56 @@ class CodeController extends Controller
         }
 
         //写操作
-        $total = 0;
-        $sql = "INSERT INTO logistics_codes (logistics_id,code,created_at,updated_at) VALUES";
+        $codes = DB::table('logistics_codes')->lists('code');  //获取已经取得的物流号，用于后面的筛选
+
+        $successNumber = 0;
+        $repeatNumber = 0;
+        $repeatCodes = [];
+        $baseSql = "INSERT INTO logistics_codes (logistics_id,code,created_at,updated_at) VALUES";
+        $valuesStr = "";
         if (($handle = fopen($destinationPath.'/'.$fileName, "r")) !== FALSE) {
             $created_at = null;
             while (($data = fgetcsv($handle, ",")) !== FALSE) {
-                echo $data[0];
-                $total++;
-                $sql .= "(".$logistic_id.",'".$data[0]."',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),";
+                if(in_array($data[0], $codes)){
+                    $repeatCodes[] = $data[0];
+                    $repeatNumber++;
+                }else{
+                    $valuesStr .= "(".$logistic_id.",'".$data[0]."',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),";
+                    $successNumber++;
+                }
             }
             fclose($handle);
+            if($valuesStr != ""){
+                $sql = $baseSql.$valuesStr;
+                $sql = substr($sql,0,strlen($sql)-1); //去除最后一个value的逗号
+                DB::statement($sql);
+            }
 
-            $sql = substr($sql,0,strlen($sql)-1); //去除最后一个value的逗号
-            DB::statement($sql);
-            return Redirect::to('logisticsCode')->with('alert', $this->alert('success', '总共上传成功：'.$total.'个！'));
+            $totalNumber = $successNumber + $repeatNumber;
+            $content = "本次共选择导入".$totalNumber."个跟踪号,成功导入".$successNumber."个,有".$repeatNumber."个重复未导入,如下：";
+            foreach($repeatCodes as $repeatCode){
+                $content .= $repeatCode.",";
+            }
+            $content = substr($content,0,strlen($content)-1);
+            return Redirect::to('logisticsCode')->with('alert', $this->alert('success', $content));
         }else{
             return Redirect::to('logisticsCode')->with('alert', $this->alert('danger', '上传失败！'));
         }
+    }
+
+    //扫描
+    public function scanAddTrCode($logistic_id)
+    {
+        $logistic = LogisticsModel::find($logistic_id);
+        $meta = [
+            "mainIndex" => "http://www.chenxuewenerp.com/logisticsCode",
+            "mainTitle" => "物流方式列表",
+            "title" => "扫描-号码池",
+        ];
+        $response = [
+            'metas' => $meta,
+            'logistic' => $logistic,
+        ];
+        return view($this->viewPath . 'scanadd', $response);
     }
 }

@@ -43,7 +43,7 @@
     </div>
     <div class="form-group col-lg-4">
         <label for="used_at" class="control-label">使用时间</label>
-        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') ? old('used_at') : $code->used_at }}">
+        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') ? old('used_at') : $model->used_at }}">
     </div>
 @stop
 <script type='text/javascript'>

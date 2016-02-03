@@ -36,16 +36,19 @@
                 <a href="{{ route('logistics.edit', ['id'=>$logistics->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                @if($logistics->api_docking == '号码池')
-                    <a href="/batchAddTrCode/{{ $logistics->id }}" class="btn btn-success btn-xs">
-                        <span class="glyphicon glyphicon-plus"></span> 号码池
-                    </a>
-                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $logistics->id }}"
                    data-url="{{ route('logistics.destroy', ['id' => $logistics->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                @if($logistics->api_docking == '号码池')
+                    <a href="/batchAddTrCode/{{ $logistics->id }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-plus"></span> 导入-号码池
+                    </a>
+                    <a href="/scanAddTrCode/{{ $logistics->id }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-plus"></span> 扫描-号码池
+                    </a>
+                @endif
             </td>
         </tr>
     @endforeach

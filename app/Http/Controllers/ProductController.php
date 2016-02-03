@@ -71,6 +71,7 @@ class ProductController extends Controller
             'attributes' => json_encode($productAttributeValueModel->where('product_id',$id)->get()->toArray()),
             'features' => json_encode($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get()->toArray()),
         ];
+        
         return view($this->viewPath . 'edit', $response);
     }
 

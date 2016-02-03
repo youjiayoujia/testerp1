@@ -45,10 +45,8 @@
                 <div class="checkbox panel-body ">
                     @foreach($product->catalog->features as $key=>$getfeature)
                         @if($getfeature->type==1)
-                            <div>                           
-                                <label>                                
-                                    <input class='{{$getfeature->id}}-{{$getfeature->name}}' type='checkbox' name='features[{{$getfeature->id}}]' value='{{$getfeature->name}}'>    {{$getfeature->name}}
-                                </label>                            
+                            <div class="featurestyle" style="padding-bottom:10px">                           
+                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="" name='featureinput[{{$getfeature->id}}]' />
                             </div>
                         @elseif($getfeature->type==2)
                             <div class="radio">{{$getfeature->name}}
@@ -184,9 +182,11 @@
             $("."+key).attr("checked", true);
         }
         var features = <?php echo $features; ?>;
+        
         for(i=0;i<features.length;i++){
             var key = features[i].feature_id+'-'+features[i].feature_value;
             $("."+key).attr("checked", true);
+            $("#featuretext"+features[i].feature_id).val(features[i].feature_value);
         }
     }); 
 

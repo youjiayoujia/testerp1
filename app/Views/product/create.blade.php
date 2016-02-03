@@ -52,13 +52,8 @@
                 <div class="checkbox panel-body ">
                     @foreach($catalogs[0]->features as $key=>$getfeature)
                         @if($getfeature->type==1)
-                            <div>
-                            
-                            <label>
-                                
-                                <input type='checkbox' name='featureinput[{{$getfeature->id}}]' value='{{$getfeature->name}}'>    {{$getfeature->name}}
-                            </label>
-                            
+                            <div style="padding-bottom:10px">
+                                <span >{{$getfeature->name}} :</span> <input style="margin-left:15px" type="text" value="" name='featureinput[{{$getfeature->id}}]' />
                             </div>
                         @elseif($getfeature->type==2)
                             <div class="radio">{{$getfeature->name}}

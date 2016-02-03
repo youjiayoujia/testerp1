@@ -42,3 +42,5 @@ Route::get('countPacket/{id}', ['uses' => 'Logistics\ZoneController@countPacket'
 Route::get('batchAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@batchAddTrCode', 'as' => 'batchAddTrCode']);
 Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCodeFn', 'as' => 'logisticsCodeFn']);
 Route::get('scanAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
+Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
+

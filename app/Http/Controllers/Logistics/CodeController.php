@@ -17,6 +17,8 @@ use Input;
 use App;
 use Redirect;
 use DB;
+use Excel;
+use Request;
 
 
 class codesImport extends \Maatwebsite\Excel\Files\ExcelFile {
@@ -98,7 +100,6 @@ class CodeController extends Controller
 
     public function batchAddTrCodeFn()
     {
-
         //public_path();
         //app_path();
 
@@ -149,10 +150,12 @@ class CodeController extends Controller
 
             $totalNumber = $successNumber + $repeatNumber;
             $content = "本次共选择导入".$totalNumber."个跟踪号,成功导入".$successNumber."个,有".$repeatNumber."个重复未导入,如下：";
-            foreach($repeatCodes as $repeatCode){
-                $content .= $repeatCode.",";
+            if(count($repeatCodes)){
+                foreach($repeatCodes as $repeatCode){
+                    $content .= $repeatCode.",";
+                }
+                $content = substr($content,0,strlen($content)-1);
             }
-            $content = substr($content,0,strlen($content)-1);
             return Redirect::to('logisticsCode')->with('alert', $this->alert('success', $content));
         }else{
             return Redirect::to('logisticsCode')->with('alert', $this->alert('danger', '上传失败！'));
@@ -173,5 +176,57 @@ class CodeController extends Controller
             'logistic' => $logistic,
         ];
         return view($this->viewPath . 'scanadd', $response);
+    }
+
+    //扫描录入
+    public function scanAddTrCodeFn()
+    {
+        $logistic_id = Input::get('logistic_id', '');
+        if(!$logistic_id){
+            return Redirect::to('logistics')->with('alert', $this->alert('danger', '未选择物流方式！'));
+        }
+        $input_codes = Input::get('codes');
+
+        if($input_codes){
+
+            $codes = DB::table('logistics_codes')->lists('code');  //获取已经取得的物流号，用于后面的筛选
+            $successNumber = 0;
+            $repeatNumber = 0;
+            $repeatCodes = [];
+            $baseSql = "INSERT INTO logistics_codes (logistics_id,code,created_at,updated_at) VALUES";
+            $valuesStr = "";
+
+            foreach($input_codes as $input_code){
+                if(in_array($input_code, $codes)){
+                    $repeatCodes[] = $input_code;
+                    $repeatNumber++;
+                }else{
+                    $valuesStr .= "(".$logistic_id.",'".$input_code."',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),";
+                    $successNumber++;
+                }
+            }
+
+            if($valuesStr != ""){
+                $sql = $baseSql.$valuesStr;
+                $sql = substr($sql,0,strlen($sql)-1); //去除最后一个value的逗号
+                DB::statement($sql);
+            }else{
+                return Redirect::to('scanAddTrCode')->with('alert', $this->alert('danger', '录入失败！'));
+            }
+
+            $totalNumber = $successNumber + $repeatNumber;
+            $content = "本次共扫描".$totalNumber."个跟踪号,成功录入".$successNumber."个,有".$repeatNumber."个重复未录入,如下：";
+            if(count($repeatCodes)){
+                foreach($repeatCodes as $repeatCode){
+                    $content .= $repeatCode.",";
+                }
+                $content = substr($content,0,strlen($content)-1);
+            }
+
+            return Redirect::to('logisticsCode')->with('alert', $this->alert('success', $content));
+
+        }else{
+            return Redirect::to('scanAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger', '未输入任何物流号！'));
+        }
     }
 }

@@ -99,7 +99,7 @@ class ProductModel extends BaseModel
      * @param int $catalog_id,$product_id 品类及产品ID
      * @return array
      */
-    function getCatalogProperty($catalog_id,$product_id=0) {  
+    public function getCatalogProperty($catalog_id,$product_id=0) {  
         $catalog = $this->getCatalogs($catalog_id);
         $set = ['Attributes', 'features'];
         $data = [];           
@@ -126,28 +126,11 @@ class ProductModel extends BaseModel
     }
 
     /**
-     * 获得辅供应商
+     * jq获得产品属性
      * 2016-1-11 14:00:41 YJ
-     * @param string $second_supplier_str 辅助供应商字符串
-     * @return array
+     * @param array $data,$files obj
      */
-    function getSecondSupplier($second_supplier_str) {  
-        $second_arr[0] = '';
-        $second_arr[1] = '';
-        $second_arr[2] = '';
-        $second_arr[3] = '';
-        if(strlen($second_supplier_str)>1){
-            $arr = implode(',', $second_supplier_str);
-            for($i=0;$i<count($arr);$i++){
-                $second_arr[$i] = $arr[$i];
-            }
-        }else{
-            $second_arr[0] = $second_supplier_str;
-        }
-        return $second_arr; 
-    }
-
-    function createProduct($data='',$files=''){
+    public function createProduct($data='',$files=''){
         DB::beginTransaction();
         try {       
             //创建spu，,并插入数据
@@ -156,13 +139,6 @@ class ProductModel extends BaseModel
             $spuarr['spu'] = $spu;
             $spuobj = $spumodel->create($spuarr);
             $data['spu_id'] = $spuobj->id;
-            $second_supplier_id_str = '';
-            //拼接辅助供应商id
-            foreach($data['second_supplier_id_arr'] as $supplier_id){
-                if($supplier_id!=0)$second_supplier_id_str .= $supplier_id.",";
-            }
-            $second_supplier_id_str = substr($second_supplier_id_str, 0,strlen($second_supplier_id_str)-1);
-            $data['second_supplier_id'] = $second_supplier_id_str;
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = $this->getCatalogs($data['catalog_id']);
             foreach($data['modelSet'] as $model){
@@ -226,7 +202,12 @@ class ProductModel extends BaseModel
         DB::commit();
     }
 
-    function updateProduct($id,$data,$files = null){
+    /**
+     * 更新product
+     * 2016-1-13 17:48:26 YJ
+     * @param $id int, $data array, $files obj
+     */
+    public function updateProduct($id,$data,$files = null){
         $product = $this->find($id);
         $spu_id = $product->spu_id;
         DB::beginTransaction();
@@ -268,14 +249,6 @@ class ProductModel extends BaseModel
                      
                 }             
             }
-            $second = $data['second_supplier_id_arr'];
-            $second_supp = '';
-            foreach($second as $_second){
-                if($_second!=0)$second_supp .= $_second.",";
-            }
-            //主供应商
-            $second_supp = substr($second_supp,0,strlen($second_supp)-1);
-            $data['second_supplier_id'] = $second_supp;
             //更新图片
             $data['product_id'] = $id;
             $data['spu_id'] = $spu_id;
@@ -305,7 +278,7 @@ class ProductModel extends BaseModel
      * @param array product_id_array 产品id字符串
      * @return array
      */
-    function createItem($product_id_array) {
+    public function createItem($product_id_array) {
         foreach($product_id_array as $product_id){
             $productModel = $this->find($product_id);
             $attributes = $productModel->productAttributeValue;

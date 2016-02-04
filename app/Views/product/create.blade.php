@@ -108,39 +108,14 @@
 
 
         
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
-                @endforeach
-                </select>
-        </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
-                @endforeach
-            </select>          
-        </div>
-
+    <div class="form-group col-md-3"><label for="color">辅供应商</label>
+        <select  class="form-control" name="second_supplier_id">
+            <option value="0"></option>
+            @foreach($suppliers as $supplier)
+            <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
+            @endforeach
+        </select>
+    </div>
 
     <div class="form-group col-md-3">
         <label for="color">采购链接</label>

@@ -17,8 +17,6 @@ use App\Models\CountryModel as CountryModel;
 
 class ZoneController extends Controller
 {
-    protected $zone;
-
     public function __construct(ZoneModel $zoneModel)
     {
         $this->model = $zoneModel;
@@ -48,9 +46,9 @@ class ZoneController extends Controller
         return CountryModel::all();
     }
 
-    public function countExpress($id, LogisticsRepository $logistics, CountryRepository $country)
+    public function countExpress($id, LogisticsModel $logistics, CountryModel $country)
     {
-        $obj = $this->zone->get($id);
+        $obj = $this->model->find($id);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'zone' => $obj,
@@ -60,9 +58,9 @@ class ZoneController extends Controller
         return view('logistics.zone.countExpress', $response);
     }
 
-    public function countPacket($id, LogisticsRepository $logistics, CountryRepository $country)
+    public function countPacket($id, LogisticsModel $logistics, CountryModel $country)
     {
-        $obj = $this->zone->get($id);
+        $obj = $this->model->find($id);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'zone' => $obj,
@@ -75,14 +73,14 @@ class ZoneController extends Controller
     public function zoneShipping()
     {
         $id = $_GET['id'];
-        $buf = $this->zone->get($id)->shipping_id;
+        $buf = $this->model->find($id)->shipping_id;
         echo json_encode($buf);
     }
 
-    public function country(CountryRepository $country)
+    public function country(CountryModel $country)
     {
         $id = $_GET['id'];
-        $buf = $country->get($id)->name;
+        $buf = $country->find($id)->name;
         echo json_encode($buf);
     }
 

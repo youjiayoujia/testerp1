@@ -154,7 +154,7 @@
         var select = document.getElementById("country_id");
         //var str = [];
         var arr = [];
-        for(i = 0; i < select.length; i++) {
+        for(var i = 0; i < select.length; i++) {
             if(select.options[i].selected) {
                 //str.push(select[i].value);
                 $.ajax({

@@ -32,7 +32,7 @@ class ZoneModel extends BaseModel
         'discount',
     ];
 
-    protected $searchFields = ['zone', 'logistics_id', 'country_id', 'shipping_id'];
+    public $searchFields = ['zone', 'logistics_id', 'country_id', 'shipping_id'];
 
     public $rules = [
         'create' => [

@@ -24,7 +24,7 @@ class CodeModel extends BaseModel
         'used_at'
     ];
 
-    protected $searchFields = ['logistics_id', 'code', 'status', 'package_id'];
+    public $searchFields = ['logistics_id', 'code', 'status', 'package_id'];
 
     public $rules = [
         'create' => [

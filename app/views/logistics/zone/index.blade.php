@@ -1,21 +1,21 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort">ID</th>
-    <th class="sort">物流分区</th>
-    <th class="sort">物流方式</th>
+    <th class="sort" data-field="created_at">ID</th>
+    <th>物流分区</th>
+    <th>物流方式</th>
     <th>国家</th>
-    <th class="sort">种类</th>
-    <th class="sort">首重(kg)</th>
-    <th class="sort">首重价格(/kg)</th>
-    <th class="sort">续重(kg)</th>
-    <th class="sort">续重价格(/kg)</th>
-    <th class="sort">其他固定费用</th>
-    <th class="sort">其他比例费用(%)</th>
-    <th class="sort">价格(/kg)</th>
-    <th class="sort">其他费用</th>
-    <th class="sort">最后折扣</th>
-    <th class="sort">创建时间</th>
-    <th class="sort"></th>
+    <th>种类</th>
+    <th>首重(kg)</th>
+    <th>首重价格(/kg)</th>
+    <th>续重(kg)</th>
+    <th>续重价格(/kg)</th>
+    <th>其他固定费用</th>
+    <th >其他比例费用(%)</th>
+    <th>价格(/kg)</th>
+    <th>其他费用</th>
+    <th >最后折扣</th>
+    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

@@ -1,6 +1,6 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort">ID</th>
+    <th class="sort" data-field="id">ID</th>
     <th>物流方式简码</th>
     <th>物流方式名称</th>
     <th>种类</th>
@@ -10,8 +10,8 @@
     <th>物流追踪网址</th>
     <th>API对接方式</th>
     <th>是否启用</th>
-    <th class="sort">创建时间</th>
-    <th class="sort">更新时间</th>
+    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

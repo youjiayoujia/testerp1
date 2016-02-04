@@ -1,13 +1,13 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort">ID</th>
-    <th class="sort">物流方式</th>
-    <th class="sort">跟踪号</th>
-    <th class="sort">包裹ID</th>
+    <th class="sort" data-field="id">ID</th>
+    <th>物流方式</th>
+    <th>跟踪号</th>
+    <th class="sort" data-field="package_id">包裹ID</th>
     <th>状态</th>
-    <th class="sort">使用时间</th>
-    <th class="sort">创建时间</th>
-    <th class="sort">更新时间</th>
+    <th class="sort" data-field="used_at">使用时间</th>
+    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

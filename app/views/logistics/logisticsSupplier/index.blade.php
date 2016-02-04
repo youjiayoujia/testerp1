@@ -10,7 +10,7 @@
 @section('tableTitle') 物流商列表 @stop
 @section('tableHeader')
     <th>ID</th>
-    <th>物流商名称</th>
+    <th class="sort" data-field="id">物流商名称</th>
     <th>客户ID</th>
     <th>密钥</th>
     <th>是否有API</th>
@@ -19,8 +19,8 @@
     <th>技术人员</th>
     <th>技术联系方式</th>
     <th>备注</th>
-    <th>创建时间</th>
-    <th>更新时间</th>
+    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')

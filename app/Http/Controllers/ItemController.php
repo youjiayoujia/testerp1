@@ -41,7 +41,6 @@ class ItemController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'suppliers' => $this->supplier->all(),
-            'second_supplier_id' => $this->product->getSecondSupplier($model->second_supplier_id),
         ];
         return view($this->viewPath . 'edit', $response);
     }

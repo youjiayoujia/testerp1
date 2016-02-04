@@ -35,37 +35,14 @@
         <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $model->supplier_info }}">
     </div>        
     <div class="form-group col-md-3"><label for="color">辅供应商</label>
-        <select  class="form-control" name="second_supplier_id_arr[]">
+        <select  class="form-control" name="second_supplier_id">
             <option value="0"></option>
             @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == $second_supplier_id[0] ? 'selected' : '' }} >{{$supplier->name}}</option>
+                <option value="{{ $supplier->id}}" {{ $supplier->id == $model->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
             @endforeach
         </select>
     </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == $second_supplier_id[1] ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == $second_supplier_id[2] ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
-                </select>
-        </div>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id_arr[]">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == $second_supplier_id[3] ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
-            </select>          
-        </div>
+       
 
     <div class="form-group col-md-3">
         <label for="color">供应商sku</label>

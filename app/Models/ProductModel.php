@@ -9,6 +9,7 @@ use App\Models\ItemModel;
 use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use Illuminate\Support\Facades\DB;
+use Tool;
 
 class ProductModel extends BaseModel
 {
@@ -93,96 +94,6 @@ class ProductModel extends BaseModel
     }
 
     /**
-     * 获取笛卡尔积model集合
-     * 2016-1-6 16:15:22 YJ
-     * @param int catalog_id 品类id
-     * @return array
-     */
-    public function getModels($catalog_id=0)
-    {
-        if($catalog_id==0){
-            $catalog = $this->getCatalogs('','1');          
-        }else{
-            $catalog = $this->getCatalogs($catalog_id);
-        }
-        $brr = [];
-        //获得product对应set的笛卡尔积
-        foreach($catalog->sets as $set){
-            $arr = [];
-            foreach($set->values as $setValue){
-                $arr[] = $setValue->name;
-            }
-            $brr[] =$arr;
-        }
-        $result = $this->createDikaer($brr);
-        $modelSet = [];
-        //拼接model
-        foreach($result as $_result){
-            $sku = '';
-            foreach($_result as $__result){
-                $sku .= '-'.$__result;
-            }
-            $sku = substr($sku,1);
-            $modelSet[] = $sku;
-        }
-        return $modelSet;
-    }
-
-    /**
-     * 随机创建sku
-     * 2015-12-18 10:43:21 YJ
-     * @return str
-     */
-    public function createSku()
-    {
-        $str = null;
-        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        $max = strlen($strPol)-1;
-        for($i=0;$i<5;$i++){
-            $str.=$strPol[rand(0,$max)];
-        }
-        return $str;
- 
-    }
-    /**
-     * 创建sku对应属性的笛卡尔积
-     * 2015-12-18 10:43:48 YJ
-     * @param array $data
-     * @return array
-     */
-    public function createDikaer($data)
-    {
-        $cnt = count($data);  
-        $result = array();  
-        foreach($data[0] as $item) {  
-            $result[] = array($item);  
-        }  
-        for($i = 1; $i < $cnt; $i++) {  
-            $result = $this->combineArray($result,$data[$i]);  
-        }  
-        return $result;
- 
-    }
-
-    /**
-     * 2个数组对笛卡尔积的处理
-     * 2015-12-18 10:43:48 YJ
-     * @param array $arr1,$arr2
-     * @return array
-     */
-    function combineArray($arr1,$arr2) {  
-        $result = array();  
-        foreach ($arr1 as $item1) {  
-            foreach ($arr2 as $item2) {  
-                $temp = $item1;  
-                $temp[] = $item2;  
-                $result[] = $temp;  
-            }  
-        }  
-        return $result;  
-    }
-
-    /**
      * jq获得产品属性
      * 2016-1-11 14:00:41 YJ
      * @param int $catalog_id,$product_id 品类及产品ID
@@ -192,7 +103,7 @@ class ProductModel extends BaseModel
         $catalog = $this->getCatalogs($catalog_id);
         $set = ['Attributes', 'features'];
         $data = [];           
-        $modelSet = $this->getModels($catalog_id);                              
+        $modelSet = $catalog->getModels($catalog_id);                        
         foreach($set as $models){
             $i = 0;
             foreach($catalog->$models as $model){
@@ -241,7 +152,7 @@ class ProductModel extends BaseModel
         try {       
             //创建spu，,并插入数据
             $spumodel = new SpuModel();
-            $spu = $this->createSku();
+            $spu = Tool::createSku();
             $spuarr['spu'] = $spu;
             $spuobj = $spumodel->create($spuarr);
             $data['spu_id'] = $spuobj->id;
@@ -283,7 +194,7 @@ class ProductModel extends BaseModel
                             $attributeArray['attribute_value'] = $attributeValueModel->name;
                             $attributeArray['product_id'] = $product->id;
                             $productAttributeValueModel = new ProductAttributeValueModel();
-                            $productAttributeValueModel->create($attributeArray);              
+                            $productAttributeValueModel->create($attributeArray);             
                         }
                     }                    
                 }

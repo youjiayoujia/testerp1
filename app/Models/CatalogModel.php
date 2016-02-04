@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use Illuminate\Support\Facades\DB;
+use Tool;
 
 class CatalogModel extends BaseModel
 {
@@ -139,6 +140,42 @@ class CatalogModel extends BaseModel
             return $this->all();
         }
         
+    }
+
+    /**
+     * 获取笛卡尔积model集合
+     * 2016-1-6 16:15:22 YJ
+     * @param int catalog_id 品类id
+     * @return array
+     */
+    public function getModels($catalog_id=0)
+    {
+        if($catalog_id==0){
+            $catalog = $this->getCatalog('','1');          
+        }else{
+            $catalog = $this->getCatalog($catalog_id);
+        }
+        $brr = [];
+        //获得product对应set的笛卡尔积
+        foreach($catalog->sets as $set){
+            $arr = [];
+            foreach($set->values as $setValue){
+                $arr[] = $setValue->name;
+            }
+            $brr[] =$arr;
+        }
+        $result = Tool::createDikaer($brr);
+        $modelSet = [];
+        //拼接model
+        foreach($result as $_result){
+            $sku = '';
+            foreach($_result as $__result){
+                $sku .= '-'.$__result;
+            }
+            $sku = substr($sku,1);
+            $modelSet[] = $sku;
+        }
+        return $modelSet;
     }
 
 }

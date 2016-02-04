@@ -33,7 +33,7 @@ class ProductController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
-            'models' => $this->model->getModels(),
+            'models' => $this->catalog->getModels(),
             'suppliers' => $this->supplier->all(),
         ];
         return view($this->viewPath . 'create', $response);

@@ -66,7 +66,6 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'product' => $product,
-            'second_supplier_id' => $this->model->getSecondSupplier($product->second_supplier_id),
             'suppliers' => $this->supplier->all(),
             'attributes' => json_encode($productAttributeValueModel->where('product_id',$id)->get()->toArray()),
             'features' => json_encode($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get()->toArray()),
@@ -123,7 +122,8 @@ class ProductController extends Controller
         $product_id = isset($_GET['product_id'])?$_GET['product_id']:0;
         $data = $this->model->getCatalogProperty($catalog_id,$product_id);
 
-        echo json_encode($data);
+        echo view($this->viewPath . 'ajaxset',['data' => $data]);exit;
+        
     }
 
     /**

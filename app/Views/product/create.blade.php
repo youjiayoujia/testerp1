@@ -4,79 +4,16 @@
 @section('formBody')
 
     <div class="form-group">
-        <label for="catalog_id">分类</label>
+        <label for="catalog_id">分类</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select id="catalog_id" class="form-control" name="catalog_id">
+            <option value="">选择分类</option>
             @foreach($catalogs as $_catalogs)
                 <option value="{{ $_catalogs->id }}">{{ $_catalogs->name }}</option>
             @endforeach
         </select>
     </div>
     <div class="ajaxinsert">
-        <div class="panel panel-info adjustmargin">
-
-            <div class="panel-heading">勾选model及对应attribute属性:</div>
-            @foreach($models as $model)
-                <div class="checkbox panel-body ">
-                    <div class="checkbox col-md-2">
-                        <label>
-                            <input type='checkbox' id="{{$model}}" onclick="quanxuan('{{$model}}')" name='modelSet[{{$model}}][model]' value='{{$model}}'>{{$model}}
-                        </label>
-                    </div>
-                    @foreach($catalogs[0]->attributes as $key=>$getattr)        
-                        <div class="checkbox col-md-2">{{$getattr->name}}:
-                            @foreach($getattr->values as $innervalue)
-                                <label>
-                                    <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][attributes][{{$getattr->name}}][]' value='{{$innervalue->name}}'>{{$innervalue->name}}
-                                </label>
-                            @endforeach
-                        </div>
-                        @endforeach
-                </div>
-
-                <div style="margin-left:25px;margin-bottom:15px">
-                        <label for="color">上传图片：</label>
-                        <div class='upimage'><input name='modelSet[{{$model}}][image][image0]' type='file'/></div>
-                        <div class='upimage'><input name='modelSet[{{$model}}][image][image1]' type='file'/></div>
-                        <div class='upimage'><input name='modelSet[{{$model}}][image][image2]' type='file'/></div>
-                        <div class='upimage'><input name='modelSet[{{$model}}][image][image3]' type='file'/></div>
-                        <div class='upimage'><input name='modelSet[{{$model}}][image][image4]' type='file'/></div>
-                        <div class='upimage'><input name='modelSet[{{$model}}][image][image5]' type='file'/></div>
-                </div>  
-            <hr width="98%" style="border:0.5px solid #d9edf7">
-            @endforeach
-        </div>
-
-        <div class="form-group third">
-            <label for='set'>feature属性:</label>
-            <div class="panel panel-info">
-                <div class="checkbox panel-body ">
-                    @foreach($catalogs[0]->features as $key=>$getfeature)
-                        @if($getfeature->type==1)
-                            <div style="padding-bottom:10px">
-                                <span >{{$getfeature->name}} :</span> <input style="margin-left:15px" type="text" value="" name='featureinput[{{$getfeature->id}}]' />
-                            </div>
-                        @elseif($getfeature->type==2)
-                            <div class="radio">{{$getfeature->name}}
-                            @foreach($getfeature->values as $value)
-                            <label>
-                                <input type='radio' name='featureradio[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
-                            </label>
-                            @endforeach
-                            </div>
-                        @else($getfeature->type==3)
-                            <div class="checkbox">{{$getfeature->name}}
-                            @foreach($getfeature->values as $value)
-                            <label>
-                                <input type='checkbox' name='featurecheckbox[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
-                            </label>
-                            @endforeach
-                            </div>
-                        @endif
-
-                    @endforeach
-                </div>
-            </div>
-        </div> 
+ 
     </div>
     <div class="form-group col-md-3">
         <label for="size">产品name</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -106,8 +43,6 @@
         <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
     </div>
 
-
-        
     <div class="form-group col-md-3"><label for="color">辅供应商</label>
         <select  class="form-control" name="second_supplier_id">
             <option value="0"></option>
@@ -203,55 +138,10 @@
             $.ajax({
                 url: "getCatalogProperty",
                 data:{catalog_id:catalog_id},
-                dataType: "json",
+                dataType: "html",
                 type:'get',
                 success:function(result){
-                    var html = '<div class="panel panel-info adjustmargin">';
-                    html += '<div class="panel-heading ">勾选model及对应attribute属性:</div>';
-                    for(var i =0;i<result['models'].length;i++){
-                            html += '<div class="checkbox panel-body "><div class="checkbox col-md-2">';
-                            html += '<label><input type="checkbox" id="'+result['models'][i]+'" onclick="quanxuan(\''+result['models'][i]+'\')" name="modelSet['+result['models'][i]+'][model]" value="'+result['models'][i]+'">'+result['models'][i]+'</label></div>';
-                            for(k=0;k<result['attributes'].length;k++){
-                                html+= '<div class="checkbox col-md-2">'+result['attributes'][k]['name']+':';
-                                for(m=0;m<result['attributes'][k]['value'].length;m++){
-                                    html+= '<label style="padding-left:25px"><input type="checkbox" class="'+result['models'][i]+'quanxuan" name="modelSet['+result['models'][i]+'][attributes]['+result["attributes"][k]["name"]+'][]" value="'+result["attributes"][k]["value"][m]+'">'+result["attributes"][k]["value"][m]+'</label>';
-                                }
-                                html+='</div>';
-                            }
-                            html += '</div>';
-                            html += '<div style="margin-left:25px;margin-bottom:15px"><label for="color">上传图片：</label><div class="upimage"><input name="modelSet['+result['models'][i]+'][image][image0]" type="file"/></div><div class="upimage"><input name="modelSet['+result['models'][i]+'][image][image1]" type="file"/></div><div class="upimage"><input name="modelSet['+result['models'][i]+'][image][image2]" type="file"/></div><div class="upimage"><input name="modelSet['+result['models'][i]+'][image][image3]" type="file"/></div><div class="upimage"><input name="modelSet['+result['models'][i]+'][image][image4]" type="file"/></div><div class="upimage"><input name="modelSet['+result['models'][i]+'][image][image5]" type="file"/></div>';
-                            html += '</div><hr width="98%" style="border:0.5px solid #d9edf7">';
-                    }
-                    html +='</div>';
-                    html +='<div class="form-group third"><label for="set">feature属性:</label><div class="panel panel-info"><div class="checkbox panel-body ">';
-                    for(var n=0;n<result['features'].length;n++){
-                        switch(result['features'][n]['type'])
-                        {
-                        case 1:
-                            html += '<div>';
-                            html+='<label><input type="checkbox" name="featureinput['+result['features'][n]['feature_id']+']" value="'+result['features'][n]['name']+'">'+result['features'][n]['name']+'</label>';
-                            html +='</div>';
-                            break;
-                        case 2:
-                            html +='<div class="radio">'+result['features'][n]['name'];
-                            for(var p=0;p<result['features'][n]['value'].length;p++){
-                                html+='<label style="padding-left:25px"><input type="radio" name="featureradio['+result['features'][n]['feature_id']+'][]" value="'+result['features'][n]['value'][p]+'">'+result['features'][n]['value'][p]+'</label>';
-                            }
-                            html +='</div>';                         
-                            break;
-                        case 3:
-                            html +='<div class="checkbox">'+result['features'][n]['name'];
-                            for(var p=0;p<result['features'][n]['value'].length;p++){
-                                html+='<label style="padding-left:25px"><input type="checkbox" name="featurecheckbox['+result['features'][n]['feature_id']+'][]" value="'+result['features'][n]['value'][p]+'">'+result['features'][n]['value'][p]+'</label>';
-                            }
-                            html +='</div>';
-                            break;              
-                        }
-                    }
-                    html +='</div>';
-                    html +='</div>';
-                    html +='</div>';
-                    $(".ajaxinsert").html(html);
+                    $(".ajaxinsert").html(result);
                 }
             });       
         });

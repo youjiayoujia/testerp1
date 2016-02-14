@@ -83,25 +83,41 @@
 
     <div class="form-group col-md-3">
         <label for="color">物流限制</label>
-        <input class="form-control" id="carriage_limit" placeholder="物流限制" name='carriage_limit' value="{{ old('carriage_limit') }}">
+        <select  class="form-control" name="carriage_limit">
+            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+                <option value="{{ $carriage_limit }}">{{$carriage_limit}}</option>
+            @endforeach
+        </select>
     </div>
-            <div class="form-group col-md-3">
+    <div class="form-group col-md-3">
         <label for="size">物流限制1</label>
-        <input class="form-control" id="carriage_limit_1" placeholder="物流限制1" name='carriage_limit_1' value="{{ old('carriage_limit_1') }}">
+        <select  class="form-control" name="carriage_limit_1">
+            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+                <option value="{{ $carriage_limit }}">{{$carriage_limit}}</option>
+            @endforeach
+        </select>
     </div>
     <div class="form-group col-md-3">
         <label for="color">包装限制</label>
-        <input class="form-control" id="package_limit" placeholder="包装限制" name='package_limit' value="{{ old('package_limit') }}">
+        <select  class="form-control" name="package_limit">
+            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <option value="{{ $package_limit }}">{{$package_limit}}</option>
+            @endforeach
+        </select>
     </div>
-            <div class="form-group col-md-3">
+    <div class="form-group col-md-3">
         <label for="size">包装限制1</label>
-        <input class="form-control" id="package_limit_1" placeholder="包装限制1" name='package_limit_1' value="{{ old('package_limit_1') }}">
+        <select  class="form-control" name="package_limit_1">
+            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <option value="{{ $package_limit }}">{{$package_limit}}</option>
+            @endforeach
+        </select>
     </div>
     <div class="form-group col-md-3">
         <label for="color">备注</label>
         <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
     </div>
-    
+
 @stop
 
 @section('pageJs')

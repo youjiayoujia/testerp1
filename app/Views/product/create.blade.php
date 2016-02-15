@@ -157,7 +157,12 @@
                 dataType: "html",
                 type:'get',
                 success:function(result){
-                    $(".ajaxinsert").html(result);
+                    if(result==0){
+                        $(".ajaxinsert").html('');
+                    }else{
+                        $(".ajaxinsert").html(result);  
+                    }
+                    
                 }
             });       
         });

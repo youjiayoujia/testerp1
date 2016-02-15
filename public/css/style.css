@@ -61,3 +61,7 @@ th:hover:not([data-sort=false]) {
 .innercheckboxs{
     margin-top: 10px !important;
 }
+
+.upimage{
+    margin-bottom: 5px
+}

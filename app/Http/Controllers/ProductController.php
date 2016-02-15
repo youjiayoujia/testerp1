@@ -119,6 +119,9 @@ class ProductController extends Controller
     public function getCatalogProperty()
     {   
         $catalog_id = $_GET['catalog_id'];
+        if($catalog_id==''){
+            echo json_encode(0);exit;
+        }
         $product_id = isset($_GET['product_id'])?$_GET['product_id']:0;
         $data = $this->model->getCatalogProperty($catalog_id,$product_id);
 

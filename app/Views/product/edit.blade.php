@@ -20,7 +20,7 @@
                         </label>
                     </div>
                     @foreach($product->catalog->attributes as $key=>$getattr)        
-                        <div class="checkbox col-md-2">{{$getattr->name}}:
+                        <div class="checkbox col-md-2 innercheckboxs">{{$getattr->name}}:
                             @foreach($getattr->values as $innervalue)
                                 <label>
                                     <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='attributes[{{$getattr->id}}][]' value='{{$innervalue->name}}'>{{$innervalue->name}}
@@ -156,7 +156,7 @@
         <label for="size">包装限制1</label>
         <select  class="form-control" name="package_limit_1">
             @foreach(config('product.package_limit') as $package_key=>$package_limit)
-                <option value="{{ $package_limit }}" {{ $product->package_limit_1 == 1 ? 'selected' : '' }} >{{$package_limit}}</option>
+                <option value="{{ $package_limit }}" {{ $product->package_limit_1 == $package_limit ? 'selected' : '' }} >{{$package_limit}}</option>
             @endforeach
         </select>
     </div>

@@ -8,7 +8,7 @@
                 </label>
             </div>
             @foreach($data['attributes'] as $key=>$getattr)        
-                <div class="checkbox col-md-2">{{$getattr['name']}}:
+                <div class="checkbox col-md-2 innercheckboxs">{{$getattr['name']}}:
                     @foreach($getattr['value'] as $innervalue)
                         <label>
                             <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][attributes][{{$getattr['name']}}][]' value='{{$innervalue}}'>{{$innervalue}}

@@ -53,7 +53,7 @@
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
                        data-id="{{ $product->id }}"
                        data-url="{{route('examine')}}">
-                        <span class="glyphicon glyphicon-check"></span> <span id='examine'>审核</span>
+                        <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>审核</span>
                     </a>
                 @else
                     <a href="javascript:" class="btn btn-info btn-xs has_check">
@@ -84,8 +84,7 @@
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        //$("#examine").text("已审核");
-                        $(this).text("已审核");
+                        $(".examine_"+product_id).text("已审核");
                     }                  
                 })
             }

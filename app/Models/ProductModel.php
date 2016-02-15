@@ -289,7 +289,8 @@ class ProductModel extends BaseModel
                 $brr[$attribute->attribute_id][] = $attribute->attribute_value;
             } 
             $brr = array_values($brr);
-            $result = $this->createDikaer($brr);
+            //$result = $this->createDikaer($brr);
+            $result = Tool::createDikaer($brr);
             $model = $productModel->model;
             foreach($result as $_result){
                 $item = $model;

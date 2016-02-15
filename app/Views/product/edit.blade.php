@@ -130,6 +130,7 @@
     <div class="form-group col-md-3">
         <label for="color">物流限制</label>
         <select  class="form-control" name="carriage_limit">
+            <option value=""></option>
             @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
                 <option value="{{ $carriage_limit }}" {{ $product->carriage_limit == $carriage_limit ? 'selected' : '' }} >{{$carriage_limit}}</option>
             @endforeach
@@ -138,6 +139,7 @@
     <div class="form-group col-md-3">
         <label for="size">物流限制1</label>
         <select  class="form-control" name="carriage_limit_1">
+            <option value=""></option>
             @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
                 <option value="{{ $carriage_limit }}" {{ $product->carriage_limit_1 == $carriage_limit ? 'selected' : '' }} >{{$carriage_limit}}</option>
             @endforeach
@@ -147,6 +149,7 @@
     <div class="form-group col-md-3">
         <label for="color">包装限制</label>
         <select  class="form-control" name="package_limit">
+            <option value=""></option>
             @foreach(config('product.package_limit') as $package_key=>$package_limit)
                 <option value="{{ $package_limit }}" {{ $product->package_limit == $package_limit ? 'selected' : '' }} >{{$package_limit}}</option>
             @endforeach
@@ -155,6 +158,7 @@
     <div class="form-group col-md-3">
         <label for="size">包装限制1</label>
         <select  class="form-control" name="package_limit_1">
+            <option value=""></option>
             @foreach(config('product.package_limit') as $package_key=>$package_limit)
                 <option value="{{ $package_limit }}" {{ $product->package_limit_1 == $package_limit ? 'selected' : '' }} >{{$package_limit}}</option>
             @endforeach

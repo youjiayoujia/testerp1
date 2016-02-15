@@ -3,9 +3,9 @@
 
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th>ID</th>
-    <th>sku名称</th>
-    <th>创建时间</th>
+    <th class="sort" data-field="id">ID</th>
+    <th class="sort" data-field="sku">sku名称</th>
+    <th class="sort" data-field="created_at">创建时间</th>
     <th>更新时间</th>
     <th>操作</th>
 @stop

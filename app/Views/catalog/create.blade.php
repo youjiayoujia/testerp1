@@ -7,18 +7,21 @@
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Set属性</div>
-        <div class="panel-body setfirst"></div>
-        <button type="button" class="btn btn-primary btn-lg btn-block" id='setadd'>添加set</button>
+        <div class="panel-body setfirst">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id='setadd'>添加set</button>
+        </div>
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Attribute属性</i></div>
-        <div class="panel-body attributefirst"></div>
-        <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加attribute</button>
+        <div class="panel-body attributefirst">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加attribute</button>
+        </div>
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Feature属性</div>
-        <div class="panel-body featurefirst"></div>
-        <button type="button" class="btn btn-primary btn-lg btn-block" id='featureadd'>添加feature</button>
+        <div class="panel-body featurefirst">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id='featureadd'>添加feature</button>
+        </div>
     </div>
     <input type='hidden' value='0' id='setnum' name="setnum" >
     <input type='hidden' value='0' id='attrnum' name="attrnum" >
@@ -66,7 +69,7 @@
         $(document).on('click','#setadd',function(){
             var aa = $("input[name^='sets[']:last").attr('name');
             if(aa==undefined){
-                $(".setfirst").html("<div class='form-group form-inline sets' id='setkey_0'> 属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='sets[0][name]' ></div> 属性值：<div class='form-group' title='cannotremove'><input type='text' class='form-control'  placeholder='属性值' name='sets[0][value][name][][name]' ></div><button type='button' class='btn btn-primary setsvalues ajaxinput'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div>");
+                $(".setfirst").html("<div class='form-group form-inline sets' id='setkey_0'> 属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='sets[0][name]' ></div> 属性值：<div class='form-group' title='cannotremove'><input type='text' class='form-control'  placeholder='属性值' name='sets[0][value][name][][name]' ></div><button type='button' class='btn btn-primary setsvalues ajaxinput'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div><button type='button' class='btn btn-primary btn-lg btn-block' id='setadd'>添加set</button></div>");
                 return;
             }
             var num = aa.substr(5,1);
@@ -89,7 +92,7 @@
         $(document).on('click','#attradd',function(){
             var aa = $("input[name^='attributes[']:last").attr('name');
             if(aa==undefined){
-                $(".attributefirst").html("<div class='form-group form-inline attrs' id='attrkey_0'>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='attributes[0][name]' ></div> 属性值：<div class='form-group' title='cannotremove'><input type='text' class='form-control'  placeholder='属性值'' name='attributes[0][value][name][][name]' ></div><button type='button' class='btn btn-primary attrvalues ajaxinput' >添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div>");
+                $(".attributefirst").html("<div class='form-group form-inline attrs' id='attrkey_0'>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='attributes[0][name]' ></div> 属性值：<div class='form-group' title='cannotremove'><input type='text' class='form-control'  placeholder='属性值'' name='attributes[0][value][name][][name]' ></div><button type='button' class='btn btn-primary attrvalues ajaxinput' >添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div><button type='button' class='btn btn-primary btn-lg btn-block' id='attradd'>添加attribute</button>");
                 return;
             }
             var num = aa.substr(11,1);
@@ -112,7 +115,7 @@
         $(document).on('click','#featureadd',function(){
             var aa = $("input[name^='features[']:last").attr('name');
             if(aa==undefined){
-                $(".featurefirst").html("<div class='form-group form-inline features' id='featurekey_0'>类型：<select name='features[0][type]' class='form-control featype'><option value='1'>文本</option><option value='2'>单选</option><option value='3'>多选</option></select>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名''  name='features[0][name]' ></div><div class='form-group fhide_0' title='cannotremove' style='display:none'>  属性值：<input type='text' class='form-control'  placeholder='属性值' name='features[0][value][name][][name]' ></div><button type='button' class='btn btn-primary featurevalues ajaxinput fhide_0' style='display:none'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div>");
+                $(".featurefirst").html("<div class='form-group form-inline features' id='featurekey_0'>类型：<select name='features[0][type]' class='form-control featype'><option value='1'>文本</option><option value='2'>单选</option><option value='3'>多选</option></select>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名''  name='features[0][name]' ></div><div class='form-group fhide_0' title='cannotremove' style='display:none'>  属性值：<input type='text' class='form-control'  placeholder='属性值' name='features[0][value][name][][name]' ></div><button type='button' class='btn btn-primary featurevalues ajaxinput fhide_0' style='display:none'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div><button type='button' class='btn btn-primary btn-lg btn-block' id='featureadd'>添加feature</button>");
                 return;
             }
             var num = aa.substr(9,1);

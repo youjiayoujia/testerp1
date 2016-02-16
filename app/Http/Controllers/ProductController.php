@@ -15,9 +15,7 @@ use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
 {
-
-    protected $product;
-
+    
     public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog)
     {
         $this->model = $product;

@@ -14,6 +14,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Logistics\ZoneModel as ZoneModel;
 use App\Models\LogisticsModel as LogisticsModel;
 use App\Models\CountryModel as CountryModel;
+use DB;
+use DebugBar\JavascriptRenderer;
 
 class ZoneController extends Controller
 {
@@ -33,6 +35,10 @@ class ZoneController extends Controller
             'logisticses'=>$this->getLogisticses(),
             'countries'=>$this->getCountries(),
         ];
+//        foreach($this->getCountries() as $a){
+//            var_dump($a);
+//        }
+//        exit;
         return view($this->viewPath . 'create', $response);
     }
 
@@ -43,7 +49,7 @@ class ZoneController extends Controller
 
     public function getCountries()
     {
-        return CountryModel::all();
+        return DB::table('countries')->select('id', 'name')->orderBy('abbreviation', 'asc')->get();
     }
 
     public function countExpress($id, LogisticsModel $logistics, CountryModel $country)

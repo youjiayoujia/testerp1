@@ -71,31 +71,30 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="discount" placeholder="最后折扣(八折录入0.8)" name='discount' value="{{ old('discount') }}">
     </div>
-    <div class="form-group col-lg-12">
-        <label for="country_id" class="control-label">国家</label>
+    <div class="form-group col-lg-4">
+        <label for="country_id" class="control-label">已有国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="country_id" class="form-control" id="country_id" multiple onclick="fun()">
+        <select name="country_id" class="form-control" multiple style="height:600px;width:400px;">
             @foreach($countries as $country)
-                <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}}>
+                <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
                     {{ $country->name }}
                 </option>
             @endforeach
         </select>
-        <textarea class="form-control" rows="3" id="country_id" placeholder="国家" name='country_id' readonly>{{ old('country_id') }}</textarea>
     </div>
+
+    <div class="form-group col-lg-4" style="margin-left: 100px;">
+        <label for="country_id" class="control-label">已选国家</label>
+        <select class="form-control" id="dselectCountry" multiple  style="height:600px;width:400px;">
+
+        </select>
+    </div>
+    <div style="display:none">
+        <textarea class="form-control" rows="3" type="hidden" id="country_id" placeholder="国家" name='country_id' readonly>{{ old('country_id') }}</textarea>
+    </div>
+
 @stop
 <script type="text/javascript">
-//    $(function(){
-//        $("select[name = 'country_id']").click(function() {
-//            var all = "";
-//            $("select option").each(function() {
-//                all += $(this).attr("value")+",";
-//            });
-//            var sel = $("select[name = 'country_id']").val();
-//            alert("多选列表所有的value值:"+all);
-//            alert("其中被选中的是:"+sel);
-//        });
-//    });
 
     $(document).ready(function() {
         var logistics_id = $("#logistics_id").val();
@@ -137,37 +136,24 @@
         });
     }
 
-    function selectCountry() {
-        var country_id = $("#country_id").val();
-        $.ajax({
-            url : "{{ route('country') }}",
-            data : { id : country_id},
-            dataType : 'json',
-            type : 'get',
-            success : function(result) {
-                $("textarea[name = 'country_id']").val(result);
-            }
+    function getPostCountry(){
+        var selectCountry = "";
+        $(".thecountry").each(function(){
+            selectCountry += $.trim($(this).html()) + ",";
         });
+        selectCountry=selectCountry.substring(0,selectCountry.length-1);
+        $("#country_id").html(selectCountry);
     }
 
-    function fun() {
-        var select = document.getElementById("country_id");
-        //var str = [];
-        var arr = [];
-        for(var i = 0; i < select.length; i++) {
-            if(select.options[i].selected) {
-                //str.push(select[i].value);
-                $.ajax({
-                    url : "{{ route('country') }}",
-                    data : { id : select[i].value},
-                    dataType : 'json',
-                    type : 'get',
-                    success : function(result) {
-                        arr += result + ",";
-                        $("textarea[name = 'country_id']").val(arr);
-                    }
-                });
-            }
-        }
+    function addCountry(that){
+        var countryHtml = '<option class="form-control thecountry" value="' + $(that).html() + '" onclick="dselectCountry( this )">' + $(that).html() + '</option>';
+        $("#dselectCountry").append(countryHtml);
+        getPostCountry();
     }
+
+    function dselectCountry(that){
+        $(that).remove();
+        getPostCountry();
+    }
+
 </script>

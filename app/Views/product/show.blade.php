@@ -41,9 +41,9 @@
     <div class="panel panel-default">
         <div class="panel-heading">Feature属性:</div>
         <div class="panel-body">
-            @foreach($model->spu->productFeatureValue as $model)
+            @foreach($model->spu->productFeatureValue as $featureModel)
             <div class="col-lg-3">
-                <strong>{{$model->featureName->name}}</strong>: {{$model->feature_value}}
+                <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
             </div>
             @endforeach
         </div> 

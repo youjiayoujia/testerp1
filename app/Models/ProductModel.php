@@ -6,6 +6,7 @@ use App\Base\BaseModel;
 use App\Models\CatalogModel;
 use App\Models\SpuModel;
 use App\Models\ItemModel;
+use App\Models\Product\ImageModel;
 use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use Illuminate\Support\Facades\DB;
@@ -151,15 +152,16 @@ class ProductModel extends BaseModel
                 $data['product_id'] = $product->id;
                 //默认s图片id为0
                 $default_image_id = 0;
-                /*foreach($model['image'] as $key=>$file){
+                $imageModel = new ImageModel();
+                foreach($model['image'] as $key=>$file){
                     if($file!=''){
-                        $image_id = $this->imageRepository->singleCreate($data,$file,$key);
+                        $image_id = $imageModel->singleCreate($data,$file,$key);
                         //获得首图的product_image_id
                         if($key=='image0'){
                             $default_image_id = $image_id;
                         }
                     }
-                }*/
+                }
                 //更新产品首图
                 $product->update(['default_image'=>$default_image_id]);
                 //插入产品attribute属性

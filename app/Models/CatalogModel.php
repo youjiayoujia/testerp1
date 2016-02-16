@@ -148,16 +148,11 @@ class CatalogModel extends BaseModel
      * @param int catalog_id 品类id
      * @return array
      */
-    public function getModels($catalog_id=0)
+    public function getModels()
     {
-        if($catalog_id==0){
-            $catalog = $this->getCatalog('','1');          
-        }else{
-            $catalog = $this->getCatalog($catalog_id);
-        }
         $brr = [];
         //获得product对应set的笛卡尔积
-        foreach($catalog->sets as $set){
+        foreach($this->sets as $set){
             $arr = [];
             foreach($set->values as $setValue){
                 $arr[] = $setValue->name;

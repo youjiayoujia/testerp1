@@ -102,12 +102,6 @@ class ProductModel extends BaseModel
         $supplier = new SupplierModel();
         return $supplier::find($id)->name;
     }
-    
-    public function getCatalogs($id='',$where='')
-    {      
-        $catalog = new CatalogModel();
-        return $catalog->getCatalog($id,$where);
-    }
 
     /**
      * jq获得产品属性
@@ -115,11 +109,11 @@ class ProductModel extends BaseModel
      * @param int $catalog_id,$product_id 品类及产品ID
      * @return array
      */
-    public function getCatalogProperty($catalog_id,$product_id=0) {  
-        $catalog = $this->getCatalogs($catalog_id);
+    public function getCatalogProperty($catalog_id) {  
+        $catalog = CatalogModel::find($catalog_id);
         $set = ['Attributes', 'features'];
         $data = [];           
-        $modelSet = $catalog->getModels($catalog_id);                        
+        $modelSet = $catalog->getModels();                        
         foreach($set as $models){
             $i = 0;
             foreach($catalog->$models as $model){
@@ -156,7 +150,7 @@ class ProductModel extends BaseModel
             $spuobj = $spumodel->create($spuarr);
             $data['spu_id'] = $spuobj->id;
             //获取catalog对象,将关联catalog的属性插入数据表
-            $catalog = $this->getCatalogs($data['catalog_id']);
+            $catalog = CatalogModel::find($data['catalog_id']);
             foreach($data['modelSet'] as $model){
                 if(count($model)==1)continue;
                 $data['model'] = $spu."-".$model['model'];;

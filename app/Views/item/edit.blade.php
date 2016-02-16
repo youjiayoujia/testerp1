@@ -3,7 +3,7 @@
 @section('formBody')
     <div class="form-group col-md-3">
         <label for="size">item</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="name" placeholder="sku" name='sku' value="{{ old('sku') ?  old('sku') : $model->sku }}">
+        <input class="form-control" disabled="disabled" id="name" placeholder="sku" name='sku' value="{{ old('sku') ?  old('sku') : $model->sku }}">
     </div> 
 
     <div class="form-group col-md-3">

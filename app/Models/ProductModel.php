@@ -9,6 +9,7 @@ use App\Models\ItemModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\Product\SupplierModel;
 use Illuminate\Support\Facades\DB;
 use Tool;
 
@@ -90,6 +91,12 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\ItemModel','product_id');
     }
 
+    public function secondSupplierName($id)
+    {
+        $supplier = new SupplierModel();
+        return $supplier::find($id)->name;
+    }
+    
     public function getCatalogs($id='',$where='')
     {      
         $catalog = new CatalogModel();

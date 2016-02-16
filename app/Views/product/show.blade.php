@@ -70,7 +70,7 @@
                 <strong>主供应商sku</strong>: {{ $model->supplier_sku }}
             </div>
             <div class="col-lg-3">
-                <strong>辅供应商</strong>: 暂时没有功能
+                <strong>辅供应商</strong>: <?php if($model->second_supplier_id==0){echo "无辅供应商";}else{echo $model->secondSupplierName($model->second_supplier_id);} ?>
             </div>
         </div>
     </div>

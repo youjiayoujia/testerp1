@@ -37,13 +37,13 @@
                 <strong>供应商ID</strong>: {{ $model->supplier_id }}
             </div>
             <div class="col-lg-3">
-                <strong>供应商名</strong>: {{ $model->name }}
+                <strong>供应商名</strong>: {{ $model->product->supplier->name }}
             </div>
             <div class="col-lg-3">
                 <strong>供应商信息</strong>: {{ $model->supplier_info }}
             </div>
             <div class="col-lg-3">
-                <strong>辅助供应商</strong>: {{ $model->second_supplier_id }}
+                <strong>辅助供应商</strong>: <?php if($model->second_supplier_id==0){echo "无辅供应商";}else{echo $model->secondSupplierName($model->second_supplier_id);} ?>
             </div>
         </div>
     </div>

@@ -63,13 +63,13 @@
                 <strong>sku</strong>: {{ $allotmentform->sku }}
             </div>
             <div class="col-lg-2">
-                <strong>数量</strong>: {{ $allotmentform->amount }}
+                <strong>数量</strong>: {{ $allotmentform->quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>金额(￥)</strong>: {{ $allotmentform->total_amount }}
+                <strong>金额(￥)</strong>: {{ $allotmentform->amount }}
             </div>
             <div class="col-lg-2">
-                <strong>入库数量</strong>: {{ isset($allotmentform->receive_amount) ? $allotmentform->receive_amount : '' }}
+                <strong>入库数量</strong>: {{ isset($allotmentform->receive_quantity) ? $allotmentform->receive_quantity : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>入库库位</strong>: {{ isset($allotmentform->inposition->name) ? $allotmentform->inposition->name : '' }}

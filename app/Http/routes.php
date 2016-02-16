@@ -76,11 +76,11 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 /**
  * stock controller route
  */
-Route::get('stockposition', ['uses'=>'StockController@stockposition', 'as'=>'stockposition']);
-Route::get('getpsi', ['uses'=>'StockController@getpsi', 'as'=>'getpsi']);
+Route::get('allotsku', ['uses'=>'StockController@ajaxAllotSku', 'as'=>'allotsku']);
+Route::get('allotoutwarehouse', ['uses'=>'StockController@ajaxAllotOutWarehouse', 'as'=>'allotoutwarehouse']);
 Route::get('getbyposition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'getbyposition']);
 Route::get('getmessage', ['uses'=>'StockController@ajaxGetMessage', 'as'=>'getmessage']);
-Route::get('getunitcost', ['uses'=>'StockController@getUnitCost','as'=>'getunitcost']);
+Route::get('allotposition', ['uses'=>'StockController@ajaxAllotPosition','as'=>'allotposition']);
 Route::resource('stock', 'StockController');
 
 //品类路由
@@ -98,6 +98,6 @@ Route::resource('channelAccount', 'Channel\AccountController');
 Route::post('checkformupdate/{id}', ['uses'=>'Stock\AllotmentController@checkformupdate', 'as'=>'checkformupdate']);
 Route::get('checkform/{id}', ['uses'=>'Stock\AllotmentController@checkform', 'as'=>'checkform']);
 Route::get('allotmentpick', ['uses'=>'Stock\AllotmentController@allotmentpick', 'as'=>'allotmentpick']);
-Route::get('allotmentcheck', ['uses' => 'Stock\AllotmentController@allotmentcheck', 'as'=>'allotmentcheck']);
+Route::get('allotmentcheck', ['uses' => 'Stock\AllotmentController@ajaxAllotmentcheck', 'as'=>'allotmentcheck']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 

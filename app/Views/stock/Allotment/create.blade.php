@@ -9,8 +9,8 @@
             <input type='text' class="form-control" id="allotment_id" placeholder="调拨单号" name='allotment_id' value="{{ old('allotment_id') ? old('allotment_id') : 'DB'.time()}}" readonly>
         </div>
         <div class="form-group col-lg-2">
-            <label for="allotment_man_id" class='control-label'>调拨人</label> 
-            <input type='text' class="form-control" id="allotment_man_id" placeholder="调拨人" name='allotment_man_id' value="{{ old('allotment_man_id') }}" readonly>
+            <label for="allotment_by" class='control-label'>调拨人</label> 
+            <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ old('allotment_by') }}" readonly>
         </div>
         <div class="form-group col-lg-2">
             <label for="allotment_time" class='control-label'>调拨时间</label> 
@@ -50,25 +50,26 @@
                     <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
                     </select>
                 </div>
+                <div class="form-group col-sm-2">
+                    <label for="sku">sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select name='arr[sku][0]' id='arr[sku][0]' class='form-control sku'>
+                    </select>
+                </div>
                 <div class="form-group col-sm-1">
                     <label for="item_id" class='control-label'>item号</label> 
                     <input type='text' class="form-control item_id" id="arr[item_id][0]" placeholder="item号" name='arr[item_id][0]' value="{{ old('arr[item_id][0]') }}" readonly>
                 </div>
-                <div class="form-group col-sm-1">
-                    <label for="sku" class='control-label'>sku</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}" readonly>
+                <div class="form-group col-sm-2">
+                    <label for="access_quantity" class='control-label'>可用数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control access_quantity" placeholder="可用数量" name='arr[access_quantity][0]' value="{{ old('arr[access_quantity][0]') }}" readonly>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="access_amount" class='control-label'>可用数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control access_amount" placeholder="可用数量" name='arr[access_amount][0]' value="{{ old('arr[access_amount][0]') }}" readonly>
+                    <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="数量" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
-                </div>
-                <div class="form-group col-sm-2">
-                    <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control total_amount" id="arr[total_amount][0]" placeholder="总金额" name='arr[total_amount][0]' value="{{ old('arr[total_amount][0]') }}" readonly>
+                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="总金额" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}" readonly>
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
@@ -82,7 +83,7 @@
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
-        psi_tmp = '';
+        allotoutwarehouse = '';
         current = 1;
         $(document).on('click', '#create_form', function(){
               var appendhtml = "\
@@ -92,25 +93,26 @@
                         <select name='arr[warehouse_positions_id]["+current+"]' id='arr[warehouse_positions_id]["+current+"]' class='form-control warehouse_positions_id'>\
                         </select>\
                     </div>\
+                    <div class='form-group col-sm-2'>\
+                        <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <select name='arr[sku]["+current+"]' id='arr[sku]["+current+"]' class='form-control sku'>\
+                        </select>\
+                    </div>\
                     <div class='form-group col-sm-1'>\
                         <label for='item_id' class='control-label'>item号</label> \
                         <input type='text' class='form-control item_id' id='arr[item_id]["+current+"]' placeholder='item号' name='arr[item_id]["+current+"]' value='{{ old('arr[item_id]["+current+"]') }}' readonly>\
                     </div>\
-                    <div class='form-group col-sm-1'>\
-                        <label for='sku' class='control-label'>sku</label><small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <input type='text' class='form-control sku' id='arr[sku]["+current+"]' placeholder='sku' name='arr[sku]["+current+"]' value='{{ old('arr[sku]["+current+"]') }}' readonly>\
-                    </div>\
                     <div class='form-group col-sm-2'>\
-                    <label for='access_amount' class='control-label'>可用数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                    <input type='text' class='form-control access_amount' placeholder='可用数量' name='arr[access_amount]["+current+"]' value='{{ old('arr[access_amount]["+current+"]') }}' readonly>\
+                    <label for='access_quantity' class='control-label'>可用数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                    <input type='text' class='form-control access_quantity' placeholder='可用数量' name='arr[access_quantity]["+current+"]' value='{{ old('arr[access_quantity]["+current+"]') }}' readonly>\
                 </div>\
                     <div class='form-group col-sm-2'>\
-                        <label for='amount' class='control-label'>数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <input type='text' class='form-control amount' id='arr[amount]["+current+"]' placeholder='数量' name='arr[amount]["+current+"]' value='{{ old('arr[amount]["+current+"]') }}'>\
+                        <label for='quantity' class='control-label'>数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <input type='text' class='form-control quantity' id='arr[quantity]["+current+"]' placeholder='数量' name='arr[quantity]["+current+"]' value={{ old('arr[quantity]["+current+"]') }}>\
                     </div>\
                     <div class='form-group col-sm-2'>\
-                        <label for='total_amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <input type='text' class='form-control total_amount' id='arr[total_amount]["+current+"]' placeholder='总金额' name='arr[total_amount]["+current+"]' value='{{ old('arr[total_amount]["+current+"]') }}' readonly>\
+                        <label for='amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
+                        <input type='text' class='form-control amount' id='arr[amount]["+current+"]' placeholder='总金额' name='arr[amount]["+current+"]' value='{{ old('arr[amount]["+current+"]') }}' readonly>\
                     </div>\
                     <button type='button' class='btn btn-danger btn-outline bt_right'><i class='glyphicon glyphicon-trash'></i></button>\
                 </div>";
@@ -119,25 +121,29 @@
             val = $('#out_warehouses_id').val();
             obj = $('.addpanel').prev();
             position = obj.find('.warehouse_positions_id');
-            if(psi_tmp) {
-                obj.find('.warehouse_positions_id').empty();
-                if(psi_tmp != 'none') {
-                    str = '';
-                    for(var i=0;i<psi_tmp[0].length;i++) 
-                    {
-                        str += '<option value='+psi_tmp[0][i]['id']+'>'+psi_tmp[0][i]['name']+'</option>';
-                    }
-                    if(psi_tmp[1][0]) {
-                        obj.find('.item_id').val(psi_tmp[1][0]['item_id']);
-                        obj.find('.sku').val(psi_tmp[1][0]['sku']);  
-                        obj.find('.access_amount').val(psi_tmp[1][0]['available_amount']); 
-                    } else {
-                        obj.find('.item_id').val('');
-                        obj.find('.sku').val('');
-                        obj.find('.access_amount').val('');
-                    }
-                    $(str).appendTo(obj.find('.warehouse_positions_id'));
+            sku = obj.find('.sku');
+            position.empty();
+            if(allotoutwarehouse != 'none') {
+                str = '';
+                str1 = '';
+                for(var i=0;i<allotoutwarehouse[0].length;i++) 
+                {
+                    str += '<option value='+allotoutwarehouse[0][i]['id']+'>'+allotoutwarehouse[0][i]['name']+'</option>';
                 }
+                for(var i=0;i<allotoutwarehouse[1].length;i++)
+                {
+                    str1 += '<option value='+allotoutwarehouse[1][i]['sku']+'>'+allotoutwarehouse[1][i]['sku']+'</option>';
+                }
+                if(allotoutwarehouse[1][0]) {
+                    $('.item_id').val(allotoutwarehouse[1][0]['item_id']);
+                    $('.access_quantity').val(allotoutwarehouse[1][0]['available_quantity']); 
+                } else {
+                    $('.item_id').val('');
+                    $('.access_quantity').val('');
+                    sku.empty();
+                }
+                $(str).appendTo(position);
+                $(str1).appendTo(sku);
             }
             current++;
         });
@@ -150,30 +156,36 @@
             val = $('#out_warehouses_id').val();
             obj = $(this).parent();
             position = $('.warehouse_positions_id');
+            sku = $('.sku');
             $.ajax({
-                url: "{{ route('getpsi') }}",
+                url: "{{ route('allotoutwarehouse') }}",
                 data: {warehouse:val},
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    psi_tmp = result;
+                    allotoutwarehouse = result;
                     position.empty();
                     if(result != 'none') {
                         str = '';
+                        str1 = '';
                         for(var i=0;i<result[0].length;i++) 
                         {
                             str += '<option value='+result[0][i]['id']+'>'+result[0][i]['name']+'</option>';
                         }
+                        for(var i=0;i<result[1].length;i++)
+                        {
+                            str1 += '<option value='+result[1][i]['sku']+'>'+result[1][i]['sku']+'</option>';
+                        }
                         if(result[1][0]) {
                             $('.item_id').val(result[1][0]['item_id']);
-                            $('.sku').val(result[1][0]['sku']);   
-                            $('.access_amount').val(result[1][0]['available_amount']); 
+                            $('.access_quantity').val(result[1][0]['available_quantity']); 
                         } else {
                             $('.item_id').val('');
-                            $('.sku').val('');
-                            $('.access_amount').val('');
+                            $('.access_quantity').val('');
+                            sku.empty();
                         }
                         $(str).appendTo(position);
+                        $(str1).appendTo(sku);
                     }
                 }
             });
@@ -181,53 +193,96 @@
 
         $(document).on('change', '.warehouse_positions_id', function(){
             obj = $(this).parent().parent();
-            val_position = obj.find('.warehouse_positions_id').val();
+            warehouse = $('#out_warehouses_id').val();
+            position = $(this).val();
+            sku = obj.find('.sku');
             $.ajax({
-                url:"{{ route('getsku' )}}",
-                data: {val_position:val_position},
+                url:"{{ route('allotposition' )}}",
+                data: {position:position, warehouse:warehouse},
+                dataType:'json',
+                type:'get',
+                success:function(result) {
+                    sku.empty();
+                    if(result != 'none') {
+                        str = '';
+                        for(var i=0;i<result[0].length;i++) 
+                        {
+                            str +="<option value="+result[0][i]['sku']+">"+result[0][i]['sku']+"</option>";
+                        }
+                        obj.find('.access_quantity').val(result[0][0]['available_quantity']);
+                        obj.find('.item_id').val(result[0][0]['item_id']);
+                        if(obj.find('.quantity').val()) 
+                        {
+                            obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
+                        }
+                    } else {
+                        obj.find('.sku').empty();
+                        obj.find('.access_quantity').val('');
+                        obj.find('.item_id').val('');
+                    }
+                    $(str).appendTo(sku);
+                }
+            });
+        });
+
+        $(document).on('change', '.sku', function(){
+            obj = $(this).parent().parent();
+            warehouse = $('#out_warehouses_id').val();
+            position = obj.find('.warehouse_positions_id').val();
+            sku = $(this).val();
+            $.ajax({
+                url:"{{ route('allotsku' )}}",
+                data: {position:position, warehouse:warehouse, sku:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
                     if(result != 'none') {
-                        obj.find('.sku').val(result[0]);
-                        obj.find('.access_amount').val(result[1]);
-                        obj.find('.item_id').val(result[2]);
-                        if(obj.find('.amount').val()) {
-                            obj.find('.total_amount').val(result[1]*obj.find('.amount').val());
+                        obj.find('.item_id').val(result[0]['item_id']);
+                        obj.find('.access_quantity').val(result[0]['available_quantity']);
+                        if(obj.find('.quantity').val())
+                        {
+                            obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
                         }
                     } else {
-                        obj.find('.sku').val('');
-                        obj.find('.access_amount').val('');
+                        alert('sku对应没有库存');
                         obj.find('.item_id').val('');
+                        obj.find('access_quantity').val('');
+                        obj.find('.amount').val('');
                     }
                 }
             });
         });
 
-        $(document).on('blur', '.amount', function(){
-            var reg = /-(\d)+/gi;
-            if(reg.test($(this).val())) {
-                alert('fuck,数量是负的了');
+        $(document).on('blur', '.quantity', function(){
+            var reg = /^(\d)+$/gi;
+            if(!reg.test($(this).val())) {
+                alert('fuck,数量有问题啊');
                 $(this).val('');
                 return;
             }
             obj = $(this).parent().parent();
+            warehouse =  $('#out_warehouses_id').val();
             position = obj.find('.warehouse_positions_id').val();
+            sku = obj.find('.sku').val();
+            if($(this).val() > parseFloat(obj.find('.access_quantity').val())) {
+                alert('超出可用数量');
+                $(this).val('');
+                obj.find('.amount').val('');
+                return;
+            }
             $.ajax({
-                url:"{{ route('getavailableamount') }}",
-                data:{position:position},
+                url:"{{ route('allotsku') }}",
+                data:{warehouse:warehouse, position:position, sku:sku},
                 dataType:'json',
                 'type':'get',
                 success:function(result){
-                    if(result[0] < obj.find('.amount').val()) {
-                        alert('超出可用数量');
-                        obj.find('.amount').val('');
-                    } else {
-                        obj.find('.total_amount').val((result[1]*obj.find('.amount').val()).toFixed('3'));
+                    if(result != 'none') {
+                        obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
                     }
                 }
             });
         });
+
         $('#allotment_time').cxCalendar();
     });
 </script>

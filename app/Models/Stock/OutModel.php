@@ -63,6 +63,8 @@ class OutModel extends BaseModel
     {
         if($this->type == 'ADJUSTMENT')
             return $this->stockAdjustment->adjust_form_id;
+        if($this->type == 'ALLOTMENT')
+            return $this->stockAllotment->allotment_id;
     }
 
     /**
@@ -95,6 +97,17 @@ class OutModel extends BaseModel
     public function stockAdjustment()
     {
         return $this->belongsTo('App\Models\Stock\AdjustmentModel', 'relation_id', 'id');
+    }
+
+    /**
+     * get the relation between the two Model
+     * 
+     *  @return relation
+     *
+     */
+    public function stockAllotment()
+    {
+        return $this->belongsTo('App\Models\Stock\AllotmentModel', 'relation_id', 'id');
     }
     
     /**

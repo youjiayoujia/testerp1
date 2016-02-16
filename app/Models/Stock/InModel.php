@@ -64,18 +64,6 @@ class InModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
     }
-
-    /**
-     * accessor get the relation name 
-     *
-     * @return name
-     *
-     */
-    public function getRelationNameAttribute()
-    {
-        if($this->type == 'ADJUSTMENT')
-            return $this->stockAdjustment->adjust_form_id;
-    }
     
     /**
      *  make the accessor. 
@@ -109,6 +97,31 @@ class InModel extends BaseModel
     public function stockAdjustment()
     {
         return $this->belongsTo('App\Models\Stock\AdjustmentModel', 'relation_id', 'id');
+    }
+
+    /**
+     * accessor get the relation name 
+     *
+     * @return name
+     *
+     */
+    public function getRelationNameAttribute()
+    {
+        if($this->type == 'ADJUSTMENT')
+            return $this->stockAdjustment->adjust_form_id;
+        if($this->type == 'ALLOTMENT')
+            return $this->stockAllotment->allotment_id;
+    }
+
+    /**
+     * get the relation between the two Model
+     * 
+     *  @return relation
+     *
+     */
+    public function stockAllotment()
+    {
+        return $this->belongsTo('App\Models\Stock\AllotmentModel', 'relation_id', 'id');
     }
 
     /**

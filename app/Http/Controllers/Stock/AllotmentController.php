@@ -89,8 +89,7 @@ class AllotmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['stock_allotments_id'] = $obj->id;
-            $allotmentform = new allotmentFormModel;
-            $allotmentform->create($buf);
+            AllotmentFormModel::create($buf);
         }
 
         return redirect($this->mainIndex);
@@ -105,13 +104,25 @@ class AllotmentController extends Controller
      */
     public function edit($id)
     {
-        $position = new PositionModel;
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+
+        $allotment = $model->allotmentform;
+        $arr = [];
+        foreach($allotment as $key => $value) 
+        {
+            $arr[] = StockModel::where(['warehouses_id'=>$model->out_warehouses_id, 'warehouse_positions_id'=>$value->warehouse_positions_id])->get(['sku'])->toArray();
+        }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'allotment' => $this->model->find($id),
+            'allotment' => $model,
             'warehouses' => WarehouseModel::all(),
-            'positions' => $position->getObj(['warehouses_id'=>$this->model->find($id)->out_warehouses_id]),
-            'allotmentforms' => $this->model->find($id)->allotmentform, 
+            'positions' => PositionModel::where(['warehouses_id'=>$model->out_warehouses_id])->get(),
+            'skus' => $arr,
+            'allotmentforms' => $allotment, 
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -177,7 +188,7 @@ class AllotmentController extends Controller
      * @return json|time
      *
      */
-    public function allotmentcheck()
+    public function ajaxAllotmentcheck()
     {
         $id = $_GET['id'];
         $time = date('Y-m-d',time());       
@@ -186,7 +197,7 @@ class AllotmentController extends Controller
         echo json_encode($time);
         
         $stock = new StockModel;
-        $obj->relation_id = $obj->allotment_id;
+        $obj->relation_id = $obj->id;
         $arr = $obj->toArray();
         $buf = $obj->allotmentform->toArray();
         for($i=0;$i<count($buf);$i++) {
@@ -208,8 +219,8 @@ class AllotmentController extends Controller
     {
         $arr = [
             'allotment_time' => 'date|required',
-            'out_warehouses_id' => 'required|numeric',
-            'in_warehouses_id' => 'required|numeric',
+            'out_warehouses_id' => 'required|integer',
+            'in_warehouses_id' => 'required|integer',
         ];
         $buf = $request->all();
         $buf = $buf['arr'];
@@ -220,20 +231,20 @@ class AllotmentController extends Controller
                 {
                     $arr['arr.sku.'.$k] ='required';
                 }
-            if($key == 'amount')
+            if($key == 'quantity')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.amount.'.$k] ='required|integer';
+                    $arr['arr.quantity.'.$k] ='required|integer';
                 }
             if($key == 'warehouse_positions_id')
                 foreach($val as $k => $v)
                 {
                     $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
                 }
-            if($key == 'total_amount')
+            if($key == 'amount')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.total_amount.'.$k] = 'required';
+                    $arr['arr.amount.'.$k] = 'required';
                 }
         }
 
@@ -288,18 +299,17 @@ class AllotmentController extends Controller
         request()->flash();
         $arr = request()->all();
         $obj = $this->model->find($id)->allotmentform;
-        
         DB::beginTransaction();
         try {
-            $buf[] = $arr['arr']['receive_amount'];
+            $buf[] = $arr['arr']['new_receive_quantity'];
             $buf[] = $arr['arr']['warehouse_positions_id'];
-            $buf[] = $arr['arr']['old_receive_amount'];
+            $buf[] = $arr['arr']['old_receive_quantity'];
             for($i=0; $i<count($buf[0]); $i++)
             {   
-                $obj[$i]->update(['receive_amount'=>($buf[0][$i]+$buf[2][$i]), 'in_warehouse_positions_id'=>$buf[1][$i]]);
+                $obj[$i]->update(['receive_quantity'=>($buf[0][$i]+$buf[2][$i]), 'in_warehouse_positions_id'=>$buf[1][$i]]);
             }
             $flag = 1;
-            $buf[] = $arr['arr']['amount'];
+            $buf[] = $arr['arr']['quantity'];
             for($i=0;$i<count($buf[3]);$i++)
             {
                 if($buf[3][$i] != ($buf[0][$i] + $buf[2][$i]))
@@ -327,10 +337,12 @@ class AllotmentController extends Controller
                 $buf = array_merge($buf,$arr);
                 $buf['type'] = "ALLOTMENT";
                 $buf['warehouses_id'] = $this->model->find($id)->in_warehouses_id;
-                $buf['relation_id'] = $buf['allotment_id'];
-                $buf['total_amount'] = round($buf['total_amount']/$buf['amount']*$buf['receive_amount'],3);
-                $buf['amount'] = $buf['receive_amount'];
-                if($buf['amount'] != 0)
+                $buf['relation_id'] = $id;
+                $buf['amount'] = round($buf['amount']/$buf['quantity']*$buf['new_receive_quantity'],3);
+                $buf['quantity'] = $buf['new_receive_quantity'];
+                if($buf['amount'] < 0)
+                    throw new Exception('库存金额低于0了');
+                if($buf['quantity'])
                     $stock->in($buf);
             }
         } catch(Exception $e) {

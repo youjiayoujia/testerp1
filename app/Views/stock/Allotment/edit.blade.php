@@ -10,8 +10,8 @@
             <input type='text' class="form-control" id="allotment_id" placeholder="调拨单号" name='allotment_id' value="{{ old('allotment_id') ? old('allotment_id') : $allotment->allotment_id }}" readonly>
         </div>
         <div class="form-group col-lg-2">
-            <label for="allotment_man_id" class='control-label'>调拨人</label> 
-            <input type='text' class="form-control" id="allotment_man_id" placeholder="调拨人" name='allotment_man_id' value="{{ old('allotment_man_id') ? old('allotment_man_id') : $allotment->allotment_man_id}}" readonly>
+            <label for="allotment_by" class='control-label'>调拨人</label> 
+            <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ old('allotment_by') ? old('allotment_by') : $allotment->allotment_by}}" readonly>
         </div>
         <div class="form-group col-lg-2">
             <label for="allotment_time" class='control-label'>调拨时间</label> 
@@ -54,20 +54,24 @@
                         </select>
                     </div>
                     <div class='form-group col-sm-2'>
+                        <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <select name='arr[sku][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
+                        @foreach($skus[$key] as $sku)
+                            <option value="{{$sku['sku']}}" {{ $sku['sku'] == $allotmentform->sku ? 'selected' : ''}}>{{$sku['sku']}}</option>
+                        @endforeach
+                        </select>
+                    </div>
+                    <div class='form-group col-sm-2'>
                         <label for='item_id' class='control-label'>item号</label> 
                         <input type='text' class='form-control item_id' id='arr[item_id][{{$key}}]' placeholder='item号' name='arr[item_id][{{$key}}]' value={{ $allotmentform->item_id }} readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='sku' class='control-label'>sku</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[sku][{{$key}}]' value='{{ $allotmentform->sku }}' readonly>
+                        <label for='quantity' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <input type='text' class='form-control quantity' id='arr[quantity][{{$key}}]' placeholder='quantity' name='arr[quantity][{{$key}}]' value='{{ $allotmentform->quantity }}'>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='amount' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control amount' id='arr[amount][{{$key}}]' placeholder='amount' name='arr[amount][{{$key}}]' value='{{ $allotmentform->amount }}'>
-                    </div>
-                    <div class='form-group col-sm-2'>
-                        <label for='total_amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control total_amount' id='arr[total_amount][{{$key}}]' placeholder='总金额(￥)' name='arr[total_amount][{{$key}}]' value='{{ $allotmentform->total_amount }}' readonly>
+                        <label for='amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <input type='text' class='form-control amount' id='arr[amount][{{$key}}]' placeholder='总金额(￥)' name='arr[amount][{{$key}}]' value='{{ $allotmentform->amount }}' readonly>
                     </div>
                     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
                 </div>
@@ -86,27 +90,36 @@
             val = $('#out_warehouses_id').val();
             obj = $(this).parent();
             position = $('.warehouse_positions_id');
+            sku = $('.sku');
             $.ajax({
-                url: "{{ route('getpsi') }}",
+                url: "{{ route('allotoutwarehouse') }}",
                 data: {warehouse:val},
                 dataType:'json',
                 type:'get',
                 success:function(result){
+                    allotoutwarehouse = result;
                     position.empty();
                     if(result != 'none') {
                         str = '';
+                        str1 = '';
                         for(var i=0;i<result[0].length;i++) 
                         {
                             str += '<option value='+result[0][i]['id']+'>'+result[0][i]['name']+'</option>';
                         }
+                        for(var i=0;i<result[1].length;i++)
+                        {
+                            str1 += '<option value='+result[1][i]['sku']+'>'+result[1][i]['sku']+'</option>';
+                        }
                         if(result[1][0]) {
                             $('.item_id').val(result[1][0]['item_id']);
-                            $('.sku').val(result[1][0]['sku']);   
+                            $('.access_quantity').val(result[1][0]['available_quantity']); 
                         } else {
                             $('.item_id').val('');
-                            $('.sku').val('');
+                            $('.access_quantity').val('');
+                            sku.empty();
                         }
                         $(str).appendTo(position);
+                        $(str1).appendTo(sku);
                     }
                 }
             });
@@ -114,44 +127,91 @@
 
         $(document).on('change', '.warehouse_positions_id', function(){
             obj = $(this).parent().parent();
-            val_position = obj.find('.warehouse_positions_id').val();
+            warehouse = $('#out_warehouses_id').val();
+            position = $(this).val();
+            sku = obj.find('.sku');
             $.ajax({
-                url:"{{ route('getsku' )}}",
-                data: {val_position:val_position},
+                url:"{{ route('allotposition' )}}",
+                data: {position:position, warehouse:warehouse},
+                dataType:'json',
+                type:'get',
+                success:function(result) {
+                    sku.empty();
+                    if(result != 'none') {
+                        str = '';
+                        for(var i=0;i<result[0].length;i++) 
+                        {
+                            str +="<option value="+result[0][i]['sku']+">"+result[0][i]['sku']+"</option>";
+                        }
+                        obj.find('.access_quantity').val(result[0][0]['available_quantity']);
+                        obj.find('.item_id').val(result[0][0]['item_id']);
+                        if(obj.find('.quantity').val()) 
+                        {
+                            obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
+                        }
+                    } else {
+                        obj.find('.sku').empty();
+                        obj.find('.access_quantity').val('');
+                        obj.find('.item_id').val('');
+                    }
+                    $(str).appendTo(sku);
+                }
+            });
+        });
+
+        $(document).on('change', '.sku', function(){
+            obj = $(this).parent().parent();
+            warehouse = $('#out_warehouses_id').val();
+            position = obj.find('.warehouse_positions_id').val();
+            sku = $(this).val();
+            $.ajax({
+                url:"{{ route('allotsku' )}}",
+                data: {position:position, warehouse:warehouse, sku:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
                     if(result != 'none') {
-                        obj.find('.sku').val(result[0]);
-                        obj.find('.item_id').val(result[2]);
+                        obj.find('.item_id').val(result[0]['item_id']);
+                        obj.find('.access_quantity').val(result[0]['available_quantity']);
+                        if(obj.find('.quantity').val())
+                        {
+                            obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
+                        }
                     } else {
-                        obj.find('.sku').val('');
+                        alert('sku对应没有库存');
                         obj.find('.item_id').val('');
+                        obj.find('access_quantity').val('');
+                        obj.find('.amount').val('');
                     }
                 }
             });
         });
 
-        $(document).on('blur', '.amount', function(){
-            var reg = /-(\d)+/gi;
-            if(reg.test($(this).val())) {
-                alert('fuck,数量是负的了');
+        $(document).on('blur', '.quantity', function(){
+            var reg = /^(\d)+$/gi;
+            if(!reg.test($(this).val())) {
+                alert('fuck,数量有问题啊');
                 $(this).val('');
                 return;
             }
             obj = $(this).parent().parent();
+            warehouse =  $('#out_warehouses_id').val();
             position = obj.find('.warehouse_positions_id').val();
+            sku = obj.find('.sku').val();
+            if($(this).val() > parseFloat(obj.find('.access_quantity').val())) {
+                alert('超出可用数量');
+                $(this).val('');
+                obj.find('.amount').val('');
+                return;
+            }
             $.ajax({
-                url:"{{ route('getavailableamount') }}",
-                data:{position:position},
+                url:"{{ route('allotsku') }}",
+                data:{warehouse:warehouse, position:position, sku:sku},
                 dataType:'json',
                 'type':'get',
                 success:function(result){
-                    if(result[0] < obj.find('.amount').val()) {
-                        alert('超出可用数量');
-                        obj.find('.amount').val('');
-                    } else {
-                        obj.find('.total_amount').val(result[1]*obj.find('.amount').val());
+                    if(result != 'none') {
+                        obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
                     }
                 }
             });

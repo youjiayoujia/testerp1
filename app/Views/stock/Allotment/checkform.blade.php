@@ -8,8 +8,8 @@
             <input type='text' class="form-control" id="allotment_id" placeholder="调拨单号" name='allotment_id' value="{{ $allotment->allotment_id }}" readonly>
         </div>
         <div class="form-group col-lg-2">
-            <label for="allotment_man_id" class='control-label'>调拨人</label> 
-            <input type='text' class="form-control" id="allotment_man_id" placeholder="调拨人" name='allotment_man_id' value="{{ $allotment->allotment_man_id}}" readonly>
+            <label for="allotment_by" class='control-label'>调拨人</label> 
+            <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ $allotment->allotment_by}}" readonly>
         </div>
         <div class="form-group col-lg-2">
             <label for="allotment_time" class='control-label'>调拨时间</label> 
@@ -40,20 +40,20 @@
                         <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[sku][{{$key}}]' value='{{ $allotmentform->sku }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='amount' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control amount' id='arr[amount][{{$key}}]' placeholder='amount' name='arr[amount][{{$key}}]' value={{ $allotmentform->amount }} readonly>
+                        <label for='quantity' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <input type='text' class='form-control quantity' id='arr[quantity][{{$key}}]' placeholder='quantity' name='arr[quantity][{{$key}}]' value={{ $allotmentform->quantity }} readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='total_amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control total_amount' id='arr[total_amount][{{$key}}]' placeholder='总金额(￥)' name='arr[total_amount][{{$key}}]' value='{{ $allotmentform->total_amount }}' readonly>
+                        <label for='amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <input type='text' class='form-control amount' id='arr[amount][{{$key}}]' placeholder='总金额(￥)' name='arr[amount][{{$key}}]' value='{{ $allotmentform->amount }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='receive_amount' class='control-label'>之前收到数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control old_receive_amount' id='arr[old_receive_amount][{{$key}}]' name='arr[old_receive_amount][{{$key}}]' value='{{ $allotmentform->receive_amount }}' readonly>
+                        <label for='receive_quantity' class='control-label'>之前收到数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <input type='text' class='form-control old_receive_quantity' id='arr[old_receive_quantity][{{$key}}]' name='arr[old_receive_quantity][{{$key}}]' value='{{ $allotmentform->receive_quantity }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='receive_amount' class='control-label'>新收到数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control receive_amount' id='arr[receive_amount][{{$key}}]' placeholder='新收到数量' name='arr[receive_amount][{{$key}}]'>
+                        <label for='new_receive_quantity' class='control-label'>新收到数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <input type='text' class='form-control new_receive_quantity' id='arr[new_receive_quantity][{{$key}}]' placeholder='新收到数量' name='arr[new_receive_quantity][{{$key}}]'>
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
@@ -76,66 +76,44 @@
 <script type='text/javascript'>
 $(document).ready(function(){
     $.each($('.warehouse_positions_id'), function(){
-        if($(this).val() == '')
+        if($(this).val() == '') {
             $('button:submit').attr('disabled', true);
-    });
-    
-    $('.receive_amount').blur(function(){
-        obj = $(this);
-        var reg=/^(\d)+$/gi;
-        if(!reg.test(obj.val())) {
-            alert('fuck,你输入的是整数吗？');
-            obj.val('');
             return;
-        }
-        if(parseInt(obj.val()) > parseInt(obj.parent().prev().prev().prev().children('.amount').val())) {
-            alert('超出数量');
-            obj.val('');
-            return;
-        }
-        all_amount = parseInt(obj.parent().parent().find('.amount').val());
-        old_amount = parseInt(obj.parent().parent().find('.old_receive_amount').val());
-        amount = parseInt(obj.val());
-        if(all_amount < (old_amount + amount)) {
-            alert('fuck,超出数量了');
-            $(this).val('');
-            return;
+        } else {
+            $('button:submit').attr('disabled', false);
         }
     });
 
-    $('.warehouse_positions_id').blur(function(){
-        obj = $(this);
-        val = obj.val();
-        sku = obj.parent().parent().find('.sku').val();
-        $.ajax({
-            url:"{{ route('stockposition') }}",
-            data:{warehouse:{{$allotment->in_warehouses_id}}, position:val},
-            dataType:'json',
-            type:'get',
-            success:function(result) {
-                if(result != 'none') {
-                    if(result['sku'] != sku) {
-                        alert('库位与sku不匹配');
-                        obj.empty();
-                        arr = {!! $positions !!};
-                        str = "<option value=''>请选择仓库</option>";
-                        for(i=0;i<arr.length;i++)
-                            str +="<option value="+arr[i].id+">"+arr[i].name+"</option>";
-                        $(str).appendTo(obj);
-                        $('button:submit').attr('disabled', true);
-                        return;
-                    }
-                    $.each($('.warehouse_positions_id'), function(){
-                        if($(this).val() == '') {
-                            $('button:submit').attr('disabled', 'disabled');
-                            return;
-                        } else {
-                            $('button:submit').attr('disabled', false);
-                        }
-                    });
-                }
+    $('.warehouse_positions_id').change(function(){
+        $.each($('.warehouse_positions_id'), function(){
+            if($(this).val() == '') {
+                $('button:submit').attr('disabled', true);
+                return;
+            } else {
+                $('button:submit').attr('disabled', false);
             }
         });
+    });
+
+    
+    $('.new_receive_quantity').blur(function(){
+        obj = $(this);
+        if($(this).val()) {
+            var reg=/^(\d)+$/gi;
+            if(!reg.test(obj.val())) {
+                alert('fuck,你输入的是整数吗？');
+                obj.val('');
+                return;
+            }
+            quantity = parseInt(obj.parent().parent().find('.quantity').val());
+            old_quantity = parseInt(obj.parent().parent().find('.old_receive_quantity').val());
+            new_quantity = parseInt(obj.val());
+            if(quantity < (old_quantity + new_quantity)) {
+                alert('fuck,超出数量了');
+                $(this).val('');
+                return;
+            }
+        }
     });
 });
 </script>

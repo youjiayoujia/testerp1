@@ -66,12 +66,11 @@ class StockController extends Controller
     }
 
     /**
-     * 获取对象，通过仓库和库位
-     * 某仓库某库位的对象
+     * 获取库存对象，通过仓库和库位
+     * 某仓库某库位的对象里面的所有sku
      *
-     *
-     *
-     *
+     * @return obj
+     * @var array
      *
      */
     public function ajaxGetByPosition()
@@ -85,6 +84,18 @@ class StockController extends Controller
             return false;
         }
     }
+
+    /**
+     * 获取信息 
+     * 传参：sku，仓库号
+     * array[0] => item号的相应对象
+     * array[1] => 通过仓库和sku 来获取对应的库存对象
+     * array[2] => 对应于array[1]的position对象
+     * array[3] => 获取商品单价
+     *
+     * @return array
+     *
+     */
     public function ajaxGetMessage()
     {
         if(request()->ajax()) {
@@ -115,82 +126,80 @@ class StockController extends Controller
     }
 
     /**
-     *  获取某商品的平均单价
+     * 
      *
      * @param none
      * @return json
      *
      */
-    public function getUnitCost()
-    {  
-        $sku = $_GET['sku'];
-        $unit = $this->model->where(['sku'=>$sku])->get()->first()->unit_cost;
-
-        if($unit) {
-            echo json_encode($unit);
-        } else {
-            echo json_encode('none');
-        }
-    }
-
-    /**
-     * 获取product 可用数量 
-     *
-     * @param none
-     * @return json|可用数量
-     *
-     */
-    public function getAvailableAmount()
+    public function ajaxAllotOutWarehouse()
     {
-        $position = $_GET['position'];
-        $obj = $this->model->getObj(['warehouse_positions_id'=>$position])->first();
-        $cost = $obj->unit_cost;
-        if($obj)
-            echo json_encode([$obj->available_amount,$cost]);
-        else
-            echo json_encode('none');
-    }
-
-    /**
-     * 根据仓库获取position,根据第一个Position获取item_id,sku,available_amount 
-     *
-     * @param none
-     * @return json
-     *
-     */
-    public function getpsi()
-    {
-        $position = new PositionModel;
-        $warehouse = $_GET['warehouse'];
-        $arr[] = $position->getObj(['warehouses_id'=>$warehouse], ['id', 'name'])->toArray();
-        if(!empty($arr[0])) {
-            $obj = $this->model->getObj(['warehouse_positions_id'=>$arr[0][0]['id']], ['item_id', 'sku', 'available_amount'])->first();
-            if($obj) {
-                $arr[1][] = $obj ->toArray();
+        if(request()->ajax()) {
+            $warehouse = $_GET['warehouse'];
+            $arr[] = PositionModel::where('warehouses_id', $warehouse)->get(['id', 'name'])->toArray();
+            if(!empty($arr[0])) {
+                $obj = $this->model->where(['warehouse_positions_id'=>$arr[0][0]['id'], 'warehouses_id'=>$warehouse])->get(['item_id', 'sku', 'available_quantity']);
+                if($obj) {
+                    $arr[1] = $obj ->toArray();
+                }
+                echo json_encode($arr);
+            } else {
+                echo json_encode('none');
             }
-            echo json_encode($arr);
+        } else {
+            echo json_encode('false');
+        }
+    }
+
+    /**
+     * 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function ajaxAllotPosition()
+    {
+        if(request()->ajax()) {
+            $position = $_GET['position'];
+            $warehouse = $_GET['warehouse'];
+            $obj = StockModel::where(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position])->get(['sku', 'item_id', 'available_quantity']);
+            $arr[] = $obj->toArray();
+            $arr[] = $obj->first()->unit_cost;
+            if($arr) {
+                echo json_encode($arr);
+            } else {
+                echo json_encode('none');
+            }
         } else {
             echo json_encode('none');
         }
     }
 
     /**
-     * 根据仓库库位定sku 
+     * 
      *
      * @param none
      * @return json
      *
      */
-    public function stockposition()
+    public function ajaxAllotSku()
     {
-        $warehouse = $_GET['warehouse'];
-        $position = $_GET['position'];
+        if(request()->ajax()) {
+            $position =$_GET['position'];
+            $warehouse =$_GET['warehouse'];
+            $sku = $_GET['sku'];
+            $obj = StockModel::where(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position, 'sku'=>$sku])->get()->first();
+            $arr[] = $obj->toArray();
+            $arr[] = $obj->unit_cost;
 
-        $buf = $this->model->getObj(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position], ['sku'])->first();
-
-        if($buf->toArray())
-            echo json_encode($buf);
-        else
-            echo json_encode('none');
+            if($arr) {
+                echo json_encode($arr);
+            } else {
+                echo json_encode('none');
+            }
+        } else {
+            echo json_encode('false');
+        }
     }
 }

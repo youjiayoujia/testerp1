@@ -142,25 +142,6 @@
             current++;
         });
 
-        $('#in_warehouses_id, #out_warehouses_id').change(function(){
-            inwarehouse = $('#in_warehouses_id').val();
-            outwarehouse = $('#out_warehouses_id').val();
-            obj = $('#in_warehouses_id');
-            obj1 = $('#out_warehouses_id');
-            if(inwarehouse && outwarehouse && inwarehouse == outwarehouse)
-            {
-                alert('两仓库不可同名');
-                obj.empty();
-                obj1.empty();
-                arr = {!! $warehouses !!};
-                str = '<option>请选择仓库</option>';
-                for(i=0;i<arr.length;i++)
-                    str +="<option value="+arr[i].id+">"+arr[i].name+"</option>";
-                $(str).appendTo(obj);
-                $(str).appendTo(obj1);
-            }
-        });
-
         $(document).on('click', '.bt_right', function(){
             $(this).parent().remove();
         });

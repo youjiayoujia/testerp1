@@ -19,7 +19,7 @@ class AdjustFormModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['adjust_form_id', 'warehouses_id', 'adjust_man_id', 'adjust_time', 'remark', 'status', 'check_man_id', 'check_time', 'created_at'];
+    protected $fillable = ['stock_adjustments_id', 'item_id', 'sku', 'type', 'warehouse_positions_id', 'quantity', 'amount', 'created_at'];
 
     /**
      * return the relationship between the two Model 
@@ -33,13 +33,13 @@ class AdjustFormModel extends BaseModel
     }
 
     /**
-     * return the relationship between the two Model 
+     * get the relationship between the two module 
      *
      * @return
      *
      */
-    public function adjustment()
+    public function position()
     {
-        return $this->hasMany('App\Models\Stock\AdjustmentModel', 'adjust_forms_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
     }
 }

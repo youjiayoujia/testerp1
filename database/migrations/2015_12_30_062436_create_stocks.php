@@ -18,10 +18,10 @@ class CreateStocks extends Migration
             $table->string('sku')->comment('sku')->default(NULL);
             $table->integer('warehouses_id')->comment('仓库id')->default(NULL);
             $table->integer('warehouse_positions_id')->comment('库位id')->default(NULL);
-            $table->integer('all_amount')->comment('总数量')->default(NULL);
-            $table->integer('available_amount')->comment('可用数量')->default(NULL);
-            $table->integer('hold_amount')->comment('hold库存')->default(NULL);
-            $table->float('total_amount')->comment('总金额')->default(NULL);
+            $table->integer('all_quantity')->comment('总数量')->default(NULL);
+            $table->integer('available_quantity')->comment('可用数量')->default(NULL);
+            $table->integer('hold_quantity')->comment('hold库存')->default(NULL);
+            $table->float('amount')->comment('总金额')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

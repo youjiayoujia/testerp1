@@ -19,16 +19,16 @@
                 <strong>库位</strong>: {{ $model->position->name }}
             </div>
             <div class="col-lg-2">
-                <strong>总数量</strong>: {{ $model->all_amount }}
+                <strong>总数量</strong>: {{ $model->all_quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>可用数量</strong>: {{ $model->available_amount }}
+                <strong>可用数量</strong>: {{ $model->available_quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>hold数量</strong>: {{ $model->hold_amount }}
+                <strong>hold数量</strong>: {{ $model->hold_quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>总金额(￥)</strong>: {{ $model->total_amount }}
+                <strong>总金额(￥)</strong>: {{ $model->amount }}
             </div>
         </div>
     </div>

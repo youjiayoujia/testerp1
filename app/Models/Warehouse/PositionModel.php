@@ -42,6 +42,7 @@ class PositionModel extends BaseModel
     {
        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
     }
+
     /**
      *  获取库位信息 
      *  @param $arr 
@@ -52,6 +53,28 @@ class PositionModel extends BaseModel
     public function getObj($arr,$field = ['*'])
     {
         return $this->where($arr)->get($field);
+    }
+
+    /**
+     * 通过id,获取库位信息
+     *  
+     * @param $id integer 仓库id
+     * @return array [key|name]
+     *
+     */
+    public function getPosition($id)
+    {
+        $buf =  PositionModel::all()->toArray();
+        $arr = [];
+        $i = 0;
+        foreach($buf as $line)
+            if($line['warehouses_id'] == $id) {
+                foreach($line as $key => $val)
+                    $arr[$i][$key] = $val;
+                $i++;
+            }
+
+        return $arr;
     }
 
 }

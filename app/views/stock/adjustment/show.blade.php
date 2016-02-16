@@ -22,16 +22,16 @@
                 <strong>sku</strong>: {{ $adjustment->sku }}
             </div>
             <div class="col-lg-2">
-                <strong>type</strong>: {{ $adjustment->type }}
+                <strong>type</strong>: {{ $adjustment->type == 'IN' ? '入库' : '出库'}}
             </div>
             <div class="col-lg-2">
                 <strong>库位</strong>: {{ $adjustment->position->name }}
             </div>
             <div class="col-lg-2">
-                <strong>数量</strong>: {{ $adjustment->amount }}
+                <strong>数量</strong>: {{ $adjustment->quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>金额(￥)</strong>: {{ $adjustment->total_amount }}
+                <strong>金额(￥)</strong>: {{ $adjustment->amount }}
             </div>
         </div>
     </div>

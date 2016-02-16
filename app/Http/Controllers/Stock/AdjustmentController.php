@@ -22,7 +22,7 @@ use App\Models\Stock\AdjustFormModel;
 
 class AdjustmentController extends Controller
 {
-    public function __construct(AdjustFormModel $adjust)
+    public function __construct(AdjustmentModel $adjust)
     {
         $this->model = $adjust;
         $this->mainIndex = route('stockAdjustment.index');
@@ -91,8 +91,8 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['adjust_forms_id'] = $obj->id;
-            AdjustmentModel::create($buf);
+            $buf['stock_adjustments_id'] = $obj->id;
+            AdjustFormModel::create($buf);
         }
 
         return redirect($this->mainIndex);
@@ -111,13 +111,12 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $position = new PositionModel;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'adjustments' => $model->adjustment,
             'warehouses' => WarehouseModel::all(),
-            'positions' =>$position->getObj(['warehouses_id' => $model->warehouses_id])->toArray(),
+            'positions' =>PositionModel::where('warehouses_id', $model->warehouses_id)->get()->toArray(),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -149,7 +148,6 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $id;
-
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {
@@ -184,27 +182,31 @@ class AdjustmentController extends Controller
      * @return json|time
      *
      */
-    public function check()
+    public function ajaxCheck()
     {
-        $id = $_GET['id'];
-        $time = date('Y-m-d',time());       
-        $obj = $this->model->find($id);
-        $obj->update(['status'=>'Y', 'check_time'=>$time]); 
-        echo json_encode($time);
+        if(request()->ajax()) {
+            $id = $_GET['id'];
+            $time = date('Y-m-d',time());       
+            $obj = $this->model->find($id);
+            $obj->update(['status'=>'Y', 'check_time'=>$time]); 
+            echo json_encode($time);
 
-        $obj->relation_id = $obj->adjust_form_id;
-        $arr = $obj->toArray();
-        $buf = $obj->adjustment->toArray();
-        $stock = new StockModel;
-        for($i=0;$i<count($buf);$i++) {
-            $tmp = array_merge($arr,$buf[$i]);
-            if($tmp['type'] == '入库') {
-                $tmp['type'] = 'ADJUSTMENT';
-                $stock->in($tmp);
-            } else {
-                $tmp['type'] = 'ADJUSTMENT';
-                $stock->out($tmp);
+            $obj->relation_id = $obj->id;
+            $arr = $obj->toArray();
+            $buf = $obj->adjustment->toArray();
+            $stock = new StockModel;
+            for($i=0;$i<count($buf);$i++) {
+                $tmp = array_merge($arr,$buf[$i]);
+                if($tmp['type'] == 'IN') {
+                    $tmp['type'] = 'ADJUSTMENT';
+                    $stock->in($tmp);
+                } else {
+                    $tmp['type'] = 'ADJUSTMENT';
+                    $stock->out($tmp);
+                }
             }
+        } else {
+            return false;
         }
     }
 

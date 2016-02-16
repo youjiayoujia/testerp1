@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StockModel;
 use App\Models\WarehouseModel;
+use App\Models\ItemModel;
 use App\Models\Warehouse\PositionModel;
 
 class StockController extends Controller
@@ -50,13 +51,67 @@ class StockController extends Controller
      */
     public function edit($id)
     {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'model' => $this->model->find($id),
+            'model' => $model,
             'warehouses' => WarehouseModel::all(),
+            'positions' => PositionModel::where(['warehouses_id' => $model->warehouses_id])->get(['id', 'name']),
         ];
 
         return view($this->viewPath.'edit', $response);
+    }
+
+    /**
+     * 获取对象，通过仓库和库位
+     * 某仓库某库位的对象
+     *
+     *
+     *
+     *
+     *
+     */
+    public function ajaxGetByPosition()
+    {
+        if(request()->ajax()) {
+            $warehouses_id = $_GET['warehouses_id'];
+            $warehouse_positions_id = $_GET['warehouse_positions_id'];
+            $obj = StockModel::where(['warehouses_id'=>$warehouses_id, 'warehouse_positions_id'=>$warehouse_positions_id])->get();
+            echo json_encode($obj);
+        } else {
+            return false;
+        }
+    }
+    public function ajaxGetMessage()
+    {
+        if(request()->ajax()) {
+            $sku = $_GET['sku'];
+            $warehouses_id = $_GET['warehouses_id'];
+            $obj = ItemModel::where(['sku'=>$sku])->get()->first();
+            $obj1 = StockModel::where(['warehouses_id'=>$warehouses_id, 'sku'=>$sku])->get();
+            if(!$obj) {
+                echo json_encode('sku_none');
+                exit;
+            }
+            if(!count($obj1)) {
+                echo json_encode('stock_none');
+                exit;
+            }
+            $arr[] = $obj;
+            $arr[] = $obj1;
+            foreach($obj1 as $tmp) {
+                $buf = PositionModel::where(['id'=>$tmp->warehouse_positions_id])->get()->first();
+                $arr[2][] = $buf;
+            }
+            if($obj1)
+                $arr[3] = $obj1->first()->unit_cost;
+            echo json_encode($arr);
+        } else {
+            echo json_encode('false');
+        }
     }
 
     /**
@@ -69,31 +124,13 @@ class StockController extends Controller
     public function getUnitCost()
     {  
         $sku = $_GET['sku'];
-        $unit = $this->model->getunitcost($sku);
+        $unit = $this->model->where(['sku'=>$sku])->get()->first()->unit_cost;
 
         if($unit) {
             echo json_encode($unit);
         } else {
-            echo json_encode('1');
-        }
-    }
-
-    /**
-     * 获取sku
-     * 
-     * @param none
-     * @return 'none' or json
-     *
-     */
-    public function getSku()
-    {
-        $val_position = $_GET['val_position'];
-        $obj = $this->model->getObj(['warehouse_positions_id'=>$val_position])->first();
-        $cost = $obj->unit_cost;
-        if($obj)
-            echo json_encode([$obj->sku, $obj->available_amount, $obj->item_id, $cost]);
-        else
             echo json_encode('none');
+        }
     }
 
     /**

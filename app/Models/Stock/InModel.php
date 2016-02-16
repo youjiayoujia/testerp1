@@ -21,29 +21,27 @@ class InModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['item_id', 'sku', 'amount', 'total_amount', 'remark', 'warehouses_id', 'warehouse_positions_id', 'type', 'relation_id'];
+    protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
 
     // 用于查询
-    protected $searchFields = ['sku'];
+    public $searchFields = [''];
 
     // 规则验证
     public $rules = [
         'create' => [
-            'item_id' => 'required',
-            'sku' => 'required|max:128',
-            'amount' => 'required|numeric',
+            'quantity' => 'required|integer',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|integer',
+            'stock_id' => 'required|integer',
+            'amount' => 'required|numeric',
         ],
         'update' => [
-            'item_id' => 'required',
-            'sku' => 'required|max:128',
-            'amount' => 'required|integer',
-            'warehouses_id' => 'required|integer     ',
+            'quantity' => 'required|integer',
+            'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|integer',
+            'stock_id' => 'required|integer',
+            'amount' => 'required|numeric',
         ]
     ];
 
@@ -68,6 +66,18 @@ class InModel extends BaseModel
     }
 
     /**
+     * accessor get the relation name 
+     *
+     * @return name
+     *
+     */
+    public function getRelationNameAttribute()
+    {
+        if($this->type == 'ADJUSTMENT')
+            return $this->stockAdjustment->adjust_form_id;
+    }
+    
+    /**
      *  make the accessor. 
      *  get the name by key in config.
      *
@@ -79,7 +89,28 @@ class InModel extends BaseModel
         return $buf[$this->type];
     }
 
+    /**
+     * return the relationship between the two module 
+     *
+     *  @return
+     *
+     */
+    public function stock()
+    {
+        return $this->belongsTo('App\Models\StockModel', 'stock_id', 'id');
+    }
     
+    /**
+     *  get the relation between the two Model 
+     *
+     *  @return none
+     *
+     */
+    public function stockAdjustment()
+    {
+        return $this->belongsTo('App\Models\Stock\AdjustmentModel', 'relation_id', 'id');
+    }
+
     /**
      * 通过sku  获取对应的item_id
      *
@@ -94,27 +125,5 @@ class InModel extends BaseModel
             if($item['sku'] == $sku)
                 return $item['id'];
         return '';
-    }
-
-    /**
-     * 通过id,获取库位信息
-     *  
-     * @param $id integer 仓库id
-     * @return array [key|name]
-     *
-     */
-    public function getPosition($id)
-    {
-        $buf =  PositionModel::all()->toArray();
-        $arr = [];
-        $i = 0;
-        foreach($buf as $line)
-            if($line['warehouses_id'] == $id) {
-                foreach($line as $key => $val)
-                    $arr[$i][$key] = $val;
-                $i++;
-            }
-
-        return $arr;
     }
 }

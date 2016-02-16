@@ -3,6 +3,7 @@
 namespace App\Models\Stock;
 
 use App\Base\BaseModel;
+use App\Models\Stock\AdjustmentModel;
 
 class OutModel extends BaseModel
 {
@@ -19,26 +20,26 @@ class OutModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['item_id', 'sku', 'amount', 'total_amount', 'remark', 'warehouses_id', 'warehouse_positions_id', 'type', 'relation_id'];
+    protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
     // 用于查询
-    protected $searchFields = ['sku'];
+    public $searchFields = [''];
 
     // 规则验证
     public $rules = [
         'create' => [
             'sku' => 'required|max:128',
-            'amount' => 'required|integer',
+            'quantity' => 'required|integer',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|integer',
+            'amount' => 'required|integer',
         ],
         'update' => [
             'sku' => 'required|max:128',
-            'amount' => 'required|integer',
+            'quantity' => 'required|integer',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
-            'total_amount' => 'required|integer',
+            'amount' => 'required|integer',
         ]
     ];
     
@@ -53,6 +54,18 @@ class OutModel extends BaseModel
     }
 
     /**
+     * accessor get the relation name 
+     *
+     * @return name
+     *
+     */
+    public function getRelationNameAttribute()
+    {
+        if($this->type == 'ADJUSTMENT')
+            return $this->stockAdjustment->adjust_form_id;
+    }
+
+    /**
      *  get the relationship between the two module 
      *
      *  @return connection
@@ -62,6 +75,28 @@ class OutModel extends BaseModel
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
     }
 
+    /**
+     * return the relationship between the two module 
+     *
+     *  @return
+     *
+     */
+    public function stock()
+    {
+        return $this->belongsTo('App\Models\StockModel', 'stock_id', 'id');
+    }
+
+    /**
+     *  get the relation between the two Model 
+     *
+     *  @return none
+     *
+     */
+    public function stockAdjustment()
+    {
+        return $this->belongsTo('App\Models\Stock\AdjustmentModel', 'relation_id', 'id');
+    }
+    
     /**
      *  make accessor!
      *  get the name by key in config.

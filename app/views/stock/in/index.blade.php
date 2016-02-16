@@ -1,4 +1,5 @@
 @extends('common.table')
+@section('tableToolButtons')@stop
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th class='sort' data-field='item_id'>item号</th>
@@ -17,27 +18,19 @@
     @foreach($data as $stockin)
         <tr>
             <td>{{ $stockin->id }}</td>
-            <td>{{ $stockin->item_id }}</td>
-            <td>{{ $stockin->sku }}</td>
+            <td>{{ $stockin->stock->item_id }}</td>
+            <td>{{ $stockin->stock->sku }}</td>
+            <td>{{ $stockin->quantity}}</td>
             <td>{{ $stockin->amount}}</td>
-            <td>{{ $stockin->total_amount}}</td>
-            <td>{{ $stockin->warehouse->name }}</td>
-            <td>{{ $stockin->position->name }}</td>
+            <td>{{ $stockin->stock->warehouse->name }}</td>
+            <td>{{ $stockin->stock->position->name }}</td>
             <td>{{ $stockin->type_name }}</td>
-            <td>{{ $stockin->relation_id }}</td>
+            <td>{{ $stockin->relation_name }}</td>
             <td>{{ $stockin->remark }} </td>
             <td>{{ $stockin->created_at }}</td>
             <td>
                 <a href="{{ route('stockIn.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
-                </a>
-                <a href="{{ route('stockIn.edit', ['id'=>$stockin->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $stockin->id }}"
-                   data-url="{{ route('stockIn.destroy', ['id' => $stockin->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>
         </tr>

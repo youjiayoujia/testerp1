@@ -7,28 +7,28 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>item号</strong>: {{ $model->item_id }}
+                <strong>item号</strong>: {{ $model->stock->item_id }}
             </div>
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $model->sku }}
+                <strong>sku</strong>: {{ $model->stock->sku }}
             </div>
             <div class="col-lg-2">
-                <strong>数量</strong>: {{ $model->amount }}
+                <strong>数量</strong>: {{ $model->quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>总金额(￥)</strong>: {{ $model->total_amount }}
+                <strong>总金额(￥)</strong>: {{ $model->amount }}
             </div>
             <div class="col-lg-2">
-                <strong>仓库</strong>: {{ $model->warehouse->name }}
+                <strong>仓库</strong>: {{ $model->stock->warehouse->name }}
             </div>
             <div class="col-lg-2">
-                <strong>库位</strong>: {{ $model->position->name }}
+                <strong>库位</strong>: {{ $model->stock->position->name }}
             </div>
             <div class="col-lg-2">
                 <strong>入库类型</strong>: {{ $model->type_name }}
             </div>
             <div class="col-lg-2">
-                <strong>入库类型id</strong>: {{ $model->relation_id }}
+                <strong>入库类型id</strong>: {{ $model->relation_name }}
             </div>
             <div class="col-lg-2">
                 <strong>remark</strong>: {{ $model->remark }}

@@ -37,7 +37,7 @@ Route::post('auth/register', 'Auth\AuthController@postRegister');
  *  InController  controller  route
  */
 Route::get('getitemid', ['uses' => 'Stock\InController@getItemId', 'as'=>'getitemid']);
-Route::get('getposition', ['uses' => 'Stock\InController@getPosition', 'as'=>'getposition']);
+Route::get('getposition', ['uses' => 'Stock\InController@ajaxGetPosition', 'as'=>'getposition']);
 Route::resource('stockIn', 'Stock\InController');
 
 /**
@@ -64,12 +64,13 @@ Route::resource('warehouse', 'WarehouseController');
 /**
  * stockAdjustment controller route
  */
-Route::get('check', ['uses'=>'Stock\AdjustmentController@check', 'as'=>'check']);
+Route::get('check', ['uses'=>'Stock\AdjustmentController@ajaxCheck', 'as'=>'check']);
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
 /**
  * warehousePosition controller route
  */
+Route::get('getposition', ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as'=>'getposition']);
 Route::resource('warehousePosition', 'Warehouse\PositionController');
 
 /**
@@ -77,8 +78,8 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
  */
 Route::get('stockposition', ['uses'=>'StockController@stockposition', 'as'=>'stockposition']);
 Route::get('getpsi', ['uses'=>'StockController@getpsi', 'as'=>'getpsi']);
-Route::get('getavailableamount', ['uses'=>'StockController@getAvailableAmount', 'as'=>'getavailableamount']);
-Route::get('getsku', ['uses'=>'StockController@getSku', 'as'=>'getsku']);
+Route::get('getbyposition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'getbyposition']);
+Route::get('getmessage', ['uses'=>'StockController@ajaxGetMessage', 'as'=>'getmessage']);
 Route::get('getunitcost', ['uses'=>'StockController@getUnitCost','as'=>'getunitcost']);
 Route::resource('stock', 'StockController');
 

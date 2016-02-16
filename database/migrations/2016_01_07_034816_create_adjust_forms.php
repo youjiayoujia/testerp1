@@ -14,14 +14,13 @@ class CreateAdjustForms extends Migration
     {
         Schema::create('adjust_forms', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('adjust_form_id')->comment('调整单号id')->default(NULL);
-            $table->integer('warehouses_id')->comment('仓库id')->default(NULL);
-            $table->integer('adjust_man_id')->comment('调整人')->default(NULL);
-            $table->date('adjust_time')->comment('调整时间')->default(NULL);
-            $table->text('remark')->comment('备注')->default(NULL);
-            $table->integer('check_man_id')->comment('审核人')->default(NULL);
-            $table->date('check_time')->comment('审核时间')->default(NULL);
-            $table->enum('status', ['N', 'Y'])->comment("审核状态")->default('N');
+            $table->integer('stock_adjustments_id')->comment('调整单号id')->default(0);
+            $table->integer('item_id')->comment('item号')->default(0);
+            $table->string('sku')->comment('sku')->default('0');
+            $table->enum('type', ['IN','OUT'])->comment('出入库类型')->default('IN');
+            $table->integer('warehouse_positions_id')->comment('库位')->default('0');
+            $table->integer('quantity')->comment('调整数量')->default(0);
+            $table->float('amount')->comment('调整金额')->default(0.0);
             $table->timestamps();
             $table->softDeletes();
         });

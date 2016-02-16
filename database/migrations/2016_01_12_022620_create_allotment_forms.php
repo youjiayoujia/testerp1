@@ -14,13 +14,13 @@ class CreateAllotmentForms extends Migration
     {
         Schema::create('allotment_forms', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('stock_allotments_id')->comment('调整单号id')->default(NULL);
+            $table->string('stock_allotments_id')->comment('调整单号id')->default('0');
             $table->integer('warehouse_positions_id')->comment('库位')->default(0);
             $table->integer('item_id')->comment('item号')->default(0);
-            $table->string('sku')->comment('sku')->default(NULL);
-            $table->integer('amount')->comment('数量')->default(0);
-            $table->float('total_amount')->comment('总金额')->default(0.0);
-            $table->integer('receive_amount')->comment('收到数量')->default(0);
+            $table->string('sku')->comment('sku')->default('0');
+            $table->integer('quantity')->comment('数量')->default(0);
+            $table->float('total_quantity')->comment('总金额')->default(0.0);
+            $table->integer('receive_quantity')->comment('收到数量')->default(0);
             $table->integer('in_warehouse_positions_id')->comment('入库位')->default(0);
             $table->timestamps();
             $table->softDeletes();

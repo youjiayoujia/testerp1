@@ -60,4 +60,25 @@ class PositionController extends Controller
 
         return view($this->viewPath.'edit', $response);
     }
+
+    /**
+     * 获取库位信息,return 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function ajaxGetPosition()
+    {
+        if(request()->ajax()) {
+            $warehouses_id = $_GET['val'];
+            $buf = $this->model->where(['warehouses_id'=>$warehouses_id])->get();
+            if($buf)
+                echo json_encode($buf);
+            else
+                echo json_encode('none');
+        } else {
+            return false;
+        }
+    }
 }

@@ -25,43 +25,6 @@ class InController extends Controller
         $this->mainTitle = '入库';
         $this->viewPath = 'stock.in.';
     }
-
-    /**
-     * 跳转创建页 
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function create()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => config('in.in'),
-            'warehouses' => WarehouseModel::all(),
-        ];
-
-        return view($this->viewPath.'create', $response);
-    }
-
-    /**
-     * 跳转数据编辑页 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function edit($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => config('in.in'),
-            'model' => $this->model->find($id),
-            'warehouses' => WarehouseModel::all(),
-        ];
-
-        return view($this->viewPath.'edit', $response);
-    }
     
     /**
      * 获取itemid，返回
@@ -76,20 +39,5 @@ class InController extends Controller
         $id = $this->model->getitemid($sku_val);
 
         echo json_encode($id);
-    }
-
-    /**
-     * 获取库位信息,return 
-     *
-     * @param none
-     * @return json
-     *
-     */
-    public function getPosition()
-    {
-        $warehouses_id = $_GET['val'];
-        $arr = $this->model->getPosition($warehouses_id);
-
-        echo json_encode($arr);
     }
 }

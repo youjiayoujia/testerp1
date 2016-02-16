@@ -29,27 +29,27 @@
     </div>
     <div class='row'>
         <div class="form-group col-sm-3">
-            <label for="all_amount" class='control-label'>总数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control all_amount" id="all_amount" placeholder="总数量" name='all_amount' value="{{ old('all_amount') }}">
+            <label for="all_quantity" class='control-label'>总数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control all_quantity" id="all_quantity" placeholder="总数量" name='all_quantity' value="{{ old('all_quantity') }}">
         </div>
         <div class="form-group col-sm-3">
-            <label for="available_amount" class='control-label'>可用数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control available_amount" id="available_amount" placeholder="可用数量" name='available_amount' value="{{ old('available_amount') }}">
+            <label for="available_quantity" class='control-label'>可用数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control available_quantity" id="available_quantity" placeholder="可用数量" name='available_quantity' value="{{ old('available_quantity') }}">
         </div>
         <div class="form-group col-sm-3">
-            <label for="hold_amount" class='control-label'>hold数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control hold_amount" id="hold_amount" placeholder="hold数量" name='hold_amount' value="{{ old('hold_amount') }}">
+            <label for="hold_quantity" class='control-label'>hold数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control hold_quantity" id="hold_quantity" placeholder="hold数量" name='hold_quantity' value="{{ old('hold_quantity') }}">
         </div>
         <div class="form-group col-sm-3">
-            <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control total_amount" id="total_amount" placeholder="总金额" name='total_amount' value="{{ old('total_amount') }}">
+            <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control amount" id="amount" placeholder="总金额" name='amount' value="{{ old('amount') }}">
         </div>
     </div>
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
-        $('.all_amount,.available_amount,.hold_amount').blur(function(){
-            if(parseInt($('.all_amount').val()) != parseInt($('.available_amount').val()) + parseInt($('.hold_amount').val())) {
+        $('.all_quantity,.available_quantity,.hold_quantity').blur(function(){
+            if(parseInt($('.all_quantity').val()) != parseInt($('.available_quantity').val()) + parseInt($('.hold_quantity').val())) {
                 $(':button[type=submit]').attr('disabled', true);
             } else {
                 $(':button[type=submit]').attr('disabled', false);
@@ -86,10 +86,9 @@
                 success:function(result){
                     $('#warehouse_positions_id').empty();
                     for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('#warehouse_positions_id'));
+                        $('<option value='+result[i].id+'>'+result[i].name+'</option>').appendTo($('#warehouse_positions_id'));
                 }
             });
         });
-
     });
 </script>

@@ -1,5 +1,4 @@
 @extends('common.table')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th class='sort' data-field='allotment_id'>调拨单号</th>
@@ -83,6 +82,7 @@
     @endforeach
 @stop
 @section('childJs')
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 <script type='text/javascript'>
 $(document).ready(function(){   
     $(document).on('click', '.check_time', function(){

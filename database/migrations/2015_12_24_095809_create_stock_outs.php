@@ -14,14 +14,11 @@ class CreateStockOuts extends Migration
     {
         Schema::create('stock_outs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('item_id')->comment('item号')->default(NULL);
-            $table->string('sku')->comment('sku')->default(NULL);
-            $table->integer('amount')->comment('数量')->default(NULL);
-            $table->float('total_amount')->comment('总金额')->default(NULL);
-            $table->integer('warehouses_id')->comment('仓库id')->default(NULL);
-            $table->integer('warehouse_positions_id')->comment('库位id')->default(NULL);
-            $table->string('type')->comment('出库类型')->default(NULL);
-            $table->string('relation_id', 64)->comment('出库类型id')->default(NULL);
+            $table->integer('quantity')->comment('数量')->default(0);
+            $table->float('amount')->comment('总金额')->default(0);
+            $table->string('type')->comment('出库类型')->default('0');
+            $table->string('relation_id', 64)->comment('出库类型id')->default('0');
+            $table->integer('stock_id')->comment('stock的id号')->default(0);
             $table->text('remark')->comment('备注')->default(NULL);
             $table->timestamps();
             $table->softDeletes();

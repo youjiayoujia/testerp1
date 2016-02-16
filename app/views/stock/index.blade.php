@@ -20,10 +20,10 @@
             <td>{{ $stock->sku }}</td>
             <td>{{ $stock->warehouse->name }}</td>
             <td>{{ $stock->position->name }}</td>
-            <td>{{ $stock->all_amount}}</td>
-            <td>{{ $stock->available_amount}}</td>
-            <td>{{ $stock->hold_amount}}</td>
-            <td>{{ $stock->total_amount}}</td>
+            <td>{{ $stock->all_quantity}}</td>
+            <td>{{ $stock->available_quantity}}</td>
+            <td>{{ $stock->hold_quantity}}</td>
+            <td>{{ $stock->amount}}</td>
             <td>{{ $stock->created_at }}</td>
             <td>
                 <a href="{{ route('stock.show', ['id'=>$stock->id]) }}" class="btn btn-info btn-xs">

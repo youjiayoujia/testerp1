@@ -19,7 +19,7 @@ class AllotmentFormModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['stock_allotments_id', 'warehouse_positions_id', 'item_id', 'sku', 'amount', 'total_amount', 'receive_amount', 'in_warehouse_positions_id', 'created_at'];
+    protected $fillable = ['stock_allotments_id', 'warehouse_positions_id', 'item_id', 'sku', 'quantity', 'total_quantity', 'receive_quantity', 'in_warehouse_positions_id', 'created_at'];
 
     /**
      * return the relationship between the two Model 

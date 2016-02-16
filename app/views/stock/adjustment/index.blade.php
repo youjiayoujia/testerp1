@@ -1,5 +1,4 @@
 @extends('common.table')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th class='sort' data-field='adjust_form_id'>调整单号</th>
@@ -20,10 +19,10 @@
             <td>{{ $adjust->adjust_form_id }}</td>
             <td>{{ $adjust->warehouse->name }}</td>
             <td>{{ $adjust->remark }}</td>
-            <td>{{ $adjust->adjust_man_id }} </td>
+            <td>{{ $adjust->adjust_by }} </td>
             <td>{{ $adjust->adjust_time }}</td>
             <td>{{ $adjust->status == 'Y' ? '已审核' : '未审核' }}</td>
-            <td>{{ $adjust->check_man_id }}</td>
+            <td>{{ $adjust->check_by }}</td>
             <td>{{ $adjust->check_time }}</td>
             <td>{{ $adjust->created_at }}</td>
             <td>
@@ -53,10 +52,11 @@
     @endforeach
 @stop
 @section('childJs')
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 <script type='text/javascript'>
 $(document).ready(function(){    
     $('.check_time').click(function(){
-        if($(this).parent().prev().prev().prev().prev().text() == '未审核') {
+        if($(this).parent().parent().find('td:eq(6)').text() == '未审核') {
             if(confirm('确认审核?')) {
                 tmp = $(this);
                 id = tmp.data('id');

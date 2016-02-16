@@ -24,40 +24,4 @@ class OutController extends Controller
         $this->mainTitle = '出库';
         $this->viewPath = 'stock.out.';
     }
-
-    /**
-     * 跳转创建页 
-     *
-     * @param none
-     * @return view
-     *
-     */
-    public function create()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => config('out'),
-            'warehouses' => WarehouseModel::all(),
-        ];
-
-        return view($this->viewPath.'create', $response);
-    }
-    /**
-     * 跳转数据编辑页 
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function edit($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => config('out'),
-            'model' => $this->model->find($id),
-            'warehouses' => WarehouseModel::all(),
-        ];
-
-        return view($this->viewPath.'edit', $response);
-    }
 }

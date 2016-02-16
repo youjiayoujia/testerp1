@@ -53,12 +53,12 @@
                     <label>出入库类型</label>
                     <div class='radio type'>
                         <label>
-                            <input type='radio' name='arr[type][{{$key}}]' value='入库' {{ old('arr[type][$key]') ? old('arr[type][$key]') == '入库' ? 'checked' : '' : $adjustment->type == '入库' ? 'checked' : ''}}>入库
+                            <input type='radio' name='arr[type][{{$key}}]' value='IN' {{ old('arr[type][$key]') ? old('arr[type][$key]') == 'IN' ? 'checked' : '' : $adjustment->type == 'IN' ? 'checked' : ''}}>入库
                         </label>
                     </div>
                     <div class='radio type'>
                         <label>
-                            <input type='radio' name='arr[type][{{$key}}]' value='出库' {{ old('arr[type][$key]') ? old('arr[type][$key]') == '出库' ? 'checked' : '' : $adjustment->type == '出库' ? 'checked' : ''}}>出库
+                            <input type='radio' name='arr[type][{{$key}}]' value='OUT' {{ old('arr[type][$key]') ? old('arr[type][$key]') == 'OUT' ? 'checked' : '' : $adjustment->type == 'OUT' ? 'checked' : ''}}>出库
                         </label>
                     </div>
                 </div>
@@ -71,12 +71,12 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-3">
-                    <label for="amount" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control amount" placeholder="数量" name='arr[amount][{{$key}}]' value="{{ old('arr[amount][$key]') ? old('arr[amount][$key]') : $adjustment->amount }}">
+                    <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control quantity" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
                 </div>
                 <div class="form-group col-sm-3">
-                    <label for="total_amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control total_amount" placeholder="总金额" name='arr[total_amount][{{$key}}]' value="{{ old('arr[total_amount][$key]') ? old('arr[total_amount][$key]') : $adjustment->total_amount }}" {{$adjustment->type == '出库' ? 'readonly' : ''}}>
+                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <input type='text' class="form-control amount" placeholder="总金额" name='arr[amount][{{$key}}]' value="{{ old('arr[amount][$key]') ? old('arr[amount][$key]') : $adjustment->amount }}" {{$adjustment->type == 'OUT' ? 'readonly' : ''}}>
                 </div>
             </div>
         </div>
@@ -86,113 +86,81 @@
 
 <script type='text/javascript'>
     $(document).ready(function(){
-        $(document).on('blur', '.type,.warehouse_positions_id,.sku', function(){
-            tmp = $(this).parent().parent().parent();
-            val_sku = tmp.find('.sku').val();
-            val_type = tmp.find('.type :radio:checked').val();
-            val_position = tmp.find('.warehouse_positions_id').val();
-            if(val_sku && val_type && val_position) {
+        $(document).on('blur', '.quantity,.amount', function(){
+            tmp = $(this);
+            block = tmp.parent().parent().parent();
+            type = block.find(':radio:checked').val();
+            quantity = block.find('.quantity').val();
+            amount = block.find('.amount').val();
+            sku = block.find('.sku').val();
+            warehouses_id = $('#warehouses_id').val();
+            if(sku && warehouses_id){
                 $.ajax({
-                    url:"{{ route('getsku') }}",
-                    data:{val_position:val_position},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result) {
-                        if(val_type == '入库') {
-                            if(result != 'none') {
-                                if(result[0] != val_sku) {
-                                    alert('sku 和 库位不匹配');
-                                    tmp.find('.sku').val('');
-                                } else {
-                                    total_amount = tmp.find('.total_amount').val();
-                                    amount = tmp.find('.amount').val();
-                                    if(total_amount && amount) {
-                                        form_cost = total_amount/amount;
-                                        if((form_cost > result[3]*1.3) || (form_cost < result[3]*0.6)) {
-                                            alert('商品单价'+result[3]+',调整单价不在单价*0.6-1.3变动范围内');
-                                            tmp.find('.amount').val('');
-                                            tmp.find('.total_amount').val('');
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            if(result == 'none') {
-                                alert('无此库位，不可出库');
-                                tmp.find('.sku').val('');
-                            } else {
-                                if(result[0] != val_sku) {
-                                    alert('sku 和 库位不匹配');
-                                    tmp.find('.sku').val('');
-                                } else {
-                                    buf = tmp.find('.amount');
-                                    if(buf.val()) {
-                                        if(parseInt(buf.val()) > result[1]) {
-                                            alert('数量超出可用库存，最大可用数量'+result[1]);
-                                            buf.val('');
-                                        } else {
-                                            buf.parent().next().children('.total_amount').val(result[3]*buf.val());
-                                        }
-                                    }
-                                }
+                    url: "{{route('getmessage')}}",
+                    data: {sku:sku, warehouses_id:warehouses_id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function(result){
+                        if(type == 'OUT' && quantity) {
+                            block.find('.amount').val((parseFloat(quantity)*result[3]).toFixed('3'));
+                            return;
+                        }
+                        if(type == 'IN' && quantity && amount) {
+                            if(amount/quantity > result[3]*1.3 || amount/quantity < result[3]*0.7) {
+                                alert('fuck,调整单价超出范围,库存单价'+result[3]);
+                                block.find('.quantity').val('');
+                                block.find('.amount').val('');
                             }
                         }
                     }
-                });
+                })
             }
+        });
+
+        $(document).on('blur', '.warehouse_positions_id', function(){
+            tmp = $(this);
+            block = tmp.parent().parent().parent();
+            sku = block.find('.sku').val();
+            warehouse_positions_id = tmp.val();
+            quantity = block.find('.quantity').val();
+            warehouses_id = $('#warehouses_id').val();
+            $.ajax({
+                url:"{{route('getbyposition')}}",
+                data:{warehouse_positions_id:warehouse_positions_id,warehouses_id:warehouses_id},
+                dataType:'json',
+                type:'get',
+                success:function(result){
+                    if(block.find('.type').find(':radio:checked').val() == 'OUT' && sku) {
+                        flag = 0;
+                        available_quantity = '';
+                        for(var i=0;i<result.length;i++) {
+                            if(result[i].sku == sku) {
+                                available_quantity = result[i].available_quantity;
+                                flag = 1;
+                            }
+                        }
+                        if(flag == 0) {
+                            alert('sku和库位不匹配');
+                            block.find('.sku').val('');
+                            block.find('.item_id').val('');
+                            return;
+                        }
+                        if(available_quantity < quantity) {
+                            alert('数量超出了库存数量');
+                            block.find('.quantity').val('');
+                            block.find('.amount').val(''); 
+                            return;                       
+                        }
+                    }
+                }
+            })
         });
 
         $(document).on('click', '.type', function(){
-            if($(this).parent().find(':radio:checked').val() == '入库')
-                $(this).parent().parent().find('.total_amount').attr('readonly', false);
+            if($(this).parent().find(':radio:checked').val() == 'IN')
+                $(this).parent().parent().find('.amount').attr('readonly', false);
             else
-                $(this).parent().parent().find('.total_amount').attr('readonly', true);
-        });
-
-        $(document).on('blur', '.amount,.total_amount', function(){
-            var rowline = $(this).parent().parent();
-            var sku = rowline.prev().find('.sku').val();
-            var position = rowline.find('.warehouse_positions_id').val();
-            var tmp = $(this);
-            if(tmp.val()) {
-                $.ajax({
-                    url:"{{ route('getunitcost') }}",
-                    data:{sku:sku},
-                    dataType:'json',
-                    'type':'get',
-                    success:function(result){
-                        if(rowline.find(':radio:checked').val() == '出库') {
-                            $.ajax({
-                                url:"{{ route('getavailableamount') }}",
-                                data:{position:position},
-                                dataType:'json',
-                                type:'get',
-                                success:function(result){
-                                    if(sku && position) {
-                                        if(result[0] < tmp.val()) {
-                                            alert('超出可用库存，最大可用量'+result);
-                                            tmp.val('');
-                                        } else {
-                                            tmp.parent().next().children('.total_amount').val(result[1]*tmp.val());
-                                        }
-                                    }
-                                }
-                            });
-                        } else {
-                            total_amount = rowline.find('.total_amount').val();
-                            amount = rowline.find('.amount').val();
-                            if(total_amount && amount) {
-                                form_cost = total_amount/amount;
-                                if((form_cost > result*1.3) || (form_cost < result*0.6)) {
-                                    alert('调整单价有误不在单价*0.6-1.3变动范围内');
-                                    rowline.find('.amount').val('');
-                                    rowline.find('.total_amount').val('');
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+                $(this).parent().parent().find('.amount').attr('readonly', true);
         });
 
         $(document).on('click','.div_del',function(){
@@ -201,18 +169,68 @@
 
         $(document).on('blur', '.sku', function(){
             var tmp = $(this);
-            var sku_val = $(this).val();
-            if(sku_val){
+            var block = $(this).parent().parent().parent();
+            var sku = $(this).val();
+            var warehouses_id = $('#warehouses_id').val();
+            if(sku && warehouses_id){
                 $.ajax({
-                    url: "{{route('getitemid')}}",
-                    data: {sku_val:sku_val},
+                    url: "{{route('getmessage')}}",
+                    data: {sku:sku, warehouses_id:warehouses_id},
                     dataType: 'json',
                     type: 'get',
                     success: function(result){
-                        tmp.parent().prev().children(':text').val(result);
-                        if(!result) {
+                        if(result == 'false' || result == 'sku_none') {
+                            alert('sku有误');
                             tmp.val('');
-                            alert('sku不存在');
+                            return;
+                        }
+                        if(result == 'stock_none'  && block.find('.type').find(':radio:checked').val() == 'OUT') {
+                            alert('该sku没有对应的库存了');
+                            tmp.val('');
+                            return;
+                        }
+                        block.find('.item_id').val(result[0].id);
+                        var str = '';
+                        var position = block.find('.warehouse_positions_id').val();
+                        var flag = 0;
+                        for(var i=0;i<result[2].length;i++) {
+                            str +="<option value="+result[2][i].id+">"+result[2][i].name+"</option>";
+                            if(result[2][i].id == position)
+                                flag = 1;
+                        }
+                        if(flag == 0 && result != 'stock_none') {
+                            block.find('.warehouse_positions_id').empty();
+                            block.find('.warehouse_positions_id').html(str);
+                            block.find('.quantity').val('');
+                            block.find('.amount').val('');
+                            return;
+                        }
+                        available_amount = '';
+                        for(var i=0;i<result[1].length;i++) {
+                            if(position == result[1][i].warehouse_positions_id && warehouses_id == result[1][i].warehouses_id) {
+                                available_amount = result[1][i].available_quantity;
+                            }
+                        }
+                        if(block.find('.type').find(':radio:checked').val() == 'OUT' && block.find('.quantity').val()) {
+                            if(parseFloat(block.find('.quantity').val()) > available_amount) {
+                                alert('fuck，该库位数量不足啊，'+available_amount);
+                                block.find('.quantity').val('');
+                                block.find('.amount').val('');
+                                return;
+                            }
+                            block.find('.amount').val((block.find('.quantity').val()*result[3]).toFixed('3'));
+                        }
+                        if(block.find('.type').find(':radio:checked').val() == '入库') {
+                            quantity = block.find('.quantity').val();
+                            amount = block.find('.amount').val();
+                            if(quantity && amount) {
+                                if(amount/quantity > result[3]*1.3 || amount/quantity < result[3]*0.6) {
+                                    alert('单价变动超出范围,库存单价'+result[3]);
+                                    block.find('.quantity').val('');
+                                    block.find('.amount').val('');
+                                    return;
+                                }
+                            }
                         }
                     } 
                 });
@@ -221,15 +239,19 @@
 
         $(document).on('change', '#warehouses_id', function(){
             val = $(this).val();
+            tmp = 
             $.ajax({
                 url: "{{ route('getposition') }}",
                 data: {val:val},
                 dataType:'json',
                 type:'get',
                 success:function(result){
+                    position_buf = result;
                     $('.warehouse_positions_id').empty();
                     for(var i=0;i<result.length;i++)
                         $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));
+                    $('.quantity').val('');
+                    $('.amount').val('');
                 }
             });
         });

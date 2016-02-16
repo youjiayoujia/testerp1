@@ -19,7 +19,7 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_man_id', 'allotment_time', 'allotment_status', 'check_man_id', 'check_status', 'check_time', 'checkform_man_id', 'checkform_time', 'created_at'];
+    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_by', 'allotment_time', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
 
     /**
      * get the relationship between the two module 

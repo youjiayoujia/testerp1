@@ -19,6 +19,7 @@ use Redirect;
 use DB;
 use Excel;
 use Request;
+use Config;
 
 
 class codesImport extends \Maatwebsite\Excel\Files\ExcelFile {
@@ -209,6 +210,7 @@ class CodeController extends Controller
             if($valuesStr != ""){
                 $sql = $baseSql.$valuesStr;
                 $sql = substr($sql,0,strlen($sql)-1); //去除最后一个value的逗号
+                $sql = stripslashes($sql);  //去除\斜杠导致的数据库报错
                 DB::statement($sql);
             }else{
                 return Redirect::to('scanAddTrCode')->with('alert', $this->alert('danger', '录入失败！'));
@@ -228,5 +230,15 @@ class CodeController extends Controller
         }else{
             return Redirect::to('scanAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger', '未输入任何物流号！'));
         }
+    }
+
+    public function getMysqlConnnection()
+    {
+        $database_host = Config::get('database.connections.mysql.host');
+        $database_user = Config::get('database.connections.mysql.username');
+        $database_password = Config::get('database.connections.mysql.password');
+        $database_name = 'erp';
+        $connection = mysqli_connect($database_host,$database_user,$database_password,$database_name);
+        return $connection;
     }
 }

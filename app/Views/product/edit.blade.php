@@ -23,7 +23,7 @@
                         <div class="checkbox col-md-2 innercheckboxs">{{$getattr->name}}:
                             @foreach($getattr->values as $innervalue)
                                 <label>
-                                    <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='attributes[{{$getattr->id}}][]' value='{{$innervalue->name}}'>{{$innervalue->name}}
+                                    <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='attributes[{{$getattr->id}}][]' value='{{$innervalue->name}}' {{ in_array($innervalue->id, $attribute_value_id_arr)? 'checked' : '' }}>{{$innervalue->name}}
                                 </label>
                             @endforeach
                         </div>
@@ -174,7 +174,7 @@
 @section('pageJs')
 <script type="text/javascript">
     $(document).ready(function() { 
-        var attributes = <?php echo $attributes; ?>;
+        /*var attributes = <?php echo $attributes; ?>;
         for(i=0;i<attributes.length;i++){
             var key = attributes[i].attribute_id+'-'+attributes[i].attribute_value;
             $("."+key).attr("checked", true);
@@ -185,7 +185,7 @@
             var key = features[i].feature_id+'-'+features[i].feature_value;
             $("."+key).attr("checked", true);
             $("#featuretext"+features[i].feature_id).val(features[i].feature_value);
-        }
+        }*/
     }); 
 
     $(document).on('change','#catalog_id',function(){

@@ -9,6 +9,7 @@ use App\Models\ItemModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\Catalog\AttributeValueModel;
 use App\Models\Product\SupplierModel;
 use Illuminate\Support\Facades\DB;
 use Tool;
@@ -136,7 +137,7 @@ class ProductModel extends BaseModel
     }
 
     /**
-     * jq获得产品属性
+     * 创建产品
      * 2016-1-11 14:00:41 YJ
      * @param array $data,$files obj
      */
@@ -157,7 +158,7 @@ class ProductModel extends BaseModel
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
-                //默认s图片id为0
+                //默认图片id为0
                 $default_image_id = 0;
                 $imageModel = new ImageModel();
                 foreach($model['image'] as $key=>$file){
@@ -179,6 +180,7 @@ class ProductModel extends BaseModel
                             $attributeValueModel = $attributeModel->values()->where('name','=',$attributeValue)->get()->first();   
                             $attributeArray['attribute_id'] =$attributeModel->id;
                             $attributeArray['attribute_value'] = $attributeValueModel->name;
+                            $attributeArray['attribute_value_id'] = $attributeValueModel->id;
                             $attributeArray['product_id'] = $product->id;
                             $productAttributeValueModel = new ProductAttributeValueModel();
                             $productAttributeValueModel->create($attributeArray);             
@@ -197,6 +199,10 @@ class ProductModel extends BaseModel
                             foreach($feature_value as $value){
                                 $featureArray['feature_value'] = $value;
                                 $productFeatureValueModel = new ProductFeatureValueModel();
+                                //$featureModel = new FeatureValueModel();
+                                //$value_id = $featureModel->where('name','=',$value)->where('feature_id','=',$feature_id)->get()->toArray();
+                                //print_r($value_id[0]['id']);exit;
+                                //$featureArray['feature_value_id'] = $value_id[0]['id'];
                                 $productFeatureValueModel->create($featureArray);                        
                             }                        
                         }else{
@@ -218,21 +224,25 @@ class ProductModel extends BaseModel
      * 2016-1-13 17:48:26 YJ
      * @param $id int, $data array, $files obj
      */
-    public function updateProduct($id,$data,$files = null){
-        $product = $this->find($id);
-        $spu_id = $product->spu_id;
+    public function updateProduct($data,$files = null){
+        //$product = $this->find($id);
+        $spu_id = $this->spu_id;
         DB::beginTransaction();
         try {     
             //更新产品attribute属性
             if(array_key_exists('attributes',$data)){
                 $productAttributeValueModel = new ProductAttributeValueModel();
-                $attributes = $productAttributeValueModel->where('product_id',$id)->delete(); 
+                $attributes = $productAttributeValueModel->where('product_id',$this->id)->delete(); 
                 foreach($data['attributes'] as $attribute_id=>$attribute_values){
                     $tmp = [];
-                    $tmp['product_id'] = $id;
+                    $tmp['product_id'] = $this->id;
                     $tmp['attribute_id'] = $attribute_id;
+                    $attributeValueModel = new AttributeValueModel();
+
                     foreach($attribute_values as $attribute_value){
                         $tmp['attribute_value'] = $attribute_value;
+                        $attribute_value_id = $attributeValueModel->where('name',$attribute_value)->where('attribute_id',$attribute_id)->get()->toArray();
+                        $tmp['attribute_value_id'] = $attribute_value_id[0]['id']; 
                         $model = new ProductAttributeValueModel();
                         $model->create($tmp);
                     }            
@@ -261,22 +271,23 @@ class ProductModel extends BaseModel
                 }             
             }
             //更新图片
-            $data['product_id'] = $id;
+            $data['product_id'] = $this->id;
             $data['spu_id'] = $spu_id;
             $data['type'] = 'original';
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
-            
-            /*foreach($files as $key=>$file){
+            $imageModel = new ImageModel();
+            foreach($files as $key=>$file){
                 if($file!=''){
-                    $image_id = $this->imageRepository->singleCreate($data,$file,$key);
+                    $image_id = $imageModel->singleCreate($data,$file,$key);
                     if($key=='image0'){
                         $default_image_id = $image_id;
                     }
                 }
                 $data['default_image'] = $default_image_id;
-            }*/           
+            } 
+                    
             //更新基础信息
-            $product->update($data);
+            $this->update($data);
         }catch (Exception $e) {
             DB::rollBack(); 
         }

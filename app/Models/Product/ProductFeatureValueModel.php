@@ -9,6 +9,6 @@ class ProductFeatureValueModel extends BaseModel
             ];
     public function featureName()
     {
-        return $this->belongsTo('App\Models\Catalog\FeatureModel','feature_id');
+        return $this->belongsTo('App\Models\Catalog\FeatureModel','feature_id','feature_value_id');
     }
 }

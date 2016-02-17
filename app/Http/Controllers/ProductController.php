@@ -66,8 +66,14 @@ class ProductController extends Controller
             'suppliers' => $this->supplier->all(),
             'attributes' => json_encode($productAttributeValueModel->where('product_id',$id)->get()->toArray()),
             'features' => json_encode($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get()->toArray()),
+            'attribute_value_id_arr' => array_column($productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray(),'attribute_value_id'),
+            'features_value_id_arr' => array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'),
         ];
-        
+        /*echo '<pre>';
+        $a = $productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray();
+        $last_names = array_column($a, 'attribute_value_id');
+        print_r($productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray());
+        exit;*/
         return view($this->viewPath . 'edit', $response);
     }
 
@@ -82,7 +88,8 @@ class ProductController extends Controller
     {   
         request()->flash();
         $this->validate(request(), $this->model->rules('update',$id));
-        $this->model->updateProduct($id,request()->all(),request()->files);
+        $productModel = $this->model->find($id);
+        $productModel->updateProduct(request()->all(),request()->files);
 
         return redirect($this->mainIndex);
     }
@@ -119,7 +126,6 @@ class ProductController extends Controller
         if($catalog_id==''){
             echo json_encode(0);exit;
         }
-        $product_id = isset($_GET['product_id'])?$_GET['product_id']:0;
         $data = $this->model->getCatalogProperty($catalog_id);
 
         echo view($this->viewPath . 'ajaxset',['data' => $data]);exit;

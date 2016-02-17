@@ -5,7 +5,7 @@ class ProductAttributeValueModel extends BaseModel
 {
     protected $table = 'product_attribute_values';
     protected $fillable = [
-            'product_id','attribute_id','attribute_value'
+            'product_id','attribute_id','attribute_value','attribute_value_id'
             ];
     public function AttributeValue()
     {      

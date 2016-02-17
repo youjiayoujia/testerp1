@@ -25,7 +25,7 @@ class CatalogController extends Controller
      * 2015-12-18 14:38:20 YJ
      * @return Illuminate\Http\RedirectResponse Object
      */
-    public function store()
+    public function store() //todo:attribute是否需要大写
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));

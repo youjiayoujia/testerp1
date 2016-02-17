@@ -15,7 +15,7 @@ use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
 {
-    
+
     public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog)
     {
         $this->model = $product;
@@ -34,7 +34,7 @@ class ProductController extends Controller
             'suppliers' => $this->supplier->all(),
         ];
         return view($this->viewPath . 'create', $response);
-    }    
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -51,6 +51,7 @@ class ProductController extends Controller
         return redirect($this->mainIndex);
     }
 
+    //todo: 在参数内实力化
     public function edit($id)
     {
         $product = $this->model->find($id);
@@ -80,7 +81,7 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update($id)
-    {   
+    {
         request()->flash();
         $this->validate(request(), $this->model->rules('update',$id));
         $productModel = $this->model->find($id);
@@ -95,7 +96,7 @@ class ProductController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function destroy($id)
+    public function destroy($id) //todo:统一风格
     {
         $model = $this->model->find($id);
         if (!$model) {
@@ -104,7 +105,7 @@ class ProductController extends Controller
         foreach ($model->item as $item) {
             $item->delete();
         }
-        
+
         $model->destroy($id);
         return redirect($this->mainIndex);
     }
@@ -115,8 +116,8 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function getCatalogProperty()
-    {   
+    public function getCatalogProperty() //todo:echo修改成return,get的获取方法改成post,用request获取数据
+    {
         $catalog_id = $_GET['catalog_id'];
         if($catalog_id==''){
             echo json_encode(0);exit;
@@ -124,7 +125,7 @@ class ProductController extends Controller
         $data = $this->model->getCatalogProperty($catalog_id);
 
         echo view($this->viewPath . 'ajaxset',['data' => $data]);exit;
-        
+
     }
 
     /**
@@ -134,7 +135,7 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function examine()
-    {   
+    {
         $product_ids = isset($_GET['product_ids'])?$_GET['product_ids']:'';
         $product_id_arr = explode(',', $product_ids);
         $this->model->createItem($product_id_arr);

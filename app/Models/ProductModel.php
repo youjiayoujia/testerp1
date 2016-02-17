@@ -35,7 +35,7 @@ class ProductModel extends BaseModel
             'product_size' => 'required',
             'weight' => 'required|numeric',
             'upload_user' => 'required',
-            'catalog_id' =>'required',
+            'catalog_id' => 'required',
         ],
         'update' => [
             'name' => 'required',
@@ -46,53 +46,79 @@ class ProductModel extends BaseModel
             'product_size' => 'required',
             'weight' => 'required|numeric',
             'upload_user' => 'required',
-            'catalog_id' =>'required',
+            'catalog_id' => 'required',
         ]
     ];
 
-    public $searchFields = ['name','id','c_name','model'];
+    public $searchFields = ['name', 'id', 'c_name', 'model'];
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['id','model','name','c_name','alias_name','alias_cname','catalog_id','supplier_id','supplier_info','purchase_url','product_sale_url','purchase_price',
-                            'purchase_carriage','product_size','package_size','weight','upload_user','assigner','default_image','carriage_limit',
-                            'carriage_limit_1','package_limit','package_limit_1','status','remark','spu_id','second_supplier_id','supplier_sku'];
-
+    protected $fillable = [
+        'id',
+        'model',
+        'name',
+        'c_name',
+        'alias_name',
+        'alias_cname',
+        'catalog_id',
+        'supplier_id',
+        'supplier_info',
+        'purchase_url',
+        'product_sale_url',
+        'purchase_price',
+        'purchase_carriage',
+        'product_size',
+        'package_size',
+        'weight',
+        'upload_user',
+        'assigner',
+        'default_image',
+        'carriage_limit',
+        'carriage_limit_1',
+        'package_limit',
+        'package_limit_1',
+        'status',
+        'remark',
+        'spu_id',
+        'second_supplier_id',
+        'supplier_sku'
+    ];
 
 
     public function image()
     {
-        return $this->belongsTo('App\Models\Product\ImageModel','default_image');
+        return $this->belongsTo('App\Models\Product\ImageModel', 'default_image');
     }
 
     public function catalog()
     {
-        return $this->belongsTo('App\Models\CatalogModel','catalog_id');
+        return $this->belongsTo('App\Models\CatalogModel', 'catalog_id');
     }
 
     public function spu()
     {
-        return $this->belongsTo('App\Models\SpuModel','spu_id');
+        return $this->belongsTo('App\Models\SpuModel', 'spu_id');
     }
 
     public function supplier()
     {
-        return $this->belongsTo('App\Models\Product\SupplierModel','supplier_id');
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
     public function productAttributeValue()
-    {      
-        return $this->hasMany('App\Models\Product\ProductAttributeValueModel','product_id');
+    {
+        return $this->hasMany('App\Models\Product\ProductAttributeValueModel', 'product_id');
     }
 
     public function item()
-    {      
-        return $this->hasMany('App\Models\ItemModel','product_id');
+    {
+        return $this->hasMany('App\Models\ItemModel', 'product_id');
     }
-    
+
     /**
      * 获得辅助供应商
      * 2016-2-16 14:00:41 YJ
@@ -108,27 +134,28 @@ class ProductModel extends BaseModel
     /**
      * jq获得产品属性
      * 2016-1-11 14:00:41 YJ
-     * @param int $catalog_id,$product_id 品类及产品ID
+     * @param int $catalog_id ,$product_id 品类及产品ID
      * @return array
      */
-    public function getCatalogProperty($catalog_id) {  
+    public function getCatalogProperty($catalog_id)
+    {
         $catalog = CatalogModel::find($catalog_id);
         $set = ['Attributes', 'features'];
-        $data = [];           
-        $modelSet = $catalog->getModels();                        
-        foreach($set as $models){
+        $data = [];
+        $modelSet = $catalog->getModels();
+        foreach ($set as $models) {
             $i = 0;
-            foreach($catalog->$models as $model){
+            foreach ($catalog->$models as $model) {
                 $data[$models][$i]['name'] = $model->name;
-                if($models=='features'){
+                if ($models == 'features') {
                     $data[$models][$i]['type'] = $model->type;
                     $data[$models][$i]['feature_id'] = $model->id;
                 }
-                foreach($model->values as $key=>$value){
-                    $data[$models][$i]['value'][] = $value->name; 
-                }               
+                foreach ($model->values as $key => $value) {
+                    $data[$models][$i]['value'][] = $value->name;
+                }
                 $i++;
-            }  
+            }
         }
         $data['models'] = $modelSet;
         //修改key值
@@ -140,11 +167,12 @@ class ProductModel extends BaseModel
     /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ
-     * @param array $data,$files obj
+     * @param array $data ,$files obj
      */
-    public function createProduct($data='',$files=''){
+    public function createProduct($data = '', $files = '')
+    {
         DB::beginTransaction();
-        try {       
+        try {
             //创建spu，,并插入数据
             $spumodel = new SpuModel();
             $spu = Tool::createSku();
@@ -153,59 +181,63 @@ class ProductModel extends BaseModel
             $data['spu_id'] = $spuobj->id;
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
-            foreach($data['modelSet'] as $model){
-                if(count($model)==1)continue;
-                $data['model'] = $spu."-".$model['model'];;
+            foreach ($data['modelSet'] as $model) {
+                if (count($model) == 1) {
+                    continue;
+                }
+                $data['model'] = $spu . "-" . $model['model'];;
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
                 //默认图片id为0
                 $default_image_id = 0;
                 $imageModel = new ImageModel();
-                foreach($model['image'] as $key=>$file){
-                    if($file!=''){
-                        $image_id = $imageModel->singleCreate($data,$file,$key);
+                foreach ($model['image'] as $key => $file) {
+                    if ($file != '') {
+                        $image_id = $imageModel->singleCreate($data, $file, $key);
                         //获得首图的product_image_id
-                        if($key=='image0'){
+                        if ($key == 'image0') {
                             $default_image_id = $image_id;
                         }
                     }
                 }
                 //更新产品首图
-                $product->update(['default_image'=>$default_image_id]);
+                $product->update(['default_image' => $default_image_id]);
                 //插入产品attribute属性
-                if(array_key_exists('attributes',$model)){
-                    foreach($model['attributes'] as $attribute=>$attributeValues){              
-                        $attributeModel = $catalog->Attributes()->where('name','=',$attribute)->get()->first();
-                        foreach($attributeValues as $attributeValue){
-                            $attributeValueModel = $attributeModel->values()->where('name','=',$attributeValue)->get()->first();   
-                            $attributeArray['attribute_id'] =$attributeModel->id;
+                if (array_key_exists('attributes', $model)) {
+                    foreach ($model['attributes'] as $attribute => $attributeValues) {
+                        $attributeModel = $catalog->Attributes()->where('name', '=', $attribute)->get()->first();
+                        foreach ($attributeValues as $attributeValue) {
+                            $attributeValueModel = $attributeModel->values()->where('name', '=',
+                                $attributeValue)->get()->first();
+                            $attributeArray['attribute_id'] = $attributeModel->id;
                             $attributeArray['attribute_value'] = $attributeValueModel->name;
                             $attributeArray['attribute_value_id'] = $attributeValueModel->id;
                             $attributeArray['product_id'] = $product->id;
                             $productAttributeValueModel = new ProductAttributeValueModel();
-                            $productAttributeValueModel->create($attributeArray);             
+                            $productAttributeValueModel->create($attributeArray);
                         }
-                    }                    
+                    }
                 }
             }
             //插入feature属性
-            $keyset = ['featureradio','featurecheckbox','featureinput'];
-            foreach($keyset as $key){
-                if(array_key_exists($key, $data)){
-                    foreach($data[$key] as $feature_id=>$feature_value){
+            $keyset = ['featureradio', 'featurecheckbox', 'featureinput'];
+            foreach ($keyset as $key) {
+                if (array_key_exists($key, $data)) {
+                    foreach ($data[$key] as $feature_id => $feature_value) {
                         $featureArray['feature_id'] = $feature_id;
                         $featureArray['spu_id'] = $spuobj->id;
-                        if($key!='featureinput'){
-                            foreach($feature_value as $value){
+                        if ($key != 'featureinput') {
+                            foreach ($feature_value as $value) {
                                 $featureArray['feature_value'] = $value;
                                 $productFeatureValueModel = new ProductFeatureValueModel();
                                 $featureModel = new FeatureValueModel();
-                                $value_id = $featureModel->where('name','=',$value)->where('feature_id','=',$feature_id)->get()->toArray();         
+                                $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',
+                                    $feature_id)->get()->toArray();
                                 $featureArray['feature_value_id'] = $value_id[0]['id'];
-                                $productFeatureValueModel->create($featureArray);                        
-                            }                        
-                        }else{
+                                $productFeatureValueModel->create($featureArray);
+                            }
+                        } else {
                             $featureArray['feature_value'] = $feature_value;
                             $featureArray['feature_value_id'] = 0;
                             $productFeatureValueModel = new ProductFeatureValueModel();
@@ -214,7 +246,7 @@ class ProductModel extends BaseModel
                     }
                 }
             }
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
         }
         DB::commit();
@@ -225,61 +257,64 @@ class ProductModel extends BaseModel
      * 2016-1-13 17:48:26 YJ
      * @param $id int, $data array, $files obj
      */
-    public function updateProduct($data,$files = null){
+    public function updateProduct($data, $files = null)
+    {
         $spu_id = $this->spu_id;
         DB::beginTransaction();
-        try {     
+        try {
             //更新产品attribute属性
-            if(array_key_exists('attributes',$data)){
+            if (array_key_exists('attributes', $data)) {
                 $productAttributeValueModel = new ProductAttributeValueModel();
-                $attributes = $productAttributeValueModel->where('product_id',$this->id)->delete(); 
-                foreach($data['attributes'] as $attribute_id=>$attribute_values){
+                $attributes = $productAttributeValueModel->where('product_id', $this->id)->delete();
+                foreach ($data['attributes'] as $attribute_id => $attribute_values) {
                     $tmp = [];
                     $tmp['product_id'] = $this->id;
                     $tmp['attribute_id'] = $attribute_id;
                     $attributeValueModel = new AttributeValueModel();
 
-                    foreach($attribute_values as $attribute_value){
+                    foreach ($attribute_values as $attribute_value) {
                         $tmp['attribute_value'] = $attribute_value;
-                        $attribute_value_id = $attributeValueModel->where('name',$attribute_value)->where('attribute_id',$attribute_id)->get()->toArray();
-                        $tmp['attribute_value_id'] = $attribute_value_id[0]['id']; 
+                        $attribute_value_id = $attributeValueModel->where('name',
+                            $attribute_value)->where('attribute_id', $attribute_id)->get()->toArray();
+                        $tmp['attribute_value_id'] = $attribute_value_id[0]['id'];
                         $model = new ProductAttributeValueModel();
                         $model->create($tmp);
-                    }            
+                    }
                 }
             }
             //更新产品feature属性
-            if(array_key_exists('features',$data)){
+            if (array_key_exists('features', $data)) {
                 $ProductFeatureValueModel = new ProductFeatureValueModel();
-                $ProductFeatureValueModel->where('spu_id',$spu_id)->delete();
-                foreach($data['features'] as $feature_id=>$feature_values){
+                $ProductFeatureValueModel->where('spu_id', $spu_id)->delete();
+                foreach ($data['features'] as $feature_id => $feature_values) {
                     $tmp = [];
                     $tmp['spu_id'] = $spu_id;
                     $tmp['feature_id'] = $feature_id;
-                    if(is_array($feature_values)){
-                        foreach($feature_values as $feature_value){
+                    if (is_array($feature_values)) {
+                        foreach ($feature_values as $feature_value) {
                             $tmp['feature_value'] = $feature_value;
                             $model = new ProductFeatureValueModel();
                             $featureModel = new FeatureValueModel();
-                            $value_id = $featureModel->where('name','=',$feature_value)->where('feature_id','=',$feature_id)->get()->toArray();         
+                            $value_id = $featureModel->where('name', '=', $feature_value)->where('feature_id', '=',
+                                $feature_id)->get()->toArray();
                             $tmp['feature_value_id'] = $value_id[0]['id'];
                             $model->create($tmp);
-                        }                    
-                    }else{
+                        }
+                    } else {
                         $tmp['feature_value'] = $feature_values;
                         $model = new ProductFeatureValueModel();
                         $model->create($tmp);
                     }
-                     
+
                 }
-                foreach($data['featureinput'] as $featureInputKey=>$featureInputValue){
+                foreach ($data['featureinput'] as $featureInputKey => $featureInputValue) {
                     unset($tmp);
                     $tmp['spu_id'] = $spu_id;
                     $tmp['feature_id'] = $featureInputKey;
                     $tmp['feature_value'] = $featureInputValue;
                     $model = new ProductFeatureValueModel();
                     $model->create($tmp);
-                }   
+                }
             }
             //更新图片
             $data['product_id'] = $this->id;
@@ -287,20 +322,20 @@ class ProductModel extends BaseModel
             $data['type'] = 'original';
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
             $imageModel = new ImageModel();
-            foreach($files as $key=>$file){
-                if($file!=''){
-                    $image_id = $imageModel->singleCreate($data,$file,$key);
-                    if($key=='image0'){
+            foreach ($files as $key => $file) {
+                if ($file != '') {
+                    $image_id = $imageModel->singleCreate($data, $file, $key);
+                    if ($key == 'image0') {
                         $default_image_id = $image_id;
                     }
                 }
                 $data['default_image'] = $default_image_id;
-            } 
+            }
 
             //更新基础信息
             $this->update($data);
-        }catch (Exception $e) {
-            DB::rollBack(); 
+        } catch (Exception $e) {
+            DB::rollBack();
         }
         DB::commit();
     }
@@ -311,31 +346,32 @@ class ProductModel extends BaseModel
      * @param array product_id_array 产品id字符串
      * @return array
      */
-    public function createItem($product_id_array) {
-        foreach($product_id_array as $product_id){
+    public function createItem($product_id_array)
+    {
+        foreach ($product_id_array as $product_id) {
             $productModel = $this->find($product_id);
             $attributes = $productModel->productAttributeValue;
             $brr = [];
-            foreach($attributes as $attribute){
+            foreach ($attributes as $attribute) {
                 $brr[$attribute->attribute_id][] = $attribute->attribute_value;
-            } 
+            }
             $brr = array_values($brr);
             $result = Tool::createDikaer($brr);
             $model = $productModel->model;
-            foreach($result as $_result){
+            foreach ($result as $_result) {
                 $item = $model;
-                foreach($_result as $__result){
-                    $item .="-".$__result;
+                foreach ($_result as $__result) {
+                    $item .= "-" . $__result;
                 }
                 $product_data = $this->find($product_id)->toArray();
                 $product_data['sku'] = $item;
                 $product_data['product_id'] = $product_id;
                 $item = new ItemModel();
-                $item->create($product_data);         
+                $item->create($product_data);
             }
             $productModel->status = 1;
-            $productModel->save();           
-        }      
+            $productModel->save();
+        }
     }
 
 }

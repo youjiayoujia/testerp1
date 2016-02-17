@@ -108,14 +108,12 @@ class AllotmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-
         $allotment = $model->allotmentform;
         $arr = [];
         foreach($allotment as $key => $value) 
         {
             $arr[] = StockModel::where(['warehouses_id'=>$model->out_warehouses_id, 'warehouse_positions_id'=>$value->warehouse_positions_id])->get(['sku'])->toArray();
         }
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
@@ -190,21 +188,25 @@ class AllotmentController extends Controller
      */
     public function ajaxAllotmentcheck()
     {
-        $id = $_GET['id'];
-        $time = date('Y-m-d',time());       
-        $obj = $this->model->find($id);
-        $obj->update(['check_status'=>'Y', 'check_time'=>$time, 'allotment_status'=>'out']); 
-        echo json_encode($time);
-        
-        $stock = new StockModel;
-        $obj->relation_id = $obj->id;
-        $arr = $obj->toArray();
-        $buf = $obj->allotmentform->toArray();
-        for($i=0;$i<count($buf);$i++) {
-            $tmp = array_merge($arr, $buf[$i]);
-            $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
-            $tmp['type'] = 'ALLOTMENT';
-            $stock->out($tmp);
+        if(request()->ajax()) {
+            $id = $_GET['id'];
+            $time = date('Y-m-d',time());       
+            $obj = $this->model->find($id);
+            $obj->update(['check_status'=>'Y', 'check_time'=>$time, 'allotment_status'=>'out']); 
+            echo json_encode($time);
+            
+            $stock = new StockModel;
+            $obj->relation_id = $obj->id;
+            $arr = $obj->toArray();
+            $buf = $obj->allotmentform->toArray();
+            for($i=0;$i<count($buf);$i++) {
+                $tmp = array_merge($arr, $buf[$i]);
+                $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
+                $tmp['type'] = 'ALLOTMENT';
+                $stock->out($tmp);
+            }
+        } else {
+            echo json_encode('false');
         }
     }
 

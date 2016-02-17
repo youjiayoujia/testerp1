@@ -78,7 +78,7 @@ $(document).ready(function(){
     $.each($('.warehouse_positions_id'), function(){
         if($(this).val() == '') {
             $('button:submit').attr('disabled', true);
-            return;
+            return false;
         } else {
             $('button:submit').attr('disabled', false);
         }
@@ -88,14 +88,13 @@ $(document).ready(function(){
         $.each($('.warehouse_positions_id'), function(){
             if($(this).val() == '') {
                 $('button:submit').attr('disabled', true);
-                return;
+                return false;
             } else {
                 $('button:submit').attr('disabled', false);
             }
         });
     });
 
-    
     $('.new_receive_quantity').blur(function(){
         obj = $(this);
         if($(this).val()) {

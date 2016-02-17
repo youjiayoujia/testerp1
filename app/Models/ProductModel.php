@@ -267,12 +267,19 @@ class ProductModel extends BaseModel
                         }                    
                     }else{
                         $tmp['feature_value'] = $feature_values;
-                        $tmp['feature_value_id'] = 0;
                         $model = new ProductFeatureValueModel();
                         $model->create($tmp);
                     }
                      
-                }             
+                }
+                foreach($data['featureinput'] as $featureInputKey=>$featureInputValue){
+                    unset($tmp);
+                    $tmp['spu_id'] = $spu_id;
+                    $tmp['feature_id'] = $featureInputKey;
+                    $tmp['feature_value'] = $featureInputValue;
+                    $model = new ProductFeatureValueModel();
+                    $model->create($tmp);
+                }   
             }
             //更新图片
             $data['product_id'] = $this->id;

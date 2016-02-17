@@ -64,16 +64,11 @@ class ProductController extends Controller
             'catalogs' => $this->catalog->all(),
             'product' => $product,
             'suppliers' => $this->supplier->all(),
-            'attributes' => json_encode($productAttributeValueModel->where('product_id',$id)->get()->toArray()),
-            'features' => json_encode($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get()->toArray()),
+            'features_input' => $ProductFeatureValueModel->where('spu_id',$product->spu_id)->where('feature_value_id',0)->get()->toArray(),
             'attribute_value_id_arr' => array_column($productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray(),'attribute_value_id'),
             'features_value_id_arr' => array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'),
         ];
-        /*echo '<pre>';
-        $a = $productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray();
-        $last_names = array_column($a, 'attribute_value_id');
-        print_r(array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'));
-        exit;*/
+
         return view($this->viewPath . 'edit', $response);
     }
 

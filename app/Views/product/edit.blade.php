@@ -42,12 +42,14 @@
         <div class="form-group third">
             <label for='set'>feature属性:</label>
             <div class="panel panel-info">
-                <div class="checkbox panel-body ">
+                <div class="checkbox panel-body "><?php $i=0; ?>
                     @foreach($product->catalog->features as $key=>$getfeature)
+                        
                         @if($getfeature->type==1)
                             <div class="featurestyle" style="padding-bottom:10px">                           
-                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="" name='featureinput[{{$getfeature->id}}]' />
+                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
                             </div>
+                            
                         @elseif($getfeature->type==2)
                             <div class="radio">{{$getfeature->name}}
                             @foreach($getfeature->values as $value)
@@ -173,21 +175,6 @@
 @stop
 @section('pageJs')
 <script type="text/javascript">
-    $(document).ready(function() { 
-        /*var attributes = <?php echo $attributes; ?>;
-        for(i=0;i<attributes.length;i++){
-            var key = attributes[i].attribute_id+'-'+attributes[i].attribute_value;
-            $("."+key).attr("checked", true);
-        }
-        var features = <?php echo $features; ?>;
-        
-        for(i=0;i<features.length;i++){
-            var key = features[i].feature_id+'-'+features[i].feature_value;
-            $("."+key).attr("checked", true);
-            $("#featuretext"+features[i].feature_id).val(features[i].feature_value);
-        }*/
-    }); 
-
     $(document).on('change','#catalog_id',function(){
         var catalog_id = $("#catalog_id").val();
         var product_id = {{$product->id}};

@@ -52,7 +52,7 @@
                             <div class="radio">{{$getfeature->name}}
                             @foreach($getfeature->values as $value)
                             <label>
-                                <input class='{{$getfeature->id}}-{{$value->name}}' type='radio' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
+                                <input class='{{$getfeature->id}}-{{$value->name}}' {{ in_array($value->id, $features_value_id_arr)? 'checked' : '' }} type='radio' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
                             </label>
                             @endforeach
                             </div>
@@ -60,7 +60,7 @@
                             <div class="checkbox">{{$getfeature->name}}
                             @foreach($getfeature->values as $value)
                             <label>
-                                <input class='{{$getfeature->id}}-{{$value->name}}' type='checkbox' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
+                                <input class='{{$getfeature->id}}-{{$value->name}}' {{ in_array($value->id, $features_value_id_arr)? 'checked' : '' }} type='checkbox' name='features[{{$getfeature->id}}][]' value='{{$value->name}}'>{{$value->name}}
                             </label>
                             @endforeach
                             </div>

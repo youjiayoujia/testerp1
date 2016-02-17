@@ -72,7 +72,7 @@ class ProductController extends Controller
         /*echo '<pre>';
         $a = $productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray();
         $last_names = array_column($a, 'attribute_value_id');
-        print_r($productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray());
+        print_r(array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'));
         exit;*/
         return view($this->viewPath . 'edit', $response);
     }

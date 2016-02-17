@@ -10,6 +10,7 @@ use App\Models\Product\ImageModel;
 use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\Catalog\AttributeValueModel;
+use App\Models\Catalog\FeatureValueModel;
 use App\Models\Product\SupplierModel;
 use Illuminate\Support\Facades\DB;
 use Tool;
@@ -199,14 +200,14 @@ class ProductModel extends BaseModel
                             foreach($feature_value as $value){
                                 $featureArray['feature_value'] = $value;
                                 $productFeatureValueModel = new ProductFeatureValueModel();
-                                //$featureModel = new FeatureValueModel();
-                                //$value_id = $featureModel->where('name','=',$value)->where('feature_id','=',$feature_id)->get()->toArray();
-                                //print_r($value_id[0]['id']);exit;
-                                //$featureArray['feature_value_id'] = $value_id[0]['id'];
+                                $featureModel = new FeatureValueModel();
+                                $value_id = $featureModel->where('name','=',$value)->where('feature_id','=',$feature_id)->get()->toArray();         
+                                $featureArray['feature_value_id'] = $value_id[0]['id'];
                                 $productFeatureValueModel->create($featureArray);                        
                             }                        
                         }else{
                             $featureArray['feature_value'] = $feature_value;
+                            $featureArray['feature_value_id'] = 0;
                             $productFeatureValueModel = new ProductFeatureValueModel();
                             $productFeatureValueModel->create($featureArray);
                         }
@@ -225,7 +226,6 @@ class ProductModel extends BaseModel
      * @param $id int, $data array, $files obj
      */
     public function updateProduct($data,$files = null){
-        //$product = $this->find($id);
         $spu_id = $this->spu_id;
         DB::beginTransaction();
         try {     
@@ -260,10 +260,14 @@ class ProductModel extends BaseModel
                         foreach($feature_values as $feature_value){
                             $tmp['feature_value'] = $feature_value;
                             $model = new ProductFeatureValueModel();
+                            $featureModel = new FeatureValueModel();
+                            $value_id = $featureModel->where('name','=',$feature_value)->where('feature_id','=',$feature_id)->get()->toArray();         
+                            $tmp['feature_value_id'] = $value_id[0]['id'];
                             $model->create($tmp);
                         }                    
                     }else{
                         $tmp['feature_value'] = $feature_values;
+                        $tmp['feature_value_id'] = 0;
                         $model = new ProductFeatureValueModel();
                         $model->create($tmp);
                     }
@@ -285,7 +289,7 @@ class ProductModel extends BaseModel
                 }
                 $data['default_image'] = $default_image_id;
             } 
-                    
+
             //更新基础信息
             $this->update($data);
         }catch (Exception $e) {
@@ -309,7 +313,6 @@ class ProductModel extends BaseModel
                 $brr[$attribute->attribute_id][] = $attribute->attribute_value;
             } 
             $brr = array_values($brr);
-            //$result = $this->createDikaer($brr);
             $result = Tool::createDikaer($brr);
             $model = $productModel->model;
             foreach($result as $_result){

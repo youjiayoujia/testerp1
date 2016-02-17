@@ -11,15 +11,9 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
-use App\Models\Logistics\CodeModel as CodeModel;
-use App\Models\LogisticsModel as LogisticsModel;
-use Input;
-use App;
-use Redirect;
+use App\Models\Logistics\CodeModel;
+use App\Models\LogisticsModel;
 use DB;
-use Excel;
-use Request;
-use Config;
 
 
 class CodeController extends Controller
@@ -59,7 +53,7 @@ class CodeController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'logisticses'=>LogisticsModel::all(),``
+            'logisticses'=>LogisticsModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -72,13 +66,8 @@ class CodeController extends Controller
     public function batchAddTrCode($logistic_id)
     {
         $logistic = LogisticsModel::find($logistic_id);
-        $meta = [
-            "mainIndex" => "http://www.chenxuewenerp.com/logisticsCode",
-            "mainTitle" => "物流方式列表",
-            "title" => "导入号码池",
-        ];
         $response = [
-            'metas' => $meta,
+            'metas' => $this->metas(__FUNCTION__, '导入号码池'),
             'logistic' => $logistic,
         ];
         return view($this->viewPath . 'batchadd', $response);
@@ -90,24 +79,24 @@ class CodeController extends Controller
      */
     public function batchAddTrCodeFn()
     {
-
-        $logistic_id = Input::get('logistic_id', '');
-        if(!$logistic_id){
-            return Redirect::to('logistics')->with('alert', $this->alert('danger', '未选择物流方式！'));
+        if(request()->has('logistic_id')){
+            $logistic_id = request()->input('logistic_id');
+        }else{
+            return redirect('batchAddTrCode')->with('alert', $this->alert('danger', $this->mainTitle . '未选择物流方式.'));
         }
 
         // 保存上传文件
-        if (Input::hasFile('trackingnos')) {
-            if (Input::file('trackingnos')->isValid()) {
-                $file = Input::file('trackingnos');
+        if (request()->hasFile('trackingnos')) {
+            if (request()->file('trackingnos')->isValid()) {
+                $file = request()->file('trackingnos');
                 $destinationPath = public_path() . '/uploads/logistics/codes';
                 $fileName = date("Y-m-d", time()) . '-' . rand(100, 999) . '-' . $file->getClientOriginalName();
-                Input::file('trackingnos')->move($destinationPath, $fileName);
+                request()->file('trackingnos')->move($destinationPath, $fileName);
             }else{
-                return Redirect::to('batchAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger', '文件非法！'));
+                return redirect('batchAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger',  '文件非法'));
             }
         }else{
-            return Redirect::to('batchAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger', '未上传任何文件！'));
+            return redirect('batchAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger',  '未上传任何文件'));
         }
 
         //写操作
@@ -115,8 +104,7 @@ class CodeController extends Controller
         $successNumber = 0;
         $repeatNumber = 0;
         $repeatCodes = [];
-        $baseSql = "INSERT INTO logistics_codes (logistics_id,code,created_at,updated_at) VALUES";
-        $valuesStr = "";
+
         if (($handle = fopen($destinationPath.'/'.$fileName, "r")) !== FALSE) {
             $created_at = null;
             while (($data = fgetcsv($handle, ",")) !== FALSE) {
@@ -124,16 +112,14 @@ class CodeController extends Controller
                     $repeatCodes[] = $data[0];
                     $repeatNumber++;
                 }else{
-                    $valuesStr .= "(".$logistic_id.",'".$data[0]."',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),";
+                    $nowTime = date('Y-m-d H:i:s',time());
+                    $data = ['logistics_id'=>$logistic_id, 'code'=>$data[0], 'status'=>"N", 'created_at'=>$nowTime, 'updated_at'=>$nowTime];
+                    //插入
+                    $this->model->create($data);
                     $successNumber++;
                 }
             }
             fclose($handle);
-            if($valuesStr != ""){
-                $sql = $baseSql.$valuesStr;
-                $sql = substr($sql,0,strlen($sql)-1); //去除最后一个value的逗号
-                DB::statement($sql);
-            }
 
             $totalNumber = $successNumber + $repeatNumber;
             $content = "本次共选择导入".$totalNumber."个跟踪号,成功导入".$successNumber."个,有".$repeatNumber."个重复未导入,如下：";
@@ -143,9 +129,9 @@ class CodeController extends Controller
                 }
                 $content = substr($content,0,strlen($content)-1);
             }
-            return Redirect::to('logisticsCode')->with('alert', $this->alert('success', $content));
+            return redirect('logisticsCode')->with('alert', $this->alert('success', $content));
         }else{
-            return Redirect::to('logisticsCode')->with('alert', $this->alert('danger', '上传失败！'));
+            return redirect('logisticsCode')->with('alert', $this->alert('danger', '上传失败！'));
         }
     }
 
@@ -157,13 +143,8 @@ class CodeController extends Controller
     public function scanAddTrCode($logistic_id)
     {
         $logistic = LogisticsModel::find($logistic_id);
-        $meta = [
-            "mainIndex" => "http://www.chenxuewenerp.com/logisticsCode",
-            "mainTitle" => "物流方式列表",
-            "title" => "扫描-号码池",
-        ];
         $response = [
-            'metas' => $meta,
+            'metas' => $this->metas(__FUNCTION__, '扫描-号码池'),
             'logistic' => $logistic,
         ];
         return view($this->viewPath . 'scanadd', $response);
@@ -175,11 +156,17 @@ class CodeController extends Controller
      */
     public function scanAddTrCodeFn()
     {
-        $logistic_id = Input::get('logistic_id', '');
-        if(!$logistic_id){
-            return Redirect::to('logistics')->with('alert', $this->alert('danger', '未选择物流方式！'));
+        if(request()->has('logistic_id')){
+            $logistic_id = request()->input('logistic_id');
+        }else{
+            return redirect('batchAddTrCode')->with('alert', $this->alert('danger', $this->mainTitle . '未选择物流方式.'));
         }
-        $input_codes = Input::get('codes');
+
+        if(request()->has('codes')){
+            $input_codes = request()->input('codes');
+        }else{
+            $input_codes = "";
+        }
 
         if($input_codes){
 
@@ -187,26 +174,17 @@ class CodeController extends Controller
             $successNumber = 0;
             $repeatNumber = 0;
             $repeatCodes = [];
-            $baseSql = "INSERT INTO logistics_codes (logistics_id,code,created_at,updated_at) VALUES";
-            $valuesStr = "";
 
             foreach($input_codes as $input_code){
                 if(in_array($input_code, $codes)){
                     $repeatCodes[] = $input_code;
                     $repeatNumber++;
                 }else{
-                    $valuesStr .= "(".$logistic_id.",'".$input_code."',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),";
+                    $nowTime = date('Y-m-d H:i:s',time());
+                    $data = ['logistics_id'=>$logistic_id, 'code'=>$input_code, 'status'=>"N", 'created_at'=>$nowTime, 'updated_at'=>$nowTime];
+                    $this->model->create($data);
                     $successNumber++;
                 }
-            }
-
-            if($valuesStr != ""){
-                $sql = $baseSql.$valuesStr;
-                $sql = substr($sql,0,strlen($sql)-1); //去除最后一个value的逗号
-                $sql = stripslashes($sql);  //去除\斜杠导致的数据库报错
-                DB::statement($sql);
-            }else{
-                return Redirect::to('scanAddTrCode')->with('alert', $this->alert('danger', '录入失败！'));
             }
 
             $totalNumber = $successNumber + $repeatNumber;
@@ -217,11 +195,10 @@ class CodeController extends Controller
                 }
                 $content = substr($content,0,strlen($content)-1);
             }
-
-            return Redirect::to('logisticsCode')->with('alert', $this->alert('success', $content));
+            return redirect('logisticsCode')->with('alert', $this->alert('success', $content));
 
         }else{
-            return Redirect::to('scanAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger', '未输入任何物流号！'));
+            return redirect('scanAddTrCode/'.$logistic_id)->with('alert', $this->alert('success',  '未输入任何物流号！'));
         }
     }
 }

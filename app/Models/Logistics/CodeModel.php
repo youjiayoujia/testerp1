@@ -21,7 +21,6 @@ class CodeModel extends BaseModel
         'code',
         'package_id',
         'status',
-        'used_at'
     ];
 
     public $searchFields = ['logistics_id', 'code', 'status', 'package_id'];

@@ -14,7 +14,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Logistics\ZoneModel;
 use App\Models\LogisticsModel;
 use App\Models\CountryModel;
-use DB;
 
 class ZoneController extends Controller
 {
@@ -35,8 +34,9 @@ class ZoneController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses'=>LogisticsModel::all(),
-            'countries'=>CountryModel::select('id', 'name')->orderBy('abbreviation', 'asc')->get(),
+            'countries'=>CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
         ];
+
 
         return view($this->viewPath . 'create', $response);
     }
@@ -57,7 +57,7 @@ class ZoneController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'countries'=>CountryModel::select('id', 'name')->orderBy('abbreviation', 'asc')->get(),
+            'countries'=>CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
             'selectedCountries'=>$selectedCountries,
         ];
         return view($this->viewPath . 'edit', $response);

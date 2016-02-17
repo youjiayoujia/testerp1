@@ -60,7 +60,7 @@ class CatalogController extends Controller
         $extra['Attributes'] = request()->input('attributes');
         $extra['features'] = request()->input('features');
         //更新品类信息
-        $this->model->updateCatalog($catalogModel,$data,$extra);
+        $catalogModel->updateCatalog($data,$extra);
         return redirect($this->mainIndex);
     }
 
@@ -72,7 +72,8 @@ class CatalogController extends Controller
      */
     public function destroy($id)
     {
-        $this->model->destoryCatalog($id);
+        $catalogModel = $this->model->find($id);
+        $catalogModel->destoryCatalog();
         return redirect(route('catalog.index'));
     }
 }

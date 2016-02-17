@@ -87,6 +87,7 @@
         <label for="country_id" class="control-label">已选国家</label>
         <select class="form-control" id="dselectCountry" multiple  style="height:600px;width:400px;">
 
+
         </select>
     </div>
     <div style="display:none">
@@ -146,12 +147,12 @@
     }
 
     function addCountry(that){
-        var countryHtml = '<option class="form-control thecountry" value="' + $(that).html() + '" onclick="dselectCountry( this )">' + $(that).html() + '</option>';
+        var countryHtml = '<option class="form-control thecountry" value="' + $(that).html() + '" onclick="deleteCountry( this )">' + $(that).html() + '</option>';
         $("#dselectCountry").append(countryHtml);
         getPostCountry();
     }
 
-    function dselectCountry(that){
+    function deleteCountry(that){
         $(that).remove();
         getPostCountry();
     }

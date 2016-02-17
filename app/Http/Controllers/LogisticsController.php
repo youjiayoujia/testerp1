@@ -24,16 +24,25 @@ class LogisticsController extends Controller
         $this->viewPath = 'logistics.';
     }
 
+    /**
+     * 新建
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses'=>$this->getWarehouses(),
-            'suppliers'=>$this->getSuppliers(),
+            'warehouses'=>Warehouse::all(),
+            'suppliers'=>Supplier::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
 
+    /**
+     * 编辑
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
     public function edit($id)
     {
         $model = $this->model->find($id);
@@ -43,22 +52,15 @@ class LogisticsController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'warehouses'=>$this->getWarehouses(),
-            'suppliers'=>$this->getSuppliers(),
+            'warehouses'=>Warehouse::all(),
+            'suppliers'=>Supplier::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
 
-    public function getSuppliers()
-    {
-        return Supplier::all();
-    }
-
-    public function getWarehouses()
-    {
-        return Warehouse::all();
-    }
-
+    /**
+     *
+     */
     public function zone()
     {
         $id = $_GET['id'];

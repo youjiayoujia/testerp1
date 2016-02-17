@@ -21,15 +21,6 @@
         </select>
     </div>
     <div class="form-group col-lg-4">
-        <label for="country_id" class="control-label">国家</label>
-        <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="country_id" class="form-control" id="country_id">
-            <option value="{{$model->country_id}}">
-                {{$model->country->name}}
-            </option>
-        </select>
-    </div>
-    <div class="form-group col-lg-4">
         <label for="shipping_id" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="shipping_id" placeholder="种类" name="shipping_id" value="{{ old('shipping_id') ? old('shipping_id') : $model->shipping_id }}" readonly>
@@ -79,6 +70,28 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="discount" placeholder="最后折扣(八折录入0.8)" name='discount' value="{{ old('discount') ? old('discount') : $model->discount }}">
     </div>
+    <div class="form-group col-lg-4">
+        <label for="country_id" class="control-label">已有国家</label>
+        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <select name="country_id" class="form-control" multiple style="height:600px;width:400px;">
+            @foreach($countries as $country)
+                <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
+                    {{ $country->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group col-lg-4" style="margin-left: 100px;">
+        <label for="country_id" class="control-label">已选国家</label>
+        <select class="form-control" id="dselectCountry" multiple  style="height:600px;width:400px;">
+            @foreach($selectedCountries as $selectedCountry)
+                <option class="form-control thecountry" value="{{ $selectedCountry  }}" onclick="deleteCountry( this )">{{ $selectedCountry }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div style="display:none">
+        <textarea class="form-control" rows="3" type="hidden" id="country_id" placeholder="国家" name='country_id' readonly>{{ old('country_id') }}</textarea>
+    </div>
 @stop
 <script type="text/javascript">
     $(document).ready(function() {
@@ -90,5 +103,26 @@
             $("div#packet").show();
             $("div#express").hide();
         }
+        getPostCountry();
     });
+
+    function getPostCountry(){
+        var selectCountry = "";
+        $(".thecountry").each(function(){
+            selectCountry += $.trim($(this).html()) + ",";
+        });
+        selectCountry=selectCountry.substring(0,selectCountry.length-1);
+        $("#country_id").html(selectCountry);
+    }
+
+    function addCountry(that){
+        var countryHtml = '<option class="form-control thecountry" value="' + $(that).html() + '" onclick="deleteCountry( this )">' + $(that).html() + '</option>';
+        $("#dselectCountry").append(countryHtml);
+        getPostCountry();
+    }
+
+    function deleteCountry(that){
+        $(that).remove();
+        getPostCountry();
+    }
 </script>

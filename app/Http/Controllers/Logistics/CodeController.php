@@ -22,28 +22,6 @@ use Request;
 use Config;
 
 
-class codesImport extends \Maatwebsite\Excel\Files\ExcelFile {
-
-    protected $delimiter  = ',';
-    protected $enclosure  = '"';
-    protected $lineEnding = '\r\n';
-
-    public function getFile()
-    {
-        $file = Input::file('report');
-        $filename = $this->doSomethingLikeUpload($file);
-        return $filename;
-    }
-
-    public function getFilters()
-    {
-        return [
-            'chunk'
-        ];
-    }
-
-}
-
 class CodeController extends Controller
 {
     public function __construct(CodeModel $channel)
@@ -54,16 +32,24 @@ class CodeController extends Controller
         $this->viewPath = 'logistics.code.';
     }
 
-
+    /**
+     * 新建
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function create()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'logisticses'=>$this->getLogistics(),
+            'logisticses'=>LogisticsModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
 
+    /**
+     * 编辑
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function edit($id)
     {
         $model = $this->model->find($id);
@@ -73,17 +59,16 @@ class CodeController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'logisticses'=>$this->getLogistics(),
+            'logisticses'=>LogisticsModel::all(),``
         ];
         return view($this->viewPath . 'edit', $response);
     }
 
-    public function getLogistics(){
-
-        return LogisticsModel::all();
-    }
-
-    //导入
+    /**
+     * 批量上传物流号页面
+     * @param $logistic_id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function batchAddTrCode($logistic_id)
     {
         $logistic = LogisticsModel::find($logistic_id);
@@ -99,10 +84,12 @@ class CodeController extends Controller
         return view($this->viewPath . 'batchadd', $response);
     }
 
+    /**
+     * 处理批量上传物流号程序
+     * @return mixed
+     */
     public function batchAddTrCodeFn()
     {
-        //public_path();
-        //app_path();
 
         $logistic_id = Input::get('logistic_id', '');
         if(!$logistic_id){
@@ -125,7 +112,6 @@ class CodeController extends Controller
 
         //写操作
         $codes = DB::table('logistics_codes')->lists('code');  //获取已经取得的物流号，用于后面的筛选
-
         $successNumber = 0;
         $repeatNumber = 0;
         $repeatCodes = [];
@@ -163,7 +149,11 @@ class CodeController extends Controller
         }
     }
 
-    //扫描
+    /**
+     * 扫描录入物流号页面
+     * @param $logistic_id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function scanAddTrCode($logistic_id)
     {
         $logistic = LogisticsModel::find($logistic_id);
@@ -179,7 +169,10 @@ class CodeController extends Controller
         return view($this->viewPath . 'scanadd', $response);
     }
 
-    //扫描录入
+    /**
+     * 扫描录入处理方法
+     * @return mixed
+     */
     public function scanAddTrCodeFn()
     {
         $logistic_id = Input::get('logistic_id', '');
@@ -230,15 +223,5 @@ class CodeController extends Controller
         }else{
             return Redirect::to('scanAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger', '未输入任何物流号！'));
         }
-    }
-
-    public function getMysqlConnnection()
-    {
-        $database_host = Config::get('database.connections.mysql.host');
-        $database_user = Config::get('database.connections.mysql.username');
-        $database_password = Config::get('database.connections.mysql.password');
-        $database_name = 'erp';
-        $connection = mysqli_connect($database_host,$database_user,$database_password,$database_name);
-        return $connection;
     }
 }

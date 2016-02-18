@@ -28,9 +28,9 @@ class CatalogModel extends BaseModel
         return $this->hasMany('App\Models\Catalog\SetModel','catalog_id');
     }
 
-    public function attributes()
+    public function variations()
     {
-        return $this->hasMany('App\Models\Catalog\AttributeModel','catalog_id');
+        return $this->hasMany('App\Models\Catalog\VariationModel','catalog_id');
     }
 
     public function features()
@@ -106,12 +106,10 @@ class CatalogModel extends BaseModel
 
     public function destoryCatalog()
     {
-        $extras = ['attributes','sets','features'];
-        //echo '<pre>';
-        //print_r($this->attributes());exit;
+        $extras = ['variations','sets','features'];
         //删除对应的属性
         foreach ($extras as $models) {
-            foreach ($this->$models() as $model) {
+            foreach ($this->$models as $model) {
                 foreach ($model->values as $value) {
                     $value->delete();
                 }

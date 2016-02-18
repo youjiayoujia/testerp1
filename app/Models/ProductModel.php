@@ -139,7 +139,7 @@ class ProductModel extends BaseModel
     public function getCatalogProperty($catalog_id)
     {
         $catalog = CatalogModel::find($catalog_id);
-        $set = ['Attributes', 'features'];
+        $set = ['variations', 'features'];
         $data = [];
         $modelSet = $catalog->getModels();
         foreach ($set as $models) {
@@ -149,17 +149,19 @@ class ProductModel extends BaseModel
                 if ($models == 'features') {
                     $data[$models][$i]['type'] = $model->type;
                     $data[$models][$i]['feature_id'] = $model->id;
-                }
+                }echo '<pre>';print_r($model);exit;
                 foreach ($model->values as $key => $value) {
-                    $data[$models][$i]['value'][] = $value->name;
+                    $data[$models][$i]['value'][] = $value->name;echo 11;exit;
                 }
                 $i++;
             }
         }
+        echo '<pre>';print_r($data);exit;
         $data['models'] = $modelSet;
         //修改key值
-        $data['attributes'] = $data['Attributes'];
-        unset($data['Attributes']);
+        //$data['attributes'] = $data['variations'];
+        //unset($data['Attributes']);
+
         return $data;
     }
 

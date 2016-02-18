@@ -31,7 +31,7 @@
     <div class="panel panel-info">
         <div class="panel-heading">Attribute属性</div>      
         <div class="panel-body">
-            @foreach($model->attributes as $key=>$attr)
+            @foreach($model->variations as $key=>$attr)
                 <div class="form-group form-inline attrs" id='attrkey_0'>
                     属性名：
                     <div class="form-group">               

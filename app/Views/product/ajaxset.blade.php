@@ -1,3 +1,4 @@
+<?php print_r($data['attributes']);exit; ?>
 <div class="panel panel-info adjustmargin">
     <div class="panel-heading">勾选model及对应attribute属性:</div>
     @foreach($data['models'] as $model)
@@ -7,7 +8,7 @@
                     <input type='checkbox' id="{{$model}}" onclick="quanxuan('{{$model}}')" name='modelSet[{{$model}}][model]' value='{{$model}}'>{{$model}}
                 </label>
             </div>
-            @foreach($data['attributes'] as $key=>$getattr)        
+            @foreach($data['variations'] as $key=>$getattr)        
                 <div class="checkbox col-md-2 innercheckboxs">{{$getattr['name']}}:
                     @foreach($getattr['value'] as $innervalue)
                         <label>

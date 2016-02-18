@@ -19,7 +19,7 @@
                             {{$product->model}}
                         </label>
                     </div>
-                    @foreach($product->catalog->attributes as $key=>$getattr)        
+                    @foreach($product->catalog->variations as $key=>$getattr)        
                         <div class="checkbox col-md-2 innercheckboxs">{{$getattr->name}}:
                             @foreach($getattr->values as $innervalue)
                                 <label>

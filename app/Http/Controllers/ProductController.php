@@ -51,7 +51,6 @@ class ProductController extends Controller
         return redirect($this->mainIndex);
     }
 
-    //todo: 在参数内实力化
     public function edit($id)
     {
         $product = $this->model->find($id);

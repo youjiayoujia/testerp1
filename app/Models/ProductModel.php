@@ -208,7 +208,7 @@ class ProductModel extends BaseModel
                         $attributeModel = $catalog->Attributes()->where('name', '=', $attribute)->get()->first();
                         foreach ($attributeValues as $attributeValue) {
                             $attributeValueModel = $attributeModel->values()->where('name', '=',
-                                $attributeValue)->get()->first();
+                            $attributeValue)->get()->first();
                             $attributeArray['attribute_id'] = $attributeModel->id;
                             $attributeArray['attribute_value'] = $attributeValueModel->name;
                             $attributeArray['attribute_value_id'] = $attributeValueModel->id;
@@ -232,7 +232,7 @@ class ProductModel extends BaseModel
                                 $productFeatureValueModel = new ProductFeatureValueModel();
                                 $featureModel = new FeatureValueModel();
                                 $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',
-                                    $feature_id)->get()->toArray();
+                                $feature_id)->get()->toArray();
                                 $featureArray['feature_value_id'] = $value_id[0]['id'];
                                 $productFeatureValueModel->create($featureArray);
                             }

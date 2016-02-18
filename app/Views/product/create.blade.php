@@ -126,10 +126,6 @@
 
 @section('pageJs')
     <script type="text/javascript">
-    $(document).ready(function(){
-        //alert(23);
-    })
-
         $(document).on('click','.quanxuan',function(){
             var model = $(this).val();
             if($("input[name^='modelSet["+model+"]'").attr("checked")=='checked'){

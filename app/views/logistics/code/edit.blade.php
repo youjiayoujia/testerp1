@@ -7,7 +7,7 @@
 @section('formAttributes') name='creator'@stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
         <label for="logistics_id">物流方式</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="logistics_id" class="form-control">
@@ -18,16 +18,20 @@
             @endforeach
         </select>
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
         <label for="code" class="control-label">跟踪号</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="code" placeholder="跟踪号" name='code' value="{{ old('code') ? old('code') : $model->code }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
         <label for="package_id" class="control-label">包裹ID</label>
         <input class="form-control" id="package_id" placeholder="包裹ID" name='package_id' value="{{ old('package_id') ? old('package_id') : $model->package_id }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
+        <label for="used_at" class="control-label">使用时间</label>
+        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') ? old('used_at') : $model->used_at }}">
+    </div>
+    <div class="form-group col-lg-3">
         <label for="status" class="control-label">状态</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
@@ -40,10 +44,6 @@
                 <input type="radio" name="status" value="N" {{ $model->status == 'N' ? 'checked' : '' }}>未启用
             </label>
         </div>
-    </div>
-    <div class="form-group col-lg-4">
-        <label for="used_at" class="control-label">使用时间</label>
-        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') ? old('used_at') : $model->used_at }}">
     </div>
 @stop
 <script type='text/javascript'>

@@ -6,7 +6,7 @@
 @section('formAction') {{ route('logisticsCode.store') }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
         <label for="logistics_id">物流方式</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="logistics_id" class="form-control" id="logistics_id">
@@ -17,16 +17,21 @@
             @endforeach
         </select>
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
         <label for="code" class="control-label">跟踪号</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="code" placeholder="跟踪号" name='code' value="{{ old('code') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-3">
         <label for="package_id" class="control-label">包裹ID</label>
         <input class="form-control" id="package_id" placeholder="包裹ID" name='package_id' value="{{ old('package_id') }}" disabled>
     </div>
-    <div class="form-group col-lg-4">
+
+    <div class="form-group col-lg-3">
+        <label for="used_at" class="control-label">使用时间</label>
+        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') }}" disabled>
+    </div>
+    <div class="form-group col-lg-3">
         <label for="status" class="control-label">状态</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
@@ -39,10 +44,6 @@
                 <input type="radio" name="status" value="N" checked>未启用
             </label>
         </div>
-    </div>
-    <div class="form-group col-lg-4">
-        <label for="used_at" class="control-label">使用时间</label>
-        <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') }}" disabled>
     </div>
 @stop
 <script type='text/javascript'>

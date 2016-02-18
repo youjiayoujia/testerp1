@@ -9,16 +9,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\LogisticsModel;
-use App\Models\WarehouseModel as Warehouse;
-use App\Models\Logistics\SupplierModel as Supplier;
+use App\Models\WarehouseModel;
+use App\Models\Logistics\SupplierModel;
 
 
 class LogisticsController extends Controller
 {
 
-    public function __construct(LogisticsModel $channel)
+    public function __construct(LogisticsModel $logisticsModel)
     {
-        $this->model = $channel;
+        $this->model = $logisticsModel;
         $this->mainIndex = route('logistics.index');
         $this->mainTitle = '物流';
         $this->viewPath = 'logistics.';
@@ -32,8 +32,8 @@ class LogisticsController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses'=>Warehouse::all(),
-            'suppliers'=>Supplier::all(),
+            'warehouses'=>WarehouseModel::all(),
+            'suppliers'=>SupplierModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -45,27 +45,27 @@ class LogisticsController extends Controller
      */
     public function edit($id)
     {
-        $model = $this->model->find($id);
-        if (!$model) {
+        $logistic = $this->model->find($id);
+        if (!$logistic) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'warehouses'=>Warehouse::all(),
-            'suppliers'=>Supplier::all(),
+            'model' => $logistic,
+            'warehouses'=>WarehouseModel::all(),
+            'suppliers'=>SupplierModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
 
     /**
-     *
+     *ajax获取zone
      */
     public function zone()
     {
-        $id = $_GET['id'];
+        $id = request()->input("id");
         $buf =$this->model->find($id)->species;
-        echo json_encode($buf);
+        return json_encode($buf);
     }
 
 }

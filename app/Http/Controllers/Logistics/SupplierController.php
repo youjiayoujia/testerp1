@@ -11,7 +11,7 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
-use App\Models\Logistics\SupplierModel as SupplierModel;
+use App\Models\Logistics\SupplierModel;
 
 class SupplierController extends Controller
 {

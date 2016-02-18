@@ -36,8 +36,6 @@ class ZoneController extends Controller
             'logisticses'=>LogisticsModel::all(),
             'countries'=>CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
         ];
-
-
         return view($this->viewPath . 'create', $response);
     }
 
@@ -70,10 +68,10 @@ class ZoneController extends Controller
      */
     public function countExpress($id)
     {
-        $obj = $this->model->find($id);
+        $zone = $this->model->find($id);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'zone' => $obj,
+            'zone' => $zone,
             'logistics' => LogisticsModel::all(),
             'country' => CountryModel::all(),
         ];
@@ -87,10 +85,10 @@ class ZoneController extends Controller
      */
     public function countPacket($id)
     {
-        $obj = $this->model->find($id);
+        $zone = $this->model->find($id);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'zone' => $obj,
+            'zone' => $zone,
             'logistics' => LogisticsModel::all(),
             'country' => CountryModel::all(),
         ];
@@ -102,9 +100,9 @@ class ZoneController extends Controller
      */
     public function zoneShipping()
     {
-        $id = $_GET['id'];
+        $id = request()->input("id");
         $buf = $this->model->find($id)->shipping_id;
-        echo json_encode($buf);
+        return json_encode($buf);
     }
 
 }

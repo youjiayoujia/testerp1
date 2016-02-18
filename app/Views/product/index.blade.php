@@ -84,7 +84,12 @@
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        $(".examine_"+product_id).text("已审核");
+                        if(result==1){
+                           $(".examine_"+product_id).text("已审核"); 
+                       }else{
+                            alert("审核失败");
+                       }
+                        
                     }                  
                 })
             }

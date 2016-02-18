@@ -29,7 +29,6 @@
     <hr width="98%" style="border:0.5px solid #d9edf7">
     @endforeach
 </div>
-
 <div class="form-group third">
     <label for='set'>feature属性:</label>
     <div class="panel panel-info">

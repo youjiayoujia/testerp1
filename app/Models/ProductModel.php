@@ -374,4 +374,14 @@ class ProductModel extends BaseModel
         }
     }
 
+    public function destoryProduct()
+    {
+        //删除product对应的item
+        foreach ($this->item as $item) {
+            $item->delete();
+        }
+        //删除product
+        $this->delete();
+    }
+
 }

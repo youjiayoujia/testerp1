@@ -4,7 +4,7 @@
 @section('formBody')
     <div class="form-group">
         <label for="catalog_id">分类</label>
-        <select id="catalog_id" class="form-control" name="catalog_id">
+        <select id="catalog_id" class="form-control" name="catalog_id" disabled="disabled">
             @foreach($catalogs as $_catalogs)
                 <option value="{{ $_catalogs->id }}" {{ $_catalogs->id == $product->catalog_id ? 'selected' : '' }}>{{ $_catalogs->name }}</option>
             @endforeach
@@ -172,66 +172,4 @@
     </div>  
     <input type='hidden' value='PUT' name="_method">
 
-@stop
-@section('pageJs')
-<script type="text/javascript">
-    $(document).on('change','#catalog_id',function(){
-        var catalog_id = $("#catalog_id").val();
-        var product_id = {{$product->id}};
-        $.ajax({
-            url: "../getCatalogProperty",
-            data:{catalog_id:catalog_id,product_id:product_id},
-            dataType: "json",
-            type:'get',
-            success:function(result){
-                var html = '<div class="panel panel-info adjustmargin">';
-                html += '<div class="panel-heading ">选择attribute属性:</div>';
-
-                html += '<div class="checkbox panel-body "><div class="checkbox col-md-2">';
-                html += '<label>{{$product->model}}</label></div>';
-                for(k=0;k<result['attributes'].length;k++){
-                    html+= '<div class="checkbox col-md-2">'+result['attributes'][k]['name']+':';
-                    for(m=0;m<result['attributes'][k]['value'].length;m++){
-                        html+= '<label style="padding-left:25px"><input type="checkbox" name="" value="'+result["attributes"][k]["value"][m]+'">'+result["attributes"][k]["value"][m]+'</label>';
-                    }
-                    html+='</div>';
-                }
-                html += '</div>';
-                html += '<div style="margin-left:25px;margin-bottom:15px"><label for="color">上传图片：</label><div class="upimage"><input name="image0" type="file"/></div><div class="upimage"><input name="image1" type="file"/></div><div class="upimage"><input name="image2" type="file"/></div><div class="upimage"><input name="image3" type="file"/></div><div class="upimage"><input name="image4" type="file"/></div><div class="upimage"><input name="image5" type="file"/></div>';
-                html += '</div><hr width="98%" style="border:0.5px solid #d9edf7">';
-
-                html +='</div>';
-                html +='<div class="form-group third"><label for="set">feature属性:</label><div class="panel panel-info"><div class="checkbox panel-body ">';
-                for(var n=0;n<result['features'].length;n++){
-                    switch(result['features'][n]['type'])
-                    {
-                    case 1:
-                        html += '<div>';
-                        html+='<label><input type="checkbox" name="featureinput['+result['features'][n]['feature_id']+']" value="'+result['features'][n]['name']+'">'+result['features'][n]['name']+'</label>';
-                        html +='</div>';
-                        break;
-                    case 2:
-                        html +='<div class="radio">'+result['features'][n]['name'];
-                        for(var p=0;p<result['features'][n]['value'].length;p++){
-                            html+='<label style="padding-left:25px"><input type="radio" name="featureradio['+result['features'][n]['feature_id']+'][]" value="'+result['features'][n]['value'][p]+'">'+result['features'][n]['value'][p]+'</label>';
-                        }
-                        html +='</div>';                         
-                        break;
-                    case 3:
-                        html +='<div class="checkbox">'+result['features'][n]['name'];
-                        for(var p=0;p<result['features'][n]['value'].length;p++){
-                            html+='<label style="padding-left:25px"><input type="checkbox" name="featurecheckbox['+result['features'][n]['feature_id']+'][]" value="'+result['features'][n]['value'][p]+'">'+result['features'][n]['value'][p]+'</label>';
-                        }
-                        html +='</div>';
-                        break;              
-                    }
-                }
-                html +='</div>';
-                html +='</div>';
-                html +='</div>';
-                $(".ajaxinsert").html(html);
-            }
-        });       
-    });
-</script>
 @stop

@@ -96,17 +96,14 @@ class ProductController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function destroy($id) //todo:统一风格
+    public function destroy($id) 
     {
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        foreach ($model->item as $item) {
-            $item->delete();
-        }
+        $model->destoryProduct();
 
-        $model->destroy($id);
         return redirect($this->mainIndex);
     }
 
@@ -116,15 +113,15 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function getCatalogProperty() //todo:echo修改成return,get的获取方法改成post,用request获取数据
+    public function getCatalogProperty() 
     {
-        $catalog_id = $_GET['catalog_id'];
+        $catalog_id = request()->input('catalog_id');
         if($catalog_id==''){
-            echo json_encode(0);exit;
+            return 0;
         }
         $data = $this->model->getCatalogProperty($catalog_id);
 
-        echo view($this->viewPath . 'ajaxset',['data' => $data]);exit;
+        return view($this->viewPath . 'ajaxset',['data' => $data]);
 
     }
 
@@ -136,10 +133,12 @@ class ProductController extends Controller
      */
     public function examine()
     {
-        $product_ids = isset($_GET['product_ids'])?$_GET['product_ids']:'';
+        $product_ids = request()->input('product_ids');
         $product_id_arr = explode(',', $product_ids);
-        $this->model->createItem($product_id_arr);
-
-        echo json_encode(1);
+        if($this->model->createItem($product_id_arr)){
+            return 1;
+        }else{
+            return 0;
+        }
     }
 }

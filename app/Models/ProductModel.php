@@ -46,7 +46,6 @@ class ProductModel extends BaseModel
             'product_size' => 'required',
             'weight' => 'required|numeric',
             'upload_user' => 'required',
-            'catalog_id' => 'required',
         ]
     ];
 

@@ -66,12 +66,12 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="other_price" placeholder="其他费用" name='other_price' value="{{ old('other_price') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" style="clear: right;">
         <label for="discount" class="control-label">最后折扣</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="discount" placeholder="最后折扣(八折录入0.8)" name='discount' value="{{ old('discount') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-4" style="clear:left;">
         <label for="country_id" class="control-label">已有国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select name="country_id" class="form-control" multiple style="height:600px;width:400px;">
@@ -83,7 +83,7 @@
         </select>
     </div>
 
-    <div class="form-group col-lg-4" style="margin-left: 100px;">
+    <div class="form-group col-lg-4" style="">
         <label for="country_id" class="control-label">已选国家</label>
         <select class="form-control" id="dselectCountry" multiple  style="height:600px;width:400px;">
 

@@ -14,7 +14,7 @@ class CreateVariationValues extends Migration
     {
         Schema::create('variation_values', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('attribute_id')->comment('attribute主键')->default(0);
+            $table->integer('variation_id')->comment('variation主键')->default(0);
             $table->string('name')->comment('属性名')->default(NULL);
             $table->timestamps();
             $table->softDeletes();

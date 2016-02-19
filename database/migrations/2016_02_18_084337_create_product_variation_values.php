@@ -14,9 +14,9 @@ class CreateProductVariationValues extends Migration
     {
         Schema::create('product_variation_values', function (Blueprint $table) {
             $table->increments('id');
-            $table->tinyInteger('product_id')->comment('状态')->nullable()->default(0);
-            $table->string('attribute_id')->comment('属性id')->nullable()->default(NULL);
-            $table->string('attribute_value')->comment('属性值')->nullable()->default(NULL);
+            $table->Integer('product_id')->comment('产品id')->nullable()->default(0);
+            $table->string('variation_id')->comment('属性id')->nullable()->default(NULL);
+            $table->string('variation_value')->comment('属性值')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -10,7 +10,7 @@ namespace App\Http\Controllers;
 use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
-use App\Models\Product\ProductAttributeValueModel;
+use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
@@ -54,7 +54,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = $this->model->find($id);
-        $productAttributeValueModel = new ProductAttributeValueModel();
+        $ProductVariationValueModel = new ProductVariationValueModel();
         $ProductFeatureValueModel = new ProductFeatureValueModel();
         if (!$product) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -65,7 +65,7 @@ class ProductController extends Controller
             'product' => $product,
             'suppliers' => $this->supplier->all(),
             'features_input' => $ProductFeatureValueModel->where('spu_id',$product->spu_id)->where('feature_value_id',0)->get()->toArray(),
-            'attribute_value_id_arr' => array_column($productAttributeValueModel->where('product_id',$id)->get(['attribute_value_id'])->toArray(),'attribute_value_id'),
+            'attribute_value_id_arr' => array_column($ProductVariationValueModel->where('product_id',$id)->get(['variation_value_id'])->toArray(),'variation_value_id'),
             'features_value_id_arr' => array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'),
         ];
 
@@ -134,10 +134,12 @@ class ProductController extends Controller
     {
         $product_ids = request()->input('product_ids');
         $product_id_arr = explode(',', $product_ids);
-        if($this->model->createItem($product_id_arr)){
-            return 1;
-        }else{
-            return 0;
+        //创建item
+        foreach($product_id_arr as $product_id){
+            $model = $this->model->find($product_id);
+            $model->createItem();
         }
+
+        return 1;
     }
 }

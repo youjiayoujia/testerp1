@@ -12,9 +12,9 @@
         </div>
     </div>
     <div class="panel panel-info">
-        <div class="panel-heading">Attribute属性</i></div>
+        <div class="panel-heading">Variation属性</i></div>
         <div class="panel-body attributefirst">
-            <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加attribute</button>
+            <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加variation</button>
         </div>
     </div>
     <div class="panel panel-info">

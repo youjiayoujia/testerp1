@@ -7,7 +7,8 @@ use App\Models\CatalogModel;
 use App\Models\SpuModel;
 use App\Models\ItemModel;
 use App\Models\Product\ImageModel;
-use App\Models\Product\ProductAttributeValueModel;
+//use App\Models\Product\ProductAttributeValueModel;
+use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\Catalog\AttributeValueModel;
 use App\Models\Catalog\FeatureValueModel;
@@ -108,9 +109,9 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
-    public function productAttributeValue()
+    public function attributeValue()
     {
-        return $this->hasMany('App\Models\Product\ProductAttributeValueModel', 'product_id');
+        return $this->hasMany('App\Models\Product\ProductVariationValueModel', 'product_id');
     }
 
     public function item()
@@ -149,18 +150,14 @@ class ProductModel extends BaseModel
                 if ($models == 'features') {
                     $data[$models][$i]['type'] = $model->type;
                     $data[$models][$i]['feature_id'] = $model->id;
-                }echo '<pre>';print_r($model);exit;
+                }
                 foreach ($model->values as $key => $value) {
-                    $data[$models][$i]['value'][] = $value->name;echo 11;exit;
+                    $data[$models][$i]['value'][] = $value->name;
                 }
                 $i++;
             }
         }
-        echo '<pre>';print_r($data);exit;
         $data['models'] = $modelSet;
-        //修改key值
-        //$data['attributes'] = $data['variations'];
-        //unset($data['Attributes']);
 
         return $data;
     }
@@ -207,16 +204,15 @@ class ProductModel extends BaseModel
                 //插入产品attribute属性
                 if (array_key_exists('attributes', $model)) {
                     foreach ($model['attributes'] as $attribute => $attributeValues) {
-                        $attributeModel = $catalog->Attributes()->where('name', '=', $attribute)->get()->first();
+                        $attributeModel = $catalog->variations()->where('name', '=', $attribute)->get()->first();
                         foreach ($attributeValues as $attributeValue) {
-                            $attributeValueModel = $attributeModel->values()->where('name', '=',
-                            $attributeValue)->get()->first();
-                            $attributeArray['attribute_id'] = $attributeModel->id;
-                            $attributeArray['attribute_value'] = $attributeValueModel->name;
-                            $attributeArray['attribute_value_id'] = $attributeValueModel->id;
+                            $attributeValueModel = $attributeModel->values()->where('name', '=',$attributeValue)->get()->first();
+                            $attributeArray['variation_id'] = $attributeModel->id;
+                            $attributeArray['variation_value'] = $attributeValueModel->name;
+                            $attributeArray['variation_value_id'] = $attributeValueModel->id;
                             $attributeArray['product_id'] = $product->id;
-                            $productAttributeValueModel = new ProductAttributeValueModel();
-                            $productAttributeValueModel->create($attributeArray);
+                            $ProductVariationValueModel = new ProductVariationValueModel();
+                            $ProductVariationValueModel->create($attributeArray);
                         }
                     }
                 }
@@ -233,8 +229,7 @@ class ProductModel extends BaseModel
                                 $featureArray['feature_value'] = $value;
                                 $productFeatureValueModel = new ProductFeatureValueModel();
                                 $featureModel = new FeatureValueModel();
-                                $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',
-                                $feature_id)->get()->toArray();
+                                $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',$feature_id)->get()->toArray();
                                 $featureArray['feature_value_id'] = $value_id[0]['id'];
                                 $productFeatureValueModel->create($featureArray);
                             }
@@ -265,8 +260,8 @@ class ProductModel extends BaseModel
         try {
             //更新产品attribute属性
             if (array_key_exists('attributes', $data)) {
-                $productAttributeValueModel = new ProductAttributeValueModel();
-                $attributes = $productAttributeValueModel->where('product_id', $this->id)->delete();
+                $ProductVariationValueModel = new ProductVariationValueModel();
+                $attributes = $ProductVariationValueModel->where('product_id', $this->id)->delete();
                 foreach ($data['attributes'] as $attribute_id => $attribute_values) {
                     $tmp = [];
                     $tmp['product_id'] = $this->id;
@@ -275,10 +270,9 @@ class ProductModel extends BaseModel
 
                     foreach ($attribute_values as $attribute_value) {
                         $tmp['attribute_value'] = $attribute_value;
-                        $attribute_value_id = $attributeValueModel->where('name',
-                            $attribute_value)->where('attribute_id', $attribute_id)->get()->toArray();
-                        $tmp['attribute_value_id'] = $attribute_value_id[0]['id'];
-                        $model = new ProductAttributeValueModel();
+                        $attribute_value_id = $attributeValueModel->where('name',$attribute_value)->where('variation_id', $attribute_id)->get()->toArray();
+                        $tmp['variation_value_id'] = $attribute_value_id[0]['id'];
+                        $model = new ProductVariationValueModel();
                         $model->create($tmp);
                     }
                 }
@@ -347,32 +341,33 @@ class ProductModel extends BaseModel
      * @param array product_id_array 产品id字符串
      * @return array
      */
-    public function createItem($product_id_array)
+    public function createItem()
     {
-        foreach ($product_id_array as $product_id) {
-            $productModel = $this->find($product_id);
-            $attributes = $productModel->productAttributeValue;
+        //foreach ($product_id_array as $product_id) {
+            //$productModel = $this->find($product_id);
+            $attributes = $this->attributeValue;
+            
             $brr = [];
             foreach ($attributes as $attribute) {
                 $brr[$attribute->attribute_id][] = $attribute->attribute_value;
             }
             $brr = array_values($brr);
             $result = Tool::createDikaer($brr);
-            $model = $productModel->model;
+            $model = $this->model;
             foreach ($result as $_result) {
                 $item = $model;
                 foreach ($_result as $__result) {
                     $item .= "-" . $__result;
                 }
-                $product_data = $this->find($product_id)->toArray();
+                $product_data = $this->toArray();
                 $product_data['sku'] = $item;
-                $product_data['product_id'] = $product_id;
+                $product_data['product_id'] = $this->id;
                 $item = new ItemModel();
                 $item->create($product_data);
             }
-            $productModel->status = 1;
-            $productModel->save();
-        }
+            $this->status = 1;
+            $this->save();
+        //}
     }
 
     public function destoryProduct()

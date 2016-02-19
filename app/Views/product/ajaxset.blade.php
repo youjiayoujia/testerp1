@@ -1,4 +1,3 @@
-<?php print_r($data['attributes']);exit; ?>
 <div class="panel panel-info adjustmargin">
     <div class="panel-heading">勾选model及对应attribute属性:</div>
     @foreach($data['models'] as $model)

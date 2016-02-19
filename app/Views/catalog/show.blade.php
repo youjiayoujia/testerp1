@@ -28,9 +28,9 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">attribute属性 :</div>
+        <div class="panel-heading">variation属性 :</div>
         <div class="panel-body">
-            @foreach($model->attributes as $attr)
+            @foreach($model->variations as $attr)
                 <div class="col-lg-12">
                     <div class="col-lg-1"><strong>{{ $attr->name }}</strong>:</div>
                     @foreach($attr->values as $attrvalue)

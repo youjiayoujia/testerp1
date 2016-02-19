@@ -27,6 +27,6 @@ class VariationModel extends BaseModel
 
     public function values()
     {
-        return $this->hasMany('App\Models\Catalog\VariationValueModel','attribute_id');
+        return $this->hasMany('App\Models\Catalog\VariationValueModel','variation_id');
     }
 }

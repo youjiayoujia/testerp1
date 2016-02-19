@@ -18,10 +18,10 @@ class VariationValueModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['attribute_id', 'name'];
+    protected $fillable = ['variation_id', 'name'];
 
     public function set()
     {
-        return $this->belongsTo('App\Models\Catalog\VariationModel','attribute_id');
+        return $this->belongsTo('App\Models\Catalog\VariationModel','variation_id');
     }
 }

@@ -1,5 +1,5 @@
 <div class="panel panel-info adjustmargin">
-    <div class="panel-heading">勾选model及对应attribute属性:</div>
+    <div class="panel-heading">勾选model及对应variation属性:</div>
     @foreach($data['models'] as $model)
         <div class="checkbox panel-body ">
             <div class="checkbox col-md-2">
@@ -11,7 +11,7 @@
                 <div class="checkbox col-md-2 innercheckboxs">{{$getattr['name']}}:
                     @foreach($getattr['value'] as $innervalue)
                         <label>
-                            <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][attributes][{{$getattr['name']}}][]' value='{{$innervalue}}'>{{$innervalue}}
+                            <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][variations][{{$getattr['name']}}][]' value='{{$innervalue}}'>{{$innervalue}}
                         </label>
                     @endforeach
                 </div>

@@ -10,7 +10,8 @@ use App\Models\Product\ImageModel;
 //use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
-use App\Models\Catalog\AttributeValueModel;
+//use App\Models\Catalog\AttributeValueModel;
+use App\Models\Catalog\variationValueModel;
 use App\Models\Catalog\FeatureValueModel;
 use App\Models\Product\SupplierModel;
 use Illuminate\Support\Facades\DB;
@@ -202,17 +203,17 @@ class ProductModel extends BaseModel
                 //更新产品首图
                 $product->update(['default_image' => $default_image_id]);
                 //插入产品attribute属性
-                if (array_key_exists('attributes', $model)) {
-                    foreach ($model['attributes'] as $attribute => $attributeValues) {
-                        $attributeModel = $catalog->variations()->where('name', '=', $attribute)->get()->first();
-                        foreach ($attributeValues as $attributeValue) {
-                            $attributeValueModel = $attributeModel->values()->where('name', '=',$attributeValue)->get()->first();
-                            $attributeArray['variation_id'] = $attributeModel->id;
-                            $attributeArray['variation_value'] = $attributeValueModel->name;
-                            $attributeArray['variation_value_id'] = $attributeValueModel->id;
-                            $attributeArray['product_id'] = $product->id;
+                if (array_key_exists('variations', $model)) {
+                    foreach ($model['variations'] as $variation => $variationValues) {
+                        $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
+                        foreach ($variationValues as $variationValue) {
+                            $variationValueModel = $variationModel->values()->where('name', '=',$variationValue)->get()->first();
+                            $variationArray['variation_id'] = $variationModel->id;
+                            $variationArray['variation_value'] = $variationValueModel->name;
+                            $variationArray['variation_value_id'] = $variationValueModel->id;
+                            $variationArray['product_id'] = $product->id;
                             $ProductVariationValueModel = new ProductVariationValueModel();
-                            $ProductVariationValueModel->create($attributeArray);
+                            $ProductVariationValueModel->create($variationArray);
                         }
                     }
                 }
@@ -259,19 +260,19 @@ class ProductModel extends BaseModel
         DB::beginTransaction();
         try {
             //更新产品attribute属性
-            if (array_key_exists('attributes', $data)) {
+            if (array_key_exists('variations', $data)) {
                 $ProductVariationValueModel = new ProductVariationValueModel();
-                $attributes = $ProductVariationValueModel->where('product_id', $this->id)->delete();
-                foreach ($data['attributes'] as $attribute_id => $attribute_values) {
+                $variations = $ProductVariationValueModel->where('product_id', $this->id)->delete();
+                foreach ($data['variations'] as $variation_id => $variation_values) {
                     $tmp = [];
                     $tmp['product_id'] = $this->id;
-                    $tmp['attribute_id'] = $attribute_id;
-                    $attributeValueModel = new AttributeValueModel();
+                    $tmp['variation_id'] = $variation_id;
+                    $variationValueModel = new variationValueModel();
 
-                    foreach ($attribute_values as $attribute_value) {
-                        $tmp['attribute_value'] = $attribute_value;
-                        $attribute_value_id = $attributeValueModel->where('name',$attribute_value)->where('variation_id', $attribute_id)->get()->toArray();
-                        $tmp['variation_value_id'] = $attribute_value_id[0]['id'];
+                    foreach ($variation_values as $variation_value) {
+                        $tmp['variation_value'] = $variation_value;
+                        $variation_value_id = $variationValueModel->where('name',$variation_value)->where('variation_id', $variation_id)->get()->toArray();
+                        $tmp['variation_value_id'] = $variation_value_id[0]['id'];
                         $model = new ProductVariationValueModel();
                         $model->create($tmp);
                     }

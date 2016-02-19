@@ -65,7 +65,7 @@ class ProductController extends Controller
             'product' => $product,
             'suppliers' => $this->supplier->all(),
             'features_input' => $ProductFeatureValueModel->where('spu_id',$product->spu_id)->where('feature_value_id',0)->get()->toArray(),
-            'attribute_value_id_arr' => array_column($ProductVariationValueModel->where('product_id',$id)->get(['variation_value_id'])->toArray(),'variation_value_id'),
+            'variation_value_id_arr' => array_column($ProductVariationValueModel->where('product_id',$id)->get(['variation_value_id'])->toArray(),'variation_value_id'),
             'features_value_id_arr' => array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'),
         ];
 

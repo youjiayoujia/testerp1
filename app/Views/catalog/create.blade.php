@@ -13,7 +13,7 @@
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Variation属性</i></div>
-        <div class="panel-body attributefirst">
+        <div class="panel-body variationfirst">
             <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加variation</button>
         </div>
     </div>
@@ -79,27 +79,27 @@
             $(".sets").last().after("<div class='form-group form-inline sets '>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='sets["+num+"][name]' ></div> 属性值：<div class='form-group'><input type='text' class='form-control'  placeholder='属性值' name='sets["+num+"][value][name][][name]'></div><button type='button' class='btn btn-primary setsvalues ajaxinput'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div>");
         });
 
-        {{-- 添加attribute属性值  --}}
+        {{-- 添加variation属性值  --}}
         $(document).on('click','.attrvalues',function(){       
             var aa = $(this).prev().prev().find('input').attr('name');
             var num = aa.substr(11,1);
             num = parseInt(num);
             $(this).next().css("display","inline");
-            $(this).prev().after("<div class='form-group ajaxinput'><input type='text' class='form-control'  placeholder='属性值' name='attributes["+num+"][value][name][][name]'><button type='button' class='btn btn-outline btn-danger delete-column ajaxinput'><i class='glyphicon glyphicon-remove'></i></div>");            
+            $(this).prev().after("<div class='form-group ajaxinput'><input type='text' class='form-control'  placeholder='属性值' name='variations["+num+"][value][name][][name]'><button type='button' class='btn btn-outline btn-danger delete-column ajaxinput'><i class='glyphicon glyphicon-remove'></i></div>");            
         });
 
-        {{-- 添加attribute属性行  --}}
+        {{-- 添加variation属性行  --}}
         $(document).on('click','#attradd',function(){
-            var aa = $("input[name^='attributes[']:last").attr('name');
+            var aa = $("input[name^='variations[']:last").attr('name');
             if(aa==undefined){
-                $(".attributefirst").html("<div class='form-group form-inline attrs' id='attrkey_0'>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='attributes[0][name]' ></div> 属性值：<div class='form-group' title='cannotremove'><input type='text' class='form-control'  placeholder='属性值'' name='attributes[0][value][name][][name]' ></div><button type='button' class='btn btn-primary attrvalues ajaxinput' >添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div><button type='button' class='btn btn-primary btn-lg btn-block' id='attradd'>添加attribute</button>");
+                $(".variationfirst").html("<div class='form-group form-inline attrs' id='attrkey_0'>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='variations[0][name]' ></div> 属性值：<div class='form-group' title='cannotremove'><input type='text' class='form-control'  placeholder='属性值'' name='variations[0][value][name][][name]' ></div><button type='button' class='btn btn-primary attrvalues ajaxinput' >添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div><button type='button' class='btn btn-primary btn-lg btn-block' id='attradd'>添加variation</button>");
                 return;
             }
             var num = aa.substr(11,1);
             num = parseInt(num);
             num = num+1;
             $("#attrnum").val(num);
-            $(".attrs").last().after("<div class='form-group form-inline attrs'>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='attributes["+num+"][name]' ></div> 属性值：<div class='form-group'><input type='text' class='form-control'  placeholder='属性值' name='attributes["+num+"][value][name][][name]'></div><button type='button' class='btn btn-primary attrvalues ajaxinput'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div>");
+            $(".attrs").last().after("<div class='form-group form-inline attrs'>属性名：<div class='form-group'><input class='form-control'  placeholder='属性名'  name='variations["+num+"][name]' ></div> 属性值：<div class='form-group'><input type='text' class='form-control'  placeholder='属性值' name='variations["+num+"][value][name][][name]'></div><button type='button' class='btn btn-primary attrvalues ajaxinput'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div>");
         });
 
         {{-- 添加feature属性列  --}}

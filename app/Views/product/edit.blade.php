@@ -12,7 +12,7 @@
     </div>
     <div class="ajaxinsert">
         <div class="panel panel-info adjustmargin">
-        <div class="panel-heading">选择attribute属性:</div>            
+        <div class="panel-heading">选择variation属性:</div>            
                 <div class="checkbox panel-body ">
                     <div class="checkbox col-md-2" style="width:auto">
                         <label style="padding-left:0px">

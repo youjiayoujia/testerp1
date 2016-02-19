@@ -53,9 +53,13 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = $this->model->find($id);
-        $ProductVariationValueModel = new ProductVariationValueModel();
-        $ProductFeatureValueModel = new ProductFeatureValueModel();
+        $product = $this->model->find($id);        
+        foreach($product->variationValue->toArray() as $key=>$arr){
+            $variation_value_id_arr[$key] = $arr['variation_value_id'];
+        }
+        foreach($product->spu->productFeatureValue->toArray() as $key=>$arr){
+            $features_value_id_arr[$key] = $arr['feature_value_id'];
+        }       
         if (!$product) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -64,10 +68,11 @@ class ProductController extends Controller
             'catalogs' => $this->catalog->all(),
             'product' => $product,
             'suppliers' => $this->supplier->all(),
-            'features_input' => $ProductFeatureValueModel->where('spu_id',$product->spu_id)->where('feature_value_id',0)->get()->toArray(),
-            'variation_value_id_arr' => array_column($ProductVariationValueModel->where('product_id',$id)->get(['variation_value_id'])->toArray(),'variation_value_id'),
-            'features_value_id_arr' => array_column($ProductFeatureValueModel->where('spu_id',$product->spu_id)->get(['feature_value_id'])->toArray(),'feature_value_id'),
+            'features_input' => array_values($product->spu->productFeatureValue->where('feature_value_id',0)->toArray()),
+            'variation_value_id_arr' => $variation_value_id_arr,
+            'features_value_id_arr' => $features_value_id_arr,
         ];
+
 
         return view($this->viewPath . 'edit', $response);
     }

@@ -110,10 +110,12 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
-    public function attributeValue()
+    public function variationValue()
     {
         return $this->hasMany('App\Models\Product\ProductVariationValueModel', 'product_id');
     }
+
+    
 
     public function item()
     {
@@ -346,7 +348,7 @@ class ProductModel extends BaseModel
     {
         //foreach ($product_id_array as $product_id) {
             //$productModel = $this->find($product_id);
-            $attributes = $this->attributeValue;
+            $attributes = $this->variationValue;
             
             $brr = [];
             foreach ($attributes as $attribute) {

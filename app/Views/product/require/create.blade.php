@@ -45,7 +45,7 @@
             <input type='text' class="form-control" id="similar_sku" placeholder="类似款sku" name='similar_sku' value="{{ old('similar_sku') }}">
         </div>
         <div class="form-group col-lg-3">
-            <label for="competition_url" class='control-label'>竞争产品url</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="competition_url" class='control-label'>竞争产品url</label>
             <input type='text' class="form-control" id="competition_url" placeholder="竞争产品url" name='competition_url' value="{{ old('competition_url') }}">
         </div>
          <div class="form-group col-lg-3">

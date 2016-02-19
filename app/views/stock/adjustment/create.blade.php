@@ -255,7 +255,7 @@
                             if(result[2][i].id == position)
                                 flag = 1;
                         }
-                        if(flag == 0 && result != 'stock_none') {
+                        if(flag == 0 && result != 'stock_none' && block.find('.type').find(':radio:checked').val() == 'OUT') {
                             block.find('.warehouse_positions_id').empty();
                             block.find('.warehouse_positions_id').html(str);
                             block.find('.quantity').val('');

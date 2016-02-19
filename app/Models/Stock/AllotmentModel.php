@@ -22,6 +22,13 @@ class AllotmentModel extends BaseModel
     protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_by', 'allotment_time', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
 
     /**
+     * search field 
+     *
+     *  @return
+     */
+    public $searchFields = ['allotment_id'];
+
+    /**
      * get the relationship between the two module 
      *
      * @return 
@@ -85,6 +92,49 @@ class AllotmentModel extends BaseModel
     public function logistics()
     {
         return $this->hasMany('App\Models\Stock\AllotmentLogisticsModel', 'allotments_id', 'id');
+    }
+
+    /**
+     * 返回验证规则 
+     *
+     * @param $request request请求
+     * @return $arr
+     *
+     */
+    public function rule($request)
+    {
+        $arr = [
+            'allotment_time' => 'date|required',
+            'out_warehouses_id' => 'required|integer',
+            'in_warehouses_id' => 'required|integer',
+        ];
+        $buf = $request->all();
+        $buf = $buf['arr'];
+        foreach($buf as $key => $val) 
+        {
+            if($key == 'sku')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.sku.'.$k] ='required';
+                }
+            if($key == 'quantity')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.quantity.'.$k] ='required|integer';
+                }
+            if($key == 'warehouse_positions_id')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
+                }
+            if($key == 'amount')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.amount.'.$k] = 'required';
+                }
+        }
+
+        return $arr;
     }
 
 }

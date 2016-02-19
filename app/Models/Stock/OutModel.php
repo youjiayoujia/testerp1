@@ -62,9 +62,15 @@ class OutModel extends BaseModel
     public function getRelationNameAttribute()
     {
         if($this->type == 'ADJUSTMENT')
-            return $this->stockAdjustment->adjust_form_id;
+            if($this->stockAdjustment)
+                return $this->stockAdjustment->adjust_form_id;
+            else
+                return '';
         if($this->type == 'ALLOTMENT')
-            return $this->stockAllotment->allotment_id;
+            if($this->stockAllotment)
+                return $this->stockAllotment->allotment_id;
+            else 
+                return '';
     }
 
     /**

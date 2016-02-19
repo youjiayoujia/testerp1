@@ -46,18 +46,18 @@
             @foreach($allotmentforms as $key => $allotmentform)
                 <div class='row'>
                     <div class='form-group col-sm-2'>
-                        <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <select name='arr[warehouse_positions_id][{{$key}}]' id='arr[warehouse_positions_id][{{$key}}]' class='form-control warehouse_positions_id'>
-                        @foreach($positions as $position)
-                            <option value="{{$position->id}}" {{ $position->id == $allotmentform->warehouse_positions_id ? 'selected' : ''}}>{{$position->name}}</option>
+                        <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <select name='arr[sku][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
+                        @foreach($skus as $sku)
+                            <option value="{{$sku['sku']}}" {{ $sku['sku'] == $allotmentform->sku ? 'selected' : ''}}>{{$sku['sku']}}</option>
                         @endforeach
                         </select>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <select name='arr[sku][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
-                        @foreach($skus[$key] as $sku)
-                            <option value="{{$sku['sku']}}" {{ $sku['sku'] == $allotmentform->sku ? 'selected' : ''}}>{{$sku['sku']}}</option>
+                        <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <select name='arr[warehouse_positions_id][{{$key}}]' id='arr[warehouse_positions_id][{{$key}}]' class='form-control warehouse_positions_id'>
+                        @foreach($positions[$key] as $position)
+                            <option value="{{$position['id']}}" {{ $position['id'] == $allotmentform->warehouse_positions_id ? 'selected' : ''}}>{{$position['name']}}</option>
                         @endforeach
                         </select>
                     </div>
@@ -65,9 +65,13 @@
                         <label for='item_id' class='control-label'>item号</label> 
                         <input type='text' class='form-control item_id' id='arr[item_id][{{$key}}]' placeholder='item号' name='arr[item_id][{{$key}}]' value={{ $allotmentform->item_id }} readonly>
                     </div>
+                    <div class="form-group col-sm-1">
+                        <label for="access_quantity" class='control-label'>可用数量</label>
+                        <input type='text' class="form-control access_quantity" placeholder="可用数量" name='arr[access_quantity][{{$key}}]' value="{{ $availquantity[$key] }}" readonly>
+                    </div>
                     <div class='form-group col-sm-2'>
                         <label for='quantity' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control quantity' id='arr[quantity][{{$key}}]' placeholder='quantity' name='arr[quantity][{{$key}}]' value='{{ $allotmentform->quantity }}'>
+                        <input type='text' class='form-control quantity' id='arr[quantity][{{$key}}]' placeholder='数量' name='arr[quantity][{{$key}}]' value='{{ $allotmentform->quantity }}'>
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
@@ -90,6 +94,8 @@
             val = $('#out_warehouses_id').val();
             obj = $(this).parent();
             position = $('.warehouse_positions_id');
+            quantity = $('.quantity');
+            amount = $('.amount');
             sku = $('.sku');
             $.ajax({
                 url: "{{ route('allotoutwarehouse') }}",
@@ -98,21 +104,24 @@
                 type:'get',
                 success:function(result){
                     allotoutwarehouse = result;
+                    sku.empty();
                     position.empty();
+                    quantity.val('');
+                    amount.val('');
                     if(result != 'none') {
                         str = '';
                         str1 = '';
-                        for(var i=0;i<result[0].length;i++) 
+                        for(var i=0;i<result[2].length;i++) 
                         {
-                            str += '<option value='+result[0][i]['id']+'>'+result[0][i]['name']+'</option>';
+                            str += '<option value='+result[2][i]['id']+'>'+result[2][i]['name']+'</option>';
                         }
-                        for(var i=0;i<result[1].length;i++)
+                        for(var i=0;i<result[0].length;i++)
                         {
-                            str1 += '<option value='+result[1][i]['sku']+'>'+result[1][i]['sku']+'</option>';
+                            str1 += '<option value='+result[0][i]['sku']+'>'+result[0][i]['sku']+'</option>';
                         }
-                        if(result[1][0]) {
-                            $('.item_id').val(result[1][0]['item_id']);
-                            $('.access_quantity').val(result[1][0]['available_quantity']); 
+                        if(result[1]) {
+                            $('.item_id').val(result[1]['item_id']);
+                            $('.access_quantity').val(result[1]['available_quantity']); 
                         } else {
                             $('.item_id').val('');
                             $('.access_quantity').val('');
@@ -129,32 +138,27 @@
             obj = $(this).parent().parent();
             warehouse = $('#out_warehouses_id').val();
             position = $(this).val();
-            sku = obj.find('.sku');
+            sku = obj.find('.sku').val();
             $.ajax({
                 url:"{{ route('allotposition' )}}",
-                data: {position:position, warehouse:warehouse},
+                data: {position:position, warehouse:warehouse, sku:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
-                    sku.empty();
                     if(result != 'none') {
-                        str = '';
-                        for(var i=0;i<result[0].length;i++) 
+                        obj.find('.access_quantity').val(result[0]['available_quantity']);
+                        if(obj.find('.quantity').val() && obj.find('.quantity').val() > result[0]['available_quantity']) 
                         {
-                            str +="<option value="+result[0][i]['sku']+">"+result[0][i]['sku']+"</option>";
-                        }
-                        obj.find('.access_quantity').val(result[0][0]['available_quantity']);
-                        obj.find('.item_id').val(result[0][0]['item_id']);
-                        if(obj.find('.quantity').val()) 
-                        {
-                            obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
+                            alert('数量超过了可用数量');
+                            obj.find('.quantity').val('');
+                            obj.find('.amount').val('');
                         }
                     } else {
-                        obj.find('.sku').empty();
                         obj.find('.access_quantity').val('');
                         obj.find('.item_id').val('');
+                        obj.find('.quantity').val('');
+                        obj.find('.amount').val('');
                     }
-                    $(str).appendTo(sku);
                 }
             });
         });
@@ -162,23 +166,31 @@
         $(document).on('change', '.sku', function(){
             obj = $(this).parent().parent();
             warehouse = $('#out_warehouses_id').val();
-            position = obj.find('.warehouse_positions_id').val();
+            position = obj.find('.warehouse_positions_id');
             sku = $(this).val();
             $.ajax({
                 url:"{{ route('allotsku' )}}",
-                data: {position:position, warehouse:warehouse, sku:sku},
+                data: {warehouse:warehouse, sku:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
                     if(result != 'none') {
+                        str = '';
+                        position.empty();
                         obj.find('.item_id').val(result[0]['item_id']);
                         obj.find('.access_quantity').val(result[0]['available_quantity']);
                         if(obj.find('.quantity').val())
                         {
-                            obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
+                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
                         }
+                        for(var i=0;i<result[1].length;i++) 
+                        {
+                            str +="<option value="+result[1][i]['id']+">"+result[1][i]['name']+"</option>";
+                        }
+                        $(str).appendTo(position);
                     } else {
                         alert('sku对应没有库存');
+                        position.empty();
                         obj.find('.item_id').val('');
                         obj.find('access_quantity').val('');
                         obj.find('.amount').val('');
@@ -188,33 +200,35 @@
         });
 
         $(document).on('blur', '.quantity', function(){
-            var reg = /^(\d)+$/gi;
-            if(!reg.test($(this).val())) {
-                alert('fuck,数量有问题啊');
-                $(this).val('');
-                return;
-            }
-            obj = $(this).parent().parent();
-            warehouse =  $('#out_warehouses_id').val();
-            position = obj.find('.warehouse_positions_id').val();
-            sku = obj.find('.sku').val();
-            if($(this).val() > parseFloat(obj.find('.access_quantity').val())) {
-                alert('超出可用数量');
-                $(this).val('');
-                obj.find('.amount').val('');
-                return;
-            }
-            $.ajax({
-                url:"{{ route('allotsku') }}",
-                data:{warehouse:warehouse, position:position, sku:sku},
-                dataType:'json',
-                'type':'get',
-                success:function(result){
-                    if(result != 'none') {
-                        obj.find('.amount').val((result[1]*obj.find('.quantity').val()).toFixed('3'));
-                    }
+            if($(this).val()) {
+                var reg = /^(\d)+$/gi;
+                if(!reg.test($(this).val())) {
+                    alert('fuck,数量有问题啊');
+                    $(this).val('');
+                    return;
                 }
-            });
+                obj = $(this).parent().parent();
+                warehouse =  $('#out_warehouses_id').val();
+                position = obj.find('.warehouse_positions_id').val();
+                sku = obj.find('.sku').val();
+                if($(this).val() > parseFloat(obj.find('.access_quantity').val())) {
+                    alert('超出可用数量');
+                    $(this).val('');
+                    obj.find('.amount').val('');
+                    return;
+                }
+                $.ajax({
+                    url:"{{ route('allotsku') }}",
+                    data:{warehouse:warehouse, position:position, sku:sku},
+                    dataType:'json',
+                    'type':'get',
+                    success:function(result){
+                        if(result != 'none') {
+                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
+                        }
+                    }
+                });
+            }
         });
 
         $('#allotment_time').cxCalendar();

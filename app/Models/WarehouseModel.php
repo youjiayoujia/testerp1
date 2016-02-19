@@ -36,5 +36,5 @@ class WarehouseModel extends BaseModel
     ];
 
     //查询
-    protected $searchField=['name, type, is_available, is_default'];
+    public $searchFields=['name'];
 }

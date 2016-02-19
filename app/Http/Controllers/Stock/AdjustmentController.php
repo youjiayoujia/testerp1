@@ -10,6 +10,7 @@
 
 namespace App\Http\Controllers\Stock;
 
+use DB;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
@@ -79,8 +80,8 @@ class AdjustmentController extends Controller
     public function store()
     {
         request()->flash();
-        $this->validate(request(), $this->rules(request()));
-        $len = count(array_keys(request()->input('arr')['sku']));
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         $arr = request()->input('arr');
@@ -132,8 +133,8 @@ class AdjustmentController extends Controller
     public function update($id)
     {
         request()->flash();
-        $this->validate(request(), $this->rules(request()));
-        $len = count(array_keys(request()->input('arr')['sku']));
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
         $obj = $this->model->find($id)->adjustment;
         $obj_len = count($obj);
@@ -167,10 +168,10 @@ class AdjustmentController extends Controller
      */
     public function destroy($id)
     {
-        $obj = $this->model->find($id)->adjustment;
-        foreach($obj as $val)
+        $obj = $this->model->find($id);
+        foreach($obj->adjustment as $val)
             $val->delete();
-        $this->destroy($id);
+        $obj->delete($id);
 
         return redirect($this->mainIndex);
     }
@@ -185,7 +186,7 @@ class AdjustmentController extends Controller
     public function ajaxCheck()
     {
         if(request()->ajax()) {
-            $id = $_GET['id'];
+            $id = request()->input('id');
             $time = date('Y-m-d',time());       
             $obj = $this->model->find($id);
             $obj->update(['status'=>'Y', 'check_time'=>$time]); 
@@ -195,54 +196,24 @@ class AdjustmentController extends Controller
             $arr = $obj->toArray();
             $buf = $obj->adjustment->toArray();
             $stock = new StockModel;
-            for($i=0;$i<count($buf);$i++) {
-                $tmp = array_merge($arr,$buf[$i]);
-                if($tmp['type'] == 'IN') {
-                    $tmp['type'] = 'ADJUSTMENT';
-                    $stock->in($tmp);
-                } else {
-                    $tmp['type'] = 'ADJUSTMENT';
-                    $stock->out($tmp);
+            DB::beginTransaction();
+            try {
+                for($i=0;$i<count($buf);$i++) {
+                    $tmp = array_merge($arr,$buf[$i]);
+                    if($tmp['type'] == 'IN') {
+                        $tmp['type'] = 'ADJUSTMENT';
+                        $stock->in($tmp);
+                    } else {
+                        $tmp['type'] = 'ADJUSTMENT';
+                        $stock->out($tmp);
+                    }
                 }
+            } catch (Exception $e) {
+                DB::rollback();
             }
+            DB::commit();
         } else {
-            return false;
+            return json_encode('false');
         }
-    }
-
-    /**
-     * 返回验证规则 
-     *
-     * @param $request
-     * @return $arr
-     *
-     */
-    public function rules($request)
-    {
-        $arr = [
-            'adjust_time' => 'date|required',
-        ];
-        $buf = $request->all();
-        $buf = $buf['arr'];
-        foreach($buf as $key => $val) 
-        {
-            if($key == 'sku')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.sku.'.$k] ='required';
-                }
-            if($key == 'amount')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.amount.'.$k] ='required|numeric';
-                }
-            if($key == 'warehouse_positions_id')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.warehouse_positions_id.'.$k] = 'required|numeric';
-                }
-        }
-
-        return $arr;
     }
 }

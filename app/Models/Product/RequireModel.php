@@ -19,20 +19,18 @@ class RequireModel extends BaseModel
     public $rules = [
         'create' => [   
                 'name' => 'required|max:255|unique:product_require,name',
-                'competition_url' => 'active_url',
                 'needer_id' => 'required',
                 'needer_shop_id' => 'required'
         ],
         'update' => [   
                 'name' => 'required|max:255|unique:product_require,name, {id}',
-                'competition_url' => 'active_url',
                 'needer_id' => 'required',
                 'needer_shop_id' => 'required',
         ]
     ];
 
     //查询
-    protected $searchField = ['name, expected_date'];
+    public $searchFields = ['name', 'expected_date'];
     
     /**
      *  移动文件 

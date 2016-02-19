@@ -86,65 +86,44 @@
         allotoutwarehouse = '';
         current = 1;
         $(document).on('click', '#create_form', function(){
-              var appendhtml = "\
-                <div class='row'>\
-                    <div class='form-group col-sm-2'>\
-                        <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <select name='arr[sku]["+current+"]' id='arr[sku]["+current+"]' class='form-control sku'>\
-                        </select>\
-                    </div>\
-                    <div class='form-group col-sm-2'>\
-                        <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <select name='arr[warehouse_positions_id]["+current+"]' id='arr[warehouse_positions_id]["+current+"]' class='form-control warehouse_positions_id'>\
-                        </select>\
-                    </div>\
-                    <div class='form-group col-sm-1'>\
-                        <label for='item_id' class='control-label'>item号</label> \
-                        <input type='text' class='form-control item_id' id='arr[item_id]["+current+"]' placeholder='item号' name='arr[item_id]["+current+"]' value='{{ old('arr[item_id]["+current+"]') }}' readonly>\
-                    </div>\
-                    <div class='form-group col-sm-2'>\
-                    <label for='access_quantity' class='control-label'>可用数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                    <input type='text' class='form-control access_quantity' placeholder='可用数量' name='arr[access_quantity]["+current+"]' value='{{ old('arr[access_quantity]["+current+"]') }}' readonly>\
-                </div>\
-                    <div class='form-group col-sm-2'>\
-                        <label for='quantity' class='control-label'>数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <input type='text' class='form-control quantity' id='arr[quantity]["+current+"]' placeholder='数量' name='arr[quantity]["+current+"]' value={{ old('arr[quantity]["+current+"]') }}>\
-                    </div>\
-                    <div class='form-group col-sm-2'>\
-                        <label for='amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>\
-                        <input type='text' class='form-control amount' id='arr[amount]["+current+"]' placeholder='总金额' name='arr[amount]["+current+"]' value='{{ old('arr[amount]["+current+"]') }}' readonly>\
-                    </div>\
-                    <button type='button' class='btn btn-danger btn-outline bt_right'><i class='glyphicon glyphicon-trash'></i></button>\
-                </div>";
-            $('.addpanel').before(appendhtml);
-            val = $('#out_warehouses_id').val();
-            obj = $('.addpanel').prev();
-            position = obj.find('.warehouse_positions_id');
-            sku = obj.find('.sku');
-            position.empty();
-            if(allotoutwarehouse != 'none') {
-                str = '';
-                str1 = '';
-                for(var i=0;i<allotoutwarehouse[2].length;i++) 
-                {
-                    str += '<option value='+allotoutwarehouse[2][i]['id']+'>'+allotoutwarehouse[2][i]['name']+'</option>';
+            $.ajax({
+                url:"{{ route('add') }}",
+                data:{current:current},
+                dataType:'html',
+                type:'get',
+                success:function(result) {
+                    $('.addpanel').before(result);
+                    val = $('#out_warehouses_id').val();
+                    obj = $('.addpanel').prev();
+                    position = obj.find('.warehouse_positions_id');
+                    sku = obj.find('.sku');
+                    position.empty();
+                    if(allotoutwarehouse != 'none') {
+                        str = '';
+                        str1 = '';
+                        for(var i=0;i<allotoutwarehouse[2].length;i++) 
+                        {
+                            str += '<option value='+allotoutwarehouse[2][i]['id']+'>'+allotoutwarehouse[2][i]['name']+'</option>';
+                        }
+                        for(var i=0;i<allotoutwarehouse[0].length;i++)
+                        {
+                            str1 += '<option value='+allotoutwarehouse[0][i]['sku']+'>'+allotoutwarehouse[0][i]['sku']+'</option>';
+                        }
+                        if(allotoutwarehouse[1]) {
+                            obj.find('.item_id').val(allotoutwarehouse[1]['item_id']);
+                            obj.find('.access_quantity').val(allotoutwarehouse[1]['available_quantity']); 
+                        } else {
+                            obj.find('.item_id').val('');
+                            obj.find('.access_quantity').val('');
+                            sku.empty();
+                        }
+                        $(str).appendTo(position);
+                        $(str1).appendTo(sku);
+                    }
+                    current++;
                 }
-                for(var i=0;i<allotoutwarehouse[0].length;i++)
-                {
-                    str1 += '<option value='+allotoutwarehouse[0][i]['sku']+'>'+allotoutwarehouse[0][i]['sku']+'</option>';
-                }
-                if(allotoutwarehouse[1]) {
-                    $('.item_id').val(allotoutwarehouse[1]['item_id']);
-                    $('.access_quantity').val(allotoutwarehouse[1]['available_quantity']); 
-                } else {
-                    $('.item_id').val('');
-                    $('.access_quantity').val('');
-                    sku.empty();
-                }
-                $(str).appendTo(position);
-                $(str1).appendTo(sku);
-            }
-            current++;
+            })
+            
         });
 
         $(document).on('click', '.bt_right', function(){
@@ -202,7 +181,7 @@
             sku = obj.find('.sku').val();
             $.ajax({
                 url:"{{ route('allotposition' )}}",
-                data: {position:position, warehouse:warehouse, sku:sku},
+                data: {position:positio, sku:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
@@ -240,7 +219,7 @@
                         position.empty();
                         obj.find('.item_id').val(result[0]['item_id']);
                         obj.find('.access_quantity').val(result[0]['available_quantity']);
-                        if(obj.find('.quantity').val())
+                        if(obj.find('.quantity').val() && obj.find('.quantity').val() < obj.find('.access_quantity').val())
                         {
                             obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
                         }
@@ -280,7 +259,7 @@
                 }
                 $.ajax({
                     url:"{{ route('allotsku') }}",
-                    data:{warehouse:warehouse, position:position, sku:sku},
+                    data:{warehouse:warehouse, sku:sku},
                     dataType:'json',
                     'type':'get',
                     success:function(result){

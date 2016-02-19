@@ -43,27 +43,33 @@
                 <a href="{{ route('stockAllotment.show', ['id'=>$allotment->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if($allotment->allotment_status == 'new' || $allotment->allotment_status == 'pick')
+                @if($allotment->check_status == 'N')
                 <a href="{{ route('stockAllotment.edit', ['id'=>$allotment->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 @endif
-                @if($allotment->allotment_status != 'new')
+                @if($allotment->allotment_status == 'new' && $allotment->check_status == 'N')
                 <a href="javascript:" class="btn btn-success btn-xs check_time" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    @if($allotment->check_status == 'N')
-                        未审核
-                    @else
-                        已审核
-                    @endif
+                    审核调拨单
                 </a>
                 @endif
-                @if($allotment->allotment_status == 'new')
+                @if($allotment->check_status == 'Y' && $allotment->allotment_status == 'new')
                 <a href="javascript:" class="btn btn-success btn-xs pick" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>生成拣货单
                 </a>
                 @endif
-                @if($allotment->allotment_status == 'out' || $allotment->check_status == 'Y')
+                @if($allotment->allotment_status == 'pick')
+                <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    new
+                </a>
+                <a href="javascript:" class="btn btn-success btn-xs check_out" data-id="{{ $allotment->id }}">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    确认出库
+                </a>
+                @endif
+                @if($allotment->check_status == 'Y' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
                     @if($allotment->allotment_status != 'over')
                     <a href="{{ route('checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 对单
@@ -91,11 +97,12 @@ $(document).ready(function(){
         if(obj.find('td:eq(9)').text() == '未审核') {
             if(confirm('确认审核?')) {
                 tmp.prev().hide();
-                tmp.next().next().hide();
                 id = $(this).data('id');
-                url = "{{ route('checkform',['id' =>''])}}/"+id;
-                tmp.after(" <a href='"+url+"' class='btn btn-success btn-xs'>\
-                <span class='glyphicon glyphicon-eye-open'></span> 对单</a>");
+                str = "data-id="+id;
+                tmp.after(" <a href='javascript:' class='btn btn-success btn-xs pick' "+str+">\
+                <span class='glyphicon glyphicon-eye-open'></span>生成拣货单</a>");
+                tmp.hide();
+                obj.find('.delete_item').hide();
                 $.ajax({
                     url:"{{ route('allotmentcheck') }}",
                     data:{id:id},
@@ -105,7 +112,6 @@ $(document).ready(function(){
                         tmp.html('<span class="glyphicon glyphicon-pencil"></span>已审核');
                         obj.find('td:eq(10)').text(result);
                         obj.find('td:eq(9)').text('已审核');
-                        obj.find('td:eq(7)').text('已出库');
                     }
                 });
             }
@@ -114,7 +120,7 @@ $(document).ready(function(){
         }
     });
 
-    $('.pick').click(function(){
+    $(document).on('click', '.pick', function(){
         obj = $(this).parent().parent();
         tmp = $(this);
         id = $(this).data('id');
@@ -124,13 +130,66 @@ $(document).ready(function(){
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    tmp.before("<a href='javascript:' class='btn btn-success btn-xs check_time' data-id='"+id+"'>\
-                    <span class='glyphicon glyphicon-pencil'></span>\
-                        未审核</a>");
                     obj.find('td:eq(7)').text('拣货中');
+                    tmp.after("<a href='javascript:' class='btn btn-success btn-xs new' data-id="+id+"><span class='glyphicon glyphicon-pencil'></span>new</a> <a href='javascript:' class='btn btn-success btn-xs check_out' data-id="+id+"><span class='glyphicon glyphicon-pencil'></span>确认出库</a>");
                     tmp.hide();
                 }
             });
+    });
+
+    $(document).on('click', '.new', function(){
+        id = $(this).data('id');
+        obj = $(this);
+        td = obj.parent();
+        $.ajax({
+            url:"{{ route('allotmentnew') }}",
+            data:{id:id},
+            dataType:'json',
+            type:'get',
+            success:function(result) {
+                str = "{{route('stockAllotment.show', ['id'=>''])}}/"+id;
+                str1 = "{{ route('stockAllotment.edit', ['id'=>'']) }}/"+id;
+                str2 = "{{route('stockAllotment.destroy', ['id'=>''])}}/"+id;
+                td.html("<a href='"+str+"' class='btn btn-info btn-xs'>\
+                    <span class='glyphicon glyphicon-eye-open'></span> 查看\
+                </a> <a href='"+str1+"' class='btn btn-warning btn-xs'>\
+                    <span class='glyphicon glyphicon-pencil'></span> 编辑\
+                </a> <a href='javascript:' class='btn btn-success btn-xs check_time' data-id='"+id+"'>\
+                    <span class='glyphicon glyphicon-pencil'></span>\
+                    审核调拨单\
+                </a> <a href='javascript:' class='btn btn-danger btn-xs delete_item'\
+                   data-id='"+id+"'\
+                   data-url='"+str2+"'>\
+                    <span class='glyphicon glyphicon-trash'></span> 删除\
+                </a>");
+                td.parent().find('td:eq(7)').text('new');
+                td.parent().find('td:eq(9)').text('未审核');
+            }
+        });
+    });
+
+    $(document).on('click', '.check_out', function(){
+        id = $(this).data('id');
+        obj = $(this);
+        td = obj.parent();
+        block = obj.parent().parent();
+        $.ajax({
+            url:"{{ route('allotmentcheckout') }}",
+            data:{id:id},
+            dataType:'json',
+            type:'get',
+            success:function(result) {
+                block.find('td:eq(7)').text('出库');
+                td.empty();
+                str = "{{route('stockAllotment.show', ['id'=>''])}}/"+id;
+                str1 = "{{ route('checkform', ['id'=>'']) }}/"+id;
+                td.html("<a href='"+str+"' class='btn btn-info btn-xs'>\
+                    <span class='glyphicon glyphicon-eye-open'></span> 查看\
+                </a> <a href='"+str1+"' class='btn btn-success btn-xs'>\
+                        <span class='glyphicon glyphicon-eye-open'></span> 对单\
+                    </a>")
+            }
+        });
     });
 });
 </script>

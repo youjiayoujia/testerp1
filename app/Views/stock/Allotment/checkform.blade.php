@@ -29,6 +29,17 @@
             列表
         </div>  
         <div class='panel-body'>
+            <div class='row'>
+                <div class='col-sm-1'>
+                    <label for='searchsku'>sku:</label>
+                </div>
+                <div class='col-sm-2'>
+                    <input type='text' name='searchsku' class='searchsku form-control' value="{{ old('searchsku') }}"/>
+                </div>
+                <div class='col-sm-1'>
+                    <input type='button' name='search' class='search btn btn-info form-control' value='搜索'/>
+                </div>
+            </div>
             @foreach($allotmentforms as $key => $allotmentform)
                 <div class='row'>
                     <div class='form-group col-sm-1'>
@@ -112,6 +123,21 @@ $(document).ready(function(){
                 $(this).val('');
                 return;
             }
+        }
+    });
+
+    $('.search').click(function(){
+        area = $(this).parent().parent().parent();
+        searchsku = area.find('.searchsku').val();
+        if(searchsku) {
+            sku = area.find('.sku');
+            $.each(sku, function(){
+                sku = $(this).val();
+                if(sku == searchsku)
+                    $(this).parent().parent().css('background', 'gray');
+                else
+                    $(this).parent().parent().css('background', 'none');
+            });
         }
     });
 });

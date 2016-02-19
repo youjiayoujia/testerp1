@@ -21,6 +21,10 @@ class AdjustFormModel extends BaseModel
      */
     protected $fillable = ['stock_adjustments_id', 'item_id', 'sku', 'type', 'warehouse_positions_id', 'quantity', 'amount', 'created_at'];
 
+
+    //查询
+    public $searchFields = ['stock_adjustments_id'];
+    
     /**
      * return the relationship between the two Model 
      *

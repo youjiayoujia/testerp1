@@ -1,5 +1,6 @@
 @extends('common.form')
 <script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('productSupplier.update', ['id' => $model->id]) }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
@@ -36,7 +37,7 @@
     <div class="row"> 
         <div class="form-group col-lg-4">
             <label for="url">线上供货商网址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $model->url }}">
+            <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $model->url }}" {{ old('type') ? old('type') == 'offline' ? 'disabled' : '' :$model->type == 'offline' ? 'disabled' : ''}}>
         </div> 
         <div class="form-group col-lg-4">
             <label for="telephone">电话</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -67,10 +68,21 @@
    </div>
 @stop
 <script type='text/javascript'>
-    window.onload = function(){
+    $(document).ready(function(){
         var buf = new Array();
         buf[0] = "{{ old('province') ? old('province') : $model->province }}" ;
         buf[1] = "{{ old('city') ? old('city') : $model->city }}" ;
         init(buf[0],buf[1]);
-    };
+
+        $('.radio').click(function(){
+            if($(this).find(':radio:checked').val() == 'offline') {
+                $(this).parent().parent().next().find('.url').val('');
+                $(this).parent().parent().next().find('.url').attr('disabled', true);
+            }
+            else {
+                $(this).parent().parent().next().find('.url').attr('disabled', false);
+            }
+        });
+    });
+
 </script>

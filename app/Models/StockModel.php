@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use Exception;
 use App\Base\BaseModel;
 use App\Models\Stock\InModel;
 use App\Models\Stock\OutModel;
@@ -160,8 +161,9 @@ class StockModel extends BaseModel
                 $obj->all_quantity -=$arr['quantity'];
                 $obj->available_quantity -= $arr['quantity'];
                 $obj->amount -= $arr['amount'];
-                if($obj->available_quantity < 0 || $obj->amount < 0)
+                if($obj->available_quantity < 0 || $obj->amount < 0) {
                     throw new Exception('数量或金额有误');
+                }
                 $obj->save();
                 $arr['stock_id'] = $obj->id;
                 $obj->stockOut()->create($arr);

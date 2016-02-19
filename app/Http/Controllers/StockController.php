@@ -76,13 +76,12 @@ class StockController extends Controller
     public function ajaxGetByPosition()
     {
         if(request()->ajax()) {
-            $warehouses_id = $_GET['warehouses_id'];
-            $warehouse_positions_id = $_GET['warehouse_positions_id'];
-            $obj = StockModel::where(['warehouses_id'=>$warehouses_id, 'warehouse_positions_id'=>$warehouse_positions_id])->get();
-            echo json_encode($obj);
-        } else {
-            echo json_encode('false');
-        }
+            $warehouse_positions_id = request()->input('warehouse_positions_id');
+            $obj = StockModel::where(['warehouse_positions_id'=>$warehouse_positions_id])->get();
+            return json_encode($obj);
+        } 
+        
+        return json_encode('false');
     }
 
     /**
@@ -99,17 +98,15 @@ class StockController extends Controller
     public function ajaxGetMessage()
     {
         if(request()->ajax()) {
-            $sku = $_GET['sku'];
-            $warehouses_id = $_GET['warehouses_id'];
+            $sku = request()->input('sku');
+            $warehouses_id = request()->input('warehouses_id');
             $obj = ItemModel::where(['sku'=>$sku])->get()->first();
             $obj1 = StockModel::where(['warehouses_id'=>$warehouses_id, 'sku'=>$sku])->get();
             if(!$obj) {
-                echo json_encode('sku_none');
-                exit;
+                return json_encode('sku_none');
             }
             if(!count($obj1)) {
-                echo json_encode('stock_none');
-                exit;
+                return json_encode('stock_none');
             }
             $arr[] = $obj;
             $arr[] = $obj1;
@@ -119,14 +116,13 @@ class StockController extends Controller
             }
             if($obj1)
                 $arr[3] = $obj1->first()->unit_cost;
-            echo json_encode($arr);
-        } else {
-            echo json_encode('false');
+            return json_encode($arr);
         }
+        return json_encode('false');
     }
 
     /**
-     * 
+     * 调拨调出仓库对应的ajax调用
      *
      * @param none
      * @return json
@@ -135,11 +131,10 @@ class StockController extends Controller
     public function ajaxAllotOutWarehouse()
     {
         if(request()->ajax()) {
-            $warehouse = $_GET['warehouse'];
+            $warehouse = request()->input('warehouse');
             $buf = $this->model->where('warehouses_id', $warehouse)->distinct()->get(['sku'])->toArray();
             if(empty($buf)) {
-                echo json_encode('none');
-                exit;
+                return json_encode('none');
             }
             $arr[] = $buf;
             $arr[] = $this->model->where('warehouses_id', $warehouse)->get()->first()->toArray();
@@ -149,14 +144,14 @@ class StockController extends Controller
                 $tmp = $val->position->toArray();
                 $arr[2][] = $tmp;
             }
-            echo json_encode($arr);
-        } else {
-            echo json_encode('false');
+            return json_encode($arr);
         }
+
+        return json_encode('false');
     }
 
     /**
-     * 
+     * 调拨库位对应的ajax调用
      *
      * @param none
      * @return json
@@ -165,24 +160,23 @@ class StockController extends Controller
     public function ajaxAllotPosition()
     {
         if(request()->ajax()) {
-            $position = $_GET['position'];
-            $warehouse = $_GET['warehouse'];
+            $position = request()->input('position');
             $sku = $_GET['sku'];
-            $obj = StockModel::where(['warehouses_id'=>$warehouse, 'warehouse_positions_id'=>$position, 'sku'=>$sku])->get()->first();
+            $obj = StockModel::where(['warehouse_positions_id'=>$position, 'sku'=>$sku])->get()->first();
             $arr[] = $obj->toArray();
             $arr[] = $obj->unit_cost;
             if($arr) {
-                echo json_encode($arr);
+                return json_encode($arr);
             } else {
-                echo json_encode('none');
+                return json_encode('none');
             }
-        } else {
-            echo json_encode('false');
         }
+
+        return json_encode('false');
     }
 
     /**
-     * 
+     * 调拨sku对应的ajax调用
      *
      * @param none
      * @return json
@@ -191,18 +185,16 @@ class StockController extends Controller
     public function ajaxAllotSku()
     {
         if(request()->ajax()) {
-            $warehouse =$_GET['warehouse'];
-            $sku = $_GET['sku'];
+            $warehouse =request()->input('warehouse');
+            $sku = request()->input('sku');
             $obj = StockModel::where(['warehouses_id'=>$warehouse, 'sku'=>$sku])->get()->first();
             if(!$obj) {
-                echo json_encode('none');
-                exit;
+                return json_encode('none');
             }
             $arr[] = $obj->toArray();
             $tmp = StockModel::where(['warehouses_id'=>$warehouse, 'sku'=>$sku])->distinct()->get();
             if(!$tmp) {
-                echo json_eoncode('none');
-                exit;
+                return json_eoncode('none');
             }
             foreach($tmp as $val) 
             {
@@ -211,12 +203,12 @@ class StockController extends Controller
             }
             $arr[2] = $obj->unit_cost;
             if($arr) {
-                echo json_encode($arr);
+                return json_encode($arr);
             } else {
-                echo json_encode('none');
+                return json_encode('none');
             }
-        } else {
-            echo json_encode('false');
         }
+
+        return json_encode('false');
     }
 }

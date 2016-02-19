@@ -76,8 +76,8 @@ class AllotmentController extends Controller
     public function store()
     {
         request()->flash();
-        $this->validate(request(), $this->rules(request()));
-        $len = count(array_keys(request()->input('arr')['sku']));
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
@@ -110,17 +110,26 @@ class AllotmentController extends Controller
         }
         $allotment = $model->allotmentform;
         $arr = [];
+        $available_quantity = [];
         foreach($allotment as $key => $value) 
         {
-            $arr[] = StockModel::where(['warehouses_id'=>$model->out_warehouses_id, 'warehouse_positions_id'=>$value->warehouse_positions_id])->get(['sku'])->toArray();
+            $obj = StockModel::where(['warehouses_id'=>$model->out_warehouses_id, 'sku'=>$value->sku])->get();
+            $available_quantity[] =  $obj->first()->available_quantity;
+            $buf = [];
+            foreach($obj as $v)
+            {   
+                $buf[] = $v->position->toArray();
+            }
+            $arr[] = $buf;
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
             'warehouses' => WarehouseModel::all(),
-            'positions' => PositionModel::where(['warehouses_id'=>$model->out_warehouses_id])->get(),
-            'skus' => $arr,
+            'skus' => StockModel::where(['warehouses_id'=>$model->out_warehouses_id])->distinct()->get(['sku']),
+            'positions' => $arr,
             'allotmentforms' => $allotment, 
+            'availquantity' => $available_quantity,
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -136,8 +145,8 @@ class AllotmentController extends Controller
     public function update($id)
     {
         request()->flash();
-        $this->validate(request(), $this->rules(request()));
-        $len = count(array_keys(request()->input('arr')['sku']));
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
         $obj = $this->model->find($id)->allotmentform;
         $obj_len = count($obj);
@@ -171,10 +180,10 @@ class AllotmentController extends Controller
      */
     public function destroy($id)
     {
-        $obj = $this->model->find($id)->allotmentform;
-        foreach($obj as $val)
+        $obj = $this->model->find($id);
+        foreach($obj->allotmentform as $val)
             $val->delete();
-        $this->model->destroy($id);
+        $obj->delete();
 
         return redirect($this->mainIndex);
     }
@@ -186,71 +195,51 @@ class AllotmentController extends Controller
      * @return json|time
      *
      */
-    public function ajaxAllotmentcheck()
+    public function ajaxAllotmentCheck()
     {
         if(request()->ajax()) {
-            $id = $_GET['id'];
+            $id = request()->input('id');
             $time = date('Y-m-d',time());       
             $obj = $this->model->find($id);
-            $obj->update(['check_status'=>'Y', 'check_time'=>$time, 'allotment_status'=>'out']); 
+            $obj->update(['check_status'=>'Y', 'check_time'=>$time]); 
             echo json_encode($time);
-            
-            $stock = new StockModel;
-            $obj->relation_id = $obj->id;
-            $arr = $obj->toArray();
-            $buf = $obj->allotmentform->toArray();
-            for($i=0;$i<count($buf);$i++) {
-                $tmp = array_merge($arr, $buf[$i]);
-                $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
-                $tmp['type'] = 'ALLOTMENT';
-                $stock->out($tmp);
-            }
         } else {
             echo json_encode('false');
         }
     }
 
-    /**
-     * 返回验证规则 
-     *
-     * @param $request request请求
-     * @return $arr
-     *
-     */
-    public function rules($request)
+    public function ajaxAllotmentNew()
     {
-        $arr = [
-            'allotment_time' => 'date|required',
-            'out_warehouses_id' => 'required|integer',
-            'in_warehouses_id' => 'required|integer',
-        ];
-        $buf = $request->all();
-        $buf = $buf['arr'];
-        foreach($buf as $key => $val) 
-        {
-            if($key == 'sku')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.sku.'.$k] ='required';
-                }
-            if($key == 'quantity')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.quantity.'.$k] ='required|integer';
-                }
-            if($key == 'warehouse_positions_id')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
-                }
-            if($key == 'amount')
-                foreach($val as $k => $v)
-                {
-                    $arr['arr.amount.'.$k] = 'required';
-                }
-        }
+        $id = request()->input('id');
+        $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00']);
+        echo json_encode('111');
+    }
 
-        return $arr;
+    public function ajaxAllotmentCheckOut()
+    {
+        $id = request()->input('id');
+        $obj = $this->model->find($id);
+        $obj->update(['allotment_status'=>'out']);
+        $stock = new StockModel;
+        $obj->relation_id = $obj->id;
+        $arr = $obj->toArray();
+        $buf = $obj->allotmentform->toArray();
+        for($i=0;$i<count($buf);$i++) {
+            $tmp = array_merge($arr, $buf[$i]);
+            $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
+            $tmp['type'] = 'ALLOTMENT';
+            $stock->out($tmp);
+        }
+        echo json_encode('1221');
+    }
+
+    /**
+     * 
+     */
+    public function ajaxAllotmentAdd()
+    {
+        $current = request()->input('current');
+        return view($this->viewPath.'add', ['current'=>$current]);
     }
 
     /**
@@ -262,7 +251,7 @@ class AllotmentController extends Controller
      */
     public function allotmentpick()
     {
-        $id = $_GET['id'];
+        $id = request()->input('id');
         $this->model->find($id)->update(['allotment_status'=>'pick']);
         echo json_encode('11');
     }
@@ -283,7 +272,7 @@ class AllotmentController extends Controller
             'allotment' => $obj,
             'allotmentforms' => $obj->allotmentform,
             'warehouses' => WarehouseModel::all(),
-            'positions' => $position->getObj(['warehouses_id'=>$obj->in_warehouses_id]),
+            'positions' => PositionModel::where(['warehouses_id'=>$obj->in_warehouses_id])->get(),
         ];
 
         return view($this->viewPath.'checkform', $response);

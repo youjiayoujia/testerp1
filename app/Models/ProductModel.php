@@ -123,49 +123,6 @@ class ProductModel extends BaseModel
     }
 
     /**
-     * 获得辅助供应商
-     * 2016-2-16 14:00:41 YJ
-     * @param int $id 供应商ID
-     * @return array
-     */
-    public function secondSupplierName($id)
-    {
-        $supplier = new SupplierModel();
-        return $supplier::find($id)->name;
-    }
-
-    /**
-     * jq获得产品属性
-     * 2016-1-11 14:00:41 YJ
-     * @param int $catalog_id ,$product_id 品类及产品ID
-     * @return array
-     */
-    public function getCatalogProperty($catalog_id)
-    {
-        $catalog = CatalogModel::find($catalog_id);
-        $set = ['variations', 'features'];
-        $data = [];
-        $modelSet = $catalog->getModels();
-        foreach ($set as $models) {
-            $i = 0;
-            foreach ($catalog->$models as $model) {
-                $data[$models][$i]['name'] = $model->name;
-                if ($models == 'features') {
-                    $data[$models][$i]['type'] = $model->type;
-                    $data[$models][$i]['feature_id'] = $model->id;
-                }
-                foreach ($model->values as $key => $value) {
-                    $data[$models][$i]['value'][] = $value->name;
-                }
-                $i++;
-            }
-        }
-        $data['models'] = $modelSet;
-
-        return $data;
-    }
-
-    /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ
      * @param array $data ,$files obj
@@ -346,31 +303,28 @@ class ProductModel extends BaseModel
      */
     public function createItem()
     {
-        //foreach ($product_id_array as $product_id) {
-            //$productModel = $this->find($product_id);
-            $attributes = $this->variationValue;
-            
-            $brr = [];
-            foreach ($attributes as $attribute) {
-                $brr[$attribute->attribute_id][] = $attribute->attribute_value;
+        $attributes = $this->variationValue;
+        
+        $brr = [];
+        foreach ($attributes as $attribute) {
+            $brr[$attribute->attribute_id][] = $attribute->attribute_value;
+        }
+        $brr = array_values($brr);
+        $result = Tool::createDikaer($brr);
+        $model = $this->model;
+        foreach ($result as $_result) {
+            $item = $model;
+            foreach ($_result as $__result) {
+                $item .= "-" . $__result;
             }
-            $brr = array_values($brr);
-            $result = Tool::createDikaer($brr);
-            $model = $this->model;
-            foreach ($result as $_result) {
-                $item = $model;
-                foreach ($_result as $__result) {
-                    $item .= "-" . $__result;
-                }
-                $product_data = $this->toArray();
-                $product_data['sku'] = $item;
-                $product_data['product_id'] = $this->id;
-                $item = new ItemModel();
-                $item->create($product_data);
-            }
-            $this->status = 1;
-            $this->save();
-        //}
+            $product_data = $this->toArray();
+            $product_data['sku'] = $item;
+            $product_data['product_id'] = $this->id;
+            $item = new ItemModel();
+            $item->create($product_data);
+        }
+        $this->status = 1;
+        $this->save();
     }
 
     public function destoryProduct()

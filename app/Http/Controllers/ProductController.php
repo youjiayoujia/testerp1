@@ -123,7 +123,7 @@ class ProductController extends Controller
         if($catalog_id==''){
             return 0;
         }
-        $data = $this->model->getCatalogProperty($catalog_id);
+        $data = $this->catalog->getCatalogProperty($catalog_id);
 
         return view($this->viewPath . 'ajaxset',['data' => $data]);
 

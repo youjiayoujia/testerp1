@@ -151,4 +151,35 @@ class CatalogModel extends BaseModel
         return $modelSet;
     }
 
+    /**
+     * jq获得产品属性
+     * 2016-1-11 14:00:41 YJ
+     * @param int $catalog_id ,$product_id 品类及产品ID
+     * @return array
+     */
+    public function getCatalogProperty($catalog_id)
+    {
+        $catalog = $this->find($catalog_id);
+        $set = ['variations', 'features'];
+        $data = [];
+        $modelSet = $catalog->getModels();
+        foreach ($set as $models) {
+            $i = 0;
+            foreach ($catalog->$models as $model) {
+                $data[$models][$i]['name'] = $model->name;
+                if ($models == 'features') {
+                    $data[$models][$i]['type'] = $model->type;
+                    $data[$models][$i]['feature_id'] = $model->id;
+                }
+                foreach ($model->values as $key => $value) {
+                    $data[$models][$i]['value'][] = $value->name;
+                }
+                $i++;
+            }
+        }
+        $data['models'] = $modelSet;
+
+        return $data;
+    }
+
 }

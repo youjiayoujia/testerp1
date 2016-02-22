@@ -45,22 +45,9 @@ class DataList
                     }
                     $filters = array_merge($urlFilters, $filters);
                 }
-                $queries = [];
-                foreach (explode('&', request()->getQueryString()) as $query) {
-                    $query = explode('=', $query);
-                    if ($query[0] == 'filters') {
-                        $queries[] = 'filters=' . implode(',', $filters);
-                    } else {
-                        $queries[] = $query[0] == 'filterClear' ? '' : $query[0] . '=' . $query[1];
-                    }
-                }
-                $url = request()->url() . '?' . implode('&', $queries);
-            } else {
-                $url = request()->fullUrl() . '&filters=' . implode(',', $filters);
             }
-        } else {
-            $url = request()->fullUrl() . '?filters=' . implode(',', $filters);
         }
+        $url = request()->url() . '?filters=' . implode(',', $filters);
         return $clear == true ? $url . '&filterClear=yes' : $url;
     }
 

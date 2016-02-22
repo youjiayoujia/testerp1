@@ -20,4 +20,59 @@ class Tool
     {
         return pathinfo($fileName, PATHINFO_EXTENSION);
     }
+
+    /**
+     * 创建sku对应属性的笛卡尔积
+     * 2015-12-18 10:43:48 YJ
+     * @param array $data
+     * @return array
+     */
+    public function createDikaer($data)
+    {
+        $cnt = count($data);  
+        $result = array();  
+        foreach($data[0] as $item) {  
+            $result[] = array($item);  
+        }  
+        for($i = 1; $i < $cnt; $i++) {  
+            $result = $this->combineArray($result,$data[$i]);  
+        }  
+        return $result;
+ 
+    }
+
+    /**
+     * 2个数组对笛卡尔积的处理
+     * 2015-12-18 10:43:48 YJ
+     * @param array $arr1,$arr2
+     * @return array
+     */
+    function combineArray($arr1,$arr2) {  
+        $result = array();  
+        foreach ($arr1 as $item1) {  
+            foreach ($arr2 as $item2) {  
+                $temp = $item1;  
+                $temp[] = $item2;  
+                $result[] = $temp;  
+            }  
+        }  
+        return $result;  
+    }
+
+    /**
+     * 随机创建sku
+     * 2015-12-18 10:43:21 YJ
+     * @return str
+     */
+    public function createSku()
+    {
+        $str = null;
+        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        $max = strlen($strPol)-1;
+        for($i=0;$i<5;$i++){
+            $str.=$strPol[rand(0,$max)];
+        }
+        return $str;
+ 
+    }
 }

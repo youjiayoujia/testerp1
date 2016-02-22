@@ -4,24 +4,24 @@ namespace App\Models\Catalog;
 
 use App\Base\BaseModel;
 
-class FeatureValueModel extends BaseModel
+class VariationValueModel extends BaseModel
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'feature_values';
+    protected $table = 'variation_values';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['feature_id', 'name'];
+    protected $fillable = ['variation_id', 'name'];
 
-    public function feature()
+    public function set()
     {
-        return $this->belongsTo('App\Models\Catalog\FeatureModel','feature_id');
+        return $this->belongsTo('App\Models\Catalog\VariationModel','variation_id');
     }
 }

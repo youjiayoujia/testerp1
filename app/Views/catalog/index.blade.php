@@ -1,9 +1,9 @@
 @extends('common.table')
 @section('tableHeader')
-    <th class="sort" data-url="{{ Sort::url('id') }}">ID{!! Sort::label('id') !!}</th>
+    <th class="sort" data-field="id">ID</th>
     <th>名称</th>
-    <th class="sort" data-url="{{ Sort::url('created_at') }}">创建时间{!! Sort::label('created_at') !!}</th>
-    <th class="sort" data-url="{{ Sort::url('created_at') }}">更新时间{!! Sort::label('created_at') !!}</th>
+    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
 

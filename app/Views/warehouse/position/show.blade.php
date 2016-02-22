@@ -10,13 +10,22 @@
                 <strong>名称</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-1">
-                <strong>仓库名</strong>: {{ $model->warehouse->name }}
+                <strong>仓库名</strong>: {{ $model->warehouse ? $model->warehouse->name : '' }}
             </div>
             <div class="col-lg-1">
                 <strong>备注</strong>: {{ $model->remark }}
             </div>
             <div class="col-lg-2">
                 <strong>库位大小</strong>: {{ $model->size }}
+            </div>
+            <div class="col-lg-2">
+                <strong>长(cm)</strong>: {{ $model->length }}
+            </div>
+            <div class="col-lg-2">
+                <strong>宽(cm)</strong>: {{ $model->width }}
+            </div>
+            <div class="col-lg-2">
+                <strong>高(cm)</strong>: {{ $model->height }}
             </div>
             <div class="col-lg-2">
                 <strong>是否启用</strong>: {{ $model->is_available == 'Y' ? '是' : '否' }}

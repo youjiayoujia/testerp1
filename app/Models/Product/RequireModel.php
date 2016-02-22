@@ -30,7 +30,7 @@ class RequireModel extends BaseModel
     ];
 
     //查询
-    public $searchFields = ['name', 'expected_date'];
+    public $searchFields = ['name'];
     
     /**
      *  移动文件 

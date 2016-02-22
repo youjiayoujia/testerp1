@@ -20,6 +20,8 @@ use App\Models\Stock\AllotmentFormModel;
 use App\Models\Stock\OutRepository;
 use App\Models\StockModel;
 use App\Models\Stock\AllotmentLogisticsModel;
+use App\Models\Stock\InModel;
+use App\Models\Stock\OutModel;
 
 class AllotmentController extends Controller
 {
@@ -43,7 +45,8 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $this->model->find($id),
-            'allotmentforms' => $this->model->find($id)->allotmentform,
+            'stockins' => InModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
+            'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
         ];
         
         return view($this->viewPath.'show', $response);
@@ -208,38 +211,82 @@ class AllotmentController extends Controller
         }
     }
 
+    /**
+     * 处理ajax请求，返回重新审核 
+     *
+     *  @param none
+     *  @return any
+     *
+     */
     public function ajaxAllotmentNew()
     {
-        $id = request()->input('id');
-        $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00']);
-        echo json_encode('111');
-    }
-
-    public function ajaxAllotmentCheckOut()
-    {
-        $id = request()->input('id');
-        $obj = $this->model->find($id);
-        $obj->update(['allotment_status'=>'out']);
-        $stock = new StockModel;
-        $obj->relation_id = $obj->id;
-        $arr = $obj->toArray();
-        $buf = $obj->allotmentform->toArray();
-        for($i=0;$i<count($buf);$i++) {
-            $tmp = array_merge($arr, $buf[$i]);
-            $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
-            $tmp['type'] = 'ALLOTMENT';
-            $stock->out($tmp);
+        if(request()->ajax()) {
+            $id = request()->input('id');
+            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00']);
+            return json_encode('111');
         }
-        echo json_encode('1221');
+
+        return json_encode('false');
     }
 
     /**
-     * 
+     * 处理ajax请求，确认出库 
+     *
+     *  @param none
+     *  @return  any
+     *
+     */
+    public function ajaxAllotmentCheckOut()
+    {
+        if(request()->ajax()) {
+            $id = request()->input('id');
+            $obj = $this->model->find($id);
+            $obj->update(['allotment_status'=>'out']);
+            $stock = new StockModel;
+            $obj->relation_id = $obj->id;
+            $arr = $obj->toArray();
+            $buf = $obj->allotmentform->toArray();
+            for($i=0;$i<count($buf);$i++) {
+                $tmp = array_merge($arr, $buf[$i]);
+                $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
+                $tmp['type'] = 'ALLOTMENT';
+                $stock->out($tmp);
+            }
+            return json_encode('1221');
+        }
+
+        return json_encode('false');
+    }
+
+    /**
+     *  处理ajax请求 
+     *
+     *  @param none
+     *  @return view
+     *
      */
     public function ajaxAllotmentAdd()
     {
-        $current = request()->input('current');
-        return view($this->viewPath.'add', ['current'=>$current]);
+        if(request()->ajax()) {
+            $current = request()->input('current');
+            $warehouse = request()->input('warehouse');
+            $sku_buf = StockModel::where('warehouses_id', $warehouse)->distinct()->get(['sku'])->toArray();
+            $positions = StockModel::where(['warehouses_id'=>$warehouse, 'sku'=>$sku_buf[0]['sku']])->get();
+            $buf = [];
+            foreach($positions as $position)
+            {
+                $tmp = $position->position->toArray();
+                $buf[] = $tmp;
+            }
+            $response = [
+                'skus' => $sku_buf,
+                'positions' => $buf,
+                'model' => $positions->first(),
+                'current'=>$current,
+            ];
+
+            return view($this->viewPath.'add', $response);
+        } 
     }
 
     /**
@@ -251,9 +298,13 @@ class AllotmentController extends Controller
      */
     public function allotmentpick()
     {
-        $id = request()->input('id');
-        $this->model->find($id)->update(['allotment_status'=>'pick']);
-        echo json_encode('11');
+        if(request()->ajax()) {
+            $id = request()->input('id');
+            $this->model->find($id)->update(['allotment_status'=>'pick']);
+            return json_encode('11');
+        }
+        
+        return json_encode('false');
     }
 
     /**

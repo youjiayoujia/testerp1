@@ -13,10 +13,10 @@
                 <strong>sku</strong>: {{ $model->sku }}
             </div>
             <div class="col-lg-1">
-                <strong>仓库</strong>: {{ $model->warehouse->name }}
+                <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : ''}}
             </div>
             <div class="col-lg-2">
-                <strong>库位</strong>: {{ $model->position->name }}
+                <strong>库位</strong>: {{ $model->position ? $model->position->name : ''}}
             </div>
             <div class="col-lg-2">
                 <strong>总数量</strong>: {{ $model->all_quantity }}

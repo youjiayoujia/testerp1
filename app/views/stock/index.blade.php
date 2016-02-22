@@ -18,8 +18,8 @@
             <td>{{ $stock->id }}</td>
             <td>{{ $stock->item_id }}</td>
             <td>{{ $stock->sku }}</td>
-            <td>{{ $stock->warehouse->name }}</td>
-            <td>{{ $stock->position->name }}</td>
+            <td>{{ $stock->warehouse ? $stock->warehouse->name : '' }}</td>
+            <td>{{ $stock->position ? $stock->position->name : '' }}</td>
             <td>{{ $stock->all_quantity}}</td>
             <td>{{ $stock->available_quantity}}</td>
             <td>{{ $stock->hold_quantity}}</td>

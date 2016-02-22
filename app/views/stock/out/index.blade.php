@@ -18,12 +18,12 @@
     @foreach($data as $stockout)
         <tr>
             <td>{{ $stockout->id }}</td>
-            <td>{{ $stockout->stock->item_id }}</td>
+            <td>{{ $stockout->stock ? $stockout->stock->item_id : '' }}</td>
             <td>{{ $stockout->stock->sku }}</td>
             <td>{{ $stockout->quantity}}</td>
             <td>{{ $stockout->amount}}</td>
-            <td>{{ $stockout->stock->warehouse->name }}</td>
-            <td>{{ $stockout->stock->position->name }}</td>
+            <td>{{ $stockout->stock ? $stockout->stock->warehouse ? $stockout->stock->warehouse->name : '' : '' }}</td>
+            <td>{{ $stockout->stock ? $stockout->stock->position ? $stockout->stock->position->name : '' : '' }}</td>
             <td>{{ $stockout->type_name }}</td>
             <td>{{ $stockout->relation_name }}</td>
             <td>{{ $stockout->remark }} </td>

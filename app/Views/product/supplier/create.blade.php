@@ -36,7 +36,7 @@
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="url">供货商网址</label>
-            <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') }}" disabled>
+            <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') }}" {{ old('type') ? old('type') == 'offline' ? 'disabled' : '' : 'disabled' }}>
         </div>
         <div class="form-group col-lg-4">
             <label for="telephone">供货商电话</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -68,7 +68,10 @@
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
-        init();
+        var buf = new Array();
+        buf[0] = "{{ old('province') }}" ;
+        buf[1] = "{{ old('city') }}" ;
+        init(buf[0],buf[1]);
 
         $('.radio').click(function(){
             if($(this).find(':radio:checked').val() == 'offline') {

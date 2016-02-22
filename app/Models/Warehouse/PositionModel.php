@@ -19,19 +19,25 @@ class PositionModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'warehouses_id', 'remark', 'size', 'is_available'];
+    protected $fillable = ['name', 'warehouses_id', 'remark', 'size', 'length', 'width', 'height', 'is_available'];
 
     // 用于规则验证
     public $rules = [
         'create' => [
             'name' => 'required|max:128|unique:warehouse_positions,name',
             'warehouses_id' => 'required',
-            'size' => 'required'
+            'size' => 'required',
+            'length' => 'numeric',
+            'width' => 'numeric', 
+            'height' => 'numeric'
             ],
         'update' => [
             'name' => 'required|max:128|unique:warehouse_positions,name,{id}',
             'warehouses_id' => 'required',
-            'size' => 'required'
+            'size' => 'required',
+            'length' => 'numeric',
+            'width' => 'numeric', 
+            'height' => 'numeric'
             ]
     ];
 

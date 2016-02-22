@@ -86,40 +86,14 @@
         allotoutwarehouse = '';
         current = 1;
         $(document).on('click', '#create_form', function(){
+            warehouse = $('#out_warehouses_id').val();
             $.ajax({
                 url:"{{ route('add') }}",
-                data:{current:current},
+                data:{current:current, warehouse:warehouse},
                 dataType:'html',
                 type:'get',
                 success:function(result) {
                     $('.addpanel').before(result);
-                    val = $('#out_warehouses_id').val();
-                    obj = $('.addpanel').prev();
-                    position = obj.find('.warehouse_positions_id');
-                    sku = obj.find('.sku');
-                    position.empty();
-                    if(allotoutwarehouse != 'none') {
-                        str = '';
-                        str1 = '';
-                        for(var i=0;i<allotoutwarehouse[2].length;i++) 
-                        {
-                            str += '<option value='+allotoutwarehouse[2][i]['id']+'>'+allotoutwarehouse[2][i]['name']+'</option>';
-                        }
-                        for(var i=0;i<allotoutwarehouse[0].length;i++)
-                        {
-                            str1 += '<option value='+allotoutwarehouse[0][i]['sku']+'>'+allotoutwarehouse[0][i]['sku']+'</option>';
-                        }
-                        if(allotoutwarehouse[1]) {
-                            obj.find('.item_id').val(allotoutwarehouse[1]['item_id']);
-                            obj.find('.access_quantity').val(allotoutwarehouse[1]['available_quantity']); 
-                        } else {
-                            obj.find('.item_id').val('');
-                            obj.find('.access_quantity').val('');
-                            sku.empty();
-                        }
-                        $(str).appendTo(position);
-                        $(str1).appendTo(sku);
-                    }
                     current++;
                 }
             })

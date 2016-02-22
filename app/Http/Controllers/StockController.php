@@ -59,7 +59,7 @@ class StockController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouses' => WarehouseModel::all(),
-            'positions' => PositionModel::where(['warehouses_id' => $model->warehouses_id])->get(['id', 'name']),
+            'positions' => $model->warehouse->get(['id', 'name']),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -141,7 +141,7 @@ class StockController extends Controller
             $obj = $this->model->where(['warehouses_id'=>$warehouse, 'sku'=>$arr[0][0]['sku']])->get();
             foreach($obj as $val)
             {
-                $tmp = $val->position->toArray();
+                $tmp = $val->position ? $val->position->toArray() : '';
                 $arr[2][] = $tmp;
             }
             return json_encode($arr);

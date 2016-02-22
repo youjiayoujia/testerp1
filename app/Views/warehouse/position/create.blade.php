@@ -18,32 +18,46 @@
         <label for="remark">备注信息</label>
         <input type='text' class="form-control" id="remark" placeholder="备注信息" name='remark' value="{{ old('remark') }}">
     </div>
+</div>
+<div class='row'>
+<div class="form-group col-lg-2">
+    <label for="size">库位大小</label>
+    <div class='radio'>
+        <label>
+            <input type='radio' name='size' value='小' {{ old('size') ? (old('size') == '小' ? 'checked' :  '') : '' }}>小
+        </label>
+        <label>
+            <input type='radio' name='size' value='中' {{ old('size') ? (old('size') == '中' ? 'checked' :  '') : 'checked' }}>中
+        </label>
+        <label>
+            <input type='radio' name='size' value='大' {{ old('size') ? (old('size') == '大' ? 'checked' :  '') : '' }}>大
+        </label>
+    </div>       
+</div>
+<div class='form-group col-lg-6'>
+    <div class='col-lg-2'>
+        <label for='length'>长(cm)</label>
+        <input type='text' name='length' class='form-control' placeholder='长' value={{ old('length')}}>
     </div>
-    <div class='row'>
-    <div class="form-group col-lg-2">
-        <label for="size">库位大小</label>
-        <div class='radio'>
-            <label>
-                <input type='radio' name='size' value='小' {{ old('size') ? (old('size') == '小' ? 'checked' :  '') : '' }}>小
-            </label>
-            <label>
-                <input type='radio' name='size' value='中' {{ old('size') ? (old('size') == '中' ? 'checked' :  '') : 'checked' }}>中
-            </label>
-            <label>
-                <input type='radio' name='size' value='大' {{ old('size') ? (old('size') == '大' ? 'checked' :  '') : '' }}>大
-            </label>
-        </div>       
+    <div class='col-lg-2'>
+        <label for='length'>宽(cm)</label>
+        <input type='text' name='width' class='form-control' placeholder='宽' value={{ old('width') }}>
     </div>
-    <div class="form-group col-lg-2">
-        <label for="is_available">库位是否启用</label>
-        <div class='radio'>
-            <label>
-                <input type='radio' name='is_available' value='Y' {{ old('is_available') ? (old('is_available') == 'Y' ? 'checked' :  '') : '' }}>启用
-            </label>   
-            <label>
-                <input type='radio' name='is_available' value='N' {{ old('is_available') ? (old('is_available') == 'N' ? 'checked' :  '') : 'checked' }}>不启用
-            </label>
-        </div>    
+    <div class='col-lg-2'>
+        <label for='length'>高(cm)</label>
+        <input type='text' name='height' class='form-control' placeholder='高' value={{ old('height')}}>
     </div>
-    </div>
+</div>
+<div class="form-group col-lg-2">
+    <label for="is_available">库位是否启用</label>
+    <div class='radio'>
+        <label>
+            <input type='radio' name='is_available' value='Y' {{ old('is_available') ? (old('is_available') == 'Y' ? 'checked' :  '') : '' }}>启用
+        </label>   
+        <label>
+            <input type='radio' name='is_available' value='N' {{ old('is_available') ? (old('is_available') == 'N' ? 'checked' :  '') : 'checked' }}>不启用
+        </label>
+    </div>    
+</div>
+</div>
 @stop

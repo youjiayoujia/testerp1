@@ -17,7 +17,7 @@
         <tr>
             <td>{{ $adjust->id }}</td>
             <td>{{ $adjust->adjust_form_id }}</td>
-            <td>{{ $adjust->warehouse->name }}</td>
+            <td>{{ $adjust->warehouse ? $adjust->warehouse->name : '' }}</td>
             <td>{{ $adjust->remark }}</td>
             <td>{{ $adjust->adjust_by }} </td>
             <td>{{ $adjust->adjust_time }}</td>

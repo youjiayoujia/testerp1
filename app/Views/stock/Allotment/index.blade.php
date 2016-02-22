@@ -24,19 +24,19 @@
         <tr>
             <td>{{ $allotment->id }}</td>
             <td>{{ $allotment->allotment_id }}</td>
-            <td>{{ $allotment->outwarehouse->name }}</td>
-            <td>{{ $allotment->inwarehouse->name }}</td>
+            <td>{{ $allotment->outwarehouse ? $allotment->outwarehouse->name : '' }}</td>
+            <td>{{ $allotment->inwarehouse ? $allotment->inwarehouse->name : '' }}</td>
             <td>{{ $allotment->remark }}</td>
-            <td>{{ $allotment->allotment_man_id }}</td>
+            <td>{{ $allotment->allotment_by }}</td>
             <td>{{ $allotment->allotment_time }}</td>
             <td>{{ $allotment->status_name }}</td>
-            <td>{{ $allotment->check_man_id }}</td>
+            <td>{{ $allotment->check_by }}</td>
             <td>{{ $allotment->check_status == 'N' ? '未审核' : '已审核' }}</td>
             <td>{{ $allotment->check_time }}</td>
             <td>1</td>
             <td>1</td>
             <td>1</td>
-            <td>{{ $allotment->checkform_man_id }}</td>
+            <td>{{ $allotment->checkform_by }}</td>
             <td>{{ $allotment->checkform_time }}</td>
             <td>{{ $allotment->created_at }}</td>
             <td>
@@ -147,23 +147,7 @@ $(document).ready(function(){
             dataType:'json',
             type:'get',
             success:function(result) {
-                str = "{{route('stockAllotment.show', ['id'=>''])}}/"+id;
-                str1 = "{{ route('stockAllotment.edit', ['id'=>'']) }}/"+id;
-                str2 = "{{route('stockAllotment.destroy', ['id'=>''])}}/"+id;
-                td.html("<a href='"+str+"' class='btn btn-info btn-xs'>\
-                    <span class='glyphicon glyphicon-eye-open'></span> 查看\
-                </a> <a href='"+str1+"' class='btn btn-warning btn-xs'>\
-                    <span class='glyphicon glyphicon-pencil'></span> 编辑\
-                </a> <a href='javascript:' class='btn btn-success btn-xs check_time' data-id='"+id+"'>\
-                    <span class='glyphicon glyphicon-pencil'></span>\
-                    审核调拨单\
-                </a> <a href='javascript:' class='btn btn-danger btn-xs delete_item'\
-                   data-id='"+id+"'\
-                   data-url='"+str2+"'>\
-                    <span class='glyphicon glyphicon-trash'></span> 删除\
-                </a>");
-                td.parent().find('td:eq(7)').text('new');
-                td.parent().find('td:eq(9)').text('未审核');
+                location.reload();
             }
         });
     });

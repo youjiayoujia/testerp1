@@ -95,7 +95,6 @@ Route::resource('channel', 'ChannelController');
 //渠道账号路由
 Route::resource('channelAccount', 'Channel\AccountController');
 
-<<<<<<< HEAD
 /**
  *  stock allotment route
  */
@@ -108,9 +107,8 @@ Route::get('allotmentpick', ['uses'=>'Stock\AllotmentController@allotmentpick', 
 Route::get('allotmentcheck', ['uses' => 'Stock\AllotmentController@ajaxAllotmentCheck', 'as'=>'allotmentcheck']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 
-=======
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
 Route::resource('product', 'ProductController');
->>>>>>> master
+

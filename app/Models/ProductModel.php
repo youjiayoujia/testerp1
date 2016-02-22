@@ -291,6 +291,18 @@ class ProductModel extends BaseModel
     }
 
     /**
+     * 获得辅助供应商
+     * 2016-2-16 14:00:41 YJ
+     * @param int $id 供应商ID
+     * @return array
+     */
+    public function secondSupplierName($id)
+    {
+        $supplier = new SupplierModel();
+        return $supplier::find($id)->name;
+    }
+
+    /**
      * 创建item
      * 2016-1-13 17:48:26 YJ
      * @param array product_id_array 产品id字符串

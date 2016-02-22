@@ -1,36 +1,11 @@
 <?php
-
 namespace App\Models;
 
-use App\Base\BaseModel;
-<<<<<<< HEAD
-
-class ItemModel extends BaseModel
-{
-
-=======
 use App\Models\Product\SupplierModel;
+use App\Base\BaseModel;
 
 class ItemModel extends BaseModel
 {
->>>>>>> master
-    /**
-     * The database table used by the model.
-     *
-     * @var string
-     */
-<<<<<<< HEAD
-    protected $table = 'item';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['sku'];
-
-}
-=======
     protected $table = 'items';
 
 	public $searchFields = ['sku'];
@@ -56,4 +31,3 @@ class ItemModel extends BaseModel
         return $supplier::find($id)->name;
     }
 }
->>>>>>> master

@@ -21,8 +21,16 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 //品类路由
 Route::resource('catalog', 'CatalogController');
 
+//item路由
+Route::resource('item', 'ItemController');
+
 //渠道路由
 Route::resource('channel', 'ChannelController');
 
 //渠道账号路由
 Route::resource('channelAccount', 'Channel\AccountController');
+
+//产品管理路由
+Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
+Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
+Route::resource('product', 'ProductController');

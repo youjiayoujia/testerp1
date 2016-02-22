@@ -57,3 +57,15 @@ th:hover:not([data-sort=false]) {
 .ajaxi{
     margin-left: 3px;
 }
+
+.innercheckboxs{
+    margin-top: 10px !important;
+}
+
+.upimage{
+    margin-bottom: 5px
+}
+
+.panel-body .form-group{
+    padding-left: 1px !important;
+}

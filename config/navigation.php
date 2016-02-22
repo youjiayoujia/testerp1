@@ -36,6 +36,16 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '产品管理',
+                'url' => 'product.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '货品',
+                'url' => 'item.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '产品图片',
                 'url' => 'productImage.index',
                 'icon' => '',

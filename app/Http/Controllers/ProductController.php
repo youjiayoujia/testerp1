@@ -51,17 +51,25 @@ class ProductController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 产品编辑页面
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function edit($id)
     {
-        $product = $this->model->find($id);        
+        $product = $this->model->find($id);       
+        if (!$product) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        //已选中的variation的id号集合     
         foreach($product->variationValue->toArray() as $key=>$arr){
             $variation_value_id_arr[$key] = $arr['variation_value_id'];
         }
+        //已选中的feature的id集合
         foreach($product->spu->productFeatureValue->toArray() as $key=>$arr){
             $features_value_id_arr[$key] = $arr['feature_value_id'];
-        }       
-        if (!$product) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

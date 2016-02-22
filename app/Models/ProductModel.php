@@ -7,10 +7,8 @@ use App\Models\CatalogModel;
 use App\Models\SpuModel;
 use App\Models\ItemModel;
 use App\Models\Product\ImageModel;
-//use App\Models\Product\ProductAttributeValueModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
-//use App\Models\Catalog\AttributeValueModel;
 use App\Models\Catalog\variationValueModel;
 use App\Models\Catalog\FeatureValueModel;
 use App\Models\Product\SupplierModel;
@@ -115,8 +113,6 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\Product\ProductVariationValueModel', 'product_id');
     }
 
-    
-
     public function item()
     {
         return $this->hasMany('App\Models\ItemModel', 'product_id');
@@ -165,8 +161,8 @@ class ProductModel extends BaseModel
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
                         $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
-                        foreach ($variationValues as $variationValue) {
-                            $variationValueModel = $variationModel->values()->where('name', '=',$variationValue)->get()->first();
+                        foreach ($variationValues as $value_id=>$variationValue) {
+                            $variationValueModel = $variationModel->values()->where('id', '=',$value_id)->get()->first();
                             $variationArray['variation_id'] = $variationModel->id;
                             $variationArray['variation_value'] = $variationValueModel->name;
                             $variationArray['variation_value_id'] = $variationValueModel->id;
@@ -179,6 +175,7 @@ class ProductModel extends BaseModel
             }
             //插入feature属性
             $keyset = ['featureradio', 'featurecheckbox', 'featureinput'];
+            
             foreach ($keyset as $key) {
                 if (array_key_exists($key, $data)) {
                     foreach ($data[$key] as $feature_id => $feature_value) {
@@ -190,6 +187,7 @@ class ProductModel extends BaseModel
                                 $productFeatureValueModel = new ProductFeatureValueModel();
                                 $featureModel = new FeatureValueModel();
                                 $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',$feature_id)->get()->toArray();
+
                                 $featureArray['feature_value_id'] = $value_id[0]['id'];
                                 $productFeatureValueModel->create($featureArray);
                             }
@@ -227,11 +225,9 @@ class ProductModel extends BaseModel
                     $tmp['product_id'] = $this->id;
                     $tmp['variation_id'] = $variation_id;
                     $variationValueModel = new variationValueModel();
-
-                    foreach ($variation_values as $variation_value) {
+                    foreach ($variation_values as $feature_value_id=>$variation_value) {
                         $tmp['variation_value'] = $variation_value;
-                        $variation_value_id = $variationValueModel->where('name',$variation_value)->where('variation_id', $variation_id)->get()->toArray();
-                        $tmp['variation_value_id'] = $variation_value_id[0]['id'];
+                        $tmp['variation_value_id'] = $feature_value_id;
                         $model = new ProductVariationValueModel();
                         $model->create($tmp);
                     }
@@ -250,8 +246,7 @@ class ProductModel extends BaseModel
                             $tmp['feature_value'] = $feature_value;
                             $model = new ProductFeatureValueModel();
                             $featureModel = new FeatureValueModel();
-                            $value_id = $featureModel->where('name', '=', $feature_value)->where('feature_id', '=',
-                                $feature_id)->get()->toArray();
+                            $value_id = $featureModel->where('name', '=', $feature_value)->where('feature_id', '=',$feature_id)->get()->toArray();
                             $tmp['feature_value_id'] = $value_id[0]['id'];
                             $model->create($tmp);
                         }

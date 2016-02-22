@@ -20,7 +20,7 @@ class FeatureValueModel extends BaseModel
      */
     protected $fillable = ['feature_id', 'name'];
 
-    public function set()
+    public function feature()
     {
         return $this->belongsTo('App\Models\Catalog\FeatureModel','feature_id');
     }

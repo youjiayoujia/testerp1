@@ -7,11 +7,12 @@
                     <input type='checkbox' id="{{$model}}" onclick="quanxuan('{{$model}}')" name='modelSet[{{$model}}][model]' value='{{$model}}'>{{$model}}
                 </label>
             </div>
+
             @foreach($data['variations'] as $key=>$getattr)        
                 <div class="checkbox col-md-2 innercheckboxs">{{$getattr['name']}}:
-                    @foreach($getattr['value'] as $innervalue)
+                    @foreach($getattr['value'] as $varaiton_key=>$innervalue)
                         <label>
-                            <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][variations][{{$getattr['name']}}][]' value='{{$innervalue}}'>{{$innervalue}}
+                            <input type='checkbox' class="{{$model}}quanxuan" name='modelSet[{{$model}}][variations][{{$getattr['name']}}][{{$varaiton_key}}]' value='{{$innervalue}}'>{{$innervalue}}
                         </label>
                     @endforeach
                 </div>

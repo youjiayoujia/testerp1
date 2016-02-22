@@ -172,13 +172,13 @@ class CatalogModel extends BaseModel
                     $data[$models][$i]['feature_id'] = $model->id;
                 }
                 foreach ($model->values as $key => $value) {
-                    $data[$models][$i]['value'][] = $value->name;
+                    $data[$models][$i]['value'][$value->id] = $value->name;
                 }
                 $i++;
             }
         }
         $data['models'] = $modelSet;
-
+        
         return $data;
     }
 

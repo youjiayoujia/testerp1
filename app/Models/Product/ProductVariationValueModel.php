@@ -12,4 +12,8 @@ class ProductVariationValueModel extends BaseModel
     {      
         return $this->belongsTo('App\Models\Catalog\VariationModel','variation_id');
     }
+
+    public function productVariation(){
+        return $this->belongsToMany('App\Models\Product\ProductVariationValueModel');
+    }
 }

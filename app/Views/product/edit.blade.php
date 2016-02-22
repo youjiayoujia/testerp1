@@ -23,7 +23,7 @@
                         <div class="checkbox col-md-2 innercheckboxs">{{$getattr->name}}:
                             @foreach($getattr->values as $innervalue)
                                 <label>
-                                    <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='variations[{{$getattr->id}}][]' value='{{$innervalue->name}}' {{ in_array($innervalue->id, $variation_value_id_arr)? 'checked' : '' }}>{{$innervalue->name}}
+                                    <input type='checkbox' class='{{$getattr->id}}-{{$innervalue->name}}' name='variations[{{$getattr->id}}][{{$innervalue->id}}]' value='{{$innervalue->name}}' {{ in_array($innervalue->id, $variation_value_id_arr)? 'checked' : '' }}>{{$innervalue->name}}
                                 </label>
                             @endforeach
                         </div>

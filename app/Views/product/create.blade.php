@@ -133,8 +133,6 @@
             }else{
                 $("input[name^='modelSet["+model+"]'").attr("checked", true);
             }
-            
-            //alert(model);
         })
 
         function quanxuan(id){

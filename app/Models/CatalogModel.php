@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use Illuminate\Support\Facades\DB;
+use Tool;
 
 class CatalogModel extends BaseModel
 {
@@ -15,9 +16,9 @@ class CatalogModel extends BaseModel
      */
     protected $fillable = ['name'];
 
-    protected $searchFields = ['name'];
+    public $searchFields = ['name'];
 
-    protected $rules = [
+    public $rules = [
         'create' => ['name' => 'required|unique:catalogs,name'],
         'update' => ['name' => 'required|unique:catalogs,name,{id}']
     ];
@@ -27,9 +28,9 @@ class CatalogModel extends BaseModel
         return $this->hasMany('App\Models\Catalog\SetModel','catalog_id');
     }
 
-    public function Attributes()
+    public function variations()
     {
-        return $this->hasMany('App\Models\Catalog\AttributeModel','catalog_id');
+        return $this->hasMany('App\Models\Catalog\VariationModel','catalog_id');
     }
 
     public function features()
@@ -64,11 +65,11 @@ class CatalogModel extends BaseModel
         return $catalog;        
     }
 
-    public function updateCatalog($catalogModel,$data,$extra=[])
+    public function updateCatalog($data,$extra=[])
     {
         DB::beginTransaction();
         //更新分类信息
-        $catalogModel->update($data);
+        $this->update($data);
         //更新分类属性
         if($extra){
             try {
@@ -76,7 +77,7 @@ class CatalogModel extends BaseModel
                         foreach($property as $valueModel){
                             if(array_key_exists("id",$valueModel)){
                                 //更新属性名属性值
-                                $modelObj =  $catalogModel->$model()->find($valueModel['id']);
+                                $modelObj =  $this->$model()->find($valueModel['id']);
                                 $modelObj->update($valueModel);
                                 foreach($valueModel['value'] as $valueModelValue){
                                     if(array_key_exists("id",$valueModelValue)){                                        
@@ -88,7 +89,7 @@ class CatalogModel extends BaseModel
                                     }
                                 }
                             }else{//新增属性名属性值
-                                $newset = $catalogModel->$model()->create($valueModel);
+                                $newset = $this->$model()->create($valueModel);
                                 foreach($valueModel['value'] as $one){
                                     $newset->values()->create($one);
                                 }
@@ -103,14 +104,12 @@ class CatalogModel extends BaseModel
         DB::commit();
     }
 
-    public function destoryCatalog($id)
+    public function destoryCatalog()
     {
-        $extras = ['Attributes','sets','features'];
-        //找到catalog model
-        $catalog = $this->find($id);
+        $extras = ['variations','sets','features'];
         //删除对应的属性
         foreach ($extras as $models) {
-            foreach ($catalog->$models as $model) {
+            foreach ($this->$models as $model) {
                 foreach ($model->values as $value) {
                     $value->delete();
                 }
@@ -118,7 +117,69 @@ class CatalogModel extends BaseModel
             }
         }
         //删除catalog
-        $catalog->delete();
+        $this->delete();
+    }
+
+    /**
+     * 获取笛卡尔积model集合
+     * 2016-1-6 16:15:22 YJ
+     * @param int catalog_id 品类id
+     * @return array
+     */
+    public function getModels()
+    {
+        $brr = [];
+        //获得product对应set的笛卡尔积
+        foreach($this->sets as $set){
+            $arr = [];
+            foreach($set->values as $setValue){
+                $arr[] = $setValue->name;
+            }
+            $brr[] =$arr;
+        }
+        $result = Tool::createDikaer($brr);
+        $modelSet = [];
+        //拼接model
+        foreach($result as $_result){
+            $sku = '';
+            foreach($_result as $__result){
+                $sku .= '-'.$__result;
+            }
+            $sku = substr($sku,1);
+            $modelSet[] = $sku;
+        }
+        return $modelSet;
+    }
+
+    /**
+     * jq获得产品属性
+     * 2016-1-11 14:00:41 YJ
+     * @param int $catalog_id ,$product_id 品类及产品ID
+     * @return array
+     */
+    public function getCatalogProperty($catalog_id)
+    {
+        $catalog = $this->find($catalog_id);
+        $set = ['variations', 'features'];
+        $data = [];
+        $modelSet = $catalog->getModels();
+        foreach ($set as $models) {
+            $i = 0;
+            foreach ($catalog->$models as $model) {
+                $data[$models][$i]['name'] = $model->name;
+                if ($models == 'features') {
+                    $data[$models][$i]['type'] = $model->type;
+                    $data[$models][$i]['feature_id'] = $model->id;
+                }
+                foreach ($model->values as $key => $value) {
+                    $data[$models][$i]['value'][$value->id] = $value->name;
+                }
+                $i++;
+            }
+        }
+        $data['models'] = $modelSet;
+        
+        return $data;
     }
 
 }

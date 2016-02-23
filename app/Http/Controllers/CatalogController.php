@@ -25,14 +25,14 @@ class CatalogController extends Controller
      * 2015-12-18 14:38:20 YJ
      * @return Illuminate\Http\RedirectResponse Object
      */
-    public function store()
+    public function store() //todo:attribute是否需要大写
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         //封装数据
         $data = request()->all();
         $extra['sets'] = request()->input('sets');
-        $extra['Attributes'] = request()->input('attributes');
+        $extra['variations'] = request()->input('variations');
         $extra['features'] = request()->input('features');
         //创建品类
         $this->model->createCatalog($data,$extra);
@@ -57,10 +57,10 @@ class CatalogController extends Controller
         //封装数据
         $data = request()->all();
         $extra['sets'] = request()->input('sets');
-        $extra['Attributes'] = request()->input('attributes');
+        $extra['variations'] = request()->input('variations');
         $extra['features'] = request()->input('features');
         //更新品类信息
-        $this->model->updateCatalog($catalogModel,$data,$extra);
+        $catalogModel->updateCatalog($data,$extra);
         return redirect($this->mainIndex);
     }
 
@@ -72,7 +72,8 @@ class CatalogController extends Controller
      */
     public function destroy($id)
     {
-        $this->model->destoryCatalog($id);
+        $catalogModel = $this->model->find($id);
+        $catalogModel->destoryCatalog();
         return redirect(route('catalog.index'));
     }
 }

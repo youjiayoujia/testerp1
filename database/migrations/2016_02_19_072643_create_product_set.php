@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAttributes extends Migration
+class CreateProductSet extends Migration
 {
     /**
      * Run the migrations.
@@ -12,13 +12,14 @@ class CreateAttributes extends Migration
      */
     public function up()
     {
-        Schema::create('attributes', function (Blueprint $table) {
+        Schema::create('sets', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('catalog_id')->comment('属性名')->default(0);
             $table->string('name')->comment('属性名')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
-        });    }
+        });
+    }
 
     /**
      * Reverse the migrations.
@@ -27,6 +28,6 @@ class CreateAttributes extends Migration
      */
     public function down()
     {
-        Schema::drop('attributes');
+        Schema::drop('sets');
     }
 }

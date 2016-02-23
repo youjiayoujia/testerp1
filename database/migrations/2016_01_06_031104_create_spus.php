@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSoftDeleteToUser extends Migration
+class CreateSpus extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,11 @@ class AddSoftDeleteToUser extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::create('spus', function (Blueprint $table) {
+            $table->increments('id');
+            $table->tinyInteger('spu')->comment('spu')->nullable()->default(NULL);
+            $table->tinyInteger('status')->comment('状态')->nullable()->default(0);
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -24,8 +28,6 @@ class AddSoftDeleteToUser extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['delete_at']);
-        });
+        Schema::drop('spus');
     }
 }

@@ -22,6 +22,9 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 //品类路由
 Route::resource('catalog', 'CatalogController');
 
+//item路由
+Route::resource('item', 'ItemController');
+
 //渠道路由
 Route::resource('channel', 'ChannelController');
 
@@ -44,3 +47,7 @@ Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCo
 Route::get('scanAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 
+//产品管理路由
+Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
+Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
+Route::resource('product', 'ProductController');

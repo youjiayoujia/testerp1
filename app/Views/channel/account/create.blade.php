@@ -187,6 +187,8 @@
 @stop
 
 <script type="text/javascript">
+
+    // 拼接已选的option
     function getPostOption(){
         var selectedOptions = "";
         $(".selectedOption").each(function(){
@@ -196,9 +198,24 @@
         $("#businesser_ids").html(selectedOptions);
     }
 
+    // 检测是否被选
+    function checkWhetherSelected(that)
+    {
+        var selectedOption = [];
+        $(".selectedOption").each(function(){
+            selectedOption.push($(this).val());
+        });
+
+        var status = selectedOption.indexOf($(that).val());
+        if(status >= 0){
+            return true;
+        }else if(status < 0){
+            return false;
+        }
+    }
+
     function addOption(that){
-        if(!$(that).hasClass("selected")){
-            $(that).addClass("selected");
+        if(!checkWhetherSelected(that)){
             var optionHtml = '<option class="form-control selectedOption" value="' + $(that).val() + '" onclick="deleteOption( this )">' + $(that).html() + '</option>';
             $("#addNewOption").append(optionHtml);
             getPostOption();

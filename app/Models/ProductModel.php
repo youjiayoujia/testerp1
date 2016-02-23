@@ -118,16 +118,9 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\ItemModel', 'product_id');
     }
 
-    /**
-     * 获得辅助供应商
-     * 2016-2-16 14:00:41 YJ
-     * @param int $id 供应商ID
-     * @return array
-     */
-    public function secondSupplierName($id)
+    public function ProductVariationvalue()
     {
-        $supplier = new SupplierModel();
-        return $supplier::find($id)->name;
+        return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
     }
 
     /**
@@ -137,7 +130,7 @@ class ProductModel extends BaseModel
      */
     public function createProduct($data = '', $files = '')
     {
-        DB::beginTransaction();
+        //DB::beginTransaction();
         try {
             //创建spu，,并插入数据
             $spumodel = new SpuModel();
@@ -175,12 +168,8 @@ class ProductModel extends BaseModel
                         $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
                         foreach ($variationValues as $value_id=>$variationValue) {
                             $variationValueModel = $variationModel->values()->where('id', '=',$value_id)->get()->first();
-                            $variationArray['variation_id'] = $variationModel->id;
-                            $variationArray['variation_value'] = $variationValueModel->name;
-                            $variationArray['variation_value_id'] = $variationValueModel->id;
-                            $variationArray['product_id'] = $product->id;
-                            $ProductVariationValueModel = new ProductVariationValueModel();
-                            $ProductVariationValueModel->create($variationArray);
+                            $variation_value_arr = [$variationValueModel->id=>['variation_value'=>$variationValueModel->name,'variation_id'=>$variationModel->id]];
+                            $product->ProductVariationvalue()->attach($variation_value_arr);
                         }
                     }
                 }
@@ -310,11 +299,11 @@ class ProductModel extends BaseModel
      */
     public function createItem()
     {
-        $variations = $this->variationValue;
+        $attributes = $this->variationValue;
         
         $brr = [];
-        foreach ($variations as $variation) {
-            $brr[$variation->variation_id][] = $variation->variation_value;
+        foreach ($attributes as $attribute) {
+            $brr[$attribute->attribute_id][] = $attribute->attribute_value;
         }
         $brr = array_values($brr);
         $result = Tool::createDikaer($brr);

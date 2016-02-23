@@ -92,6 +92,7 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
+            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
             $buf['stock_adjustments_id'] = $obj->id;
             AdjustFormModel::create($buf);
         }
@@ -149,6 +150,7 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $id;
+            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {
@@ -177,6 +179,23 @@ class AdjustmentController extends Controller
     }
 
     /**
+     * 
+     *
+     *
+     */
+    public function ajaxAdjustAdd()
+    {
+        $current = request()->input('current');
+        $warehouse = request()->input('warehouse');
+        $response = [
+            'current' => $current,
+            'positions' => PositionModel::where('warehouses_id', $warehouse)->get(),
+        ];
+
+        return view($this->viewPath.'add', $response);
+    }
+
+    /**
      * 处理ajax请求参数,审核
      *
      * @param none
@@ -191,7 +210,6 @@ class AdjustmentController extends Controller
             $obj = $this->model->find($id);
             $obj->update(['status'=>'Y', 'check_time'=>$time]); 
             echo json_encode($time);
-
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustment->toArray();
@@ -199,12 +217,14 @@ class AdjustmentController extends Controller
             DB::beginTransaction();
             try {
                 for($i=0;$i<count($buf);$i++) {
+
                     $tmp = array_merge($arr,$buf[$i]);
                     if($tmp['type'] == 'IN') {
                         $tmp['type'] = 'ADJUSTMENT';
                         $stock->in($tmp);
                     } else {
                         $tmp['type'] = 'ADJUSTMENT';
+
                         $stock->out($tmp);
                     }
                 }
@@ -212,8 +232,6 @@ class AdjustmentController extends Controller
                 DB::rollback();
             }
             DB::commit();
-        } else {
-            return json_encode('false');
         }
     }
 }

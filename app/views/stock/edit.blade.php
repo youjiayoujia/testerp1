@@ -3,16 +3,16 @@
 @section('formAction') {{ route('stock.update', ['id' => $model->id] ) }} @stop
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'>
-    <div class="form-group">
-        <label for="item_id" class='control-label'>item号</label> 
-        <input type='text' class="form-control" id="item_id" placeholder="item号" name='item_id' value="{{ old('item_id') ? old('item_id') : $model->item_id }}" readonly>
-    </div>
-    <div class="form-group">
-        <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') ? old('sku') : $model->sku }}">
-    </div>
     <div class='row'>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-lg-4">
+            <label for="item" class='control-label'>item</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='items_id' class='form-control'>
+                @foreach($items as $item)
+                <option value={{$item->id}} {{ old('items_id') ? old('items_id') == $item->id ? 'selected' : '' : $item->id == $model->items_id ? 'selected' : '' }}>{{$item->sku}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-sm-4">
             <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouses_id' id='warehouses_id' class='form-control'>
                 <option>请选择仓库</option>
@@ -21,7 +21,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-4">
             <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'>
                 @foreach($positions as $position)

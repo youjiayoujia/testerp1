@@ -1,9 +1,9 @@
 <div class='row'>
 <div class='form-group col-sm-2'>
     <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-    <select name='arr[sku][{{$current}}]' id='arr[sku][{{$current}}]' class='form-control sku'>
+    <select name='arr[items_id][{{$current}}]' id='arr[sku][{{$current}}]' class='form-control sku'>
     @foreach($skus as $sku)
-        <option value={{$sku['sku']}}>{{$sku['sku']}}</option>
+        <option value={{$sku['items']['id']}}>{{$sku['items']['sku']}}</option>
     @endforeach
     </select>
 </div>
@@ -14,10 +14,6 @@
         <option value={{$position['id']}}>{{$position['name']}}</option>
     @endforeach
     </select>
-</div>
-<div class='form-group col-sm-1'>
-    <label for='item_id' class='control-label'>item号</label> 
-    <input type='text' class='form-control item_id' id='arr[item_id][{{$current}}]' placeholder='item号' name='arr[item_id][{{$current}}]' value="{{ $model->item_id }}" readonly>
 </div>
 <div class='form-group col-sm-2'>
 <label for='access_quantity' class='control-label'>可用数量</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>

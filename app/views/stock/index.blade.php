@@ -1,14 +1,13 @@
 @extends('common.table')
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
-    <th class='sort' data-field='item_id'>item号</th>
     <th>sku</th>  
     <th>仓库</th>
     <th>库位</th>
-    <th class='sort' data-field='all_amount'>总数量</th>
-    <th class='sort' data-field='available_amount'>可用数量</th>
-    <th class='sort' data-field='hold_amount'>hold数量</th>
-    <th class='sort' data-field='total_amount'>总金额</th>
+    <th class='sort' data-field='all_quantity'>总数量</th>
+    <th class='sort' data-field='available_quantity'>可用数量</th>
+    <th class='sort' data-field='hold_quantity'>hold数量</th>
+    <th class='sort' data-field='amount'>总金额</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
 @stop
@@ -16,8 +15,7 @@
     @foreach($data as $stock)
         <tr>
             <td>{{ $stock->id }}</td>
-            <td>{{ $stock->item_id }}</td>
-            <td>{{ $stock->sku }}</td>
+            <td>{{ $stock->items ? $stock->items->sku : '' }}</td>
             <td>{{ $stock->warehouse ? $stock->warehouse->name : '' }}</td>
             <td>{{ $stock->position ? $stock->position->name : '' }}</td>
             <td>{{ $stock->all_quantity}}</td>

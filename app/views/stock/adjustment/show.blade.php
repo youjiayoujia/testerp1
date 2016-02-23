@@ -19,7 +19,7 @@
         <div class="panel-heading">调动信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $adjustment->sku }}
+                <strong>sku</strong>: {{ $adjustment->items->sku }}
             </div>
             <div class="col-lg-2">
                 <strong>type</strong>: {{ $adjustment->type == 'IN' ? '入库' : '出库'}}

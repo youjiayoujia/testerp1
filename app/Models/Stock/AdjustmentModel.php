@@ -56,7 +56,7 @@ class AdjustmentModel extends BaseModel
     public function rule($request)
     {
         $arr = [
-            'adjust_time' => 'date|required',
+            'adjust_time' => 'date',
         ];
         $buf = $request->all();
         $buf = $buf['arr'];

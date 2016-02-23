@@ -31,65 +31,59 @@
             <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') ? old('remark') : $model->remark }}</textarea>
         </div>
     </div>
-    @foreach($adjustments as $key => $adjustment)
     <div class="panel panel-primary">
         <div class="panel-heading">
-            sku{{($key+1)}}
+            sku
             <button type='button' class='btn btn-primary div_del bt_right'><span class='glyphicon glyphicon-remove'></span></button>
         </div>
         <div class='panel-body'>
-            <div class='row'>
-                <div class="form-group col-sm-6">
-                    <label for="item_id" class='control-label'>item号</label> 
-                    <input type='text' class="form-control item_id" placeholder="item号" name='arr[item_id][{{$key}}]' value="{{ old('arr[item_id][$key]') ? old('arr[item_id][$key]') : $adjustment->item_id }}" readonly>
-                </div>
-                <div class="form-group col-sm-6">
-                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control sku" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $adjustment->sku }}">
-                </div>
-            </div>
-            <div class='row'>
-                <div class='form-group col-sm-3'>
-                    <label>出入库类型</label>
-                    <div class='radio type'>
-                        <label>
-                            <input type='radio' name='arr[type][{{$key}}]' value='IN' {{ old('arr[type][$key]') ? old('arr[type][$key]') == 'IN' ? 'checked' : '' : $adjustment->type == 'IN' ? 'checked' : ''}}>入库
-                        </label>
+            @foreach($adjustments as $key => $adjustment)
+                <div class='row'>
+                    <div class="form-group col-sm-2">
+                        <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $adjustment->items->sku }}">
                     </div>
-                    <div class='radio type'>
-                        <label>
-                            <input type='radio' name='arr[type][{{$key}}]' value='OUT' {{ old('arr[type][$key]') ? old('arr[type][$key]') == 'OUT' ? 'checked' : '' : $adjustment->type == 'OUT' ? 'checked' : ''}}>出库
-                        </label>
+                    <div class='form-group col-sm-2'>
+                        <label>出入库类型</label>
+                        <select name='arr[type][{{$key}}]' class='form-control type'>
+                            <option value='IN' {{ old('arr[type][$key]')? old('arr[type][$key]') == 'IN' ? 'selected' : '' :$adjustment->type == 'IN' ? 'selected' : '' }}>入库</option>
+                            <option value='OUT' {{ old('arr[type][$key]')? old('arr[type][$key]') == 'OUT' ? 'selected' : '' :$adjustment->type == 'OUT' ? 'selected' : '' }}>出库</option>
+                        </select>
                     </div>
+                    <div class="form-group col-sm-2">
+                        <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <select name='arr[warehouse_positions_id][{{$key}}]' id='arr[warehouse_positions_id][{{$key}}]' class='form-control warehouse_positions_id'>
+                        @foreach($positions as $position)
+                            <option value={{$position['id']}} {{ $position['id'] == $adjustment->warehouse_positions_id ? 'selected' : ''}}>{{ $position['name'] }}</option>
+                        @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <label for="quantity" class='control-label'>数量</label>
+                        <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <input type='text' class="form-control amount" id="arr[amount][{{$key}}]" placeholder="总金额" name='arr[amount][{{$key}}]' value="{{ old('arr[amount][$key]') ? old('arr[amount][$key]') : $adjustment->amount }}" {{ $adjustment->type == 'OUT' ? 'readonly' : ''}}>
+                    </div>
+                    <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
                 </div>
-                <div class="form-group col-sm-3">
-                    <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <select name='arr[warehouse_positions_id][{{$key}}]' id="warehouse_positions_id[{{$key}}]" class='form-control warehouse_positions_id'>
-                    @foreach($positions as $position)
-                        <option value={{$position['id']}} {{ $position['id'] == $adjustment->warehouse_positions_id ? 'selected' : ''}}>{{ $position['name'] }}</option>
-                    @endforeach
-                    </select>
-                </div>
-                <div class="form-group col-sm-3">
-                    <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control quantity" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
-                </div>
-                <div class="form-group col-sm-3">
-                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control amount" placeholder="总金额" name='arr[amount][{{$key}}]' value="{{ old('arr[amount][$key]') ? old('arr[amount][$key]') : $adjustment->amount }}" {{$adjustment->type == 'OUT' ? 'readonly' : ''}}>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
-    @endforeach
+
 @stop
 
 <script type='text/javascript'>
     $(document).ready(function(){
+        $(document).on('click', '.bt_right', function(){
+            $(this).parent().remove();
+        });
+
         $(document).on('blur', '.quantity,.amount', function(){
             tmp = $(this);
-            block = tmp.parent().parent().parent();
-            type = block.find(':radio:checked').val();
+            block = tmp.parent().parent();
+            type = block.find('.type').val();
             quantity = block.find('.quantity').val();
             amount = block.find('.amount').val();
             sku = block.find('.sku').val();
@@ -119,22 +113,22 @@
 
         $(document).on('blur', '.warehouse_positions_id', function(){
             tmp = $(this);
-            block = tmp.parent().parent().parent();
+            block = tmp.parent().parent();
             sku = block.find('.sku').val();
-            warehouse_positions_id = tmp.val();
+            position = tmp.val();
             quantity = block.find('.quantity').val();
             warehouses_id = $('#warehouses_id').val();
             $.ajax({
                 url:"{{route('getbyposition')}}",
-                data:{warehouse_positions_id:warehouse_positions_id,warehouses_id:warehouses_id},
+                data:{position:position},
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    if(block.find('.type').find(':radio:checked').val() == 'OUT' && sku) {
+                    if(block.find('.type').val() == 'OUT' && sku) {
                         flag = 0;
                         available_quantity = '';
                         for(var i=0;i<result.length;i++) {
-                            if(result[i].sku == sku) {
+                            if(result[i].items.sku == sku) {
                                 available_quantity = result[i].available_quantity;
                                 flag = 1;
                             }
@@ -142,10 +136,9 @@
                         if(flag == 0) {
                             alert('sku和库位不匹配');
                             block.find('.sku').val('');
-                            block.find('.item_id').val('');
                             return;
                         }
-                        if(available_quantity < quantity) {
+                        if(quantity && available_quantity < quantity) {
                             alert('数量超出了库存数量');
                             block.find('.quantity').val('');
                             block.find('.amount').val(''); 
@@ -156,20 +149,16 @@
             })
         });
 
-        $(document).on('click', '.type', function(){
-            if($(this).parent().find(':radio:checked').val() == 'IN')
+        $(document).on('change', '.type', function(){
+            if($(this).val() == 'IN')
                 $(this).parent().parent().find('.amount').attr('readonly', false);
             else
                 $(this).parent().parent().find('.amount').attr('readonly', true);
         });
 
-        $(document).on('click','.div_del',function(){
-            $(this).parent().parent().remove(); 
-        });
-
         $(document).on('blur', '.sku', function(){
             var tmp = $(this);
-            var block = $(this).parent().parent().parent();
+            var block = $(this).parent().parent();
             var sku = $(this).val();
             var warehouses_id = $('#warehouses_id').val();
             if(sku && warehouses_id){
@@ -184,12 +173,11 @@
                             tmp.val('');
                             return;
                         }
-                        if(result == 'stock_none'  && block.find('.type').find(':radio:checked').val() == 'OUT') {
+                        if(result == 'stock_none'  && block.find('.type').val() == 'OUT') {
                             alert('该sku没有对应的库存了');
                             tmp.val('');
                             return;
                         }
-                        block.find('.item_id').val(result[0].id);
                         var str = '';
                         var position = block.find('.warehouse_positions_id').val();
                         var flag = 0;
@@ -198,7 +186,7 @@
                             if(result[2][i].id == position)
                                 flag = 1;
                         }
-                        if(flag == 0 && result != 'stock_none') {
+                        if(flag == 0 && result != 'stock_none' && block.find('.type').val() == 'OUT') {
                             block.find('.warehouse_positions_id').empty();
                             block.find('.warehouse_positions_id').html(str);
                             block.find('.quantity').val('');
@@ -211,7 +199,7 @@
                                 available_amount = result[1][i].available_quantity;
                             }
                         }
-                        if(block.find('.type').find(':radio:checked').val() == 'OUT' && block.find('.quantity').val()) {
+                        if(block.find('.type').val() == 'OUT' && block.find('.quantity').val()) {
                             if(parseFloat(block.find('.quantity').val()) > available_amount) {
                                 alert('fuck，该库位数量不足啊，'+available_amount);
                                 block.find('.quantity').val('');
@@ -220,7 +208,7 @@
                             }
                             block.find('.amount').val((block.find('.quantity').val()*result[3]).toFixed('3'));
                         }
-                        if(block.find('.type').find(':radio:checked').val() == '入库') {
+                        if(block.find('.type').val() == 'IN') {
                             quantity = block.find('.quantity').val();
                             amount = block.find('.amount').val();
                             if(quantity && amount) {
@@ -239,19 +227,20 @@
 
         $(document).on('change', '#warehouses_id', function(){
             val = $(this).val();
-            tmp = 
             $.ajax({
                 url: "{{ route('getposition') }}",
                 data: {val:val},
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    position_buf = result;
                     $('.warehouse_positions_id').empty();
                     for(var i=0;i<result.length;i++)
                         $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));
+                    $('.type').val('IN');
+                    $('.amount').attr('readonly', false);
                     $('.quantity').val('');
                     $('.amount').val('');
+                    $('.sku').val('');
                 }
             });
         });

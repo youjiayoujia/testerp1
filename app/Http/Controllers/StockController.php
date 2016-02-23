@@ -37,6 +37,7 @@ class StockController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::all(),
+            'items' => ItemModel::all(), 
         ];
 
         return view($this->viewPath.'create', $response);
@@ -59,7 +60,8 @@ class StockController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouses' => WarehouseModel::all(),
-            'positions' => $model->warehouse->get(['id', 'name']),
+            'positions' => PositionModel::where('warehouses_id', $model->warehouses_id)->get(),
+            'items' => ItemModel::all(),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -75,11 +77,10 @@ class StockController extends Controller
      */
     public function ajaxGetByPosition()
     {
-        if(request()->ajax()) {
-            $warehouse_positions_id = request()->input('warehouse_positions_id');
-            $obj = StockModel::where(['warehouse_positions_id'=>$warehouse_positions_id])->get();
+            $position = request()->input('position');
+            $obj = StockModel::where(['warehouse_positions_id'=>$position])->with('items')->get();
+
             return json_encode($obj);
-        } 
         
         return json_encode('false');
     }
@@ -100,24 +101,26 @@ class StockController extends Controller
         if(request()->ajax()) {
             $sku = request()->input('sku');
             $warehouses_id = request()->input('warehouses_id');
-            $obj = ItemModel::where(['sku'=>$sku])->get()->first();
-            $obj1 = StockModel::where(['warehouses_id'=>$warehouses_id, 'sku'=>$sku])->get();
-            if(!$obj) {
+            $obj = ItemModel::where(['sku'=>$sku])->get();
+            if(!count($obj)) {
                 return json_encode('sku_none');
             }
+            $obj = $obj->first();
+            $obj1 = StockModel::where(['warehouses_id'=>$warehouses_id, 'items_id'=>$obj->id])->get();
             if(!count($obj1)) {
                 return json_encode('stock_none');
             }
             $arr[] = $obj;
             $arr[] = $obj1;
             foreach($obj1 as $tmp) {
-                $buf = PositionModel::where(['id'=>$tmp->warehouse_positions_id])->get()->first();
+                $buf = $tmp->position->first();
                 $arr[2][] = $buf;
             }
             if($obj1)
                 $arr[3] = $obj1->first()->unit_cost;
             return json_encode($arr);
         }
+
         return json_encode('false');
     }
 
@@ -132,13 +135,13 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $warehouse = request()->input('warehouse');
-            $buf = $this->model->where('warehouses_id', $warehouse)->distinct()->get(['sku'])->toArray();
-            if(empty($buf)) {
+            $buf = $this->model->where('warehouses_id', $warehouse)->distinct()->with('items')->get()->toArray();
+            if(!count($buf)) {
                 return json_encode('none');
             }
             $arr[] = $buf;
             $arr[] = $this->model->where('warehouses_id', $warehouse)->get()->first()->toArray();
-            $obj = $this->model->where(['warehouses_id'=>$warehouse, 'sku'=>$arr[0][0]['sku']])->get();
+            $obj = $this->model->where(['warehouses_id'=>$warehouse, 'items_id'=>$arr[0][0]['items']['id']])->get();
             foreach($obj as $val)
             {
                 $tmp = $val->position ? $val->position->toArray() : '';
@@ -161,8 +164,8 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $position = request()->input('position');
-            $sku = $_GET['sku'];
-            $obj = StockModel::where(['warehouse_positions_id'=>$position, 'sku'=>$sku])->get()->first();
+            $items_id = $_GET['items_id'];
+            $obj = StockModel::where(['warehouse_positions_id'=>$position, 'items_id'=>$items_id])->get()->first();
             $arr[] = $obj->toArray();
             $arr[] = $obj->unit_cost;
             if($arr) {
@@ -184,15 +187,15 @@ class StockController extends Controller
      */
     public function ajaxAllotSku()
     {
-        if(request()->ajax()) {
-            $warehouse =request()->input('warehouse');
-            $sku = request()->input('sku');
-            $obj = StockModel::where(['warehouses_id'=>$warehouse, 'sku'=>$sku])->get()->first();
+        
+            $warehouse = request()->input('warehouse');
+            $items_id = request()->input('items_id');
+            $obj = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$items_id])->get()->first();
             if(!$obj) {
                 return json_encode('none');
             }
             $arr[] = $obj->toArray();
-            $tmp = StockModel::where(['warehouses_id'=>$warehouse, 'sku'=>$sku])->distinct()->get();
+            $tmp = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$items_id])->distinct()->get();
             if(!$tmp) {
                 return json_eoncode('none');
             }
@@ -207,7 +210,7 @@ class StockController extends Controller
             } else {
                 return json_encode('none');
             }
-        }
+        
 
         return json_encode('false');
     }

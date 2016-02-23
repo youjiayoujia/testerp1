@@ -14,8 +14,7 @@ class CreateStocks extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('item_id')->comment('item号')->default(NULL);
-            $table->string('sku')->comment('sku')->default(NULL);
+            $table->integer('items_id')->comment('item号')->default(NULL);
             $table->integer('warehouses_id')->comment('仓库id')->default(NULL);
             $table->integer('warehouse_positions_id')->comment('库位id')->default(NULL);
             $table->integer('all_quantity')->comment('总数量')->default(NULL);

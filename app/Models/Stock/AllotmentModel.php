@@ -104,7 +104,7 @@ class AllotmentModel extends BaseModel
     public function rule($request)
     {
         $arr = [
-            'allotment_time' => 'date|required',
+            'allotment_time' => 'date',
             'out_warehouses_id' => 'required|integer',
             'in_warehouses_id' => 'required|integer',
         ];

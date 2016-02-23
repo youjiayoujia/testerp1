@@ -15,8 +15,7 @@ class CreateAdjustForms extends Migration
         Schema::create('adjust_forms', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('stock_adjustments_id')->comment('调整单号id')->default(0);
-            $table->integer('item_id')->comment('item号')->default(0);
-            $table->string('sku')->comment('sku')->default('0');
+            $table->integer('items_id')->comment('item号')->default(0);
             $table->enum('type', ['IN','OUT'])->comment('出入库类型')->default('IN');
             $table->integer('warehouse_positions_id')->comment('库位')->default('0');
             $table->integer('quantity')->comment('调整数量')->default(0);

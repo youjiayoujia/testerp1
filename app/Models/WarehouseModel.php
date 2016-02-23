@@ -37,4 +37,15 @@ class WarehouseModel extends BaseModel
 
     //查询
     public $searchFields=['name'];
+
+    /**
+     * get the relationship
+     * 
+     *  @return
+     *
+     */
+    public function position()
+    {
+        return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouses_id' ,'id');
+    }
 }

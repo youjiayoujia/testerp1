@@ -20,9 +20,6 @@ Route::resource('productImage', 'Product\ImageController');
 Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
-
-Route::resource('product', 'productController');
-
 Route::resource('brand', 'brandController');
 Route::resource('catalog', 'CatalogController');
 // Authentication routes...
@@ -64,6 +61,7 @@ Route::resource('warehouse', 'WarehouseController');
 /**
  * stockAdjustment controller route
  */
+Route::get('adjustadd', ['uses'=>'Stock\AdjustmentController@ajaxAdjustAdd', 'as'=>'adjustadd']);
 Route::get('check', ['uses'=>'Stock\AdjustmentController@ajaxCheck', 'as'=>'check']);
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 

@@ -15,7 +15,7 @@
         </div>
         <div class="form-group col-lg-2">
             <label for="allotment_time" class='control-label'>调拨时间</label> 
-            <input type='text' class="form-control" id="allotment_time" placeholder="调拨时间" name='allotment_time' value="{{ old('allotment_time') ? old('allotment_time') : $allotment->allotment_time}}" >
+            <input type='text' class="form-control" id="allotment_time" placeholder="调拨时间" name='allotment_time' value="{{ old('allotment_time') ? old('allotment_time') : $allotment->allotment_time }}" >
         </div>
         <div class="form-group col-lg-2">
             <label for="out_warehouses_id" class='control-label'>调出仓库</label> 
@@ -47,9 +47,9 @@
                 <div class='row'>
                     <div class='form-group col-sm-2'>
                         <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <select name='arr[sku][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
+                        <select name='arr[items_id][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
                         @foreach($skus as $sku)
-                            <option value="{{$sku['sku']}}" {{ $sku['sku'] == $allotmentform->sku ? 'selected' : ''}}>{{$sku['sku']}}</option>
+                            <option value="{{$sku['items_id']}}" {{ $sku['items_id'] == $allotmentform->items_id ? 'selected' : ''}}>{{$sku['items']['sku']}}</option>
                         @endforeach
                         </select>
                     </div>
@@ -61,11 +61,7 @@
                         @endforeach
                         </select>
                     </div>
-                    <div class='form-group col-sm-2'>
-                        <label for='item_id' class='control-label'>item号</label> 
-                        <input type='text' class='form-control item_id' id='arr[item_id][{{$key}}]' placeholder='item号' name='arr[item_id][{{$key}}]' value={{ $allotmentform->item_id }} readonly>
-                    </div>
-                    <div class="form-group col-sm-1">
+                    <div class="form-group col-sm-2">
                         <label for="access_quantity" class='control-label'>可用数量</label>
                         <input type='text' class="form-control access_quantity" placeholder="可用数量" name='arr[access_quantity][{{$key}}]' value="{{ $availquantity[$key] }}" readonly>
                     </div>
@@ -117,13 +113,11 @@
                         }
                         for(var i=0;i<result[0].length;i++)
                         {
-                            str1 += '<option value='+result[0][i]['sku']+'>'+result[0][i]['sku']+'</option>';
+                            str1 += '<option value='+result[0][i]['items']['id']+'>'+result[0][i]['items']['sku']+'</option>';
                         }
                         if(result[1]) {
-                            $('.item_id').val(result[1]['item_id']);
                             $('.access_quantity').val(result[1]['available_quantity']); 
                         } else {
-                            $('.item_id').val('');
                             $('.access_quantity').val('');
                             sku.empty();
                         }
@@ -141,7 +135,7 @@
             sku = obj.find('.sku').val();
             $.ajax({
                 url:"{{ route('allotposition' )}}",
-                data: {position:position, warehouse:warehouse, sku:sku},
+                data: {position:position, items_id:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
@@ -170,16 +164,15 @@
             sku = $(this).val();
             $.ajax({
                 url:"{{ route('allotsku' )}}",
-                data: {warehouse:warehouse, sku:sku},
+                data: {warehouse:warehouse, items_id:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
                     if(result != 'none') {
                         str = '';
                         position.empty();
-                        obj.find('.item_id').val(result[0]['item_id']);
                         obj.find('.access_quantity').val(result[0]['available_quantity']);
-                        if(obj.find('.quantity').val())
+                        if(obj.find('.quantity').val() && obj.find('.quantity').val() < obj.find('.access_quantity').val())
                         {
                             obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
                         }
@@ -191,7 +184,6 @@
                     } else {
                         alert('sku对应没有库存');
                         position.empty();
-                        obj.find('.item_id').val('');
                         obj.find('access_quantity').val('');
                         obj.find('.amount').val('');
                     }
@@ -219,7 +211,7 @@
                 }
                 $.ajax({
                     url:"{{ route('allotsku') }}",
-                    data:{warehouse:warehouse, position:position, sku:sku},
+                    data:{warehouse:warehouse, items_id:sku},
                     dataType:'json',
                     'type':'get',
                     success:function(result){

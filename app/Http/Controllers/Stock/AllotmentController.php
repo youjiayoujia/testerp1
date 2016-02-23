@@ -45,6 +45,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $this->model->find($id),
+            'allotments' =>$this->model->find($id)->allotmentform,
             'stockins' => InModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
             'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
         ];
@@ -80,7 +81,7 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.items_id')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
@@ -116,7 +117,7 @@ class AllotmentController extends Controller
         $available_quantity = [];
         foreach($allotment as $key => $value) 
         {
-            $obj = StockModel::where(['warehouses_id'=>$model->out_warehouses_id, 'sku'=>$value->sku])->get();
+            $obj = StockModel::where(['warehouses_id'=>$model->out_warehouses_id, 'items_id'=>$value->items->id])->get();
             $available_quantity[] =  $obj->first()->available_quantity;
             $buf = [];
             foreach($obj as $v)
@@ -129,7 +130,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
             'warehouses' => WarehouseModel::all(),
-            'skus' => StockModel::where(['warehouses_id'=>$model->out_warehouses_id])->distinct()->get(['sku']),
+            'skus' => StockModel::where(['warehouses_id'=>$model->out_warehouses_id])->distinct()->with('items')->get(),
             'positions' => $arr,
             'allotmentforms' => $allotment, 
             'availquantity' => $available_quantity,
@@ -149,7 +150,7 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.items_id')));
         $buf = request()->all();
         $obj = $this->model->find($id)->allotmentform;
         $obj_len = count($obj);
@@ -267,11 +268,11 @@ class AllotmentController extends Controller
      */
     public function ajaxAllotmentAdd()
     {
-        if(request()->ajax()) {
+        
             $current = request()->input('current');
             $warehouse = request()->input('warehouse');
-            $sku_buf = StockModel::where('warehouses_id', $warehouse)->distinct()->get(['sku'])->toArray();
-            $positions = StockModel::where(['warehouses_id'=>$warehouse, 'sku'=>$sku_buf[0]['sku']])->get();
+            $sku_buf = StockModel::where('warehouses_id', $warehouse)->distinct()->with('items')->get()->toArray();
+            $positions = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$sku_buf[0]['items']['id']])->get(); 
             $buf = [];
             foreach($positions as $position)
             {
@@ -286,7 +287,7 @@ class AllotmentController extends Controller
             ];
 
             return view($this->viewPath.'add', $response);
-        } 
+
     }
 
     /**
@@ -366,8 +367,7 @@ class AllotmentController extends Controller
 
             $arr['checkform_time'] = date('Y-m-d',time());
             $this->model->find($id)->update(['allotment_status'=>$arr['allotment_status'], 'checkform_time'=>$arr['checkform_time'], 'remark'=>$arr['remark']]);
-
-            $len = count($arr['arr']['item_id']);
+            $len = count($arr['arr']['items_id']);
             $stock = new StockModel;
             for($i=0; $i<$len; $i++)
             {
@@ -382,6 +382,7 @@ class AllotmentController extends Controller
                 $buf['relation_id'] = $id;
                 $buf['amount'] = round($buf['amount']/$buf['quantity']*$buf['new_receive_quantity'],3);
                 $buf['quantity'] = $buf['new_receive_quantity'];
+                $buf['items_id'] = ItemModel::where('sku',$buf['items_id'])->get()->first()->id;
                 if($buf['amount'] < 0)
                     throw new Exception('库存金额低于0了');
                 if($buf['quantity'])

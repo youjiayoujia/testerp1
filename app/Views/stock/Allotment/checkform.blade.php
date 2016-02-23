@@ -43,12 +43,8 @@
             @foreach($allotmentforms as $key => $allotmentform)
                 <div class='row'>
                     <div class='form-group col-sm-1'>
-                        <label for='item_id' class='control-label'>item号</label> 
-                        <input type='text' class='form-control item_id' id='arr[item_id][{{$key}}]' placeholder='item号' name='arr[item_id][{{$key}}]' value={{ $allotmentform->item_id }} readonly>
-                    </div>
-                    <div class='form-group col-sm-1'>
                         <label for='sku' class='control-label'>sku</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[sku][{{$key}}]' value='{{ $allotmentform->sku }}' readonly>
+                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[items_id][{{$key}}]' value='{{ $allotmentform->items->sku }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='quantity' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>

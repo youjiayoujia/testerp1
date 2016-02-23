@@ -6,11 +6,8 @@
             <div class="col-lg-2">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
-            <div class="col-lg-2">
-                <strong>item号</strong>: {{ $model->item_id }}
-            </div>
             <div class="col-lg-1">
-                <strong>sku</strong>: {{ $model->sku }}
+                <strong>sku</strong>: {{ $model->items ? $model->items->sku : '' }}
             </div>
             <div class="col-lg-1">
                 <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : ''}}

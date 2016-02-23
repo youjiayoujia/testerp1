@@ -7,7 +7,7 @@
     <input type="hidden" name="_method" value="PUT"/>
     <div class="row">
         <div class="form-group col-lg-2">
-            <label for="name">供货商名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="name">名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="供货商名" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
         </div>
         <div class="form-group col-lg-2">
@@ -36,7 +36,7 @@
     </div>
     <div class="row"> 
         <div class="form-group col-lg-4">
-            <label for="url">线上供货商网址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="url">供货商网址</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $model->url }}" {{ old('type') ? old('type') == 'offline' ? 'disabled' : '' :$model->type == 'offline' ? 'disabled' : ''}}>
         </div> 
         <div class="form-group col-lg-4">

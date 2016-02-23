@@ -7,7 +7,7 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $model->stock ? $model->stock->sku : '' }}
+                <strong>sku</strong>: {{ $model->stock ? $model->stock->items ? $model->stock->items->sku : '' : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>数量</strong>: {{ $model->quantity }}

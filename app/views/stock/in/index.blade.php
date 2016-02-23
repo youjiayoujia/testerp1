@@ -2,7 +2,6 @@
 @section('tableToolButtons')@stop
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
-    <th class='sort' data-field='item_id'>item号</th>
     <th>sku</th>
     <th class='sort' data-field='amount'>数量</th>
     <th class='sort' data-field='total_amount'>总金额(￥)</th>
@@ -18,8 +17,7 @@
     @foreach($data as $stockin)
         <tr>
             <td>{{ $stockin->id }}</td>
-            <td>{{ $stockin->stock ? $stockin->stock->item_id : ''}}</td>
-            <td>{{ $stockin->stock->sku }}</td>
+            <td>{{ $stockin->stock ? $stockin->stock->items ? $stockin->stock->items->sku : '' : '' }}</td>
             <td>{{ $stockin->quantity}}</td>
             <td>{{ $stockin->amount}}</td>
             <td>{{ $stockin->stock ? $stockin->stock->warehouse ? $stockin->stock->warehouse->name : '' : '' }}</td>

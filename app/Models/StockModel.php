@@ -23,7 +23,7 @@ class StockModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['item_id', 'sku', 'warehouses_id', 'warehouse_positions_id', 'all_quantity', 'available_quantity', 'hold_quantity', 'amount', 'created_at'];
+    protected $fillable = ['items_id', 'warehouses_id', 'warehouse_positions_id', 'all_quantity', 'available_quantity', 'hold_quantity', 'amount', 'created_at'];
 
     // 用于查询
     protected $searchFields = ['sku'];
@@ -31,19 +31,19 @@ class StockModel extends BaseModel
     // 规则验证
     public $rules = [
         'create' => [
-            'sku' => 'required',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
             'all_quantity' => 'required|integer',
             'available_quantity' => 'required|integer',
+            'hold_quantity' => 'required|integer',
             'amount' => 'required|numeric',    
         ],
         'update' => [
-            'sku' => 'required',
             'warehouses_id' => 'required|integer',
             'warehouse_positions_id' => 'required|integer',
             'all_quantity' => 'required|integer',
             'available_quantity' => 'required|integer',
+            'hold_quantity' => 'required|integer',
             'amount' => 'required|numeric', 
         ],
     ];
@@ -98,10 +98,8 @@ class StockModel extends BaseModel
      * @param $arr 
      * the keys in order
      * 'item_id'=>item号,
-     * 'sku' => sku,
      * 'quantity' => '数量',
      * 'amount' => '总金额',
-     * 'warehouses_id' => '仓库id',
      * 'warehouse_positions_id' => '库位id',
      * 'type' => '入库类型',
      * 'relation_id' => '入库来源id',
@@ -113,7 +111,7 @@ class StockModel extends BaseModel
     {
         DB::beginTransaction();
         try {
-            $obj = $this->where(['warehouses_id'=>$arr['warehouses_id'], 'warehouse_positions_id'=>$arr['warehouse_positions_id'], 'sku'=>$arr['sku']])->get()->first();
+            $obj = $this->where(['warehouse_positions_id'=>$arr['warehouse_positions_id'], 'items_id'=>$arr['items_id']])->get()->first();
             if($obj) {
                 $obj->all_quantity += $arr['quantity'];
                 $obj->available_quantity +=$arr['quantity'];
@@ -141,10 +139,8 @@ class StockModel extends BaseModel
      * @param $arr 
      * the keys in order
      * 'item_id'=>item号,
-     * 'sku' => sku,
      * 'quantity' => '数量',
      * 'amount' => '总金额',
-     * 'warehouses_id' => '仓库id',
      * 'warehouse_positions_id' => '库位id',
      * 'type' => '入库类型',
      * 'relation_id' => '入库来源id',
@@ -156,7 +152,7 @@ class StockModel extends BaseModel
     {
         DB::beginTransaction();
         try {
-            $obj = $this->where(['warehouses_id'=>$arr['warehouses_id'], 'warehouse_positions_id'=>$arr['warehouse_positions_id'], 'sku'=>$arr['sku']])->get()->first();
+            $obj = $this->where(['warehouse_positions_id'=>$arr['warehouse_positions_id'], 'items_id'=>$arr['items_id']])->get()->first();
             if($obj) {
                 $obj->all_quantity -=$arr['quantity'];
                 $obj->available_quantity -= $arr['quantity'];
@@ -175,6 +171,17 @@ class StockModel extends BaseModel
     }
     
     /**
+     * return the the relation ship between the two model
+     *
+     *  @return model
+     *
+     */
+    public function items()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'items_id', 'id');
+    }
+
+    /**
      * add additional attribute according to sku ,get the goods unit cost 
      *
      * @param none
@@ -183,7 +190,7 @@ class StockModel extends BaseModel
      */
     public function getUnitCostAttribute()
     {
-        $obj = $this->where('sku', $this->sku)->get()->toArray();
+        $obj = $this->where('items_id', $this->items_id)->get()->toArray();
         $money = '';
         $amount = '';
         for($i=0; $i < count($obj); $i++)

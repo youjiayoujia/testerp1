@@ -27,7 +27,7 @@
     </div>
     <div class='row'>
         <div class="form-group col-lg-4">
-            <label for="name" class='control-label'>需求名</label>
+            <label for="name" class='control-label'>需求名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') }}">
         </div>
         <div class="form-group col-lg-4">

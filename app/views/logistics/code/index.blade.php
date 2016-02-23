@@ -18,7 +18,7 @@
             <td>{{ $code->code }}</td>
             <td>{{ $code->package_id }}</td>
             <td>{{ $code->status == 'Y' ? '启用' : '未启用'}}</td>
-            <td>{{ $code->used_at }}</td>
+            <td>{{ substr($code->used_at, 0, 10) }}</td>
             <td>{{ $code->updated_at }}</td>
             <td>{{ $code->created_at }}</td>
             <td>

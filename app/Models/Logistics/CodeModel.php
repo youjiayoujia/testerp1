@@ -20,6 +20,7 @@ class CodeModel extends BaseModel
         'logistics_id',
         'code',
         'package_id',
+        'used_at',
         'status',
     ];
 

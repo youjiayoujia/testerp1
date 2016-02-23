@@ -310,11 +310,11 @@ class ProductModel extends BaseModel
      */
     public function createItem()
     {
-        $attributes = $this->variationValue;
+        $variations = $this->variationValue;
         
         $brr = [];
-        foreach ($attributes as $attribute) {
-            $brr[$attribute->attribute_id][] = $attribute->attribute_value;
+        foreach ($variations as $variation) {
+            $brr[$variation->variation_id][] = $variation->variation_value;
         }
         $brr = array_values($brr);
         $result = Tool::createDikaer($brr);

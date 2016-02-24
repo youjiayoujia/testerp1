@@ -81,7 +81,6 @@ class ProductController extends Controller
             'features_value_id_arr' => $features_value_id_arr,
         ];
 
-
         return view($this->viewPath . 'edit', $response);
     }
 

@@ -40,16 +40,13 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>调整人</strong>: {{ $adjust->adjust_by }}
-            </div>
-            <div class="col-lg-4">
-                <strong>调整时间</strong>: {{ $adjust->adjust_time }}
+                <strong>调整人</strong>: {{ $adjust->adjustByName ? $adjust->adjustByName->name : '' }}
             </div>
             <div class="col-lg-4">
                 <strong>审核状态</strong>: {{ $adjust->status == 'Y' ? '已审核' : '未审核' }}
             </div>
             <div class="col-lg-4">
-                <strong>审核人</strong>: {{ $adjust->check_by }}
+                <strong>审核人</strong>: {{ $adjust->checkByName ? $adjust->checkByName->name : '' }}
             </div>
             <div class="col-lg-4">
                 <strong>审核时间</strong>: {{ $adjust->check_time }}

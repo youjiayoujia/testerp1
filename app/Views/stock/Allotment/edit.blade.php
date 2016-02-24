@@ -13,11 +13,7 @@
             <label for="allotment_by" class='control-label'>调拨人</label> 
             <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ old('allotment_by') ? old('allotment_by') : $allotment->allotment_by}}" readonly>
         </div>
-        <div class="form-group col-lg-2">
-            <label for="allotment_time" class='control-label'>调拨时间</label> 
-            <input type='text' class="form-control" id="allotment_time" placeholder="调拨时间" name='allotment_time' value="{{ old('allotment_time') ? old('allotment_time') : $allotment->allotment_time }}" >
-        </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label for="out_warehouses_id" class='control-label'>调出仓库</label> 
             <select id='out_warehouses_id' name='out_warehouses_id' class='form-control'>
             @foreach($warehouses as $warehouse)
@@ -25,7 +21,7 @@
             @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label for="in_warehouses_id" class='control-label'>调入仓库</label> 
             <select name='in_warehouses_id' class='form-control'>
             @foreach($warehouses as $warehouse)
@@ -172,13 +168,21 @@
                         str = '';
                         position.empty();
                         obj.find('.access_quantity').val(result[0]['available_quantity']);
-                        if(obj.find('.quantity').val() && obj.find('.quantity').val() < obj.find('.access_quantity').val())
-                        {
-                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
-                        }
                         for(var i=0;i<result[1].length;i++) 
                         {
                             str +="<option value="+result[1][i]['id']+">"+result[1][i]['name']+"</option>";
+                        }
+                        if(obj.find('.quantity').val() && obj.find('.quantity').val() > obj.find('.access_quantity').val())
+                        {
+                            alert('超出库存数量');
+                            obj.find('.quantity').val('');
+                            obj.find('.amount').val('');
+                            $(str).appendTo(position);
+                            return;
+                        }
+                        if(obj.find('.quantity').val() && obj.find('.quantity').val() < obj.find('.access_quantity').val())
+                        {
+                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
                         }
                         $(str).appendTo(position);
                     } else {

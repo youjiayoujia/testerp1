@@ -17,7 +17,6 @@ class CreateStockAdjustment extends Migration
             $table->string('adjust_form_id')->comment('调整单号id')->default(0);
             $table->integer('warehouses_id')->comment('仓库id')->default(0);
             $table->integer('adjust_by')->comment('调整人')->default(0);
-            $table->date('adjust_time')->comment('调整时间')->default('0000-00-00');
             $table->text('remark')->comment('备注')->default(NULL);
             $table->integer('check_by')->comment('审核人')->default(0);
             $table->date('check_time')->comment('审核时间')->default('0000-00-00');

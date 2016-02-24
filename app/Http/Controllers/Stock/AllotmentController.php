@@ -48,6 +48,7 @@ class AllotmentController extends Controller
             'allotments' =>$this->model->find($id)->allotmentform,
             'stockins' => InModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
             'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
+            'logisticses' => AllotmentLogisticsModel::where('allotments_id', $id)->get(),
         ];
         
         return view($this->viewPath.'show', $response);
@@ -187,9 +188,89 @@ class AllotmentController extends Controller
         $obj = $this->model->find($id);
         foreach($obj->allotmentform as $val)
             $val->delete();
+        foreach($obj->logistics as $tmp)
+            $tmp->delete();
         $obj->delete();
 
         return redirect($this->mainIndex);
+    }
+
+    public function checkResult($id)
+    {
+        $model = $this->model->find($id);
+        $arr = request()->all();
+        $time = date('Y-m-d',time());       
+        if($arr['result'] == 0) {
+            $model->update(['check_status'=>'FAIL', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
+            return redirect($this->mainIndex);
+        }
+        $time = date('Y-m-d',time());       
+        $model->update(['check_status'=>'SUCCESS', 'check_time'=>$time, 'check_by'=>'2']); 
+
+        return redirect($this->mainIndex);
+    }
+
+    public function checkout()
+    {
+        $id = request()->input('id');
+        $model = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view($this->viewPath.'checkout', $response);
+    }
+
+    public function getLogistics($id)
+    {
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $arr = request()->all();
+        $arr['allotments_id'] = $id;
+        $model->logistics()->create($arr);
+
+        $model->update(['allotment_status'=>'out']);
+        $stock = new StockModel;
+        $model->relation_id = $model->id;
+        $arr = $model->toArray();
+        $buf = $model->allotmentform->toArray();
+        DB::beginTransaction();
+        try {
+            for($i=0;$i<count($buf);$i++) {
+                $tmp = array_merge($arr, $buf[$i]);
+                $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
+                $tmp['type'] = 'ALLOTMENT';
+                $stock->out($tmp);
+            }
+        } catch(Exception $e) {
+            DB::rollback();
+        }
+        DB::commit();
+
+        return redirect($this->mainIndex);
+    }
+
+    public function allotmentOver($id)
+    {
+        $this->model->find($id)->update(['allotment_status'=>'over']);
+
+        return redirect($this->mainIndex);
+    }
+
+    public function allotmentCheck($id)
+    {   
+        $model = $this->model->find($id);
+        $allotmentform = $model->allotmentform;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'allotments' => $allotmentform,
+        ];
+
+        return view($this->viewPath.'allotmentcheck', $response);
     }
 
     /**
@@ -205,8 +286,8 @@ class AllotmentController extends Controller
             $id = request()->input('id');
             $time = date('Y-m-d',time());       
             $obj = $this->model->find($id);
-            $obj->update(['check_status'=>'Y', 'check_time'=>$time]); 
-            echo json_encode($time);
+            $obj->update(['check_status'=>'Y', 'check_time'=>$time, 'check_by'=>'2']); 
+            echo json_encode([$time, $obj->checkByName->name]);
         } else {
             echo json_encode('false');
         }
@@ -223,7 +304,8 @@ class AllotmentController extends Controller
     {
         if(request()->ajax()) {
             $id = request()->input('id');
-            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00']);
+            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00',
+                'check_by'=>'0']);
             return json_encode('111');
         }
 
@@ -308,6 +390,7 @@ class AllotmentController extends Controller
         return json_encode('false');
     }
 
+
     /**
      * 跳转对单页面 
      *
@@ -341,6 +424,7 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $arr = request()->all();
+        $this->model->find($id)->update(['checkform_by'=>'3']);
         $obj = $this->model->find($id)->allotmentform;
         DB::beginTransaction();
         try {

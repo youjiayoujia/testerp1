@@ -5,11 +5,11 @@
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'/>
     <div class='row'>
-        <div class='form-group col-sm-2'>
+        <div class='form-group col-sm-4'>
             <label for='adjust_form_id'>调整单号</label>
             <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : $model->adjust_form_id }}" readonly>
         </div>
-        <div class="form-group col-sm-2">
+        <div class="form-group col-sm-4">
             <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouses_id' id='warehouses_id' class='form-control warehouses_id'>
                 <option>请选择仓库</option>
@@ -18,18 +18,14 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-sm-2">
-            <label for="adjust_man_id">调整人</label>
-            <input type='text' class="form-control adjust_man_id" id="adjust_man_id" placeholder="调整人" name='adjust_man_id' value="{{ old('adjust_man_id') ? old('adjust_man_id') : $model->adjust_man_id }}" readonly>
+        <div class="form-group col-sm-4">
+            <label for="adjust_by">调整人</label>
+            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ old('adjust_by') ? old('adjust_by') : $model->adjust_by }}" readonly>
         </div>
-        <div class="form-group col-sm-2">
-            <label for="adjust_time">调整时间</label>
-            <input type='text' class="form-control adjust_time" id="adjust_time" placeholder="调整时间" name='adjust_time' value="{{ old('adjust_time') ? old('adjust_time') : $model->adjust_time}}">
-        </div>
-        <div class='form-group col-sm-4'>
-            <label for='label'>备注(原因)</label>
-            <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') ? old('remark') : $model->remark }}</textarea>
-        </div>
+    </div>
+    <div class='form-group'>
+        <label for='label'>备注(原因)</label>
+        <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') ? old('remark') : $model->remark }}</textarea>
     </div>
     <div class="panel panel-primary">
         <div class="panel-heading">
@@ -245,7 +241,6 @@
             });
         });
         
-        $('#adjust_time').cxCalendar();
         $('#check_time').cxCalendar();
     });
 </script>

@@ -5,7 +5,6 @@
     <th>仓库</th>
     <th>备注</th>
     <th>调整人</th>
-    <th>调整时间</th>
     <th>状态</th>
     <th>审核人</th>
     <th class='sort' data-field='check_time'>审核时间</th>
@@ -19,10 +18,9 @@
             <td>{{ $adjust->adjust_form_id }}</td>
             <td>{{ $adjust->warehouse ? $adjust->warehouse->name : '' }}</td>
             <td>{{ $adjust->remark }}</td>
-            <td>{{ $adjust->adjust_by }} </td>
-            <td>{{ $adjust->adjust_time }}</td>
+            <td>{{ $adjust->adjustByName ? $adjust->adjustByName->name : '' }} </td>
             <td>{{ $adjust->status == 'Y' ? '已审核' : '未审核' }}</td>
-            <td>{{ $adjust->check_by }}</td>
+            <td>{{ $adjust->checkByName ? $adjust->checkByName->name : '' }}</td>
             <td>{{ $adjust->check_time }}</td>
             <td>{{ $adjust->created_at }}</td>
             <td>
@@ -56,7 +54,7 @@
 <script type='text/javascript'>
 $(document).ready(function(){    
     $('.check_time').click(function(){
-        if($(this).parent().parent().find('td:eq(6)').text() == '未审核') {
+        if($(this).parent().parent().find('td:eq(5)').text() == '未审核') {
             if(confirm('确认审核?')) {
                 tmp = $(this);
                 id = tmp.data('id');
@@ -70,7 +68,8 @@ $(document).ready(function(){
                         tmp.html("<span class='glyphicon glyphicon-pencil'></span> 已审核");
                         check = tmp.parent().prev().prev();
                         tmp.prev().remove();
-                        check.text(result);
+                        check.text(result[0]);
+                        check.prev().text(result[1]);
                         check.prev().prev().text('已审核');
                     }
                 });

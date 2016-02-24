@@ -19,7 +19,7 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_by', 'allotment_time', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
+    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_by', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
 
     /**
      * search field 
@@ -27,6 +27,39 @@ class AllotmentModel extends BaseModel
      *  @return
      */
     public $searchFields = ['allotment_id'];
+
+    /**
+     * get the relationship between the two module 
+     *
+     * @return 
+     *
+     */
+    public function allotmentByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'allotment_by', 'id');
+    }
+
+    /**
+     * get the relationship between the two module 
+     *
+     * @return 
+     *
+     */
+    public function checkByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'check_by', 'id');
+    }
+
+    /**
+     * get the relationship between the two module 
+     *
+     * @return 
+     *
+     */
+    public function checkformByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'checkform_by', 'id');
+    }
 
     /**
      * get the relationship between the two module 
@@ -104,7 +137,6 @@ class AllotmentModel extends BaseModel
     public function rule($request)
     {
         $arr = [
-            'allotment_time' => 'date',
             'out_warehouses_id' => 'required|integer',
             'in_warehouses_id' => 'required|integer',
         ];

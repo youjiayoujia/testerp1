@@ -208,8 +208,8 @@ class AdjustmentController extends Controller
             $id = request()->input('id');
             $time = date('Y-m-d',time());       
             $obj = $this->model->find($id);
-            $obj->update(['status'=>'Y', 'check_time'=>$time]); 
-            echo json_encode($time);
+            $obj->update(['status'=>'Y', 'check_time'=>$time, 'check_by'=>'2']); 
+            echo json_encode([$time, $obj->checkByName->name]);
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustment->toArray();

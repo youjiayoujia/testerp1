@@ -19,7 +19,7 @@ class AdjustmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['adjust_form_id', 'warehouses_id', 'adjust_by', 'adjust_time', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
+    protected $fillable = ['adjust_form_id', 'warehouses_id', 'adjust_by', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
 
     // 用于查询
     public $searchFields = ['adjust_form_id'];
@@ -44,6 +44,28 @@ class AdjustmentModel extends BaseModel
     public function adjustment()
     {
         return $this->hasMany('App\Models\Stock\AdjustFormModel', 'stock_adjustments_id', 'id');
+    }
+
+    /**
+     * return the relationship between the two Model 
+     *
+     * @return
+     *
+     */
+    public function checkByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'check_by', 'id');
+    }
+
+    /**
+     * return the relationship between the two Model 
+     *
+     * @return
+     *
+     */
+    public function adjustByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'adjust_by', 'id');
     }
 
     /**

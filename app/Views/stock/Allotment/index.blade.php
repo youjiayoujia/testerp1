@@ -6,14 +6,13 @@
     <th>调入仓库</th>
     <th>备注</th>  
     <th>调拨人</th>
-    <th>调拨时间</th>
     <th>调拨状态</th>
     <th class='sort' data-field='check_man_id'>审核人</th>
     <th>审核状态</th>
     <th class='sort' data-field='check_time'>审核时间</th>
     <th>物流方式</th>
     <th>物流号</th>
-    <th>物流方式</th>
+    <th>物流费(￥)</th>
     <th>对单人</th>
     <th>对单时间</th>
     <th>创建时间</th>
@@ -27,16 +26,15 @@
             <td>{{ $allotment->outwarehouse ? $allotment->outwarehouse->name : '' }}</td>
             <td>{{ $allotment->inwarehouse ? $allotment->inwarehouse->name : '' }}</td>
             <td>{{ $allotment->remark }}</td>
-            <td>{{ $allotment->allotment_by }}</td>
-            <td>{{ $allotment->allotment_time }}</td>
+            <td>{{ $allotment->allotmentByName ? $allotment->allotmentByName->name : '' }}</td>
             <td>{{ $allotment->status_name }}</td>
-            <td>{{ $allotment->check_by }}</td>
-            <td>{{ $allotment->check_status == 'N' ? '未审核' : '已审核' }}</td>
+            <td>{{ $allotment->checkByName ? $allotment->checkByName->name : '' }}</td>
+            <td>{{ $allotment->check_status == 'N' ? '未审核' : $allotment->check_status == 'FAIL' ? '审核未通过' : '审核通过' }}</td>
             <td>{{ $allotment->check_time }}</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>{{ $allotment->checkform_by }}</td>
+            <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->type : ''}}</td>
+            <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->code : ''}}</td>
+            <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->fee : ''}}</td>
+            <td>{{ $allotment->checkformByName ? $allotment->checkformByName->name : '' }}</td>
             <td>{{ $allotment->checkform_time }}</td>
             <td>{{ $allotment->created_at }}</td>
             <td>
@@ -49,12 +47,12 @@
                 </a>
                 @endif
                 @if($allotment->allotment_status == 'new' && $allotment->check_status == 'N')
-                <a href="javascript:" class="btn btn-success btn-xs check_time" data-id="{{ $allotment->id }}">
+                <a href="{{ route('allotmentcheck', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>
                     审核调拨单
                 </a>
                 @endif
-                @if($allotment->check_status == 'Y' && $allotment->allotment_status == 'new')
+                @if($allotment->check_status == 'SUCCESS' && $allotment->allotment_status == 'new')
                 <a href="javascript:" class="btn btn-success btn-xs pick" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>生成拣货单
                 </a>
@@ -64,19 +62,19 @@
                     <span class="glyphicon glyphicon-pencil"></span>
                     new
                 </a>
-                <a href="javascript:" class="btn btn-success btn-xs check_out" data-id="{{ $allotment->id }}">
+                <a href="{{ route('checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>
                     确认出库
                 </a>
                 @endif
-                @if($allotment->check_status == 'Y' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
+                @if($allotment->check_status == 'SUCCESS' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
                     @if($allotment->allotment_status != 'over')
                     <a href="{{ route('checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 对单
                     </a>
                     @endif
                 @endif
-                @if($allotment->check_status == 'N')
+                @if($allotment->check_status != 'SUCCESS')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $allotment->id }}"
                    data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}">
@@ -94,7 +92,7 @@ $(document).ready(function(){
     $(document).on('click', '.check_time', function(){
         obj = $(this).parent().parent();
         tmp = $(this);
-        if(obj.find('td:eq(9)').text() == '未审核') {
+        if(obj.find('td:eq(8)').text() == '未审核') {
             if(confirm('确认审核?')) {
                 tmp.prev().hide();
                 id = $(this).data('id');
@@ -110,8 +108,9 @@ $(document).ready(function(){
                     type:'get',
                     success:function(result){
                         tmp.html('<span class="glyphicon glyphicon-pencil"></span>已审核');
-                        obj.find('td:eq(10)').text(result);
-                        obj.find('td:eq(9)').text('已审核');
+                        obj.find('td:eq(9)').text(result[0]);
+                        obj.find('td:eq(8)').text('已审核');
+                        obj.find('td:eq(7)').text(result[1]);
                     }
                 });
             }
@@ -130,9 +129,7 @@ $(document).ready(function(){
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    obj.find('td:eq(7)').text('拣货中');
-                    tmp.after("<a href='javascript:' class='btn btn-success btn-xs new' data-id="+id+"><span class='glyphicon glyphicon-pencil'></span>new</a> <a href='javascript:' class='btn btn-success btn-xs check_out' data-id="+id+"><span class='glyphicon glyphicon-pencil'></span>确认出库</a>");
-                    tmp.hide();
+                    location.reload();
                 }
             });
     });
@@ -148,30 +145,6 @@ $(document).ready(function(){
             type:'get',
             success:function(result) {
                 location.reload();
-            }
-        });
-    });
-
-    $(document).on('click', '.check_out', function(){
-        id = $(this).data('id');
-        obj = $(this);
-        td = obj.parent();
-        block = obj.parent().parent();
-        $.ajax({
-            url:"{{ route('allotmentcheckout') }}",
-            data:{id:id},
-            dataType:'json',
-            type:'get',
-            success:function(result) {
-                block.find('td:eq(7)').text('出库');
-                td.empty();
-                str = "{{route('stockAllotment.show', ['id'=>''])}}/"+id;
-                str1 = "{{ route('checkform', ['id'=>'']) }}/"+id;
-                td.html("<a href='"+str+"' class='btn btn-info btn-xs'>\
-                    <span class='glyphicon glyphicon-eye-open'></span> 查看\
-                </a> <a href='"+str1+"' class='btn btn-success btn-xs'>\
-                        <span class='glyphicon glyphicon-eye-open'></span> 对单\
-                    </a>")
             }
         });
     });

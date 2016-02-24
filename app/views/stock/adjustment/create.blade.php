@@ -4,11 +4,11 @@
 @section('formAction') {{ route('stockAdjustment.store') }} @stop
 @section('formBody')
     <div class='row'>
-        <div class='form-group col-sm-3'>
+        <div class='form-group col-sm-4'>
             <label for='adjust_form_id'>调整单号</label>
             <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : 'CD'.time() }}" readonly>
         </div>
-        <div class="form-group col-sm-3">
+        <div class="form-group col-sm-4">
             <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouses_id' id='warehouses_id' class='form-control'>
                 <option value=''>请选择仓库</option>
@@ -17,13 +17,9 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-sm-3">
-            <label for="adjust_man_id">调整人</label>
-            <input type='text' class="form-control" id="adjust_man_id" placeholder="调整人" name='adjust_man_id' value="{{ old('adjust_man_id') }}" readonly>
-        </div>
-        <div class="form-group col-sm-3">
-            <label for="adjust_time">调整时间</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="adjust_time" placeholder="调整时间" name='adjust_time' value="{{ old('adjust_time') }}">
+        <div class="form-group col-sm-4">
+            <label for="adjust_by">调整人</label>
+            <input type='text' class="form-control" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ old('adjust_by') ? old('adjust_by') : '1'}}" readonly>
         </div>
         <div class='form-group col-sm-12'>
             <label for='label'>备注(原因)</label>
@@ -256,7 +252,6 @@
             });
         });
         
-        $('#adjust_time').cxCalendar();
         $('#check_time').cxCalendar();
     });
 </script>

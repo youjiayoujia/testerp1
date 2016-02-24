@@ -96,13 +96,17 @@ Route::resource('channelAccount', 'Channel\AccountController');
 /**
  *  stock allotment route
  */
+Route::post('checkresult/{id}', ['uses'=>'Stock\AllotmentController@checkResult', 'as'=>'checkresult']);
+Route::get('allotmentover/{id}', ['uses'=>'Stock\AllotmentController@allotmentOver', 'as'=>'allotmentover']);
+Route::post('getlogistics/{id}', ['uses'=>'Stock\AllotmentController@getLogistics', 'as'=>'getlogistics']);
+Route::get('checkout', ['uses'=>'Stock\AllotmentController@checkout', 'as'=>'checkout']);
 Route::get('allotmentnew', ['uses'=>'Stock\AllotmentController@ajaxAllotmentNew', 'as'=>'allotmentnew']);
 Route::get('allotmentcheckout', ['uses'=>'Stock\AllotmentController@ajaxAllotmentCheckOut', 'as'=>'allotmentcheckout']);
 Route::get('add', ['uses'=>'Stock\AllotmentController@ajaxAllotmentAdd', 'as'=>'add']);
 Route::post('checkformupdate/{id}', ['uses'=>'Stock\AllotmentController@checkformupdate', 'as'=>'checkformupdate']);
 Route::get('checkform/{id}', ['uses'=>'Stock\AllotmentController@checkform', 'as'=>'checkform']);
 Route::get('allotmentpick', ['uses'=>'Stock\AllotmentController@allotmentpick', 'as'=>'allotmentpick']);
-Route::get('allotmentcheck', ['uses' => 'Stock\AllotmentController@ajaxAllotmentCheck', 'as'=>'allotmentcheck']);
+Route::get('allotmentcheck/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as'=>'allotmentcheck']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 
 //产品管理路由

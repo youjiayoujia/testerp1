@@ -82,13 +82,13 @@
                 <strong>物流限制</strong>: {{ $model->carriage_limit }}
             </div>
             <div class="col-lg-3">
-                <strong>物流限制1</strong>: {{ $model->carriage_limit1 }}
+                <strong>物流限制1</strong>: {{ $model->carriage_limit_1 }}
             </div>
             <div class="col-lg-3">
                 <strong>包装限制</strong>: {{ $model->package_limit }}
             </div>
             <div class="col-lg-3">
-                <strong>包装限制1</strong>: {{ $model->package_limit1 }}
+                <strong>包装限制1</strong>: {{ $model->package_limit_1 }}
             </div>
         </div>
         <div class="panel-body">

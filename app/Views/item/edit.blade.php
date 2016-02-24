@@ -42,8 +42,6 @@
             @endforeach
         </select>
     </div>
-       
-
     <div class="form-group col-md-3">
         <label for="color">供应商sku</label>
         <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">

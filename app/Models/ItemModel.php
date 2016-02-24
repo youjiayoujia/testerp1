@@ -29,4 +29,9 @@ class ItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\ProductModel','product_id');
     }
+
+    public function supplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
 }

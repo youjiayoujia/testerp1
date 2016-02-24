@@ -123,6 +123,8 @@ class ProductModel extends BaseModel
         return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
     }
 
+    
+
     /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ
@@ -180,23 +182,16 @@ class ProductModel extends BaseModel
             foreach ($keyset as $key) {
                 if (array_key_exists($key, $data)) {
                     foreach ($data[$key] as $feature_id => $feature_value) {
-                        $featureArray['feature_id'] = $feature_id;
-                        $featureArray['spu_id'] = $spuobj->id;
                         if ($key != 'featureinput') {
                             foreach ($feature_value as $value) {
-                                $featureArray['feature_value'] = $value;
-                                $productFeatureValueModel = new ProductFeatureValueModel();
                                 $featureModel = new FeatureValueModel();
                                 $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',$feature_id)->get()->toArray();
-
-                                $featureArray['feature_value_id'] = $value_id[0]['id'];
-                                $productFeatureValueModel->create($featureArray);
+                                $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$value,'feature_id'=>$feature_id]];
+                                $spuobj->ProductManyToFeaturevalue()->attach($feature_value_arr);               
                             }
                         } else {
-                            $featureArray['feature_value'] = $feature_value;
-                            $featureArray['feature_value_id'] = 0;
-                            $productFeatureValueModel = new ProductFeatureValueModel();
-                            $productFeatureValueModel->create($featureArray);
+                            $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id,'feature_value_id'=>0]];
+                            $spuobj->ProductManyToFeaturevalue()->attach($feature_value_arr);
                         }
                     }
                 }
@@ -222,15 +217,9 @@ class ProductModel extends BaseModel
                 $ProductVariationValueModel = new ProductVariationValueModel();
                 $variations = $ProductVariationValueModel->where('product_id', $this->id)->delete();
                 foreach ($data['variations'] as $variation_id => $variation_values) {
-                    $tmp = [];
-                    $tmp['product_id'] = $this->id;
-                    $tmp['variation_id'] = $variation_id;
-                    $variationValueModel = new variationValueModel();
-                    foreach ($variation_values as $feature_value_id=>$variation_value) {
-                        $tmp['variation_value'] = $variation_value;
-                        $tmp['variation_value_id'] = $feature_value_id;
-                        $model = new ProductVariationValueModel();
-                        $model->create($tmp);
+                    foreach ($variation_values as $variation_value_id=>$variation_value) {
+                        $variation_value_arr = [$variation_value_id=>['variation_value'=>$variation_value,'variation_id'=>$variation_id]];
+                        $this->ProductVariationvalue()->attach($variation_value_arr);
                     }
                 }
             }
@@ -244,27 +233,21 @@ class ProductModel extends BaseModel
                     $tmp['feature_id'] = $feature_id;
                     if (is_array($feature_values)) {
                         foreach ($feature_values as $feature_value) {
-                            $tmp['feature_value'] = $feature_value;
                             $model = new ProductFeatureValueModel();
                             $featureModel = new FeatureValueModel();
                             $value_id = $featureModel->where('name', '=', $feature_value)->where('feature_id', '=',$feature_id)->get()->toArray();
-                            $tmp['feature_value_id'] = $value_id[0]['id'];
-                            $model->create($tmp);
+                            $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id]];
+                            $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);  
                         }
                     } else {
-                        $tmp['feature_value'] = $feature_values;
-                        $model = new ProductFeatureValueModel();
-                        $model->create($tmp);
+                        $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_values,'feature_id'=>$feature_id]];
+                        $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);
                     }
 
                 }
                 foreach ($data['featureinput'] as $featureInputKey => $featureInputValue) {
-                    unset($tmp);
-                    $tmp['spu_id'] = $spu_id;
-                    $tmp['feature_id'] = $featureInputKey;
-                    $tmp['feature_value'] = $featureInputValue;
-                    $model = new ProductFeatureValueModel();
-                    $model->create($tmp);
+                    $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$featureInputValue,'feature_id'=>$featureInputKey,'feature_value_id'=>0]];
+                    $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);
                 }
             }
             //更新图片

@@ -123,8 +123,6 @@ class ProductModel extends BaseModel
         return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
     }
 
-    
-
     /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ
@@ -132,7 +130,7 @@ class ProductModel extends BaseModel
      */
     public function createProduct($data = '', $files = '')
     {
-        //DB::beginTransaction();
+        DB::beginTransaction();
         try {
             //创建spu，,并插入数据
             $spumodel = new SpuModel();
@@ -146,6 +144,7 @@ class ProductModel extends BaseModel
                 if (count($model) == 1) {
                     continue;
                 }
+                //拼接model号
                 $data['model'] = $spu . "-" . $model['model'];;
                 $product = $this->create($data);
                 //获得productID,插入产品图片
@@ -164,12 +163,15 @@ class ProductModel extends BaseModel
                 }
                 //更新产品首图
                 $product->update(['default_image' => $default_image_id]);
-                //插入产品attribute属性
+                //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
+                        //获得此产品的品类所对应的variation属性
                         $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
                         foreach ($variationValues as $value_id=>$variationValue) {
+                            //获得variation属性对应的属性值
                             $variationValueModel = $variationModel->values()->where('id', '=',$value_id)->get()->first();
+                            //多对多插入的attach数组
                             $variation_value_arr = [$variationValueModel->id=>['variation_value'=>$variationValueModel->name,'variation_id'=>$variationModel->id]];
                             $product->ProductVariationvalue()->attach($variation_value_arr);
                         }
@@ -178,18 +180,19 @@ class ProductModel extends BaseModel
             }
             //插入feature属性
             $keyset = ['featureradio', 'featurecheckbox', 'featureinput'];
-            
             foreach ($keyset as $key) {
                 if (array_key_exists($key, $data)) {
                     foreach ($data[$key] as $feature_id => $feature_value) {
-                        if ($key != 'featureinput') {
+                        if ($key != 'featureinput') {//单选和多选框插入
                             foreach ($feature_value as $value) {
                                 $featureModel = new FeatureValueModel();
+                                //找到featureValue对应的ID
                                 $value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',$feature_id)->get()->toArray();
+                                //多对多插入的attach数组
                                 $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$value,'feature_id'=>$feature_id]];
                                 $spuobj->ProductManyToFeaturevalue()->attach($feature_value_arr);               
                             }
-                        } else {
+                        } else {//input框插入
                             $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id,'feature_value_id'=>0]];
                             $spuobj->ProductManyToFeaturevalue()->attach($feature_value_arr);
                         }
@@ -212,9 +215,10 @@ class ProductModel extends BaseModel
         $spu_id = $this->spu_id;
         DB::beginTransaction();
         try {
-            //更新产品attribute属性
+            //更新产品variation属性
             if (array_key_exists('variations', $data)) {
                 $ProductVariationValueModel = new ProductVariationValueModel();
+                //先删除对应的variation属性,再添加
                 $variations = $ProductVariationValueModel->where('product_id', $this->id)->delete();
                 foreach ($data['variations'] as $variation_id => $variation_values) {
                     foreach ($variation_values as $variation_value_id=>$variation_value) {
@@ -228,23 +232,21 @@ class ProductModel extends BaseModel
                 $ProductFeatureValueModel = new ProductFeatureValueModel();
                 $ProductFeatureValueModel->where('spu_id', $spu_id)->delete();
                 foreach ($data['features'] as $feature_id => $feature_values) {
-                    $tmp = [];
-                    $tmp['spu_id'] = $spu_id;
-                    $tmp['feature_id'] = $feature_id;
-                    if (is_array($feature_values)) {
+                    if (is_array($feature_values)) {//feature为多选框
                         foreach ($feature_values as $feature_value) {
-                            $model = new ProductFeatureValueModel();
                             $featureModel = new FeatureValueModel();
+                            //查找featureValue对应的ID
                             $value_id = $featureModel->where('name', '=', $feature_value)->where('feature_id', '=',$feature_id)->get()->toArray();
                             $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id]];
                             $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);  
                         }
-                    } else {
+                    } else {//feature为单选框
                         $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_values,'feature_id'=>$feature_id]];
                         $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);
                     }
 
                 }
+                //feature为input框
                 foreach ($data['featureinput'] as $featureInputKey => $featureInputValue) {
                     $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$featureInputValue,'feature_id'=>$featureInputKey,'feature_value_id'=>0]];
                     $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);
@@ -282,17 +284,20 @@ class ProductModel extends BaseModel
      */
     public function createItem()
     {
-        $attributes = $this->variationValue;
-        
+        //获得variation属性集合
+        $variations = $this->variationValue;
         $brr = [];
-        foreach ($attributes as $attribute) {
-            $brr[$attribute->attribute_id][] = $attribute->attribute_value;
+        foreach ($variations as $variation) {
+            $brr[$variation->variation_id][] = $variation->variation_value;
         }
+        //按照指定格式的数组去笛卡尔及创建item
         $brr = array_values($brr);
         $result = Tool::createDikaer($brr);
+        //产品model号赋值
         $model = $this->model;
         foreach ($result as $_result) {
             $item = $model;
+            //循环拼接创建item
             foreach ($_result as $__result) {
                 $item .= "-" . $__result;
             }

@@ -10,7 +10,7 @@
                 <strong>名称</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-4">
-                <strong>别名</strong>: {{ $model->alias }}
+                <strong>描述</strong>: {{ $model->brief }}
             </div>
         </div>
     </div>

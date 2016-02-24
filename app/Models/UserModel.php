@@ -36,4 +36,10 @@ class UserModel extends BaseModel implements AuthenticatableContract,
      * @var array
      */
     protected $hidden = ['password', 'remember_token'];
+
+
+    public function channelAccounts()
+    {
+        return $this->belongsToMany('App\Models\UserModel', 'channel_account_user', 'channel_account_id', 'user_id');
+    }
 }

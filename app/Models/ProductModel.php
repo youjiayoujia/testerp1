@@ -125,18 +125,6 @@ class ProductModel extends BaseModel
     }
 
     /**
-     * 获得辅助供应商
-     * 2016-2-16 14:00:41 YJ
-     * @param int $id 供应商ID
-     * @return array
-     */
-    public function secondSupplierName($id)
-    {
-        $supplier = new SupplierModel();
-        return $supplier::find($id)->name;
-    }
-
-    /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ
      * @param array $data ,$files obj
@@ -146,10 +134,7 @@ class ProductModel extends BaseModel
         DB::beginTransaction();
         try {
             //创建spu，,并插入数据
-            $spumodel = new SpuModel();
-            $spu = Tool::createSku();
-            $spuarr['spu'] = $spu;
-            $spuobj = $spumodel->create($spuarr);
+            $spuobj = SpuModel::create(['spu'=>Tool::createSku()]);
             $data['spu_id'] = $spuobj->id;
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
@@ -158,7 +143,7 @@ class ProductModel extends BaseModel
                     continue;
                 }
                 //拼接model号
-                $data['model'] = $spu . "-" . $model['model'];;
+                $data['model'] = $spuobj->spu . "-" . $model['model'];;
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;

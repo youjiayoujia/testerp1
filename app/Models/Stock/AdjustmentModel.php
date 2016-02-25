@@ -28,7 +28,6 @@ class AdjustmentModel extends BaseModel
      * get the relationship between the two module 
      *
      * @return 
-     *
      */
     public function warehouse()
     {
@@ -39,7 +38,6 @@ class AdjustmentModel extends BaseModel
      * return the relationship between the two Model 
      *
      * @return
-     *
      */
     public function adjustment()
     {
@@ -50,7 +48,6 @@ class AdjustmentModel extends BaseModel
      * return the relationship between the two Model 
      *
      * @return
-     *
      */
     public function checkByName()
     {
@@ -61,7 +58,6 @@ class AdjustmentModel extends BaseModel
      * return the relationship between the two Model 
      *
      * @return
-     *
      */
     public function adjustByName()
     {
@@ -73,13 +69,10 @@ class AdjustmentModel extends BaseModel
      *
      * @param $request
      * @return $arr
-     *
      */
     public function rule($request)
     {
-        $arr = [
-            'adjust_time' => 'date',
-        ];
+        $arr = [];
         $buf = $request->all();
         $buf = $buf['arr'];
         foreach($buf as $key => $val) 
@@ -97,7 +90,7 @@ class AdjustmentModel extends BaseModel
             if($key == 'warehouse_positions_id')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.warehouse_positions_id.'.$k] = 'required|numeric';
+                    $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
                 }
         }
 

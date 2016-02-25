@@ -53,27 +53,7 @@
                 $(':button[type=submit]').attr('disabled', false);
             }
         });
-
-        $('#sku').blur(function(){
-            var sku_val = $('#sku').val();
-            if(sku_val){
-            $.ajax({
-                url: "{{route('getitemid')}}",
-                data: {sku_val:sku_val},
-                dataType: 'json',
-                type: 'get',
-                success: function(result){
-                    $('#item_id').val(result);
-                    if(!result) {
-                        $('#sku').val('');
-                        alert('sku不存在');
-                    }
-                } 
-            });
-            }
-            
-        });
-
+        
         $('#warehouses_id').change(function(){
             val = $('#warehouses_id').val();
             $.ajax({

@@ -129,20 +129,4 @@ class InModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Stock\AllotmentModel', 'relation_id', 'id');
     }
-
-    /**
-     * 通过sku  获取对应的item_id
-     *
-     * @param $sku sku值
-     * @return ''|id
-     *
-     */
-    public function getItemId($sku)
-    {
-        $buf = ItemModel::all()->toArray();
-        foreach($buf as $item)
-            if($item['sku'] == $sku)
-                return $item['id'];
-        return '';
-    }
 }

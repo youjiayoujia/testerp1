@@ -94,7 +94,7 @@ Route::resource('channel', 'ChannelController');
 //渠道账号路由
 Route::resource('channelAccount', 'Channel\AccountController');
 
-<<<<<<< HEAD
+
 /**
  *  stock allotment route
  */
@@ -110,7 +110,7 @@ Route::get('checkform/{id}', ['uses'=>'Stock\AllotmentController@checkform', 'as
 Route::get('allotmentpick', ['uses'=>'Stock\AllotmentController@allotmentpick', 'as'=>'allotmentpick']);
 Route::get('allotmentcheck/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as'=>'allotmentcheck']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
-=======
+
 //物流路由
 Route::resource('logistics', 'LogisticsController');
 Route::resource('logisticsSupplier', 'Logistics\SupplierController');
@@ -126,7 +126,7 @@ Route::get('batchAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@
 Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCodeFn', 'as' => 'logisticsCodeFn']);
 Route::get('scanAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
->>>>>>> master
+
 
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');

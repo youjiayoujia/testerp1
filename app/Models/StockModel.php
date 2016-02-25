@@ -111,7 +111,9 @@ class StockModel extends BaseModel
     {
         DB::beginTransaction();
         try {
-            $obj = $this->where(['warehouse_positions_id'=>$arr['warehouse_positions_id'], 'items_id'=>$arr['items_id']])->get()->first();
+            $model = $this->where(['warehouse_positions_id'=>$arr['warehouse_positions_id'], 'items_id'=>$arr['items_id']])->get();
+            $len = count($model);
+            $obj = $model->first();
             if($obj) {
                 $obj->all_quantity += $arr['quantity'];
                 $obj->available_quantity +=$arr['quantity'];
@@ -120,6 +122,8 @@ class StockModel extends BaseModel
                 $arr['stock_id'] = $obj->id;
                 $obj->stockIn()->create($arr);
             } else {
+                if($len >= 2)
+                    throw new Exception('sku对应库位最大数量超过了2个');
                 $tmp = $this->create($arr);
                 $tmp->all_quantity = $arr['quantity'];
                 $tmp->available_quantity = $arr['quantity'];
@@ -128,6 +132,7 @@ class StockModel extends BaseModel
                 $tmp->stockIn()->create($arr);
             }
         } catch (Exception $e) {
+            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
         }
         DB::commit();
@@ -138,7 +143,7 @@ class StockModel extends BaseModel
      *  
      * @param $arr 
      * the keys in order
-     * 'item_id'=>item号,
+     * 'items_id'=>item号,
      * 'quantity' => '数量',
      * 'amount' => '总金额',
      * 'warehouse_positions_id' => '库位id',
@@ -158,18 +163,57 @@ class StockModel extends BaseModel
                 $obj->available_quantity -= $arr['quantity'];
                 $obj->amount -= $arr['amount'];
                 if($obj->available_quantity < 0 || $obj->amount < 0) {
-                    throw new Exception('数量或金额有误');
+                    throw new Exception('库存数量和金额为负');
                 }
                 $obj->save();
                 $arr['stock_id'] = $obj->id;
                 $obj->stockOut()->create($arr);
             }
         } catch (Exception $e) {
+            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
         }
         DB::commit();
     }
-    
+
+    /**
+     * the api of stock hold | similar to the stock in
+     *
+     * arr[]参数列表
+     * 'items_id'=>item号
+     * 'warehouse_positions_id'=> 库位号
+     * 'quantity'=>数量
+     *
+     * $flag bool 1表示hold 0表示反Hold
+     *  @return none
+     *
+     */
+    public function hold($arr, $flag) 
+    {
+        DB::beginTransaction();
+        try {
+            $obj = $this->where(['warehouse_positions_id'=>$arr['warehouse_positions_id'], 'items_id'=>$arr['items_id']])->get()->first();
+            if($flag && $obj) {
+                $obj->available_quantity -= $arr['quantity'];
+                $obj->hold_quantity += $arr['quantity'];
+                if($obj->available_quantity < 0) {
+                    throw new Exception('可用数量是负的了');
+                }
+                $obj->save();
+            } else {
+                $obj->available_quantity += $arr['quantity'];
+                $obj->hold_quantity -= $arr['quantity'];
+                if($obj->hold_quantity < 0) {
+                    throw new Exception('hold数量是负的了');
+                }
+                $obj->save();
+            }
+        } catch (Exception $e) {
+            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
+            DB::rollback();
+        }
+        DB::commit();
+    }    
     /**
      * return the the relation ship between the two model
      *

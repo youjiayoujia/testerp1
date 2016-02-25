@@ -23,7 +23,7 @@ class OutModel extends BaseModel
     protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
     // 用于查询
-    public $searchFields = [''];
+    public $searchFields = ['quantity'];
 
     // 规则验证
     public $rules = [

@@ -179,20 +179,24 @@ class AdjustmentController extends Controller
     }
 
     /**
+     * 新增一个条目
      * 
-     *
+     * @param current int warehouse 仓库
+     * @return view
      *
      */
     public function ajaxAdjustAdd()
     {
-        $current = request()->input('current');
-        $warehouse = request()->input('warehouse');
-        $response = [
-            'current' => $current,
-            'positions' => PositionModel::where('warehouses_id', $warehouse)->get(),
-        ];
+        if(request()->ajax()) {
+            $current = request()->input('current');
+            $warehouse = request()->input('warehouse');
+            $response = [
+                'current' => $current,
+                'positions' => PositionModel::where('warehouses_id', $warehouse)->get(),
+            ];
 
-        return view($this->viewPath.'add', $response);
+            return view($this->viewPath.'add', $response);
+        }
     }
 
     /**
@@ -217,14 +221,12 @@ class AdjustmentController extends Controller
             DB::beginTransaction();
             try {
                 for($i=0;$i<count($buf);$i++) {
-
                     $tmp = array_merge($arr,$buf[$i]);
                     if($tmp['type'] == 'IN') {
                         $tmp['type'] = 'ADJUSTMENT';
                         $stock->in($tmp);
                     } else {
                         $tmp['type'] = 'ADJUSTMENT';
-
                         $stock->out($tmp);
                     }
                 }

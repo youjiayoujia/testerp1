@@ -43,7 +43,7 @@
                         <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[items_id][{{$key}}]' value='{{ $allotmentform->items->sku }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='quantity' class='control-label'>数量</label>
+                        <label for='quantity' class='control-label'>实发数量</label>
                         <input type='text' class='form-control quantity' id='arr[quantity][{{$key}}]' placeholder='quantity' name='arr[quantity][{{$key}}]' value={{ $allotmentform->quantity }} readonly>
                     </div>
                     <div class='form-group col-sm-2'>
@@ -82,26 +82,6 @@
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){
-    $.each($('.warehouse_positions_id'), function(){
-        if($(this).val() == '') {
-            $('button:submit').attr('disabled', true);
-            return false;
-        } else {
-            $('button:submit').attr('disabled', false);
-        }
-    });
-
-    $('.warehouse_positions_id').change(function(){
-        $.each($('.warehouse_positions_id'), function(){
-            if($(this).val() == '') {
-                $('button:submit').attr('disabled', true);
-                return false;
-            } else {
-                $('button:submit').attr('disabled', false);
-            }
-        });
-    });
-
     $('.new_receive_quantity').blur(function(){
         obj = $(this);
         if($(this).val()) {

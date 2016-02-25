@@ -25,19 +25,4 @@ class InController extends Controller
         $this->mainTitle = '入库';
         $this->viewPath = 'stock.in.';
     }
-    
-    /**
-     * 获取itemid，返回
-     *
-     * @param none 
-     * @return json
-     *
-     */
-    public function getItemId()
-    { 
-        $sku_val = $_GET['sku_val']; 
-        $id = $this->model->getitemid($sku_val);
-
-        echo json_encode($id);
-    }
 }

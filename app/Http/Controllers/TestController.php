@@ -10,10 +10,12 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Jobs\test;
 use App\Jobs\test1;
 use Queue;
+use App\Models\StockModel;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class TestController extends Controller
@@ -22,14 +24,20 @@ class TestController extends Controller
 
     public function test()
     {
-      error_reporting(E_ALL);
-      ini_set('display_errors', 0);
-
-      getType($type);
-      getType();
-      get_type();
-
+      $obj = StockModel::where(['warehouses_id'=>12, 'items_id'=>4])->get()->first()->position;
+      var_dump($obj->toArray());
+      exit;
     }
+    // public function test()
+    // {
+    //   error_reporting(E_ALL);
+    //   ini_set('display_errors', 0);
+
+    //   getType($type);
+    //   getType();
+    //   get_type();
+
+    // }
 
     public function test3()
     {

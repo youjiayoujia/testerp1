@@ -89,36 +89,6 @@
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 <script type='text/javascript'>
 $(document).ready(function(){   
-    $(document).on('click', '.check_time', function(){
-        obj = $(this).parent().parent();
-        tmp = $(this);
-        if(obj.find('td:eq(8)').text() == '未审核') {
-            if(confirm('确认审核?')) {
-                tmp.prev().hide();
-                id = $(this).data('id');
-                str = "data-id="+id;
-                tmp.after(" <a href='javascript:' class='btn btn-success btn-xs pick' "+str+">\
-                <span class='glyphicon glyphicon-eye-open'></span>生成拣货单</a>");
-                tmp.hide();
-                obj.find('.delete_item').hide();
-                $.ajax({
-                    url:"{{ route('allotmentcheck') }}",
-                    data:{id:id},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){
-                        tmp.html('<span class="glyphicon glyphicon-pencil"></span>已审核');
-                        obj.find('td:eq(9)').text(result[0]);
-                        obj.find('td:eq(8)').text('已审核');
-                        obj.find('td:eq(7)').text(result[1]);
-                    }
-                });
-            }
-        } else {
-            alert('已审核');
-        }
-    });
-
     $(document).on('click', '.pick', function(){
         obj = $(this).parent().parent();
         tmp = $(this);

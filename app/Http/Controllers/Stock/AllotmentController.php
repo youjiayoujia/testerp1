@@ -50,7 +50,7 @@ class AllotmentController extends Controller
             'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
             'logisticses' => AllotmentLogisticsModel::where('allotments_id', $id)->get(),
         ];
-        
+
         return view($this->viewPath.'show', $response);
     }
 
@@ -85,6 +85,7 @@ class AllotmentController extends Controller
         $len = count(array_keys(request()->input('arr.items_id')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
+        $stock = new StockModel;
         for($i=0; $i<$len; $i++)
         {   
             $arr = request()->input('arr');
@@ -95,6 +96,7 @@ class AllotmentController extends Controller
             }
             $buf['stock_allotments_id'] = $obj->id;
             AllotmentFormModel::create($buf);
+            $stock->hold($buf, 1);
         }
 
         return redirect($this->mainIndex);
@@ -186,8 +188,11 @@ class AllotmentController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach($obj->allotmentform as $val)
+        $stock = new StockModel;
+        foreach($obj->allotmentform as $val) {
+            $stock->hold($val->toArray(), 0);
             $val->delete();
+        }
         foreach($obj->logistics as $tmp)
             $tmp->delete();
         $obj->delete();
@@ -195,6 +200,13 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 调拨单审核处理 
+     *
+     * @param $id 调拨单id
+     * @return mainIndex
+     *
+     */
     public function checkResult($id)
     {
         $model = $this->model->find($id);
@@ -210,6 +222,12 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 跳转出库物流回传页面
+     *
+     *  @return view
+     *
+     */
     public function checkout()
     {
         $id = request()->input('id');
@@ -222,6 +240,13 @@ class AllotmentController extends Controller
         return view($this->viewPath.'checkout', $response);
     }
 
+    /**
+     * 出库操作
+     * 物流信息回传，出库
+     *
+     * @return mainIndex
+     *
+     */
     public function getLogistics($id)
     {
         $model = $this->model->find($id);
@@ -231,7 +256,6 @@ class AllotmentController extends Controller
         $arr = request()->all();
         $arr['allotments_id'] = $id;
         $model->logistics()->create($arr);
-
         $model->update(['allotment_status'=>'out']);
         $stock = new StockModel;
         $model->relation_id = $model->id;
@@ -253,6 +277,12 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 强制结束调拨单 
+     *
+     *  @return mainIndex
+     *
+     */
     public function allotmentOver($id)
     {
         $this->model->find($id)->update(['allotment_status'=>'over']);
@@ -260,6 +290,12 @@ class AllotmentController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 跳转调拨单审核页面
+     *
+     * @return view
+     *
+     */
     public function allotmentCheck($id)
     {   
         $model = $this->model->find($id);
@@ -271,26 +307,6 @@ class AllotmentController extends Controller
         ];
 
         return view($this->viewPath.'allotmentcheck', $response);
-    }
-
-    /**
-     * 处理ajax请求参数,审核
-     *
-     * @param none
-     * @return json|time
-     *
-     */
-    public function ajaxAllotmentCheck()
-    {
-        if(request()->ajax()) {
-            $id = request()->input('id');
-            $time = date('Y-m-d',time());       
-            $obj = $this->model->find($id);
-            $obj->update(['check_status'=>'Y', 'check_time'=>$time, 'check_by'=>'2']); 
-            echo json_encode([$time, $obj->checkByName->name]);
-        } else {
-            echo json_encode('false');
-        }
     }
 
     /**
@@ -313,35 +329,6 @@ class AllotmentController extends Controller
     }
 
     /**
-     * 处理ajax请求，确认出库 
-     *
-     *  @param none
-     *  @return  any
-     *
-     */
-    public function ajaxAllotmentCheckOut()
-    {
-        if(request()->ajax()) {
-            $id = request()->input('id');
-            $obj = $this->model->find($id);
-            $obj->update(['allotment_status'=>'out']);
-            $stock = new StockModel;
-            $obj->relation_id = $obj->id;
-            $arr = $obj->toArray();
-            $buf = $obj->allotmentform->toArray();
-            for($i=0;$i<count($buf);$i++) {
-                $tmp = array_merge($arr, $buf[$i]);
-                $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
-                $tmp['type'] = 'ALLOTMENT';
-                $stock->out($tmp);
-            }
-            return json_encode('1221');
-        }
-
-        return json_encode('false');
-    }
-
-    /**
      *  处理ajax请求 
      *
      *  @param none
@@ -350,7 +337,7 @@ class AllotmentController extends Controller
      */
     public function ajaxAllotmentAdd()
     {
-        
+        if(request()->ajax()) {
             $current = request()->input('current');
             $warehouse = request()->input('warehouse');
             $sku_buf = StockModel::where('warehouses_id', $warehouse)->distinct()->with('items')->get()->toArray();
@@ -369,7 +356,7 @@ class AllotmentController extends Controller
             ];
 
             return view($this->viewPath.'add', $response);
-
+        }
     }
 
     /**
@@ -389,7 +376,6 @@ class AllotmentController extends Controller
         
         return json_encode('false');
     }
-
 
     /**
      * 跳转对单页面 
@@ -423,6 +409,7 @@ class AllotmentController extends Controller
     public function checkformupdate($id)
     {
         request()->flash();
+
         $arr = request()->all();
         $this->model->find($id)->update(['checkform_by'=>'3']);
         $obj = $this->model->find($id)->allotmentform;
@@ -433,6 +420,8 @@ class AllotmentController extends Controller
             $buf[] = $arr['arr']['old_receive_quantity'];
             for($i=0; $i<count($buf[0]); $i++)
             {   
+                if($buf[0][$i] == '' || $buf[1][$i] == '')
+                    continue;
                 $obj[$i]->update(['receive_quantity'=>($buf[0][$i]+$buf[2][$i]), 'in_warehouse_positions_id'=>$buf[1][$i]]);
             }
             $flag = 1;
@@ -467,12 +456,15 @@ class AllotmentController extends Controller
                 $buf['amount'] = round($buf['amount']/$buf['quantity']*$buf['new_receive_quantity'],3);
                 $buf['quantity'] = $buf['new_receive_quantity'];
                 $buf['items_id'] = ItemModel::where('sku',$buf['items_id'])->get()->first()->id;
+                if($buf['quantity'] == '' || $buf['warehouse_positions_id'] == '')
+                    continue;
                 if($buf['amount'] < 0)
                     throw new Exception('库存金额低于0了');
                 if($buf['quantity'])
                     $stock->in($buf);
             }
         } catch(Exception $e) {
+            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
         }
         DB::commit();

@@ -68,7 +68,7 @@ class StockController extends Controller
     }
 
     /**
-     * 获取库存对象，通过仓库和库位
+     * 获取库存对象，通过库位
      * 某仓库某库位的对象里面的所有sku
      *
      * @return obj
@@ -77,11 +77,12 @@ class StockController extends Controller
      */
     public function ajaxGetByPosition()
     {
+        if(request()->ajax()) {
             $position = request()->input('position');
             $obj = StockModel::where(['warehouse_positions_id'=>$position])->with('items')->get();
-
             return json_encode($obj);
-        
+        }
+
         return json_encode('false');
     }
 
@@ -89,12 +90,11 @@ class StockController extends Controller
      * 获取信息 
      * 传参：sku，仓库号
      * array[0] => item号的相应对象
-     * array[1] => 通过仓库和sku 来获取对应的库存对象
+     * array[1] => 通过仓库和items_id 来获取对应的库存对象
      * array[2] => 对应于array[1]的position对象
      * array[3] => 获取商品单价
      *
      * @return array
-     *
      */
     public function ajaxGetMessage()
     {
@@ -113,7 +113,7 @@ class StockController extends Controller
             $arr[] = $obj;
             $arr[] = $obj1;
             foreach($obj1 as $tmp) {
-                $buf = $tmp->position->first();
+                $buf = $tmp->position;
                 $arr[2][] = $buf;
             }
             if($obj1)
@@ -135,7 +135,7 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $warehouse = request()->input('warehouse');
-            $buf = $this->model->where('warehouses_id', $warehouse)->distinct()->with('items')->get()->toArray();
+            $buf = $this->model->where('warehouses_id', $warehouse)->distinct()->with('items')->get(['items_id'])->toArray();
             if(!count($buf)) {
                 return json_encode('none');
             }
@@ -187,7 +187,7 @@ class StockController extends Controller
      */
     public function ajaxAllotSku()
     {
-        
+        if(request()->ajax()) {
             $warehouse = request()->input('warehouse');
             $items_id = request()->input('items_id');
             $obj = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$items_id])->get()->first();
@@ -205,12 +205,9 @@ class StockController extends Controller
                 $arr[1][] = $buf;
             }
             $arr[2] = $obj->unit_cost;
-            if($arr) {
-                return json_encode($arr);
-            } else {
-                return json_encode('none');
-            }
-        
+            
+            return json_encode($arr);
+        }
 
         return json_encode('false');
     }

@@ -73,6 +73,7 @@ class ProductModel extends BaseModel
         'product_size',
         'package_size',
         'weight',
+        'warehouse_id',
         'upload_user',
         'assigner',
         'default_image',

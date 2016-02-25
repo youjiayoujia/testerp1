@@ -26,5 +26,9 @@ class HelpServiceProvider extends ServiceProvider
         $this->app->singleton('datalist', function () {
             return new \App\Helps\DataList;
         });
+
+        $this->app->singleton('tool', function () {
+            return new \App\Helps\Tool;
+        });
     }
 }

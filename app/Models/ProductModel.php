@@ -139,9 +139,6 @@ class ProductModel extends BaseModel
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
             foreach ($data['modelSet'] as $model) {
-                if (count($model) == 1) {
-                    continue;
-                }
                 //拼接model号
                 $data['model'] = $spuobj->spu . "-" . $model['model'];;
                 $product = $this->create($data);

@@ -135,24 +135,27 @@
 
 @section('pageJs')
     <script type="text/javascript">
-        $(document).on('click','.quanxuan',function(){
-            var model = $(this).val();
-            if($("input[name^='modelSet["+model+"]'").attr("checked")=='checked'){
-                $("input[name^='modelSet["+model+"]'").attr("checked", false);
-            }else{
-                $("input[name^='modelSet["+model+"]'").attr("checked", true);
-            }
-        })
-
-        function quanxuan(id){
-            var collid = document.getElementById(id);
-            var coll = $("input[class^="+id+"quanxuan]"); 
+        function quanxuan(model){
+            var collid = document.getElementById(model);
+            var coll = $("input[class^="+model+"quanxuan]"); 
             if (collid.checked){
-               for(var i = 0; i < coll.length; i++)
-                   coll[i].checked = true;
+                for(var i = 0; i < coll.length; i++){
+                    coll[i].checked = true;
+                }
+                html ='<div style="margin-left:25px;margin-bottom:15px" class=image_'+model+'><label for="color">上传图片：</label>';
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image0]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image1]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image2]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image3]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image4]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image5]' type='file'/></div>";
+                html+="</div>";
+                $("."+model).after(html);
             }else{
-               for(var i = 0; i < coll.length; i++)
-                   coll[i].checked = false;
+                for(var i = 0; i < coll.length; i++){
+                    coll[i].checked = false;
+                }
+                $(".image_"+model).remove();
             }
         }
 

@@ -21,15 +21,33 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 class TestController extends Controller
 {
     use DispatchesJobs;
-
+    use ok;
+    public $a = '123';
     public function test()
     {
-      echo "<script type='text/javascript'>alert('123');</script>";
-      exit;
-      $obj = StockModel::where(['warehouses_id'=>12, 'items_id'=>4])->get()->first()->position;
-      var_dump($obj->toArray());
-      exit;
+      var_dump($GLOBALS);
+      EXIT;
     }
+    // public function test()
+    // {
+    //   $arr = [
+    //     ['a',['m','n']],
+    //     ['c','d']
+    //   ];
+    //   foreach($arr as $key =>list($e,$f))
+
+    //     var_dump($key." ".$e." ".$f."<br/>");
+    // }
+
+
+    // public function test()
+    // {
+    //   echo "<script type='text/javascript'>alert('123');</script>";
+    //   exit;
+    //   $obj = StockModel::where(['warehouses_id'=>12, 'items_id'=>4])->get()->first()->position;
+    //   var_dump($obj->toArray());
+    //   exit;
+    // }
     // public function test()
     // {
     //   error_reporting(E_ALL);
@@ -106,4 +124,11 @@ class TestController extends Controller
        sleep(30);
        socket_close($sock);
     }
+}
+
+trait ok{
+  public function mc()
+  {
+    echo $this->$a;
+  }
 }

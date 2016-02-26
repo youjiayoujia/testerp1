@@ -68,8 +68,10 @@ class ProductController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         //已选中的variation的id号集合     
-        foreach($product->variationValue->toArray() as $key=>$arr){
-            $variation_value_id_arr[$key] = $arr['variation_value_id'];
+        foreach($product->ProductVariationvalue->toArray() as $key=>$arr){
+            if($arr['pivot']['created_at']==$arr['pivot']['updated_at']){
+                $variation_value_id_arr[$key] = $arr['pivot']['variation_value_id'];
+            }   
         }
         //已选中的feature的id集合
         foreach($product->spu->productFeatureValue->toArray() as $key=>$arr){

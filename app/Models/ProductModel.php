@@ -286,10 +286,14 @@ class ProductModel extends BaseModel
     public function createItem()
     {
         //获得variation属性集合
-        $variations = $this->variationValue;
+        $variations = $this->ProductVariationvalue->toArray();
         $brr = [];
+        //print_r($variations->toArray());exit;
         foreach ($variations as $variation) {
-            $brr[$variation->variation_id][] = $variation->variation_value;
+            if($variation['pivot']['created_at']==$variation['pivot']['updated_at']){
+                $brr[$variation['variation_id']][] = $variation['pivot']['variation_value_id'];
+            }
+            
         }
         //按照指定格式的数组去笛卡尔及创建item
         $brr = array_values($brr);
@@ -305,7 +309,6 @@ class ProductModel extends BaseModel
             $product_data = $this->toArray();
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
-            //$item = new ItemModel();
             $this->item()->create($product_data);
         }
         $this->status = 1;

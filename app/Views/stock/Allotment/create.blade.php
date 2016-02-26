@@ -219,7 +219,7 @@
                 warehouse =  $('#out_warehouses_id').val();
                 position = obj.find('.warehouse_positions_id').val();
                 sku = obj.find('.sku').val();
-                if($(this).val() > obj.find('.access_quantity').val()) {
+                if($(this).val() > parseInt(obj.find('.access_quantity').val())) {
                     alert('超出可用数量');
                     $(this).val('');
                     obj.find('.amount').val('');

@@ -7,6 +7,7 @@ use Exception;
 use App\Base\BaseModel;
 use App\Models\Stock\InModel;
 use App\Models\Stock\OutModel;
+use App\Models\Warehouse\PositionModel;
 
 class StockModel extends BaseModel
 {
@@ -112,7 +113,6 @@ class StockModel extends BaseModel
         DB::beginTransaction();
         try {
             $model = $this->where(['warehouse_positions_id'=>$arr['warehouse_positions_id'], 'items_id'=>$arr['items_id']])->get();
-            $len = count($model);
             $obj = $model->first();
             if($obj) {
                 $obj->all_quantity += $arr['quantity'];
@@ -122,6 +122,8 @@ class StockModel extends BaseModel
                 $arr['stock_id'] = $obj->id;
                 $obj->stockIn()->create($arr);
             } else {
+                $warehouses_id = PositionModel::find($arr['warehouse_positions_id'])->warehouses_id;
+                $len = StockModel::where(['warehouses_id'=>$warehouses_id, 'items_id'=>$arr['items_id']])->get()->count();
                 if($len >= 2)
                     throw new Exception('sku对应库位最大数量超过了2个');
                 $tmp = $this->create($arr);
@@ -132,8 +134,8 @@ class StockModel extends BaseModel
                 $tmp->stockIn()->create($arr);
             }
         } catch (Exception $e) {
-            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
+            throw new Exception('入库出错,可能的原因是sku对应的库位数超过了2,请检查入库库位');
         }
         DB::commit();
     }
@@ -170,8 +172,8 @@ class StockModel extends BaseModel
                 $obj->stockOut()->create($arr);
             }
         } catch (Exception $e) {
-            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
+            throw new Exception('出库出错,可能的原因是库存数量或金额被减成负的了');
         }
         DB::commit();
     }
@@ -209,11 +211,12 @@ class StockModel extends BaseModel
                 $obj->save();
             }
         } catch (Exception $e) {
-            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
+            throw new Exception('hold出错,hold数量变成负的了');
         }
         DB::commit();
-    }    
+    } 
+       
     /**
      * return the the relation ship between the two model
      *

@@ -24,6 +24,8 @@ class TestController extends Controller
 
     public function test()
     {
+      echo "<script type='text/javascript'>alert('123');</script>";
+      exit;
       $obj = StockModel::where(['warehouses_id'=>12, 'items_id'=>4])->get()->first()->position;
       var_dump($obj->toArray());
       exit;

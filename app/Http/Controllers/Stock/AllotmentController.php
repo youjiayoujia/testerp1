@@ -217,7 +217,7 @@ class AllotmentController extends Controller
             return redirect($this->mainIndex);
         }
         $time = date('Y-m-d',time());       
-        $model->update(['check_status'=>'SUCCESS', 'check_time'=>$time, 'check_by'=>'2']); 
+        $model->update(['check_status'=>'SUCCESS', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
 
         return redirect($this->mainIndex);
     }
@@ -255,18 +255,18 @@ class AllotmentController extends Controller
         }
         $arr = request()->all();
         $arr['allotments_id'] = $id;
-        $model->logistics()->create($arr);
-        $model->update(['allotment_status'=>'out']);
-        $stock = new StockModel;
-        $model->relation_id = $model->id;
-        $arr = $model->toArray();
-        $buf = $model->allotmentform->toArray();
         DB::beginTransaction();
         try {
+            $model->logistics()->create($arr);
+            $model->update(['allotment_status'=>'out']);
+            $stock = new StockModel;
+            $model->relation_id = $model->id;
+            $arr = $model->toArray();
+            $buf = $model->allotmentform->toArray();
             for($i=0;$i<count($buf);$i++) {
                 $tmp = array_merge($arr, $buf[$i]);
-                $tmp['warehouses_id'] = $tmp['out_warehouses_id'];
                 $tmp['type'] = 'ALLOTMENT';
+                $stock->hold($tmp, 0);
                 $stock->out($tmp);
             }
         } catch(Exception $e) {
@@ -340,7 +340,7 @@ class AllotmentController extends Controller
         if(request()->ajax()) {
             $current = request()->input('current');
             $warehouse = request()->input('warehouse');
-            $sku_buf = StockModel::where('warehouses_id', $warehouse)->distinct()->with('items')->get()->toArray();
+            $sku_buf = StockModel::where('warehouses_id', $warehouse)->distinct()->with('items')->get(['items_id'])->toArray();
             $positions = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$sku_buf[0]['items']['id']])->get(); 
             $buf = [];
             foreach($positions as $position)
@@ -451,7 +451,6 @@ class AllotmentController extends Controller
                 }
                 $buf = array_merge($buf,$arr);
                 $buf['type'] = "ALLOTMENT";
-                $buf['warehouses_id'] = $this->model->find($id)->in_warehouses_id;
                 $buf['relation_id'] = $id;
                 $buf['amount'] = round($buf['amount']/$buf['quantity']*$buf['new_receive_quantity'],3);
                 $buf['quantity'] = $buf['new_receive_quantity'];
@@ -464,7 +463,6 @@ class AllotmentController extends Controller
                     $stock->in($buf);
             }
         } catch(Exception $e) {
-            echo "<script type='text/javascript'>alert('".$e->getMessage()."');</script>";
             DB::rollback();
         }
         DB::commit();

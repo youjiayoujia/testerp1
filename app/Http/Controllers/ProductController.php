@@ -63,7 +63,7 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $product = $this->model->find($id);       
+        $product = $this->model->find($id);     
         if (!$product) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -80,7 +80,7 @@ class ProductController extends Controller
             }
             
         }
-
+        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),

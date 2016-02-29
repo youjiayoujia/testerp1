@@ -135,7 +135,7 @@ class ProductModel extends BaseModel
      * @param array $data ,$files obj
      */
     public function createProduct($data = '', $files = '')
-    {
+    {   
         DB::beginTransaction();
         try {
             //创建spu，,并插入数据
@@ -145,7 +145,9 @@ class ProductModel extends BaseModel
             $catalog = CatalogModel::find($data['catalog_id']);
             foreach ($data['modelSet'] as $model) {
                 //拼接model号
-                $data['model'] = $spuobj->spu . "-" . $model['model'];;
+                $data['model'] = $spuobj->spu . "-" . $model['model'];
+                $data['carriage_limit'] = implode(',', $data['carriage_limit_arr']);
+                $data['package_limit'] = implode(',', $data['package_limit_arr']);
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;

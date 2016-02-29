@@ -109,11 +109,6 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
-    public function variationValue()
-    {
-        return $this->hasMany('App\Models\Product\ProductVariationValueModel', 'product_id');
-    }
-
     public function item()
     {
         return $this->hasMany('App\Models\ItemModel', 'product_id');
@@ -182,8 +177,6 @@ class ProductModel extends BaseModel
                     foreach ($data[$key] as $feature_id => $feature_value) {
                         if ($key != 'featureinput') {//单选和多选框插入
                             foreach ($feature_value as $value) {
-                                //$featureModel = new FeatureValueModel();
-                                //$value_id = $featureModel->where('name', '=', $value)->where('feature_id', '=',$feature_id)->get()->toArray();
                                 $featureModel = $catalog->features()->find($feature_id);
                                 //找到featureValue对应的ID
                                 $featureValueModel = $featureModel->values()->where('name',$value)->get()->first()->toArray();
@@ -233,8 +226,6 @@ class ProductModel extends BaseModel
                 foreach ($data['features'] as $feature_id => $feature_values) {
                     if (is_array($feature_values)) {//feature为多选框
                         foreach ($feature_values as $feature_value) {
-                            //$featureModel = new FeatureValueModel();
-                            //$value_id = $featureModel->where('name', '=', $feature_value)->where('feature_id', '=',$feature_id)->get()->toArray();
                             $featureModel = $this->catalog->features()->find($feature_id);
                             //找到featureValue对应的ID
                             $featureValueModel = $featureModel->values()->where('name',$feature_value)->get()->first()->toArray();
@@ -288,10 +279,10 @@ class ProductModel extends BaseModel
         //获得variation属性集合
         $variations = $this->ProductVariationvalue->toArray();
         $brr = [];
-        //print_r($variations->toArray());exit;
+        
         foreach ($variations as $variation) {
             if($variation['pivot']['created_at']==$variation['pivot']['updated_at']){
-                $brr[$variation['variation_id']][] = $variation['pivot']['variation_value_id'];
+                $brr[$variation['variation_id']][] = $variation['name'];
             }
             
         }
@@ -321,6 +312,8 @@ class ProductModel extends BaseModel
         foreach ($this->item as $item) {
             $item->delete();
         }
+        $productVariationValueModel = new ProductVariationValueModel();
+        $productVariationValueModel->where('product_id',$this->id)->delete();
         //删除product
         $this->delete();
     }

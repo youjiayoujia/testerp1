@@ -119,6 +119,16 @@ class ProductModel extends BaseModel
         return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
     }
 
+    public function ProductManyToFeaturevalue()
+    {
+        return $this->belongsToMany('App\Models\Catalog\FeatureValueModel', 'product_feature_values', 'product_id', 'feature_value_id')->withTimestamps();
+    }
+
+    public function productFeatureValue()
+    {
+        return $this->hasMany('App\Models\Product\ProductFeatureValueModel','product_id');
+    }
+
     /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ
@@ -169,28 +179,30 @@ class ProductModel extends BaseModel
                         }
                     }
                 }
-            }
-            //插入feature属性
-            $keyset = ['featureradio', 'featurecheckbox', 'featureinput'];
-            foreach ($keyset as $key) {
-                if (array_key_exists($key, $data)) {
-                    foreach ($data[$key] as $feature_id => $feature_value) {
-                        if ($key != 'featureinput') {//单选和多选框插入
-                            foreach ($feature_value as $value) {
-                                $featureModel = $catalog->features()->find($feature_id);
-                                //找到featureValue对应的ID
-                                $featureValueModel = $featureModel->values()->where('name',$value)->get()->first()->toArray();
-                                //多对多插入的attach数组
-                                $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$value,'feature_id'=>$feature_id]];
-                                $spuobj->ProductManyToFeaturevalue()->attach($feature_value_arr);               
+
+                //插入feature属性
+                $keyset = ['featureradio', 'featurecheckbox', 'featureinput'];
+                foreach ($keyset as $key) {
+                    if (array_key_exists($key, $data)) {
+                        foreach ($data[$key] as $feature_id => $feature_value) {
+                            if ($key != 'featureinput') {//单选和多选框插入
+                                foreach ($feature_value as $value) {
+                                    $featureModel = $catalog->features()->find($feature_id);
+                                    //找到featureValue对应的ID
+                                    $featureValueModel = $featureModel->values()->where('name',$value)->get()->first()->toArray();
+                                    //多对多插入的attach数组
+                                    $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$value,'feature_id'=>$feature_id]];
+                                    $product->ProductManyToFeaturevalue()->attach($feature_value_arr);               
+                                }
+                            } else {//input框插入
+                                $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id,'feature_value_id'=>0]];
+                                $product->ProductManyToFeaturevalue()->attach($feature_value_arr);
                             }
-                        } else {//input框插入
-                            $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id,'feature_value_id'=>0]];
-                            $spuobj->ProductManyToFeaturevalue()->attach($feature_value_arr);
                         }
                     }
                 }
             }
+            
         } catch (Exception $e) {
             DB::rollBack();
         }
@@ -222,7 +234,7 @@ class ProductModel extends BaseModel
             //更新产品feature属性
             if (array_key_exists('features', $data)) {
                 $ProductFeatureValueModel = new ProductFeatureValueModel();
-                $ProductFeatureValueModel->where('spu_id', $spu_id)->delete();
+                $ProductFeatureValueModel->where('product_id', $this->id)->delete();
                 foreach ($data['features'] as $feature_id => $feature_values) {
                     if (is_array($feature_values)) {//feature为多选框
                         foreach ($feature_values as $feature_value) {
@@ -230,18 +242,18 @@ class ProductModel extends BaseModel
                             //找到featureValue对应的ID
                             $featureValueModel = $featureModel->values()->where('name',$feature_value)->get()->first()->toArray();
                             $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id]];
-                            $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);  
+                            $this->ProductManyToFeaturevalue()->attach($feature_value_arr);  
                         }
                     } else {//feature为单选框
                         $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$feature_values,'feature_id'=>$feature_id]];
-                        $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);
+                        $this->ProductManyToFeaturevalue()->attach($feature_value_arr);
                     }
 
                 }
                 //feature为input框
                 foreach ($data['featureinput'] as $featureInputKey => $featureInputValue) {
                     $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$featureInputValue,'feature_id'=>$featureInputKey,'feature_value_id'=>0]];
-                    $this->spu->ProductManyToFeaturevalue()->attach($feature_value_arr);
+                    $this->ProductManyToFeaturevalue()->attach($feature_value_arr);
                 }
             }
             //更新图片

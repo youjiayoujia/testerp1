@@ -74,7 +74,7 @@ class ProductController extends Controller
             }   
         }
         //已选中的feature的id集合
-        foreach($product->spu->productFeatureValue->toArray() as $key=>$arr){
+        foreach($product->productFeatureValue->toArray() as $key=>$arr){
             $features_value_id_arr[$key] = $arr['feature_value_id'];
         }
         $response = [
@@ -82,7 +82,7 @@ class ProductController extends Controller
             'catalogs' => $this->catalog->all(),
             'product' => $product,
             'suppliers' => $this->supplier->all(),
-            'features_input' => array_values($product->spu->productFeatureValue->where('feature_value_id',0)->toArray()),
+            'features_input' => array_values($product->productFeatureValue->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
             'warehouses' => $this->warehouse->where('type','本地仓库')->get(),

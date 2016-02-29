@@ -27,13 +27,13 @@ class SpuModel extends BaseModel
         return $this->hasMany('App\Models\Product');
     }
 
-    public function productFeatureValue()
+    /*public function productFeatureValue()
     {
         return $this->hasMany('App\Models\Product\ProductFeatureValueModel','spu_id');
     }
 
-    public function ProductManyToFeaturevalue()
+    public function ProductManyToFeaturevalues()
     {
         return $this->belongsToMany('App\Models\Catalog\FeatureValueModel', 'product_feature_values', 'spu_id', 'feature_value_id')->withTimestamps();
-    }
+    }*/
 }

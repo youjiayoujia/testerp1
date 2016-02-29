@@ -326,6 +326,8 @@ class ProductModel extends BaseModel
         }
         $productVariationValueModel = new ProductVariationValueModel();
         $productVariationValueModel->where('product_id',$this->id)->delete();
+        $ProductFeatureValueModel = new ProductFeatureValueModel();
+        $ProductFeatureValueModel->where('product_id',$this->id)->delete();
         //删除product
         $this->delete();
     }

@@ -74,9 +74,13 @@ class ProductController extends Controller
             }   
         }
         //已选中的feature的id集合
-        foreach($product->productFeatureValue->toArray() as $key=>$arr){
-            $features_value_id_arr[$key] = $arr['feature_value_id'];
+        foreach($product->ProductManyToFeaturevalue->toArray() as $key=>$arr){
+            if($arr['pivot']['created_at']==$arr['pivot']['updated_at']){
+                $features_value_id_arr[$key] = $arr['pivot']['feature_value_id'];
+            }
+            
         }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),

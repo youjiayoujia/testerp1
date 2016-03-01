@@ -7,8 +7,8 @@
         <input type='text' class="form-control" id="name" placeholder="库位名字" name='name' value="{{ old('name') }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name='warehouses_id' class='form-control'>
+        <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <select name='warehouse_id' class='form-control'>
             @foreach($warehouses as $warehouse)
                 <option value="{{ $warehouse->id }}" {{ $warehouse->id == old('$warehouse->warehouse->id') ? 'selected' : '' }}>{{ $warehouse->name }}</option>
             @endforeach

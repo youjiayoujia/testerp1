@@ -24,24 +24,6 @@ class OutModel extends BaseModel
 
     // 用于查询
     public $searchFields = ['quantity'];
-
-    // 规则验证
-    public $rules = [
-        'create' => [
-            'sku' => 'required|max:128',
-            'quantity' => 'required|integer',
-            'warehouses_id' => 'required|integer',
-            'warehouse_positions_id' => 'required|integer',
-            'amount' => 'required|integer',
-        ],
-        'update' => [
-            'sku' => 'required|max:128',
-            'quantity' => 'required|integer',
-            'warehouses_id' => 'required|integer',
-            'warehouse_positions_id' => 'required|integer',
-            'amount' => 'required|integer',
-        ]
-    ];
     
     /**
      *  get the relationship between the two module
@@ -50,7 +32,7 @@ class OutModel extends BaseModel
      */
     public function warehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
 
     /**
@@ -80,7 +62,7 @@ class OutModel extends BaseModel
      */
     public function position()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
     }
 
     /**

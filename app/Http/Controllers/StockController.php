@@ -60,7 +60,7 @@ class StockController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouses' => WarehouseModel::all(),
-            'positions' => PositionModel::where('warehouses_id', $model->warehouses_id)->get(),
+            'positions' => PositionModel::where('warehouse_id', $model->warehouse_id)->get(),
             'items' => ItemModel::all(),
         ];
 
@@ -79,7 +79,7 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $position = request()->input('position');
-            $obj = StockModel::where(['warehouse_positions_id'=>$position])->with('items')->get();
+            $obj = StockModel::where(['warehouse_position_id'=>$position])->with('items')->get();
             return json_encode($obj);
         }
 
@@ -100,13 +100,13 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $sku = request()->input('sku');
-            $warehouses_id = request()->input('warehouses_id');
+            $warehouse_id = request()->input('warehouse_id');
             $obj = ItemModel::where(['sku'=>$sku])->get();
             if(!count($obj)) {
                 return json_encode('sku_none');
             }
             $obj = $obj->first();
-            $obj1 = StockModel::where(['warehouses_id'=>$warehouses_id, 'items_id'=>$obj->id])->get();
+            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$obj->id])->get();
             if(!count($obj1)) {
                 return json_encode('stock_none');
             }
@@ -135,13 +135,13 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $warehouse = request()->input('warehouse');
-            $buf = $this->model->where('warehouses_id', $warehouse)->distinct()->with('items')->get(['items_id'])->toArray();
+            $buf = $this->model->where('warehouse_id', $warehouse)->distinct()->with('items')->get(['item_id'])->toArray();
             if(!count($buf)) {
                 return json_encode('none');
             }
             $arr[] = $buf;
-            $arr[] = $this->model->where('warehouses_id', $warehouse)->get()->first()->toArray();
-            $obj = $this->model->where(['warehouses_id'=>$warehouse, 'items_id'=>$arr[0][0]['items']['id']])->get();
+            $arr[] = $this->model->where('warehouse_id', $warehouse)->first()->toArray();
+            $obj = $this->model->where(['warehouse_id'=>$warehouse, 'item_id'=>$arr[0][0]['items']['id']])->get();
             foreach($obj as $val)
             {
                 $tmp = $val->position ? $val->position->toArray() : '';
@@ -164,8 +164,8 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $position = request()->input('position');
-            $items_id = $_GET['items_id'];
-            $obj = StockModel::where(['warehouse_positions_id'=>$position, 'items_id'=>$items_id])->get()->first();
+            $item_id = $_GET['item_id'];
+            $obj = StockModel::where(['warehouse_position_id'=>$position, 'item_id'=>$item_id])->get()->first();
             $arr[] = $obj->toArray();
             $arr[] = $obj->unit_cost;
             if($arr) {
@@ -189,13 +189,13 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $warehouse = request()->input('warehouse');
-            $items_id = request()->input('items_id');
-            $obj = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$items_id])->get()->first();
+            $item_id = request()->input('item_id');
+            $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->get()->first();
             if(!$obj) {
                 return json_encode('none');
             }
             $arr[] = $obj->toArray();
-            $tmp = StockModel::where(['warehouses_id'=>$warehouse, 'items_id'=>$items_id])->distinct()->get();
+            $tmp = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->distinct()->get();
             if(!$tmp) {
                 return json_eoncode('none');
             }

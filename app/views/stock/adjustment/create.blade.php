@@ -9,11 +9,11 @@
             <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : 'CD'.time() }}" readonly>
         </div>
         <div class="form-group col-sm-4">
-            <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouses_id' id='warehouses_id' class='form-control'>
+            <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouse_id' id='warehouse_id' class='form-control'>
                 <option value=''>请选择仓库</option>
                 @foreach($warehouses as $warehouse)
-                    <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
+                    <option value={{ $warehouse->id }} {{ old('warehouse_id') ? old('warehouse_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -44,8 +44,8 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
+                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select name='arr[warehouse_position_id][0]' id='arr[warehouse_position_id][0]' class='form-control warehouse_position_id'>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
@@ -70,7 +70,7 @@
     $(document).ready(function(){
         var current = 1;    
         $('#create_form').click(function(){
-            warehouse = $('#warehouses_id').val();    
+            warehouse = $('#warehouse_id').val();    
             $.ajax({
                 url:"{{ route('adjustadd') }}",
                 data:{current:current, warehouse:warehouse},
@@ -94,11 +94,11 @@
             quantity = block.find('.quantity').val();
             amount = block.find('.amount').val();
             sku = block.find('.sku').val();
-            warehouses_id = $('#warehouses_id').val();
+            warehouse_id = $('#warehouse_id').val();
             if(sku && warehouses_id){
                 $.ajax({
                     url: "{{route('getmessage')}}",
-                    data: {sku:sku, warehouses_id:warehouses_id},
+                    data: {sku:sku, warehouse_id:warehouse_id},
                     dataType: 'json',
                     type: 'get',
                     success: function(result){
@@ -118,13 +118,13 @@
             }
         });
 
-        $(document).on('blur', '.warehouse_positions_id', function(){
+        $(document).on('blur', '.warehouse_position_id', function(){
             tmp = $(this);
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();
             quantity = block.find('.quantity').val();
-            warehouses_id = $('#warehouses_id').val();
+            warehouse_id = $('#warehouse_id').val();
             $.ajax({
                 url:"{{route('getbyposition')}}",
                 data:{position:position},
@@ -167,11 +167,11 @@
             var tmp = $(this);
             var block = $(this).parent().parent();
             var sku = $(this).val();
-            var warehouses_id = $('#warehouses_id').val();
-            if(sku && warehouses_id){
+            var warehouse_id = $('#warehouse_id').val();
+            if(sku && warehouse_id){
                 $.ajax({
                     url: "{{route('getmessage')}}",
-                    data: {sku:sku, warehouses_id:warehouses_id},
+                    data: {sku:sku, warehouse_id:warehouse_id},
                     dataType: 'json',
                     type: 'get',
                     success: function(result){
@@ -186,7 +186,7 @@
                             return;
                         }
                         var str = '';
-                        var position = block.find('.warehouse_positions_id').val();
+                        var position = block.find('.warehouse_position_id').val();
                         var flag = 0;
                         for(var i=0;i<result[2].length;i++) {
                             str +="<option value="+result[2][i].id+">"+result[2][i].name+"</option>";
@@ -194,15 +194,15 @@
                                 flag = 1;
                         }
                         if(flag == 0 && result != 'stock_none' && block.find('.type').val() == 'OUT') {
-                            block.find('.warehouse_positions_id').empty();
-                            block.find('.warehouse_positions_id').html(str);
+                            block.find('.warehouse_position_id').empty();
+                            block.find('.warehouse_position_id').html(str);
                             block.find('.quantity').val('');
                             block.find('.amount').val('');
                             return;
                         }
                         available_amount = '';
                         for(var i=0;i<result[1].length;i++) {
-                            if(position == result[1][i].warehouse_positions_id && warehouses_id == result[1][i].warehouses_id) {
+                            if(position == result[1][i].warehouse_position_id && warehouses_id == result[1][i].warehouse_id) {
                                 available_amount = result[1][i].available_quantity;
                             }
                         }
@@ -232,7 +232,7 @@
             }
         });
 
-        $(document).on('change', '#warehouses_id', function(){
+        $(document).on('change', '#warehouse_id', function(){
             val = $(this).val();
             $.ajax({
                 url: "{{ route('getposition') }}",
@@ -240,9 +240,9 @@
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    $('.warehouse_positions_id').empty();
+                    $('.warehouse_position_id').empty();
                     for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_positions_id'));
+                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_position_id'));
                     $('.type').val('IN');
                     $('.amount').attr('readonly', false);
                     $('.quantity').val('');

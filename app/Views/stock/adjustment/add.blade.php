@@ -11,8 +11,8 @@
         </select>
     </div>
     <div class='form-group col-sm-2'>
-        <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-        <select name='arr[warehouse_positions_id][{{$current}}]' id='arr[warehouse_positions_id][{{$current}}]' class='form-control warehouse_positions_id'>
+        <label for='warehouse_position_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+        <select name='arr[warehouse_position_id][{{$current}}]' id='arr[warehouse_position_id][{{$current}}]' class='form-control warehouse_position_id'>
             @foreach($positions as $position)
                 <option value={{$position->id}}>{{$position->name}}</option>
             @endforeach
@@ -26,5 +26,5 @@
         <label for='amount' class='control-label'>总金额(￥)</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
         <input type='text' class='form-control amount' id='arr[amount][{{$current}}]' placeholder='总金额' name='arr[amount][{{$current}}]' value='{{ old('arr[amount][$current]') }}'>
     </div>
-    <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+    <button type='button' class='btn btn-danger'><i class='glyphicon glyphicon-trash'></i></button>
 </div>

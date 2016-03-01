@@ -19,7 +19,7 @@ class AllotmentFormModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['stock_allotments_id', 'warehouse_positions_id', 'items_id', 'quantity', 'amount', 'receive_quantity', 'in_warehouse_positions_id', 'created_at'];
+    protected $fillable = ['stock_allotment_id', 'warehouse_position_id', 'item_id', 'quantity', 'amount', 'receive_quantity', 'in_warehouse_position_id', 'created_at'];
 
     /**
      * return the relationship between the two Model 
@@ -29,7 +29,7 @@ class AllotmentFormModel extends BaseModel
      */
     public function allotment()
     {
-        return $this->hasMany('App\Models\Stock\AllotmentModel', 'stock_allotments_id', 'id');
+        return $this->hasMany('App\Models\Stock\AllotmentModel', 'stock_allotment_id', 'id');
     }
 
     /**
@@ -40,7 +40,7 @@ class AllotmentFormModel extends BaseModel
      */
     public function position()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
     }
 
     /**
@@ -50,7 +50,7 @@ class AllotmentFormModel extends BaseModel
      */
     public function inposition()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'in_warehouse_positions_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'in_warehouse_position_id', 'id');
     }
 
     /**
@@ -60,6 +60,6 @@ class AllotmentFormModel extends BaseModel
      */
     public function items()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'items_id', 'id');
+        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
 }

@@ -19,7 +19,7 @@ class AdjustmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['adjust_form_id', 'warehouses_id', 'adjust_by', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
+    protected $fillable = ['adjust_form_id', 'warehouse_id', 'adjust_by', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
 
     // 用于查询
     public $searchFields = ['adjust_form_id'];
@@ -31,7 +31,7 @@ class AdjustmentModel extends BaseModel
      */
     public function warehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
     
     /**
@@ -41,7 +41,7 @@ class AdjustmentModel extends BaseModel
      */
     public function adjustment()
     {
-        return $this->hasMany('App\Models\Stock\AdjustFormModel', 'stock_adjustments_id', 'id');
+        return $this->hasMany('App\Models\Stock\AdjustFormModel', 'stock_adjustment_id', 'id');
     }
 
     /**
@@ -87,10 +87,10 @@ class AdjustmentModel extends BaseModel
                 {
                     $arr['arr.amount.'.$k] ='required|numeric';
                 }
-            if($key == 'warehouse_positions_id')
+            if($key == 'warehouse_position_id')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
+                    $arr['arr.warehouse_position_id.'.$k] = 'required|integer';
                 }
         }
 

@@ -70,8 +70,8 @@ class PositionController extends Controller
     public function ajaxGetPosition()
     {
         if(request()->ajax()) {
-            $warehouses_id = request()->input('val');
-            $buf = $this->model->where(['warehouses_id'=>$warehouses_id])->get();
+            $warehouse_id = request()->input('val');
+            $buf = $this->model->where(['warehouse_id'=>$warehouse_id])->get();
             if($buf)
                 return json_encode($buf);
             else

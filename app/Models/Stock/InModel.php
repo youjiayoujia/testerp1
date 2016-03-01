@@ -27,24 +27,6 @@ class InModel extends BaseModel
     // 用于查询
     public $searchFields = [''];
 
-    // 规则验证
-    public $rules = [
-        'create' => [
-            'quantity' => 'required|integer',
-            'warehouses_id' => 'required|integer',
-            'warehouse_positions_id' => 'required|integer',
-            'stock_id' => 'required|integer',
-            'amount' => 'required|numeric',
-        ],
-        'update' => [
-            'quantity' => 'required|integer',
-            'warehouses_id' => 'required|integer',
-            'warehouse_positions_id' => 'required|integer',
-            'stock_id' => 'required|integer',
-            'amount' => 'required|numeric',
-        ]
-    ];
-
     /**
      * get the relationship between the two module 
      *
@@ -52,7 +34,7 @@ class InModel extends BaseModel
      */
     public function warehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
 
     /**
@@ -62,7 +44,7 @@ class InModel extends BaseModel
      */
     public function position()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
     }
     
     /**

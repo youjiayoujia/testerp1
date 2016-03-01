@@ -92,8 +92,8 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
-            $buf['stock_adjustments_id'] = $obj->id;
+            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
+            $buf['stock_adjustment_id'] = $obj->id;
             AdjustFormModel::create($buf);
         }
 
@@ -118,7 +118,7 @@ class AdjustmentController extends Controller
             'model' => $model,
             'adjustments' => $model->adjustment,
             'warehouses' => WarehouseModel::all(),
-            'positions' =>PositionModel::where('warehouses_id', $model->warehouses_id)->get()->toArray(),
+            'positions' =>PositionModel::where('warehouse_id', $model->warehouse_id)->get()->toArray(),
         ];
 
         return view($this->viewPath.'edit', $response);

@@ -15,8 +15,8 @@ class CreateStockAllotments extends Migration
         Schema::create('stock_allotments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('allotment_id')->comment('调拨单号')->default(NULL);
-            $table->integer('out_warehouses_id')->comment('调出仓库')->default(0);
-            $table->integer('in_warehouses_id')->comment('调入仓库')->default(0);
+            $table->integer('out_warehouse_id')->comment('调出仓库')->default(0);
+            $table->integer('in_warehouse_id')->comment('调入仓库')->default(0);
             $table->text('remark')->comment('备注')->default(NULL);
             $table->integer('allotment_by')->comment('调拨人')->default(0);
             $table->enum('allotment_status',['new', 'pick', 'out', 'check', 'over'])->default('new');

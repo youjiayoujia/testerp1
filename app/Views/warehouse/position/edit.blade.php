@@ -8,10 +8,10 @@
     <input type='text' class="form-control" id="name" placeholder="库位名字" name='name' value="{{ old('name') ? old('name') : $model->name }}">
 </div>
 <div class="form-group col-lg-4">
-    <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-    <select name='warehouses_id' class='form-control'>
+    <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+    <select name='warehouse_id' class='form-control'>
         @foreach($warehouses as $warehouse)
-            <option value="{{ $warehouse->id }}" {{ old('warehouses_id') ? (old('warehouses_id') == $warehouse->id ? 'selected' : '') : ($warehouse->id  == $model->warehouses_id ? 'selected' : '') }}>
+            <option value="{{ $warehouse->id }}" {{ old('warehouse_id') ? (old('warehouse_id') == $warehouse->id ? 'selected' : '') : ($warehouse->id  == $model->warehouse_id ? 'selected' : '') }}>
                 {{ $warehouse->name }}
             </option>
         @endforeach    

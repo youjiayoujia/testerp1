@@ -19,5 +19,5 @@ class AllotmentLogisticsModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotments_id', 'type', 'code', 'fee', 'created_at'];
+    protected $fillable = ['allotment_id', 'type', 'code', 'fee', 'created_at'];
 }

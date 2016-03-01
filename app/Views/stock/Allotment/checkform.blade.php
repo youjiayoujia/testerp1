@@ -12,12 +12,12 @@
             <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ $allotment->allotment_by}}" readonly>
         </div>
         <div class="form-group col-lg-3">
-            <label for="out_warehouses_id" class='control-label'>调出仓库</label> 
-            <input type='text' class="form-control" id="out_warehouses_id" placeholder="调出仓库" name='out_warehouses_id' value="{{ $allotment->outwarehouse->name}}" readonly>
+            <label for="out_warehouse_id" class='control-label'>调出仓库</label> 
+            <input type='text' class="form-control" id="out_warehouse_id" placeholder="调出仓库" name='out_warehouse_id' value="{{ $allotment->outwarehouse->name}}" readonly>
         </div>
         <div class="form-group col-lg-3">
-            <label for="in_warehouses_id" class='control-label'>调入仓库</label> 
-            <input type='text' class="form-control" id="in_warehouses_id" placeholder="调入仓库" name='in_warehouses_id' value="{{ $allotment->inwarehouse->name}}" readonly>
+            <label for="in_warehouse_id" class='control-label'>调入仓库</label> 
+            <input type='text' class="form-control" id="in_warehouse_id" placeholder="调入仓库" name='in_warehouse_id' value="{{ $allotment->inwarehouse->name}}" readonly>
         </div>
     </div>
     <div class="panel panel-primary">
@@ -59,8 +59,8 @@
                         <input type='text' class='form-control new_receive_quantity' id='arr[new_receive_quantity][{{$key}}]' placeholder='新收到数量' name='arr[new_receive_quantity][{{$key}}]'>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <select name='arr[warehouse_positions_id][{{$key}}]' id='arr[warehouse_positions_id][{{$key}}]' class='form-control warehouse_positions_id'>
+                        <label for='warehouse_position_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+                        <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id'>
                         <option value=''>请输入库位</option>
                         @foreach($positions as $position)
                             <option value="{{$position->id}}" {{$allotmentform->in_warehouse_positions_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
@@ -87,7 +87,7 @@ $(document).ready(function(){
         if($(this).val()) {
             var reg=/^(\d)+$/gi;
             if(!reg.test(obj.val())) {
-                alert('fuck,你输入的是整数吗？');
+                alert('你输入的是整数吗？');
                 obj.val('');
                 return;
             }

@@ -19,13 +19,13 @@ class PositionModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'warehouses_id', 'remark', 'size', 'length', 'width', 'height', 'is_available'];
+    protected $fillable = ['name', 'warehouse_id', 'remark', 'size', 'length', 'width', 'height', 'is_available'];
 
     // 用于规则验证
     public $rules = [
         'create' => [
             'name' => 'required|max:128|unique:warehouse_positions,name',
-            'warehouses_id' => 'required',
+            'warehouse_id' => 'required',
             'size' => 'required',
             'length' => 'numeric',
             'width' => 'numeric', 
@@ -33,7 +33,7 @@ class PositionModel extends BaseModel
             ],
         'update' => [
             'name' => 'required|max:128|unique:warehouse_positions,name,{id}',
-            'warehouses_id' => 'required',
+            'warehouse_id' => 'required',
             'size' => 'required',
             'length' => 'numeric',
             'width' => 'numeric', 
@@ -46,7 +46,7 @@ class PositionModel extends BaseModel
     
     public function warehouse()
     {
-       return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+       return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
 
 }

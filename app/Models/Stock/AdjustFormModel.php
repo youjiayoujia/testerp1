@@ -19,11 +19,11 @@ class AdjustFormModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['stock_adjustments_id', 'items_id', 'type', 'warehouse_positions_id', 'quantity', 'amount', 'created_at'];
+    protected $fillable = ['stock_adjustment_id', 'item_id', 'type', 'warehouse_position_id', 'quantity', 'amount', 'created_at'];
 
 
     //查询
-    public $searchFields = ['stock_adjustments_id'];
+    public $searchFields = ['stock_adjustment_id'];
     
     /**
      * return the relationship between the two Model 
@@ -33,7 +33,7 @@ class AdjustFormModel extends BaseModel
      */
     public function warehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'warehouses_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
 
     /**
@@ -44,7 +44,7 @@ class AdjustFormModel extends BaseModel
      */
     public function position()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
     }
 
     /**
@@ -55,6 +55,6 @@ class AdjustFormModel extends BaseModel
      */
     public function items()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'items_id', 'id');
+        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
 }

@@ -1,15 +1,15 @@
 <div class='row'>
 <div class='form-group col-sm-2'>
     <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-    <select name='arr[items_id][{{$current}}]' id='arr[sku][{{$current}}]' class='form-control sku'>
+    <select name='arr[item_id][{{$current}}]' id='arr[sku][{{$current}}]' class='form-control sku'>
     @foreach($skus as $sku)
         <option value={{$sku['items']['id']}}>{{$sku['items']['sku']}}</option>
     @endforeach
     </select>
 </div>
 <div class='form-group col-sm-2'>
-    <label for='warehouse_positions_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-    <select name='arr[warehouse_positions_id][{{$current}}]' id='arr[warehouse_positions_id][{{$current}}]' class='form-control warehouse_positions_id'>
+    <label for='warehouse_position_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+    <select name='arr[warehouse_position_id][{{$current}}]' id='arr[warehouse_position_id][{{$current}}]' class='form-control warehouse_position_id'>
     @foreach($positions as $position)
         <option value={{$position['id']}}>{{$position['name']}}</option>
     @endforeach

@@ -19,7 +19,7 @@ class AllotmentModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['allotment_id', 'out_warehouses_id', 'in_warehouses_id', 'remark', 'allotment_by', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
+    protected $fillable = ['allotment_id', 'out_warehouse_id', 'in_warehouse_id', 'remark', 'allotment_by', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
 
     /**
      * search field 
@@ -69,7 +69,7 @@ class AllotmentModel extends BaseModel
      */
     public function outwarehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'out_warehouses_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'out_warehouse_id', 'id');
     }
 
     /**
@@ -80,7 +80,7 @@ class AllotmentModel extends BaseModel
      */
     public function inwarehouse()
     {
-        return $this->belongsTo('App\Models\WarehouseModel', 'in_warehouses_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'in_warehouse_id', 'id');
     }
 
     /**
@@ -91,7 +91,7 @@ class AllotmentModel extends BaseModel
      */
     public function outposition()
     {
-        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_positions_id', 'id');
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
     }
 
     /**
@@ -102,7 +102,7 @@ class AllotmentModel extends BaseModel
      */
     public function allotmentform()
     {
-        return $this->hasMany('App\Models\Stock\AllotmentFormModel', 'stock_allotments_id', 'id');
+        return $this->hasMany('App\Models\Stock\AllotmentFormModel', 'stock_allotment_id', 'id');
     }
 
     /**
@@ -124,7 +124,7 @@ class AllotmentModel extends BaseModel
      */
     public function logistics()
     {
-        return $this->hasMany('App\Models\Stock\AllotmentLogisticsModel', 'allotments_id', 'id');
+        return $this->hasMany('App\Models\Stock\AllotmentLogisticsModel', 'allotment_id', 'id');
     }
 
     /**
@@ -137,8 +137,8 @@ class AllotmentModel extends BaseModel
     public function rule($request)
     {
         $arr = [
-            'out_warehouses_id' => 'required|integer',
-            'in_warehouses_id' => 'required|integer',
+            'out_warehouse_id' => 'required|integer',
+            'in_warehouse_id' => 'required|integer',
         ];
         $buf = $request->all();
         $buf = $buf['arr'];
@@ -157,7 +157,7 @@ class AllotmentModel extends BaseModel
             if($key == 'warehouse_positions_id')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.warehouse_positions_id.'.$k] = 'required|integer';
+                    $arr['arr.warehouse_position_id.'.$k] = 'required|integer';
                 }
             if($key == 'amount')
                 foreach($val as $k => $v)

@@ -15,7 +15,7 @@ class CreateWarehousePosition extends Migration
         Schema::create('warehouse_positions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 128)->comment('库位名')->default('0');
-            $table->integer('warehouses_id')->comment('仓库id')->default(0);
+            $table->integer('warehouse_id')->comment('仓库id')->default(0);
             $table->text('remark')->comment('库位描述')->default(NULL);
             $table->enum('size', ['大', '中', '小'])->comment('库位大小')->default('中');
             $table->float('length')->comment('长')->default(1);

@@ -6,26 +6,26 @@
     <div class='row'>
         <div class="form-group col-lg-4">
             <label for="item" class='control-label'>item</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='items_id' class='form-control'>
+            <select name='item_id' class='form-control'>
                 @foreach($items as $item)
-                <option value={{$item->id}} {{ old('items_id') ? old('items_id') == $item->id ? 'selected' : '' : $item->id == $model->items_id ? 'selected' : '' }}>{{$item->sku}}</option>
+                <option value={{$item->id}} {{ old('item_id') ? old('item_id') == $item->id ? 'selected' : '' : $item->id == $model->item_id ? 'selected' : '' }}>{{$item->sku}}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-sm-4">
-            <label for="warehouses_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouses_id' id='warehouses_id' class='form-control'>
+            <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouse_id' id='warehouse_id' class='form-control'>
                 <option>请选择仓库</option>
                 @foreach($warehouses as $warehouse)
-                    <option value={{ $warehouse->id }} {{ old('warehouses_id') ? old('warehouses_id') == $warehouse->id ? 'selected' : '' : $model->warehouses_id == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
+                    <option value={{ $warehouse->id }} {{ old('warehouse_id') ? old('warehouse_id') == $warehouse->id ? 'selected' : '' : $model->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-sm-4">
-            <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouse_positions_id' id='warehouse_positions_id' class='form-control'>
+            <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name='warehouse_position_id' id='warehouse_position_id' class='form-control'>
                 @foreach($positions as $position)
-                    <option value={{ $position->id }} {{ old('warehouse_positions_id') ? old('warehouse_positions_id') == $position->id ? 'selected' : '' : $model->warehouse_positions_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
+                    <option value={{ $position->id }} {{ old('warehouse_position_id') ? old('warehouse_position_id') == $position->id ? 'selected' : '' : $model->warehouse_position_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
                 @endforeach
             </select>
         </div>
@@ -59,17 +59,17 @@
             }
         });
 
-        $('#warehouses_id').change(function(){
-            val = $('#warehouses_id').val();
+        $('#warehouse_id').change(function(){
+            val = $('#warehouse_id').val();
             $.ajax({
                 url: "{{ route('getposition') }}",
                 data: {val:val},
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    $('#warehouse_positions_id').empty();
+                    $('#warehouse_position_id').empty();
                     for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i].id+'>'+result[i].name+'</option>').appendTo($('#warehouse_positions_id'));
+                        $('<option value='+result[i].id+'>'+result[i].name+'</option>').appendTo($('#warehouse_position_id'));
                 }
             });
         });

@@ -15,7 +15,7 @@ class CreateStockAdjustment extends Migration
         Schema::create('stock_adjustments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('adjust_form_id')->comment('调整单号id')->default(0);
-            $table->integer('warehouses_id')->comment('仓库id')->default(0);
+            $table->integer('warehouse_id')->comment('仓库id')->default(0);
             $table->integer('adjust_by')->comment('调整人')->default(0);
             $table->text('remark')->comment('备注')->default(NULL);
             $table->integer('check_by')->comment('审核人')->default(0);

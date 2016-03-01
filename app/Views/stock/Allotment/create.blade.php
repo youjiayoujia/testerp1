@@ -13,20 +13,20 @@
             <input type='text' class="form-control" id="allotment_by" placeholder="调拨人" name='allotment_by' value="{{ old('allotment_by') ? old('allotment_by') : '1' }}" readonly>
         </div>
         <div class="form-group col-lg-3">
-            <label for="out_warehouses_id" class='control-label'>调出仓库</label>  <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id='out_warehouses_id' name='out_warehouses_id' class='form-control'>
+            <label for="out_warehouse_id" class='control-label'>调出仓库</label>  <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id='out_warehouse_id' name='out_warehouse_id' class='form-control'>
             <option value=''>请选择仓库</option>
             @foreach($warehouses as $warehouse)
-                <option value='{{ $warehouse->id }}' {{old('out_warehouses_id') == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
+                <option value='{{ $warehouse->id }}' {{old('out_warehouse_id') == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
             @endforeach
             </select>
         </div>
         <div class="form-group col-lg-3">
-            <label for="in_warehouses_id" class='control-label'>调入仓库</label>  <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id='in_warehouses_id' name='in_warehouses_id' class='form-control'>
+            <label for="in_warehouse_id" class='control-label'>调入仓库</label>  <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id='in_warehouse_id' name='in_warehouse_id' class='form-control'>
             <option value=''>请选择仓库</option>
             @foreach($warehouses as $warehouse)
-                <option value='{{ $warehouse->id }}' {{old('in_warehouses_id') == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
+                <option value='{{ $warehouse->id }}' {{old('in_warehouse_id') == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
             @endforeach
             </select> 
         </div>
@@ -47,8 +47,8 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="warehouse_positions_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <select name='arr[warehouse_positions_id][0]' id='arr[warehouse_positions_id][0]' class='form-control warehouse_positions_id'>
+                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <select name='arr[warehouse_position_id][0]' id='arr[warehouse_position_id][0]' class='form-control warehouse_position_id'>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
@@ -77,7 +77,7 @@
     $(document).ready(function(){
         current = 1;
         $(document).on('click', '#create_form', function(){
-            warehouse = $('#out_warehouses_id').val();
+            warehouse = $('#out_warehouse_id').val();
             $.ajax({
                 url:"{{ route('add') }}",
                 data:{current:current, warehouse:warehouse},
@@ -94,20 +94,20 @@
             $(this).parent().remove();
         });
 
-        $(document).on('change', '#out_warehouses_id', function(){
-            val = $('#out_warehouses_id').val();
+        $(document).on('change', '#out_warehouse_id', function(){
+            alert('1');
+            warehouse = $('#out_warehouse_id').val();
             obj = $(this).parent();
-            position = $('.warehouse_positions_id');
+            position = $('.warehouse_position_id');
             quantity = $('.quantity');
             amount = $('.amount');
             sku = $('.sku');
             $.ajax({
                 url: "{{ route('allotoutwarehouse') }}",
-                data: {warehouse:val},
+                data: {warehouse:warehouse},
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    allotoutwarehouse = result;
                     sku.empty();
                     position.empty();
                     quantity.val('');
@@ -136,14 +136,14 @@
             });
         });
 
-        $(document).on('change', '.warehouse_positions_id', function(){
+        $(document).on('change', '.warehouse_position_id', function(){
             obj = $(this).parent().parent();
-            warehouse = $('#out_warehouses_id').val();
+            warehouse = $('#out_warehouse_id').val();
             position = $(this).val();
             sku = obj.find('.sku').val();
             $.ajax({
                 url:"{{ route('allotposition' )}}",
-                data: {position:position, items_id:sku},
+                data: {position:position, item_id:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
@@ -167,12 +167,12 @@
 
         $(document).on('change', '.sku', function(){
             obj = $(this).parent().parent();
-            warehouse = $('#out_warehouses_id').val();
-            position = obj.find('.warehouse_positions_id');
+            warehouse = $('#out_warehouse_id').val();
+            position = obj.find('.warehouse_position_id');
             sku = $(this).val();
             $.ajax({
                 url:"{{ route('allotsku' )}}",
-                data: {warehouse:warehouse, items_id:sku},
+                data: {warehouse:warehouse, item_id:sku},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
@@ -216,8 +216,8 @@
                     return;
                 }
                 obj = $(this).parent().parent();
-                warehouse =  $('#out_warehouses_id').val();
-                position = obj.find('.warehouse_positions_id').val();
+                warehouse =  $('#out_warehouse_id').val();
+                position = obj.find('.warehouse_position_id').val();
                 sku = obj.find('.sku').val();
                 if($(this).val() > parseInt(obj.find('.access_quantity').val())) {
                     alert('超出可用数量');
@@ -227,7 +227,7 @@
                 }
                 $.ajax({
                     url:"{{ route('allotsku') }}",
-                    data:{warehouse:warehouse, items_id:sku},
+                    data:{warehouse:warehouse, item_id:sku},
                     dataType:'json',
                     'type':'get',
                     success:function(result){

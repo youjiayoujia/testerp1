@@ -17,13 +17,12 @@ class ItemModel extends BaseModel
 	public $searchFields = ['sku'];
 
     public $rules = [
-        'create' => ['sku' => 'required|unique:items,sku'],
-        'update' => ['sku' => 'required|unique:items,sku,{id}']
+        'update' => []
     ];
 
 	protected $fillable = [
         'product_id','sku','weight','inventory','name','c_name','alias_name','alias_cname','catalog_id','supplier_id','supplier_sku','second_supplier_id','supplier_info','purchase_url'
-        ,'purchase_price','purchase_carriage','product_size','package_size','carriage_limit','package_limit','status','remark'
+        ,'purchase_price','purchase_carriage','product_size','package_size','carriage_limit','carriage_limit_1','package_limit','package_limit_1','status','remark'
     ];
 
     public function product()
@@ -31,9 +30,16 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\ProductModel','product_id');
     }
 
-    public function secondSupplierName($id)
+    public function supplier()
     {
-        $supplier = new SupplierModel();
-        return $supplier::find($id)->name;
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+
+    public function updateItem($data)
+    {
+        $data['carriage_limit'] = empty($data['carriage_limit_arr'])?'':implode(',', $data['carriage_limit_arr']);
+        $data['package_limit'] = empty($data['package_limit_arr'])?'':implode(',', $data['package_limit_arr']);
+        
+        $this->update($data);
     }
 }

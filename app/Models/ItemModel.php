@@ -8,21 +8,44 @@ class ItemModel extends BaseModel
 {
     protected $table = 'items';
 
-	public $searchFields = ['sku'];
+    protected $stock;
+
+    public $searchFields = ['sku'];
 
     public $rules = [
         'create' => ['sku' => 'required|unique:items,sku'],
         'update' => ['sku' => 'required|unique:items,sku,{id}']
     ];
 
-	protected $fillable = [
-        'product_id','sku','weight','inventory','name','c_name','alias_name','alias_cname','catalog_id','supplier_id','supplier_sku','second_supplier_id','supplier_info','purchase_url'
-        ,'purchase_price','purchase_carriage','product_size','package_size','carriage_limit','package_limit','status','remark'
+    protected $fillable = [
+        'product_id',
+        'sku',
+        'weight',
+        'inventory',
+        'name',
+        'c_name',
+        'alias_name',
+        'alias_cname',
+        'catalog_id',
+        'supplier_id',
+        'supplier_sku',
+        'second_supplier_id',
+        'supplier_info',
+        'purchase_url'
+        ,
+        'purchase_price',
+        'purchase_carriage',
+        'product_size',
+        'package_size',
+        'carriage_limit',
+        'package_limit',
+        'status',
+        'remark'
     ];
 
     public function product()
     {
-        return $this->belongsTo('App\Models\ProductModel','product_id');
+        return $this->belongsTo('App\Models\ProductModel', 'product_id');
     }
 
     public function secondSupplierName($id)
@@ -39,34 +62,35 @@ class ItemModel extends BaseModel
 
     public function getStock($warehoustPosistionId)
     {
-        return $this->stocks()->where('warehouse_position_id', $warehoustPosistionId)->get();
+        $stock = $this->stocks()->where('warehouse_position_id', $warehoustPosistionId)->first();
+        if (!$stock) {
+            $stock = $this->stocks()->create();
+        }
+        return $stock;
     }
 
     public function in($warehoustPosistionId, $quantity, $amount)
     {
         $stock = $this->getStock($warehoustPosistionId);
-        if ($stock) {
-            $stock->in($quantity, $amount);
-        } else {
-            $stock->createNew($warehoustPosistionId, $quantity, $amount);
-        }
+        return $stock->in($quantity, $amount);
+
     }
 
     public function hold($warehoustPosistionId, $quantity)
     {
         $stock = $this->getStock($warehoustPosistionId);
-        $stock->hold($quantity);
+        return $stock->hold($quantity);
     }
 
     public function unhold($warehoustPosistionId, $quantity)
     {
         $stock = $this->getStock($warehoustPosistionId);
-        $stock->unhold($quantity);
+        return $stock->unhold($quantity);
     }
 
     public function out($warehoustPosistionId, $quantity)
     {
         $stock = $this->getStock($warehoustPosistionId);
-        $stock->out($quantity);
+        return $stock->out($quantity);
     }
 }

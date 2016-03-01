@@ -10,24 +10,28 @@
 
 namespace App\Http\Controllers;
 
+use Bus;
 use Exception;
 use Illuminate\Http\Request;
+use App\Jobs\dj;
 use App\Jobs\test;
 use App\Jobs\test1;
 use Queue;
 use App\Models\StockModel;
+use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class TestController extends Controller
 {
     use DispatchesJobs;
+    use Queueable;
     use ok;
     public $a = '123';
-    public function test()
-    {
-      var_dump($GLOBALS);
-      EXIT;
-    }
+    // public function test()
+    // {
+    //   var_dump(url('allotmentcheck'));
+    //   EXIT;
+    // }
     // public function test()
     // {
     //   $arr = [
@@ -40,14 +44,12 @@ class TestController extends Controller
     // }
 
 
-    // public function test()
-    // {
-    //   echo "<script type='text/javascript'>alert('123');</script>";
-    //   exit;
-    //   $obj = StockModel::where(['warehouses_id'=>12, 'items_id'=>4])->get()->first()->position;
-    //   var_dump($obj->toArray());
-    //   exit;
-    // }
+    public function test()
+    {
+      $obj = (new dj())->onQueue('ss');
+      
+      $this->dispatch($obj);
+    }
     // public function test()
     // {
     //   error_reporting(E_ALL);

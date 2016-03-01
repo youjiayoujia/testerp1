@@ -56,7 +56,7 @@
                     <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="总金额" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
                 </div>
-                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+                <button type='button' class='btn btn-danger'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
             <div class='form-group addpanel'>
                 <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>

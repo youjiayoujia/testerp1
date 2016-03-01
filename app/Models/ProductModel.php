@@ -219,7 +219,7 @@ class ProductModel extends BaseModel
             if (array_key_exists('variations', $data)) {
                 $ProductVariationValueModel = new ProductVariationValueModel();
                 //先删除对应的variation属性,再添加
-                $variations = $ProductVariationValueModel->where('product_id', $this->id)->delete();
+                $variations = $ProductVariationValueModel->where('product_id', $this->id)->forceDelete();
                 foreach ($data['variations'] as $variation_id => $variation_values) {
                     foreach ($variation_values as $variation_value_id=>$variation_value) {
                         $variation_value_arr = [$variation_value_id=>['variation_value'=>$variation_value,'variation_id'=>$variation_id]];
@@ -230,7 +230,7 @@ class ProductModel extends BaseModel
             //更新产品feature属性
             if (array_key_exists('features', $data)) {
                 $ProductFeatureValueModel = new ProductFeatureValueModel();
-                $ProductFeatureValueModel->where('product_id', $this->id)->delete();
+                $ProductFeatureValueModel->where('product_id', $this->id)->forceDelete();
                 foreach ($data['features'] as $feature_id => $feature_values) {
                     if (is_array($feature_values)) {//feature为多选框
                         foreach ($feature_values as $feature_value) {
@@ -293,8 +293,7 @@ class ProductModel extends BaseModel
         foreach ($variations as $variation) {
             if($variation['pivot']['created_at']==$variation['pivot']['updated_at']){
                 $brr[$variation['variation_id']][] = $variation['name'];
-            }
-            
+            }  
         }
         //按照指定格式的数组去笛卡尔及创建item
         $brr = array_values($brr);

@@ -92,7 +92,7 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
+            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['stock_adjustment_id'] = $obj->id;
             AdjustFormModel::create($buf);
         }
@@ -192,7 +192,7 @@ class AdjustmentController extends Controller
             $warehouse = request()->input('warehouse');
             $response = [
                 'current' => $current,
-                'positions' => PositionModel::where('warehouses_id', $warehouse)->get(),
+                'positions' => PositionModel::where('warehouse_id', $warehouse)->get(),
             ];
 
             return view($this->viewPath.'add', $response);
@@ -217,17 +217,17 @@ class AdjustmentController extends Controller
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustment->toArray();
-            $stock = new StockModel;
             DB::beginTransaction();
             try {
                 for($i=0;$i<count($buf);$i++) {
                     $tmp = array_merge($arr,$buf[$i]);
+                    $item = ItemModel::find($tmp['item_id']);
                     if($tmp['type'] == 'IN') {
                         $tmp['type'] = 'ADJUSTMENT';
-                        $stock->in($tmp);
+                        $item->in($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['amount'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
                     } else {
                         $tmp['type'] = 'ADJUSTMENT';
-                        $stock->out($tmp);
+                        $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
                     }
                 }
             } catch (Exception $e) {

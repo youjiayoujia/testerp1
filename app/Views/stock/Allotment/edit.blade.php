@@ -43,9 +43,9 @@
                 <div class='row'>
                     <div class='form-group col-sm-2'>
                         <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <select name='arr[items_id][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
+                        <select name='arr[item_id][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
                         @foreach($skus as $sku)
-                            <option value="{{$sku['items_id']}}" {{ $sku['items_id'] == $allotmentform->items_id ? 'selected' : ''}}>{{$sku['items']['sku']}}</option>
+                            <option value="{{$sku['item_id']}}" {{ $sku['item_id'] == $allotmentform->item_id ? 'selected' : ''}}>{{$sku['items']['sku']}}</option>
                         @endforeach
                         </select>
                     </div>
@@ -83,7 +83,7 @@
         });
 
         $(document).on('change', '#out_warehouse_id', function(){
-            val = $('#out_warehouse_id').val();
+            warehouse = $('#out_warehouse_id').val();
             obj = $(this).parent();
             position = $('.warehouse_position_id');
             quantity = $('.quantity');
@@ -91,11 +91,10 @@
             sku = $('.sku');
             $.ajax({
                 url: "{{ route('allotoutwarehouse') }}",
-                data: {warehouse:val},
+                data: {warehouse:warehouse},
                 dataType:'json',
                 type:'get',
                 success:function(result){
-                    allotoutwarehouse = result;
                     sku.empty();
                     position.empty();
                     quantity.val('');
@@ -137,6 +136,7 @@
                 success:function(result) {
                     if(result != 'none') {
                         obj.find('.access_quantity').val(result[0]['available_quantity']);
+                        alert(result[0]['available_quantity']);
                         if(obj.find('.quantity').val() && obj.find('.quantity').val() > result[0]['available_quantity']) 
                         {
                             alert('数量超过了可用数量');
@@ -172,7 +172,7 @@
                         {
                             str +="<option value="+result[1][i]['id']+">"+result[1][i]['name']+"</option>";
                         }
-                        if(obj.find('.quantity').val() && obj.find('.quantity').val() > obj.find('.access_quantity').val())
+                        if(obj.find('.quantity').val() && parseInt(obj.find('.quantity').val()) > parseInt(obj.find('.access_quantity').val()))
                         {
                             alert('超出库存数量');
                             obj.find('.quantity').val('');
@@ -180,9 +180,9 @@
                             $(str).appendTo(position);
                             return;
                         }
-                        if(obj.find('.quantity').val() && obj.find('.quantity').val() < obj.find('.access_quantity').val())
+                        if(obj.find('.quantity').val() && parseInt(obj.find('.quantity').val()) < parseInt(obj.find('.access_quantity').val()))
                         {
-                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
+                            obj.find('.amount').val((result[2]*parseInt(obj.find('.quantity').val())).toFixed('3'));
                         }
                         $(str).appendTo(position);
                     } else {
@@ -207,7 +207,7 @@
                 warehouse =  $('#out_warehouse_id').val();
                 position = obj.find('.warehouse_position_id').val();
                 sku = obj.find('.sku').val();
-                if($(this).val() > parseFloat(obj.find('.access_quantity').val())) {
+                if($(this).val() > parseInt(obj.find('.access_quantity').val())) {
                     alert('超出可用数量');
                     $(this).val('');
                     obj.find('.amount').val('');

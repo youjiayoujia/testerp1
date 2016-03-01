@@ -43,7 +43,7 @@
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku">sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <select name='arr[items_id][0]' id='arr[sku][0]' class='form-control sku'>
+                    <select name='arr[item_id][0]' id='arr[sku][0]' class='form-control sku'>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
@@ -95,7 +95,6 @@
         });
 
         $(document).on('change', '#out_warehouse_id', function(){
-            alert('1');
             warehouse = $('#out_warehouse_id').val();
             obj = $(this).parent();
             position = $('.warehouse_position_id');
@@ -184,7 +183,7 @@
                         {
                             str +="<option value="+result[1][i]['id']+">"+result[1][i]['name']+"</option>";
                         }
-                        if(obj.find('.quantity').val() && obj.find('.quantity').val() > obj.find('.access_quantity').val())
+                        if(obj.find('.quantity').val() && parseInt(obj.find('.quantity').val()) > parseInt(obj.find('.access_quantity').val()))
                         {
                             alert('超出库存数量');
                             obj.find('.quantity').val('');
@@ -192,9 +191,9 @@
                             $(str).appendTo(position);
                             return;
                         }
-                        if(obj.find('.quantity').val() && obj.find('.quantity').val() < obj.find('.access_quantity').val())
+                        if(obj.find('.quantity').val() && parseInt(obj.find('.quantity').val()) < parseInt(obj.find('.access_quantity').val()))
                         {
-                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
+                            obj.find('.amount').val((result[2]*parseInt(obj.find('.quantity').val())).toFixed('3'));
                         }
                         $(str).appendTo(position);
                     } else {
@@ -211,7 +210,7 @@
             if($(this).val()) {
                 var reg = /^(\d)+$/gi;
                 if(!reg.test($(this).val())) {
-                    alert('fuck,数量有问题啊');
+                    alert('输入数量有问题');
                     $(this).val('');
                     return;
                 }

@@ -18,8 +18,10 @@ use App\Jobs\test;
 use App\Jobs\test1;
 use Queue;
 use App\Models\StockModel;
+use App\Models\ItemModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use App\Models\Warehouse\PositionModel;
 
 class TestController extends Controller
 {
@@ -27,7 +29,27 @@ class TestController extends Controller
     use Queueable;
     use ok;
     public $a = '123';
-    // public function test()
+
+
+
+    public function test()
+    {
+      $obj = ItemModel::find(12);
+      $obj = $obj->out(4,2,'ADJUSTMENT',3,'asd');
+    }   
+
+
+
+
+
+
+
+
+
+
+
+
+     // public function test()
     // {
     //   var_dump(url('allotmentcheck'));
     //   EXIT;
@@ -42,14 +64,6 @@ class TestController extends Controller
 
     //     var_dump($key." ".$e." ".$f."<br/>");
     // }
-
-
-    public function test()
-    {
-      $obj = (new dj())->onQueue('ss');
-      
-      $this->dispatch($obj);
-    }
     // public function test()
     // {
     //   error_reporting(E_ALL);

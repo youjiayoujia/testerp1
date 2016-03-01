@@ -95,7 +95,7 @@
             amount = block.find('.amount').val();
             sku = block.find('.sku').val();
             warehouse_id = $('#warehouse_id').val();
-            if(sku && warehouses_id){
+            if(sku && warehouse_id){
                 $.ajax({
                     url: "{{route('getmessage')}}",
                     data: {sku:sku, warehouse_id:warehouse_id},
@@ -202,7 +202,7 @@
                         }
                         available_amount = '';
                         for(var i=0;i<result[1].length;i++) {
-                            if(position == result[1][i].warehouse_position_id && warehouses_id == result[1][i].warehouse_id) {
+                            if(position == result[1][i].warehouse_position_id && warehouse_id == result[1][i].warehouse_id) {
                                 available_amount = result[1][i].available_quantity;
                             }
                         }

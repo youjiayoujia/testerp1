@@ -85,7 +85,6 @@ class AllotmentController extends Controller
         $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
-        $stock = new StockModel;
         for($i=0; $i<$len; $i++)
         {   
             $arr = request()->input('arr');
@@ -96,7 +95,9 @@ class AllotmentController extends Controller
             }
             $buf['stock_allotment_id'] = $obj->id;
             AllotmentFormModel::create($buf);
-            $stock->hold($buf, 1);
+            $item = ItemModel::find($buf['item_id']);
+
+            $item->hold($buf['warehouse_position_id'], $buf['quantity']);
         }
 
         return redirect($this->mainIndex);
@@ -120,7 +121,7 @@ class AllotmentController extends Controller
         $available_quantity = [];
         foreach($allotment as $key => $value) 
         {
-            $obj = StockModel::where(['warehouse_id'=>$model->out_warehouse_id, 'item_id'=>$value->item->id])->get();
+            $obj = StockModel::where(['warehouse_id'=>$model->out_warehouse_id, 'item_id'=>$value->items->id])->get();
             $available_quantity[] =  $obj->first()->available_quantity;
             $buf = [];
             foreach($obj as $v)
@@ -133,7 +134,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
             'warehouses' => WarehouseModel::all(),
-            'skus' => StockModel::where(['warehouse_id'=>$model->out_warehouse_id])->distinct()->with('items')->get(),
+            'skus' => StockModel::where(['warehouse_id'=>$model->out_warehouse_id])->distinct()->with('items')->get(['item_id']),
             'positions' => $arr,
             'allotmentforms' => $allotment, 
             'availquantity' => $available_quantity,
@@ -188,9 +189,9 @@ class AllotmentController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        $stock = new StockModel;
         foreach($obj->allotmentform as $val) {
-            $stock->hold($val->toArray(), 0);
+            $item = ItemModel::find($val->item_id);
+            $item->unhold($val->warehouse_position_id, $val->quantity);
             $val->delete();
         }
         foreach($obj->logistics as $tmp)
@@ -259,15 +260,15 @@ class AllotmentController extends Controller
         try {
             $model->logistics()->create($arr);
             $model->update(['allotment_status'=>'out']);
-            $stock = new StockModel;
             $model->relation_id = $model->id;
             $arr = $model->toArray();
             $buf = $model->allotmentform->toArray();
             for($i=0;$i<count($buf);$i++) {
                 $tmp = array_merge($arr, $buf[$i]);
                 $tmp['type'] = 'ALLOTMENT';
-                $stock->hold($tmp, 0);
-                $stock->out($tmp);
+                $item = ItemModel::find($tmp['item_id']);
+                $item->unhold($tmp['warehouse_position_id'], $tmp['quantity']);
+                $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
             }
         } catch(Exception $e) {
             DB::rollback();
@@ -416,7 +417,7 @@ class AllotmentController extends Controller
         DB::beginTransaction();
         try {
             $buf[] = $arr['arr']['new_receive_quantity'];
-            $buf[] = $arr['arr']['warehouse_positions_id'];
+            $buf[] = $arr['arr']['warehouse_position_id'];
             $buf[] = $arr['arr']['old_receive_quantity'];
             for($i=0; $i<count($buf[0]); $i++)
             {   
@@ -441,7 +442,6 @@ class AllotmentController extends Controller
             $arr['checkform_time'] = date('Y-m-d',time());
             $this->model->find($id)->update(['allotment_status'=>$arr['allotment_status'], 'checkform_time'=>$arr['checkform_time'], 'remark'=>$arr['remark']]);
             $len = count($arr['arr']['item_id']);
-            $stock = new StockModel;
             for($i=0; $i<$len; $i++)
             {
                 $buf = [];
@@ -454,13 +454,14 @@ class AllotmentController extends Controller
                 $buf['relation_id'] = $id;
                 $buf['amount'] = round($buf['amount']/$buf['quantity']*$buf['new_receive_quantity'],3);
                 $buf['quantity'] = $buf['new_receive_quantity'];
-                $buf['items_id'] = ItemModel::where('sku',$buf['item_id'])->get()->first()->id;
+                $buf['item_id'] = ItemModel::where('sku',$buf['item_id'])->get()->first()->id;
                 if($buf['quantity'] == '' || $buf['warehouse_position_id'] == '')
                     continue;
                 if($buf['amount'] < 0)
                     throw new Exception('库存金额低于0了');
+                $item = ItemModel::find($buf['item_id']);
                 if($buf['quantity'])
-                    $stock->in($buf);
+                    $item->in($buf['warehouse_position_id'], $buf['quantity'], $buf['amount'], $buf['type'], $buf['relation_id'], $buf['remark']);
             }
         } catch(Exception $e) {
             DB::rollback();

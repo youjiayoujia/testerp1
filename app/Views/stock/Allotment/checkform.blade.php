@@ -40,7 +40,7 @@
                 <div class='row'>
                     <div class='form-group col-sm-1'>
                         <label for='sku' class='control-label'>sku</label>
-                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[items_id][{{$key}}]' value='{{ $allotmentform->items->sku }}' readonly>
+                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[item_id][{{$key}}]' value='{{ $allotmentform->items->sku }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='quantity' class='control-label'>实发数量</label>
@@ -63,7 +63,7 @@
                         <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id'>
                         <option value=''>请输入库位</option>
                         @foreach($positions as $position)
-                            <option value="{{$position->id}}" {{$allotmentform->in_warehouse_positions_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
+                            <option value="{{$position->id}}" {{$allotmentform->in_warehouse_position_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
                         @endforeach
                         </select>
                     </div>

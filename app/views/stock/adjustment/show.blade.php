@@ -14,28 +14,30 @@
             </div>
         </div>
     </div>
-    @foreach($adjustments as $adjustment)
     <div class="panel panel-default">
         <div class="panel-heading">调动信息</div>
         <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>sku</strong>: {{ $adjustment->items->sku }}
+            @foreach($adjustments as $adjustment)
+            <div class='row'>
+                <div class="col-lg-2">
+                    <strong>sku</strong>: {{ $adjustment->items->sku }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>type</strong>: {{ $adjustment->type == 'IN' ? '入库' : '出库'}}
+                </div>
+                <div class="col-lg-2">
+                    <strong>库位</strong>: {{ $adjustment->position ? $adjustment->position->name : '' }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>数量</strong>: {{ $adjustment->quantity }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>金额(￥)</strong>: {{ $adjustment->amount }}
+                </div>
             </div>
-            <div class="col-lg-2">
-                <strong>type</strong>: {{ $adjustment->type == 'IN' ? '入库' : '出库'}}
-            </div>
-            <div class="col-lg-2">
-                <strong>库位</strong>: {{ $adjustment->position ? $adjustment->position->name : '' }}
-            </div>
-            <div class="col-lg-2">
-                <strong>数量</strong>: {{ $adjustment->quantity }}
-            </div>
-            <div class="col-lg-2">
-                <strong>金额(￥)</strong>: {{ $adjustment->amount }}
-            </div>
+            @endforeach
         </div>
     </div>
-    @endforeach
     <div class="panel panel-default">
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">

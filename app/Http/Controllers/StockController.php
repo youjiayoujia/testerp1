@@ -165,7 +165,7 @@ class StockController extends Controller
         if(request()->ajax()) {
             $position = request()->input('position');
             $item_id = $_GET['item_id'];
-            $obj = StockModel::where(['warehouse_position_id'=>$position, 'item_id'=>$item_id])->get()->first();
+            $obj = StockModel::where(['warehouse_position_id'=>$position, 'item_id'=>$item_id])->first();
             $arr[] = $obj->toArray();
             $arr[] = $obj->unit_cost;
             if($arr) {

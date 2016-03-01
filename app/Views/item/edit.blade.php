@@ -72,22 +72,19 @@
     </div>
     <div class="form-group col-md-3">
         <label for="color">物流限制</label>
-        <select  class="form-control" name="carriage_limit">
-            <option value=""></option>
-            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
-                <option value="{{ $carriage_limit }}" {{ $model->carriage_limit == $carriage_limit ? 'selected' : '' }} >{{$carriage_limit}}</option>
-            @endforeach
-        </select>
+        @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+                <label>
+                    <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}' {{ in_array($carriage_key, explode(',',$model->carriage_limit))? 'checked' : '' }} >{{$carriage_limit}}
+                </label>
+        @endforeach
     </div>
     <div class="form-group col-md-3">
-        <label for="size">物流限制1</label>
-        <select  class="form-control" name="carriage_limit_1">
-            <option value=""></option>
-            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
-                <option value="{{ $carriage_limit }}" {{ $model->carriage_limit_1 == $carriage_limit ? 'selected' : '' }} >{{$carriage_limit}}</option>
-            @endforeach
-        </select>
-
+        <label for="color">包装限制</label>
+        @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <label>
+                    <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}' {{ in_array($package_key, explode(',',$model->package_limit))? 'checked' : '' }} >{{$package_limit}}
+                </label>
+        @endforeach
     </div>
     <div class="form-group col-md-3">
         <label for="color">包装限制</label>

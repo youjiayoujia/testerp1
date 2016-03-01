@@ -105,12 +105,23 @@ return [
             ],
         ],
     ],
-
-    //采购导航
+ 	//采购导航
     [
         'name' => '采购',
         'icon' => 'shopping-cart',
-        'url' => 'dashboard.index',
+         'url' => '',
+        'subnavigations' => [
+            [
+                'name' => '采购条目',
+                'url' => 'purchaseItem.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '采购单',
+                'url' => 'purchaseOrder.index',
+                'icon' => '',
+            ],
+        ],
     ],
     //渠道导航
     [

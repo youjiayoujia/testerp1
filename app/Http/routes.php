@@ -19,6 +19,12 @@ Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 Route::resource('warehousePosition', 'Warehouse\PositionController');
 
+//采购条目
+Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+
+//采购单
+Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
+
 //品类路由
 Route::resource('catalog', 'CatalogController');
 

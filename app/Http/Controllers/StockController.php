@@ -190,7 +190,7 @@ class StockController extends Controller
         if(request()->ajax()) {
             $warehouse = request()->input('warehouse');
             $item_id = request()->input('item_id');
-            $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->get()->first();
+            $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->first();
             if(!$obj) {
                 return json_encode('none');
             }

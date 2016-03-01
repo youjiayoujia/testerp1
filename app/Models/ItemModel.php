@@ -61,6 +61,13 @@ class ItemModel extends BaseModel
         return $this->hasMany('App\Models\StockModel', 'item_id');
     }
 
+    /**
+     * 获取库存对象 
+     * @param $warehousePositionId 库位id
+     * 
+     * @return 库存对象
+     *
+     */
     public function getStock($warehousePosistionId)
     {
         $stock = $this->stocks()->where('warehouse_position_id', $warehousePosistionId)->first();
@@ -76,24 +83,64 @@ class ItemModel extends BaseModel
         return $stock;
     }
 
+    /**
+     * in api 
+     * @param
+     * $warehousePositionId 库位id
+     * $quantity 数量
+     * $amount 金额
+     * $type 类型
+     * $relation_id 类型id
+     * $remark 备注
+     *
+     * @return
+     */
     public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark='')
     {
         $stock = $this->getStock($warehousePosistionId);
         return $stock->in($quantity, $amount, $type, $relation_id, $remark);
     }
 
+    /**
+     * hold api 
+     * @param
+     * $warehousePositionId 库位id
+     * $quantity 数量
+     *
+     * @return
+     */
     public function hold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
         return $stock->hold($quantity);
     }
 
+    /**
+     * unhold api 
+     * @param
+     * $warehousePositionId 库位id
+     * $quantity 数量
+     * 
+     * @return
+     */
     public function unhold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
         return $stock->unhold($quantity);
     }
 
+    /**
+     * out api 
+     *
+     * @param 
+     * $warehousePoistionId 库位id
+     * $quantity 数量
+     * $type 类型
+     * $relation_id 类型id
+     * $remark 备注
+     *
+     * @return
+     */
     public function out($warehousePosistionId, $quantity, $type, $relation_id, $remark='')
     {
         $stock = $this->getStock($warehousePosistionId);

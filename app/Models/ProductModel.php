@@ -146,8 +146,8 @@ class ProductModel extends BaseModel
             foreach ($data['modelSet'] as $model) {
                 //拼接model号
                 $data['model'] = $spuobj->spu . "-" . $model['model'];
-                $data['carriage_limit'] = implode(',', $data['carriage_limit_arr']);
-                $data['package_limit'] = implode(',', $data['package_limit_arr']);
+                $data['carriage_limit'] = empty($data['carriage_limit_arr'])?'':implode(',', $data['carriage_limit_arr']);
+                $data['package_limit'] = empty($data['package_limit_arr'])?'':implode(',', $data['package_limit_arr']);
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
@@ -273,7 +273,9 @@ class ProductModel extends BaseModel
                 }
                 $data['default_image'] = $default_image_id;
             }
-
+            
+            $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '':implode(',', $data['carriage_limit_arr']);
+            $data['package_limit'] = empty($data['package_limit_arr']) ? '':implode(',', $data['package_limit_arr']);
             //更新基础信息
             $this->update($data);
         } catch (Exception $e) {

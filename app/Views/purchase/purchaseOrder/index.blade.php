@@ -1,43 +1,37 @@
 @extends('common.table')
 @section('tableHeader')
-    <th>ID</th>
-    <th>Item_ID</th>
-    <th>采购类型</th>
-    <th>订单id</th>
-    <th>产品图片</th>
-    <th>供应商</th>
+    <th>ID</th> 
+    <th>采购单状态</th> 
+   	<th>供应商</th>
     <th>采购去向</th>
-    <th>库存数量</th>
-    <th>采购需求/采购数目/仍需采购</th>
-    <th>shop</th>
-    <th>采购条目状态</th>
+    <th>结算状态</th>
+    <th>异常类型</th>
     <th>创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $purchaseOrder)
         <tr>
-            <td>{{ $purchaseOrder->id }}</td>
-            <td>{{ $purchaseOrder->sku_id}}</td>
-            @foreach(config('purchase.purchaseOrder.type') as $k=>$type)
-            	@if($purchaseOrder->type == $k)
-            	<td>{{ $type }}</td>
-                @endif
-            @endforeach
-            <td>{{ $purchaseOrder->order_id}}</td>
-            <td><img src="{{ asset($purchaseOrder->purchaseOrderImage->product->image->src)}}" height="50px"/></td>
-            <td>{{ $purchaseOrder->supplier->name}}</td>
-            <td>{{ $purchaseOrder->warehouse->name}}</td>
-            <td>{{ $purchaseOrder->stock}}</td>
-            <td>{{ $purchaseOrder->purchase_num}}/{{ $purchaseOrder->arrival_num}}/{{ $purchaseOrder->lack_num}}</td>
-             @foreach(config('purchase.purchaseOrder.platforms') as $k=>$platform)
-            	@if($purchaseOrder->platform_id == $k)
-            	<td>{{ $platform }}</td>
-                @endif
-            @endforeach
-            @foreach(config('purchase.purchaseOrder.status') as $k=>$status)
+            <td>{{ $purchaseOrder->id }}</td> 
+            @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
-            	<td>{{ $status }}</td>
+            	<td>{{ $statu }}</td>
+                @endif
+            @endforeach     
+    		<td>
+            @if($purchaseOrder->supplier_id >0)
+            	{{ $purchaseOrder->supplier->name}}
+            @endif
+            </td>
+            <td>{{ $purchaseOrder->warehouse->name}}</td>
+             @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
+            	@if($purchaseOrder->close_status == $k)
+            	<td>{{ $close_statu}}</td>
+                @endif
+            @endforeach
+            @foreach(config('purchase.purchaseOrder.active') as $k=>$active)
+            	@if($purchaseOrder->active == $k)
+            	<td>{{ $active }}</td>
                 @endif
             @endforeach            
             <td>{{ $purchaseOrder->created_at }}</td>

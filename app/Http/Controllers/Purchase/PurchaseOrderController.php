@@ -52,18 +52,18 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'create', $response);		
 	}
 	
+	
 	/**
-     * 创建采购条目
+     * 创建采购条目页面
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function store()
+	public function purchaseOrderSupplier()
 	{
-		$data=request()->all();
-		$this->model->purchasestore($data);
-        return redirect($this->mainIndex);		
+		  
+        return view($this->viewPath . 'create', $response);		
 	}
 	
 	/**

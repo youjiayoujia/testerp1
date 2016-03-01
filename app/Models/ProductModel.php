@@ -114,17 +114,17 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\ItemModel', 'product_id');
     }
 
-    public function ProductVariationvalue()
+    public function variationValues()
     {
         return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
     }
 
-    public function ProductManyToFeaturevalue()
+    public function featureValues()
     {
         return $this->belongsToMany('App\Models\Catalog\FeatureValueModel', 'product_feature_values', 'product_id', 'feature_value_id')->withTimestamps();
     }
 
-    public function productFeatureValue()
+    public function featureTextValues()
     {
         return $this->hasMany('App\Models\Product\ProductFeatureValueModel','product_id');
     }
@@ -177,7 +177,7 @@ class ProductModel extends BaseModel
                             $variationValueModel = $variationModel->values()->find($value_id);
                             //多对多插入的attach数组
                             $variation_value_arr = [$variationValueModel->id=>['variation_value'=>$variationValueModel->name,'variation_id'=>$variationModel->id]];
-                            $product->ProductVariationvalue()->attach($variation_value_arr);
+                            $product->variationValues()->attach($variation_value_arr);
                         }
                     }
                 }
@@ -194,11 +194,11 @@ class ProductModel extends BaseModel
                                     $featureValueModel = $featureModel->values()->where('name',$value)->get()->first()->toArray();
                                     //多对多插入的attach数组
                                     $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$value,'feature_id'=>$feature_id]];
-                                    $product->ProductManyToFeaturevalue()->attach($feature_value_arr);               
+                                    $product->featureValues()->attach($feature_value_arr);               
                                 }
                             } else {//input框插入
                                 $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id,'feature_value_id'=>0]];
-                                $product->ProductManyToFeaturevalue()->attach($feature_value_arr);
+                                $product->featureValues()->attach($feature_value_arr);
                             }
                         }
                     }
@@ -229,7 +229,7 @@ class ProductModel extends BaseModel
                 foreach ($data['variations'] as $variation_id => $variation_values) {
                     foreach ($variation_values as $variation_value_id=>$variation_value) {
                         $variation_value_arr = [$variation_value_id=>['variation_value'=>$variation_value,'variation_id'=>$variation_id]];
-                        $this->ProductVariationvalue()->attach($variation_value_arr);
+                        $this->variationValues()->attach($variation_value_arr);
                     }
                 }
             }
@@ -244,18 +244,18 @@ class ProductModel extends BaseModel
                             //找到featureValue对应的ID
                             $featureValueModel = $featureModel->values()->where('name',$feature_value)->get()->first()->toArray();
                             $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id]];
-                            $this->ProductManyToFeaturevalue()->attach($feature_value_arr);  
+                            $this->featureValues()->attach($feature_value_arr);  
                         }
                     } else {//feature为单选框
                         $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$feature_values,'feature_id'=>$feature_id]];
-                        $this->ProductManyToFeaturevalue()->attach($feature_value_arr);
+                        $this->featureValues()->attach($feature_value_arr);
                     }
 
                 }
                 //feature为input框
                 foreach ($data['featureinput'] as $featureInputKey => $featureInputValue) {
                     $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$featureInputValue,'feature_id'=>$featureInputKey,'feature_value_id'=>0]];
-                    $this->ProductManyToFeaturevalue()->attach($feature_value_arr);
+                    $this->featureValues()->attach($feature_value_arr);
                 }
             }
             //更新图片
@@ -293,7 +293,7 @@ class ProductModel extends BaseModel
     public function createItem()
     {
         //获得variation属性集合
-        $variations = $this->ProductVariationvalue->toArray();
+        $variations = $this->variationValues->toArray();
         $brr = [];
         
         foreach ($variations as $variation) {
@@ -328,8 +328,8 @@ class ProductModel extends BaseModel
         foreach ($this->item as $item) {
             $item->delete();
         }
-        $this->ProductVariationvalue()->detach();
-        $this->ProductManyToFeaturevalue()->detach();
+        $this->variationValues()->detach();
+        $this->featureValues()->detach();
         //删除product
         $this->delete();
     }

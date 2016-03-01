@@ -65,30 +65,29 @@ class ProductController extends Controller
     {
         $variation_value_id_arr = [];
         $features_value_id_arr  = [];
+        $features_input = [];
         $product = $this->model->find($id);     
         if (!$product) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         //已选中的variation的id号集合     
-        foreach($product->ProductVariationvalue->toArray() as $key=>$arr){
+        foreach($product->variationValues->toArray() as $key=>$arr){
             if($arr['pivot']['created_at']==$arr['pivot']['updated_at']){
                 $variation_value_id_arr[$key] = $arr['pivot']['variation_value_id'];
             }   
         }
         //已选中的feature的id集合
-        foreach($product->ProductManyToFeaturevalue->toArray() as $key=>$arr){
+        foreach($product->featureValues->toArray() as $key=>$arr){
             if($arr['pivot']['created_at']==$arr['pivot']['updated_at']){
                 $features_value_id_arr[$key] = $arr['pivot']['feature_value_id'];
-            }
-            
+            }    
         }
-        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'product' => $product,
             'suppliers' => $this->supplier->all(),
-            'features_input' => array_values($product->productFeatureValue->where('feature_value_id',0)->toArray()),
+            'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
             'warehouses' => $this->warehouse->where('type','本地仓库')->get(),

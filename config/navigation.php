@@ -19,36 +19,38 @@ return [
         'name' => '产品',
         'icon' => 'tags',
         'url' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => '品类',
-                'url' => 'catalog.index',
-                'icon' => '',
+            '产品管理' => [
+                [
+                    'name' => '品类',
+                    'url' => 'catalog.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '产品',
+                    'url' => 'product.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '货品',
+                    'url' => 'item.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => '供货商',
-                'url' => 'productSupplier.index',
-                'icon' => '',
+            '选款' => [
+                [
+                    'name' => '选款需求',
+                    'url' => 'productRequire.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => '选款需求',
-                'url' => 'productRequire.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '产品管理',
-                'url' => 'product.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '货品',
-                'url' => 'item.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '产品图片',
-                'url' => 'productImage.index',
-                'icon' => '',
+            '供应链' => [
+                [
+                    'name' => '供货商',
+                    'url' => 'productSupplier.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -57,12 +59,14 @@ return [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => 'dashboard.index',
+        'type' => 'group',
     ],
     //仓储导航
     [
         'name' => '仓储',
         'icon' => 'home',
         'url' => '',
+        'type' => '',
         'subnavigations' => [
             [
                 'name' => '仓库',
@@ -76,12 +80,37 @@ return [
             ],
         ],
     ],
+
     //物流导航
     [
         'name' => '物流',
         'icon' => 'plane',
         'url' => 'dashboard.index',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '物流商',
+                'url' => 'logisticsSupplier.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流方式',
+                'url' => 'logistics.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '跟踪号',
+                'url' => 'logisticsCode.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流分区报价',
+                'url' => 'logisticsZone.index',
+                'icon' => '',
+            ],
+        ],
     ],
+
     //采购导航
     [
         'name' => '采购',
@@ -93,6 +122,7 @@ return [
         'name' => '渠道',
         'icon' => 'transfer',
         'url' => '',
+        'type' => '',
         'subnavigations' => [
             [
                 'name' => '渠道',

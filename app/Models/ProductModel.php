@@ -3,15 +3,9 @@
 namespace App\Models;
 
 use App\Base\BaseModel;
-use App\Models\CatalogModel;
-use App\Models\SpuModel;
-use App\Models\ItemModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
-use App\Models\Catalog\variationValueModel;
-use App\Models\Catalog\FeatureValueModel;
-use App\Models\Product\SupplierModel;
 use Illuminate\Support\Facades\DB;
 use Tool;
 
@@ -225,7 +219,7 @@ class ProductModel extends BaseModel
             if (array_key_exists('variations', $data)) {
                 $ProductVariationValueModel = new ProductVariationValueModel();
                 //先删除对应的variation属性,再添加
-                $variations = $ProductVariationValueModel->where('product_id', $this->id)->forceDelete();
+                $variations = $ProductVariationValueModel->where('product_id', $this->id)->delete();
                 foreach ($data['variations'] as $variation_id => $variation_values) {
                     foreach ($variation_values as $variation_value_id=>$variation_value) {
                         $variation_value_arr = [$variation_value_id=>['variation_value'=>$variation_value,'variation_id'=>$variation_id]];
@@ -236,7 +230,7 @@ class ProductModel extends BaseModel
             //更新产品feature属性
             if (array_key_exists('features', $data)) {
                 $ProductFeatureValueModel = new ProductFeatureValueModel();
-                $ProductFeatureValueModel->where('product_id', $this->id)->forceDelete();
+                $ProductFeatureValueModel->where('product_id', $this->id)->delete();
                 foreach ($data['features'] as $feature_id => $feature_values) {
                     if (is_array($feature_values)) {//feature为多选框
                         foreach ($feature_values as $feature_value) {

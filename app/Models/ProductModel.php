@@ -328,10 +328,8 @@ class ProductModel extends BaseModel
         foreach ($this->item as $item) {
             $item->delete();
         }
-        $productVariationValueModel = new ProductVariationValueModel();
-        $productVariationValueModel->where('product_id',$this->id)->delete();
-        $ProductFeatureValueModel = new ProductFeatureValueModel();
-        $ProductFeatureValueModel->where('product_id',$this->id)->delete();
+        $this->ProductVariationvalue()->detach();
+        $this->ProductManyToFeaturevalue()->detach();
         //删除product
         $this->delete();
     }

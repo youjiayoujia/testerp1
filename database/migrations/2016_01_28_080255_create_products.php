@@ -15,6 +15,7 @@ class CreateProducts extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('model')->comment('model')->nullable()->default(NULL);
+            $table->integer('warehouse_id')->comment('默认仓库')->default(0);
             $table->integer('spu_id')->comment('spu_id')->nullable()->default(0);
             $table->string('name')->comment('中文名')->nullable()->default(NUll);
             $table->string('c_name')->comment('英文名')->nullable()->default(NUll);

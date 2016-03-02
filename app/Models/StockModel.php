@@ -24,7 +24,16 @@ class StockModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['item_id', 'warehouse_id', 'warehouse_position_id', 'all_quantity', 'available_quantity', 'hold_quantity', 'amount', 'created_at'];
+    protected $fillable = [
+        'item_id',
+        'warehouse_id',
+        'warehouse_position_id',
+        'all_quantity',
+        'available_quantity',
+        'hold_quantity',
+        'amount',
+        'created_at'
+    ];
 
     // 用于查询
     protected $searchFields = ['sku'];
@@ -37,7 +46,7 @@ class StockModel extends BaseModel
             'all_quantity' => 'required|integer',
             'available_quantity' => 'required|integer',
             'hold_quantity' => 'required|integer',
-            'amount' => 'required|numeric',    
+            'amount' => 'required|numeric',
         ],
         'update' => [
             'warehouse_id' => 'required|integer',
@@ -45,14 +54,14 @@ class StockModel extends BaseModel
             'all_quantity' => 'required|integer',
             'available_quantity' => 'required|integer',
             'hold_quantity' => 'required|integer',
-            'amount' => 'required|numeric', 
+            'amount' => 'required|numeric',
         ],
     ];
-    
+
     /**
      * get the relationship between the two model
      *
-     * @return 
+     * @return
      *
      */
     public function warehouse()
@@ -61,7 +70,7 @@ class StockModel extends BaseModel
     }
 
     /**
-     * get the relationship between the two model 
+     * get the relationship between the two model
      *
      * @return
      *
@@ -72,9 +81,9 @@ class StockModel extends BaseModel
     }
 
     /**
-     * get the relationship between the two model 
+     * get the relationship between the two model
      *
-     *  @return
+     * @return
      *
      */
     public function stockIn()
@@ -83,9 +92,9 @@ class StockModel extends BaseModel
     }
 
     /**
-     * get the relationship between the two model 
+     * get the relationship between the two model
      *
-     *  @return
+     * @return
      *
      */
     public function stockOut()
@@ -94,7 +103,7 @@ class StockModel extends BaseModel
     }
 
     /**
-     * return the relation ship 
+     * return the relation ship
      *
      * @return relation
      *
@@ -105,7 +114,7 @@ class StockModel extends BaseModel
     }
 
     /**
-     * add additional attribute according to sku ,get the goods unit cost 
+     * add additional attribute according to sku ,get the goods unit cost
      *
      * @param none
      * @return json
@@ -116,19 +125,18 @@ class StockModel extends BaseModel
         $obj = $this->where('item_id', $this->item_id)->get()->toArray();
         $money = '';
         $amount = '';
-        for($i=0; $i < count($obj); $i++)
-        {
+        for ($i = 0; $i < count($obj); $i++) {
             $money += $obj[$i]['amount'];
             $amount += $obj[$i]['all_quantity'];
         }
 
-        return round($money/$amount, 3);
+        return round($money / $amount, 3);
     }
 
     /**
-     * in api 
-     * @param 
-     * $quantity 数量 
+     * in api
+     * @param
+     * $quantity 数量
      * $amount 金额
      * $type 入库类型
      * $relation_id   例:调整表的某个id
@@ -143,13 +151,19 @@ class StockModel extends BaseModel
         $this->available_quantity += $quantity;
         $this->amount += $amount;
         $this->save();
-        $this->stockIn()->create(['quantity'=>$quantity, 'amount'=>$amount, 'type'=>$type, 'relation_id'=>$relation_id, 'remark'=>$remark]);
+        $this->stockIn()->create([
+            'quantity' => $quantity,
+            'amount' => $amount,
+            'type' => $type,
+            'relation_id' => $relation_id,
+            'remark' => $remark
+        ]);
     }
 
     /**
-     * hold api 
-     * @param 
-     * $quantity 数量 
+     * hold api
+     * @param
+     * $quantity 数量
      *
      * @return none
      *
@@ -157,16 +171,17 @@ class StockModel extends BaseModel
     public function hold($quantity)
     {
         $this->available_quantity -= $quantity;
-        if($this->available_quantity < 0)
+        if ($this->available_quantity < 0) {
             throw new Exception('hold时，可用数量为负了');
+        }
         $this->hold_quantity += $quantity;
         $this->save();
     }
 
     /**
-     * unhold api 
-     * @param 
-     * $quantity 数量 
+     * unhold api
+     * @param
+     * $quantity 数量
      *
      * @return none
      *
@@ -174,16 +189,17 @@ class StockModel extends BaseModel
     public function unhold($quantity)
     {
         $this->hold_quantity -= $quantity;
-        if($this->hold_quantity < 0)
+        if ($this->hold_quantity < 0) {
             throw new Exception('unhold时，hold数量为负了');
+        }
         $this->available_quantity += $quantity;
         $this->save();
     }
 
     /**
-     * in api 
-     * @param 
-     * $quantity 数量 
+     * in api
+     * @param
+     * $quantity 数量
      * $type 入库类型
      * $relation_id   例:调整表的某个id
      * $remark 备注
@@ -195,11 +211,17 @@ class StockModel extends BaseModel
     {
         $this->all_quantity -= $quantity;
         $this->available_quantity -= $quantity;
-        $this->amount -= $quantity*$this->unit_cost;
-        if($this->available_quantity < 0 || $this->amount < 0) {
+        $this->amount -= $quantity * $this->unit_cost;
+        if ($this->available_quantity < 0 || $this->amount < 0) {
             throw new Exception('出库时数量和金额有问题');
         }
         $this->save();
-        $this->stockOut()->create(['quantity'=>$quantity, 'amount'=>$quantity*$this->unit_cost, 'type'=>$type, 'relation_id'=>$relation_id, 'remark'=>$remark]);
+        $this->stockOut()->create([
+            'quantity' => $quantity,
+            'amount' => $quantity * $this->unit_cost,
+            'type' => $type,
+            'relation_id' => $relation_id,
+            'remark' => $remark
+        ]);
     }
 }

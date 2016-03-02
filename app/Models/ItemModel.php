@@ -18,9 +18,30 @@ class ItemModel extends BaseModel
         'update' => []
     ];
 
-	protected $fillable = [
-        'product_id','sku','weight','inventory','name','c_name','alias_name','alias_cname','catalog_id','supplier_id','supplier_sku','second_supplier_id','supplier_info','purchase_url'
-        ,'purchase_price','purchase_carriage','product_size','package_size','carriage_limit','package_limit','status','remark'
+    protected $fillable = [
+        'product_id',
+        'sku',
+        'weight',
+        'inventory',
+        'name',
+        'c_name',
+        'alias_name',
+        'alias_cname',
+        'catalog_id',
+        'supplier_id',
+        'supplier_sku',
+        'second_supplier_id',
+        'supplier_info',
+        'purchase_url'
+        ,
+        'purchase_price',
+        'purchase_carriage',
+        'product_size',
+        'package_size',
+        'carriage_limit',
+        'package_limit',
+        'status',
+        'remark'
     ];
 
     public function product()
@@ -35,9 +56,9 @@ class ItemModel extends BaseModel
 
     public function updateItem($data)
     {
-        $data['carriage_limit'] = empty($data['carriage_limit_arr'])?'':implode(',', $data['carriage_limit_arr']);
-        $data['package_limit'] = empty($data['package_limit_arr'])?'':implode(',', $data['package_limit_arr']);
-        
+        $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',', $data['carriage_limit_arr']);
+        $data['package_limit'] = empty($data['package_limit_arr']) ? '' : implode(',', $data['package_limit_arr']);
+
         $this->update($data);
     }
 
@@ -47,9 +68,9 @@ class ItemModel extends BaseModel
     }
 
     /**
-     * 获取库存对象 
+     * 获取库存对象
      * @param $warehousePositionId 库位id
-     * 
+     *
      * @return 库存对象
      *
      */
@@ -57,19 +78,22 @@ class ItemModel extends BaseModel
     {
         $stock = $this->stocks()->where('warehouse_position_id', $warehousePosistionId)->first();
         if (!$stock) {
-            $warehouse = PositionModel::where(['id'=>$warehousePosistionId])->first()->warehouse_id;
-            $len = StockModel::where(['item_id'=>$this->id, 'warehouse_id'=>$warehouse])->count();
-            if($len>=2) {
+            $warehouse = PositionModel::where(['id' => $warehousePosistionId])->first()->warehouse_id;
+            $len = StockModel::where(['item_id' => $this->id, 'warehouse_id' => $warehouse])->count();
+            if ($len >= 2) {
                 throw new Exception('该sku对应的库位已经是2，且并没找到库位');
             }
-            $stock = $this->stocks()->create(['warehouse_position_id'=>$warehousePosistionId, 'warehouse_id'=>$warehouse]);
+            $stock = $this->stocks()->create([
+                'warehouse_position_id' => $warehousePosistionId,
+                'warehouse_id' => $warehouse
+            ]);
         }
 
         return $stock;
     }
 
     /**
-     * in api 
+     * in api
      * @param
      * $warehousePositionId 库位id
      * $quantity 数量
@@ -80,14 +104,14 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark='')
+    public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         return $stock->in($quantity, $amount, $type, $relation_id, $remark);
     }
 
     /**
-     * hold api 
+     * hold api
      * @param
      * $warehousePositionId 库位id
      * $quantity 数量
@@ -101,11 +125,11 @@ class ItemModel extends BaseModel
     }
 
     /**
-     * unhold api 
+     * unhold api
      * @param
      * $warehousePositionId 库位id
      * $quantity 数量
-     * 
+     *
      * @return
      */
     public function unhold($warehousePosistionId, $quantity)
@@ -115,9 +139,9 @@ class ItemModel extends BaseModel
     }
 
     /**
-     * out api 
+     * out api
      *
-     * @param 
+     * @param
      * $warehousePoistionId 库位id
      * $quantity 数量
      * $type 类型
@@ -126,7 +150,7 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function out($warehousePosistionId, $quantity, $type, $relation_id, $remark='')
+    public function out($warehousePosistionId, $quantity, $type, $relation_id, $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         return $stock->out($quantity, $type, $relation_id, $remark);

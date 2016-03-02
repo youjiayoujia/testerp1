@@ -25,6 +25,7 @@
     <label for='set'>feature属性:</label>
     <div class="panel panel-info">
         <div class="checkbox panel-body ">
+            <?php if(array_key_exists('features',$data)){ ?>
             @foreach($data['features'] as $key=>$getfeature)
                 @if($getfeature['type']==1)
                     <div>                            
@@ -50,6 +51,9 @@
                     </div>
                 @endif
             @endforeach
+            <?php }else{ ?>
+                <span>无feature属性</span>
+            <?php } ?>
         </div>
     </div>
 </div>

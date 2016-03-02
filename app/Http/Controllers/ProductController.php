@@ -10,17 +10,19 @@ namespace App\Http\Controllers;
 use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
+use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
 {
 
-    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog)
+    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,WarehouseModel $warehouse)
     {
         $this->model = $product;
         $this->supplier = $supplier;
         $this->catalog = $catalog;
+        $this->warehouse = $warehouse;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '产品';
         $this->viewPath = 'product.';
@@ -32,7 +34,9 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'suppliers' => $this->supplier->all(),
+            'warehouses' => $this->warehouse->where('type','本地仓库')->get(),
         ];
+
         return view($this->viewPath . 'create', $response);
     }
 
@@ -59,28 +63,35 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $product = $this->model->find($id);       
+        $variation_value_id_arr = [];
+        $features_value_id_arr  = [];
+        $features_input = [];
+        $product = $this->model->find($id);     
         if (!$product) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         //已选中的variation的id号集合     
-        foreach($product->variationValue->toArray() as $key=>$arr){
-            $variation_value_id_arr[$key] = $arr['variation_value_id'];
+        foreach($product->variationValues->toArray() as $key=>$arr){
+            if($arr['pivot']['created_at']==$arr['pivot']['updated_at']){
+                $variation_value_id_arr[$key] = $arr['pivot']['variation_value_id'];
+            }   
         }
         //已选中的feature的id集合
-        foreach($product->spu->productFeatureValue->toArray() as $key=>$arr){
-            $features_value_id_arr[$key] = $arr['feature_value_id'];
+        foreach($product->featureValues->toArray() as $key=>$arr){
+            if($arr['pivot']['created_at']==$arr['pivot']['updated_at']){
+                $features_value_id_arr[$key] = $arr['pivot']['feature_value_id'];
+            }    
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'product' => $product,
             'suppliers' => $this->supplier->all(),
-            'features_input' => array_values($product->spu->productFeatureValue->where('feature_value_id',0)->toArray()),
+            'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
+            'warehouses' => $this->warehouse->where('type','本地仓库')->get(),
         ];
-
 
         return view($this->viewPath . 'edit', $response);
     }

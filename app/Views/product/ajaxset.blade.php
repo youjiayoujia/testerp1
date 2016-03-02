@@ -1,7 +1,7 @@
 <div class="panel panel-info adjustmargin">
     <div class="panel-heading">勾选model及对应variation属性:</div>
     @foreach($data['models'] as $model)
-        <div class="checkbox panel-body ">
+        <div class="checkbox panel-body {{$model}}">
             <div class="checkbox col-md-2">
                 <label>
                     <input type='checkbox' id="{{$model}}" onclick="quanxuan('{{$model}}')" name='modelSet[{{$model}}][model]' value='{{$model}}'>{{$model}}
@@ -17,15 +17,6 @@
                     @endforeach
                 </div>
             @endforeach
-        </div>
-        <div style="margin-left:25px;margin-bottom:15px">
-                <label for="color">上传图片：</label>
-                <div class='upimage'><input name='modelSet[{{$model}}][image][image0]' type='file'/></div>
-                <div class='upimage'><input name='modelSet[{{$model}}][image][image1]' type='file'/></div>
-                <div class='upimage'><input name='modelSet[{{$model}}][image][image2]' type='file'/></div>
-                <div class='upimage'><input name='modelSet[{{$model}}][image][image3]' type='file'/></div>
-                <div class='upimage'><input name='modelSet[{{$model}}][image][image4]' type='file'/></div>
-                <div class='upimage'><input name='modelSet[{{$model}}][image][image5]' type='file'/></div>
         </div>  
     <hr width="98%" style="border:0.5px solid #d9edf7">
     @endforeach

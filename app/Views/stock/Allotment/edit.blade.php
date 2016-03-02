@@ -39,10 +39,26 @@
             列表
         </div>  
         <div class='panel-body'>
+            <div class='row'>
+                <div class='form-group col-sm-2'>
+                    <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+                </div>
+                <div class='form-group col-sm-2'>
+                    <label for='warehouse_position_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="access_quantity" class='control-label'>可用数量</label>
+                </div>
+                <div class='form-group col-sm-2'>
+                    <label for='quantity' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                </div>
+                <div class='form-group col-sm-2'>
+                    <label for='amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
+                </div>
+            </div>
             @foreach($allotmentforms as $key => $allotmentform)
                 <div class='row'>
                     <div class='form-group col-sm-2'>
-                        <label for='sku'>sku</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
                         <select name='arr[item_id][{{$key}}]' id='arr[sku][{{$key}}]' class='form-control sku'>
                         @foreach($skus as $sku)
                             <option value="{{$sku['item_id']}}" {{ $sku['item_id'] == $allotmentform->item_id ? 'selected' : ''}}>{{$sku['items']['sku']}}</option>
@@ -50,7 +66,6 @@
                         </select>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='warehouse_position_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
                         <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id'>
                         @foreach($positions[$key] as $position)
                             <option value="{{$position['id']}}" {{ $position['id'] == $allotmentform->warehouse_position_id ? 'selected' : ''}}>{{$position['name']}}</option>
@@ -58,15 +73,12 @@
                         </select>
                     </div>
                     <div class="form-group col-sm-2">
-                        <label for="access_quantity" class='control-label'>可用数量</label>
                         <input type='text' class="form-control access_quantity" placeholder="可用数量" name='arr[access_quantity][{{$key}}]' value="{{ $availquantity[$key] }}" readonly>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='quantity' class='control-label'>数量</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
                         <input type='text' class='form-control quantity' id='arr[quantity][{{$key}}]' placeholder='数量' name='arr[quantity][{{$key}}]' value='{{ $allotmentform->quantity }}'>
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label for='amount' class='control-label'>总金额(￥)</label><small class='text-danger glyphicon glyphicon-asterisk'></small>
                         <input type='text' class='form-control amount' id='arr[amount][{{$key}}]' placeholder='总金额(￥)' name='arr[amount][{{$key}}]' value='{{ $allotmentform->amount }}' readonly>
                     </div>
                     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>

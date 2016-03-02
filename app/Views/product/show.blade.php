@@ -41,7 +41,7 @@
     <div class="panel panel-default">
         <div class="panel-heading">Feature属性:</div>
         <div class="panel-body">
-            @foreach($model->spu->productFeatureValue as $featureModel)
+            @foreach($model->featureTextValues as $featureModel)
             <div class="col-lg-3">
                 <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
             </div>
@@ -70,7 +70,7 @@
                 <strong>主供应商sku</strong>: {{ $model->supplier_sku }}
             </div>
             <div class="col-lg-3">
-                <strong>辅供应商</strong>: <?php if($model->second_supplier_id==0){echo "无辅供应商";}else{echo $model->secondSupplierName($model->second_supplier_id);} ?>
+                <strong>辅供应商</strong>: <?php if($model->second_supplier_id==0){echo "无辅供应商";}else{echo $model->supplier->where('id',$model->second_supplier_id)->get()->first()->name;} ?>
             </div>
         </div>
     </div>
@@ -79,16 +79,28 @@
         <div class="panel-heading">其他信息:</div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>物流限制</strong>: {{ $model->carriage_limit }}
+                <strong>物流限制</strong>: 
+                <?php 
+                    $carriage_key_arr = explode(',',$model->carriage_limit);
+                    foreach(config('product.carriage_limit') as $carriage_key=>$carriage_value){
+                        if(in_array($carriage_key, $carriage_key_arr)){
+                            echo $carriage_value.",";
+                        }
+                    }
+
+                ?>
             </div>
             <div class="col-lg-3">
-                <strong>物流限制1</strong>: {{ $model->carriage_limit1 }}
-            </div>
-            <div class="col-lg-3">
-                <strong>包装限制</strong>: {{ $model->package_limit }}
-            </div>
-            <div class="col-lg-3">
-                <strong>包装限制1</strong>: {{ $model->package_limit1 }}
+                <strong>包装限制</strong>: 
+                <?php 
+                    $package_key_arr = explode(',',$model->package_limit);
+                    foreach(config('product.package_limit') as $package_key=>$package_value){
+                        if(in_array($package_key, $package_key_arr)){
+                            echo $package_value.",";
+                        }
+                    }
+
+                ?>
             </div>
         </div>
         <div class="panel-body">

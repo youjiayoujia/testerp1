@@ -43,24 +43,36 @@
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku">sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="access_quantity" class='control-label'>可用数量</label>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+            </div>
+            <div class='row'>
+                <div class="form-group col-sm-2">
                     <select name='arr[item_id][0]' id='arr[sku][0]' class='form-control sku'>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select name='arr[warehouse_position_id][0]' id='arr[warehouse_position_id][0]' class='form-control warehouse_position_id'>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="access_quantity" class='control-label'>可用数量</label>
                     <input type='text' class="form-control access_quantity" placeholder="可用数量" name='arr[access_quantity][0]' value="{{ old('arr[access_quantity][0]') }}" readonly>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="总金额" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}" readonly>
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>

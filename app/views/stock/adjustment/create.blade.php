@@ -34,29 +34,41 @@
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
                 <div class='form-group col-sm-2'>
                     <label>出入库类型</label>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="quantity" class='control-label'>数量</label>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+            </div>
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+                </div>
+                <div class='form-group col-sm-2'>
                     <select name='arr[type][0]' class='form-control type'>
                         <option value='IN' {{ old('arr[type][0]') == 'IN' ? 'selected' : '' }}>入库</option>
                         <option value='OUT' {{ old('arr[type][0]') == 'OUT' ? 'selected' : '' }}>出库</option>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select name='arr[warehouse_position_id][0]' id='arr[warehouse_position_id][0]' class='form-control warehouse_position_id'>
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="quantity" class='control-label'>数量</label>
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="总金额" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
                 </div>
-                <button type='button' class='btn btn-danger'><i class='glyphicon glyphicon-trash'></i></button>
+                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
             <div class='form-group addpanel'>
                 <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>

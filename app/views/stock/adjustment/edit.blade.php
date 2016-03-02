@@ -33,21 +33,35 @@
             <button type='button' class='btn btn-primary div_del bt_right'><span class='glyphicon glyphicon-remove'></span></button>
         </div>
         <div class='panel-body'>
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class='form-group col-sm-2'>
+                    <label>出入库类型</label>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="quantity" class='control-label'>数量</label>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+            </div>
             @foreach($adjustments as $key => $adjustment)
                 <div class='row'>
                     <div class="form-group col-sm-2">
-                        <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $adjustment->items->sku }}">
                     </div>
                     <div class='form-group col-sm-2'>
-                        <label>出入库类型</label>
                         <select name='arr[type][{{$key}}]' class='form-control type'>
                             <option value='IN' {{ old('arr[type][$key]')? old('arr[type][$key]') == 'IN' ? 'selected' : '' :$adjustment->type == 'IN' ? 'selected' : '' }}>入库</option>
                             <option value='OUT' {{ old('arr[type][$key]')? old('arr[type][$key]') == 'OUT' ? 'selected' : '' :$adjustment->type == 'OUT' ? 'selected' : '' }}>出库</option>
                         </select>
                     </div>
                     <div class="form-group col-sm-2">
-                        <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id'>
                         @foreach($positions as $position)
                             <option value={{$position['id']}} {{ $position['id'] == $adjustment->warehouse_position_id ? 'selected' : ''}}>{{ $position['name'] }}</option>
@@ -55,11 +69,9 @@
                         </select>
                     </div>
                     <div class="form-group col-sm-2">
-                        <label for="quantity" class='control-label'>数量</label>
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
                     </div>
                     <div class="form-group col-sm-2">
-                        <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                         <input type='text' class="form-control amount" id="arr[amount][{{$key}}]" placeholder="总金额" name='arr[amount][{{$key}}]' value="{{ old('arr[amount][$key]') ? old('arr[amount][$key]') : $adjustment->amount }}" {{ $adjustment->type == 'OUT' ? 'readonly' : ''}}>
                     </div>
                     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>

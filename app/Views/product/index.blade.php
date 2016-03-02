@@ -24,7 +24,6 @@
     <th>操作</th>
 @stop
 @section('tableBody')
-
     @foreach($data as $product)
         <tr>
             <td>
@@ -68,7 +67,6 @@
             </td>
         </tr>
     @endforeach
-
 @stop
 
 @section('childJs')
@@ -76,6 +74,9 @@
         //单个审核
         $('.examine_model').click(function () {
             var product_id = $(this).data('id');
+            if($(".examine_"+product_id).hasClass("hasexamine_"+product_id)){
+                alert("该产品已审核");return;
+            }
             if (confirm("确认审核?")) {
                 var url = "{{route('examine')}}";
                 $.ajax({
@@ -85,18 +86,18 @@
                     type:'get',
                     success:function(result){
                         if(result==1){
-                           $(".examine_"+product_id).text("已审核"); 
+                            $(".examine_"+product_id).text("已审核");
+                            $(".examine_"+product_id).addClass("hasexamine_"+product_id);
                        }else{
                             alert("审核失败");
-                       }
-                        
+                       }                     
                     }                  
                 })
             }
         });
 
         $('.has_check').click(function () {
-            alert("已经审核通过了");
+            alert("该产品已审核");
         });
 
         //批量审核
@@ -139,6 +140,5 @@
                coll[i].checked = false;
           }
         }
-
     </script>
 @stop

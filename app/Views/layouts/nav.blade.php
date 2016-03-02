@@ -13,23 +13,47 @@
             <ul class="nav navbar-nav">
                 @foreach(config('navigation') as $navigation)
                     @if(isset($navigation['subnavigations']))
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
-                                <span class="glyphicon glyphicon-{{ $navigation['icon'] }}"></span>
-                                {{ $navigation['name'] }}
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                @foreach($navigation['subnavigations'] as $subnavigation)
-                                    <li>
-                                        <a href="{{ route($subnavigation['url']) }}">
-                                            <span class="glyphicon glyphicon-{{ $subnavigation['icon'] }}"></span>
-                                            {{ $subnavigation['name'] }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </li>
+                        @if($navigation['type'] == 'group')
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+                                    <span class="glyphicon glyphicon-{{ $navigation['icon'] }}"></span>
+                                    {{ $navigation['name'] }}
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @foreach($navigation['subnavigations'] as $key => $subnavigations)
+                                        <li class="disabled"><a href="#">{{ $key }}</a></li>
+                                        @foreach($subnavigations as $subnavigation)
+                                            <li>
+                                                <a href="{{ route($subnavigation['url']) }}">
+                                                    <span class="glyphicon glyphicon-{{ $subnavigation['icon'] }}"></span>
+                                                    {{ $subnavigation['name'] }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                        <li role="separator" class="divider"></li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:">
+                                    <span class="glyphicon glyphicon-{{ $navigation['icon'] }}"></span>
+                                    {{ $navigation['name'] }}
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @foreach($navigation['subnavigations'] as $subnavigation)
+                                        <li>
+                                            <a href="{{ route($subnavigation['url']) }}">
+                                                <span class="glyphicon glyphicon-{{ $subnavigation['icon'] }}"></span>
+                                                {{ $subnavigation['name'] }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endif
                     @else
                         <li>
                             <a href="{{ route($navigation['url']) }}">

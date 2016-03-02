@@ -22,7 +22,7 @@
             <td>{{ $supplier->province}}</td>
             <td>{{ $supplier->city}}</td>
             <td>{{ $supplier->address }}</td>
-            <td>{{ $supplier->type }} </td>
+            <td>{{ $supplier->type == 'offline' ? '线下' : '线上'}} </td>
             <td>{{ $supplier->url }}</td>
             <td>{{ $supplier->telephone }}</td>
             <td>{{ $supplier->purchase_id }}</td>

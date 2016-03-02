@@ -78,6 +78,31 @@ return [
                 'url' => 'warehousePosition.index',
                 'icon' => '',
             ],
+            [
+                'name' => '库存',
+                'url' => 'stock.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '入库',
+                'url' => 'stockIn.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '出库',
+                'url' => 'stockOut.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '库存调整',
+                'url' => 'stockAdjustment.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '库存调拨',
+                'url' => 'stockAllotment.index',
+                'icon' => '',
+            ],
         ],
     ],
 

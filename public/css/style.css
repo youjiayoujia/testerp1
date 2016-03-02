@@ -65,7 +65,3 @@ th:hover:not([data-sort=false]) {
 .upimage{
     margin-bottom: 5px
 }
-
-.panel-body .form-group{
-    padding-left: 1px !important;
-}

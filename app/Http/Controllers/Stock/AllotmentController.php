@@ -1,0 +1,473 @@
+<?php
+/**
+ * 库存调拨控制器
+ * 处理库存调整相关的Request与Response
+ *
+ * @author: MC<178069409@qq.com>
+ * Date: 15/1/11
+ * Time: 11:09
+ */
+
+namespace App\Http\Controllers\Stock;
+
+use DB;
+use App\Http\Controllers\Controller;
+use App\Models\Stock\AllotmentModel;
+use App\Models\ItemModel;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
+use App\Models\Stock\AllotmentFormModel;
+use App\Models\Stock\OutRepository;
+use App\Models\StockModel;
+use App\Models\Stock\AllotmentLogisticsModel;
+use App\Models\Stock\InModel;
+use App\Models\Stock\OutModel;
+
+class AllotmentController extends Controller
+{
+    public function __construct(AllotmentModel $allotment)
+    {
+        $this->model = $allotment;
+        $this->mainIndex = route('stockAllotment.index');
+        $this->mainTitle = '库存调拨';
+        $this->viewPath = 'stock.allotment.';
+    }
+
+    /**
+     * 信息详情页 
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
+    public function show($id)
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $this->model->find($id),
+            'allotments' =>$this->model->find($id)->allotmentform,
+            'stockins' => InModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
+            'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
+            'logisticses' => AllotmentLogisticsModel::where('allotment_id', $id)->get(),
+        ];
+
+        return view($this->viewPath.'show', $response);
+    }
+
+    /**
+     * 跳转创建页 
+     *
+     * @param none
+     * @return view
+     *
+     */
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'warehouses' => WarehouseModel::all(),
+        ];
+
+        return view($this->viewPath.'create', $response);
+    }
+
+    /**
+     * 数据保存 
+     *
+     * @param none
+     * @return view
+     *
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.item_id')));
+        $buf = request()->all();
+        $obj = $this->model->create($buf);
+        for($i=0; $i<$len; $i++)
+        {   
+            $arr = request()->input('arr');
+            foreach($arr as $key => $val)
+            {
+                $val = array_values($val);
+                $buf[$key] = $val[$i];      
+            }
+            $buf['stock_allotment_id'] = $obj->id;
+            AllotmentFormModel::create($buf);
+            $item = ItemModel::find($buf['item_id']);
+
+            $item->hold($buf['warehouse_position_id'], $buf['quantity']);
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 跳转数据编辑页 
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $allotment = $model->allotmentform;
+        $arr = [];
+        $available_quantity = [];
+        foreach($allotment as $key => $value) 
+        {
+            $obj = StockModel::where(['warehouse_id'=>$model->out_warehouse_id, 'item_id'=>$value->items->id])->get();
+            $available_quantity[] =  $obj->first()->available_quantity;
+            $buf = [];
+            foreach($obj as $v)
+            {   
+                $buf[] = $v->position->toArray();
+            }
+            $arr[] = $buf;
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'allotment' => $model,
+            'warehouses' => WarehouseModel::all(),
+            'skus' => StockModel::where(['warehouse_id'=>$model->out_warehouse_id])->distinct()->with('items')->get(['item_id']),
+            'positions' => $arr,
+            'allotmentforms' => $allotment, 
+            'availquantity' => $available_quantity,
+        ];
+
+        return view($this->viewPath.'edit', $response);
+    }
+
+    /**
+     * 数据更新 
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
+    public function update($id)
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.item_id')));
+        $buf = request()->all();
+        $obj = $this->model->find($id)->allotmentform;
+        $obj_len = count($obj);
+        $this->model->find($id)->update($buf);
+        $arr = request()->input('arr');
+        for($i=0; $i<$len; $i++)
+        {   
+            unset($buf);
+            foreach($arr as $key => $val)
+            {
+                $val = array_values($val);
+                $buf[$key] = $val[$i];      
+            }
+            $buf['stock_allotment_id'] = $id;
+            $obj[$i]->update($buf);
+        }
+        while($i != $obj_len) {
+            $obj[$i]->delete();
+            $i++;
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 记录删除 
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
+    public function destroy($id)
+    {
+        $obj = $this->model->find($id);
+        foreach($obj->allotmentform as $val) {
+            $item = ItemModel::find($val->item_id);
+            $item->unhold($val->warehouse_position_id, $val->quantity);
+            $val->delete();
+        }
+        foreach($obj->logistics as $tmp)
+            $tmp->delete();
+        $obj->delete();
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 调拨单审核处理 
+     *
+     * @param $id 调拨单id
+     * @return mainIndex
+     *
+     */
+    public function checkResult($id)
+    {
+        $model = $this->model->find($id);
+        $arr = request()->all();
+        $time = date('Y-m-d',time());       
+        if($arr['result'] == 0) {
+            $model->update(['check_status'=>'FAIL', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
+            return redirect($this->mainIndex);
+        }
+        $time = date('Y-m-d',time());       
+        $model->update(['check_status'=>'SUCCESS', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 跳转出库物流回传页面
+     *
+     *  @return view
+     *
+     */
+    public function checkout()
+    {
+        $id = request()->input('id');
+        $model = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view($this->viewPath.'checkout', $response);
+    }
+
+    /**
+     * 出库操作
+     * 物流信息回传，出库
+     *
+     * @return mainIndex
+     *
+     */
+    public function getLogistics($id)
+    {
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $arr = request()->all();
+        $arr['allotment_id'] = $id;
+        DB::beginTransaction();
+        try {
+            $model->logistics()->create($arr);
+            $model->update(['allotment_status'=>'out']);
+            $model->relation_id = $model->id;
+            $arr = $model->toArray();
+            $buf = $model->allotmentform->toArray();
+            for($i=0;$i<count($buf);$i++) {
+                $tmp = array_merge($arr, $buf[$i]);
+                $tmp['type'] = 'ALLOTMENT';
+                $item = ItemModel::find($tmp['item_id']);
+                $item->unhold($tmp['warehouse_position_id'], $tmp['quantity']);
+                $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
+            }
+        } catch(Exception $e) {
+            DB::rollback();
+        }
+        DB::commit();
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 强制结束调拨单 
+     *
+     *  @return mainIndex
+     *
+     */
+    public function allotmentOver($id)
+    {
+        $this->model->find($id)->update(['allotment_status'=>'over']);
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 跳转调拨单审核页面
+     *
+     * @return view
+     *
+     */
+    public function allotmentCheck($id)
+    {   
+        $model = $this->model->find($id);
+        $allotmentform = $model->allotmentform;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'allotments' => $allotmentform,
+        ];
+
+        return view($this->viewPath.'allotmentcheck', $response);
+    }
+
+    /**
+     * 处理ajax请求，返回重新审核 
+     *
+     *  @param none
+     *  @return any
+     *
+     */
+    public function ajaxAllotmentNew()
+    {
+        if(request()->ajax()) {
+            $id = request()->input('id');
+            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00',
+                'check_by'=>'0']);
+            return json_encode('111');
+        }
+
+        return json_encode('false');
+    }
+
+    /**
+     *  处理ajax请求 
+     *
+     *  @param none
+     *  @return view
+     *
+     */
+    public function ajaxAllotmentAdd()
+    {
+        if(request()->ajax()) {
+            $current = request()->input('current');
+            $warehouse = request()->input('warehouse');
+            $sku_buf = StockModel::where('warehouse_id', $warehouse)->distinct()->with('items')->get(['item_id'])->toArray();
+            $positions = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$sku_buf[0]['items']['id']])->get(); 
+            $buf = [];
+            foreach($positions as $position)
+            {
+                $tmp = $position->position->toArray();
+                $buf[] = $tmp;
+            }
+            $response = [
+                'skus' => $sku_buf,
+                'positions' => $buf,
+                'model' => $positions->first(),
+                'current'=>$current,
+            ];
+
+            return view($this->viewPath.'add', $response);
+        }
+    }
+
+    /**
+     * ajax请求函数
+     *  
+     * @param none
+     * @return json
+     *
+     */
+    public function allotmentpick()
+    {
+        if(request()->ajax()) {
+            $id = request()->input('id');
+            $this->model->find($id)->update(['allotment_status'=>'pick']);
+            return json_encode('11');
+        }
+        
+        return json_encode('false');
+    }
+
+    /**
+     * 跳转对单页面 
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
+    public function checkform($id)
+    {
+        $position = new PositionModel;
+        $obj = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'allotment' => $obj,
+            'allotmentforms' => $obj->allotmentform,
+            'warehouses' => WarehouseModel::all(),
+            'positions' => PositionModel::where(['warehouse_id'=>$obj->in_warehouse_id])->get(),
+        ];
+
+        return view($this->viewPath.'checkform', $response);
+    }
+
+    /**
+     * 对单数据更新 
+     *
+     * @param $id integer 记录id
+     * @return view
+     *
+     */
+    public function checkformupdate($id)
+    {
+        request()->flash();
+
+        $arr = request()->all();
+        $this->model->find($id)->update(['checkform_by'=>'3']);
+        $obj = $this->model->find($id)->allotmentform;
+        DB::beginTransaction();
+        try {
+            $buf[] = $arr['arr']['new_receive_quantity'];
+            $buf[] = $arr['arr']['warehouse_position_id'];
+            $buf[] = $arr['arr']['old_receive_quantity'];
+            for($i=0; $i<count($buf[0]); $i++)
+            {   
+                if($buf[0][$i] == '' || $buf[1][$i] == '')
+                    continue;
+                $obj[$i]->update(['receive_quantity'=>($buf[0][$i]+$buf[2][$i]), 'in_warehouse_position_id'=>$buf[1][$i]]);
+            }
+            $flag = 1;
+            $buf[] = $arr['arr']['quantity'];
+            for($i=0;$i<count($buf[3]);$i++)
+            {
+                if($buf[3][$i] != ($buf[0][$i] + $buf[2][$i]))
+                    $flag = 0;
+            }
+            if($flag == 1)
+            {
+                $arr['allotment_status'] = 'over';
+            } else {
+                $arr['allotment_status'] = 'check';
+            }
+
+            $arr['checkform_time'] = date('Y-m-d',time());
+            $this->model->find($id)->update(['allotment_status'=>$arr['allotment_status'], 'checkform_time'=>$arr['checkform_time'], 'remark'=>$arr['remark']]);
+            $len = count($arr['arr']['item_id']);
+            for($i=0; $i<$len; $i++)
+            {
+                $buf = [];
+                foreach($arr['arr'] as $key => $value)
+                {
+                    $buf[$key] = $value[$i];
+                }
+                $buf = array_merge($buf,$arr);
+                $buf['type'] = "ALLOTMENT";
+                $buf['relation_id'] = $id;
+                $buf['amount'] = round($buf['amount']/$buf['quantity']*$buf['new_receive_quantity'],3);
+                $buf['quantity'] = $buf['new_receive_quantity'];
+                $buf['item_id'] = ItemModel::where('sku',$buf['item_id'])->get()->first()->id;
+                if($buf['quantity'] == '' || $buf['warehouse_position_id'] == '')
+                    continue;
+                if($buf['amount'] < 0)
+                    throw new Exception('库存金额低于0了');
+                $item = ItemModel::find($buf['item_id']);
+                if($buf['quantity'])
+                    $item->in($buf['warehouse_position_id'], $buf['quantity'], $buf['amount'], $buf['type'], $buf['relation_id'], $buf['remark']);
+            }
+        } catch(Exception $e) {
+            DB::rollback();
+        }
+        DB::commit();
+      
+        return redirect($this->mainIndex);
+    }
+}

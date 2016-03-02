@@ -58,8 +58,20 @@ return [
     [
         'name' => '订单',
         'icon' => 'list-alt',
-        'url' => 'dashboard.index',
-        'type' => 'group',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '订单管理',
+                'url' => 'order.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '产品管理',
+                'url' => 'orderItem.index',
+                'icon' => '',
+            ],
+        ],
     ],
     //仓储导航
     [

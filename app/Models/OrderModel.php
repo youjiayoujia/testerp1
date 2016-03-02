@@ -1,0 +1,70 @@
+<?php
+/**
+ * 订单模型
+ *
+ * Created by PhpStorm.
+ * User: bianhaiwei
+ * Date: 16/2/18
+ * Time: 下午5:57
+ */
+
+namespace App\Models;
+
+use App\Base\BaseModel;
+
+class OrderModel extends BaseModel
+{
+    protected $table = 'orders';
+
+    protected $fillable = [
+        'order_item_id','order_id','channel_account_id','channel_id','order_number',
+        'customer_order_number','email','status','active','amount','amount_product',
+        'amount_shipping','amount_coupon','is_partial','by_hand','is_affair','affairer',
+        'customer_service','operator','payment','currency','rate','ip','address_confirm',
+        'comment','comment1','remark','import_remark','shipping','shipping_firstname',
+        'shipping_lastname','shipping_address','shipping_address1','shipping_city',
+        'shipping_state','shipping_country','shipping_zipcode','shipping_phone',
+        'billing_firstname','billing_lastname','billing_address','billing_city',
+        'billing_state','billing_country','billing_zipcode','billing_phone',
+        'payment_date','affair_time','create_time',
+    ];
+
+    public $searchFields = [
+        'order_item_id', 'order_id', 'order_number', 'channel_account_id', 'channel_id',
+        'email', 'customer_service', 'operator',
+    ];
+
+    public $rules = [
+        'create' => [
+            'order_item_id' => 'required',
+            'order_id' => 'required',
+            'channel_account_id' => 'required',
+            'channel_id' => 'required',
+            'order_number' => 'required',
+            'amount' => 'required',
+            'payment' => 'required',
+            'shipping_firstname' => 'required',
+            'billing_firstname' => 'required',
+            'shipping_lastname' => 'required',
+            'billing_lastname' => 'required',
+        ],
+        'update' => [
+            'order_item_id' => 'required',
+            'order_id' => 'required',
+            'channel_account_id' => 'required',
+            'channel_id' => 'required',
+            'order_number' => 'required',
+            'amount' => 'required',
+            'payment' => 'required',
+            'shipping_firstname' => 'required',
+            'billing_firstname' => 'required',
+            'shipping_lastname' => 'required',
+            'billing_lastname' => 'required',
+        ],
+    ];
+
+    public function orderItem() {
+        return $this->hasMany('App\Models\Order\ItemModel', 'order_item_id', 'order_item_id');
+    }
+
+}

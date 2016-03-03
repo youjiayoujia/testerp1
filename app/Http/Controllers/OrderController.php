@@ -10,6 +10,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Channel\AccountModel;
+use App\Models\ChannelModel;
 use App\Models\OrderModel;
 
 class OrderController extends Controller
@@ -20,6 +22,16 @@ class OrderController extends Controller
         $this->mainIndex = route('order.index');
         $this->mainTitle = '订单管理';
         $this->viewPath = 'order.';
+    }
+
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'channels' => ChannelModel::all(),
+            'accounts' => AccountModel::all(),
+        ];
+        return view($this->viewPath.'create', $response);
     }
 
 }

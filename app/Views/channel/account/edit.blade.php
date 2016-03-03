@@ -4,21 +4,21 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group col-lg-2">
-        <label for="account" class='control-label'>渠道账号</label>
+        <label for="name" class='control-label'>渠道账号</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="name" name='name' value="{{ $model->name }}">
+        <input type='text' class="form-control" id="name" name='name' value="{{ old('name') ? old('name') : $model->name }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="account" class='control-label'>渠道账号别名</label>
+        <label for="alias" class='control-label'>渠道账号别名</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" id="alias" name='alias' value="{{ $model->alias }}">
+        <input type='text' class="form-control" id="alias" name='alias' value="{{ old('alias') ? old('alias') : $model->alias }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="account" class='control-label'>账号对应域名</label>
-        <input type='text' class="form-control" id="domain" name='domain' value="{{ $model->domain }}">
+        <label for="domain" class='control-label'>账号对应域名</label>
+        <input type='text' class="form-control" id="domain" name='domain' value="{{ old('domain') ? old('domain') : $model->domain }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="type" class='control-label'>渠道类型</label>
+        <label for="channel_id" class='control-label'>渠道类型</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select class="form-control" name="channel_id">
             @foreach($channels as $channel)
@@ -27,28 +27,28 @@
         </select>
     </div>
     <div class="form-group col-lg-2">
-        <label for="account" class='control-label'>订单同步周期</label>
-        <input type='text' class="form-control" id="sync_cycle" name='sync_cycle' value="{{ $model->sync_cycle }}">
+        <label for="sync_cycle" class='control-label'>订单同步周期</label>
+        <input type='text' class="form-control" id="sync_cycle" name='sync_cycle' value="{{ old('sync_cycle') ? old('sync_cycle') : $model->sync_cycle }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="is_enable" class="control-label">上传追踪号配置</label>
-        <input type='text' class="form-control" id="tracking_config" name='tracking_config' value="{{ $model->tracking_config }}">
+        <label for="tracking_config" class="control-label">上传追踪号配置</label>
+        <input type='text' class="form-control" id="tracking_config" name='tracking_config' value="{{ old('tracking_config') ? old('tracking_config') : $model->tracking_config }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="is_enable" class="control-label">订单前缀</label>
-        <input type='text' class="form-control" id="order_prefix" name='order_prefix' value="{{ $model->order_prefix }}">
+        <label for="order_prefix" class="control-label">订单前缀</label>
+        <input type='text' class="form-control" id="order_prefix" name='order_prefix' value="{{ old('order_prefix') ? old('order_prefix') : $model->order_prefix }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="account" class='control-label'>客服邮箱地址</label>
-        <input type='text' class="form-control" id="email" name='email' value="{{ $model->email }}">
+        <label for="email" class='control-label'>客服邮箱地址</label>
+        <input type='text' class="form-control" id="email" name='email' value="{{ old('email') ? old('email') : $model->email }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="account" class='control-label'>产品图片域名</label>
-        <input type='text' class="form-control" id="image_site" name='email' value="{{ $model->image_site }}">
+        <label for="image_site" class='control-label'>产品图片域名</label>
+        <input type='text' class="form-control" id="image_site" name='image_site' value="{{ old('image_site') ? old('image_site') : $model->image_site }}">
     </div>
 
     <div class="form-group col-lg-3">
-        <label for="type" class='control-label'>所在国家</label>
+        <label for="country_id" class='control-label'>所在国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select class="form-control" name="country_id">
             @foreach($countries as $country)
@@ -57,7 +57,7 @@
         </select>
     </div>
     <div class="form-group col-lg-2">
-        <label for="type" class='control-label'>默认运营人员</label>
+        <label for="default_businesser_id" class='control-label'>默认运营人员</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select class="form-control" name="default_businesser_id">
             @foreach($users as $user)
@@ -66,7 +66,7 @@
         </select>
     </div>
     <div class="form-group col-lg-2">
-        <label for="type" class='control-label'>默认客服人员</label>
+        <label for="default_server_id" class='control-label'>默认客服人员</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select class="form-control" name="default_server_id">
             @foreach($users as $user)
@@ -75,7 +75,7 @@
         </select>
     </div>
     <div class="form-group col-lg-3">
-        <label for="type" class='control-label'>默认发货仓库</label>
+        <label for="delivery_warehouse" class='control-label'>默认发货仓库</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select class="form-control" name="delivery_warehouse">
             <option value="本地仓库" {{ $model->delivery_warehouse == '本地仓库' ? 'selected' : '' }}>本地仓库</option>
@@ -84,7 +84,7 @@
         </select>
     </div>
     <div class="form-group col-lg-4" style="clear:left;">
-        <label for="is_enable" class="control-label">是否激活</label>
+        <label for="activate" class="control-label">是否激活</label>
         <div class="radio">
             <label>
                 <input type="radio" name="activate" value="是" {{ $model->activate == '是' ? 'checked' : '' }}>是
@@ -97,7 +97,7 @@
         </div>
     </div>
     <div class="form-group col-lg-4">
-        <label for="is_enable" class="control-label">是否相同地址合并包裹</label>
+        <label for="merge_package" class="control-label">是否相同地址合并包裹</label>
         <div class="radio">
             <label>
                 <input type="radio" name="merge_package" value="是" {{ $model->merge_package == '是' ? 'checked' : '' }}>是
@@ -110,7 +110,7 @@
         </div>
     </div>
     <div class="form-group col-lg-4">
-        <label for="is_enable" class="control-label">是否打印感谢信</label>
+        <label for="thanks" class="control-label">是否打印感谢信</label>
         <div class="radio">
             <label>
                 <input type="radio" name="thanks" value="是" {{ $model->thanks == '是' ? 'checked' : '' }}>是
@@ -123,7 +123,7 @@
         </div>
     </div>
     <div class="form-group col-lg-4">
-        <label for="is_enable" class="control-label">是否打印拣货单</label>
+        <label for="picking_list" class="control-label">是否打印拣货单</label>
         <div class="radio">
             <label>
                 <input type="radio" name="picking_list" value="是" {{ $model->picking_list == '是' ? 'checked' : '' }}>是
@@ -136,7 +136,7 @@
         </div>
     </div>
     <div class="form-group col-lg-4">
-        <label for="is_enable" class="control-label">是否无规则生成渠道SKU</label>
+        <label for="generate_sku" class="control-label">是否无规则生成渠道SKU</label>
         <div class="radio">
             <label>
                 <input type="radio" name="generate_sku" value="是" {{ $model->generate_sku == '是' ? 'checked' : '' }}>是
@@ -149,7 +149,7 @@
         </div>
     </div>
     <div class="form-group col-lg-4">
-        <label for="is_enable" class="control-label">可否通关</label>
+        <label for="clearance" class="control-label">可否通关</label>
         <div class="radio">
             <label>
                 <input type="radio" name="clearance" value="是" {{ $model->clearance == '是' ? 'checked' : '' }}>是
@@ -173,7 +173,7 @@
     </div>
 
     <div class="form-group col-lg-4" style="">
-        <label for="country_id" class="control-label">已选运营人员(可多选)</label>
+        <label for="addNewOption" class="control-label">已选运营人员(可多选)</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select class="form-control" id="addNewOption" multiple  style="height:300px;width:400px;">
             @foreach($model->businessers as $businesser)

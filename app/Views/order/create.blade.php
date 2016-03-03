@@ -1,5 +1,6 @@
 @extends('common.form')
 
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('order.store') }} @stop
 @section('formBody')
@@ -7,14 +8,26 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="form-group col-lg-2">
-                <label for="channel_account_id" class='control-label'>渠道类型</label>
+                <label for="channel_id">渠道类型</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="channel_account_id" placeholder="渠道类型" name='channel_account_id' value="{{ old('channel_account_id') }}">
+                <select name="channel_id" class="form-control" id="channel_id">
+                    @foreach($channels as $channel)
+                        <option value="{{$channel->id}}" {{$channel->id == old('$channel->channel->id') ? 'selected' : ''}}>
+                            {{$channel->name}}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="channel_id" class='control-label'>渠道代码</label>
+                <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="channel_id" placeholder="渠道代码" name='channel_id' value="{{ old('channel_id') }}">
+                <select name="channel_account_id" class="form-control" id="channel_account_id">
+                    @foreach($accounts as $account)
+                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
+                            {{$account->name}}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="order_number" class='control-label'>订单号</label>
@@ -265,11 +278,8 @@
         </div>
     </div>
 @stop
-<script type="text/javascript">
-    var date = new Date();
-    var year = date.getFullYear();
-    var mon = date.getMonth() + 1;
-    var day = date.getDate();
-    var nowDay = year + "-" + (mon < 10 ? "0" + mon : mon) + "-" + (day < 10 ? "0" + day : day);
-    $('#create_time').val(nowDay);
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $('#create_time, #payment_date, #affair_time').cxCalendar();
+    });
 </script>

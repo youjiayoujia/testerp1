@@ -15,9 +15,9 @@ use App\Models\Logistics\SupplierModel;
 
 class SupplierController extends Controller
 {
-    public function __construct(SupplierModel $channel)
+    public function __construct(SupplierModel $supplier)
     {
-        $this->model = $channel;
+        $this->model = $supplier;
         $this->mainIndex = route('logisticsSupplier.index');
         $this->mainTitle = '物流商';
         $this->viewPath = 'logistics.supplier.';

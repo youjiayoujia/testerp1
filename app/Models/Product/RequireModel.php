@@ -44,7 +44,6 @@ class RequireModel extends BaseModel
     public function move_file($fd, $name, $path)
     {
         $dstname = $name.'.'.$fd->getClientOriginalExtension();
-        file_exists($path) or mkdir($path, 644, true);
         if(file_exists($path.'/'.$dstname))
             unlink($path.'/'.$dstname);
         $fd->move($path,$dstname);

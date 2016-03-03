@@ -45,6 +45,7 @@ class CatalogModel extends BaseModel
         //属性名属性值添加
         if ($extra) {
             foreach ($extra as $model => $property) {
+                if(count($property)==0)continue;
                 try {
                     foreach ($property as $modelData) {
                         $modelObj = $catalog->$model()->create($modelData);

@@ -122,7 +122,7 @@ return [
     [
         'name' => '物流',
         'icon' => 'plane',
-        'url' => 'dashboard.index',
+        'url' => '',
         'type' => '',
         'subnavigations' => [
             [

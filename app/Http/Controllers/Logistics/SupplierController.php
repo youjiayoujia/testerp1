@@ -20,7 +20,7 @@ class SupplierController extends Controller
         $this->model = $channel;
         $this->mainIndex = route('logisticsSupplier.index');
         $this->mainTitle = '物流商';
-        $this->viewPath = 'logistics.Supplier.';
+        $this->viewPath = 'logistics.supplier.';
     }
 
 }

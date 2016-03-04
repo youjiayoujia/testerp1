@@ -128,5 +128,12 @@ Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCod
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
+Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as'=>'choseShop']);
 Route::resource('product', 'ProductController');
+
+//产品渠道
+Route::any('beChosed', ['uses' => 'Product\Channel\AmazonController@beChosed', 'as'=>'beChosed']);
+Route::resource('amazonProduct', 'Product\Channel\AmazonController');
+
+
 

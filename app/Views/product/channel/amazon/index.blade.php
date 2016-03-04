@@ -5,31 +5,24 @@
             <i class="glyphicon glyphicon-ok-circle"></i> 选中shop
         </a>
     </div>
-    <div class="btn-group">
-        <a class="btn btn-info" id="batchexamine">
-            <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
-        </a>
-    </div>
+    
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
+    
     <th>ID</th>
-    <th>product_id</th>
-    <th>channel_id</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $amazonProduct)
         <tr>
-            <td>{{ $amazonProduct->id }}</td>
             <td>{{ $amazonProduct->product_id }}</td>
-            <td>{{ $amazonProduct->channel_id }}</td>
             <td>{{ $amazonProduct->created_at }}</td>
             <td>
                 <a href="{{ route('amazonProduct.show', ['id'=>$amazonProduct->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('amazonProduct.edit', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('amazonProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
@@ -41,4 +34,3 @@
         </tr>
     @endforeach
 @stop
-

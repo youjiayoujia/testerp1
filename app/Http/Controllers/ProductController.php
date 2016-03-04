@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
+use App\Models\ChannelModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
@@ -166,4 +167,27 @@ class ProductController extends Controller
 
         return 1;
     }
+
+    /**
+     * 产品审核
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function choseShop()
+    {
+        $product_ids = request()->input('product_ids');
+        $product_id_arr = explode(',', $product_ids);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->model->whereIn('id',$product_id_arr)->get()->toArray(),
+            'channels' => ChannelModel::all(),
+        ];
+
+        return view($this->viewPath . 'chosechannel', $response);
+
+    }
+
+    
+
 }

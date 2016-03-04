@@ -17,28 +17,23 @@ class ItemModel extends BaseModel
     protected $table = 'order_items';
 
     protected $fillable = [
-        'order_item_id','order_id','sku','qty','price',
+        'order_id','sku','qty','price',
         'status','ship_status','is_gift','remark',
     ];
 
     public $searchFields = [
-        'order_item_id', 'order_id', 'sku', 'status', 'ship_status',
+        'order_id', 'sku', 'status', 'ship_status',
     ];
 
     public $rules = [
         'create' => [
-            'order_item_id' => 'required',
             'order_id' => 'required',
             'sku' => 'required',
         ],
         'update' => [
-            'order_item_id' => 'required',
             'order_id' => 'required',
             'sku' => 'required',
         ],
     ];
 
-    public function order() {
-        return $this->hasMany('App\Models\OrderModel', 'order_id', 'order_id');
-    }
 }

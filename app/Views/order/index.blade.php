@@ -1,12 +1,10 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
-    <th class="sort" data-field="order_item_id">产品ID</th>
-    <th class="sort" data-field="order_id">订单ID</th>
-    <th class="sort" data-field="channel_account_id">渠道类型</th>
-    <th class="sort" data-field="channel_id">渠道代码</th>
+    <th class="sort" data-field="channel_id">渠道</th>
+    <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th class="sort" data-field="order_number">订单号</th>
-    <th class="sort" data-field="customer_order_number">批发订单号</th>
+    <th class="sort" data-field="channel_order_number">渠道订单号</th>
     <th>邮箱</th>
     <th>订单状态</th>
     <th>售后状态</th>
@@ -42,12 +40,10 @@
     @foreach($data as $order)
         <tr>
             <td>{{ $order->id }}</td>
-            <td>{{ $order->order_item_id }}</td>
-            <td>{{ $order->order_id }}</td>
-            <td>{{ $order->channel_account_id }}</td>
             <td>{{ $order->channel_id }}</td>
+            <td>{{ $order->channel_account_id }}</td>
             <td>{{ $order->order_number }}</td>
-            <td>{{ $order->customer_order_number }}</td>
+            <td>{{ $order->channel_order_number }}</td>
             <td>{{ $order->email }}</td>
             <td>{{ $order->status }}</td>
             <td>{{ $order->active }}</td>

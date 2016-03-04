@@ -3,24 +3,14 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group col-lg-2">
-        <label for="order_item_id" class='control-label'>产品ID</label>
+        <label for="channel_id" class='control-label'>渠道</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="order_item_id" placeholder="产品ID" name='order_item_id' value="{{ old('order_item_id') ? old('order_item_id') : $model->order_item_id }}">
+        <input class="form-control" id="channel_id" placeholder="渠道" name='channel_id' value="{{ old('channel_id') ? old('channel_id') : $model->channel_id }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="order_id" class='control-label'>订单ID</label>
+        <label for="channel_account_id" class='control-label'>渠道账号</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="order_id" placeholder="订单ID" name='order_id' value="{{ old('order_id') ? old('order_id') : $model->order_id }}">
-    </div>
-    <div class="form-group col-lg-2">
-        <label for="channel_account_id" class='control-label'>渠道类型</label>
-        <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="channel_account_id" placeholder="渠道类型" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $model->channel_account_id }}">
-    </div>
-    <div class="form-group col-lg-2">
-        <label for="channel_id" class='control-label'>渠道代码</label>
-        <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="channel_id" placeholder="渠道代码" name='channel_id' value="{{ old('channel_id') ? old('channel_id') : $model->channel_id }}">
+        <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $model->channel_account_id }}">
     </div>
     <div class="form-group col-lg-2">
         <label for="order_number" class='control-label'>订单号</label>
@@ -28,9 +18,9 @@
         <input class="form-control" id="order_number" placeholder="订单号" name='order_number' value="{{ old('order_number') ? old('order_number') : $model->order_number }}">
     </div>
     <div class="form-group col-lg-2">
-        <label for="customer_order_number" class='control-label'>批发订单号</label>
+        <label for="channel_order_number" class='control-label'>渠道订单号</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="customer_order_number" placeholder="批发订单号" name='customer_order_number' value="{{ old('customer_order_number') ? old('customer_order_number') : $model->customer_order_number }}">
+        <input class="form-control" id="channel_order_number" placeholder="渠道订单号" name='channel_order_number' value="{{ old('channel_order_number') ? old('channel_order_number') : $model->channel_order_number }}">
     </div>
     <div class="form-group col-lg-2">
         <label for="email" class='control-label'>邮箱</label>

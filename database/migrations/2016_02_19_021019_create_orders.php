@@ -14,12 +14,10 @@ class CreateOrders extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('order_item_id')->comment('产品ID');
-            $table->integer('order_id')->comment('订单ID');
-            $table->integer('channel_account_id')->comment('渠道类型');
-            $table->integer('channel_id')->comment('渠道代码');
+            $table->integer('channel_id')->comment('渠道');
+            $table->integer('channel_account_id')->comment('渠道账号');
             $table->string('order_number')->comment('订单号');
-            $table->string('customer_order_number')->comment('批发订单号');
+            $table->string('channel_order_number')->comment('渠道订单号');
             $table->string('email')->comment('邮箱');
             $table->integer('status')->comment('订单状态');
             $table->integer('active')->comment('售后状态');

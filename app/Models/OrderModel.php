@@ -17,8 +17,8 @@ class OrderModel extends BaseModel
     protected $table = 'orders';
 
     protected $fillable = [
-        'order_item_id','order_id','channel_account_id','channel_id','order_number',
-        'customer_order_number','email','status','active','amount','amount_product',
+        'channel_id','channel_account_id','order_number',
+        'channel_order_number','email','status','active','amount','amount_product',
         'amount_shipping','amount_coupon','is_partial','by_hand','is_affair','affairer',
         'customer_service','operator','payment','currency','rate','ip','address_confirm',
         'comment','comment1','remark','import_remark','shipping','shipping_firstname',
@@ -30,16 +30,14 @@ class OrderModel extends BaseModel
     ];
 
     public $searchFields = [
-        'order_item_id', 'order_id', 'order_number', 'channel_account_id', 'channel_id',
+        'channel_id', 'channel_account_id', 'order_number',
         'email', 'customer_service', 'operator',
     ];
 
     public $rules = [
         'create' => [
-            'order_item_id' => 'required',
-            'order_id' => 'required',
-            'channel_account_id' => 'required',
             'channel_id' => 'required',
+            'channel_account_id' => 'required',
             'order_number' => 'required',
             'amount' => 'required',
             'payment' => 'required',
@@ -49,10 +47,8 @@ class OrderModel extends BaseModel
             'billing_lastname' => 'required',
         ],
         'update' => [
-            'order_item_id' => 'required',
-            'order_id' => 'required',
-            'channel_account_id' => 'required',
             'channel_id' => 'required',
+            'channel_account_id' => 'required',
             'order_number' => 'required',
             'amount' => 'required',
             'payment' => 'required',
@@ -64,7 +60,15 @@ class OrderModel extends BaseModel
     ];
 
     public function orderItem() {
-        return $this->hasMany('App\Models\Order\ItemModel', 'order_item_id', 'order_item_id');
+        return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
+    }
+
+    public function channel() {
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
+    }
+
+    public function channelAccount() {
+        return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
     }
 
 }

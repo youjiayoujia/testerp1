@@ -7,22 +7,16 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>产品ID</strong>: {{ $model->order_item_id }}
+                <strong>渠道</strong>: {{ $model->channel_id }}
             </div>
             <div class="col-lg-2">
-                <strong>订单ID</strong>: {{ $model->order_id }}
-            </div>
-            <div class="col-lg-2">
-                <strong>渠道类型</strong>: {{ $model->channel_account_id }}
-            </div>
-            <div class="col-lg-2">
-                <strong>渠道代码</strong>: {{ $model->channel_id }}
+                <strong>渠道账号</strong>: {{ $model->channel_account_id }}
             </div>
             <div class="col-lg-2">
                 <strong>订单号</strong>: {{ $model->order_number }}
             </div>
             <div class="col-lg-2">
-                <strong>批发订单号</strong>: {{ $model->customer_order_number }}
+                <strong>渠道订单号</strong>: {{ $model->channel_order_number }}
             </div>
             <div class="col-lg-2">
                 <strong>邮箱</strong>: {{ $model->email }}

@@ -35,9 +35,9 @@
                 <input class="form-control" id="order_number" placeholder="订单号" name='order_number' value="{{ old('order_number') }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="customer_order_number" class='control-label'>渠道订单号</label>
+                <label for="channel_order_number" class='control-label'>渠道订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="customer_order_number" placeholder="批发订单号" name='customer_order_number' value="{{ old('customer_order_number') }}">
+                <input class="form-control" id="channel_order_number" placeholder="渠道订单号" name='channel_order_number' value="{{ old('channel_order_number') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="email" class='control-label'>邮箱</label>

@@ -42,8 +42,6 @@
             @endforeach
         </select>
     </div>
-       
-
     <div class="form-group col-md-3">
         <label for="color">供应商sku</label>
         <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
@@ -74,12 +72,39 @@
     </div>
     <div class="form-group col-md-3">
         <label for="color">物流限制</label>
-        <input class="form-control" id="carriage_limit" placeholder="物流限制" name='carriage_limit' value="{{ old('carriage_limit') ?  old('carriage_limit') : $model->carriage_limit }}">
+        @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+                <label>
+                    <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}' {{ in_array($carriage_key, explode(',',$model->carriage_limit))? 'checked' : '' }} >{{$carriage_limit}}
+                </label>
+        @endforeach
     </div>
     <div class="form-group col-md-3">
         <label for="color">包装限制</label>
-        <input class="form-control" id="package_limit" placeholder="包装限制" name='package_limit' value="{{ old('package_limit') ?  old('package_limit') : $model->package_limit }}">
+        @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <label>
+                    <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}' {{ in_array($package_key, explode(',',$model->package_limit))? 'checked' : '' }} >{{$package_limit}}
+                </label>
+        @endforeach
     </div>
+    <div class="form-group col-md-3">
+        <label for="color">包装限制</label>
+        <select  class="form-control" name="package_limit">
+            <option value=""></option>
+            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <option value="{{ $package_limit }}" {{ $model->package_limit == $package_limit ? 'selected' : '' }} >{{$package_limit}}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group col-md-3">
+        <label for="size">包装限制1</label>
+        <select  class="form-control" name="package_limit_1">
+            <option value=""></option>
+            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <option value="{{ $package_limit }}" {{ $model->package_limit_1 == $package_limit ? 'selected' : '' }} >{{$package_limit}}</option>
+            @endforeach
+        </select>
+    </div>
+
     <div class="form-group col-md-3">
         <label for="color">备注</label>
         <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">

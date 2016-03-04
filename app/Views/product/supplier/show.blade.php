@@ -16,7 +16,7 @@
                 <strong>市</strong>: {{ $model->city }}
             </div>
             <div class="col-lg-2">
-                <strong>是否是线上供货商</strong>: {{ $model->type }}
+                <strong>是否是线上供货商</strong>: {{ $model->type == 'offline' ? '线下' : '线上' }}
             </div>
             <div class="col-lg-2">
                 <strong>线上供货商地址</strong>: {{ $model->url }}

@@ -48,7 +48,7 @@
     </div>
     <div class='row'>
     <div class="form-group col-lg-3">
-        <label for="name" class='control-label'>选款需求名</label>
+        <label for="name" class='control-label'>选款需求名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $model->name}}">
     </div>
     <div class="form-group col-lg-3">
@@ -76,13 +76,13 @@
         <input id="expected_date" class='form-control' name='expected_date' type="text" value=" {{ old('expected_date') ? old('expected_date') : $model->expected_date }}">
     </div>
     <div class="form-group col-lg-3">
-        <label for="needer_id">需求者id</label>
+        <label for="needer_id">需求者id</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="needer_id" placeholder="需求者id" name='needer_id' value="{{ old('needer_id') ? old('needer_id') : $model->needer_id }}">
     </div>
     </div>
     <div class='row'>
     <div class="form-group col-lg-6">
-        <label for="needer_shop_id">需求店铺id</label>
+        <label for="needer_shop_id">需求店铺id</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" id="needer_shop_id" placeholder="需求店铺id" name='needer_shop_id' value="{{ old('needer_shop_id') ? old('needer_shop_id') : $model->needer_shop_id}}">
     </div>
     <div class='form-group col-lg-6'>

@@ -18,10 +18,9 @@ class PositionController extends Controller
 {
     protected $warehouse;
 
-    public function __construct(PositionModel $position, WarehouseModel $warehouse)
+    public function __construct(PositionModel $position)
     {
         $this->model = $position;
-        $this->warehouse = $warehouse;
         $this->mainIndex = route('warehousePosition.index');
         $this->mainTitle = '库位';
         $this->viewPath = 'warehouse.position.';
@@ -38,7 +37,7 @@ class PositionController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $this->warehouse->all(),
+            'warehouses' => WarehouseModel::all(),
         ];
         return view($this->viewPath.'create', $response);
     }
@@ -54,10 +53,31 @@ class PositionController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => $this->warehouse->all(),
+            'warehouses' => WarehouseModel::all(),
             'model' => $this->model->find($id),
         ];
 
         return view($this->viewPath.'edit', $response);
+    }
+
+    /**
+     * 获取库位信息,return 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function ajaxGetPosition()
+    {
+        if(request()->ajax()) {
+            $warehouse_id = request()->input('val');
+            $buf = $this->model->where(['warehouse_id'=>$warehouse_id])->get();
+            if($buf)
+                return json_encode($buf);
+            else
+                return json_encode('none');
+        }
+        
+        return json_encode('false');
     }
 }

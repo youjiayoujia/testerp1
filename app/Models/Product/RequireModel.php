@@ -19,20 +19,18 @@ class RequireModel extends BaseModel
     public $rules = [
         'create' => [   
                 'name' => 'required|max:255|unique:product_require,name',
-                'competition_url' => 'active_url',
                 'needer_id' => 'required',
                 'needer_shop_id' => 'required'
         ],
         'update' => [   
                 'name' => 'required|max:255|unique:product_require,name, {id}',
-                'competition_url' => 'active_url',
                 'needer_id' => 'required',
                 'needer_shop_id' => 'required',
         ]
     ];
 
     //查询
-    protected $searchField = ['name, expected_date'];
+    public $searchFields = ['name'];
     
     /**
      *  移动文件 
@@ -46,7 +44,6 @@ class RequireModel extends BaseModel
     public function move_file($fd, $name, $path)
     {
         $dstname = $name.'.'.$fd->getClientOriginalExtension();
-        file_exists($path) or mkdir($path, 644, true);
         if(file_exists($path.'/'.$dstname))
             unlink($path.'/'.$dstname);
         $fd->move($path,$dstname);

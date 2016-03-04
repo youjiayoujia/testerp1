@@ -14,8 +14,9 @@ class CreateProductFeatureValues extends Migration
     {
         Schema::create('product_feature_values', function (Blueprint $table) {
             $table->increments('id');
-            $table->tinyInteger('spu_id')->comment('状态')->nullable()->default(0);
-            $table->string('feature_id')->comment('属性id')->nullable()->default(NULL);
+            $table->integer('product_id')->comment('状态')->nullable()->default(0);
+            $table->integer('feature_id')->comment('属性id')->nullable()->default(0);
+            $table->integer('feature_value_id')->comment('属性值id')->nullable()->default(0);
             $table->string('feature_value')->comment('属性值')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();

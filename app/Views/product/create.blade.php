@@ -82,38 +82,26 @@
     </div>
 
     <div class="form-group col-md-3">
-        <label for="color">物流限制</label>
-        <select  class="form-control" name="carriage_limit">
-            <option value=""></option>
+        <label for="color">物流限制</label>  
             @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
-                <option value="{{ $carriage_limit }}">{{$carriage_limit}}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group col-md-3">
-        <label for="size">物流限制1</label>
-        <select  class="form-control" name="carriage_limit_1">
-            <option value=""></option>
-            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
-                <option value="{{ $carriage_limit }}">{{$carriage_limit}}</option>
-            @endforeach
-        </select>
+                <label>
+                    <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}'>{{$carriage_limit}}
+                </label>
+            @endforeach   
     </div>
     <div class="form-group col-md-3">
         <label for="color">包装限制</label>
-        <select  class="form-control" name="package_limit">
-            <option value=""></option>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
-                <option value="{{ $package_limit }}">{{$package_limit}}</option>
-            @endforeach
-        </select>
+        @foreach(config('product.package_limit') as $package_key=>$package_limit)
+                <label>
+                    <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}'>{{$package_limit}}
+                </label>
+        @endforeach
     </div>
     <div class="form-group col-md-3">
-        <label for="size">包装限制1</label>
-        <select  class="form-control" name="package_limit_1">
-            <option value=""></option>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
-                <option value="{{ $package_limit }}">{{$package_limit}}</option>
+        <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <select  class="form-control" name="warehouse_id">
+            @foreach($warehouses as $warehouse)
+                <option value="{{ $warehouse->id }}">{{$warehouse->name}}</option>
             @endforeach
         </select>
     </div>
@@ -126,24 +114,27 @@
 
 @section('pageJs')
     <script type="text/javascript">
-        $(document).on('click','.quanxuan',function(){
-            var model = $(this).val();
-            if($("input[name^='modelSet["+model+"]'").attr("checked")=='checked'){
-                $("input[name^='modelSet["+model+"]'").attr("checked", false);
-            }else{
-                $("input[name^='modelSet["+model+"]'").attr("checked", true);
-            }
-        })
-
-        function quanxuan(id){
-            var collid = document.getElementById(id);
-            var coll = $("input[class^="+id+"quanxuan]"); 
+        function quanxuan(model){
+            var collid = document.getElementById(model);
+            var coll = $("input[class^="+model+"quanxuan]"); 
             if (collid.checked){
-               for(var i = 0; i < coll.length; i++)
-                   coll[i].checked = true;
+                for(var i = 0; i < coll.length; i++){
+                    coll[i].checked = true;
+                }
+                html ='<div style="margin-left:25px;margin-bottom:15px" class=image_'+model+'><label for="color">上传图片：</label>';
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image0]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image1]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image2]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image3]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image4]' type='file'/></div>";
+                html+="<div class='upimage'><input name='modelSet["+model+"][image][image5]' type='file'/></div>";
+                html+="</div>";
+                $("."+model).after(html);
             }else{
-               for(var i = 0; i < coll.length; i++)
-                   coll[i].checked = false;
+                for(var i = 0; i < coll.length; i++){
+                    coll[i].checked = false;
+                }
+                $(".image_"+model).remove();
             }
         }
 

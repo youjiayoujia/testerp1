@@ -15,6 +15,7 @@ class CreateProducts extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('model')->comment('model')->nullable()->default(NULL);
+            $table->integer('warehouse_id')->comment('默认仓库')->default(0);
             $table->integer('spu_id')->comment('spu_id')->nullable()->default(0);
             $table->string('name')->comment('中文名')->nullable()->default(NUll);
             $table->string('c_name')->comment('英文名')->nullable()->default(NUll);
@@ -31,9 +32,7 @@ class CreateProducts extends Migration
             $table->string('purchase_carriage')->comment('运费')->nullable()->default(0);
             $table->string('product_size')->comment('产品尺寸')->nullable()->default(NUll);
             $table->string('carriage_limit')->comment('运费限制')->nullable()->default(NULL);
-            $table->string('carriage_limit_1')->comment('运费限制1')->nullable()->default(NUll);
             $table->string('package_limit')->comment('物流限制')->nullable()->default(NULL);
-            $table->string('package_limit_1')->comment('物流限制1')->nullable()->default(NUll);
             $table->string('package_size')->comment('包装尺寸')->nullable()->default(NULL);
             $table->string('upload_user')->comment('上传人')->nullable()->default(0);
             $table->string('default_image')->comment('默认图片')->nullable()->default(0);

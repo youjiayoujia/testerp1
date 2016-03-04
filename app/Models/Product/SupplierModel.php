@@ -6,7 +6,6 @@ use App\Base\BaseModel;
 
 class SupplierModel extends BaseModel
 {
-
     /**
      * The database table used by the model.
      *
@@ -22,21 +21,18 @@ class SupplierModel extends BaseModel
     protected $fillable = ['name', 'url', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level'];
 
     //查询
-    protected $searchField = ['name, telephone, purchase_id, level']; 
+    public $searchFields = ['name','telephone']; 
+
     //验证规则
     public $rules = [
             'create' => [   
                     'name' => 'required|max:128|unique:product_suppliers,name',
-                    'address' => 'required|max:256',
-                    'purchase_id' => 'required|numeric',
-                    'url' => 'required|max:256|active_url',
+                    'purchase_id' => 'required|integer',
                     'telephone' => 'required|max:256|digits_between:8,11'
             ],
             'update' => [   
                     'name' => 'required|max:128|unique:product_suppliers,name, {id}',
-                    'address' => 'required|max:256',
-                    'purchase_id' => 'required|numeric',
-                    'url' => 'required|max:256|active_url',
+                    'purchase_id' => 'required|integer',
                     'telephone' => 'required|max:256|digits_between:8,11'
             ]
     ];

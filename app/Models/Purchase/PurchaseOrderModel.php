@@ -2,7 +2,7 @@
 namespace App\Models\Purchase;
 use App\Base\BaseModel;
 use App\Models\Product\SupplierModel;
-use App\Models\Product\PurchaseItemModel;
+use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 
 class PurchaseOrderModel extends BaseModel
@@ -34,9 +34,13 @@ class PurchaseOrderModel extends BaseModel
      */
 	 
     protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost'];
-	 public function warehouse()
+	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
+    }
+	public function supplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
    /*public function purchaseItem()
     {
@@ -60,7 +64,28 @@ class PurchaseOrderModel extends BaseModel
         return $this->hasMany('App\Models\ItemModel', 'product_id');
     }*/
 	
+	public function getSuppliers($warehouse_id)
+	{	
+		$data=$this->purchaseItemSupplier($warehouse_id);
+		return $data;	
+	}
 	
- 
- 
+	public function addPurchaseOrder($data)
+	{
+		$checkedItem=explode(',',$data['checkedPurchaseItems']);
+		if(!empty($data['checkedPurchaseItems'])){
+		$dataArray['user_id']=$data['user_id'];
+		$dataArray['warehouse_id']=$data['warehouse_id'];
+		$dataArray['supplier_id']=$data['supplier_id'];
+		$purchaseOrderId=$this->create($dataArray);
+		foreach($checkedItem as $key=>$v){
+		$purchaseItemModel= new PurchaseItemModel;
+		$purchaseItem=$purchaseItemModel->find($v);
+		$purchaseItem['purchase_order_id']=$purchaseOrderId->id;
+		$purchaseItem->purchase_order_id=$purchaseItem['purchase_order_id'];
+		$purchaseItem->save();
+		}
+		}
+	}
+
 }

@@ -35,7 +35,7 @@
                 <input class="form-control" id="order_number" placeholder="订单号" name='order_number' value="{{ old('order_number') }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="customer_order_number" class='control-label'>批发订单号</label>
+                <label for="customer_order_number" class='control-label'>渠道订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="customer_order_number" placeholder="批发订单号" name='customer_order_number' value="{{ old('customer_order_number') }}">
             </div>
@@ -47,43 +47,57 @@
             <div class="form-group col-lg-2">
                 <label for="status" class='control-label'>订单状态</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="status" placeholder="订单状态" name='status' value="{{ old('status') }}">
+                <select class="form-control" name="status" id="status">
+                    @foreach(config('order.status') as $status)
+                        <option value="{{ $status }}" {{ old('status') == $status ? 'selected' : '' }}>
+                            {{ $status }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="active" class='control-label'>售后状态</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="active" placeholder="售后状态" name='active' value="{{ old('active') }}">
-            </div>
-
-            <div class="form-group col-lg-2">
-                <label for="is_partial" class='control-label'>是否分批发货</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="is_partial" placeholder="是否分批发货" name='is_partial' value="{{ old('is_partial') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="by_hand" class='control-label'>是否手工</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="by_hand" placeholder="是否手工" name='by_hand' value="{{ old('by_hand') }}">
+                <select class="form-control" name="active" id="active">
+                    @foreach(config('order.active') as $active)
+                        <option value="{{ $active }}" {{ old('active') == $active ? 'selected' : '' }}>
+                            {{ $active }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="is_affair" class='control-label'>是否做账</label>
+                <label for="affairer">做账人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="is_affair" placeholder="是否做账" name='is_affair' value="{{ old('is_affair') }}">
+                <select name="affairer" class="form-control" id="affairer">
+                    @foreach($accounts as $account)
+                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
+                            {{$account->name}}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="affairer" class='control-label'>做账人员</label>
+                <label for="customer_service">客服人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="affairer" placeholder="做账人员" name='affairer' value="{{ old('affairer') }}">
+                <select name="channel_account_id" class="form-control" id="channel_account_id">
+                    @foreach($accounts as $account)
+                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
+                            {{$account->name}}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="customer_service" class='control-label'>客服人员</label>
+                <label for="operator">运营人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="customer_service" placeholder="客服人员" name='customer_service' value="{{ old('customer_service') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="operator" class='control-label'>运营人员</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="operator" placeholder="运营人员" name='operator' value="{{ old('operator') }}">
+                <select name="channel_account_id" class="form-control" id="channel_account_id">
+                    @foreach($accounts as $account)
+                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
+                            {{$account->name}}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="ip" class='control-label'>IP地址</label>
@@ -93,7 +107,13 @@
             <div class="form-group col-lg-2">
                 <label for="address_confirm" class='control-label'>地址验证</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="address_confirm" placeholder="地址验证" name='address_confirm' value="{{ old('address_confirm') }}">
+                <select class="form-control" name="address_confirm" id="address_confirm">
+                    @foreach(config('order.address') as $address)
+                        <option value="{{ $address }}" {{ old('address_confirm') == $address ? 'selected' : '' }}>
+                            {{ $address }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment" class='control-label'>备用字段</label>
@@ -106,6 +126,16 @@
                 <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') }}">
             </div>
             <div class="form-group col-lg-2">
+                <label for="remark" class='control-label'>订单备注</label>
+                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') }}">
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="import_remark" class='control-label'>导单备注</label>
+                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') }}">
+            </div>
+            <div class="form-group col-lg-2">
                 <label for="affair_time" class='control-label'>做账时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') }}">
@@ -116,24 +146,62 @@
                 <input class="form-control" id="create_time" placeholder="定义时间" name='create_time' value="{{ old('create_time') }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="remark" class='control-label'>订单备注</label>
+                <label for="is_partial" class='control-label'>是否分批发货</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') }}">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="is_partial" value="1">是
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="is_partial" value="0" checked>否
+                    </label>
+                </div>
             </div>
             <div class="form-group col-lg-2">
-                <label for="import_remark" class='control-label'>导单备注</label>
+                <label for="by_hand" class='control-label'>是否手工</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') }}">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="by_hand" value="1" checked>是
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="by_hand" value="0">否
+                    </label>
+                </div>
+            </div>
+            <div class="form-group col-lg-2">
+                <label for="is_affair" class='control-label'>是否做账</label>
+                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="is_affair" value="1">是
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="is_affair" value="0" checked>否
+                    </label>
+                </div>
             </div>
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">金额</div>
+        <div class="panel-heading">金额信息</div>
         <div class="panel-body">
             <div class="form-group col-lg-2">
                 <label for="currency" class='control-label'>币种</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="currency" placeholder="币种" name='currency' value="{{ old('currency') }}">
+                <select class="form-control" name="currency" id="currency">
+                    @foreach(config('order.currency') as $currency)
+                        <option value="{{ $currency }}" {{ old('currency') == $currency ? 'selected' : '' }}>
+                            {{ $currency }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="rate" class='control-label'>汇率</label>
@@ -168,7 +236,13 @@
             <div class="form-group col-lg-2">
                 <label for="shipping" class='control-label'>种类</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping" placeholder="种类" name='shipping' value="{{ old('shipping') }}">
+                <select class="form-control" name="shipping" id="shipping">
+                    @foreach(config('order.shipping') as $shipping)
+                        <option value="{{ $shipping }}" {{ old('shipping') == $shipping ? 'selected' : '' }}>
+                            {{ $shipping }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_firstname" class='control-label'>发货名字</label>
@@ -223,7 +297,13 @@
             <div class="form-group col-lg-2">
                 <label for="payment" class='control-label'>支付方式</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="payment" placeholder="支付方式" name='payment' value="{{ old('payment') }}">
+                <select class="form-control" name="payment" id="payment">
+                    @foreach(config('order.payment') as $payment)
+                        <option value="{{ $payment }}" {{ old('payment') == $payment ? 'selected' : '' }}>
+                            {{ $payment }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_firstname" class='control-label'>账单名字</label>
@@ -275,11 +355,89 @@
     <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label'>sku</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-1">
+                    <label for="qty" class='control-label'>数量</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-1">
+                    <label for="price" class='control-label'>金额</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="status" class='control-label'>订单状态</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="ship_status" class='control-label'>发货状态</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-1">
+                    <label for="is_gift" class='control-label'>是否赠品</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="remark" class='control-label'>备注</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+            </div>
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+                </div>
+                <div class="form-group col-sm-1">
+                    <input type='text' class="form-control qty" id="arr[qty][0]" placeholder="数量" name='arr[qty][0]' value="{{ old('arr[qty][0]') }}">
+                </div>
+                <div class="form-group col-sm-1">
+                    <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control status" id="arr[status][0]" placeholder="订单状态" name='arr[status][0]' value="{{ old('arr[status][0]') }}">
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control ship_status" id="arr[ship_status][0]" placeholder="发货状态" name='arr[ship_status][0]' value="{{ old('arr[ship_status][0]') }}">
+                </div>
+                <div class="form-group col-sm-1">
+                    <input type='text' class="form-control is_gift" id="arr[is_gift][0]" placeholder="是否赠品" name='arr[is_gift][0]' value="{{ old('arr[is_gift][0]') }}">
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control remark" id="arr[remark][0]" placeholder="备注" name='arr[remark][0]' value="{{ old('arr[remark][0]') }}">
+                </div>
+                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+            </div>
+            <div class='form-group addpanel'>
+                <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>
+                    <span class='glyphicon glyphicon-plus'>新增</span>
+                </a>
+            </div>
         </div>
     </div>
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
         $('#create_time, #payment_date, #affair_time').cxCalendar();
+
+        var current = 1;
+        $('#create_form').click(function(){
+            $.ajax({
+                url:"{{ route('orderAdd') }}",
+                data:{current:current},
+                dataType:'html',
+                type:'get',
+                success:function(result) {
+                    $('.addpanel').before(result);
+                }
+            });
+            current++;
+        });
     });
+
+    $(document).on('click', '.bt_right', function(){
+        $(this).parent().remove();
+    });
+
 </script>

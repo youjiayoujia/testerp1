@@ -34,4 +34,16 @@ class OrderController extends Controller
         return view($this->viewPath.'create', $response);
     }
 
+    public function ajaxOrderAdd()
+    {
+        if(request()->ajax()) {
+            $current = request()->input('current');
+            $response = [
+                'current' => $current,
+            ];
+            return view($this->viewPath.'add', $response);
+        }
+        return null;
+    }
+
 }

@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Product\Channel;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
+use App\Models\ProductModel;
+use App\Models\Product\channel\amazonProductModel;
 use App\Http\Controllers\Controller;
 
 class AmazonController extends Controller
 {
 
-    public function __construct()
+    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel)
     {
         $this->mainIndex = route('amazonProduct.index');
+        $this->model = $amazonProductModel;
+        $this->product = $productModel;
         $this->mainTitle = '亚马逊选中产品';
         $this->viewPath = 'product.channel.amazon.';
     }
@@ -23,8 +24,19 @@ class AmazonController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {print_r(__FUNCTION__);exit;
-        echo 111;exit;
+    {
+        $product_ids = request()->input('product_ids');
+        $channel_id = request()->input('channel_id');
+        if($product_ids){
+
+        }
+        $response = [
+            'metas' => $this->metas('index'),
+            'data' => $this->autoList($this->model),
+        ];
+
+        return view( $this->viewPath .'index', $response);
+
     }
 
     /**
@@ -45,7 +57,7 @@ class AmazonController extends Controller
      */
     public function store()
     {
-        echo 933;exit;
+        echo 9313;exit;
     }
 
     /**
@@ -101,14 +113,23 @@ class AmazonController extends Controller
      */
     public function beChosed()
     {
-        $product_ids = request()->input('product_ids');
-        $channel_id = request()->input('channel_id');
-        //print_r(__FUNCTION__);exit;
-        $response = [
-            'metas' => $this->metas('index'),
-        ];
+        $channel_id = request()->input('channel_id');   
+        $product_id_arr = request()->input('product_ids');
+        //创建item
+        foreach($product_id_arr as $product_id){
+            $productModel = $this->product->find($product_id);
+            if(empty($productModel->item->toArray())){
+                $productModel->createItem();
+            }
+            $data = [];
+            if(empty($productModel->amazonProduct)){
+                $data['choies_info'] = 'u are stupid';
+                $data['product_id'] = $product_id;
+                $this->model->create($data);
+            }
 
-        return view( $this->viewPath .'index', $response);
+        }
 
+        return redirect($this->mainIndex);
     }
 }

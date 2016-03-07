@@ -123,6 +123,12 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\Product\ProductFeatureValueModel','product_id');
     }
 
+    public function amazonProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\amazonProductModel','product_id');
+    }
+
+
     /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ

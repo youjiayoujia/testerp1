@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
+use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
 
 class OrderController extends Controller
@@ -32,6 +33,27 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
         ];
         return view($this->viewPath.'create', $response);
+    }
+
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.sku')));
+        $buf = request()->all();
+        $obj = $this->model->create($buf);
+        $arr = request()->input('arr');
+        for($i=0; $i<$len; $i++)
+        {
+            foreach($arr as $key => $val)
+            {
+                $val = array_values($val);
+                $buf[$key] = $val[$i];
+            }
+            $buf['order_id'] = $obj->id;
+            ItemModel::create($buf);
+        }
+        return redirect($this->mainIndex);
     }
 
     public function ajaxOrderAdd()

@@ -7,9 +7,6 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>产品ID</strong>: {{ $model->order_item_id }}
-            </div>
-            <div class="col-lg-4">
                 <strong>订单ID</strong>: {{ $model->order_id }}
             </div>
             <div class="col-lg-4">

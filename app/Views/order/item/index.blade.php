@@ -1,7 +1,7 @@
 @extends('common.table')
+@section('tableToolButtons')@stop
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
-    <th class="sort" data-field="order_item_id">产品ID</th>
     <th class="sort" data-field="order_id">订单ID</th>
     <th>sku</th>
     <th class="sort" data-field="qty">数量</th>
@@ -18,7 +18,6 @@
     @foreach($data as $item)
         <tr>
             <td>{{ $item->id }}</td>
-            <td>{{ $item->order_item_id }}</td>
             <td>{{ $item->order_id }}</td>
             <td>{{ $item->sku }}</td>
             <td>{{ $item->qty }}</td>

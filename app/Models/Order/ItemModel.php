@@ -26,10 +26,6 @@ class ItemModel extends BaseModel
     ];
 
     public $rules = [
-        'create' => [
-            'order_id' => 'required',
-            'sku' => 'required',
-        ],
         'update' => [
             'order_id' => 'required',
             'sku' => 'required',

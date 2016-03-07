@@ -26,7 +26,7 @@ class CreateOrders extends Migration
             $table->float('amount_shipping')->comment('订单运费');
             $table->float('amount_coupon')->comment('折扣金额');
             $table->integer('is_partial')->comment('是否分批发货');
-            $table->string('by_hand')->comment('是否手工');
+            $table->integer('by_hand')->comment('是否手工');
             $table->integer('is_affair')->comment('是否做账');
             $table->string('affairer')->comment('做账人员');
             $table->string('customer_service')->comment('客服人员');
@@ -35,7 +35,7 @@ class CreateOrders extends Migration
             $table->string('currency')->comment('币种');
             $table->float('rate')->comment('汇率');
             $table->string('ip')->comment('IP地址');
-            $table->string('address_confirm')->comment('地址验证');
+            $table->integer('address_confirm')->comment('地址验证');
             $table->string('comment')->comment('备用字段');
             $table->string('comment1')->comment('红人/choies用');
             $table->string('remark')->comment('订单备注');

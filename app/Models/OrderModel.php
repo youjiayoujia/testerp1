@@ -59,6 +59,38 @@ class OrderModel extends BaseModel
         ],
     ];
 
+    public function rule($request)
+    {
+        $arr = [];
+        $buf = $request->all();
+        $buf = $buf['arr'];
+        foreach($buf as $key => $val)
+        {
+            if($key == 'sku')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.sku.'.$k] ='required';
+                }
+            if($key == 'qty')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.qty.'.$k] ='required';
+                }
+            if($key == 'price')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.price.'.$k] ='required';
+                }
+            if($key == 'is_gift')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.is_gift.'.$k] = 'required';
+                }
+        }
+
+        return $arr;
+    }
+
     public function orderItem() {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }

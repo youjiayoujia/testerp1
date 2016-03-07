@@ -3,11 +3,6 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group col-lg-4">
-        <label for="order_item_id" class='control-label'>产品ID</label>
-        <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="order_item_id" placeholder="产品ID" name='order_item_id' value="{{ old('order_item_id') ? old('order_item_id') : $model->order_item_id }}">
-    </div>
-    <div class="form-group col-lg-4">
         <label for="order_id" class='control-label'>订单ID</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="order_id" placeholder="订单ID" name='order_id' value="{{ old('order_id') ? old('order_id') : $model->order_id }}">

@@ -26,7 +26,7 @@ class PurchaseOrderController extends Controller
 		$this->purchaseItem=$purchaseItem;
 		$this->supplier=$supplier;
         $this->mainIndex = route('purchaseOrder.index');
-        $this->mainTitle = '采购条目';
+        $this->mainTitle = '采购单';
 		$this->viewPath = 'purchase.purchaseOrder.';
     }
     

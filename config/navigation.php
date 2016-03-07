@@ -66,9 +66,10 @@ return [
         'name' => '仓储',
         'icon' => 'home',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
+            '仓库'=>[
+			[
                 'name' => '仓库',
                 'url' => 'warehouse.index',
                 'icon' => '',
@@ -103,6 +104,7 @@ return [
                 'url' => 'stockAllotment.index',
                 'icon' => '',
             ],
+			]
         ],
     ],
 
@@ -111,9 +113,10 @@ return [
         'name' => '物流',
         'icon' => 'plane',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
+            '物流管理'=>[
+			[
                 'name' => '物流商',
                 'url' => 'logisticsSupplier.index',
                 'icon' => '',
@@ -133,16 +136,19 @@ return [
                 'url' => 'logisticsZone.index',
                 'icon' => '',
             ],
+			]
         ],
     ],
  	//采购导航
     [
         'name' => '采购',
         'icon' => 'shopping-cart',
-         'url' => '',
+        'url' => '',
+		'type' =>'group',
         'subnavigations' => [
-            [
-                'name' => '采购条目',
+           '采购管理' => [
+		    [
+                'name' => '采购需求',
                 'url' => 'purchaseItem.index',
                 'icon' => '',
             ],
@@ -151,6 +157,7 @@ return [
                 'url' => 'purchaseOrder.index',
                 'icon' => '',
             ],
+			]
         ],
     ],
     //渠道导航
@@ -158,8 +165,9 @@ return [
         'name' => '渠道',
         'icon' => 'transfer',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
+		'渠道管理'=>[
             [
                 'name' => '渠道',
                 'url' => 'channel.index',
@@ -170,6 +178,7 @@ return [
                 'url' => 'channelAccount.index',
                 'icon' => '',
             ],
+			]
         ],
     ],
     //财务导航

@@ -72,6 +72,7 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 
 //采购条目
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 
 //采购单
 Route::any('purchaseOrder/purchaseOrderSupplier', 'Purchase\purchaseOrderController@purchaseOrderSupplier');

@@ -22,7 +22,7 @@ class PurchaseItemController extends Controller
         $this->model = $purchaseItem;
 		$this->warehouse = $warehouse;
         $this->mainIndex = route('purchaseItem.index');
-        $this->mainTitle = '采购条目';
+        $this->mainTitle = '采购需求';
 		$this->viewPath = 'purchase.purchaseItem.';
     }
     
@@ -78,6 +78,20 @@ class PurchaseItemController extends Controller
 		$data=request()->all();
 		$this->model->purchaseItemUpdate($id,$data);
         return redirect($this->mainIndex);		
+	}
+	
+	
+	public function addPurchaseOrder()
+	{
+		$isadd=json_decode(request()->get('isadd'));
+		if($isadd==1){ 
+			$res=$this->model->purchaseOrderCreate();
+			if($res  == true){
+			return 1;
+			}else{
+			return 0;	
+				}
+		}
 	}
 	
 

@@ -1,4 +1,16 @@
 @extends('common.table')
+@section('tableToolButtons')
+    <div class="btn-group">
+        <a class="btn btn-info" onClick="addPurchaseOrder()">
+            <i class="glyphicon glyphicon-ok-circle"></i> 批量生成采购单
+        </a>
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+            <i class="glyphicon glyphicon-plus"></i> 新增
+        </a>
+    </div>
+@stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th>ID</th>
     <th>Item_ID</th>
@@ -56,4 +68,26 @@
             </td>
         </tr>
     @endforeach
+    <script type="text/javascript">
+	 function addPurchaseOrder(){ 
+            if (confirm("确认生成采购单?")) {
+                var url = "addPurchaseOrder";
+				var isadd = 1;
+                $.ajax({
+                    url:url,
+                    data:{isadd:isadd},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                      if(result == true){
+						  alert('成功生成订单！');
+						   window.location.reload();
+						}else{
+							alert('生成订单失败！');
+						}
+                    }                    
+                })
+            }
+		 }
+	</script>
 @stop

@@ -16,7 +16,7 @@
                 <strong>市</strong>: {{ $model->city }}
             </div>
             <div class="col-lg-2">
-                <strong>是否是线上供货商</strong>: {{ $model->type == 'offline' ? '线下' : '线上' }}
+                <strong>是否是线上供货商</strong>: {{ $model->type == '0' ? '线下' : '线上' }}
             </div>
             <div class="col-lg-2">
                 <strong>线上供货商地址</strong>: {{ $model->url }}
@@ -25,7 +25,7 @@
                 <strong>电话</strong>: {{ $model->telephone }}
             </div>
             <div class="col-lg-2">
-                <strong>采购员</strong>: {{ $model->purchase_id }}
+                <strong>采购员</strong>: {{ $model->purchaseName ? $model->purchaseName->name : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>评级</strong>: {{ $model->level }}
@@ -36,7 +36,7 @@
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <strong>创建人</strong>: {{ $model->created_by }}
+                <strong>创建人</strong>: {{ $model->createdByName ? $model->createdByName->name : '' }}
             </div>
             <div class="col-lg-4">
                 <strong>创建时间</strong>: {{ $model->created_at }}

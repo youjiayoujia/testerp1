@@ -127,7 +127,7 @@
             <strong>审核人</strong>: {{ $model->checkByName ? $model->checkByName->name : '' }}
         </div>
         <div class="col-lg-2">
-            <strong>审核状态</strong>: {{ $model->check_status == 'N' ? '未审核' : $model->check_status == 'FAIL' ? '审核未通过' : '审核通过' }}
+            <strong>审核状态</strong>: {{ $model->check_status == '0' ? '未审核' : ($model->check_status == '1' ? '审核未通过' : '审核通过') }}
         </div>
         <div class="col-lg-2">
             <strong>审核时间</strong>: {{ $model->check_time }}

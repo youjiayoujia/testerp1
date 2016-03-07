@@ -16,7 +16,7 @@
                 <strong>备注</strong>: {{ $model->remark }}
             </div>
             <div class="col-lg-2">
-                <strong>库位大小</strong>: {{ $model->size }}
+                <strong>库位大小</strong>: {{ $model->size == 'small' ? '小' : ($model->size == 'middle' ? '中' : '大') }}
             </div>
             <div class="col-lg-2">
                 <strong>长(cm)</strong>: {{ $model->length }}
@@ -28,7 +28,7 @@
                 <strong>高(cm)</strong>: {{ $model->height }}
             </div>
             <div class="col-lg-2">
-                <strong>是否启用</strong>: {{ $model->is_available == 'Y' ? '是' : '否' }}
+                <strong>是否启用</strong>: {{ $model->is_available == '1' ? '是' : '否' }}
             </div>
         </div>
     </div>

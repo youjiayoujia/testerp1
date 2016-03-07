@@ -214,11 +214,11 @@ class AllotmentController extends Controller
         $arr = request()->all();
         $time = date('Y-m-d',time());       
         if($arr['result'] == 0) {
-            $model->update(['check_status'=>'FAIL', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
+            $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
             return redirect($this->mainIndex);
         }
         $time = date('Y-m-d',time());       
-        $model->update(['check_status'=>'SUCCESS', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
+        $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
 
         return redirect($this->mainIndex);
     }
@@ -321,7 +321,7 @@ class AllotmentController extends Controller
     {
         if(request()->ajax()) {
             $id = request()->input('id');
-            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'N', 'check_time'=>'0000-00-00',
+            $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'0', 'check_time'=>'0000-00-00',
                 'check_by'=>'0']);
             return json_encode('111');
         }

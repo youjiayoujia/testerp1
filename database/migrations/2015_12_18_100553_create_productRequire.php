@@ -12,7 +12,7 @@ class CreateProductRequire extends Migration
      */
     public function up()
     {
-        Schema::create('product_require', function (Blueprint $table) {
+        Schema::create('product_requires', function (Blueprint $table) {
             $table->increments('id');
             $table->text('img1')->comment('图片1')->nullable()->default(NULL);
             $table->text('img2')->comment('图片2')->nullable()->default(NULL);
@@ -30,7 +30,7 @@ class CreateProductRequire extends Migration
             $table->integer('needer_id')->comment('需求人id')->default(NULL);
             $table->integer('needer_shop_id')->comment('需求店铺id')->default(NULL);
             $table->string('created_by')->comment('创建人')->default(NULL);
-            $table->enum('status',['未处理', '未找到', '已找到'])->comment('处理状态')->default('未处理');
+            $table->enum('status',['0', '1', '2'])->comment('处理状态')->default('0');
             $table->integer('user_id')->comment('处理人id')->nullable()->default(NULL);
             $table->date('handle_time')->comment('处理时间')->nullable()->default(NULL);
             $table->timestamps();

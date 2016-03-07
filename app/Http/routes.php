@@ -9,6 +9,8 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+
+  Route::get('test', 'TestController@test');
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 //产品图片路由
@@ -72,6 +74,7 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 /**
  * stock controller route
  */
+Route::get('createtaking', ['uses'=>'StockController@createTaking', 'as'=>'createtaking']);
 Route::get('allotsku', ['uses'=>'StockController@ajaxAllotSku', 'as'=>'allotsku']);
 Route::get('allotoutwarehouse', ['uses'=>'StockController@ajaxAllotOutWarehouse', 'as'=>'allotoutwarehouse']);
 Route::get('getbyposition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'getbyposition']);
@@ -107,6 +110,18 @@ Route::get('checkform/{id}', ['uses'=>'Stock\AllotmentController@checkform', 'as
 Route::get('allotmentpick', ['uses'=>'Stock\AllotmentController@allotmentpick', 'as'=>'allotmentpick']);
 Route::get('allotmentcheck/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as'=>'allotmentcheck']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
+
+//库存盘点
+Route::get('quantitycheck', ['uses'=>'Stock\TakingController@ajaxQuantityCheck', 'as'=>'quantitycheck']);
+Route::get('takingcheck', ['uses'=>'Stock\TakingController@ajaxTakingcheck', 'as'=>'takingcheck']);
+Route::post('takingupdate', ['uses'=>'Stock\TakingController@takingUpdate', 'as'=>'takingupdate']);
+Route::get('edittaking', ['uses'=>'Stock\TakingController@editTaking', 'as'=>'edittaking']);
+Route::resource('stockTaking', 'Stock\TakingController');
+
+//盘点调整
+Route::post('takingadjustmentcheckresult', ['uses'=>'Stock\TakingAdjustmentController@takingAdjustmentCheckResult', 'as'=>'takingadjustmentcheckresult']);
+Route::get('takingadjustmentcheck/{id}', ['uses'=>'Stock\TakingAdjustmentController@takingAdjustmentCheck', 'as'=>'takingadjustmentcheck']);
+Route::resource('stockTakingAdjustment', 'Stock\TakingAdjustmentController');
 
 //物流路由
 Route::resource('logistics', 'LogisticsController');

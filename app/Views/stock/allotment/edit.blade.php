@@ -211,7 +211,7 @@
             if($(this).val()) {
                 var reg = /^(\d)+$/gi;
                 if(!reg.test($(this).val())) {
-                    alert('fuck,数量有问题啊');
+                    alert('数量有问题啊');
                     $(this).val('');
                     return;
                 }

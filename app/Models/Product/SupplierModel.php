@@ -36,4 +36,24 @@ class SupplierModel extends BaseModel
                     'telephone' => 'required|max:256|digits_between:8,11'
             ]
     ];
+
+    /**
+     * return the relation between the two module 
+     *
+     * @return relation
+     */
+    public function purchaseName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase_id', 'id');
+    }
+
+    /**
+     * return the relation between the two module 
+     *
+     * @return relation
+     */
+    public function createdByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'created_by', 'id');
+    }
 }

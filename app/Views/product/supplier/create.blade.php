@@ -25,10 +25,10 @@
             <label for="type">是否是线上供货商(否/是)</label>
             <div class='radio'>
                 <label>
-                    <input type='radio' name='type' value='offline' {{ old('type') ? (old('type') == 'offline' ? 'checked' : '') : 'checked' }}>否
+                    <input type='radio' name='type' value='0' {{ old('type') ? (old('type') == '0' ? 'checked' : '') : 'checked' }}>否
                 </label>
                 <label>
-                    <input type='radio' name='type' value='online' {{ old('type') ? (old('type') == 'online' ? 'checked' : '') : '' }}>是
+                    <input type='radio' name='type' value='1' {{ old('type') ? (old('type') == '1' ? 'checked' : '') : '' }}>是
                 </label>
             </div>
         </div>
@@ -36,7 +36,7 @@
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="url">供货商网址</label>
-            <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') }}" {{ old('type') ? old('type') == 'offline' ? 'disabled' : '' : 'disabled' }}>
+            <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') }}" {{ old('type') ? old('type') == '0' ? 'readonly' : '' : 'readonly' }}>
         </div>
         <div class="form-group col-lg-4">
             <label for="telephone">供货商电话</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -74,12 +74,12 @@
         init(buf[0],buf[1]);
 
         $('.radio').click(function(){
-            if($(this).find(':radio:checked').val() == 'offline') {
+            if($(this).find(':radio:checked').val() == '0') {
                 $(this).parent().parent().next().find('.url').val('');
-                $(this).parent().parent().next().find('.url').attr('disabled', true);
+                $(this).parent().parent().next().find('.url').attr('readonly', true);
             }
             else {
-                $(this).parent().parent().next().find('.url').attr('disabled', false);
+                $(this).parent().parent().next().find('.url').attr('readonly', false);
             }
         });
     });

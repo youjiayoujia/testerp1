@@ -23,4 +23,13 @@ class SupplierController extends Controller
         $this->mainTitle = '供货商';
         $this->viewPath = 'product.supplier.';
     }
+
+    // public function update($id)
+    // {
+    //     request()->flash();
+    //     $this->validate(request(), $this->model->rules('update', $id));
+
+    //     var_dump(request()->all());
+    //     exit;
+    // }
 }

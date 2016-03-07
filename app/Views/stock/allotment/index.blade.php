@@ -29,7 +29,7 @@
             <td>{{ $allotment->allotmentByName ? $allotment->allotmentByName->name : '' }}</td>
             <td>{{ $allotment->status_name }}</td>
             <td>{{ $allotment->checkByName ? $allotment->checkByName->name : '' }}</td>
-            <td>{{ $allotment->check_status == 'N' ? '未审核' : $allotment->check_status == 'FAIL' ? '审核未通过' : '审核通过' }}</td>
+            <td>{{ $allotment->check_status == '0' ? '未审核' : ($allotment->check_status == '1' ? '审核未通过' : '审核通过') }}</td>
             <td>{{ $allotment->check_time }}</td>
             <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->type : ''}}</td>
             <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->code : ''}}</td>
@@ -41,18 +41,18 @@
                 <a href="{{ route('stockAllotment.show', ['id'=>$allotment->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if($allotment->check_status == 'N')
+                @if($allotment->check_status == '0')
                 <a href="{{ route('stockAllotment.edit', ['id'=>$allotment->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 @endif
-                @if($allotment->allotment_status == 'new' && $allotment->check_status == 'N')
+                @if($allotment->allotment_status == 'new' && $allotment->check_status == '0')
                 <a href="{{ route('allotmentcheck', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>
                     审核调拨单
                 </a>
                 @endif
-                @if($allotment->check_status == 'SUCCESS' && $allotment->allotment_status == 'new')
+                @if($allotment->check_status == '2' && $allotment->allotment_status == 'new')
                 <a href="javascript:" class="btn btn-success btn-xs pick" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>生成拣货单
                 </a>
@@ -67,14 +67,14 @@
                     确认出库
                 </a>
                 @endif
-                @if($allotment->check_status == 'SUCCESS' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
+                @if($allotment->check_status == '2' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
                     @if($allotment->allotment_status != 'over')
                     <a href="{{ route('checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 对单
                     </a>
                     @endif
                 @endif
-                @if($allotment->check_status != 'SUCCESS')
+                @if($allotment->check_status != '2')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $allotment->id }}"
                    data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}">

@@ -103,6 +103,16 @@ return [
                 'url' => 'stockAllotment.index',
                 'icon' => '',
             ],
+            [
+                'name' => '库存盘点',
+                'url' => 'stockTaking.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '盘点调整',
+                'url' => 'stockTakingAdjustment.index',
+                'icon' => '',
+            ],
         ],
     ],
 

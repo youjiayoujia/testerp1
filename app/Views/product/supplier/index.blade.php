@@ -22,12 +22,12 @@
             <td>{{ $supplier->province}}</td>
             <td>{{ $supplier->city}}</td>
             <td>{{ $supplier->address }}</td>
-            <td>{{ $supplier->type == 'offline' ? '线下' : '线上'}} </td>
+            <td>{{ $supplier->type == '0' ? '线下' : '线上'}} </td>
             <td>{{ $supplier->url }}</td>
             <td>{{ $supplier->telephone }}</td>
-            <td>{{ $supplier->purchase_id }}</td>
+            <td>{{ $supplier->purchaseName ? $supplier->purchaseName->name : '' }}</td>
             <td>{{ $supplier->level }}</td>
-            <td>{{ $supplier->created_by}}</td>
+            <td>{{ $supplier->createdByName ? $supplier->createdByName->name : '' }}</td>
             <td>{{ $supplier->created_at }}</td>
             <td>
                 <a href="{{ route('productSupplier.show', ['id'=>$supplier->id]) }}" class="btn btn-info btn-xs">

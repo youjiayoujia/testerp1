@@ -39,3 +39,11 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('createtaking') }}">
+        库存盘点
+    </a>
+</div>
+@parent
+@stop

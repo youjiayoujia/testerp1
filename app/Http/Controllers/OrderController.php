@@ -14,6 +14,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
+use App\Models\UserModel;
 
 class OrderController extends Controller
 {
@@ -31,6 +32,7 @@ class OrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
+            'users' => UserModel::all(),
         ];
         return view($this->viewPath.'create', $response);
     }
@@ -54,6 +56,19 @@ class OrderController extends Controller
             ItemModel::create($buf);
         }
         return redirect($this->mainIndex);
+    }
+
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'channels' => ChannelModel::all(),
+            'accounts' => AccountModel::all(),
+            'users' => UserModel::all(),
+        ];
+        return view($this->viewPath.'edit', $response);
     }
 
     public function ajaxOrderAdd()

@@ -70,9 +70,9 @@
                 <label for="affairer">做账人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="affairer" class="form-control" id="affairer">
-                    @foreach($accounts as $account)
-                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
-                            {{$account->name}}
+                    @foreach($users as $user)
+                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                            {{$user->name}}
                         </option>
                     @endforeach
                 </select>
@@ -80,10 +80,10 @@
             <div class="form-group col-lg-2">
                 <label for="customer_service">客服人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control" id="channel_account_id">
-                    @foreach($accounts as $account)
-                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
-                            {{$account->name}}
+                <select name="customer_service" class="form-control" id="customer_service">
+                    @foreach($users as $user)
+                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                            {{$user->name}}
                         </option>
                     @endforeach
                 </select>
@@ -91,10 +91,10 @@
             <div class="form-group col-lg-2">
                 <label for="operator">运营人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control" id="channel_account_id">
-                    @foreach($accounts as $account)
-                        <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
-                            {{$account->name}}
+                <select name="operator" class="form-control" id="operator">
+                    @foreach($users as $user)
+                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                            {{$user->name}}
                         </option>
                     @endforeach
                 </select>

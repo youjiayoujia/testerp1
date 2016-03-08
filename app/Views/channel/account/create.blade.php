@@ -9,7 +9,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="channel_id">
                 @foreach($channels as $channel)
-                    <option value="{{ $channel->id }}" {{ old('channel_id') == $channel->id ? 'selected' : '' }}>{{ $channel->name }}</option>
+                    <option value="{{ $channel->id }}" {{ Tool::isSelected('channel_id', $channel->id) }}>{{ $channel->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -28,7 +28,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="country_id">
                 @foreach($countries as $country)
-                    <option value="{{ $country->id }}" {{ old('channel_id') == $country->id ? 'selected' : '' }}>{{ $country->name }}</option>
+                    <option value="{{ $country->id }}" {{ Tool::isSelected('country_id', $country->id) }}>{{ $country->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -39,7 +39,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="warehouse_id">
                 @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                    <option value="{{ $warehouse->id }}" {{ Tool::isSelected('warehouse_id', $warehouse->id) }}>{{ $warehouse->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -75,7 +75,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control select_user" name="operator_id">
                 @foreach($users as $user)
-                    <option value="{{ $user->id }}" {{ old('operator_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    <option value="{{ $user->id }}" {{ Tool::isSelected('operator_id', $user->id) }}>{{ $user->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -84,7 +84,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="customer_service_id">
                 @foreach($users as $user)
-                    <option value="{{ $user->id }}" {{ old('customer_service_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                    <option value="{{ $user->id }}" {{ Tool::isSelected('customer_service_id', $user->id) }}>{{ $user->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -95,73 +95,78 @@
 
             <div class="radio">
                 <label>
-                    <input type="radio" name="is_merge_package" value="1" {{ old('is_merge_package') ? (old('is_merge_package') == '1' ? 'checked' : '') : 'checked' }}>是
+                    <input type="radio" name="is_merge_package" value="1" {{ Tool::isChecked('is_merge_package', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_merge_package" value="0" {{ old('is_merge_package') ? (old('is_merge_package') == '0' ? 'checked' : '') : '' }}>否
+                    <input type="radio" name="is_merge_package" value="0" {{ Tool::isChecked('is_merge_package', '0') }}>否
                 </label>
             </div>
         </div>
         <div class="form-group col-lg-2">
             <label for="is_thanks" class="control-label">是否打印感谢信</label>
+
             <div class="radio">
                 <label>
-                    <input type="radio" name="is_thanks" value="1" {{ old('is_thanks') ? (old('is_thanks') == '1' ? 'checked' : '') : 'checked' }}>是
+                    <input type="radio" name="is_thanks" value="1" {{ Tool::isChecked('is_thanks', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_thanks" value="0" {{ old('is_thanks') ? (old('is_thanks') == '0' ? 'checked' : '') : '' }}>否
+                    <input type="radio" name="is_thanks" value="0" {{ Tool::isChecked('is_thanks', '0') }}>否
                 </label>
             </div>
         </div>
         <div class="form-group col-lg-2">
             <label for="is_picking_list" class="control-label">是否打印拣货单</label>
+
             <div class="radio">
                 <label>
-                    <input type="radio" name="is_picking_list" value="1" {{ old('is_picking_list') ? (old('is_picking_list') == '1' ? 'checked' : '') : 'checked' }}>是
+                    <input type="radio" name="is_picking_list" value="1" {{ Tool::isChecked('is_picking_list', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_picking_list" value="0" {{ old('is_picking_list') ? (old('is_picking_list') == '0' ? 'checked' : '') : '' }}>否
+                    <input type="radio" name="is_picking_list" value="0" {{ Tool::isChecked('is_picking_list', '0') }}>否
                 </label>
             </div>
         </div>
         <div class="form-group col-lg-2">
             <label for="is_rand_sku" class="control-label">是否无规则生成渠道SKU</label>
+
             <div class="radio">
                 <label>
-                    <input type="radio" name="is_rand_sku" value="1" {{ old('is_rand_sku') ? (old('is_rand_sku') == '1' ? 'checked' : '') : 'checked' }}>是
+                    <input type="radio" name="is_rand_sku" value="1" {{ Tool::isChecked('is_rand_sku', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_rand_sku" value="0" {{ old('is_rand_sku') ? (old('is_rand_sku') == '0' ? 'checked' : '') : '' }}>否
+                    <input type="radio" name="is_rand_sku" value="0" {{ Tool::isChecked('is_rand_sku', '0') }}>否
                 </label>
             </div>
         </div>
         <div class="form-group col-lg-2">
             <label for="is_clearance" class="control-label">可否通关</label>
+
             <div class="radio">
                 <label>
-                    <input type="radio" name="is_clearance" value="1" {{ old('is_clearance') ? (old('is_clearance') == '1' ? 'checked' : '') : 'checked' }}>是
+                    <input type="radio" name="is_clearance" value="1" {{ Tool::isChecked('is_clearance', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_clearance" value="0" {{ old('is_clearance') ? (old('is_clearance') == '0' ? 'checked' : '') : '' }}>否
+                    <input type="radio" name="is_clearance" value="0" {{ Tool::isChecked('is_clearance', '0') }}>否
                 </label>
             </div>
         </div>
         <div class="form-group col-lg-2">
             <label for="is_available" class="control-label">是否激活</label>
+
             <div class="radio">
                 <label>
-                    <input type="radio" name="is_available" value="1" {{ old('is_available') ? (old('is_available') == '1' ? 'checked' : '') : 'checked' }}>是
+                    <input type="radio" name="is_available" value="1" {{ Tool::isChecked('is_available', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_available" value="0" {{ old('is_available') ? (old('is_available') == '0' ? 'checked' : '') : '' }}>否
+                    <input type="radio" name="is_available" value="0" {{ Tool::isChecked('is_available', '0') }}>否
                 </label>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="form-group col-lg-4">
-            <label for="country_id" class="control-label">已存在用户</label>
-            <select name="country_id" class="form-control" multiple style="height:300px;width:400px;">
+            <label for="uses" class="control-label">已存在用户</label>
+            <select name="uses" class="form-control" multiple style="height:300px;width:400px;">
                 @foreach($users as $user)
                     <option class="form-control" value="{{ $user->id }}" onclick="addOption( this )">
                         {{ $user->name }}

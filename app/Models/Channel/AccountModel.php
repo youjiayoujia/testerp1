@@ -101,20 +101,6 @@ class AccountModel extends BaseModel
 
     }
 
-    public function createAccount()
-    {
-        $channel = $this->create(request()->all());
-        $operatorIds = explode(',', request()->input("operator_ids"));
-        $channel->operators()->attach($operatorIds);
-        return $channel;
-    }
-
-    public function destoryAccount()
-    {
-        $this->operators()->detach();
-        $this->delete();
-    }
-
     public function getMergePackageAttribute()
     {
         return $this->is_merge_package ? '是' : '否';
@@ -143,6 +129,28 @@ class AccountModel extends BaseModel
     public function getAvailableAttribute()
     {
         return $this->is_available ? '是' : '否';
+    }
+
+    public function createAccount()
+    {
+        $channel = $this->create(request()->all());
+        $operatorIds = explode(',', request()->input("operator_ids"));
+        $channel->operators()->attach($operatorIds);
+        return $channel;
+    }
+
+    public function updateAccount()
+    {
+        $this->update(request()->all());
+        $operatorIds = explode(',', request()->input("operator_ids"));
+        $this->operators()->sync($operatorIds);
+        return $this;
+    }
+
+    public function destoryAccount()
+    {
+        $this->operators()->detach();
+        $this->delete();
     }
 
 }

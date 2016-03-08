@@ -57,6 +57,7 @@ class AccountController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $account,
             'channels' => ChannelModel::all(),
+            'warehouses' => WarehouseModel::all(),
             'users' => UserModel::orderBy('name', 'asc')->get(['id', 'name']),
             'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name'])
         ];
@@ -71,10 +72,7 @@ class AccountController extends Controller
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
-        $businesserIds = request()->input("businesser_ids");
-        $businesserArray = explode(',', $businesserIds);
-        $model->update(request()->all());
-        $model->businessers()->sync($businesserArray);
+        $model->updateAccount(request()->all());
         return redirect($this->mainIndex);
     }
 

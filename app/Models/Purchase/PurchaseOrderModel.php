@@ -42,27 +42,8 @@ class PurchaseOrderModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
-   /*public function purchaseItem()
-    {
-        return $this->belongsTo('App\Models\PurchaseItemModel', 'id');
-    }
-    public function supplier()
-    {
-        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
-    }
-    
-    public function supplier()
-    {
-        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
-    }
-    public function variationValue()
-    {
-        return $this->hasMany('App\Models\Product\ProductVariationValueModel', 'product_id');
-    }
-    public function item()
-    {
-        return $this->hasMany('App\Models\ItemModel', 'product_id');
-    }*/
+
+  
 	
 	public function getSuppliers($warehouse_id)
 	{	

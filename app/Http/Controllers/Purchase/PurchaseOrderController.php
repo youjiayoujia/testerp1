@@ -56,6 +56,28 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'create', $response);		
 	}
 	
+ 
+	 
+	  /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+			'purchaseItems'=>$this->purchaseItem->where('purchase_order_id',$id)->get(),
+        ];
+        return view($this->viewPath . 'show', $response);
+    }
+	
 	/**
      * 创建采购条目
      *
@@ -104,7 +126,7 @@ class PurchaseOrderController extends Controller
 	}
 	
 	/**
-     * ajax获得仓库对应采购商的所有采购条目
+     * ajax获得仓库对应采购商的所有采购需求
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector

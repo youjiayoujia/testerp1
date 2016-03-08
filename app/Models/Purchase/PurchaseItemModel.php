@@ -49,18 +49,6 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
     }
-   /* public function supplier()
-    {
-        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
-    }
-    public function variationValue()
-    {
-        return $this->hasMany('App\Models\Product\ProductVariationValueModel', 'product_id');
-    }
-    public function item()
-    {
-        return $this->hasMany('App\Models\ItemModel', 'product_id');
-    }*/
 	
 	/**
      * 创建采购需求
@@ -73,7 +61,7 @@ class PurchaseItemModel extends BaseModel
 		$data['lack_num']=$data['purchase_num'];
 		$item=new ItemModel();
 		$productItem=$item->find($data['sku_id']);
-		$data['supplier_id']=$productItem['supplier_id'];
+		$data['supplier_id']=$productItem->supplier_id;
 		$data['cost']=$productItem['purchase_price'];
 		$this->create($data);
 	}

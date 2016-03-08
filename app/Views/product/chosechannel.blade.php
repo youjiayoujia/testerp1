@@ -1,4 +1,3 @@
-
 @extends('common.form')
 @section('formAction') {{ route('beChosed') }} @stop
 @section('formBody')
@@ -11,6 +10,9 @@
     </div>
 
     <label for="product_model">product_model：</label>
+    <div>
+        <input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选
+    </div>
     @foreach($data as $product)
      
     <div class="form-group">
@@ -19,3 +21,18 @@
     </div>
     @endforeach
 @stop
+
+    <script type="text/javascript">
+        function quanxuan()
+        {
+          var collid = document.getElementById("checkall");
+          var coll = document.getElementsByName("product_ids[]");
+          if (collid.checked){
+             for(var i = 0; i < coll.length; i++)
+               coll[i].checked = true;
+          }else{
+             for(var i = 0; i < coll.length; i++)
+               coll[i].checked = false;
+          }
+        }
+    </script>

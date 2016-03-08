@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Product\Channel;
 
 use App\Models\ProductModel;
 use App\Models\Product\channel\amazonProductModel;
+use App\Models\Product\SupplierModel;
 use App\Http\Controllers\Controller;
 
 class AmazonController extends Controller
 {
 
-    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel)
+    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier)
     {
         $this->mainIndex = route('amazonProduct.index');
         $this->model = $amazonProductModel;
         $this->product = $productModel;
+        $this->supplier = $supplier;
         $this->mainTitle = '亚马逊选中产品';
         $this->viewPath = 'product.channel.amazon.';
     }
@@ -46,7 +48,7 @@ class AmazonController extends Controller
      */
     public function create()
     {
-        echo 222;exit;
+              
     }
 
     /**
@@ -79,7 +81,13 @@ class AmazonController extends Controller
      */
     public function edit($id)
     {
-        //
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $this->model->find($id),
+            'suppliers' =>$this->supplier->all(),
+        ];
+
+        return view($this->viewPath . 'edit', $response); 
     }
 
     /**
@@ -91,7 +99,11 @@ class AmazonController extends Controller
      */
     public function update($id)
     {
-        echo 8374;exit;
+        request()->flash();
+        //$this->validate(request(), $this->model->rules('update',$id));
+        $amazonProductModel = $this->model->find($id);
+        $amazonProductModel->updateAmazonProduct(request()->all());
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -122,12 +134,10 @@ class AmazonController extends Controller
                 $productModel->createItem();
             }
             $data = [];
-            if(empty($productModel->amazonProduct)){
-                $data['choies_info'] = 'u are stupid';
-                $data['product_id'] = $product_id;
-                $this->model->create($data);
+            
+            if(count($productModel->amazonProduct)==0){           
+                $this->model->createAmazonProduct($productModel->toArray());
             }
-
         }
 
         return redirect($this->mainIndex);

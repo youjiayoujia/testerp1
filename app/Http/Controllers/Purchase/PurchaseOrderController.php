@@ -140,7 +140,7 @@ class PurchaseOrderController extends Controller
 	
 	
 	/**
-     * 创建采购条目
+     * 更新采购单
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -151,6 +151,20 @@ class PurchaseOrderController extends Controller
 		$data=request()->all();
 		$this->model->purchaseItemUpdate($id,$data);
         return redirect($this->mainIndex);		
+	}
+	
+	/**
+     * 审核采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	
+	public function examinePurchaseOrder()
+	{
+		$purchaseOrderIds=explode(',',request()->get('purchase_ids'));
+		$this->model->updatePurchaseOrderExamine($purchaseOrderIds);
+		return 1;
 	}
 	
 

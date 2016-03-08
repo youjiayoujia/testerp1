@@ -88,4 +88,14 @@ class PurchaseOrderModel extends BaseModel
 		}
 	}
 
+
+	public function updatePurchaseOrderExamine($purchaseOrderIds)
+	{
+		foreach($purchaseOrderIds as $key=>$v){
+			$this->where('id',$v)->update(['status'=>1]);
+			$purchaseItem= new PurchaseItemModel;
+			$purchaseItem->where('purchase_order_id',$v)->update(['status'=>2]);
+		}
+	
+	}
 }

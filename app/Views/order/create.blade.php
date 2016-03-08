@@ -24,7 +24,7 @@
                 <select name="channel_account_id" class="form-control" id="channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
-                            {{$account->name}}
+                            {{$account->alias}}
                         </option>
                     @endforeach
                 </select>

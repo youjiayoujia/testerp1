@@ -48,8 +48,8 @@
                 <label for="status" class='control-label'>订单状态</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="status" id="status">
-                    @foreach(config('order.status') as $status)
-                        <option value="{{ $status }}" {{ old('status') == $status ? 'selected' : '' }}>
+                    @foreach(config('order.status') as $status_key => $status)
+                        <option value="{{ $status_key }}" {{ old('status') == $status_key ? 'selected' : '' }}>
                             {{ $status }}
                         </option>
                     @endforeach
@@ -59,8 +59,8 @@
                 <label for="active" class='control-label'>售后状态</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="active" id="active">
-                    @foreach(config('order.active') as $active)
-                        <option value="{{ $active }}" {{ old('active') == $active ? 'selected' : '' }}>
+                    @foreach(config('order.active') as $active_key => $active)
+                        <option value="{{ $active_key }}" {{ old('active') == $active_key ? 'selected' : '' }}>
                             {{ $active }}
                         </option>
                     @endforeach
@@ -108,8 +108,8 @@
                 <label for="address_confirm" class='control-label'>地址验证</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="address_confirm" id="address_confirm">
-                    @foreach(config('order.address') as $address)
-                        <option value="{{ $address }}" {{ old('address_confirm') == $address ? 'selected' : '' }}>
+                    @foreach(config('order.address') as $address_key => $address)
+                        <option value="{{ $address_key }}" {{ old('address_confirm') == $address_key ? 'selected' : '' }}>
                             {{ $address }}
                         </option>
                     @endforeach
@@ -237,8 +237,8 @@
                 <label for="shipping" class='control-label'>种类</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="shipping" id="shipping">
-                    @foreach(config('order.shipping') as $shipping)
-                        <option value="{{ $shipping }}" {{ old('shipping') == $shipping ? 'selected' : '' }}>
+                    @foreach(config('order.shipping') as $shipping_key => $shipping)
+                        <option value="{{ $shipping_key }}" {{ old('shipping') == $shipping_key ? 'selected' : '' }}>
                             {{ $shipping }}
                         </option>
                     @endforeach
@@ -396,13 +396,31 @@
                     <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control status" id="arr[status][0]" placeholder="订单状态" name='arr[status][0]' value="{{ old('arr[status][0]') }}">
+                    <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
+                        @foreach(config('order.status') as $status_key => $status)
+                            <option value="{{ $status_key }}" {{ old('arr[status][0]') == $status_key ? 'selected' : '' }}>
+                                {{ $status }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control ship_status" id="arr[ship_status][0]" placeholder="发货状态" name='arr[ship_status][0]' value="{{ old('arr[ship_status][0]') }}">
+                    <select class="form-control ship_status" name="arr[ship_status][0]" id="arr[ship_status][0]">
+                        @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
+                            <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][0]') == $ship_status_key ? 'selected' : '' }}>
+                                {{ $ship_status }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group col-sm-1">
-                    <input type='text' class="form-control is_gift" id="arr[is_gift][0]" placeholder="是否赠品" name='arr[is_gift][0]' value="{{ old('arr[is_gift][0]') }}">
+                    <select class="form-control is_gift" name="arr[is_gift][0]" id="arr[is_gift][0]">
+                        @foreach(config('order.whether') as $is_gift_key => $is_gift)
+                            <option value="{{ $is_gift_key }}" {{ old('arr[is_gift][0]') == $is_gift_key ? 'selected' : '' }}>
+                                {{ $is_gift }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control remark" id="arr[remark][0]" placeholder="备注" name='arr[remark][0]' value="{{ old('arr[remark][0]') }}">

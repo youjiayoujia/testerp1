@@ -13,7 +13,7 @@
     @foreach($data as $takingAdjustment)
         <tr>
             <td>{{ $takingAdjustment->id }}</td>
-            <td>{{ $takingAdjustment->taking ? $takingAdjustment->taking->taking_id : '' }}</td>
+            <td>{{ $takingAdjustment->taking_id }}</td>
             <td>{{ $takingAdjustment->adjustmentByName ? $takingAdjustment->adjustmentByName->name : '' }}</td>
             <td>{{ $takingAdjustment->adjustment_time }}</td>
             <td>{{ $takingAdjustment->checkByName ? $takingAdjustment->checkByName->name : '' }}</td>

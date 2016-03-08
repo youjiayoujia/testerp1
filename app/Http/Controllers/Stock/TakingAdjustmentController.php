@@ -38,7 +38,9 @@ class TakingAdjustmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'stockTakingForms' => $model->taking->stockTakingForm,
+            'stockTakingForms' => $model->stockTakingForm,
+            'stockouts' => $model->out,
+            'stockins' => $model->in,
         ];
 
         return view($this->viewPath.'show', $response);
@@ -57,7 +59,7 @@ class TakingAdjustmentController extends Controller
         $response = [
             'metas'=>$this->metas(__FUNCTION__),
             'model'=>$model,
-            'stockTakingForms' => $model->taking->stockTakingForm,
+            'stockTakingForms' => $model->stockTakingForm,
         ];
 
         return view($this->viewPath.'check', $response);
@@ -75,7 +77,7 @@ class TakingAdjustmentController extends Controller
         $id = request()->input('taking_id');
         if(request()->input('result') == 1) {
             $model = $this->model->find($id);
-            $takingforms = $model->taking->stockTakingForm;
+            $takingforms = $model->stockTakingForm;
             foreach($takingforms as $takingform) {
                 if($takingform->stock_taking_status == 'equal') {
                     continue;

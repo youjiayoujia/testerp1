@@ -123,7 +123,7 @@ class TakingController extends Controller
         if(request()->ajax()) {
             $id = request()->input('id');
             $model = $this->model->find($id);
-            $model->stockTakingAdjustment ? '' :$model->stockTakingAdjustment()->create(['adjustment_by'=>'3', 'adjustment_time'=>date('Y-m-d h:m:s', time())]);
+            $model->update(['adjustment_by'=>'3', 'adjustment_time'=>date('Y-m-d h:m:s', time())]);
             return json_encode('11');
         }
         

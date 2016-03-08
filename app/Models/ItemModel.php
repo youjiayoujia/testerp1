@@ -107,7 +107,8 @@ class ItemModel extends BaseModel
     public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+        if($quantity)
+            return $stock->in($quantity, $amount, $type, $relation_id, $remark);
     }
 
     /**
@@ -121,7 +122,8 @@ class ItemModel extends BaseModel
     public function hold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->hold($quantity);
+        if($quantity)
+            return $stock->hold($quantity);
     }
 
     /**
@@ -135,7 +137,8 @@ class ItemModel extends BaseModel
     public function unhold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->unhold($quantity);
+        if($quantity)
+            return $stock->unhold($quantity);
     }
 
     /**
@@ -153,6 +156,7 @@ class ItemModel extends BaseModel
     public function out($warehousePosistionId, $quantity, $type, $relation_id, $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->out($quantity, $type, $relation_id, $remark);
+        if($quantity)
+            return $stock->out($quantity, $type, $relation_id, $remark);
     }
 }

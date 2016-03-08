@@ -21,7 +21,11 @@
         <div class="panel-heading">盘点表信息</div>
         <div class="panel-body">
             @foreach($stockTakingForms as $stockTakingForm)
+            @if($stockTakingForm->stock_taking_status == 'less' && $stockTakingForm->stock_taking_yn == 0)
+            <div class='row tr_bgcolor'>
+            @else
             <div class='row'>
+            @endif
                 <div class="col-lg-1">
                     <strong>sku</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->items ? $stockTakingForm->stock->items->sku : '' : ''}}
                 </div>

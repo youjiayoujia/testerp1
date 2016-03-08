@@ -12,14 +12,14 @@ class TakingAdjustmentModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_taking_adjustments';
+    protected $table = 'stock_takings';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['stock_taking_id', 'quantity', 'amount', 'adjustment_by', 'adjustment_time', 'check_by', 'check_status', 'check_time', 'created_at'];
+    protected $fillable = ['adjustment_by', 'adjustment_time', 'check_by', 'check_status', 'check_time', 'created_at'];
 
 
     // 用于查询
@@ -30,11 +30,21 @@ class TakingAdjustmentModel extends BaseModel
      *
      * @param none
      */
-    public function taking()
+    public function in()
     {
-        return $this->belongsTo('App\Models\Stock\TakingModel', 'stock_taking_id', 'id');
+        return $this->hasMany('App\Models\Stock\InModel', 'relation_id', 'id');
     }
 
+    /**
+     * get the relationship between the two module 
+     *
+     * @param none
+     */
+    public function out()
+    {
+        return $this->hasMany('App\Models\Stock\OutModel', 'relation_id', 'id');
+    }
+    
     /**
      * get the relationship between the two module 
      *
@@ -43,6 +53,16 @@ class TakingAdjustmentModel extends BaseModel
     public function adjustmentByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'adjustment_by', 'id');
+    }
+
+    /**
+     * get the relationship between the two module 
+     *
+     * @param none
+     */
+    public function stockTakingForm()
+    {
+        return $this->hasMany('App\Models\Stock\TakingFormModel', 'stock_taking_id', 'id');
     }
 
     /**

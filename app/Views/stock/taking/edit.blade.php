@@ -31,7 +31,11 @@
         </div>
     </div>
     @foreach($takingForms as $key => $takingForm)
+    @if($takingForm->quantity && ($takingForm->stock ? ($takingForm->stock->all_quantity - $takingForm->quantity > $takingForm->stock->available_quantity) : ''))
+        <div class='row tr_bgcolor'>
+    @else
         <div class='row'>
+    @endif
             <div class="form-group col-lg-1">
                 <input type='text' name='arr[id][{{$key}}]' class='form-control' value="{{ $takingForm->id }}"readonly>
             </div>

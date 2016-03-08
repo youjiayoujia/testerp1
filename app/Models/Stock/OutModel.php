@@ -48,7 +48,7 @@ class OutModel extends BaseModel
         if($this->type == 'ALLOTMENT')
             return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
         if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
-            return $this->stockTakingAdjustment ? $this->stockTakingAdjustment->taking ? $this->stockTakingAdjustment->taking->taking_id : '' : '';
+            return $this->stockTaking ? $this->stockTaking->taking_id : '';
     }
 
     /**
@@ -100,9 +100,9 @@ class OutModel extends BaseModel
      *  @return relation
      *
      */
-    public function stockTakingAdjustment()
+    public function stockTaking()
     {
-        return $this->belongsTo('App\Models\Stock\TakingAdjustmentModel', 'relation_id', 'id');
+        return $this->belongsTo('App\Models\Stock\TakingModel', 'relation_id', 'id');
     }
     
     /**

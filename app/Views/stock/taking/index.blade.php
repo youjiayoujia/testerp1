@@ -19,17 +19,17 @@
                 <a href="{{ route('stockTaking.show', ['id'=>$taking->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if($taking->stockTakingAdjustment ? $taking->stockTakingAdjustment->check_status != '1' : '1')
+                @if(!$taking->check_status)
                     <a href="{{ route('stockTaking.edit', ['id'=>$taking->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 录入实盘
                     </a>
                 @endif
-                @if(($taking->stockTakingAdjustment ? $taking->stockTakingAdjustment->check_status != '1' : '1') && $taking->create_taking_adjustment == '1')
+                @if(!$taking->check_status && $taking->create_taking_adjustment == '1')
                     <a href="javascript:" class='btn btn-info btn-xs check'>
                         <span class="glyphicon glyphicon-eye-open"></span> 生成调整单
                     </a>
                 @endif
-                @if($taking->stockTakingAdjustment ? $taking->stockTakingAdjustment->check_status != '1' : '1')
+                @if(!$taking->check_status)
                     <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                        data-id="{{ $taking->id }}"
                        data-url="{{ route('stockTaking.destroy', ['id' => $taking->id]) }}">

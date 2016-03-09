@@ -37,7 +37,7 @@ return [
                     'url' => 'item.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',
@@ -64,17 +64,21 @@ return [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => '订单管理',
-                'url' => 'order.index',
-                'icon' => '',
+            '订单' => [
+                [
+                    'name' => '订单',
+                    'url' => 'order.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => '产品管理',
-                'url' => 'orderItem.index',
-                'icon' => '',
+            '包裹' => [
+                [
+                    'name' => '包裹',
+                    'url' => 'package.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

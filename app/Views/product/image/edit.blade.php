@@ -1,17 +1,17 @@
 @extends('common.form')
-@section('formAction')  {{ route('productImage.update', ['id' => $image->id]) }}  @stop
+@section('formAction')  {{ route('productImage.update', ['id' => $model->id]) }}  @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="form-group col-lg-12">
         <label for="product_id">产品ID:</label>
-        {{$image->product_id}}
+        {{$model->product_id}}
     </div>
     <div class="form-group col-lg-12">
         <label for="type">图片类型：</label>
-        {{ $image->type }}
+        {{ $model->type }}
     </div>
     <div class="form-group col-lg-12">
-        <img src="{{ asset($image->src) }}" width="200px">
+        <img src="{{ asset($model->src) }}" width="200px">
     </div>
     <div class="form-group col-lg-12">
         <label>更改图片：</label>

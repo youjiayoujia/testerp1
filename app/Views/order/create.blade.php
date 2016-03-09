@@ -352,7 +352,6 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             产品信息
-            <a href="javascript:" class="close" id="addItem"><i class="glyphicon glyphicon-plus"></i></a>
         </div>
         <div class="panel-body" id="itemDiv">
             <div class='row'>
@@ -427,6 +426,9 @@
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
+        </div>
+        <div class="panel-footer">
+            <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>
 @stop

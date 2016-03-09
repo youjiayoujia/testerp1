@@ -29,34 +29,35 @@ class Tool
      */
     public function createDikaer($data)
     {
-        $cnt = count($data);  
-        $result = array();  
-        foreach($data[0] as $item) {  
-            $result[] = array($item);  
-        }  
-        for($i = 1; $i < $cnt; $i++) {  
-            $result = $this->combineArray($result,$data[$i]);  
-        }  
+        $cnt = count($data);
+        $result = array();
+        foreach ($data[0] as $item) {
+            $result[] = array($item);
+        }
+        for ($i = 1; $i < $cnt; $i++) {
+            $result = $this->combineArray($result, $data[$i]);
+        }
         return $result;
- 
+
     }
 
     /**
      * 2个数组对笛卡尔积的处理
      * 2015-12-18 10:43:48 YJ
-     * @param array $arr1,$arr2
+     * @param array $arr1 ,$arr2
      * @return array
      */
-    function combineArray($arr1,$arr2) {  
-        $result = array();  
-        foreach ($arr1 as $item1) {  
-            foreach ($arr2 as $item2) {  
-                $temp = $item1;  
-                $temp[] = $item2;  
-                $result[] = $temp;  
-            }  
-        }  
-        return $result;  
+    function combineArray($arr1, $arr2)
+    {
+        $result = array();
+        foreach ($arr1 as $item1) {
+            foreach ($arr2 as $item2) {
+                $temp = $item1;
+                $temp[] = $item2;
+                $result[] = $temp;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -68,11 +69,37 @@ class Tool
     {
         $str = null;
         $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        $max = strlen($strPol)-1;
-        for($i=0;$i<5;$i++){
-            $str.=$strPol[rand(0,$max)];
+        $max = strlen($strPol) - 1;
+        for ($i = 0; $i < 5; $i++) {
+            $str .= $strPol[rand(0, $max)];
         }
         return $str;
- 
+
+    }
+
+    public function isSelected($field, $value, $model = null)
+    {
+        if (old($field) == $value) {
+            return 'selected';
+        } elseif ($model) {
+            if ($model->$field == $value) {
+                return 'selected';
+            }
+        }
+        return false;
+    }
+
+    public function isChecked($field, $value, $model = null, $default = false)
+    {
+        if (old($field) == $value) {
+            return 'checked';
+        } elseif ($model) {
+            if ($model->$field == $value) {
+                return 'checked';
+            }
+        } elseif ($default) {
+            return 'checked';
+        }
+        return false;
     }
 }

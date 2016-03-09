@@ -54,9 +54,9 @@
             <td>{{ $order->is_partial }}</td>
             <td>{{ $order->by_hand }}</td>
             <td>{{ $order->is_affair }}</td>
-            <td>{{ $order->affairer }}</td>
-            <td>{{ $order->customer_service }}</td>
-            <td>{{ $order->operator }}</td>
+            <td>{{ $order->user_affairer->name }}</td>
+            <td>{{ $order->user_service->name }}</td>
+            <td>{{ $order->user_operator->name }}</td>
             <td>{{ $order->payment }}</td>
             <td>{{ $order->currency }}</td>
             <td>{{ $order->rate }}</td>
@@ -66,7 +66,7 @@
             <td>{{ $order->comment1 }}</td>
             <td>{{ $order->remark }}</td>
             <td>{{ $order->import_remark }}</td>
-            <td>{{ $order->shipping }}</td>
+            <td>{{ $order->shipping == 'packet' ? '小包' : '快递' }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->payment_date }}</td>
             <td>{{ $order->affair_time }}</td>

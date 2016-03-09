@@ -101,6 +101,18 @@ class OrderController extends Controller
         return redirect($this->mainIndex);
     }
 
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'orderItems' => $model->orderItem,
+            'model' => $model,
+        ];
+
+        return view($this->viewPath.'show', $response);
+    }
+
     public function ajaxOrderAdd()
     {
         if(request()->ajax()) {

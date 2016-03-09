@@ -22,13 +22,6 @@ class TestController extends Controller
 {
     public function test()
     {
-        $fp = curl_init();
-        curl_setopt($fp, CURLOPT_URL, 'http://www.baidu.com');
-        curl_setopt($fp, CURLOPT_RETURNTRANSFER, 1);
-        $test = curl_exec($fp);
-        curl_close($fp);
-        echo "<pre>";
-        print_r($test);
-        echo "</pre>";
+        
     }
 }

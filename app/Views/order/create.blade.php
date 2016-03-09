@@ -1,6 +1,4 @@
 @extends('common.form')
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('order.store') }} @stop
 @section('formBody')
     <div class="panel panel-default">
@@ -352,8 +350,11 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">产品信息</div>
-        <div class="panel-body">
+        <div class="panel-heading">
+            产品信息
+            <a href="javascript:" class="close" id="addItem"><i class="glyphicon glyphicon-plus"></i></a>
+        </div>
+        <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku" class='control-label'>sku</label>
@@ -426,35 +427,29 @@
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
-            <div class='form-group addpanel'>
-                <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>
-                    <span class='glyphicon glyphicon-plus'>新增</span>
-                </a>
-            </div>
         </div>
     </div>
 @stop
-<script type='text/javascript'>
-    $(document).ready(function(){
-        $('#create_time, #payment_date, #affair_time').cxCalendar();
-
-        var current = 1;
-        $('#create_form').click(function(){
-            $.ajax({
-                url:"{{ route('orderAdd') }}",
-                data:{current:current},
-                dataType:'html',
-                type:'get',
-                success:function(result) {
-                    $('.addpanel').before(result);
-                }
+@section('pageJs')
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $('#create_time, #payment_date, #affair_time').cxCalendar();
+            var current = 1;
+            $('#addItem').click(function () {
+                $.ajax({
+                    url: "{{ route('orderAdd') }}",
+                    data: {current: current},
+                    dataType: 'html',
+                    type: 'get',
+                    success: function (result) {
+                        $('#itemDiv').append(result);
+                    }
+                });
+                current++;
             });
-            current++;
         });
-    });
-
-    $(document).on('click', '.bt_right', function(){
-        $(this).parent().remove();
-    });
-
-</script>
+        $(document).on('click', '.bt_right', function () {
+            $(this).parent().remove();
+        });
+    </script>
+@stop

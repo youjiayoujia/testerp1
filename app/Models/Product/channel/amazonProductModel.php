@@ -19,7 +19,7 @@ class amazonProductModel extends BaseModel
      * @var array
      */
     protected $fillable = ['product_id','choies_info','name','c_name','supplier_id','supplier_sku','product_sale_url','purchase_sale_url',
-                            'purchase_price','purchase_carriage','weight','supplier_info','remark','image_remark'];
+                            'purchase_price','purchase_carriage','weight','supplier_info','remark','image_remark','status'];
 
     public function product()
     {
@@ -37,6 +37,13 @@ class amazonProductModel extends BaseModel
 
     public function updateAmazonProduct($data)
     {   
+        //$data['status'] = 1;
+        $this->update($data);
+    }
+
+    public function updateAmazonProductImage($file)
+    {   
+        //$data['status'] = 2;
         $this->update($data);
     }
 }

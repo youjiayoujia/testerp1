@@ -142,4 +142,54 @@ class AmazonController extends Controller
 
         return redirect($this->mainIndex);
     }
+
+    /**
+     * 产品图片编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function amazonProductEditImage()
+    {
+        $id = request()->input('id');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $this->model->find($id),
+        ];
+
+        return view($this->viewPath . 'editImage', $response);
+    }
+
+    /**
+     * 产品图片编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function amazonProductUpdateImage()
+    {
+        $id = request()->input('id');
+        request()->flash();
+        //$this->validate(request(), $this->model->rules('update',$id));
+        $amazonProductModel = $this->model->find($id);
+        $amazonProductModel->updateAmazonProductImage(request()->files);
+        
+    }
+
+    /**
+     * 产品审核
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function amazonProductExamine()
+    {
+        $id = request()->input('id');
+        request()->flash();
+        //$this->validate(request(), $this->model->rules('update',$id));
+        $amazonProductModel = $this->model->find($id);
+        $amazonProductModel->updateAmazonProductImage(request()->files);
+        
+    }
+     
 }

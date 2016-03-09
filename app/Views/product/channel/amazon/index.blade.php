@@ -22,12 +22,12 @@
                 <a href="{{ route('amazonProduct.edit', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                 </a>
-                <a href="{{ route('amazonProduct.edit', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('amazonProductEditImage', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
                 <a href="javascript:" class="btn btn-info btn-xs examine_model"
                        data-id="{{ $amazonProduct->id }}"
-                       data-url="{{route('examine')}}">
+                       data-url="{{route('amazonProductExamine')}}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>审核</span>
                     </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"

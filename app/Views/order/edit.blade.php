@@ -1,4 +1,6 @@
 @extends('common.form')
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('order.update', ['id' => $model->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
@@ -22,7 +24,7 @@
                 <select name="channel_account_id" class="form-control" id="channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == $model->channel_account_id ? 'selected' : ''}}>
-                            {{$account->name}}
+                            {{$account->alias}}
                         </option>
                     @endforeach
                 </select>
@@ -167,7 +169,7 @@
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }}>否
+                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }} disabled>否
                     </label>
                 </div>
             </div>
@@ -195,7 +197,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="currency" id="currency">
                     @foreach(config('order.currency') as $currency)
-                        <option value="{{ $currency }}" {{ old('currency') == $currency ? 'selected' : '' }}>
+                        <option value="{{ $currency }}" {{ old('currency') ? (old('currency') == $currency ? 'selected' : '') : ($model->currency == $currency ? 'selected' : '') }}>
                             {{ $currency }}
                         </option>
                     @endforeach
@@ -204,27 +206,27 @@
             <div class="form-group col-lg-2">
                 <label for="rate" class='control-label'>汇率</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="rate" placeholder="汇率" name='rate' value="{{ old('rate') }}">
+                <input class="form-control" id="rate" placeholder="汇率" name='rate' value="{{ old('rate') ? old('rate') : $model->rate }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="amount" class='control-label'>收款金额</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="amount" placeholder="收款金额" name='amount' value="{{ old('amount') }}">
+                <input class="form-control" id="amount" placeholder="收款金额" name='amount' value="{{ old('amount') ? old('amount') : $model->amount }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="amount_product" class='control-label'>产品金额</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="amount_product" placeholder="产品金额" name='amount_product' value="{{ old('amount_product') }}">
+                <input class="form-control" id="amount_product" placeholder="产品金额" name='amount_product' value="{{ old('amount_product') ? old('amount_product') : $model->amount_product }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="amount_shipping" class='control-label'>订单运费</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="amount_shipping" placeholder="订单运费" name='amount_shipping' value="{{ old('amount_shipping') }}">
+                <input class="form-control" id="amount_shipping" placeholder="订单运费" name='amount_shipping' value="{{ old('amount_shipping') ? old('amount_shipping') : $model->amount_shipping }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="amount_coupon" class='control-label'>折扣金额</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="amount_coupon" placeholder="折扣金额" name='amount_coupon' value="{{ old('amount_coupon') }}">
+                <input class="form-control" id="amount_coupon" placeholder="折扣金额" name='amount_coupon' value="{{ old('amount_coupon') ? old('amount_coupon') : $model->amount_coupon }}">
             </div>
         </div>
     </div>
@@ -236,7 +238,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="shipping" id="shipping">
                     @foreach(config('order.shipping') as $shipping_key => $shipping)
-                        <option value="{{ $shipping_key }}" {{ old('shipping') == $shipping_key ? 'selected' : '' }}>
+                        <option value="{{ $shipping_key }}" {{ old('shipping') ? (old('shipping') == $shipping_key ? 'selected' : '') : ($model->shipping == $shipping_key ? 'selected' : '') }}>
                             {{ $shipping }}
                         </option>
                     @endforeach
@@ -245,47 +247,47 @@
             <div class="form-group col-lg-2">
                 <label for="shipping_firstname" class='control-label'>发货名字</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_firstname" placeholder="发货名字" name='shipping_firstname' value="{{ old('shipping_firstname') }}">
+                <input class="form-control" id="shipping_firstname" placeholder="发货名字" name='shipping_firstname' value="{{ old('shipping_firstname') ? old('shipping_firstname') : $model->shipping_firstname }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_lastname" class='control-label'>发货姓氏</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_lastname" placeholder="发货姓氏" name='shipping_lastname' value="{{ old('shipping_lastname') }}">
+                <input class="form-control" id="shipping_lastname" placeholder="发货姓氏" name='shipping_lastname' value="{{ old('shipping_lastname') ? old('shipping_lastname') : $model->shipping_lastname }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_address" class='control-label'>发货地址</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_address" placeholder="发货地址" name='shipping_address' value="{{ old('shipping_address') }}">
+                <input class="form-control" id="shipping_address" placeholder="发货地址" name='shipping_address' value="{{ old('shipping_address') ? old('shipping_address') : $model->shipping_address }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_address1" class='control-label'>发货地址1</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_address1" placeholder="发货地址1" name='shipping_address1' value="{{ old('shipping_address1') }}">
+                <input class="form-control" id="shipping_address1" placeholder="发货地址1" name='shipping_address1' value="{{ old('shipping_address1') ? old('shipping_address1') : $model->shipping_address1 }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_city" class='control-label'>发货城市</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_city" placeholder="发货城市" name='shipping_city' value="{{ old('shipping_city') }}">
+                <input class="form-control" id="shipping_city" placeholder="发货城市" name='shipping_city' value="{{ old('shipping_city') ? old('shipping_city') : $model->shipping_city }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_state" class='control-label'>发货省/州</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_state" placeholder="发货省/州" name='shipping_state' value="{{ old('shipping_state') }}">
+                <input class="form-control" id="shipping_state" placeholder="发货省/州" name='shipping_state' value="{{ old('shipping_state') ? old('shipping_state') : $model->shipping_state }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_country" class='control-label'>发货国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') }}">
+                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') ? old('') : $model->shipping_country }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_zipcode" class='control-label'>发货邮编</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_zipcode" placeholder="发货邮编" name='shipping_zipcode' value="{{ old('shipping_zipcode') }}">
+                <input class="form-control" id="shipping_zipcode" placeholder="发货邮编" name='shipping_zipcode' value="{{ old('shipping_zipcode') ? old('shipping_zipcode') : $model->shipping_zipcode }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_phone" class='control-label'>发货电话</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_phone" placeholder="发货电话" name='shipping_phone' value="{{ old('shipping_phone') }}">
+                <input class="form-control" id="shipping_phone" placeholder="发货电话" name='shipping_phone' value="{{ old('shipping_phone') ? old('shipping_phone') : $model->shipping_phone }}">
             </div>
         </div>
     </div>
@@ -297,7 +299,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="payment" id="payment">
                     @foreach(config('order.payment') as $payment)
-                        <option value="{{ $payment }}" {{ old('payment') == $payment ? 'selected' : '' }}>
+                        <option value="{{ $payment }}" {{ old('payment') ? (old('payment') == $payment ? 'selected' : '') : ($model->payment == $payment ? 'selected' : '') }}>
                             {{ $payment }}
                         </option>
                     @endforeach
@@ -306,47 +308,47 @@
             <div class="form-group col-lg-2">
                 <label for="billing_firstname" class='control-label'>账单名字</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_firstname" placeholder="账单名字" name='billing_firstname' value="{{ old('billing_firstname') }}">
+                <input class="form-control" id="billing_firstname" placeholder="账单名字" name='billing_firstname' value="{{ old('billing_firstname') ? old('billing_firstname') : $model->billing_firstname }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_lastname" class='control-label'>账单姓氏</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_lastname" placeholder="账单姓氏" name='billing_lastname' value="{{ old('billing_lastname') }}">
+                <input class="form-control" id="billing_lastname" placeholder="账单姓氏" name='billing_lastname' value="{{ old('billing_lastname') ? old('billing_lastname') : $model->billing_lastname }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_address" class='control-label'>账单地址</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_address" placeholder="账单地址" name='billing_address' value="{{ old('billing_address') }}">
+                <input class="form-control" id="billing_address" placeholder="账单地址" name='billing_address' value="{{ old('billing_address') ? old('billing_address') : $model->billing_address }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_city" class='control-label'>账单城市</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_city" placeholder="账单城市" name='billing_city' value="{{ old('billing_city') }}">
+                <input class="form-control" id="billing_city" placeholder="账单城市" name='billing_city' value="{{ old('billing_city') ? old('billing_city') : $model->billing_city }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_state" class='control-label'>账单省/州</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_state" placeholder="账单省/州" name='billing_state' value="{{ old('billing_state') }}">
+                <input class="form-control" id="billing_state" placeholder="账单省/州" name='billing_state' value="{{ old('billing_state') ? old('billing_state') : $model->billing_state }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_country" class='control-label'>账单国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_country" placeholder="账单国家/地区" name='billing_country' value="{{ old('billing_country') }}">
+                <input class="form-control" id="billing_country" placeholder="账单国家/地区" name='billing_country' value="{{ old('billing_country') ? old('billing_country') : $model->billing_country }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_zipcode" class='control-label'>账单邮编</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_zipcode" placeholder="账单邮编" name='billing_zipcode' value="{{ old('billing_zipcode') }}">
+                <input class="form-control" id="billing_zipcode" placeholder="账单邮编" name='billing_zipcode' value="{{ old('billing_zipcode') ? old('billing_zipcode') : $model->billing_zipcode }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="billing_phone" class='control-label'>账单电话</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="billing_phone" placeholder="账单电话" name='billing_phone' value="{{ old('billing_phone') }}">
+                <input class="form-control" id="billing_phone" placeholder="账单电话" name='billing_phone' value="{{ old('billing_phone') ? old('billing_phone') : $model->billing_phone }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="payment_date" class='control-label'>支付时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">
+                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') ? old('payment_date') : $model->payment_date }}">
             </div>
         </div>
     </div>
@@ -367,7 +369,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="status" class='control-label'>订单状态</label>
+                    <label for="status" class='control-label'>是否有效</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
@@ -383,53 +385,74 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
-            <div class='row'>
-                <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+            @foreach($orderItems as $key => $orderItem)
+                <div class='row'>
+                    <div class="form-group col-sm-2">
+                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}">
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <input type='text' class="form-control qty" id="arr[qty][{{$key}}]" placeholder="数量" name='arr[qty][{{$key}}]' value="{{ old('arr[qty][$key]') ? old('arr[qty][$key]') : $orderItem->qty }}">
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="金额" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="form-control status" name="arr[status][{{$key}}]" id="arr[status][{{$key}}]">
+                            @foreach(config('order.product_status') as $product_status_key => $status)
+                                <option value="{{ $product_status_key }}" {{ old('arr[status][$key]') ? (old('arr[status][$key]') == $product_status_key ? 'selected' : '') : ($orderItem->status == $product_status_key ? 'selected' : '') }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="form-control ship_status" name="arr[ship_status][{{$key}}]" id="arr[ship_status][{{$key}}]">
+                            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
+                                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$key]') ? (old('arr[ship_status][$key]') == $ship_status_key ? 'selected' : '') : ($orderItem->ship_status == $ship_status_key ? 'selected' : '') }}>
+                                    {{ $ship_status }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-1">
+                        <select class="form-control is_gift" name="arr[is_gift][{{$key}}]" id="arr[is_gift][{{$key}}]">
+                            @foreach(config('order.whether') as $is_gift_key => $is_gift)
+                                <option value="{{ $is_gift_key }}" {{ old('arr[is_gift][$key]') ? (old('arr[is_gift][$key]') == $is_gift_key ? 'selected' : '') : ($orderItem->is_gift == $is_gift_key ? 'selected' : '') }}>
+                                    {{ $is_gift }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <input type='text' class="form-control remark" id="arr[remark][{{$key}}]" placeholder="备注" name='arr[remark][{{$key}}]' value="{{ old('arr[remark][$key]') ? old('arr[remark][$key]') : $orderItem->remark }}">
+                    </div>
+                    <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
                 </div>
-                <div class="form-group col-sm-1">
-                    <input type='text' class="form-control qty" id="arr[qty][0]" placeholder="数量" name='arr[qty][0]' value="{{ old('arr[qty][0]') }}">
-                </div>
-                <div class="form-group col-sm-1">
-                    <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
-                </div>
-                <div class="form-group col-sm-2">
-                    <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
-                        @foreach(config('order.status') as $status_key => $status)
-                            <option value="{{ $status_key }}" {{ old('arr[status][0]') == $status_key ? 'selected' : '' }}>
-                                {{ $status }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group col-sm-2">
-                    <select class="form-control ship_status" name="arr[ship_status][0]" id="arr[ship_status][0]">
-                        @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                            <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][0]') == $ship_status_key ? 'selected' : '' }}>
-                                {{ $ship_status }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group col-sm-1">
-                    <select class="form-control is_gift" name="arr[is_gift][0]" id="arr[is_gift][0]">
-                        @foreach(config('order.whether') as $is_gift_key => $is_gift)
-                            <option value="{{ $is_gift_key }}" {{ old('arr[is_gift][0]') == $is_gift_key ? 'selected' : '' }}>
-                                {{ $is_gift }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group col-sm-2">
-                    <input type='text' class="form-control remark" id="arr[remark][0]" placeholder="备注" name='arr[remark][0]' value="{{ old('arr[remark][0]') }}">
-                </div>
-                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-            </div>
-            <div class='form-group addpanel'>
-                <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>
-                    <span class='glyphicon glyphicon-plus'>新增</span>
-                </a>
-            </div>
+            @endforeach
         </div>
     </div>
 @stop
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $('#create_time, #payment_date, #affair_time').cxCalendar();
+
+        var current = 1;
+        $('#create_form').click(function(){
+            $.ajax({
+                url:"{{ route('orderAdd') }}",
+                data:{current:current},
+                dataType:'html',
+                type:'get',
+                success:function(result) {
+                    $('.addpanel').before(result);
+                }
+            });
+            current++;
+        });
+    });
+
+    $(document).on('click', '.bt_right', function(){
+        $(this).parent().remove();
+    });
+
+</script>

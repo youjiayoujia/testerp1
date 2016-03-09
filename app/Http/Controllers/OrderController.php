@@ -64,11 +64,41 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'orderItems' => $model->orderItem,
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
         ];
         return view($this->viewPath.'edit', $response);
+    }
+
+    public function update($id)
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rule(request()));
+        $len = count(array_keys(request()->input('arr.sku')));
+        $buf = request()->all();
+        $obj = $this->model->find($id)->orderItem;
+        $obj_len = count($obj);
+        $this->model->find($id)->update($buf);
+        for($i=0; $i<$len; $i++)
+        {
+            unset($buf);
+            $arr = request()->input('arr');
+            foreach($arr as $key => $val)
+            {
+                $val = array_values($val);
+                $buf[$key] = $val[$i];
+            }
+            $buf['order_id'] = $id;
+            $obj[$i]->update($buf);
+        }
+        while($i != $obj_len) {
+            $obj[$i]->delete();
+            $i++;
+        }
+
+        return redirect($this->mainIndex);
     }
 
     public function ajaxOrderAdd()

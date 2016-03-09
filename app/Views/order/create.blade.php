@@ -1,5 +1,4 @@
 @extends('common.form')
-
 <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('order.store') }} @stop
@@ -169,7 +168,7 @@
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="by_hand" value="0">否
+                        <input type="radio" name="by_hand" value="0" disabled>否
                     </label>
                 </div>
             </div>
@@ -369,7 +368,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="status" class='control-label'>订单状态</label>
+                    <label for="status" class='control-label'>是否有效</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
@@ -397,8 +396,8 @@
                 </div>
                 <div class="form-group col-sm-2">
                     <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
-                        @foreach(config('order.status') as $status_key => $status)
-                            <option value="{{ $status_key }}" {{ old('arr[status][0]') == $status_key ? 'selected' : '' }}>
+                        @foreach(config('order.product_status') as $product_status_key => $status)
+                            <option value="{{ $product_status_key }}" {{ old('arr[status][0]') == $product_status_key ? 'selected' : '' }}>
                                 {{ $status }}
                             </option>
                         @endforeach

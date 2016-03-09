@@ -172,7 +172,7 @@ class AmazonController extends Controller
         request()->flash();
         //$this->validate(request(), $this->model->rules('update',$id));
         $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->updateAmazonProductImage(request()->files);
+        $this->model->updateAmazonProductImage(request()->files);
         
     }
 
@@ -182,14 +182,24 @@ class AmazonController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function amazonProductExamine()
+    public function examineAmazonProduct()
     {
-        $id = request()->input('id');
-        request()->flash();
-        //$this->validate(request(), $this->model->rules('update',$id));
+        $id = request()->input('product_ids');
         $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->updateAmazonProductImage(request()->files);
-        
+        $this->model->examineAmazonProduct($id);    
     }
      
+
+    /**
+     * 产品取消审核
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function cancelExamineAmazonProduct()
+    {
+        $id = request()->input('product_ids');
+        $amazonProductModel = $this->model->find($id);
+        $amazonProductModel->cancelExamineAmazonProduct();    
+    }
 }

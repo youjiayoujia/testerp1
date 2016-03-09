@@ -46,4 +46,16 @@ class amazonProductModel extends BaseModel
         //$data['status'] = 2;
         $this->update($data);
     }
+
+    public function examineAmazonProduct($id)
+    {   
+        $data['status'] = 1;
+        $this->find($id)->update($data);
+    }
+
+    public function cancelExamineAmazonProduct()
+    {   
+        $data['status'] = 0;
+        $this->update($data);
+    }
 }

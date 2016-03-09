@@ -37,6 +37,11 @@ return [
                     'url' => 'item.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '图片',
+                    'url' => 'productImage.index',
+                    'icon' => '',
+                ],
             ],
             '选款' => [
                 [

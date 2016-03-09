@@ -40,8 +40,8 @@
     @foreach($data as $order)
         <tr>
             <td>{{ $order->id }}</td>
-            <td>{{ $order->channel_id }}</td>
-            <td>{{ $order->channel_account_id }}</td>
+            <td>{{ $order->channel->name }}</td>
+            <td>{{ $order->channelAccount->alias }}</td>
             <td>{{ $order->order_number }}</td>
             <td>{{ $order->channel_order_number }}</td>
             <td>{{ $order->email }}</td>

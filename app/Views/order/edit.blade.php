@@ -352,7 +352,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
             <div class='row'>

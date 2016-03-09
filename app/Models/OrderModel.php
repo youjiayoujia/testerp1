@@ -103,4 +103,8 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
     }
 
+    public function user() {
+        return $this->belongsTo('App\Models\UserModel', 'id', 'affairer');
+    }
+
 }

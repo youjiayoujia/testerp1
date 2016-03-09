@@ -349,7 +349,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">
             产品信息
             <a href="javascript:" class="close" id="addItem"><i class="glyphicon glyphicon-plus"></i></a>

@@ -128,10 +128,13 @@ Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCod
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
+Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as'=>'choseShop']);
 Route::resource('product', 'ProductController');
+
 
 //订单管理路由
 Route::resource('order', 'OrderController');
 Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses'=>'OrderController@ajaxOrderAdd', 'as'=>'orderAdd']);
+
 

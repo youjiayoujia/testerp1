@@ -45,15 +45,15 @@
             <td>{{ $order->order_number }}</td>
             <td>{{ $order->channel_order_number }}</td>
             <td>{{ $order->email }}</td>
-            <td>{{ $order->status }}</td>
-            <td>{{ $order->active }}</td>
+            <td>{{ $order->status_name }}</td>
+            <td>{{ $order->active_name }}</td>
             <td>{{ $order->amount }}</td>
             <td>{{ $order->amount_product }}</td>
             <td>{{ $order->amount_shipping }}</td>
             <td>{{ $order->amount_coupon }}</td>
-            <td>{{ $order->is_partial }}</td>
-            <td>{{ $order->by_hand }}</td>
-            <td>{{ $order->is_affair }}</td>
+            <td>{{ $order->is_partial_name }}</td>
+            <td>{{ $order->by_hand_name }}</td>
+            <td>{{ $order->is_affair_name }}</td>
             <td>{{ $order->user_affairer->name }}</td>
             <td>{{ $order->user_service->name }}</td>
             <td>{{ $order->user_operator->name }}</td>
@@ -61,7 +61,7 @@
             <td>{{ $order->currency }}</td>
             <td>{{ $order->rate }}</td>
             <td>{{ $order->ip }}</td>
-            <td>{{ $order->address_confirm }}</td>
+            <td>{{ $order->address_confirm_name }}</td>
             <td>{{ $order->comment }}</td>
             <td>{{ $order->comment1 }}</td>
             <td>{{ $order->remark }}</td>

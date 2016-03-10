@@ -1,6 +1,6 @@
 @extends('common.detail')
 @section('detailBody')
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -22,25 +22,25 @@
                 <strong>邮箱</strong>: {{ $model->email }}
             </div>
             <div class="col-lg-2">
-                <strong>订单状态</strong>: {{ $model->status }}
+                <strong>订单状态</strong>: {{ $model->status_name }}
             </div>
             <div class="col-lg-2">
-                <strong>售后状态</strong>: {{ $model->active }}
+                <strong>售后状态</strong>: {{ $model->active_name }}
             </div>
             <div class="col-lg-2">
-                <strong>做账人员</strong>: {{ $model->affairer }}
+                <strong>做账人员</strong>: {{ $model->user_affairer->name }}
             </div>
             <div class="col-lg-2">
-                <strong>客服人员</strong>: {{ $model->customer_service }}
+                <strong>客服人员</strong>: {{ $model->user_service->name }}
             </div>
             <div class="col-lg-2">
-                <strong>运营人员</strong>: {{ $model->operator }}
+                <strong>运营人员</strong>: {{ $model->user_operator->name }}
             </div>
             <div class="col-lg-2">
                 <strong>IP地址</strong>: {{ $model->ip }}
             </div>
             <div class="col-lg-2">
-                <strong>地址验证</strong>: {{ $model->address_confirm }}
+                <strong>地址验证</strong>: {{ $model->address_confirm_name }}
             </div>
             <div class="col-lg-2">
                 <strong>备用字段</strong>: {{ $model->comment }}
@@ -55,13 +55,13 @@
                 <strong>导单备注</strong>: {{ $model->import_remark }}
             </div>
             <div class="col-lg-2">
-                <strong>是否分批发货</strong>: {{ $model->is_partial }}
+                <strong>是否分批发货</strong>: {{ $model->is_partial_name }}
             </div>
             <div class="col-lg-2">
-                <strong>是否手工</strong>: {{ $model->by_hand }}
+                <strong>是否手工</strong>: {{ $model->by_hand_name }}
             </div>
             <div class="col-lg-2">
-                <strong>是否做账</strong>: {{ $model->is_affair }}
+                <strong>是否做账</strong>: {{ $model->is_affair_name }}
             </div>
             <div class="col-lg-2">
                 <strong>做账时间</strong>: {{ $model->affair_time }}
@@ -71,7 +71,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">金额信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -94,11 +94,11 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>种类</strong>: {{ $model->shipping }}
+                <strong>种类</strong>: {{ $model->shipping == 'packet' ? '小包' : '快递' }}
             </div>
             <div class="col-lg-2">
                 <strong>发货名字</strong>: {{ $model->shipping_firstname }}
@@ -129,7 +129,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">支付信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -164,7 +164,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
             @foreach($orderItems as $orderItem)
@@ -179,13 +179,13 @@
                         <strong>金额</strong> : {{ $orderItem->price }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>是否有效</strong> : {{ $orderItem->status }}
+                        <strong>发货状态</strong> : {{ $orderItem->ship_status_name }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>发货状态</strong> : {{ $orderItem->ship_status }}
+                        <strong>是否有效</strong> : {{ $orderItem->status_name }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>是否赠品</strong> : {{ $orderItem->is_gift }}
+                        <strong>是否赠品</strong> : {{ $orderItem->is_gift_name }}
                     </div>
                     <div class="col-lg-2">
                         <strong>备注</strong> : {{ $orderItem->remark }}
@@ -194,7 +194,7 @@
             @endforeach
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">

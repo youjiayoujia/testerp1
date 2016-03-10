@@ -58,9 +58,9 @@ class CreateOrders extends Migration
             $table->string('billing_country')->comment('账单国家/地区');
             $table->string('billing_zipcode')->comment('账单邮编');
             $table->string('billing_phone')->comment('账单电话');
-            $table->timestamp('payment_date')->comment('支付时间');
-            $table->timestamp('affair_time')->comment('做账时间');
-            $table->timestamp('create_time')->comment('定义时间');
+            $table->date('payment_date')->comment('支付时间');
+            $table->date('affair_time')->comment('做账时间');
+            $table->date('create_time')->comment('定义时间');
             $table->timestamps();
             $table->softDeletes();
         });

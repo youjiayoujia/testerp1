@@ -32,4 +32,22 @@ class ItemModel extends BaseModel
         ],
     ];
 
+    public function getShipStatusNameAttribute()
+    {
+        $arr = config('order.ship_status');
+        return $arr[$this->ship_status];
+    }
+
+    public function getStatusNameAttribute()
+    {
+        $arr = config('order.product_status');
+        return $arr[$this->status];
+    }
+
+    public function getIsGiftNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->is_gift];
+    }
+
 }

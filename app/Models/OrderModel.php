@@ -115,4 +115,40 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'operator', 'id');
     }
 
+    public function getStatusNameAttribute()
+    {
+        $arr = config('order.status');
+        return $arr[$this->status];
+    }
+
+    public function getActiveNameAttribute()
+    {
+        $arr = config('order.active');
+        return $arr[$this->active];
+    }
+
+    public function getIsPartialNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->is_partial];
+    }
+
+    public function getByHandNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->by_hand];
+    }
+
+    public function getIsAffairNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->is_affair];
+    }
+
+    public function getAddressConfirmNameAttribute()
+    {
+        $arr = config('order.address');
+        return $arr[$this->address_confirm];
+    }
+
 }

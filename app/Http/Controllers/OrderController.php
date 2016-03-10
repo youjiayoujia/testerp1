@@ -34,6 +34,7 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
         ];
+
         return view($this->viewPath.'create', $response);
     }
 
@@ -55,6 +56,7 @@ class OrderController extends Controller
             $buf['order_id'] = $obj->id;
             ItemModel::create($buf);
         }
+
         return redirect($this->mainIndex);
     }
 
@@ -69,6 +71,7 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
         ];
+
         return view($this->viewPath.'edit', $response);
     }
 
@@ -113,6 +116,16 @@ class OrderController extends Controller
         return view($this->viewPath.'show', $response);
     }
 
+    public function destroy($id)
+    {
+        $obj = $this->model->find($id);
+        foreach($obj->orderItem as $val)
+            $val->delete();
+        $obj->delete($id);
+
+        return redirect($this->mainIndex);
+    }
+
     public function ajaxOrderAdd()
     {
         if(request()->ajax()) {
@@ -120,6 +133,7 @@ class OrderController extends Controller
             $response = [
                 'current' => $current,
             ];
+
             return view($this->viewPath.'add', $response);
         }
         return null;

@@ -139,6 +139,9 @@ Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCo
 Route::get('scanAddTrCode/{logistic_id}', ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 
+//拣货路由
+Route::get('createpick', ['uses'=>'PickController@ajaxCreatePick', 'as'=>'createpick']);
+Route::resource('pick', 'PickController');
 
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');

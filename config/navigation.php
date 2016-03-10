@@ -116,6 +116,20 @@ return [
         ],
     ],
 
+    //拣货导航
+    [
+        'name' => '拣货',
+        'icon' => 'home',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '拣货',
+                'url' => 'pick.index',
+                'icon' => '',
+            ],
+        ],
+    ],
     //物流导航
     [
         'name' => '物流',

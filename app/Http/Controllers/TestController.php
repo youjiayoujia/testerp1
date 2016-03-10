@@ -17,11 +17,21 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\Stock\TakingFormModel;
+use App\Models\AModel;
+use App\Models\BModel;
+use App\Models\CModel;
 
 class TestController extends Controller
 {
     public function test()
     {
-        
+        $arr[] = 1;
+        $this->test1($arr);
+        var_dump($arr);
+    }
+
+    public function test1(&$a)
+    {
+        $a[0] = '2';
     }
 }

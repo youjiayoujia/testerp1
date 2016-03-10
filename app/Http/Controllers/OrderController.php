@@ -139,4 +139,22 @@ class OrderController extends Controller
         return null;
     }
 
+    public function account()
+    {
+        $id = request()->input('id');
+        $buf = channelModel::find($id)->channelAccount;
+        return json_encode($buf);
+    }
+
+//    public function account()
+//    {
+//        $id = 1;
+//        $buf = $this->model->find($id)->channel->channelAccount;
+//        echo "<pre>";
+//        var_dump($buf->toArray());
+//        echo "</pre>";
+//        exit;
+//        return json_encode($buf);
+//    }
+
 }

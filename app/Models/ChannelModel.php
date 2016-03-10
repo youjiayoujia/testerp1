@@ -31,4 +31,10 @@ class ChannelModel extends BaseModel
         'create' => ['name' => 'required|unique:channels,name'],
         'update' => ['name' => 'required|unique:channels,name,{id}']
     ];
+
+    public function channelAccount()
+    {
+        return $this->hasMany('App\Models\Channel\AccountModel', 'channel_id', 'id');
+    }
+
 }

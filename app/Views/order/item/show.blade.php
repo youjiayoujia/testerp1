@@ -13,7 +13,7 @@
                 <strong>sku</strong>: {{ $model->sku }}
             </div>
             <div class="col-lg-4">
-                <strong>数量</strong>: {{ $model->qty }}
+                <strong>数量</strong>: {{ $model->quantity }}
             </div>
             <div class="col-lg-4">
                 <strong>金额</strong>: {{ $model->price }}

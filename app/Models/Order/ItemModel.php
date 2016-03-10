@@ -17,7 +17,7 @@ class ItemModel extends BaseModel
     protected $table = 'order_items';
 
     protected $fillable = [
-        'order_id','sku','qty','price',
+        'order_id','sku','quantity','price',
         'status','ship_status','is_gift','remark',
     ];
 

@@ -13,9 +13,9 @@
         <input class="form-control" id="sku" placeholder="sku" name='sku' value="{{ old('sku') ? old('sku') : $model->sku }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="qty" class='control-label'>数量</label>
+        <label for="quantity" class='control-label'>数量</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="qty" placeholder="数量" name='qty' value="{{ old('qty') ? old('qty') : $model->qty }}">
+        <input class="form-control" id="quantity" placeholder="数量" name='quantity' value="{{ old('quantity') ? old('quantity') : $model->quantity }}">
     </div>
     <div class="form-group col-lg-4">
         <label for="price" class='control-label'>金额</label>

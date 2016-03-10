@@ -18,7 +18,7 @@
             <div class="form-group col-lg-2">
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control" id="channel_account_id">
+                <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
                             {{$account->alias}}
@@ -360,7 +360,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="qty" class='control-label'>数量</label>
+                    <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
@@ -389,7 +389,7 @@
                     <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input type='text' class="form-control qty" id="arr[qty][0]" placeholder="数量" name='arr[qty][0]' value="{{ old('arr[qty][0]') }}">
+                    <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
                     <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
@@ -436,6 +436,7 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             $('#create_time, #payment_date, #affair_time').cxCalendar();
+
             var current = 1;
             $('#addItem').click(function () {
                 $.ajax({
@@ -449,9 +450,42 @@
                 });
                 current++;
             });
-        });
-        $(document).on('click', '.bt_right', function () {
-            $(this).parent().remove();
+
+            var channel_id = $("#channel_id").val();
+            $.ajax({
+                url : "{{ route('account') }}",
+                data : { id : channel_id },
+                dataType : 'json',
+                type : 'get',
+                success : function(result) {
+                    $('.channel_account_id').html();
+                    str = '';
+                    for(var i=0; i<result.length; i++)
+                        str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                    $('.channel_account_id').html(str);
+                }
+            });
+
+            $('#channel_id').click(function(){
+                var channel_id = $("#channel_id").val();
+                $.ajax({
+                    url : "{{ route('account') }}",
+                    data : { id : channel_id },
+                    dataType : 'json',
+                    type : 'get',
+                    success : function(result) {
+                        $('.channel_account_id').html();
+                        str = '';
+                        for(var i=0; i<result.length; i++)
+                            str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                        $('.channel_account_id').html(str);
+                    }
+                });
+            });
+
+            $(document).on('click', '.bt_right', function () {
+                $(this).parent().remove();
+            });
         });
     </script>
 @stop

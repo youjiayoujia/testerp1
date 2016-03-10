@@ -16,7 +16,7 @@ class CreateOrderItems extends Migration
             $table->increments('id');
             $table->integer('order_id')->comment('订单ID');
             $table->string('sku')->comment('sku');
-            $table->integer('qty')->comment('数量');
+            $table->integer('quantity')->comment('数量');
             $table->float('price')->comment('金额');
             $table->integer('status')->comment('订单状态');
             $table->integer('ship_status')->comment('发货状态');

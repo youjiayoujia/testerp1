@@ -173,7 +173,7 @@
                         <strong>sku</strong> : {{ $orderItem->sku }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>数量</strong> : {{ $orderItem->qty }}
+                        <strong>数量</strong> : {{ $orderItem->quantity }}
                     </div>
                     <div class="col-lg-2">
                         <strong>金额</strong> : {{ $orderItem->price }}

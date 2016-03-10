@@ -134,4 +134,4 @@ Route::resource('product', 'ProductController');
 Route::resource('order', 'OrderController');
 Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses'=>'OrderController@ajaxOrderAdd', 'as'=>'orderAdd']);
-
+Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);

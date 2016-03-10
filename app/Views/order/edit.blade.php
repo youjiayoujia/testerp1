@@ -21,7 +21,7 @@
             <div class="form-group col-lg-2">
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control" id="channel_account_id">
+                <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == $model->channel_account_id ? 'selected' : ''}}>
                             {{$account->alias}}
@@ -361,7 +361,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="qty" class='control-label'>数量</label>
+                    <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
@@ -391,7 +391,7 @@
                         <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <input type='text' class="form-control qty" id="arr[qty][{{$key}}]" placeholder="数量" name='arr[qty][{{$key}}]' value="{{ old('arr[qty][$key]') ? old('arr[qty][$key]') : $orderItem->qty }}">
+                        <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}">
                     </div>
                     <div class="form-group col-sm-1">
                         <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="金额" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
@@ -449,6 +449,39 @@
             });
             current++;
         });
+
+        var channel_id = $("#channel_id").val();
+        $.ajax({
+            url : "{{ route('account') }}",
+            data : { id : channel_id },
+            dataType : 'json',
+            type : 'get',
+            success : function(result) {
+                $('.channel_account_id').html();
+                str = '';
+                for(var i=0; i<result.length; i++)
+                    str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                $('.channel_account_id').html(str);
+            }
+        });
+
+        $('#channel_id').click(function(){
+            var channel_id = $("#channel_id").val();
+            $.ajax({
+                url : "{{ route('account') }}",
+                data : { id : channel_id },
+                dataType : 'json',
+                type : 'get',
+                success : function(result) {
+                    $('.channel_account_id').html();
+                    str = '';
+                    for(var i=0; i<result.length; i++)
+                        str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                    $('.channel_account_id').html(str);
+                }
+            });
+        });
+
     });
 
     $(document).on('click', '.bt_right', function(){

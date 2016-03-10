@@ -63,6 +63,6 @@ class PackageModel extends BaseModel
 
     public function items()
     {
-        return $this->hasMany('App\Models\Order\ItemModel', 'package_id');
+        return $this->hasMany('App\Models\Package\ItemModel', 'package_id');
     }
 }

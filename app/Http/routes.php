@@ -131,6 +131,7 @@ Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
 Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as'=>'choseShop']);
 Route::resource('product', 'ProductController');
 
+
 //产品渠道
 Route::any('beChosed', ['uses' => 'Product\Channel\AmazonController@beChosed', 'as'=>'beChosed']);
 Route::resource('amazonProduct', 'Product\Channel\AmazonController');
@@ -138,5 +139,12 @@ Route::get('amazonProductEditImage', ['uses' => 'Product\Channel\AmazonControlle
 Route::get('amazonProductUpdateImage', ['uses' => 'Product\Channel\AmazonController@amazonProductUpdateImage', 'as'=>'amazonProductUpdateImage']);
 Route::get('examineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@examineAmazonProduct', 'as'=>'examineAmazonProduct']);
 Route::get('cancelExamineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as'=>'cancelExamineAmazonProduct']);
+
+
+//订单管理路由
+Route::resource('order', 'OrderController');
+Route::resource('orderItem', 'Order\ItemController');
+Route::get('orderAdd', ['uses'=>'OrderController@ajaxOrderAdd', 'as'=>'orderAdd']);
+
 
 

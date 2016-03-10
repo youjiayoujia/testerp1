@@ -19,9 +19,9 @@ class CreateLogisticsSuppliers extends Migration
             $table->string('secret_key')->comment('密钥')->default(NULL);
             $table->enum('is_api', ['N', 'Y'])->comment('是否有API')->default(NULL);
             $table->string('client_manager')->comment('客户经理')->default(NULL);
-            $table->integer('manager_tel')->comment('客户经理联系方式')->default(NULL);
+            $table->string('manager_tel')->comment('客户经理联系方式')->default(NULL);
             $table->string('technician')->comment('技术人员')->default(NULL);
-            $table->integer('technician_tel')->comment('技术联系方式')->default(NULL);
+            $table->string('technician_tel')->comment('技术联系方式')->default(NULL);
             $table->string('remark')->comment('备注')->default(NULL);
             $table->timestamps();
             $table->softDeletes();

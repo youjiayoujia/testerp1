@@ -1,6 +1,8 @@
 @extends('common.form')
 @section('formAction') {{ route('amazonProduct.update', ['id' => $model->id]) }} @stop
 @section('formBody')
+<input type='hidden' value='PUT' name="_method">
+<div class='row'>
     <div class="form-group col-md-3">
         <label for="size">item</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" disabled="disabled" id="name" placeholder="sku" name='sku' value="{{ old('sku') ?  old('sku') : $model->sku }}">
@@ -18,6 +20,8 @@
         <label for="color">产品别名中文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
     </div>
+</div>
+<div class='row'>
     <div class="form-group col-md-3">
         <label for="color">产品别名英文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
@@ -42,6 +46,8 @@
             @endforeach
         </select>
     </div>
+</div>
+<div class='row'>
     <div class="form-group col-md-3">
         <label for="color">供应商sku</label>
         <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
@@ -70,7 +76,8 @@
         <label for="size">产品重量</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
     </div>
-
+</div>
+<div class='row'>
     <div class="form-group col-md-3">
         <label for="color">备注</label>
         <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
@@ -79,6 +86,10 @@
         <label for="color">图片备注</label>
         <input class="form-control" id="image_remark" placeholder="图片备注" name='image_remark' value="{{ old('image_remark') ?  old('image_remark') : $model->image_remark }}">
     </div> 
-    <input type='hidden' value='PUT' name="_method">
-
+</div>
 @stop
+@section('formButton')
+    <button type="submit" class="btn btn-success" name='edit' value='0'>保存</button>
+    <button type="submit" class="btn btn-success" name='edit' value='1'>保存并提交</button>
+    <button type="reset" class="btn btn-default">取消</button>
+@show{{-- 表单按钮 --}}

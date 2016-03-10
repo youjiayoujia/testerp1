@@ -49,6 +49,11 @@ return [
                     'url' => 'productRequire.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '选款产品列表',
+                    'url' => 'amazonProduct.index',
+                    'icon' => '',
+                ],
             ],
             '供应链' => [
                 [

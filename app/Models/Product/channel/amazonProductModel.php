@@ -2,6 +2,7 @@
 
 namespace App\Models\Product\channel;
 
+use App\Models\Product\ImageModel;
 use App\Base\BaseModel;
 
 class amazonProductModel extends BaseModel
@@ -19,8 +20,20 @@ class amazonProductModel extends BaseModel
      * @var array
      */
     protected $fillable = ['product_id','choies_info','name','c_name','supplier_id','supplier_sku','product_sale_url','purchase_sale_url',
-                            'purchase_price','purchase_carriage','weight','supplier_info','remark','image_remark','status'];
+                            'purchase_price','purchase_carriage','weight','supplier_info','remark','image_remark','status','edit_status'];
 
+    public $rules = [
+        'create' => [
+            'name' => 'required',
+            'c_name' => 'required',
+            'purchase_price' => 'required|numeric',
+            'purchase_carriage' => 'required|numeric',
+        ],
+        'update' => [
+            'name' => 'required',
+            'c_name' => 'required',       
+        ]
+    ];
     public function product()
     {
         return $this->belongsTo('App\Models\ProductModel','product_id');
@@ -28,7 +41,6 @@ class amazonProductModel extends BaseModel
 
     public function createAmazonProduct($data)
     {   
-        $data['choies_info'] = 'u are stupid';
         $data['product_id'] = $data['id'];
         $data['status'] = 0;
         
@@ -37,25 +49,21 @@ class amazonProductModel extends BaseModel
 
     public function updateAmazonProduct($data)
     {   
-        //$data['status'] = 1;
         $this->update($data);
     }
 
-    public function updateAmazonProductImage($file)
+    public function updateAmazonProductImage($data,$files = null)
     {   
-        //$data['status'] = 2;
+        $imageModel = new ImageModel();
+        $imageModel->imageCreate($data,$files);
+        $data['status'] = 2;
         $this->update($data);
     }
 
-    public function examineAmazonProduct($id)
+    public function examineAmazonProduct($status)
     {   
-        $data['status'] = 1;
-        $this->find($id)->update($data);
-    }
-
-    public function cancelExamineAmazonProduct()
-    {   
-        $data['status'] = 0;
+        $data['status'] = $status;
         $this->update($data);
     }
+
 }

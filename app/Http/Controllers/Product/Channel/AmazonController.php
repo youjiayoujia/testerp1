@@ -42,27 +42,6 @@ class AmazonController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-              
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store()
-    {
-        echo 9313;exit;
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -101,20 +80,12 @@ class AmazonController extends Controller
     {
         request()->flash();
         //$this->validate(request(), $this->model->rules('update',$id));
+        $editStatus = request()->input('edit');
+        $data = request()->all();
+        $data['status'] = $editStatus;
         $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->updateAmazonProduct(request()->all());
+        $amazonProductModel->updateAmazonProduct($data);
         return redirect($this->mainIndex);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 
     /**
@@ -144,7 +115,7 @@ class AmazonController extends Controller
     }
 
     /**
-     * 产品图片编辑
+     * 产品图片编辑界面
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -168,12 +139,16 @@ class AmazonController extends Controller
      */
     public function amazonProductUpdateImage()
     {
+        /*$id = request()->input('id');
+        request()->flash();
+        $amazonProductModel = $this->model->find($id);
+        $amazonProductModel->updateAmazonProductImage(request()->files);*/
         $id = request()->input('id');
         request()->flash();
-        //$this->validate(request(), $this->model->rules('update',$id));
         $amazonProductModel = $this->model->find($id);
-        $this->model->updateAmazonProductImage(request()->files);
-        
+        $amazonProductModel->updateAmazonProductImage(request()->all(),request()->files);
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -185,21 +160,10 @@ class AmazonController extends Controller
     public function examineAmazonProduct()
     {
         $id = request()->input('product_ids');
+        $status = request()->input('status');
         $amazonProductModel = $this->model->find($id);
-        $this->model->examineAmazonProduct($id);    
+        $amazonProductModel->examineAmazonProduct($status);
+        return 1;
     }
      
-
-    /**
-     * 产品取消审核
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function cancelExamineAmazonProduct()
-    {
-        $id = request()->input('product_ids');
-        $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->cancelExamineAmazonProduct();    
-    }
 }

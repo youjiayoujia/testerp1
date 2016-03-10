@@ -1,11 +1,29 @@
 @extends('common.table')
 @section('tableToolButtons')
-    
+    <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="glyphicon glyphicon-filter"></i> 过滤
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="{{ DataList::filtersEncode(['status','=','0']) }}">未编辑产品</a></li>
+                <li><a href="{{ DataList::filtersEncode(['status','=','1']) }}">未编辑图片</a></li>
+                <li><a href="{{ DataList::filtersEncode(['status','=','2']) }}">待审核</a></li>
+                <li><a href="{{ DataList::filtersEncode(['status','=','3']) }}">已审核</a></li>
+            </ul>
+    </div>  
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     
     <th>ID</th>
     <th>产品信息</th>
+    <th>净重(kg)</th>
+    <th>线上供货商</th>
+    <th>线上供货商地址</th>
+    <th>线上供货商货号</th>
+    <th>泽尚拿货价</th>
+    <th>销售价(USD)</th>
+    <th>选款人ID</th>
     <th>状态</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
@@ -15,29 +33,71 @@
         <tr>
             <td>{{ $amazonProduct->product_id }}</td>
             <td>{{ $amazonProduct->choies_info }}</td>
+            <td>{{ $amazonProduct->weight }}</td>
+            <td>{{ $amazonProduct->product->supplier->name }}</td>
+            <td>{{ $amazonProduct->supplier_info }}</td>
+            <td>{{ $amazonProduct->supplier_sku }}</td>
+            <td>{{ $amazonProduct->purchase_price }}</td>
+            <td>{{ $amazonProduct->choies_info }}</td>
+            <td>{{ $amazonProduct->product->upload_user }}</td>
+            <?php switch ($amazonProduct->status) {
+                case '0':
+                    ?>
+                    <td>未编辑资料</td>
+                    <?php
+                    break;
+
+                case '1':
+                    ?>
+                    <td>已编辑资料</td>
+                    <?php
+                    break;
+
+                case '2':
+                    ?>
+                    <td>已编辑图片</td>
+                    <?php
+                    break;
+
+                case '3':
+                    ?>
+                    <td>审核通过</td>
+                    <?php
+                    break;
+            } ?>
             <td>{{ $amazonProduct->created_at }}</td>
             <td>
                 <a href="{{ route('amazonProduct.show', ['id'=>$amazonProduct->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('amazonProduct.edit', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑资料
-                </a>
-                <a href="{{ route('amazonProductEditImage', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑图片
-                </a>
-                <?php if($amazonProduct->status==0){ ?>
+                <?php if($amazonProduct->status==2){ ?>
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
                            data-id="{{ $amazonProduct->id }}"
-                           data-url="{{route('examineAmazonProduct')}}">
+                           data-url="{{route('examineAmazonProduct')}}"
+                           data-status="3" >
                             <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>审核</span>
                     </a>
-                <?php }elseif($amazonProduct->status==1){ ?>
-                    <a href="javascript:" class="btn btn-info btn-xs cancel_examine_model"
+                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
                            data-id="{{ $amazonProduct->id }}"
-                           data-url="{{route('cancelExamineAmazonProduct')}}">
+                           data-url="{{route('examineAmazonProduct')}}"
+                           data-status="0" >
+                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>审核不通过</span>
+                    </a>
+                <?php }elseif($amazonProduct->status==3){ ?>
+                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
+                           data-id="{{ $amazonProduct->id }}"
+                           data-url="{{route('examineAmazonProduct')}}"
+                           data-status="0" >
                             <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>撤销审核</span>
                     </a>
+                <?php }elseif($amazonProduct->status==0){ ?>
+                    <a href="{{ route('amazonProduct.edit', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 编辑资料
+                </a>
+                <?php }elseif($amazonProduct->status==1){ ?>
+                    <a href="{{ route('amazonProductEditImage', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span> 编辑图片
+                    </a>  
                 <?php } ?>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $amazonProduct->id }}"
@@ -54,55 +114,19 @@
         //单个审核
         $('.examine_model').click(function () {
             var product_id = $(this).data('id');
-            if($(".examine_"+product_id).hasClass("hasexamine_"+product_id)){
-                alert("该产品已审核");return;
-            }
-            if (confirm("确认审核?")) {
+            var status = $(this).data('status');
+            if (confirm("确认?")) {
                 var url = "{{route('examineAmazonProduct')}}";
                 $.ajax({
                     url:url,
-                    data:{product_ids:product_id},
+                    data:{product_ids:product_id,status:status},
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        if(result==1){
-                            //$(".examine_"+product_id).text("已审核");
-                            //$(".examine_"+product_id).addClass("hasexamine_"+product_id);
-                       }else{
-                            //alert("审核失败");
-                       }                     
+                        window.location.reload();                    
                     }                  
                 })
             }
-        });
-
-
-        $('.cancel_examine_model').click(function () {
-            var product_id = $(this).data('id');
-            if($(".examine_"+product_id).hasClass("hasexamine_"+product_id)){
-                alert("该产品已审核");return;
-            }
-            if (confirm("确认审核?")) {
-                var url = "{{route('amazonProduct/cancelExamineAmazonProduct')}}";
-                $.ajax({
-                    url:url,
-                    data:{product_ids:product_id},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){
-                        if(result==1){
-                            //$(".examine_"+product_id).text("已审核");
-                            //$(".examine_"+product_id).addClass("hasexamine_"+product_id);
-                       }else{
-                            //alert("审核失败");
-                       }                     
-                    }                  
-                })
-            }
-        });
-        
-        $('.has_check').click(function () {
-            alert("该产品已审核");
         });
         </script>
 @stop

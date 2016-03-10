@@ -136,7 +136,7 @@ Route::resource('product', 'ProductController');
 Route::any('beChosed', ['uses' => 'Product\Channel\AmazonController@beChosed', 'as'=>'beChosed']);
 Route::resource('amazonProduct', 'Product\Channel\AmazonController');
 Route::get('amazonProductEditImage', ['uses' => 'Product\Channel\AmazonController@amazonProductEditImage', 'as'=>'amazonProductEditImage']);
-Route::get('amazonProductUpdateImage', ['uses' => 'Product\Channel\AmazonController@amazonProductUpdateImage', 'as'=>'amazonProductUpdateImage']);
+Route::post('amazonProductUpdateImage', ['uses' => 'Product\Channel\AmazonController@amazonProductUpdateImage', 'as'=>'amazonProductUpdateImage']);
 Route::get('examineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@examineAmazonProduct', 'as'=>'examineAmazonProduct']);
 Route::get('cancelExamineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as'=>'cancelExamineAmazonProduct']);
 

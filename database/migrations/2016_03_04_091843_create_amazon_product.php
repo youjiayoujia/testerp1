@@ -27,7 +27,8 @@ class CreateAmazonProduct extends Migration
             $table->float('weight')->comment('重量')->nullable()->default(null);
             $table->string('remark')->comment('备注')->nullable()->default(null);
             $table->string('image_remark')->comment('图片备注')->nullable()->default(null);
-            $table->tinyInteger('status')->comment('平台信息')->nullable()->default(null);
+            $table->tinyInteger('status')->comment('审核状态')->nullable()->default(0);
+            $table->tinyInteger('edit_status')->comment('编辑状态')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

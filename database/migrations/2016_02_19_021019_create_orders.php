@@ -49,7 +49,7 @@ class CreateOrders extends Migration
             $table->string('shipping_state')->comment('发货省/州');
             $table->string('shipping_country')->comment('发货国家/地区');
             $table->string('shipping_zipcode')->comment('发货邮编');
-            $table->integer('shipping_phone')->comment('发货电话');
+            $table->string('shipping_phone')->comment('发货电话');
             $table->string('billing_firstname')->comment('账单名字');
             $table->string('billing_lastname')->comment('账单姓氏');
             $table->string('billing_address')->comment('账单地址');
@@ -57,7 +57,7 @@ class CreateOrders extends Migration
             $table->string('billing_state')->comment('账单省/州');
             $table->string('billing_country')->comment('账单国家/地区');
             $table->string('billing_zipcode')->comment('账单邮编');
-            $table->integer('billing_phone')->comment('账单电话');
+            $table->string('billing_phone')->comment('账单电话');
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间');
             $table->date('create_time')->comment('定义时间');

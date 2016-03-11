@@ -10,69 +10,30 @@
 
 namespace App\Http\Controllers\Product;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Product\ImageRepository;
+use App\Models\product\ImageModel;
 
 class ImageController extends Controller
 {
-    protected $image;
 
-    public function __construct(Request $request, ImageRepository $image)
+    public function __construct(ImageModel $image)
     {
-        $this->request = $request;
-        $this->image = $image;
+        $this->model = $image;
         $this->mainIndex = route('productImage.index');
         $this->mainTitle = '产品图片';
+		$this->viewPath = 'product.image.';
     }
-
-    /**
-     * 图片列表
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
+    
+	
+	public function index()
     {
-        $this->request->flash();
+        request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->image->auto()->paginate(),
+            'data' => $this->autoList($this->model),
         ];
-
-        return view('product.image.index', $response);
+        return view($this->viewPath . 'index', $response);
     }
-
-
-    /**
-     * 图片详情
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function show($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'image' => $this->image->get($id),
-        ];
-
-        return view('product.image.show', $response);
-    }
-
-    /**
-     * 添加产品图片
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-
-        return view('product.image.create', $response);
-    }
-
     /**
      * 图片上传
      *
@@ -81,27 +42,13 @@ class ImageController extends Controller
      */
     public function store()
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->image->rules('create'));
-        $this->image->create($this->request->all(), $this->request->files);
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $this->model->imageCreate(request()->all(), request()->files);
 
         return redirect($this->mainIndex);
     }
 
-    /**
-     * 编辑
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function edit($id)
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'image' => $this->image->get($id),
-        ];
-        return view('product.image.edit', $response);
-    }
 
     /**
      * 图片更新
@@ -110,10 +57,9 @@ class ImageController extends Controller
      */
     public function update($id)
     {
-        $this->request->flash();
-        $this->validate($this->request, $this->image->rules('update'));
-        $this->image->updateImage($id, $this->request->file('image'));
-
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update'));
+        $this->model->updateImage($id, request()->file('image'));
         return redirect($this->mainIndex);
     }
 
@@ -125,7 +71,7 @@ class ImageController extends Controller
      */
     public function destroy($id)
     {
-        $this->image->destroy($id);
+        $this->model->imageDestroy($id);
         return redirect($this->mainIndex);
     }
 

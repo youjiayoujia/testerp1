@@ -39,18 +39,40 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+<div class='col-lg-2'>
+    <select name='type' class='form-control type'>
+        <option value='oo'>单单</option>
+        <option value='om'>单多</option>
+        <option value='mm'>多多</option>
+    </select>
+</div>
 <div class="btn-group">
     <a href="javascript:" class="btn btn-success createpick" >
         生成拣货单
     </a>
 </div>
 @stop
+@section('childJs')
 <script type='text/javascript'>
 $(document).ready(function(){
-    $('.createpick').click(function(){
+    $('.type').change(function(){
+        type = $(this).val();
         $.ajax({
-            url:"{{route('createpick')}}",
-            data:{},
+            url:"{{ route('pick.type')}}",
+            data:{type:type},
+            dataType:'json',
+            type:'get',
+            success:function(result) {
+                alert(result);
+            }
+        });
+    });
+
+    $('.createpick').click(function(){
+        type = $('.type').val();
+        $.ajax({
+            url:"{{ route('pick.createpick')}}",
+            data:{type:type},
             dataType:'json',
             type:'get',
             success:function(result) {
@@ -60,3 +82,4 @@ $(document).ready(function(){
     });
 });
 </script>   
+@stop

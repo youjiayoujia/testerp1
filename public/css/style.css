@@ -55,17 +55,28 @@ th:hover:not([data-sort=false]) {
     background: #efefef;
 }
 
-.ajaxinput{
-    margin-left:5px;
+.ajaxinput {
+    margin-left: 5px;
 }
-.ajaxi{
+
+.ajaxi {
     margin-left: 3px;
 }
 
-.innercheckboxs{
+.innercheckboxs {
     margin-top: 10px !important;
 }
 
-.upimage{
+.upimage {
     margin-bottom: 5px
+}
+
+.create {
+    text-align: center;
+    font-size: 16px;
+    line-height: 1;
+    color: #666 !important;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .8;
+    cursor: pointer;
 }

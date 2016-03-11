@@ -4,13 +4,13 @@
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-4">
-                <img src="{{ asset($model->src) }}" width="100px">
-            </div>
-            <div class="col-lg-4">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>图片类型</strong>: {{$model ->type }}
+                <strong>名称</strong>: {{ $model->name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>描述</strong>: {{ $model->brief }}
             </div>
         </div>
     </div>

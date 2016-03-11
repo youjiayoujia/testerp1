@@ -37,6 +37,11 @@ return [
                     'url' => 'item.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '图片',
+                    'url' => 'productImage.index',
+                    'icon' => '',
+                ],
             ],
             '选款' => [
                 [
@@ -58,8 +63,24 @@ return [
     [
         'name' => '订单',
         'icon' => 'list-alt',
-        'url' => 'dashboard.index',
+        'url' => '',
         'type' => 'group',
+        'subnavigations' => [
+            '订单' => [
+                [
+                    'name' => '订单',
+                    'url' => 'order.index',
+                    'icon' => '',
+                ],
+            ],
+            '包裹' => [
+                [
+                    'name' => '包裹',
+                    'url' => 'package.index',
+                    'icon' => '',
+                ],
+            ],
+        ],
     ],
     //仓储导航
     [

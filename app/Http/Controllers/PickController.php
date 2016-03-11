@@ -11,6 +11,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PickModel;
+use App\Models\PackageModel;
 
 class PickController extends Controller
 {
@@ -20,6 +21,21 @@ class PickController extends Controller
         $this->mainIndex = route('pick.index');
         $this->mainTitle = '拣货';
         $this->viewPath = 'pick.';
+    }
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     public function show($id)
@@ -54,7 +70,10 @@ class PickController extends Controller
 
     public function ajaxCreatePick()
     {
-        $packages = PackageModel::where('status','未处理')->get();
+        $type = 'oo';
+        $packages = PackageModel::where(['status'=>'PROCESSING'])->get();
+        var_dump($packages->toArray());
+        exit;
         $arr = [];
         $arr1 = [];
         $arr2 = [];
@@ -79,5 +98,11 @@ class PickController extends Controller
         $this->model->createddduo($arr1);
         $this->model->createduoduo($arr2);
         echo json_encode('111');
+    }
+
+    public function ajaxType()
+    {
+        $type = request()->input('type');
+
     }
 }

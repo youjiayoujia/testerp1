@@ -67,6 +67,8 @@
                         'keywords' => request()->input('keywords'),
                         'pageSize' => request()->input('pageSize'),
                         'sorts' => request()->input('sorts'),
+                        'filters' => request()->input('filters'),
+                        'filterClear' => request()->input('filterClear'),
                         ])
                         ->render()
                         !!}
@@ -139,5 +141,5 @@
             });
         });
     </script>
-    @section('childJs')@show
+@section('childJs')@show
 @stop

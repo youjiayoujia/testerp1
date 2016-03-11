@@ -45,7 +45,7 @@
         <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
     </div>
     <div class="form-group col-lg-4">
-        <label for="shipping" class="control-label">种类</label>
+        <label for="species" class="control-label">种类</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>

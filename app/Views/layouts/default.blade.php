@@ -5,6 +5,10 @@
 @section('css')
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
+<<<<<<< HEAD
+=======
+    <link href="{{ asset('css/jquery.cxcalendar.css') }}" rel="stylesheet">
+>>>>>>> package
 @stop
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}

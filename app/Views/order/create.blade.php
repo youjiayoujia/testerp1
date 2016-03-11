@@ -114,22 +114,18 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment" class='control-label'>备用字段</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment" placeholder="备用字段" name='comment' value="{{ old('comment') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment1" class='control-label'>红人/choies用</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="remark" class='control-label'>订单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="import_remark" class='control-label'>导单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') }}">
             </div>
             <div class="form-group col-lg-2">
@@ -258,7 +254,6 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_address1" class='control-label'>发货地址1</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="shipping_address1" placeholder="发货地址1" name='shipping_address1' value="{{ old('shipping_address1') }}">
             </div>
             <div class="form-group col-lg-2">
@@ -381,7 +376,6 @@
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="remark" class='control-label'>备注</label>
-                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
             <div class='row'>

@@ -17,12 +17,12 @@ class ItemModel extends BaseModel
     protected $table = 'order_items';
 
     protected $fillable = [
-        'order_id','sku','quantity','price',
+        'order_id','item_id','sku','quantity','price',
         'status','ship_status','is_gift','remark',
     ];
 
     public $searchFields = [
-        'order_id', 'sku', 'status', 'ship_status',
+        'order_id', 'item_id', 'sku', 'status', 'ship_status',
     ];
 
     public $rules = [

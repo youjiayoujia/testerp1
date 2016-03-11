@@ -15,6 +15,7 @@ class CreateOrderItems extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('order_id')->comment('订单ID');
+            $table->integer('item_id')->comment('货品ID');
             $table->string('sku')->comment('sku');
             $table->integer('quantity')->comment('数量');
             $table->float('price')->comment('金额');

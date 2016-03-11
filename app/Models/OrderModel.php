@@ -34,34 +34,50 @@ class OrderModel extends BaseModel
         'email', 'customer_service', 'operator',
     ];
 
-    public $rules = [
-        'create' => [
-            'channel_id' => 'required',
-            'channel_account_id' => 'required',
-            'order_number' => 'required',
-            'amount' => 'required',
-            'payment' => 'required',
-            'shipping_firstname' => 'required',
-            'billing_firstname' => 'required',
-            'shipping_lastname' => 'required',
-            'billing_lastname' => 'required',
-        ],
-        'update' => [
-            'channel_id' => 'required',
-            'channel_account_id' => 'required',
-            'order_number' => 'required',
-            'amount' => 'required',
-            'payment' => 'required',
-            'shipping_firstname' => 'required',
-            'billing_firstname' => 'required',
-            'shipping_lastname' => 'required',
-            'billing_lastname' => 'required',
-        ],
-    ];
-
     public function rule($request)
     {
-        $arr = [];
+        $arr = [
+            'channel_id' => 'required',
+            'channel_account_id' => 'required',
+            'order_number' => 'required',
+            'channel_order_number' => 'required',
+            'email' => 'required',
+            'status' => 'required',
+            'active' => 'required',
+            'affairer' => 'required',
+            'customer_service' => 'required',
+            'operator' => 'required',
+            'ip' => 'required',
+            'address_confirm' => 'required',
+            'affair_time' => 'required',
+            'create_time' => 'required',
+            'currency' => 'required',
+            'rate' => 'required',
+            'amount' => 'required',
+            'amount_product' => 'required',
+            'amount_shipping' => 'required',
+            'amount_coupon' => 'required',
+            'shipping' => 'required',
+            'shipping_firstname' => 'required',
+            'shipping_lastname' => 'required',
+            'shipping_address' => 'required',
+            'shipping_city' => 'required',
+            'shipping_state' => 'required',
+            'shipping_country' => 'required',
+            'shipping_zipcode' => 'required',
+            'shipping_phone' => 'required|digits_between:8,11',
+            'payment' => 'required',
+            'billing_firstname' => 'required',
+            'billing_lastname' => 'required',
+            'billing_address' => 'required',
+            'billing_city' => 'required',
+            'billing_state' => 'required',
+            'billing_country' => 'required',
+            'billing_zipcode' => 'required',
+            'billing_phone' => 'required|digits_between:8,11',
+            'payment_date' => 'required',
+        ];
+
         $buf = $request->all();
         $buf = $buf['arr'];
         foreach($buf as $key => $val)
@@ -71,15 +87,25 @@ class OrderModel extends BaseModel
                 {
                     $arr['arr.sku.'.$k] ='required';
                 }
-            if($key == 'qty')
+            if($key == 'quantity')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.qty.'.$k] ='required';
+                    $arr['arr.quantity.'.$k] ='required';
                 }
             if($key == 'price')
                 foreach($val as $k => $v)
                 {
                     $arr['arr.price.'.$k] ='required';
+                }
+            if($key == 'status')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.status.'.$k] = 'required';
+                }
+            if($key == 'ship_status')
+                foreach($val as $k => $v)
+                {
+                    $arr['arr.ship_status.'.$k] = 'required';
                 }
             if($key == 'is_gift')
                 foreach($val as $k => $v)

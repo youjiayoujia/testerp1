@@ -1,6 +1,6 @@
 @extends('common.detail')
 @section('detailBody')
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -71,7 +71,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
         <div class="panel-heading">金额信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -94,7 +94,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -129,7 +129,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
         <div class="panel-heading">支付信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
@@ -164,7 +164,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
             @foreach($orderItems as $orderItem)
@@ -194,7 +194,7 @@
             @endforeach
         </div>
     </div>
-    <div class="panel panel-primary">
+    <div class="panel panel-default">
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">

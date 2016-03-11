@@ -22,9 +22,9 @@
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
-                    @foreach($accounts as $account)
-                        <option value="{{$account->id}}" {{$account->id == $model->channel_account_id ? 'selected' : ''}}>
-                            {{$account->alias}}
+                    @foreach($aliases as $alias)
+                        <option value="{{$alias->id}}" {{$alias->id == $model->channel_account_id ? 'selected' : ''}}>
+                            {{$alias->alias}}
                         </option>
                     @endforeach
                 </select>
@@ -117,22 +117,18 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment" class='control-label'>备用字段</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment" placeholder="备用字段" name='comment' value="{{ old('comment') ? old('comment') : $model->comment }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment1" class='control-label'>红人/choies用</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') ? old('comment1') : $model->comment1 }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="remark" class='control-label'>订单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') ? old('remark') : $model->remark }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="import_remark" class='control-label'>导单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') ? old('import_remark') : $model->import_remark }}">
             </div>
             <div class="form-group col-lg-2">
@@ -261,7 +257,6 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_address1" class='control-label'>发货地址1</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="shipping_address1" placeholder="发货地址1" name='shipping_address1' value="{{ old('shipping_address1') ? old('shipping_address1') : $model->shipping_address1 }}">
             </div>
             <div class="form-group col-lg-2">
@@ -382,7 +377,6 @@
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="remark" class='control-label'>备注</label>
-                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
             @foreach($orderItems as $key => $orderItem)
@@ -448,21 +442,6 @@
                 }
             });
             current++;
-        });
-
-        var channel_id = $("#channel_id").val();
-        $.ajax({
-            url : "{{ route('account') }}",
-            data : { id : channel_id },
-            dataType : 'json',
-            type : 'get',
-            success : function(result) {
-                $('.channel_account_id').html();
-                str = '';
-                for(var i=0; i<result.length; i++)
-                    str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
-                $('.channel_account_id').html(str);
-            }
         });
 
         $('#channel_id').click(function(){

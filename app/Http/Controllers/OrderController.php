@@ -70,6 +70,7 @@ class OrderController extends Controller
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
+            'aliases' => $model->channel->channelAccount,
         ];
 
         return view($this->viewPath.'edit', $response);

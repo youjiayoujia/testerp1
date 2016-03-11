@@ -25,12 +25,10 @@ class ItemModel extends BaseModel
         'order_id', 'item_id', 'sku', 'status', 'ship_status',
     ];
 
-    public $rules = [
-        'update' => [
-            'order_id' => 'required',
-            'sku' => 'required',
-        ],
-    ];
+    public function item()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
+    }
 
     public function getShipStatusNameAttribute()
     {

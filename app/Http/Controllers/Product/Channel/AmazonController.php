@@ -86,7 +86,7 @@ class AmazonController extends Controller
     public function beChosed()
     {
         $channel_id = request()->input('channel_id');   
-        $product_id_arr = request()->input('product_ids');
+        $product_id_arr = explode(',', request()->input('product_ids'));
         //创建亚马逊product
         foreach($product_id_arr as $product_id){
             $productModel = $this->product->find($product_id);

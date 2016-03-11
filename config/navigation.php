@@ -51,7 +51,7 @@ return [
                 ],
                 [
                     'name' => '选款产品列表',
-                    'url' => 'amazonProduct.index',
+                    'url' => 'SelectProduct.index',
                     'icon' => '',
                 ],
             ],

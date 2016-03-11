@@ -1,11 +1,6 @@
 @extends('common.table')
 @section('tableToolButtons')
     <div class="btn-group">
-        <a class="btn btn-info" id="choseShop">
-            <i class="glyphicon glyphicon-ok-circle"></i> 选中
-        </a>
-    </div>
-    <div class="btn-group">
         <a class="btn btn-info" id="batchexamine">
             <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
         </a>

@@ -163,5 +163,6 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);
 Route::resource('package', 'PackageController');
 

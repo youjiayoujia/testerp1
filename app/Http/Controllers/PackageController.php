@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PackageModel;
+use App\Models\OrderModel;
 
 class PackageController extends Controller
 {
@@ -18,5 +19,19 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+    }
+
+    public function ajaxGetOrder()
+    {
+        if (request()->ajax()) {
+            $order = OrderModel::where('order_number', request()->input('ordernum'))->first();
+            if ($order) {
+                $response = [
+                    'order' => $order,
+                ];
+                return view($this->viewPath . 'ajax.order', $response);
+            }
+        }
+        return 'error';
     }
 }

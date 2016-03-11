@@ -17,12 +17,21 @@ class ItemModel extends BaseModel
     protected $table = 'order_items';
 
     protected $fillable = [
-        'order_id','sku','qty','price',
-        'status','ship_status','is_gift','remark',
+        'order_id',
+        'sku',
+        'qty',
+        'price',
+        'status',
+        'ship_status',
+        'is_gift',
+        'remark',
     ];
 
     public $searchFields = [
-        'order_id', 'sku', 'status', 'ship_status',
+        'order_id',
+        'sku',
+        'status',
+        'ship_status',
     ];
 
     public $rules = [
@@ -31,5 +40,10 @@ class ItemModel extends BaseModel
             'sku' => 'required',
         ],
     ];
+
+    public function item()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'item_id');
+    }
 
 }

@@ -18,6 +18,7 @@ class CreatePackages extends Migration
             $table->integer('logistic_id')->comment('物流方式ID');
             $table->integer('picklist_id')->comment('拣货单ID');
             $table->integer('assigner_id')->comment('负责人');
+            $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI',])->default('SINGLE')->comment('类型');
             $table->enum('status',
                 [
                     'PROCESSING',

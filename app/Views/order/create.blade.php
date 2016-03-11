@@ -9,7 +9,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="channel_id" class="form-control" id="channel_id">
                     @foreach($channels as $channel)
-                        <option value="{{$channel->id}}" {{$channel->id == old('$channel->channel->id') ? 'selected' : ''}}>
+                        <option value="{{$channel->id}}" {{ Tool::isSelected('channel_id', $channel->id) }}>
                             {{$channel->name}}
                         </option>
                     @endforeach
@@ -68,7 +68,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="affairer" class="form-control" id="affairer">
                     @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                        <option value="{{$user->id}}" {{ Tool::isSelected('affairer', $user->id) }}>
                             {{$user->name}}
                         </option>
                     @endforeach
@@ -79,7 +79,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="customer_service" class="form-control" id="customer_service">
                     @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                        <option value="{{$user->id}}" {{ Tool::isSelected('customer_service', $user->id) }}>
                             {{$user->name}}
                         </option>
                     @endforeach
@@ -90,7 +90,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="operator" class="form-control" id="operator">
                     @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                        <option value="{{$user->id}}" {{ Tool::isSelected('operator', $user->id) }}>
                             {{$user->name}}
                         </option>
                     @endforeach
@@ -345,9 +345,7 @@
         </div>
     </div>
     <div class="panel panel-primary">
-        <div class="panel-heading">
-            产品信息
-        </div>
+        <div class="panel-heading">产品信息</div>
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">

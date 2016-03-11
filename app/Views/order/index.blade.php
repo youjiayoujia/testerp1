@@ -3,8 +3,8 @@
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="channel_id">渠道</th>
     <th class="sort" data-field="channel_account_id">渠道账号</th>
-    <th class="sort" data-field="order_number">订单号</th>
-    <th class="sort" data-field="channel_order_number">渠道订单号</th>
+    <th class="sort" data-field="ordernum">订单号</th>
+    <th class="sort" data-field="channel_ordernum">渠道订单号</th>
     <th>邮箱</th>
     <th>订单状态</th>
     <th>售后状态</th>
@@ -42,8 +42,8 @@
             <td>{{ $order->id }}</td>
             <td>{{ $order->channel->name }}</td>
             <td>{{ $order->channelAccount->alias }}</td>
-            <td>{{ $order->order_number }}</td>
-            <td>{{ $order->channel_order_number }}</td>
+            <td>{{ $order->ordernum }}</td>
+            <td>{{ $order->channel_ordernum }}</td>
             <td>{{ $order->email }}</td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->active_name }}</td>

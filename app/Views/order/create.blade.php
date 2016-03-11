@@ -27,14 +27,14 @@
                 </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="order_number" class='control-label'>订单号</label>
+                <label for="ordernum" class='control-label'>订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="order_number" placeholder="订单号" name='order_number' value="{{ old('order_number') }}">
+                <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="channel_order_number" class='control-label'>渠道订单号</label>
+                <label for="channel_ordernum" class='control-label'>渠道订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="channel_order_number" placeholder="渠道订单号" name='channel_order_number' value="{{ old('channel_order_number') }}">
+                <input class="form-control" id="channel_ordernum" placeholder="渠道订单号" name='channel_ordernum' value="{{ old('channel_ordernum') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="email" class='control-label'>邮箱</label>

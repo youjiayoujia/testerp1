@@ -13,10 +13,10 @@
                 <strong>渠道账号</strong>: {{ $model->channelAccount->alias }}
             </div>
             <div class="col-lg-2">
-                <strong>订单号</strong>: {{ $model->order_number }}
+                <strong>订单号</strong>: {{ $model->ordernum }}
             </div>
             <div class="col-lg-2">
-                <strong>渠道订单号</strong>: {{ $model->channel_order_number }}
+                <strong>渠道订单号</strong>: {{ $model->channel_ordernum }}
             </div>
             <div class="col-lg-2">
                 <strong>邮箱</strong>: {{ $model->email }}

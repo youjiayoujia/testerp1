@@ -17,8 +17,8 @@ class OrderModel extends BaseModel
     protected $table = 'orders';
 
     protected $fillable = [
-        'channel_id','channel_account_id','order_number',
-        'channel_order_number','email','status','active','amount','amount_product',
+        'channel_id','channel_account_id','ordernum',
+        'channel_ordernum','email','status','active','amount','amount_product',
         'amount_shipping','amount_coupon','is_partial','by_hand','is_affair','affairer',
         'customer_service','operator','payment','currency','rate','ip','address_confirm',
         'comment','comment1','remark','import_remark','shipping','shipping_firstname',
@@ -30,7 +30,7 @@ class OrderModel extends BaseModel
     ];
 
     public $searchFields = [
-        'channel_id', 'channel_account_id', 'order_number',
+        'channel_id', 'channel_account_id', 'ordernum',
         'email', 'customer_service', 'operator',
     ];
 
@@ -39,8 +39,8 @@ class OrderModel extends BaseModel
         $arr = [
             'channel_id' => 'required',
             'channel_account_id' => 'required',
-            'order_number' => 'required',
-            'channel_order_number' => 'required',
+            'ordernum' => 'required',
+            'channel_ordernum' => 'required',
             'email' => 'required',
             'status' => 'required',
             'active' => 'required',

@@ -42,17 +42,6 @@ class AmazonController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        echo 8374;
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -66,7 +55,7 @@ class AmazonController extends Controller
             'suppliers' =>$this->supplier->all(),
         ];
 
-        return view($this->viewPath . 'edit', $response); 
+        return view($this->viewPath . 'edit', $response);
     }
 
     /**
@@ -98,14 +87,15 @@ class AmazonController extends Controller
     {
         $channel_id = request()->input('channel_id');   
         $product_id_arr = request()->input('product_ids');
-        //创建item
+        //创建亚马逊product
         foreach($product_id_arr as $product_id){
             $productModel = $this->product->find($product_id);
+            //ERP中如果该产品之前没有创建item,就创建item
             if(empty($productModel->item->toArray())){
                 $productModel->createItem();
             }
             $data = [];
-            
+            //如果该渠道之前没有被选中过,创建该渠道下的product
             if(count($productModel->amazonProduct)==0){           
                 $this->model->createAmazonProduct($productModel->toArray());
             }
@@ -139,10 +129,6 @@ class AmazonController extends Controller
      */
     public function amazonProductUpdateImage()
     {
-        /*$id = request()->input('id');
-        request()->flash();
-        $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->updateAmazonProductImage(request()->files);*/
         $id = request()->input('id');
         request()->flash();
         $amazonProductModel = $this->model->find($id);
@@ -163,6 +149,7 @@ class AmazonController extends Controller
         $status = request()->input('status');
         $amazonProductModel = $this->model->find($id);
         $amazonProductModel->examineAmazonProduct($status);
+
         return 1;
     }
      

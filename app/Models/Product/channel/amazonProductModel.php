@@ -31,14 +31,26 @@ class amazonProductModel extends BaseModel
         ],
         'update' => [
             'name' => 'required',
-            'c_name' => 'required',       
+            'c_name' => 'required',   
+            'purchase_price' => 'required|numeric',
+            'purchase_carriage' => 'required|numeric',    
         ]
     ];
+
+    /**
+     * 渠道产品与ERP产品一对一关系
+     * 2016-3-11 14:00:41 YJ
+     */
     public function product()
     {
         return $this->belongsTo('App\Models\ProductModel','product_id');
     }
 
+    /**
+     * 创建渠道产品
+     * 2016-3-11 14:00:41 YJ
+     * @param array $data
+     */
     public function createAmazonProduct($data)
     {   
         $data['product_id'] = $data['id'];
@@ -47,11 +59,21 @@ class amazonProductModel extends BaseModel
         $this->create($data);
     }
 
+    /**
+     * 编辑渠道产品资料
+     * 2016-3-11 14:00:41 YJ
+     * @param array $data
+     */
     public function updateAmazonProduct($data)
     {   
         $this->update($data);
     }
 
+    /**
+     * 编辑渠道产品图片资料
+     * 2016-3-11 14:00:41 YJ
+     * @param array $data ,$files 图片
+     */
     public function updateAmazonProductImage($data,$files = null)
     {   
         $imageModel = new ImageModel();
@@ -60,6 +82,11 @@ class amazonProductModel extends BaseModel
         $this->update($data);
     }
 
+    /**
+     * 渠道产品审核
+     * 2016-3-11 14:00:41 YJ
+     * @param int $status 审核状态
+     */
     public function examineAmazonProduct($status)
     {   
         $data['status'] = $status;

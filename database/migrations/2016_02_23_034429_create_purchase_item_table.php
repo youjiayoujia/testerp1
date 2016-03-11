@@ -16,6 +16,7 @@ class CreatePurchaseItemTable extends Migration
             $table->increments('id');
 			$table->integer('type')->comment('采购类型')->default(NULL);
 			$table->integer('status')->comment('采购条目的状态')->default(0);
+			$table->integer('costExamineStatus')->comment('审核状态')->default(0);
             $table->integer('order_id')->comment('订单ID')->default(NULL);
 			$table->string('sku_id')->comment('sku_ID')->default(NULL);
 			$table->integer('supplier_id')->comment('供应商ID')->default(NULL);

@@ -36,7 +36,7 @@ class PurchaseItemModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost'];
+    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','costExamineStatus'];
    public function purchaseItemImage()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku_id');
@@ -63,6 +63,9 @@ class PurchaseItemModel extends BaseModel
 		$productItem=$item->find($data['sku_id']);
 		$data['supplier_id']=$productItem->supplier_id;
 		$data['cost']=$productItem['purchase_price'];
+		if($data['cost']>0){
+			$data['costExamineStatus']=2;
+			}
 		$this->create($data);
 	}
 	
@@ -89,7 +92,7 @@ class PurchaseItemModel extends BaseModel
      */
 	public function purchaseOrderCreate()
 	{
-		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('status',0)->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
+		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
 		if(isset($warehouse_supplier)){
 			foreach($warehouse_supplier as $key=>$v){
 				$purchaseOrderModel =new PurchaseOrderModel;
@@ -98,12 +101,16 @@ class PurchaseItemModel extends BaseModel
 				$purchaseOrder=$purchaseOrderModel->create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){
-				$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId,'status'=>1]); 
+				$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId]); 
 				}
 			}
 			return true;
 		}else{
 			return false;
 			}
+	}
+	
+	public function changeItemStatus($data){
+		print_r($data);exit;
 	}
 }

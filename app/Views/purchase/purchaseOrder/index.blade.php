@@ -15,6 +15,7 @@
 	<th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th>ID</th> 
     <th>采购单状态</th> 
+    <th>采购单审核状态</th>
    	<th>供应商</th>
     <th>采购去向</th>
     <th>结算状态</th>
@@ -35,6 +36,11 @@
             <td>{{ $purchaseOrder->id }}</td> 
             @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
+            	<td>{{ $statu }}</td>
+                @endif
+            @endforeach 
+            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
+            	@if($purchaseOrder->examineStatus == $k)
             	<td>{{ $statu }}</td>
                 @endif
             @endforeach     
@@ -81,9 +87,7 @@
             </td>
         </tr>
     @endforeach
-@stop
 
-@section('childJs')
     <script type="text/javascript">
         //单个审核
         $('.examine_model').click(function () {

@@ -33,7 +33,7 @@ class PurchaseOrderModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost'];
+    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','examineStatus'];
 	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
@@ -73,9 +73,7 @@ class PurchaseOrderModel extends BaseModel
 	public function updatePurchaseOrderExamine($purchaseOrderIds)
 	{
 		foreach($purchaseOrderIds as $key=>$v){
-			$this->where('id',$v)->update(['status'=>1]);
-			$purchaseItem= new PurchaseItemModel;
-			$purchaseItem->where('purchase_order_id',$v)->update(['status'=>2]);
+			$this->where('id',$v)->update(['examineStatus'=>2]);
 		}
 	
 	}

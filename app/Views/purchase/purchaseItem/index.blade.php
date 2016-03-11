@@ -23,6 +23,7 @@
     <th>采购需求/采购数目/仍需采购</th>
     <th>shop</th>
     <th>采购条目状态</th>
+    <th>是否生成采购单</th>
     <th>创建时间</th>
     <th>操作</th>
 @stop
@@ -51,7 +52,12 @@
             	@if($purchaseItem->status == $k)
             	<td>{{ $status }}</td>
                 @endif
-            @endforeach            
+            @endforeach
+            	@if($purchaseItem->purchase_order_id)
+            	<td>已生成采购单</td>
+                @else
+                <td>未生成采购单</td>
+                @endif           
             <td>{{ $purchaseItem->created_at }}</td>
             <td>
                 <a href="{{ route('purchaseItem.show', ['id'=>$purchaseItem->id]) }}" class="btn btn-info btn-xs">
@@ -68,7 +74,11 @@
             </td>
         </tr>
     @endforeach
-    <script type="text/javascript">
+   
+@stop
+@section('pageJs')
+
+ <script type="text/javascript">
 	 function addPurchaseOrder(){ 
             if (confirm("确认生成采购单?")) {
                 var url = "addPurchaseOrder";

@@ -16,6 +16,7 @@ class CreatePurchaseOrderTable extends Migration
             $table->increments('id');
 			$table->integer('type')->comment('采购类型')->default(NULL);
 			$table->integer('status')->comment('采购单的状态')->default(0);
+			$table->integer('examineStatus')->comment('采购单的审核状态')->default(0);
 			$table->integer('active')->comment('异常状态')->default(0);
 			$table->integer('close_status')->comment('结算状态')->default(0);
 			$table->integer('supplier_id')->comment('供应商ID')->default(NULL);

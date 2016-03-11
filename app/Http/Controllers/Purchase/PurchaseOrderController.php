@@ -41,7 +41,7 @@ class PurchaseOrderController extends Controller
     }
 	
 	/**
-     * 创建采购条目页面
+     * 创建采购单页面
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -56,7 +56,26 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'create', $response);		
 	}
 	
- 
+ 	/**
+     * 创建采购条目页面
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	
+	public function edit($id)
+	{	
+		$model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+			'purchaseItems'=>$this->purchaseItem->where('purchase_order_id',$id)->get(),
+        ];
+        return view($this->viewPath . 'edit', $response);	
+	}
 	 
 	  /**
      * 详情
@@ -189,7 +208,11 @@ class PurchaseOrderController extends Controller
 		return 1;
 	}
 	
-
+	public function changeStatus(){
+		$data['itemStatus']=request()->get('itemStatus');
+		$data['purchaseItem_id']=request()->get('purchaseItem_id');
+		$this->purchaseItem->changeItemStatus($data);
+	}
 }
 
 

@@ -15,6 +15,23 @@
                 名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
             </div>
             <div class="form-group col-lg-4">
+            	<strong>采购类型</strong>:
+                {{$model->supplier->type}}
+                @if($model->supplier->type == 'online')
+                	<a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $model->id }}"
+                   data-url="{{ route('purchaseOrder.excelOut', ['id' =>$model->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span> 导出该订单
+                </a>
+                @else
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $model->id }}"
+                   data-url="{{ route('purchaseOrder.printOrder', ['id' =>$model->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span> 打印该订单
+                </a>
+                @endif
+            </div>
+            <div class="form-group col-lg-4">
                 <strong>采购单状态</strong>:
                @foreach(config('purchase.purchaseOrder.status') as $k=>$val)
             	@if($model->status == $k)
@@ -27,24 +44,52 @@
      <div class="panel panel-default">
         <div class="panel-heading">单身</div>
         <div class="panel-body">
-        @foreach($purchaseItems as $key=>$v)
-             <div class="form-group col-lg-3">
-                <strong>仓库</strong>:
-              {{$v->warehouse->name}}
-            </div>
-             <div class="form-group col-lg-3">
-                <strong>产品名</strong>:
-                {{$v->purchaseItemImage->product->name}}
-            </div>
-            <div class="form-group col-lg-3">
-                <strong>采购数量/已到数量/仍需采购数量</strong>:
-              	{{$v->purchase_num}}/{{$v->arrival_num}}/{{$v->lack_num}}
-            </div>
-            <div class="form-group col-lg-3">
-           		<strong>产品样图</strong>:
-                 <img src="{{ asset($v->purchaseItemImage->product->image->src) }}" width="50px">
-            </div>
-            @endforeach
+     <table class="table table-bordered table-striped table-hover sortable">
+    <thead>
+        <tr>
+            <td>采购条目ID</td> 
+            <td>采购类型</td> 
+            <td>SKU_ID</td> 
+            <td>样图</td>
+            <td>采购数量/已到数量/仍需采购数量</td>
+            <td>供应商</td>
+            <td>仓库</td>
+            <td>核实价格</td>
+            <td>所属平台</td>
+            <td>创建人</td>
+            <td>创建时间</td>    
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($purchaseItems as $purchaseItem)
+        <tr> 
+            <td>{{$purchaseItem->id}}</td>
+            <td>
+                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
+                    @if($purchaseItem->type == $key)
+                        {{$v}}
+                    @endif
+                @endforeach
+            </td>
+            <td>{{$purchaseItem->sku_id}}</td>
+            <td><img src="{{ asset($purchaseItem->purchaseItemImage->product->image->src) }}" width="50px"></td>
+            <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
+            <td>{{$purchaseItem->supplier->name}}</td>
+            <td>{{$purchaseItem->warehouse->name}}</td>
+            <td>{{$purchaseItem->stock}}</td>
+            <td>
+                @foreach(config('purchase.purchaseItem.platforms') as $key=>$vo)
+                    @if($purchaseItem->platform_id == $key)
+                        {{$vo}}
+                    @endif
+                @endforeach
+            </td>
+            <td>{{$purchaseItem->user_id}}</td>
+            <td>{{$purchaseItem->created_at}}</td>  
+        </tr>
+        @endforeach
+    </tbody>
+    </table>
         </div>
     </div>
     

@@ -143,12 +143,12 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_partial" value="1">是
+                        <input type="radio" name="is_partial" value="1" {{ old('is_partial') ? (old('is_partial') == "1" ? 'checked' : '') : '' }}>是
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_partial" value="0" checked>否
+                        <input type="radio" name="is_partial" value="0" {{ old('is_partial') ? (old('is_partial') == "0" ? 'checked' : '') : 'checked' }}>否
                     </label>
                 </div>
             </div>
@@ -171,12 +171,12 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_affair" value="1">是
+                        <input type="radio" name="is_affair" value="1" {{ old('is_affair') ? (old('is_affair') == "1" ? 'checked' : '') : '' }}>是
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_affair" value="0" checked>否
+                        <input type="radio" name="is_affair" value="0" {{ old('is_affair') ? (old('is_affair') == "0" ? 'checked' : '') : 'checked' }}>否
                     </label>
                 </div>
             </div>

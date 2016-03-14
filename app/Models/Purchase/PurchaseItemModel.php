@@ -37,7 +37,7 @@ class PurchaseItemModel extends BaseModel
      */
 	 
     protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','costExamineStatus'];
-   public function purchaseItemImage()
+	public function purchaseItem()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku_id');
     }
@@ -49,7 +49,10 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
     }
-	
+	 public function purchaseOrder()
+    {
+        return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'purchase_order_id');
+    }
 	/**
      * 创建采购需求
      *
@@ -111,6 +114,9 @@ class PurchaseItemModel extends BaseModel
 	}
 	
 	public function changeItemStatus($data){
-		print_r($data);exit;
+		$purchase=new PurchaseItemModel;
+		$purchase->where('id',$data['purchaseItem_id'])->update(['status'=>$data['itemStatus']]);
 	}
+	
+	
 }

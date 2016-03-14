@@ -18,16 +18,10 @@
             	<strong>采购类型</strong>:
                 {{$model->supplier->type}}
                 @if($model->supplier->type == 'online')
-                	<a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $model->id }}"
-                   data-url="{{ route('purchaseOrder.excelOut', ['id' =>$model->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 导出该订单
+                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
                 </a>
                 @else
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $model->id }}"
-                   data-url="{{ route('purchaseOrder.printOrder', ['id' =>$model->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 打印该订单
+                <a href="/purchaseOrder/printOrder/{{$model->id}}" class="btn btn-info btn-xs"> 打印该订单
                 </a>
                 @endif
             </div>
@@ -72,7 +66,7 @@
                 @endforeach
             </td>
             <td>{{$purchaseItem->sku_id}}</td>
-            <td><img src="{{ asset($purchaseItem->purchaseItemImage->product->image->src) }}" width="50px"></td>
+            <td><img src="{{ asset($purchaseItem->purchaseItem->product->image->src) }}" width="50px"></td>
             <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
             <td>{{$purchaseItem->supplier->name}}</td>
             <td>{{$purchaseItem->warehouse->name}}</td>

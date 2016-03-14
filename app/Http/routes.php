@@ -80,6 +80,8 @@ Route::any('purchaseOrder/purchaseOrderSupplier', 'Purchase\purchaseOrderControl
 Route::any('purchaseOrder/checkProductItems', 'Purchase\purchaseOrderController@checkProductItems');
 Route::any('purchaseOrder/checkedPurchaseItem', 'Purchase\purchaseOrderController@checkedPurchaseItem');
 Route::any('purchaseOrder/changeStatus', 'Purchase\purchaseOrderController@changeStatus');
+Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
+Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 
 /**

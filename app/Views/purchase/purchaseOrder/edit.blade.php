@@ -58,7 +58,7 @@
                 @endforeach
             </td>
             <td>{{$purchaseItem->sku_id}}</td>
-            <td><img src="{{ asset($purchaseItem->purchaseItemImage->product->image->src) }}" width="50px"></td>
+            <td><img src="{{ asset($purchaseItem->purchaseItem->product->image->src) }}" width="50px"></td>
             <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
             <td>
            	<select id="itemStatus_{{$purchaseItem->id}}">

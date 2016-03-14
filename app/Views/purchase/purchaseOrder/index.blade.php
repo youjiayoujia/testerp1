@@ -5,6 +5,10 @@
             <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
         </a>
     </div>
+    <div class="btn-group" >
+        <a class="btn btn-info" id="orderExcelOut"> 导出采购单
+        </a>
+    </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
             <i class="glyphicon glyphicon-plus"></i> 新增
@@ -143,6 +147,32 @@
                 })
             }
         });
+		
+		 //批量导出采购单
+       /* $('#orderExcelOut').click(function () {
+            if (confirm("确认导出这些采购单为一个excel?")) {
+                var checkbox = document.getElementsByName("purchaseOrder_id");
+                var purchase_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    if(checkbox[i].getAttribute('isexamine')==1){
+                        alert("id为"+checkbox[i].value+"的采购单已经审核了");
+                        return;
+                    }
+                    purchase_ids += checkbox[i].value+",";
+                }
+                purchase_ids = purchase_ids.substr(0,(purchase_ids.length)-1);
+                $.ajax({
+                    url:'purchaseOrder/examinePurchaseOrder',
+                    data:{purchase_ids:purchase_ids},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        window.location.reload();
+                    }                    
+                })
+            }
+        });*/
 
         //全选
         function quanxuan()

@@ -212,6 +212,17 @@ class PurchaseOrderController extends Controller
 		$data['itemStatus']=request()->get('itemStatus');
 		$data['purchaseItem_id']=request()->get('purchaseItem_id');
 		$this->purchaseItem->changeItemStatus($data);
+		return 1;
+	}
+	
+	public function printOrder($id)
+	{		
+		echo 111;exit;
+	}
+	
+	public function excelOut($id)
+	{
+		$this->model->purchaseOrderExcelOut($id);	
 	}
 }
 

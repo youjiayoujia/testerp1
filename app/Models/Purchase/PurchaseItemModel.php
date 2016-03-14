@@ -113,10 +113,4 @@ class PurchaseItemModel extends BaseModel
 			}
 	}
 	
-	public function changeItemStatus($data){
-		$purchase=new PurchaseItemModel;
-		$purchase->where('id',$data['purchaseItem_id'])->update(['status'=>$data['itemStatus']]);
-	}
-	
-	
 }

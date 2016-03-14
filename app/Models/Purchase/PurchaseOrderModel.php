@@ -43,8 +43,25 @@ class PurchaseOrderModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
-
-  
+	 public function updatePurchaseOrder($id,$data){
+		 $PurchaseOrder=$this->find($id);
+		 foreach($data as $key=>$v){
+		 $PurchaseOrder->$key=$v;
+		 }
+		 $PurchaseOrder->save();
+		 }
+  	
+	public function changeItemStatus($data){
+		$pitem=new PurchaseItemModel;
+		$changeItemStatu=$pitem->find($data['purchaseItem_id']);
+		$changeItemStatu->status=$data['itemStatus'];
+		$changeItemStatu->save();
+		$this->where('id',$data['purchaseItem_id'])->update(['status'=>$data['itemStatus']]);
+		if($data['itemStatus']==1){
+			$date['status']=1;
+			$this->updatePurchaseOrder($changeItemStatu->purchase_order_id,$date);
+			}
+	}
 	
 	public function getSuppliers($warehouse_id)
 	{	

@@ -21,7 +21,18 @@
             		{{$val}}
                 @endif
             	@endforeach
-            </div>         
+            </div> 
+             <div class="form-group col-lg-4">
+            	<strong>采购类型</strong>:
+                {{$model->supplier->type}}
+                @if($model->supplier->type == 'online')
+                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
+                </a>
+                @else
+                <a href="/purchaseOrder/printOrder/{{$model->id}}" class="btn btn-info btn-xs"> 打印该订单
+                </a>
+                @endif
+            </div>        
         </div>
     </div>
      <div class="panel panel-default">
@@ -123,8 +134,9 @@
                     dataType:'json',
                     type:'get',
                     success:function(result){
+						alert(1);
                         if(result==1){
-                            alert("审核失败");
+                            alert("成功更改状态");
                        }                    
                     }                  
                 })

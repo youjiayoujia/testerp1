@@ -32,6 +32,7 @@ class CreatePurchaseItemTable extends Migration
 			$table->double('postage', 15, 8)->comment('物流费用')->nullable()->default(NULL);
 			$table->double('cost', 15, 8)->comment('已审核成本价格')->nullable()->default(NULL);
 			$table->double('purchase_cost', 15, 8)->comment('采购价格')->nullable()->default(NULL);
+			$table->string('post_coding')->comment('物流单号')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

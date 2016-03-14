@@ -211,7 +211,7 @@ class PurchaseOrderController extends Controller
 	public function changeStatus(){
 		$data['itemStatus']=request()->get('itemStatus');
 		$data['purchaseItem_id']=request()->get('purchaseItem_id');
-		$this->purchaseItem->changeItemStatus($data);
+		$this->model->changeItemStatus($data);
 		return 1;
 	}
 	

@@ -54,6 +54,7 @@ class OrderController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];
             }
+            $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
             $buf['order_id'] = $obj->id;
             ItemModel::create($buf);
         }
@@ -96,6 +97,7 @@ class OrderController extends Controller
                 $buf[$key] = $val[$i];
             }
             $buf['order_id'] = $id;
+            $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {

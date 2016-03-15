@@ -37,9 +37,7 @@
     <div class="form-group col-lg-3">
         <label class='control-label'>采购数数量</label>
         <input class="form-control" type="text" name='purchase_num' value='1'/>
-    </div>    
-<script type="text/javascript">  
- </script>
+    </div> 
 @stop
  
  

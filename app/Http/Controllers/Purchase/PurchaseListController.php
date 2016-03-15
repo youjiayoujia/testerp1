@@ -22,7 +22,7 @@ class PurchaseListController extends Controller
         $this->model = $purchaseList;
 		$this->warehouse = $warehouse;
         $this->mainIndex = route('purchaseList.index');
-        $this->mainTitle = '采购需求';
+        $this->mainTitle = '采购对单';
 		$this->viewPath = 'purchase.purchaseList.';
     }
     

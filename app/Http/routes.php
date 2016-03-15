@@ -133,5 +133,6 @@ Route::resource('product', 'ProductController');
 //订单管理路由
 Route::resource('order', 'OrderController');
 Route::resource('orderItem', 'Order\ItemController');
-Route::get('orderAdd', ['uses'=>'OrderController@ajaxOrderAdd', 'as'=>'orderAdd']);
+Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);
+Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);

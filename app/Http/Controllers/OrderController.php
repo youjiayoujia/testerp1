@@ -127,6 +127,19 @@ class OrderController extends Controller
         return redirect($this->mainIndex);
     }
 
+    public function getMsg()
+    {
+        if(request()->ajax()) {
+            $sku = request()->input('sku');
+            $obj = ItemModel::where(['sku'=>$sku])->get();
+            if(!count($obj)) {
+                return json_encode('sku_none');
+            }
+        }
+
+        return json_encode('false');
+    }
+
     public function ajaxOrderAdd()
     {
         if(request()->ajax()) {

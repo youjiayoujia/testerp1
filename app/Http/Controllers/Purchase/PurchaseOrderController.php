@@ -214,6 +214,15 @@ class PurchaseOrderController extends Controller
 		$this->model->changeItemStatus($data);
 		return 1;
 	}
+	//回传物流单号
+	public function form_postCoding()
+	{
+		$data['postCoding']=request()->get('postCoding');
+		$data['purchaseItem_id']=request()->get('purchaseItem_id');
+		$data['postFee']=request()->get('postFee');
+		$this->model->fromPostCoding($data);
+		return 1;
+		}
 	
 	public function printOrder($id)
 	{		

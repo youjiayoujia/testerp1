@@ -47,10 +47,10 @@
             <td>样图</td>
             <td>采购数量/已到货数量/仍需采购数量</td>
             <td>状态</td>
-            <td>快递单号</td>
-            <td>供应商</td>
-            <td>仓库</td>
-            <td>核实价格</td>
+            <td>物流单号+物流费</td>
+           <!-- <td>采购价格</td>-->
+            <td>库存</td>
+            <td>参考价格</td>
             <td>所属平台</td>
             <td>购买链接</td>
             <td>创建人</td>
@@ -85,13 +85,17 @@
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
                     </a>
              </td>
-            <td><input type="text" value="{{$purchaseItem->arrival_num}}" id="itemStatus_{{$purchaseItem->id}}"/>
-              <a href="javascript:" class="btn btn-info btn-xs examine_model" data-id="{{ $purchaseItem->id }}">
+            <td>物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" id="postCoding_{{$purchaseItem->id}}"/>
+            物流费：<input type="text" value="{{$purchaseItem->postage}}" id="postFee_{{$purchaseItem->id}}"/>
+              <a href="javascript:" class="btn btn-info btn-xs form_postCoding" data-id="{{ $purchaseItem->id }}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
                     </a></td>
-            <td>{{$purchaseItem->supplier->name}}</td>
-            <td>{{$purchaseItem->warehouse->name}}</td>
+              <!--<td><input type="text" value="{{$purchaseItem->supplier_cost}}" id="supplierCost_{{$purchaseItem->id}}"/>
+              <a href="javascript:" class="btn btn-info btn-xs form_supplierCost" data-id="{{ $purchaseItem->id }}">
+                        <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
+                    </a></td>   --> 
             <td>{{$purchaseItem->stock}}</td>
+            <td>{{$purchaseItem->cost}}</td>
             <td>
                 @foreach(config('purchase.purchaseItem.platforms') as $key=>$vo)
                     @if($purchaseItem->platform_id == $key)
@@ -134,13 +138,28 @@
                     dataType:'json',
                     type:'get',
                     success:function(result){
-						alert(1);
                         if(result==1){
                             alert("成功更改状态");
                        }                    
                     }                  
                 })
         });
- 
+ $('.form_postCoding').click(function () {
+            var purchase_id = $(this).data('id');
+			var postCoding=$('#postCoding_'+purchase_id).val();
+			var postFee=$('#postFee_'+purchase_id).val();
+            var url = "/purchaseOrder/form_postCoding";
+                $.ajax({
+                    url:url,
+                    data:{purchaseItem_id:purchase_id,postCoding:postCoding,postFee:postFee},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        if(result==1){
+                            alert("已提交物流单号");
+                       }                    
+                    }                  
+                })
+        });
  </script>
 @stop

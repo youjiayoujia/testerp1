@@ -56,11 +56,18 @@ class PurchaseOrderModel extends BaseModel
 		$changeItemStatu=$pitem->find($data['purchaseItem_id']);
 		$changeItemStatu->status=$data['itemStatus'];
 		$changeItemStatu->save();
-		$this->where('id',$data['purchaseItem_id'])->update(['status'=>$data['itemStatus']]);
 		if($data['itemStatus']==1){
 			$date['status']=1;
 			$this->updatePurchaseOrder($changeItemStatu->purchase_order_id,$date);
 			}
+	}
+	
+	public function fromPostCoding($data){
+		$pitem=new PurchaseItemModel;
+		$fromPostCoding=$pitem->find($data['purchaseItem_id']);
+		$fromPostCoding->post_coding=$data['postCoding'];
+		$fromPostCoding->postage=$data['postFee'];
+		$fromPostCoding->save();
 	}
 	
 	public function getSuppliers($warehouse_id)

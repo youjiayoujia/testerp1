@@ -157,6 +157,11 @@ return [
                 'url' => 'purchaseOrder.index',
                 'icon' => '',
             ],
+			[
+                'name' => '采购列表',
+                'url' => 'purchaseList.index',
+                'icon' => '',
+            ],
 			]
         ],
     ],

@@ -477,23 +477,20 @@
 
             $(document).on('blur', '.sku', function(){
                 var tmp = $(this);
-                var block = $(this).parent().parent();
                 var sku = $(this).val();
-                if(sku) {
-                    $.ajax({
-                        url : "{{ route('getMsg') }}",
-                        data : {sku : sku},
-                        dataType : 'json',
-                        type : 'get',
-                        success : function(result) {
-                            if(result == 'false' || result == 'sku_none') {
-                                alert('sku有误!');
-                                tmp.val();
-                                return;
-                            }
+                $.ajax({
+                    url : "{{ route('getMsg') }}",
+                    data : {sku : sku},
+                    dataType : 'json',
+                    type : 'get',
+                    success : function(result) {
+                        if(result != 'sku') {
+                            alert('sku有误');
+                            tmp.val('');
+                            return;
                         }
-                    });
-                }
+                    }
+                });
             });
 
             $(document).on('click', '.bt_right', function () {

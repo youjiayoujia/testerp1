@@ -15,6 +15,7 @@ use App\Models\ChannelModel;
 use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
+use App\Models\ItemModel as productItem;
 
 class OrderController extends Controller
 {
@@ -131,9 +132,9 @@ class OrderController extends Controller
     {
         if(request()->ajax()) {
             $sku = request()->input('sku');
-            $obj = ItemModel::where(['sku'=>$sku])->get();
-            if(!count($obj)) {
-                return json_encode('sku_none');
+            $obj = productItem::where(['sku'=>$sku])->get();
+            if(count($obj)) {
+                return json_encode('sku');
             }
         }
 

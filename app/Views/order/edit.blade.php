@@ -461,6 +461,24 @@
             });
         });
 
+        $(document).on('blur', '.sku', function(){
+            var tmp = $(this);
+            var sku = $(this).val();
+            $.ajax({
+                url : "{{ route('getMsg') }}",
+                data : {sku : sku},
+                dataType : 'json',
+                type : 'get',
+                success : function(result) {
+                    if(result != 'sku') {
+                        alert('sku有误');
+                        tmp.val('');
+                        return;
+                    }
+                }
+            });
+        });
+
     });
 
     $(document).on('click', '.bt_right', function(){

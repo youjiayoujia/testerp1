@@ -27,6 +27,11 @@ class OrderController extends Controller
         $this->viewPath = 'order.';
     }
 
+    /**
+     * 跳转创建页面
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function create()
     {
         $response = [
@@ -39,6 +44,11 @@ class OrderController extends Controller
         return view($this->viewPath.'create', $response);
     }
 
+    /**
+     * 保存数据
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function store()
     {
         request()->flash();
@@ -62,6 +72,12 @@ class OrderController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 跳转编辑页面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function edit($id)
     {
         $model = $this->model->find($id);
@@ -78,6 +94,12 @@ class OrderController extends Controller
         return view($this->viewPath.'edit', $response);
     }
 
+    /**
+     * 数据更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function update($id)
     {
         request()->flash();
@@ -108,6 +130,12 @@ class OrderController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 信息详情页面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function show($id)
     {
         $model = $this->model->find($id);
@@ -120,6 +148,12 @@ class OrderController extends Controller
         return view($this->viewPath.'show', $response);
     }
 
+    /**
+     * 数据删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function destroy($id)
     {
         $obj = $this->model->find($id);
@@ -130,6 +164,11 @@ class OrderController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 验证订单sku
+     *
+     * @return string
+     */
     public function getMsg()
     {
         if(request()->ajax()) {
@@ -143,6 +182,11 @@ class OrderController extends Controller
         return json_encode('false');
     }
 
+    /**
+     * 新增产品条目
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+     */
     public function ajaxOrderAdd()
     {
         if(request()->ajax()) {
@@ -156,6 +200,11 @@ class OrderController extends Controller
         return null;
     }
 
+    /**
+     * 渠道对应渠道账号
+     *
+     * @return string
+     */
     public function account()
     {
         $id = request()->input('id');

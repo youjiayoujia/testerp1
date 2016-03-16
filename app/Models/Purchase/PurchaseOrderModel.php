@@ -103,6 +103,18 @@ class PurchaseOrderModel extends BaseModel
 	
 	}
 	
+	public function formSupplierCost($data)
+	{
+		$purchaseItem=new PurchaseItemModel;
+		$supplierCost=$purchaseItem->find($data['id']);
+		$cost=$supplierCost->cost;
+		if($cost*0.6<$data['supplier_cost'] && $data['supplier_cost']<1.3*$cost){
+			$supplierCost->costExamineStatus=2;
+		}
+		$supplierCost->purchase_cost=$data['supplier_cost'];
+		$supplierCost->save();
+	}
+	
 	/**
      * 导出单张采购单为单张excel
      *

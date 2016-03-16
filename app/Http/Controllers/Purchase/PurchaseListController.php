@@ -67,7 +67,7 @@ class PurchaseListController extends Controller
 	}
 	
 	/**
-     * 创建采购条目
+     * 采购条目对单
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector

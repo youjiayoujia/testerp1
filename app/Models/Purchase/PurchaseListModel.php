@@ -7,6 +7,7 @@ use App\Models\ItemModel;
 use App\Models\Product\ImageModel;
 use App\Models\WarehouseModel;
 use App\Models\Purchase\PurchaseOrderModel;
+use App\Models\Purchase\ProductAbnormalModel;
 
 class PurchaseListModel extends BaseModel
 {
@@ -40,6 +41,10 @@ class PurchaseListModel extends BaseModel
 	public function purchaseItem()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku_id');
+    }
+	public function productAbnormal()
+    {
+        return $this->belongsTo('App\Models\Purchase\ProductAbnormalModel', 'sku_id','sku_id');
     }
     public function supplier()
     {
@@ -78,9 +83,12 @@ class PurchaseListModel extends BaseModel
      * @param $id,$data
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
- 	public function purchaseItemUpdate($id,$data)
+ 	public function purchaseListUpdate($id,$data)
 	{
 		$purchaseItem=$this->find($id);
+		if($data['active']>0){
+			
+			}
 		$purchase_num=$purchaseItem->purchase_num;
 		$purchaseItem->arrival_num=$data['arrival_num'];	
 		$purchaseItem->lack_num=$purchase_num-$data['arrival_num'];

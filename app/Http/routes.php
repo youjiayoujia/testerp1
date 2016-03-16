@@ -81,6 +81,7 @@ Route::any('purchaseOrder/checkProductItems', 'Purchase\purchaseOrderController@
 Route::any('purchaseOrder/checkedPurchaseItem', 'Purchase\purchaseOrderController@checkedPurchaseItem');
 Route::any('purchaseOrder/changeStatus', 'Purchase\purchaseOrderController@changeStatus');
 Route::any('purchaseOrder/form_postCoding', 'Purchase\purchaseOrderController@form_postCoding');
+Route::any('purchaseOrder/supplierCost', 'Purchase\purchaseOrderController@supplierCost');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
 Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');

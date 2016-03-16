@@ -48,13 +48,11 @@
             <td>采购数量/已到货数量/仍需采购数量</td>
             <td>状态</td>
             <td>物流单号+物流费</td>
-           <!-- <td>采购价格</td>-->
+            <td>采购价格</td>
             <td>库存</td>
             <td>参考价格</td>
             <td>所属平台</td>
-            <td>购买链接</td>
-            <td>创建人</td>
-            <td>创建时间</td>            
+            <td>购买链接</td>            
         </tr>
     </thead>
     <tbody>
@@ -90,10 +88,10 @@
               <a href="javascript:" class="btn btn-info btn-xs form_postCoding" data-id="{{ $purchaseItem->id }}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
                     </a></td>
-              <!--<td><input type="text" value="{{$purchaseItem->supplier_cost}}" id="supplierCost_{{$purchaseItem->id}}"/>
+              <td><input type="text" value="{{$purchaseItem->purchase_cost}}" id="supplierCost_{{$purchaseItem->id}}"/>
               <a href="javascript:" class="btn btn-info btn-xs form_supplierCost" data-id="{{ $purchaseItem->id }}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
-                    </a></td>   --> 
+                    </a></td>    
             <td>{{$purchaseItem->stock}}</td>
             <td>{{$purchaseItem->cost}}</td>
             <td>
@@ -105,9 +103,7 @@
             </td>
              <td>
             <a href="http://{{$purchaseItem->supplier->url}}" text-decoration: none;>链接</a>
-            </td> 
-            <td>{{$purchaseItem->user_id}}</td>
-            <td>{{$purchaseItem->created_at}}</td> 
+            </td>  
         </tr>
         @endforeach
     </tbody>
@@ -161,5 +157,23 @@
                     }                  
                 })
         });
+		
+ $('.form_supplierCost').click(function () {
+            var purchase_id = $(this).data('id');
+			var supplierCost=$('#supplierCost_'+purchase_id).val();
+			alert(supplierCost);
+            var url = "/purchaseOrder/supplierCost";
+                $.ajax({
+                    url:url,
+                    data:{purchaseItem_id:purchase_id,supplierCost:supplierCost},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        if(result==1){
+                            alert("成功提交采购价格");
+                       }                    
+                    }                  
+                })
+        });		
  </script>
 @stop

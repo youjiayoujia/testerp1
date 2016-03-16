@@ -223,7 +223,14 @@ class PurchaseOrderController extends Controller
 		$this->model->fromPostCoding($data);
 		return 1;
 		}
-	
+	public function supplierCost()
+	{
+		$data['supplier_cost']=request()->get('supplierCost');
+		$data['id']=request()->get('purchaseItem_id');
+		$this->model->formSupplierCost($data);
+		return 1;
+		}
+		
 	public function printOrder($id)
 	{		
 		echo 111;exit;

@@ -26,7 +26,7 @@
     </div>
     <div class="form-group col-lg-4">
             <label >处理状态:</label>
-            <select name='active'>
+            <select name='status'>
             @foreach(config('purchase.purchaseItem.status') as $k=>$v)
             	<option value="{{$k}}">{{ $v }}</option>
             @endforeach
@@ -50,9 +50,9 @@
     </div>
         <div class="form-group col-lg-4">
             <label >审核成本:</label>
-            <select name='active'>
+            <select name='costExamineStatus'>
             @foreach(config('purchase.purchaseItem.costExamineStatus') as $k=>$v)
-            	<option value="{{$k}}">{{ $v }}</option>
+            	<option value="{{$k}}" @if($model->costExamineStatus == $k ) selected @endif>{{ $v }}</option>      
             @endforeach
             </select>
     </div>

@@ -87,8 +87,31 @@ class PurchaseListModel extends BaseModel
 	{
 		$purchaseItem=$this->find($id);
 		if($data['active']>0){
-			
+			$productAbnormal=new ProductAbnormalModel;
+			$abnormal['sku_id']=$purchaseItem->sku_id;
+			$abnormal['type']=$data['active'];
+			switch($data['active']){
+				case 1:	
+					$productAbnormal->create($abnormal);
+					break;
+				case 2:
+					$abnormal['arrival_time']=$data['arrival_time'];
+					$productAbnormal->create($abnormal);
+					break;
+				case 3:
+					$abnormal['remark']=$data['remark'];
+					$productAbnormal->create($abnormal);
+					break;
+				case 4:
+					$image=$this->find($id);
+					$abnormal['image_id']=$image->purchaseItem->product->default_image;
+					$productAbnormal->create($abnormal);
+					break;		
+				}			
 			}
+		$purchaseItem->active=$data['active'];
+		$purchaseItem->status=$data['status'];
+		$purchaseItem->costExamineStatus=$data['costExamineStatus'];
 		$purchase_num=$purchaseItem->purchase_num;
 		$purchaseItem->arrival_num=$data['arrival_num'];	
 		$purchaseItem->lack_num=$purchase_num-$data['arrival_num'];

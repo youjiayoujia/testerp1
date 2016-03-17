@@ -87,6 +87,7 @@ Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@pr
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 
 //采购列表
+Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
 
 /**

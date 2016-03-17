@@ -1,9 +1,12 @@
 @extends('common.table')
+@section('tableToolButtons')
+
+@stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th>ID</th>
     <th>Item_ID</th>
     <th>采购类型</th>
-    <th>订单id</th>
+    <th>异常状态</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>采购去向</th>
@@ -24,7 +27,11 @@
             	<td>{{ $type }}</td>
                 @endif
             @endforeach
-            <td>{{ $purchaseList->order_id}}</td>
+            @foreach(config('purchase.purchaseItem.active') as $k=>$vo)
+            	@if($purchaseList->active == $k)
+            	<td>{{ $vo }}</td>
+                @endif
+            @endforeach
             <td><img src="{{ asset($purchaseList->purchaseItem->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->warehouse->name}}</td>
@@ -46,6 +53,11 @@
                 <a href="{{ route('purchaseList.show', ['id'=>$purchaseList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                @if($purchaseList->active>0)
+                <a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
+                     处理异常
+                </a>
+                @endif
                 <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>

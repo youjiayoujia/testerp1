@@ -94,7 +94,15 @@ class PurchaseListController extends Controller
 		}
 	}
 	
-
+	public function activeChange($id)
+	{
+		 $response = [
+			'metas' => $this->metas(__FUNCTION__),
+			'abnormal' => $this->model->find($id),
+        ];
+        return view($this->viewPath . 'changeActive', $response);
+			
+	}
 }
 
 

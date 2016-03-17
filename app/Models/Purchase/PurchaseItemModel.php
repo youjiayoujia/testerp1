@@ -66,9 +66,7 @@ class PurchaseItemModel extends BaseModel
 		$productItem=$item->find($data['sku_id']);
 		$data['supplier_id']=$productItem->supplier_id;
 		$data['cost']=$productItem['purchase_price'];
-		if($data['cost']>0){
-			$data['costExamineStatus']=2;
-			}
+		$data['stock']=$productItem['inventory'];
 		$this->create($data);
 	}
 	

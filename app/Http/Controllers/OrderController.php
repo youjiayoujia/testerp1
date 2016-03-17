@@ -212,6 +212,27 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
+    /**
+     * 获取choies订单数据
+     *
+     */
+    public function getChoiesOrder()
+    {
+        $date = date('Y-m-d');
+        $url = 'http://www.choies.com/api/order_date_list?date='.$date;
+        $queryServer = curl_init();
+        curl_setopt($queryServer, CURLOPT_URL, $url);
+        curl_setopt($queryServer, CURLOPT_HEADER, 0);
+        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($queryServer, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($queryServer, CURLOPT_TIMEOUT, 30);
+        $data = curl_exec($queryServer);
+        curl_close($queryServer);
+        return $data;
+//        echo "<pre>";var_dump($data);echo "</pre>";exit;
+    }
+
 //    public function account()
 //    {
 //        $id = 1;

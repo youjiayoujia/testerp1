@@ -59,6 +59,13 @@ class PickListModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'pick_by', 'id');
     }
 
+    /**
+     * 接受packages，对应相应的操作,单单单多/多多
+     * 
+     * @param $packages 满足条件的包裹
+     * @return none
+     *
+     */
     public function createPickListItems($packages)
     {
         foreach($packages as $package)
@@ -72,6 +79,13 @@ class PickListModel extends BaseModel
         }
     }
 
+    /**
+     * 生成pickListItems
+     *
+     * @param $package 包裹
+     * @return none
+     *
+     */
     public function createListItems($package)
     {
         foreach($package->items as $packageitem)
@@ -96,6 +110,13 @@ class PickListModel extends BaseModel
         }
     }
 
+    /**
+     * 获取某个包裹得分
+     *
+     * @param $package 包裹
+     * @return score integer
+     *
+     */
     public function getScore($package)
     {
         $buf = [];
@@ -123,6 +144,14 @@ class PickListModel extends BaseModel
         return $num;
     }
 
+    /**
+     * 生成pickList 
+     *
+     * @param $listItemQuantity SINGLE/SINGLEMULTI 拣货单上的条目个数
+     * @param $multiQuantity MULTI 同上 | $logistic_id 物流
+     *
+     * @return none
+     */
     public function createPickList($listItemQuantity, $multiQuantity, $logistic_id)
     {
         $query = ListItemModel::where('picklist_id','0');
@@ -176,6 +205,13 @@ class PickListModel extends BaseModel
         }
     }
 
+    /**
+     * 设置picklist_id 
+     *
+     * @param $id integer
+     * @return none
+     *
+     */
     public function setPickListId($id)
     {
         $pickListItems = ListItemModel::where(['picklist_id'=>'0', 'type'=>'MULTI'])->get();
@@ -186,6 +222,12 @@ class PickListModel extends BaseModel
         }
     }
 
+    /**
+     * 获取器,status_name 
+     *
+     * @param none
+     * 
+     */
     public function getStatusNameAttribute()
     {
         $arr = config('pick.pick');

@@ -1,11 +1,11 @@
 <?php
 /**
- * 库存控制器
- * 处理库存相关的Request与Response
+ * 拣货单控制器
+ * 处理拣货单相关的Request与Response
  *
  * @author: MC<178069409@qq.com>
- * Date: 15/12/30
- * Time: 14:19pm
+ * Date: 16/3/18
+ * Time: 17:35pm
  */
 
 namespace App\Http\Controllers;
@@ -25,6 +25,13 @@ class PickListController extends Controller
         $this->viewPath = 'pick.';
     }
 
+    /**
+     * 列表显示 
+     *
+     * @param $id 
+     * @return view
+     *
+     */
     public function show($id)
     {
         $model = $this->model->find($id);
@@ -40,56 +47,13 @@ class PickListController extends Controller
         return view($this->viewPath.'show', $response);
     }
 
-    public function dd()
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'model' => $model, 
-            'packages' => $model->packages,
-            'orderitems' => $model->packages->orderitems->with('items'),
-        ];
-
-        return view($this->viewPath.'fj', $response);
-    }
-
-    public function ajaxCreatePick()
-    {
-        $packages = PackageModel::where(['status'=>'PROCESSING', 'type'=>'SINGLE'])->get();
-        $arr = [];
-        $arr1 = [];
-        $arr2 = [];
-        foreach($packages as $package)
-        {
-            if($package->type == 'SINGLE')
-            {
-                $this->model->getSinglePickListArray($package, $arr);  
-            }
-            if($package->type == 'SINGLEMULTI')
-            {
-                $this->model->getSingleMultiPickListArray($package, $arr1);  
-            }
-            // if($package->type == 'MULTI')
-            // {
-            //     //计算出package的得分
-            //     $arr2[$package->id] = $package_score;
-            // }
-        }
-        // var_dump($arr1);exit;
-        if($arr)
-        {
-            $this->model->createSingle($arr);
-        }
-        if($arr1)
-        {
-            $this->model->createSingleMulti($arr1);
-        }
-
-        echo json_encode('111');
-    }
-
+    /**
+     * 打印拣货单 
+     *
+     * @param $id
+     * @return view
+     *
+     */
     public function printPickList($id)
     {
         $model = $this->model->find($id);
@@ -109,6 +73,13 @@ class PickListController extends Controller
         return view($this->viewPath.'print', $response);
     }
 
+    /**
+     * 打包页面
+     *
+     * @param $id
+     * @return view
+     *
+     */
     public function pickListPackage($id)
     {
         $model = $this->model->find($id);
@@ -127,6 +98,13 @@ class PickListController extends Controller
         return view($this->viewPath.'package', $response);
     }
 
+    /**
+     * 拣货单结果提交
+     *
+     * @param $id
+     * @return view
+     *
+     */
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
@@ -139,6 +117,13 @@ class PickListController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 提交的打包 
+     *
+     * @param $id
+     * @return view
+     *
+     */
     public function packageStore($id)
     {
         $model = $this->model->find($id);
@@ -157,6 +142,13 @@ class PickListController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * ajax  更新packageitem信息
+     *
+     * @param none
+     * @return json
+     *
+     */
     public function ajaxPackageItemUpdate()
     {
         $package_id = request()->input('package_id');
@@ -180,9 +172,16 @@ class PickListController extends Controller
             return json_encode('1');
         }
 
-        return 'false';
+        return json_encode('false');
     }
 
+    /**
+     * 分拣界面 
+     *
+     * @param $id 
+     * @return view
+     *
+     */
     public function inbox($id)
     {
         $model = $this->model->find($id);
@@ -199,22 +198,13 @@ class PickListController extends Controller
         return view($this->viewPath.'inbox', $response);
     }
 
-    public function ajaxInboxResult()
-    {
-        $sku = 'wtRnY-bb-';
-        $id = 60;
-        $pickList = $this->model->find($id);
-        $packages = $pickList->package;
-        foreach($packages as $package) {
-            foreach($package->items as $packageitem) {
-                if(1) {//数量<原有数量 
-                    $packageitem->quantity += 1;
-                    var_dump($package->id - $packages->first()->id + 1);
-                }
-            }
-        }
-    }
-
+    /**
+     * 生成拣货单页面 
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function createPick()
     {
         $response = [
@@ -227,6 +217,13 @@ class PickListController extends Controller
         return view($this->viewPath.'createPick', $response);
     }
 
+    /**
+     * 按条件挑选package
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function createPickStore()
     {   
         if(request()->has('logistic')) {

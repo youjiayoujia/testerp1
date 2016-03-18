@@ -56,7 +56,8 @@ class InModel extends BaseModel
     public function getTypeNameAttribute()
     {
         $buf = config('in.in');
-        return $buf[$this->type];
+        if(array_key_exists($this->type, $buf))
+            return $buf[$this->type];
     }
 
     /**

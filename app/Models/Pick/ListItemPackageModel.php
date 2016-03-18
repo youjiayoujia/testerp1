@@ -35,4 +35,9 @@ class ListItemPackageModel extends BaseModel
     {
         return $this->belongsTo('App\Models\PackageModel', 'package_id', 'id');
     }
+
+    public function picklistItem()
+    {
+        return $this->belongsTo('App\Models\Pick\ListItemModel', 'picklist_item_id', 'id');
+    }
 }

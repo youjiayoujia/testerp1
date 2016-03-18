@@ -153,7 +153,7 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function out($warehousePosistionId, $quantity, $type, $relation_id, $remark = '')
+    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '1', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if($quantity)

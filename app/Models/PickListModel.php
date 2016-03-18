@@ -85,15 +85,11 @@ class PickListModel extends BaseModel
                 $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$value[0], 'picklist_id'=>'0'])->first();
                 if(!$query) {
                     $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$value[0], 'quantity'=>$value[1]]);
-                    if($package->type != 'MULTI') {
-                        $obj->pickListItemPackage()->create(['package_id' => $package->id]);
-                    }
+                    $obj->pickListItemPackage()->create(['package_id' => $package->id]);
                 } else {
                     $query->quantity += $value[1];
                     $query->save();
-                    if($package->type != 'MULTI') {
-                        $obj->pickListItemPackage()->create(['package_id' => $package->id]);
-                    }
+                    $obj->pickListItemPackage()->create(['package_id' => $package->id]);
                 }
                 $stock->where(['item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$value[0]])->first()->hold($value[1]);
             }   

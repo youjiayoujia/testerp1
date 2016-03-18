@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PackageModel;
 use App\Models\OrderModel;
+use App\Models\ItemModel;
 
 class PackageController extends Controller
 {
@@ -38,6 +39,16 @@ class PackageController extends Controller
     public function ajaxPackageSend()
     {
         $id = request()->input('id');
-        echo json_encode($id);
+        $package = $this->model->find($id);
+        foreach($package->listItemPackage as $itemPackage)
+        {
+            $picklistItem = $itemPackage->picklistItem;
+            $item = ItemModel::find($picklistItem->item_id);
+            $item->unhold($picklistItem->warehouse_position_id, $picklistItem->quantity);
+            $item->out($picklistItem->warehouse_position_id, $picklistItem->quantity);
+        }
+        $package->status = 'SHIPPED';
+        $package->save();
+        echo json_encode('success');
     }
 }

@@ -219,23 +219,21 @@ class OrderController extends Controller
      */
     public function getChoiesOrder()
     {
-//        $date = date('Y-m-d');
-//        $url = 'http://www.choies.com/api/order_date_list?date='.$date;
-////        $url = 'http://www.choies.com/api/order_date_list?date=2016-03-18';
-//        $queryServer = curl_init();
-//        curl_setopt($queryServer, CURLOPT_URL, $url);
-//        curl_setopt($queryServer, CURLOPT_HEADER, 0);
-//        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, 1);
-//        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, true);
-//        curl_setopt($queryServer, CURLOPT_CONNECTTIMEOUT, 10);
-//        curl_setopt($queryServer, CURLOPT_TIMEOUT, 30);
-//        $data = curl_exec($queryServer);
-//        curl_close($queryServer);
-        $data = '[{"id":"740159","payment_status":"verify_pass","date_purchased":"2016-02-23 21:48:04","is_active":"1 ","ordernum":"17401591340","email":"angelicamastromatteo@tiscali.it","customer_id":"2129348","currency":"USD","rate":1,"amount":"0.0000","amount_products":"0.0000","amount_shipping":"0.0000","amount_coupon":"0.0000","amount_payment":"0.0000","order_insurance":"0","ip_address":"0.0.0.0","remark":"","payment":"PP","payment_date":"1969-12-31 18:00:00","order_from":"after_sale","shipping_firstname":"Rosalia","shipping_lastname":"Pecorelli","shipping_address":"Via Salvatore Quasimodo 53\n","shipping_city":"Vieste","shipping_state":"Foggia","shipping_country":"IT","shipping_zip":"71019","shipping_phone":"3289065550","billing_firstname":"Rosalia","billing_lastname":"Pecorelli","billing_address":"Via Salvatore Quasimodo 53\n","billing_city":"Vieste","billing_state":"Foggia","billing_country":"IT","billing_zip":"71019","billing_phone":"3289065550","orderitems":[{"sku":"CTYP0797","attributes":"Size:one size;","quantity":"2","price":0,"is_gift":"0"}],"cele_admin":""}]';
+        $date = date('Y-m-d');
+        $url = 'http://www.choies.com/api/order_date_list?date='.$date;
+        $queryServer = curl_init();
+        curl_setopt($queryServer, CURLOPT_URL, $url);
+        curl_setopt($queryServer, CURLOPT_HEADER, 0);
+        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($queryServer, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($queryServer, CURLOPT_TIMEOUT, 30);
+        $data = curl_exec($queryServer);
+        curl_close($queryServer);
         $arr = json_decode($data, true);
-        $arr2 = array();
         $len = count($arr);
 
+//        $arr2 = array();
 //        foreach($arr as $key => $val) {
 //            count($val['orderitems']);
 //            $arr2[] = $val['orderitems'];
@@ -279,12 +277,9 @@ class OrderController extends Controller
             $billing_zipcode = $arr[$i]['billing_zip'];
             $billing_phone = $arr[$i]['billing_phone'];
             DB::insert('insert into orders (id, email) values (?, ?)', [$id, $email]);
-//            foreach($arr as $key => $val) {
-//                $arr2[] = $val['orderitems'];
-//            }
         }
-//        echo "<pre>";var_dump($arr2);echo "</pre>";exit;
         echo "<pre>";var_dump($arr);echo "</pre>";exit;
+//        echo "<pre>";var_dump($arr2);echo "</pre>";exit;
     }
 
 //    public function account()

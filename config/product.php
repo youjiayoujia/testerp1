@@ -20,15 +20,8 @@ return [
     	'2'=>'test2',
     	'3'=>'test3',
     ],
-	//产品异常配置
-	'productAbnormal'=>[
-		'type'=>['reportMissing'=>'报缺','reportWaiting'=>'报等','imageNotProduct'=>'图货不一'],
-		'status'=>[
-		'reportMissing'=>[0=>'正常',1=>'预报缺',2=>'核实报缺'],
-		'reportWaiting'=>[0=>'正常',1=>'报等'], 
-		'imageNotProduct'=>[0=>'正常',1=>'图货不一'],
-		]
-	], 
+	
+	
 	//产品投诉配置
 	'productcomplaint'=>[
 		'types'=>['质量不好','衣服有污迹','衣服破口','袖子长短不一'],

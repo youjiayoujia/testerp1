@@ -16,6 +16,7 @@ use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
+use DB;
 
 class OrderController extends Controller
 {
@@ -210,6 +211,80 @@ class OrderController extends Controller
         $id = request()->input('id');
         $buf = channelModel::find($id)->channelAccount;
         return json_encode($buf);
+    }
+
+    /**
+     * 获取choies订单数据
+     *
+     */
+    public function getChoiesOrder()
+    {
+//        $date = date('Y-m-d');
+//        $url = 'http://www.choies.com/api/order_date_list?date='.$date;
+////        $url = 'http://www.choies.com/api/order_date_list?date=2016-03-18';
+//        $queryServer = curl_init();
+//        curl_setopt($queryServer, CURLOPT_URL, $url);
+//        curl_setopt($queryServer, CURLOPT_HEADER, 0);
+//        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, 1);
+//        curl_setopt($queryServer, CURLOPT_RETURNTRANSFER, true);
+//        curl_setopt($queryServer, CURLOPT_CONNECTTIMEOUT, 10);
+//        curl_setopt($queryServer, CURLOPT_TIMEOUT, 30);
+//        $data = curl_exec($queryServer);
+//        curl_close($queryServer);
+        $data = '[{"id":"740159","payment_status":"verify_pass","date_purchased":"2016-02-23 21:48:04","is_active":"1 ","ordernum":"17401591340","email":"angelicamastromatteo@tiscali.it","customer_id":"2129348","currency":"USD","rate":1,"amount":"0.0000","amount_products":"0.0000","amount_shipping":"0.0000","amount_coupon":"0.0000","amount_payment":"0.0000","order_insurance":"0","ip_address":"0.0.0.0","remark":"","payment":"PP","payment_date":"1969-12-31 18:00:00","order_from":"after_sale","shipping_firstname":"Rosalia","shipping_lastname":"Pecorelli","shipping_address":"Via Salvatore Quasimodo 53\n","shipping_city":"Vieste","shipping_state":"Foggia","shipping_country":"IT","shipping_zip":"71019","shipping_phone":"3289065550","billing_firstname":"Rosalia","billing_lastname":"Pecorelli","billing_address":"Via Salvatore Quasimodo 53\n","billing_city":"Vieste","billing_state":"Foggia","billing_country":"IT","billing_zip":"71019","billing_phone":"3289065550","orderitems":[{"sku":"CTYP0797","attributes":"Size:one size;","quantity":"2","price":0,"is_gift":"0"}],"cele_admin":""}]';
+        $arr = json_decode($data, true);
+        $arr2 = array();
+        $len = count($arr);
+
+//        foreach($arr as $key => $val) {
+//            count($val['orderitems']);
+//            $arr2[] = $val['orderitems'];
+//        }
+
+        for($i=0; $i<$len; $i++) {
+            $id = $arr[$i]['id'];
+            $status = $arr[$i]['payment_status'];
+            $date_purchased = $arr[$i]['date_purchased'];
+            $ia_active = $arr[$i]['ia_active'];
+            $ordernum = $arr[$i]['ordernum'];
+            $email = $arr[$i]['email'];
+            $customer_id = $arr[$i]['customer_id'];
+            $currency = $arr[$i]['currency'];
+            $rate = $arr[$i]['rate'];
+            $amount = $arr[$i]['amount'];
+            $amount_product = $arr[$i]['amount_products'];
+            $amount_shipping = $arr[$i]['amount_shipping'];
+            $amount_coupon = $arr[$i]['amount_coupon'];
+            $amount_payment = $arr[$i]['amount_payment'];
+            $order_insurance = $arr[$i]['order_insurance'];
+            $ip = $arr[$i]['ip_address'];
+            $remark = $arr[$i]['remark'];
+            $payment = $arr[$i]['payment'];
+            $payment_date = $arr[$i]['payment_date'];
+            $order_from = $arr[$i]['order_from'];
+            $shipping_firstname = $arr[$i]['shipping_firstname'];
+            $shipping_lastname = $arr[$i]['shipping_lastname'];
+            $shipping_address = $arr[$i]['shipping_address'];
+            $shipping_city = $arr[$i]['shipping_city'];
+            $shipping_state = $arr[$i]['shipping_state'];
+            $shipping_country = $arr[$i]['shipping_country'];
+            $shipping_zipcode = $arr[$i]['shipping_zipcode'];
+            $shipping_phone = $arr[$i]['shipping_phone'];
+            $billing_firstname = $arr[$i]['billing_firstname'];
+            $billing_lastname = $arr[$i]['billing_lastname'];
+            $billing_address = $arr[$i]['billing_address'];
+            $billing_city = $arr[$i]['billing_city'];
+            $billing_state = $arr[$i]['billing_state'];
+            $billing_country = $arr[$i]['billing_country'];
+            $billing_zipcode = $arr[$i]['billing_zipcode'];
+            $billing_phone = $arr[$i]['billing_phone'];
+            DB::insert('insert into orders (id, email) values (?, ?)', [$id, $email]);
+//            foreach($arr as $key => $val) {
+//                $arr2[] = $val['orderitems'];
+//            }
+        }
+//        echo "<pre>";var_dump($arr2);echo "</pre>";exit;
+        echo "<pre>";var_dump($arr);echo "</pre>";exit;
     }
 
 //    public function account()

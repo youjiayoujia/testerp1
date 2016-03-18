@@ -18,6 +18,7 @@ class CreatePackageItems extends Migration
             $table->integer('package_id')->comment('包裹ID');
             $table->integer('order_item_id')->comment('订单产品ID');
             $table->integer('quantity')->comment('数量');
+            $table->integer('picked_quantity')->comment('拣货数量');
             $table->text('remark')->comment('备注');
             $table->timestamps();
             $table->softDeletes();

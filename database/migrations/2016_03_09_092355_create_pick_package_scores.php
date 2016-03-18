@@ -14,8 +14,8 @@ class CreatePickPackageScores extends Migration
     {
         Schema::create('pick_package_scores', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('pick_id')->comment('pick号')->default(0);
-            $table->integer('pckage_id')->comment('package号')->default(0);
+            $table->integer('picklist_id')->comment('pick号')->default(0);
+            $table->integer('package_id')->comment('package号')->default(0);
             $table->integer('package_score')->comment('package得分')->default(0);
             $table->timestamps();
             $table->softDeletes();

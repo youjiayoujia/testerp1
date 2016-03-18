@@ -15,7 +15,7 @@
     @foreach($data as $package)
         <tr>
             <td>{{ $package->id }}</td>
-            <td>{{ $package->order->ordernum }}</td>
+            <td>{{ $package->order ? $package->order->ordernum : '' }}</td>
             <td>{{ $package->status }}</td>
             <td>{{ $package->logistic_assigned_at }}</td>
             <td>{{ $package->printed_at }}</td>
@@ -30,6 +30,9 @@
                 <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                <a href="javascript:" class="btn btn-warning btn-xs send" data-id="{{ $package->id }}">
+                    <span class="glyphicon glyphicon-pencil"></span> 发货
+                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $package->id }}"
                    data-url="{{ route('package.destroy', ['id' => $package->id]) }}">
@@ -38,4 +41,22 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('childJs')
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('.send').click(function(){
+        id = $(this).data('id');
+        $.ajax({
+            url:"{{ route('package.ajaxPackageSend')}}",
+            data:{'id':id},
+            dataType:'json',
+            type:'get',
+            success:function(result) {
+                alert(result);
+            }
+        });
+    });
+});
+</script>
 @stop

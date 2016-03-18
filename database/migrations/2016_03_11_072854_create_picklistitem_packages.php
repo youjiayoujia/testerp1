@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePicks extends Migration
+class CreatePicklistitemPackages extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,10 @@ class CreatePicks extends Migration
      */
     public function up()
     {
-        Schema::create('picks', function (Blueprint $table) {
+        Schema::create('picklistitem_packages', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('pick_id')->comment('拣货单号')->default(NULL);
-            $table->enum('type', ['0', '1', '2'])->comment('拣货单状态')->default('0');
-            $table->enum('status', ['0', '1', '2'])->comment('拣货单状态')->default('0');
+            $table->integer('picklist_item_id')->comment('pick_list号')->default(0);
+            $table->integer('package_id')->comment('package号')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +28,6 @@ class CreatePicks extends Migration
      */
     public function down()
     {
-        Schema::drop('picks');
+        Schema::drop('picklistitem_packages');
     }
 }

@@ -34,4 +34,10 @@ class PackageController extends Controller
         }
         return 'error';
     }
+
+    public function ajaxPackageSend()
+    {
+        $id = request()->input('id');
+        echo json_encode($id);
+    }
 }

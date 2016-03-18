@@ -65,4 +65,10 @@ class PackageModel extends BaseModel
     {
         return $this->hasMany('App\Models\Package\ItemModel', 'package_id');
     }
+
+    public function getStatusNameAttribute()
+    {
+        $arr = config('pick.package');
+        return $arr[$this->status];
+    }
 }

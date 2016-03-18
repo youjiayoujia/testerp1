@@ -228,4 +228,42 @@ class StockModel extends BaseModel
             'remark' => $remark
         ]);
     }
+
+    /**
+     * 通过item_id和quantity自动分配库位 
+     *
+     * @param $item_id $quantity
+     * @return array
+     *
+     */
+    public function allocateStock($item_id, $quantity) 
+    {
+        $stocks = $this->where(['item_id'=>$item_id])->get();
+        foreach($stocks as $stock)
+        {
+            if($stock->available_quantity > $quantity) {
+                return [[$stock->warehouse_position_id, $quantity]];
+            }
+        }
+        $arr = [];
+        foreach($stocks as $stock)
+        {
+            if($stock->available_quantity < $quantity) {
+                $quantity -= $stock->available_quantity;
+                $arr[] = [$stock->warehouse_position_id, $stock->available_quantity, $stock->id];
+            } else {
+                $arr[] = [$stock->warehouse_position_id, $quantity, $stock->id];
+                $quantity -= $quantity;
+            }
+            if($quantity != 0) {
+                return '';
+            }
+        }
+        if($arr) {
+            return $arr;
+        } else {
+            return '';
+        }
+
+    }
 }

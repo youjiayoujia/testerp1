@@ -4,50 +4,64 @@
     <th class='sort' data-field='id'>ID</th>
     <th>拣货单号</th>
     <th>类型</th>
+    <th>物流</th>
     <th>状态</th>
+    <th>拣货人</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
-    @foreach($data as $pick)
+    @foreach($data as $pickList)
         <tr>
-            <td>{{ $pick->id }}</td>
-            <td>{{ $pick->pick_id }}</td>
-            <td>{{ $pick->type == '0' ? '单单' : ($pick->type == '1' ? '单多' : '多多')}}
-            <td>{{ $pick->status }}</td>
-            <td>{{ $pick->created_at }}</td>
+            <td>{{ $pickList->id }}</td>
+            <td>{{ $pickList->picklist_id }}</td>
+            <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
+            <td>{{ $pickList->logistic ? $pickList->logistic->logistics_type : ''}}</td>
+            <td>{{ $pickList->status_name }}</td>
+            <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
+            <td>{{ $pickList->created_at }}</td>
             <td>
-                <a href="{{ route('pick.show', ['id'=>$pick->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="javascript:" class="btn btn-warning btn-xs">
+                <a href="{{ route('pickList.print', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 打印拣货单
                 </a>
-                <a href="javascript:" class="btn btn-warning btn-xs">
+                @if($pickList->type == 'MULTI' && $pickList->status == 'PICKING')
+                <a href="{{ route('pickList.inbox', ['id'=>$pickList->id])}}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 分拣
                 </a>
-                <a href="javascript:" class="btn btn-warning btn-xs">
+                @endif
+                @if($pickList->status == 'PICKING' || $pickList->status == 'PACKAGEING')
+                <a href="{{ route('pickList.package', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 包装
                 </a>
+                @endif
+                @if($pickList->status == 'NONE')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $pick->id }}"
-                   data-url="{{ route('pick.destroy', ['id' => $pick->id]) }}">
+                   data-id="{{ $pickList->id }}"
+                   data-url="{{ route('pickList.destroy', ['id' => $pickList->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                @endif
             </td>
         </tr>
     @endforeach
 @stop
 @section('tableToolButtons')
-<div class='col-lg-2'>
-    <select name='type' class='form-control type'>
-        <option value='oo'>单单</option>
-        <option value='om'>单多</option>
-        <option value='mm'>多多</option>
-    </select>
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="glyphicon glyphicon-filter"></i> 类型
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="{{ DataList::filtersEncode(['type','=','SINGLE']) }}">单单</a></li>
+        <li><a href="{{ DataList::filtersEncode(['type','=','SINGLEMULTI']) }}">单多</a></li>
+        <li><a href="{{ DataList::filtersEncode(['type','=','MULTI']) }}">多多</a></li>
+    </ul>
 </div>
 <div class="btn-group">
-    <a href="javascript:" class="btn btn-success createpick" >
+    <a href="{{ route('pickList.createPick') }}" class="btn btn-success" >
         生成拣货单
     </a>
 </div>
@@ -55,31 +69,7 @@
 @section('childJs')
 <script type='text/javascript'>
 $(document).ready(function(){
-    $('.type').change(function(){
-        type = $(this).val();
-        $.ajax({
-            url:"{{ route('pick.type')}}",
-            data:{type:type},
-            dataType:'json',
-            type:'get',
-            success:function(result) {
-                alert(result);
-            }
-        });
-    });
 
-    $('.createpick').click(function(){
-        type = $('.type').val();
-        $.ajax({
-            url:"{{ route('pick.createpick')}}",
-            data:{type:type},
-            dataType:'json',
-            type:'get',
-            success:function(result) {
-                alert(result);
-            }
-        });
-    });
 });
 </script>   
 @stop

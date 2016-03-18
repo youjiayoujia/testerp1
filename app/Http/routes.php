@@ -11,6 +11,7 @@
  */
 
   Route::get('test', 'TestController@test');
+  Route::get('test1/{url}', ['uses'=>'TestController@test1', 'as'=>'test1']);
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 //产品图片路由
@@ -148,9 +149,18 @@ Route::get('scanAddTrCode/{logistic_id}',
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 
 //拣货路由
-Route::get('type', ['uses'=>'PickController@ajaxType', 'as'=>'pick.type']);
-Route::get('createpick', ['uses'=>'PickController@ajaxCreatePick', 'as'=>'pick.createpick']);
-Route::resource('pick', 'PickController');
+Route::post('inboxStore/{id}', ['uses'=>'PickListController@inboxStore', 'as'=>'pickList.inboxStore']);
+Route::get('pickListSend/{id}', ['uses'=>'PickListController@pickListSend', 'as'=>'pickList.send']);
+Route::post('createPickStore', ['uses'=>'PickListController@createPickStore', 'as'=>'pickList.createPickStore']);
+Route::get('createpick', ['uses'=>'PickListController@createPick', 'as'=>'pickList.createPick']);
+Route::get('inboxresult', ['uses'=>'PickListController@ajaxInboxResult', 'as'=>'pickList.inboxResult']);
+Route::get('inbox/{id}', ['uses'=>'PickListController@inbox', 'as'=>'pickList.inbox']);
+Route::get('packageitemupdate', ['uses'=>'PickListController@ajaxPackageItemUpdate', 'as'=>'pickList.packageItemUpdate']);
+Route::post('packagestore/{id}', ['uses'=>'PickListController@packageStore', 'as'=>'pickList.packageStore']);
+Route::get('picklistpackage/{id}', ['uses'=>'PickListController@pickListPackage', 'as'=>'pickList.package']);
+Route::get('picklistprint/{id}', ['uses'=>'PickListController@printPickList', 'as'=>'pickList.print']);
+Route::get('type', ['uses'=>'PickListController@ajaxType', 'as'=>'pickList.type']);
+Route::resource('pickList', 'PickListController');
 
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
@@ -163,6 +173,7 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::get('package/ajaxPackageSend', ['uses'=>'PackageController@ajaxPackageSend', 'as'=>'package.ajaxPackageSend']);
 Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);
 Route::resource('package', 'PackageController');
 

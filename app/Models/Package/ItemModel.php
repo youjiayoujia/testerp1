@@ -7,7 +7,7 @@
  * Date: 2016-03-10
  */
 
-namespace App\Models\Order;
+namespace App\Models\Package;
 
 use App\Base\BaseModel;
 
@@ -20,6 +20,12 @@ class ItemModel extends BaseModel
         'package_id',
         'order_item_id',
         'quantity',
+        'picked_quantity',
         'remark',
     ];
+
+    public function items()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
+    }
 }

@@ -10,6 +10,7 @@
 
 namespace App\Http\Controllers;
 
+use Session;
 use App\Models\StockModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
@@ -25,13 +26,13 @@ class TestController extends Controller
 {
     public function test()
     {
-        $arr[] = 1;
-        $this->test1($arr);
-        var_dump($arr);
+        if($a = '1')
+            var_dump($a);
     }
 
-    public function test1(&$a)
+    public function test1($url)
     {
-        $a[0] = '2';
+        var_dump($url);
     }
+
 }

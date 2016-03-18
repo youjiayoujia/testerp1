@@ -146,7 +146,7 @@ return [
         'subnavigations' => [
             [
                 'name' => '拣货',
-                'url' => 'pick.index',
+                'url' => 'pickList.index',
                 'icon' => '',
             ],
         ],

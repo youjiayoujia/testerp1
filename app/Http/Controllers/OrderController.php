@@ -245,7 +245,7 @@ class OrderController extends Controller
             $id = $arr[$i]['id'];
             $status = $arr[$i]['payment_status'];
             $date_purchased = $arr[$i]['date_purchased'];
-            $ia_active = $arr[$i]['ia_active'];
+            $ia_active = $arr[$i]['is_active'];
             $ordernum = $arr[$i]['ordernum'];
             $email = $arr[$i]['email'];
             $customer_id = $arr[$i]['customer_id'];
@@ -268,7 +268,7 @@ class OrderController extends Controller
             $shipping_city = $arr[$i]['shipping_city'];
             $shipping_state = $arr[$i]['shipping_state'];
             $shipping_country = $arr[$i]['shipping_country'];
-            $shipping_zipcode = $arr[$i]['shipping_zipcode'];
+            $shipping_zipcode = $arr[$i]['shipping_zip'];
             $shipping_phone = $arr[$i]['shipping_phone'];
             $billing_firstname = $arr[$i]['billing_firstname'];
             $billing_lastname = $arr[$i]['billing_lastname'];
@@ -276,7 +276,7 @@ class OrderController extends Controller
             $billing_city = $arr[$i]['billing_city'];
             $billing_state = $arr[$i]['billing_state'];
             $billing_country = $arr[$i]['billing_country'];
-            $billing_zipcode = $arr[$i]['billing_zipcode'];
+            $billing_zipcode = $arr[$i]['billing_zip'];
             $billing_phone = $arr[$i]['billing_phone'];
             DB::insert('insert into orders (id, email) values (?, ?)', [$id, $email]);
 //            foreach($arr as $key => $val) {

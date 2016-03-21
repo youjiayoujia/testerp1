@@ -173,6 +173,8 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::post('package/feeStore', ['uses'=>'PackageController@feeStore', 'as'=>'package.feeStore']);
+Route::get('package/manualLogistic/{id}', ['uses'=>'PackageController@manualLogistic', 'as'=>'package.manualLogistic']);
 Route::get('package/ajaxPackageSend', ['uses'=>'PackageController@ajaxPackageSend', 'as'=>'package.ajaxPackageSend']);
 Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);
 Route::resource('package', 'PackageController');

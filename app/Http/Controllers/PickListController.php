@@ -108,6 +108,8 @@ class PickListController extends Controller
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
+        $obj->status = 'PICKED';
+        $obj->save();
         foreach($obj->package as $package)
         {
             $package->status = 'PICKED';
@@ -228,7 +230,7 @@ class PickListController extends Controller
     {   
         if(request()->has('logistic')) {
             foreach(request()->input('logistic') as $logistic_id) {
-                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistic_id'=>$logistic_id])->where(function($query){
+                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistic_id'=>$logistic_id, 'is_auto_logistic'=>'1'])->where(function($query){
                     if(request()->has('package')) {
                         foreach(request()->input('package') as $key => $package)
                             if($key == 0)
@@ -248,8 +250,31 @@ class PickListController extends Controller
                 if(count($packages)) {
                     $this->model->createPickListItems($packages);
                     $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
-                                                 (request()->has('multitext') ? request()->input('multitext') : '20'),$logistic_id);
+                                                 (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
                 }
+            }
+        } else {
+            $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto_logistic'=>'1'])->where(function($query){
+                if(request()->has('package')) {
+                    foreach(request()->input('package') as $key => $package)
+                        if($key == 0)
+                            $query = $query->where('type', $package);
+                        else
+                            $query = $query->orwhere('type', $package);
+                }
+            })->where(function($query){
+                if(request()->has('channel')) {
+                    foreach(request()->input('channel') as $key => $channel)
+                        if($key == 0)
+                            $query = $query->where('channel_id', $channel);
+                        else
+                            $query = $query->orwhere('channel_id', $channle);
+                }
+            })->get();
+            if(count($packages)) {
+                $this->model->createPickListItems($packages);
+                $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
+                                             (request()->has('multitext') ? request()->input('multitext') : '20'));
             }
         }
 

@@ -36,6 +36,9 @@
             <tr>
                 <td><input type='checkbox' class='logistic_all'>全部</td>
             </tr>
+            <tr>
+                <td><input type='checkbox' class='mixed'>混合物流</td>
+            </tr>
             @foreach($logistics as $logistic)
             <tr>
                 <td><input type='checkbox' name='logistic[]' class='logistic' value={{$logistic->id}}>{{$logistic->logistics_type}}</td>
@@ -72,6 +75,20 @@
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){
+    $('.mixed').click(function(){
+        if($(this).prop('checked') == true) {
+            $('.logistic').prop('checked', false);
+            $('.logistic').prop('disabled', true);
+            $('.logistic_all').prop('checked', false);
+            $('.logistic_all').prop('disabled', true);
+        } else {
+            $('.logistic').prop('checked', false);
+            $('.logistic').prop('disabled', false);
+            $('.logistic_all').prop('checked', false);
+            $('.logistic_all').prop('disabled', false);
+        }
+    });
+
     $('.channel_all').click(function(){
         if($(this).prop('checked') == true)
             $('.channel').prop('checked', true);

@@ -1,63 +1,39 @@
 @extends('common.detail')
 @section('detailBody')
-    <div class="panel panel-default">
-        <div class="panel-heading">基础信息</div>
-        <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>ID</strong>: {{ $model->id }}
-            </div>
-            <div class="col-lg-2">
-                <strong>拣货单id</strong>: {{ $model->picklist_id }}
-            </div>
-            <div class="col-lg-2">
-                <strong>类型</strong>: {{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多')}}
-            </div>
-            <div class="col-lg-2">
-                <strong>拣货单状态</strong>: {{ $model->status_name }}
-            </div>
+    <div class='row'>
+        <div class='form-group col-lg-2'>
+            <label>ID</label>
+            <input type='text' class='form-control' value={{ $model->picklist_id }}>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>类型</label>
+            <input type='text' class='form-control' value={{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>状态</label>
+            <input type='text' class='form-control' value={{ $model->status_name }}>
         </div>
     </div>
-    
-    <div class="panel panel-default">
-        <div class="panel-heading">package信息</div>
-        <div class="panel-body">
+    <table class='table table-bordered table-condensed'>
+        <thead>
+            <td class='col-lg-4'>package ID</td>
+            <td class='col-lg-4'>sku</td>
+            <td class='col-lg-4'>数量</td>
+        </thead>
+        <tbody>
         @foreach($packages as $package)
-            <div class='row'>
-                <div class="col-lg-2">
-                    <strong>包裹ID</strong>: {{ $package->id }}
-                </div>
-                <div class="col-lg-2">
-                    <strong>状态</strong>: {{ $package->status }}
-                </div>
-            </div>
-            @foreach($package->items as $item)
-            <div class='row col-lg-offset-1'>
-                <div class='col-lg-2'>
-                    <strong>包裹条目id</strong>: {{ $item->id }}
-                </div>
-                <div class='col-lg-2'>
-                    <strong>sku</strong>: {{ $item->items->sku }}
-                </div>
-                <div class='col-lg-2'>
-                    <strong>数量</strong>: {{ $item->quantity }}
-                </div>
-                <div class='col-lg-2'>
-                    <strong>备注</strong>: {{ $item->quantity }}
-                </div>
-            </div>
+            <table class='table table-bordered table-condensed'>
+            @foreach($package->items as $key => $packageitem)
+                <tr>
+                    @if($key == '0')
+                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-4'>{{ $package->id }}</td>
+                    @endif
+                    <td class='sku col-lg-4'>{{ $packageitem->items ? $packageitem->items->sku : '' }}</td>
+                    <td class='quantity col-lg-4'>{{ $packageitem->quantity}}</td>
+                </tr>
             @endforeach
+            </table>
         @endforeach
-        </div>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">日志信息</div>
-        <div class="panel-body">
-            <div class="col-lg-4">
-                <strong>创建时间</strong>: {{ $model->created_at }}
-            </div>
-            <div class="col-lg-4">
-                <strong>更新时间</strong>: {{ $model->updated_at }}
-            </div>
-        </div>
-    </div>
+        </tbody>
+    </table>
 @stop

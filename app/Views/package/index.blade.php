@@ -35,6 +35,11 @@
                     <span class="glyphicon glyphicon-pencil"></span> 发货
                 </a>
                 @endif
+                @if($package->is_auto_logistic == '0' && $package->status != 'SHIPPED')
+                <a href="{{ route('package.manualLogistic', ['id'=>$package->id])}}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 手工发货
+                </a>
+                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $package->id }}"
                    data-url="{{ route('package.destroy', ['id' => $package->id]) }}">

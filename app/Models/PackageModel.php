@@ -71,6 +71,11 @@ class PackageModel extends BaseModel
         return $this->hasMany('App\Models\Pick\ListItemPackageModel', 'package_id', 'id');
     }
 
+    public function manualLogistic()
+    {
+        return $this->hasMany('App\Models\Package\LogisticModel', 'package_id', 'id');
+    }
+    
     public function getStatusNameAttribute()
     {
         $arr = config('pick.package');

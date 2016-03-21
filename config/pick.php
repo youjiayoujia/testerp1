@@ -3,6 +3,7 @@
         'pick' => [
             'NONE' => '未处理',
             'PICKING' => '拣货中',
+            'PICKED' => '拣货完成',
             'INBOXING' => '分拣中',
             'INBOXED' => '分拣完成',
             'PACKAGEING' => '包装中',

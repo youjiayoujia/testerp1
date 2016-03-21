@@ -21,13 +21,15 @@ use App\Models\Stock\TakingFormModel;
 use App\Models\AModel;
 use App\Models\BModel;
 use App\Models\CModel;
+use App\Models\UserModel;
 
 class TestController extends Controller
 {
     public function test()
     {
-        if($a = '1')
-            var_dump($a);
+        $obj = UserModel::where('id','>','0')->orderBy('id')->chunk(1, function($users){
+            var_dump($users->toArray());
+        });
     }
 
     public function test1($url)

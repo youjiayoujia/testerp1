@@ -27,11 +27,30 @@
             	<td>{{ $type }}</td>
                 @endif
             @endforeach
-            @foreach(config('purchase.purchaseItem.active') as $k=>$vo)
-            	@if($purchaseList->active == $k)
-            	<td>{{ $vo }}</td>
+           <td> @foreach(config('purchase.purchaseItem.active') as $k=>$vo)
+            	@if($purchaseList->active == $k)  
+            	{{ $vo }}
+                @if($k >0)-@endif
                 @endif
             @endforeach
+            @if($purchaseList->active==1)
+            @foreach(config('purchase.productAbnormal.status.1') as $key => $v)
+                    @if($purchaseList->active_status==$key) {{$v}} @endif 
+            @endforeach
+            @elseif($purchaseList->active==2)
+            @foreach(config('purchase.productAbnormal.status.2') as $key => $v)
+                   @if($purchaseList->active_status==$key) {{$v}} @endif 
+            @endforeach
+            @elseif($purchaseList->active==3)
+            @foreach(config('purchase.productAbnormal.status.3') as $key => $v)
+                   @if($purchaseList->active_status==$key) {{$v}} @endif 
+            @endforeach
+            @elseif($purchaseList->active==4)
+            @foreach(config('purchase.productAbnormal.status.4') as $key => $v)
+                   @if($purchaseList->active_status==$key) {{$v}} @endif 
+            @endforeach
+            @endif
+            </td>
             <td><img src="{{ asset($purchaseList->purchaseItem->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->warehouse->name}}</td>
@@ -53,7 +72,7 @@
                 <a href="{{ route('purchaseList.show', ['id'=>$purchaseList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if($purchaseList->active>0)
+                @if($purchaseList->active_status>0)
                 <a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
                      处理异常
                 </a>

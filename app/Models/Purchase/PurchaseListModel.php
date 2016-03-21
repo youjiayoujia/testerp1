@@ -42,10 +42,6 @@ class PurchaseListModel extends BaseModel
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku_id');
     }
-	public function productAbnormal()
-    {
-        return $this->belongsTo('App\Models\Purchase\ProductAbnormalModel', 'sku_id','sku_id');
-    }
     public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
@@ -58,24 +54,7 @@ class PurchaseListModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'purchase_order_id');
     }
-	/**
-     * 创建采购需求
-     *
-     * @param $data
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function purchasestore($data)
-	{
-		$data['lack_num']=$data['purchase_num'];
-		$item=new ItemModel();
-		$productItem=$item->find($data['sku_id']);
-		$data['supplier_id']=$productItem->supplier_id;
-		$data['cost']=$productItem['purchase_price'];
-		if($data['cost']>0){
-			$data['costExamineStatus']=2;
-			}
-		$this->create($data);
-	}
+	
 	
 	/**
      * 跟新采购需求
@@ -87,61 +66,36 @@ class PurchaseListModel extends BaseModel
 	{
 		$purchaseItem=$this->find($id);
 		if($data['active']>0){
-			$productAbnormal=new ProductAbnormalModel;
-			$abnormal['sku_id']=$purchaseItem->sku_id;
-			$abnormal['type']=$data['active'];
-			switch($data['active']){
-				case 1:	
-					$productAbnormal->create($abnormal);
-					break;
-				case 2:
-					$abnormal['arrival_time']=$data['arrival_time'];
-					$productAbnormal->create($abnormal);
-					break;
-				case 3:
-					$abnormal['remark']=$data['remark'];
-					$productAbnormal->create($abnormal);
-					break;
-				case 4:
-					$image=$this->find($id);
-					$abnormal['image_id']=$image->purchaseItem->product->default_image;
-					$productAbnormal->create($abnormal);
-					break;		
-				}			
-			}
-		$purchaseItem->active=$data['active'];
+			$abnormal['sku_id']=$purchaseItem->sku_id;			
+			$purchaseItem->active=$data['active'];
+			$purchaseItem->active_status=1;
+				if($data['active']==2){
+					$purchaseItem->arrival_time=$data['arrival_time'];
+				}elseif($data['active']==3){
+					$purchaseItem->remark=$data['remark'];
+				}
+		}
 		$purchaseItem->status=$data['status'];
 		$purchaseItem->costExamineStatus=$data['costExamineStatus'];
 		$purchase_num=$purchaseItem->purchase_num;
 		$purchaseItem->arrival_num=$data['arrival_num'];	
 		$purchaseItem->lack_num=$purchase_num-$data['arrival_num'];
 		$purchaseItem->save();	
+			
 	}
 	
-	/**
-     *批量创建采购单
-     *
-     * 
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function purchaseOrderCreate()
-	{
-		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$purchaseOrderModel =new PurchaseOrderModel;
-				$data['warehouse_id']=$v['warehouse_id'];
-				$data['supplier_id']=$v['supplier_id'];
-				$purchaseOrder=$purchaseOrderModel->create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-				$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}
-			}
-			return true;
-		}else{
-			return false;
-			}
+	public function activeUpdate($id,$data)
+	{	
+		$purchaseItem=$this->find($id);
+		$purchaseItem->active_status=$data['status'];
+		if(!empty($data['newSupplier'])){
+			$item=new ItemModel;
+			$itemSupplier=$item->find($purchaseItem->sku_id);
+			$itemSupplier->supplier_id=$data['newSupplier'];
+			$itemSupplier->save();
+			$purchaseItem->supplier_id=$data['newSupplier'];
+		}
+		$purchaseItem->save();
 	}
 	
 }

@@ -84,10 +84,12 @@ Route::any('purchaseOrder/form_postCoding', 'Purchase\purchaseOrderController@fo
 Route::any('purchaseOrder/supplierCost', 'Purchase\purchaseOrderController@supplierCost');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
 Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
+Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 
 //采购列表
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
+Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
 
 /**

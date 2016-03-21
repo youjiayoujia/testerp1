@@ -240,6 +240,9 @@ class PurchaseOrderController extends Controller
 	{
 		$this->model->purchaseOrderExcelOut($id);	
 	}
+	public function cancelOrder($id){
+		echo 111;exit;
+		}
 }
 
 

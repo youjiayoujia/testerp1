@@ -13,14 +13,16 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseListModel;
 use App\Models\WarehouseModel;
+use App\Models\Product\SupplierModel;
 
 class PurchaseListController extends Controller
 {
 
-    public function __construct(PurchaseListModel $purchaseList,WarehouseModel $warehouse )
+    public function __construct(PurchaseListModel $purchaseList,WarehouseModel $warehouse,SupplierModel $supplier)
     {
         $this->model = $purchaseList;
 		$this->warehouse = $warehouse;
+		$this->supplier=$supplier;
         $this->mainIndex = route('purchaseList.index');
         $this->mainTitle = '采购对单';
 		$this->viewPath = 'purchase.purchaseList.';
@@ -80,6 +82,12 @@ class PurchaseListController extends Controller
         return redirect($this->mainIndex);		
 	}
 	
+	public function updateActive($id)
+	{
+		$data=request()->all();
+		$this->model->activeUpdate($id,$data);
+        return redirect($this->mainIndex);		
+	}
 	
 	public function addPurchaseOrder()
 	{
@@ -96,9 +104,13 @@ class PurchaseListController extends Controller
 	
 	public function activeChange($id)
 	{
-		 $response = [
+		$res=$this->model->find($id);
+		$second_supplier_id=$res->purchaseItem->second_supplier_id;
+		$second_supplier=$this->supplier->find($second_supplier_id);
+		$response = [
 			'metas' => $this->metas(__FUNCTION__),
-			'abnormal' => $this->model->find($id),
+			'abnormal' => $res,
+			'second_supplier'=>$second_supplier,
         ];
         return view($this->viewPath . 'changeActive', $response);
 			

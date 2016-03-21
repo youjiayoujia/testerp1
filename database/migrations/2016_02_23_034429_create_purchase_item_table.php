@@ -34,6 +34,9 @@ class CreatePurchaseItemTable extends Migration
 			$table->double('purchase_cost', 15, 8)->comment('采购价格')->nullable()->default(NULL);
 			$table->string('post_coding')->comment('物流单号')->default(0);
 			$table->double('supplier_cost', 15, 8)->comment('采购实际成本')->nullable()->default(NULL);
+			$table->integer('active_status')->comment('异常处理状态')->default(NULL);
+			$table->string('remark')->comment('异常备注')->default(NULL);
+			$table->date('arrival_time')->comment('到货时间')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

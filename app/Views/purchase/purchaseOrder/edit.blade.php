@@ -32,6 +32,10 @@
                 <a href="/purchaseOrder/printOrder/{{$model->id}}" class="btn btn-info btn-xs"> 打印该订单
                 </a>
                 @endif
+            </div>  
+            <div class="form-group col-lg-4">
+            	<strong>取消采购单</strong>:
+                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单</a>  
             </div>        
         </div>
     </div>
@@ -52,7 +56,8 @@
             <td>库存</td>
             <td>参考价格</td>
             <td>所属平台</td>
-            <td>购买链接</td>            
+            <td>购买链接</td> 
+            <td>操作</td>           
         </tr>
     </thead>
     <tbody>
@@ -104,6 +109,7 @@
              <td>
             <a href="http://{{$purchaseItem->supplier->url}}" text-decoration: none;>链接</a>
             </td>  
+			<td>@if($purchaseItem->active>0)<a href="/purchaseOrder/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> @endif</td>
         </tr>
         @endforeach
     </tbody>

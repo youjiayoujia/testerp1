@@ -32,8 +32,7 @@
             		{{$val}}
                 @endif
             	@endforeach
-            </div> 
-             
+            </div>         
         </div>
     </div>
      <div class="panel panel-default">
@@ -51,7 +50,7 @@
             <td>仓库</td>
             <td>核实价格</td>
             <td>所属平台</td>
-            <td>操作</td>
+            <td>创建人</td>
             <td>创建时间</td>    
         </tr>
     </thead>
@@ -79,7 +78,7 @@
                     @endif
                 @endforeach
             </td>
-            <td>@if($purchaseItem->active>0)<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消订单</a> @endif</td>
+            <td>{{$purchaseItem->user_id}}</td>
             <td>{{$purchaseItem->created_at}}</td>  
         </tr>
         @endforeach

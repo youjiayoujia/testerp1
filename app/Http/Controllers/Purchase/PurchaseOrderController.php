@@ -241,7 +241,8 @@ class PurchaseOrderController extends Controller
 		$this->model->purchaseOrderExcelOut($id);	
 	}
 	public function cancelOrder($id){
-		echo 111;exit;
+		$this->model->cancelOrderItems($id);
+		 return redirect($this->mainIndex);	
 		}
 }
 

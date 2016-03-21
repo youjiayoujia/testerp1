@@ -111,4 +111,9 @@ class PurchaseItemModel extends BaseModel
 			}
 	}
 	
+	public function cancelOrderItem($id){
+		$purchaseItem=$this->find($id);
+		$purchaseItem->purchase_order_id=0;
+		$purchaseItem->save();
+		}
 }

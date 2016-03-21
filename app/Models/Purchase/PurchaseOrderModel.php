@@ -115,6 +115,12 @@ class PurchaseOrderModel extends BaseModel
 		$supplierCost->save();
 	}
 	
+	public function cancelOrderItems($id){
+		$purchaseItem=new PurchaseItemModel;
+		$purchaseItem->where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
+		$this->destroy($id);
+		}
+	
 	/**
      * 导出单张采购单为单张excel
      *

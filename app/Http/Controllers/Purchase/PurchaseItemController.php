@@ -94,6 +94,10 @@ class PurchaseItemController extends Controller
 		}
 	}
 	
+	public function cancelThisItem($id)
+	{
+		$this->model->cancelOrderItem($id);
+	}
 
 }
 

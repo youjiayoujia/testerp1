@@ -35,7 +35,7 @@
             </div>  
             <div class="form-group col-lg-4">
             	<strong>取消采购单</strong>:
-                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单</a>  
+                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该订单</a>  
             </div>        
         </div>
     </div>
@@ -109,7 +109,7 @@
              <td>
             <a href="http://{{$purchaseItem->supplier->url}}" text-decoration: none;>链接</a>
             </td>  
-			<td>@if($purchaseItem->active>0)<a href="/purchaseOrder/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> @endif</td>
+			<td>@if($purchaseItem->active ==1)<a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> @endif</td>
         </tr>
         @endforeach
     </tbody>

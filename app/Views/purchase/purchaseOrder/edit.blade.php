@@ -89,11 +89,11 @@
                     </a>
              </td>
             <td>物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" id="postCoding_{{$purchaseItem->id}}"/>
-            物流费：<input type="text" value="{{$purchaseItem->postage}}" id="postFee_{{$purchaseItem->id}}"/>
+            物流费：<input type="text" value="{{$purchaseItem->postage}}" id="postFee_{{$purchaseItem->id}}" style="width:50px"/>
               <a href="javascript:" class="btn btn-info btn-xs form_postCoding" data-id="{{ $purchaseItem->id }}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
                     </a></td>
-              <td><input type="text" value="{{$purchaseItem->purchase_cost}}" id="supplierCost_{{$purchaseItem->id}}"/>
+              <td><input type="text" value="{{$purchaseItem->purchase_cost}}" id="supplierCost_{{$purchaseItem->id}}" style="width:50px"/>
               <a href="javascript:" class="btn btn-info btn-xs form_supplierCost" data-id="{{ $purchaseItem->id }}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
                     </a></td>    
@@ -109,7 +109,18 @@
              <td>
             <a href="http://{{$purchaseItem->supplier->url}}" text-decoration: none;>链接</a>
             </td>  
-			<td>@if($purchaseItem->active ==1)<a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> @endif</td>
+			<td>@if($purchaseItem->active ==1)<a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> 
+            @else
+            <select id="activeStatus_{{$purchaseItem->id}}">
+             @foreach(config('purchase.purchaseItem.active') as $key=>$v)
+            	<option value="{{$key}}" >{{$v}}</option>
+             @endforeach
+            </select>
+             <a href="javascript:" class="btn btn-info btn-xs active_update" data-id="{{ $purchaseItem->id }}">
+                        <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
+                    </a>
+             @endif
+            </td>
         </tr>
         @endforeach
     </tbody>
@@ -142,6 +153,23 @@
                     success:function(result){
                         if(result==1){
                             alert("成功更改状态");
+                       }                    
+                    }                  
+                })
+        });
+	$('.active_update').click(function () {
+            var purchase_id = $(this).data('id');
+			var activeStatus=$('#activeStatus_'+purchase_id).val();
+            var url = "/purchaseItem/activeCreate";
+                $.ajax({
+                    url:url,
+                    data:{purchaseItem_id:purchase_id,activeStatus:activeStatus},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        if(result==1){
+                            alert("成功提交异常");
+							window.location.reload();
                        }                    
                     }                  
                 })

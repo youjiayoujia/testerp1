@@ -39,7 +39,7 @@
             @endforeach
             </select>
     </div>
-    <div class="form-group col-lg-4">
+    <!-- <div class="form-group col-lg-4">
             <label >异常状态:</label>
            <select  class="form-control" name="active" id='type' onChange="reportwait(this.id)">
             @foreach(config('purchase.purchaseItem.active') as $k=>$v)
@@ -47,7 +47,7 @@
             @endforeach
             </select>
     </div>
-    <div class="form-group col-lg-4" id='reportwaitingshow' style="display:none">
+   <div class="form-group col-lg-4" id='reportwaitingshow' style="display:none">
         <label for="URL">预计到货日期：</label>
         <input id="waiting_date" class='form-control' name='arrival_time' type="text" placeholder='预计到货时间' value="{{ old('expected_date') }}">
     </div>
@@ -55,7 +55,7 @@
         <label for="URL">异常备注：</label>
         	<textarea name="remark" cols="20" rows="5" style="width:590;hight:140">           
         	</textarea>
-    </div>
+    </div>-->
     <div class="form-group col-lg-4">
             <label >参考价格:</label>
             {{$model->cost}}

@@ -20,6 +20,7 @@
 @section('tableBody')
     @foreach($data as $purchaseList)
         <tr>
+        @if($purchaseList->purchase_order_id > 0)
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->sku_id}}</td>
             @foreach(config('purchase.purchaseItem.type') as $k=>$type)
@@ -27,7 +28,8 @@
             	<td>{{ $type }}</td>
                 @endif
             @endforeach
-           <td> @foreach(config('purchase.purchaseItem.active') as $k=>$vo)
+           <td> 
+           @foreach(config('purchase.purchaseItem.active') as $k=>$vo)
             	@if($purchaseList->active == $k)  
             	{{ $vo }}
                 @if($k >0)-@endif
@@ -86,6 +88,7 @@
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>
+            @endif
         </tr>
     @endforeach
    

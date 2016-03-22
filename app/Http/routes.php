@@ -72,6 +72,7 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 
 //采购条目
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
+Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 

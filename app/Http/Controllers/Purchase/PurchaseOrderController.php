@@ -154,11 +154,10 @@ class PurchaseOrderController extends Controller
 	public function checkProductItems()
 	{
 		$warehouse_id=json_decode(request()->get('warehouse_id'));
-		$supplier_id=json_decode(request()->get('supplier_id'));
-		if($warehouse_id=='' || $supplier_id==''){
+		if($warehouse_id==''){
             return 0;
       	}else{
-		$data = $this->purchaseItem->all()->where('warehouse_id',$warehouse_id)->where('supplier_id',$supplier_id)->where('purchase_order_id','!>',0);
+		$data = $this->purchaseItem->all()->where('warehouse_id',$warehouse_id)->where('purchase_order_id','!>',0);
         return view($this->viewPath . 'ajaxPurchaseItems',['data' => $data]);	
 		}
 	}

@@ -65,7 +65,7 @@ class PurchaseListModel extends BaseModel
  	public function purchaseListUpdate($id,$data)
 	{
 		$purchaseItem=$this->find($id);
-		if($data['active']>0){
+		/*if($data['active']>0){
 			$abnormal['sku_id']=$purchaseItem->sku_id;			
 			$purchaseItem->active=$data['active'];
 			$purchaseItem->active_status=1;
@@ -74,7 +74,7 @@ class PurchaseListModel extends BaseModel
 				}elseif($data['active']==3){
 					$purchaseItem->remark=$data['remark'];
 				}
-		}
+		}*/
 		$purchaseItem->status=$data['status'];
 		$purchaseItem->costExamineStatus=$data['costExamineStatus'];
 		$purchase_num=$purchaseItem->purchase_num;

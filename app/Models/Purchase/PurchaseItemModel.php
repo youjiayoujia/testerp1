@@ -79,10 +79,10 @@ class PurchaseItemModel extends BaseModel
  	public function purchaseItemUpdate($id,$data)
 	{
 		$purchaseItem=$this->find($id);
-		$purchase_num=$purchaseItem->purchase_num;
-		$purchaseItem->arrival_num=$data['arrival_num'];	
-		$purchaseItem->lack_num=$purchase_num-$data['arrival_num'];
-		$purchaseItem->save();	
+        $arrival_num=$purchaseItem->arrival_num;
+		$purchaseItem->purchase_num=$data['purchase_num'];
+		$purchaseItem->lack_num=$data['purchase_num']-$arrival_num;
+		$purchaseItem->save();
 	}
 	
 	/**
@@ -93,23 +93,47 @@ class PurchaseItemModel extends BaseModel
      */
 	public function purchaseOrderCreate()
 	{
-		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
+		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id >0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
 		if(isset($warehouse_supplier)){
 			foreach($warehouse_supplier as $key=>$v){
 				$purchaseOrderModel =new PurchaseOrderModel;
-				$data['warehouse_id']=$v['warehouse_id'];
+				$data['warehouse_id']=$v['warehouse_id'];		 
 				$data['supplier_id']=$v['supplier_id'];
 				$purchaseOrder=$purchaseOrderModel->create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){
 				$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}
+				}				 
 			}
 			return true;
 		}else{
 			return false;
 			}
+		$warehouse_nosupplier=$this->select('id','warehouse_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id',0)->get()->toArray();
+		if(isset($warehouse_supplier)){
+			foreach($warehouse_supplier as $key=>$v){
+				$purchaseOrderModel =new PurchaseOrderModel;
+				$data['warehouse_id']=$v['warehouse_id'];	
+				$purchaseOrder=$purchaseOrderModel->create($data);
+				$purchaseOrderId=$purchaseOrder->id; 
+				if($purchaseOrderId >0){
+				$purchaseItem=$this->find($v['id']);
+				$purchaseItem->purchase_order_id=$v['purchase_order_id'];
+				$purchaseItem->save();
+				}				 
+			}
+			return true;
+		}
+		
 	}
+
+	public function changActive($data){
+		$purchaseItem=$this->find($data['id']);
+		$purchaseItem->active=$data['active'];
+		$purchaseItem->active_status=$data['active_status'];
+		$purchaseItem->save();
+		}
+
 	
 	public function cancelOrderItem($id){
 		$purchaseItem=$this->find($id);

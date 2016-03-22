@@ -25,8 +25,8 @@
             {{$model->warehouse->name}}
     </div>
     <div class="form-group col-lg-4">
-        <label class='control-label'>已到货数量:</label>
-        <input class="form-control" type="text" name='arrival_num' value='{{$model->arrival_num}}'/>
+        <label class='control-label'>需要购买数量:</label>
+        <input class="form-control" type="text" name='purchase_num' value='{{$model->purchase_num}}'/>
     </div>
 @stop
  

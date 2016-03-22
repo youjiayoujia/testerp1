@@ -65,21 +65,21 @@ class PurchaseItemController extends Controller
 		$this->model->purchasestore($data);
         return redirect($this->mainIndex);		
 	}
-	
+
 	/**
      * 创建采购条目
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-	
+
 	public function update($id)
 	{
 		$data=request()->all();
 		$this->model->purchaseItemUpdate($id,$data);
-        return redirect($this->mainIndex);		
+        return redirect($this->mainIndex);
 	}
-	
+
 	
 	public function addPurchaseOrder()
 	{
@@ -98,7 +98,14 @@ class PurchaseItemController extends Controller
 	{
 		$this->model->cancelOrderItem($id);
 	}
-
+	
+	public function activeCreate(){
+		$data['id']=json_decode(request()->get('purchaseItem_id'));
+		$data['active']=json_decode(request()->get('activeStatus'));
+		$data['active_status']=1;
+		$this->model->changActive($data);
+		return 1;
+	}
 }
 
 

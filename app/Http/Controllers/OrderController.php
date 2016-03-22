@@ -232,54 +232,44 @@ class OrderController extends Controller
         curl_close($queryServer);
         $arr = json_decode($data, true);
         $len = count($arr);
-
-//        $arr2 = array();
-//        foreach($arr as $key => $val) {
-//            count($val['orderitems']);
-//            $arr2[] = $val['orderitems'];
-//        }
-
         for($i=0; $i<$len; $i++) {
-            $id = $arr[$i]['id'];
-            $status = $arr[$i]['payment_status'];
-            $date_purchased = $arr[$i]['date_purchased'];
-            $ia_active = $arr[$i]['is_active'];
-            $ordernum = $arr[$i]['ordernum'];
-            $email = $arr[$i]['email'];
-            $customer_id = $arr[$i]['customer_id'];
-            $currency = $arr[$i]['currency'];
-            $rate = $arr[$i]['rate'];
-            $amount = $arr[$i]['amount'];
-            $amount_product = $arr[$i]['amount_products'];
-            $amount_shipping = $arr[$i]['amount_shipping'];
-            $amount_coupon = $arr[$i]['amount_coupon'];
-            $amount_payment = $arr[$i]['amount_payment'];
-            $order_insurance = $arr[$i]['order_insurance'];
-            $ip = $arr[$i]['ip_address'];
-            $remark = $arr[$i]['remark'];
-            $payment = $arr[$i]['payment'];
-            $payment_date = $arr[$i]['payment_date'];
-            $order_from = $arr[$i]['order_from'];
-            $shipping_firstname = $arr[$i]['shipping_firstname'];
-            $shipping_lastname = $arr[$i]['shipping_lastname'];
-            $shipping_address = $arr[$i]['shipping_address'];
-            $shipping_city = $arr[$i]['shipping_city'];
-            $shipping_state = $arr[$i]['shipping_state'];
-            $shipping_country = $arr[$i]['shipping_country'];
-            $shipping_zipcode = $arr[$i]['shipping_zip'];
-            $shipping_phone = $arr[$i]['shipping_phone'];
-            $billing_firstname = $arr[$i]['billing_firstname'];
-            $billing_lastname = $arr[$i]['billing_lastname'];
-            $billing_address = $arr[$i]['billing_address'];
-            $billing_city = $arr[$i]['billing_city'];
-            $billing_state = $arr[$i]['billing_state'];
-            $billing_country = $arr[$i]['billing_country'];
-            $billing_zipcode = $arr[$i]['billing_zip'];
-            $billing_phone = $arr[$i]['billing_phone'];
-            DB::insert('insert into orders (id, email) values (?, ?)', [$id, $email]);
+            $name = substr($url, 11, 6);
+            $channel = ChannelModel::where(['name' => $name])->get();
+            foreach($channel as $value) {
+                $arr[$i]['channel_id'] = $value['id'];
+                $account = AccountModel::where(['channel_id' => $arr[$i]['channel_id']])->get();
+                foreach($account as $val) {
+                    $arr[$i]['channel_account_id'] = $val['id'];
+                    $arr[$i]['customer_service'] = $val['customer_service_id'];
+                    $arr[$i]['operator'] = $val['operator_id'];
+                    $arr[$i]['affairer'] = 2;
+                }
+            }
+            $arr[$i]['channel_ordernum'] = $arr[$i]['ordernum'];
+            $arr[$i]['status'] = 1;
+            $arr[$i]['active'] = 1;
+            $arr[$i]['ip'] = $arr[$i]['ip_address'];
+            $arr[$i]['address_confirm'] = 1;
+            $arr[$i]['affair_time'] = date('Y-m-d');
+            $arr[$i]['create_time'] = $arr[$i]['date_purchased'];
+            $arr[$i]['is_partial'] = 0;
+            $arr[$i]['by_hand'] = 0;
+            $arr[$i]['is_affair'] = 0;
+            $arr[$i]['amount_product'] = $arr[$i]['amount_products'];
+            $arr[$i]['amount_shipping'] = $arr[$i]['amount_shipping'] + $arr[$i]['order_insurance'];
+            if(($arr[$i]['amount_shipping'] / $arr[$i]['rate']) < 10) {
+                $arr[$i]['shipping'] = 'packet';
+            }else {
+                $arr[$i]['shipping'] = 'express';
+            }
+            $arr[$i]['shipping_zipcode'] = $arr[$i]['shipping_zip'];
+            $arr[$i]['billing_zipcode'] = $arr[$i]['billing_zip'];
+            $obj = OrderModel::where(['ordernum'=>$arr[$i]['ordernum']])->get();
+            if(!count($obj)) {
+                OrderModel::create($arr[$i]);
+            }
         }
         echo "<pre>";var_dump($arr);echo "</pre>";exit;
-//        echo "<pre>";var_dump($arr2);echo "</pre>";exit;
     }
 
 //    public function account()

@@ -22,7 +22,7 @@ class CreateOrderItems extends Migration
             $table->integer('status')->comment('订单状态');
             $table->integer('ship_status')->comment('发货状态');
             $table->integer('is_gift')->comment('是否赠品');
-            $table->string('remark')->comment('备注');
+            $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -16,7 +16,6 @@ use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
-use DB;
 
 class OrderController extends Controller
 {
@@ -221,6 +220,7 @@ class OrderController extends Controller
     {
         $date = date('Y-m-d');
         $url = 'http://www.choies.com/api/order_date_list?date='.$date;
+//        $url = 'http://www.choies.com/api/order_date_list?date=2016-03-21';
         $queryServer = curl_init();
         curl_setopt($queryServer, CURLOPT_URL, $url);
         curl_setopt($queryServer, CURLOPT_HEADER, 0);
@@ -267,6 +267,17 @@ class OrderController extends Controller
             $obj = OrderModel::where(['ordernum'=>$arr[$i]['ordernum']])->get();
             if(!count($obj)) {
                 OrderModel::create($arr[$i]);
+                $arr2 = $arr[$i]['orderitems'];
+                $len2 = count($arr2);
+                for($j=0; $j<$len2; $j++) {
+                    $arr2[$j]['sku'] = $arr2[$j]['sku']."-".$arr2[$j]['attributes'];
+                    $arr2[$j]['status'] = 1;
+                    $arr2[$j]['ship_status'] = 1;
+                    $arr2[$j]['order_id'] = $arr[$i]['id'];
+                    ItemModel::create($arr2[$j]);
+                    echo "<pre>";var_dump($arr2[$j]['attributes']);echo "</pre>";
+                }
+                echo "<pre>";var_dump($arr2);echo "</pre>";
             }
         }
         echo "<pre>";var_dump($arr);echo "</pre>";exit;

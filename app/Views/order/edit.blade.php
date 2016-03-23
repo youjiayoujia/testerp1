@@ -165,7 +165,7 @@
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }} disabled>否
+                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }}>否
                     </label>
                 </div>
             </div>

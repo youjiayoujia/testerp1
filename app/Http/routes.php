@@ -71,6 +71,9 @@ Route::resource('warehousePosition', 'Warehouse\PositionController');
 
 
 //采购条目
+Route::any('purchaseItem/changeStatus', 'Purchase\PurchaseItemController@changeStatus');
+Route::any('purchaseItem/form_postCoding', 'Purchase\PurchaseItemController@form_postCoding');
+Route::any('purchaseItem/supplierCost', 'Purchase\PurchaseItemController@supplierCost');
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
@@ -81,9 +84,6 @@ Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderControll
 Route::any('purchaseOrder/purchaseOrderSupplier', 'Purchase\purchaseOrderController@purchaseOrderSupplier');
 Route::any('purchaseOrder/checkProductItems', 'Purchase\purchaseOrderController@checkProductItems');
 Route::any('purchaseOrder/checkedPurchaseItem', 'Purchase\purchaseOrderController@checkedPurchaseItem');
-Route::any('purchaseOrder/changeStatus', 'Purchase\purchaseOrderController@changeStatus');
-Route::any('purchaseOrder/form_postCoding', 'Purchase\purchaseOrderController@form_postCoding');
-Route::any('purchaseOrder/supplierCost', 'Purchase\purchaseOrderController@supplierCost');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
 Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
 Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');

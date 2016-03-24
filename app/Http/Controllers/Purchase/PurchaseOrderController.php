@@ -207,28 +207,9 @@ class PurchaseOrderController extends Controller
 		return 1;
 	}
 	
-	public function changeStatus(){
-		$data['itemStatus']=request()->get('itemStatus');
-		$data['purchaseItem_id']=request()->get('purchaseItem_id');
-		$this->model->changeItemStatus($data);
-		return 1;
-	}
-	//回传物流单号
-	public function form_postCoding()
-	{
-		$data['postCoding']=request()->get('postCoding');
-		$data['purchaseItem_id']=request()->get('purchaseItem_id');
-		$data['postFee']=request()->get('postFee');
-		$this->model->fromPostCoding($data);
-		return 1;
-		}
-	public function supplierCost()
-	{
-		$data['supplier_cost']=request()->get('supplierCost');
-		$data['id']=request()->get('purchaseItem_id');
-		$this->model->formSupplierCost($data);
-		return 1;
-		}
+	
+	
+	
 		
 	public function printOrder($id)
 	{		

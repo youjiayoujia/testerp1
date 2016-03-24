@@ -106,6 +106,48 @@ class PurchaseItemController extends Controller
 		$this->model->changActive($data);
 		return 1;
 	}
+	
+	/**
+     * 回传物流单号和运费
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function form_postCoding()
+	{
+		$data['postCoding']=request()->get('postCoding');
+		$data['purchaseItem_id']=request()->get('purchaseItem_id');
+		$data['postFee']=request()->get('postFee');
+		$this->model->fromPostCoding($data);
+		return 1;
+	}
+	
+	/**
+     * 回传采购价格
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function supplierCost()
+	{
+		$data['supplier_cost']=request()->get('supplierCost');
+		$data['id']=request()->get('purchaseItem_id');
+		$this->model->formSupplierCost($data);
+		return 1;
+	}
+	
+	/**
+     * 更改采购条目状态
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function changeStatus(){
+		$data['itemStatus']=request()->get('itemStatus');
+		$data['purchaseItem_id']=request()->get('purchaseItem_id');
+		$this->model->changeItemStatus($data);
+		return 1;
+	}
 }
 
 

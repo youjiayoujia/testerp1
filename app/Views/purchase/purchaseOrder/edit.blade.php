@@ -15,6 +15,14 @@
                 名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
             </div>
             <div class="form-group col-lg-4">
+                <strong>订单成本</strong>:
+                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_cost}}  总成本{{ $model->total_postage + $model->total_cost}}
+            </div>
+            <div class="form-group col-lg-4">
+                <strong>采购仓库</strong>:
+                {{ $model->warehouse->name}}
+            </div>
+            <div class="form-group col-lg-4">
                 <strong>采购单状态</strong>:
                @foreach(config('purchase.purchaseOrder.status') as $k=>$val)
             	@if($model->status == $k)
@@ -144,7 +152,7 @@
  $('.examine_model').click(function () {
             var purchase_id = $(this).data('id');
 			var itemStatus=$('#itemStatus_'+purchase_id).val();
-            var url = "/purchaseOrder/changeStatus";
+            var url = "/purchaseItem/changeStatus";
                 $.ajax({
                     url:url,
                     data:{purchaseItem_id:purchase_id,itemStatus:itemStatus},
@@ -178,7 +186,7 @@
             var purchase_id = $(this).data('id');
 			var postCoding=$('#postCoding_'+purchase_id).val();
 			var postFee=$('#postFee_'+purchase_id).val();
-            var url = "/purchaseOrder/form_postCoding";
+            var url = "/purchaseItem/form_postCoding";
                 $.ajax({
                     url:url,
                     data:{purchaseItem_id:purchase_id,postCoding:postCoding,postFee:postFee},
@@ -195,8 +203,7 @@
  $('.form_supplierCost').click(function () {
             var purchase_id = $(this).data('id');
 			var supplierCost=$('#supplierCost_'+purchase_id).val();
-			alert(supplierCost);
-            var url = "/purchaseOrder/supplierCost";
+            var url = "/purchaseItem/supplierCost";
                 $.ajax({
                     url:url,
                     data:{purchaseItem_id:purchase_id,supplierCost:supplierCost},

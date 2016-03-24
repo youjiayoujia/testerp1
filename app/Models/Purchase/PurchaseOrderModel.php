@@ -28,11 +28,7 @@ class PurchaseOrderModel extends BaseModel
         ]
     ];
     public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    
 	 
     protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','examineStatus'];
 	public function warehouse()
@@ -51,30 +47,7 @@ class PurchaseOrderModel extends BaseModel
 		 $PurchaseOrder->save();
 		 }
   	
-	public function changeItemStatus($data){
-		$pitem=new PurchaseItemModel;
-		$changeItemStatu=$pitem->find($data['purchaseItem_id']);
-		$changeItemStatu->status=$data['itemStatus'];
-		$changeItemStatu->save();
-		if($data['itemStatus']==1){
-			$date['status']=1;
-			$this->updatePurchaseOrder($changeItemStatu->purchase_order_id,$date);
-			}
-	}
 	
-	public function fromPostCoding($data){
-		$pitem=new PurchaseItemModel;
-		$fromPostCoding=$pitem->find($data['purchaseItem_id']);
-		$fromPostCoding->post_coding=$data['postCoding'];
-		$fromPostCoding->postage=$data['postFee'];
-		$fromPostCoding->save();
-	}
-	
-	public function getSuppliers($warehouse_id)
-	{	
-		$data=$this->purchaseItemSupplier($warehouse_id);
-		return $data;	
-	}
 	
 	public function addPurchaseOrder($data)
 	{
@@ -94,7 +67,11 @@ class PurchaseOrderModel extends BaseModel
 		}
 	}
 
-
+	/*审核采购单
+	*
+	* @param $data
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
 	public function updatePurchaseOrderExamine($purchaseOrderIds)
 	{
 		foreach($purchaseOrderIds as $key=>$v){
@@ -103,23 +80,34 @@ class PurchaseOrderModel extends BaseModel
 	
 	}
 	
-	public function formSupplierCost($data)
+
+	
+	/*上报采购总成本
+	*
+	* @param $data
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
+	public function totalCost($purchase_order_id)
 	{
 		$purchaseItem=new PurchaseItemModel;
-		$supplierCost=$purchaseItem->find($data['id']);
-		$cost=$supplierCost->cost;
-		if($cost*0.6<$data['supplier_cost'] && $data['supplier_cost']<1.3*$cost){
-			$supplierCost->costExamineStatus=2;
-		}
-		$supplierCost->purchase_cost=$data['supplier_cost'];
-		$supplierCost->save();
+		$sumPostage=$purchaseItem->where('purchase_order_id',$purchase_order_id)->where('costExamineStatus',2)->sum('postage');
+		$sumPurchasecost=$purchaseItem->where('purchase_order_id',$purchase_order_id)->where('costExamineStatus',2)->sum('purchase_cost');
+		$totalOrder=$this->find($purchase_order_id);
+		$totalOrder->total_postage=$sumPostage;
+		$totalOrder->total_cost=$sumPurchasecost;
+		$totalOrder->save();
+		
 	}
-	
+	/*取消订单
+	*
+	* @param $id
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
 	public function cancelOrderItems($id){
 		$purchaseItem=new PurchaseItemModel;
 		$purchaseItem->where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
 		$this->destroy($id);
-		}
+	}
 	
 	/**
      * 导出单张采购单为单张excel
@@ -170,7 +158,7 @@ class PurchaseOrderModel extends BaseModel
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function purchaseOrdersExcelOut($id)
+	public function purchaseOrdersExcelIn($id)
 	{
 		$name='采购单'.$id;
 		$purchaseItemModel= new PurchaseItemModel;

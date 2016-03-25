@@ -23,7 +23,6 @@
    	<th>供应商</th>
     <th>采购去向</th>
     <th>结算状态</th>
-    <th>异常类型</th>
     <th>创建时间</th>
     <th>操作</th>
 @stop
@@ -31,7 +30,7 @@
     @foreach($data as $purchaseOrder)
         <tr>
        		<td>
-                @if($purchaseOrder->status >0)
+                @if($purchaseOrder->examineStatus >0)
                 <input type="checkbox" name="purchaseOrder_id"  value="{{$purchaseOrder->id}}" isexamine="1" >
                 @else
                 <input type="checkbox" name="purchaseOrder_id"  value="{{$purchaseOrder->id}}" isexamine="0" >
@@ -59,11 +58,7 @@
             	<td>{{ $close_statu}}</td>
                 @endif
             @endforeach
-            @foreach(config('purchase.purchaseOrder.active') as $k=>$active)
-            	@if($purchaseOrder->active == $k)
-            	<td>{{ $active }}</td>
-                @endif
-            @endforeach            
+                    
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">

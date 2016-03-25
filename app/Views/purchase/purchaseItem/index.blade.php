@@ -75,8 +75,7 @@
         </tr>
     @endforeach
    
-@stop
-@section('pageJs')
+  
 
  <script type="text/javascript">
 	 function addPurchaseOrder(){ 

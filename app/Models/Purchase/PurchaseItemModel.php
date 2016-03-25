@@ -39,7 +39,7 @@ class PurchaseItemModel extends BaseModel
     protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','costExamineStatus'];
 	public function purchaseItem()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'sku_id');
+        return $this->belongsTo('App\Models\ItemModel', 'sku_id','sku');
     }
     public function supplier()
     {
@@ -63,7 +63,7 @@ class PurchaseItemModel extends BaseModel
 	{
 		$data['lack_num']=$data['purchase_num'];
 		$item=new ItemModel();
-		$productItem=$item->find($data['sku_id']);
+		$productItem=$item->where('sku',$data['sku_id'])->first();
 		$data['supplier_id']=$productItem->supplier_id;
 		$data['cost']=$productItem['purchase_price'];
 		$data['stock']=$productItem['inventory'];
@@ -93,7 +93,7 @@ class PurchaseItemModel extends BaseModel
      */
 	public function purchaseOrderCreate()
 	{
-		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id >0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
+		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
 		if(isset($warehouse_supplier)){
 			foreach($warehouse_supplier as $key=>$v){
 				$purchaseOrderModel =new PurchaseOrderModel;
@@ -102,7 +102,7 @@ class PurchaseItemModel extends BaseModel
 				$purchaseOrder=$purchaseOrderModel->create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){
-				$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId]); 
+					$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId]); 
 				}				 
 			}
 			return true;
@@ -126,14 +126,24 @@ class PurchaseItemModel extends BaseModel
 		}
 		
 	}
+	/*处理异常状态
+	*
+	* @param $data
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
 
 	public function changActive($data){
 		$purchaseItem=$this->find($data['id']);
 		$purchaseItem->active=$data['active'];
 		$purchaseItem->active_status=$data['active_status'];
 		$purchaseItem->save();
-		}
-
+	}
+		
+	/*取消订单
+	*
+	* @param $data
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	*/
 	
 	public function cancelOrderItem($id){
 		$purchaseItem=$this->find($id);

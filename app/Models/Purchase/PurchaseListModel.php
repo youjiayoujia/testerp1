@@ -65,22 +65,27 @@ class PurchaseListModel extends BaseModel
  	public function purchaseListUpdate($id,$data)
 	{
 		$purchaseItem=$this->find($id);
-		/*if($data['active']>0){
-			$abnormal['sku_id']=$purchaseItem->sku_id;			
-			$purchaseItem->active=$data['active'];
-			$purchaseItem->active_status=1;
-				if($data['active']==2){
-					$purchaseItem->arrival_time=$data['arrival_time'];
-				}elseif($data['active']==3){
-					$purchaseItem->remark=$data['remark'];
-				}
-		}*/
-		$purchaseItem->status=$data['status'];
+		if($data['active_status']>0){
+			$purchaseItem->active=3;
+			$purchaseItem->active_status=$data['active_status'];
+			}
+		if($purchaseItem->status<2){
 		$purchaseItem->costExamineStatus=$data['costExamineStatus'];
 		$purchase_num=$purchaseItem->purchase_num;
 		$purchaseItem->arrival_num=$data['arrival_num'];	
 		$purchaseItem->lack_num=$purchase_num-$data['arrival_num'];
-		$purchaseItem->save();	
+		if($data['arrival_num']==$purchaseItem->purchase_num){
+			$purchaseItem->status=2;
+		}
+		$purchaseItem->save();
+		$num=$this->where('purchase_order_id',$purchaseItem->purchase_order_id)->where('status','<>',2)->count('id');	
+		if($num==0){
+			$purchaseOrder=new PurchaseOrderModel;
+			$puchaseO=$purchaseOrder->find($purchaseItem->purchase_order_id);
+			$puchaseO->status=2;
+			$puchaseO->save();
+			}
+		}
 			
 	}
 	

@@ -137,3 +137,5 @@ Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'order
 Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);
 Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
 Route::get('getChoiesOrder',['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);
+Route::get('getCode',['uses' => 'OrderController@getCode', 'as' => 'getCode']);
+Route::get('getAliExpressOrder',['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);

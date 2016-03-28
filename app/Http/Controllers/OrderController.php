@@ -41,7 +41,7 @@ class OrderController extends Controller
             'users' => UserModel::all(),
         ];
 
-        return view($this->viewPath.'create', $response);
+        return view($this->viewPath . 'create', $response);
     }
 
     /**
@@ -54,20 +54,8 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.sku')));
-        $buf = request()->all();
-        $obj = $this->model->create($buf);
-        $arr = request()->input('arr');
-        for($i=0; $i<$len; $i++)
-        {
-            foreach($arr as $key => $val)
-            {
-                $val = array_values($val);
-                $buf[$key] = $val[$i];
-            }
-            $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
-            $buf['order_id'] = $obj->id;
-            ItemModel::create($buf);
-        }
+        $data = request()->all();
+        $this->model->createOrder($data);
 
         return redirect($this->mainIndex);
     }
@@ -91,7 +79,7 @@ class OrderController extends Controller
             'aliases' => $model->channel->channelAccount,
         ];
 
-        return view($this->viewPath.'edit', $response);
+        return view($this->viewPath . 'edit', $response);
     }
 
     /**
@@ -109,12 +97,10 @@ class OrderController extends Controller
         $obj = $this->model->find($id)->orderItem;
         $obj_len = count($obj);
         $this->model->find($id)->update($buf);
-        for($i=0; $i<$len; $i++)
-        {
+        for ($i = 0; $i < $len; $i++) {
             unset($buf);
             $arr = request()->input('arr');
-            foreach($arr as $key => $val)
-            {
+            foreach ($arr as $key => $val) {
                 $val = array_values($val);
                 $buf[$key] = $val[$i];
             }
@@ -122,7 +108,7 @@ class OrderController extends Controller
             $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
             $obj[$i]->update($buf);
         }
-        while($i != $obj_len) {
+        while ($i != $obj_len) {
             $obj[$i]->delete();
             $i++;
         }
@@ -145,7 +131,7 @@ class OrderController extends Controller
             'model' => $model,
         ];
 
-        return view($this->viewPath.'show', $response);
+        return view($this->viewPath . 'show', $response);
     }
 
     /**
@@ -157,8 +143,9 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach($obj->orderItem as $val)
+        foreach ($obj->orderItem as $val) {
             $val->delete();
+        }
         $obj->delete($id);
 
         return redirect($this->mainIndex);
@@ -171,10 +158,10 @@ class OrderController extends Controller
      */
     public function getMsg()
     {
-        if(request()->ajax()) {
+        if (request()->ajax()) {
             $sku = request()->input('sku');
-            $obj = productItem::where(['sku'=>$sku])->get();
-            if(count($obj)) {
+            $obj = productItem::where(['sku' => $sku])->get();
+            if (count($obj)) {
                 return json_encode('sku');
             }
         }
@@ -189,13 +176,13 @@ class OrderController extends Controller
      */
     public function ajaxOrderAdd()
     {
-        if(request()->ajax()) {
+        if (request()->ajax()) {
             $current = request()->input('current');
             $response = [
                 'current' => $current,
             ];
 
-            return view($this->viewPath.'add', $response);
+            return view($this->viewPath . 'add', $response);
         }
         return null;
     }
@@ -218,8 +205,8 @@ class OrderController extends Controller
      */
     public function getChoiesOrder()
     {
-        $date = date('Y-m-d');
-        $url = 'http://www.choies.com/api/order_date_list?date='.$date;
+        $date = '2016-03-27';//date('Y-m-d');
+        $url = 'http://www.choies.com/api/order_date_list?date=' . $date;
         $queryServer = curl_init();
         curl_setopt($queryServer, CURLOPT_URL, $url);
         curl_setopt($queryServer, CURLOPT_HEADER, 0);
@@ -229,66 +216,24 @@ class OrderController extends Controller
         curl_setopt($queryServer, CURLOPT_TIMEOUT, 30);
         $data = curl_exec($queryServer);
         curl_close($queryServer);
-        $arr = json_decode($data, true);
-        $len = count($arr);
-        for($i=0; $i<$len; $i++) {
-            $name = substr($url, 11, 6);
-            $channel = ChannelModel::where(['name' => $name])->get();
-            foreach($channel as $value) {
-                $arr[$i]['channel_id'] = $value['id'];
-                $account = AccountModel::where(['channel_id' => $arr[$i]['channel_id']])->get();
-                foreach($account as $val) {
-                    $arr[$i]['channel_account_id'] = $val['id'];
-                    $arr[$i]['customer_service'] = $val['customer_service_id'];
-                    $arr[$i]['operator'] = $val['operator_id'];
-                    $arr[$i]['affairer'] = 2;
-                }
+        $channelOrders = json_decode($data, true);
+//        echo "<pre>";
+//        var_dump($channelOrders);
+//        exit;
+        $orders = [];
+        foreach ($channelOrders as $key => $channelOrder) {
+            $orders[$key]['ordernum'] = $channelOrder['ordernum'];
+            $orders[$key]['amount'] = $channelOrder['amount'];
+            foreach ($channelOrder['orderitems'] as $itemKey => $channelOrderItem) {
+                $orders[$key]['items'][$itemKey]['sku'] = $channelOrderItem['sku'];
+                $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];
             }
-            $arr[$i]['channel_ordernum'] = $arr[$i]['ordernum'];
-            $arr[$i]['status'] = 1;
-            $arr[$i]['active'] = 1;
-            $arr[$i]['ip'] = $arr[$i]['ip_address'];
-            $arr[$i]['address_confirm'] = 1;
-            $arr[$i]['affair_time'] = date('Y-m-d');
-            $arr[$i]['create_time'] = $arr[$i]['date_purchased'];
-            $arr[$i]['is_partial'] = 0;
-            $arr[$i]['by_hand'] = 0;
-            $arr[$i]['is_affair'] = 0;
-            $arr[$i]['amount_product'] = $arr[$i]['amount_products'];
-            $arr[$i]['amount_shipping'] = $arr[$i]['amount_shipping'] + $arr[$i]['order_insurance'];
-            if(($arr[$i]['amount_shipping'] / $arr[$i]['rate']) < 10) {
-                $arr[$i]['shipping'] = 'packet';
-            }else {
-                $arr[$i]['shipping'] = 'express';
-            }
-            $arr[$i]['shipping_zipcode'] = $arr[$i]['shipping_zip'];
-            $arr[$i]['billing_zipcode'] = $arr[$i]['billing_zip'];
-            $obj = OrderModel::where(['ordernum'=>$arr[$i]['ordernum']])->get();
-            if(!count($obj)) {
-                OrderModel::create($arr[$i]);
-                $id = OrderModel::where(['ordernum' => $arr[$i]['ordernum']])->first()->id;
-                echo $id;
-                $arr2 = $arr[$i]['orderitems'];
-                $len2 = count($arr2);
-                for($j=0; $j<$len2; $j++) {
-                    $str = $arr2[$j]['attributes'];
-                    $array = explode(";", $str);
-                    foreach ($array as $v) {
-                        if($v  == '') {
-                            break;
-                        }else {
-                            $arr2[$j]['attributes'] = $v;
-                            $arr2[$j]['sku'] = $arr2[$j]['sku']."-".substr($arr2[$j]['attributes'], 6);
-                        }
-                    }
-                    $arr2[$j]['status'] = 1;
-                    $arr2[$j]['ship_status'] = 1;
-                    $arr2[$j]['order_id'] = $id;
-                    ItemModel::create($arr2[$j]);
-                }
-//                echo "<pre>";var_dump($arr2);echo "</pre>";
-            }
+
         }
+        $this->model->createOrder($orders);
+        echo "<pre>";
+        var_dump($orders);
+        exit;
 //        echo "<pre>";var_dump($arr);echo "</pre>";exit;
     }
 

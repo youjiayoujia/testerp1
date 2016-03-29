@@ -1,3 +1,4 @@
+<input type="hidden" name="order_id" value="{{ $order->id }}"/>
 <div class="panel panel-default">
     <div class="panel-heading">
         订单产品
@@ -20,14 +21,11 @@
         </div>
         @foreach($order->items as $item)
             <div class='row'>
-                <div class="form-group col-lg-1">
-                    <input type="checkbox" checked/>
-                </div>
                 <div class="form-group col-lg-4">
                     {{ $item->sku }}
                 </div>
                 <div class="form-group col-lg-1">
-                    <input type="text" class="form-control" value="{{ $item->qty }}"/>
+                    <input type="text" class="form-control" name="item[{{ $item->sku }}][quantity]" value="{{ $item->quantity }}"/>
                 </div>
                 <div class="form-group col-lg-6">
                     <input type="text" class="form-control"/>

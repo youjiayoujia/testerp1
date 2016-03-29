@@ -21,10 +21,17 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function store()
+    {
+        echo "<pre>";
+        var_dump(request()->all());
+        exit;
+    }
+
     public function ajaxGetOrder()
     {
         if (request()->ajax()) {
-            $order = OrderModel::where('order_number', request()->input('ordernum'))->first();
+            $order = OrderModel::where('ordernum', request()->input('ordernum'))->first();
             if ($order) {
                 $response = [
                     'order' => $order,

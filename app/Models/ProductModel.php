@@ -128,6 +128,21 @@ class ProductModel extends BaseModel
         return $this->hasOne('App\Models\Product\channel\amazonProductModel','product_id');
     }
 
+    public function ebayProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\ebayProductModel','product_id');
+    }
+
+    public function aliexpressProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\aliexpressProductModel','product_id');
+    }
+
+    public function b2cProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\b2cProductModel','product_id');
+    }
+
 
     /**
      * 创建产品

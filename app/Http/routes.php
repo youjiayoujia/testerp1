@@ -133,7 +133,7 @@ Route::resource('product', 'ProductController');
 
 
 //产品渠道
-Route::any('beChosed', ['uses' => 'Product\Channel\AmazonController@beChosed', 'as'=>'beChosed']);
+Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as'=>'beChosed']);
 Route::resource('amazonProduct', 'Product\Channel\AmazonController');
 Route::resource('SelectProduct', 'Product\SelectProductController');
 Route::get('amazonProductEditImage', ['uses' => 'Product\Channel\AmazonController@amazonProductEditImage', 'as'=>'amazonProductEditImage']);

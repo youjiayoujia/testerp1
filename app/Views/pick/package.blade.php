@@ -54,8 +54,8 @@
     </table>
 @stop
 @section('formButton')
-        <button type="submit" class="btn btn-success">包装完成</button>
-        <button type="reset" class="btn btn-default">取消</button>
+    <button type="submit" class="btn btn-success">包装完成</button>
+    <button type="reset" class="btn btn-default">取消</button>
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){
@@ -78,7 +78,7 @@ $(document).ready(function(){
                                 }
                             });
                             if(flag == '1') {
-                                block.find('.status').text('已拣货');
+                                block.find('.status').text('已包装');
                             }
                         }
 

@@ -22,19 +22,38 @@ use App\Models\AModel;
 use App\Models\BModel;
 use App\Models\CModel;
 use App\Models\UserModel;
+use App\Models\Pick\ListItemModel;
 
 class TestController extends Controller
 {
     public function test()
     {
-        $obj = UserModel::where('id','>','0')->orderBy('id')->chunk(1, function($users){
-            var_dump($users->toArray());
-        });
+        $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLE'])->get();
+        $lists = $query->chunk(2);
+        foreach($lists as $list){
+            foreach($list as $item){
+                echo $item->id.'--';
+                $item->update(['picklist_id'=>'1']);
+            }
+        }
+        exit;
+        // var_dump($query);exit;
+        if($query->count()) {
+            $query->chunk(2, function($picklistItems){
+                var_dump($picklistItems);
+                foreach($picklistItems as $picklistItem) {
+                    echo "<hr>";
+                    // var_dump($picklistItem);
+                    echo $picklistItem->id;
+                    echo "--".$picklistItem->picklist_id;
+                    $picklistItem->update(['picklist_id'=>'1']);
+                }
+            });
+         }
     }
 
     public function test1($url)
     {
         var_dump($url);
     }
-
 }

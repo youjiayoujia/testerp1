@@ -1,5 +1,4 @@
 @extends('common.table')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th>拣货单号</th>
@@ -16,7 +15,7 @@
             <td>{{ $pickList->id }}</td>
             <td>{{ $pickList->picklist_id }}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
-            <td>{{ $pickList->logistic ? $pickList->logistic->logistics_type : ''}}</td>
+            <td>{{ $pickList->logistic ? $pickList->logistic->logistics_type : '混合物流'}}</td>
             <td>{{ $pickList->status_name }}</td>
             <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
             <td>{{ $pickList->created_at }}</td>
@@ -32,7 +31,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 分拣
                 </a>
                 @endif
-                @if(($pickList->status == 'PICKING' && $pickList->type != 'MULTI') || $pickList->status == 'PACKAGEING' || ($pickList->status == 'PICKED' && $pickList->type == 'MULTI'))
+                @if(($pickList->status == 'PICKING' && $pickList->type != 'MULTI') || $pickList->status == 'PACKAGEING' || ($pickList->status == 'INBOXED' && $pickList->type == 'MULTI'))
                 <a href="{{ route('pickList.package', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 包装
                 </a>
@@ -65,4 +64,7 @@
         生成拣货单
     </a>
 </div>
+@stop
+@section('childJs')
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @stop

@@ -108,7 +108,7 @@ class PickListController extends Controller
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
-        $obj->status = 'PICKED';
+        $obj->status = 'INBOXED';
         $obj->save();
         foreach($obj->package as $package)
         {
@@ -137,8 +137,10 @@ class PickListController extends Controller
 
         foreach($model->package as $package)
         {
-            $package->status = 'PACKED';
-            $package->save();
+            if($package->status != 'PACKED') {
+                $package->status = 'ERROR';
+                $package->save();
+            }    
         }
 
         return redirect($this->mainIndex);
@@ -168,7 +170,7 @@ class PickListController extends Controller
                     $flag = 0;
             }
             if($flag == 1) {
-                $package->status = 'PICKED';
+                $package->status = 'PACKED';
                 $package->save();
             }
             return json_encode('1');
@@ -248,6 +250,7 @@ class PickListController extends Controller
                     }
                 })->get();
                 if(count($packages)) {
+                    var_dump($packages->toArray());
                     $this->model->createPickListItems($packages);
                     $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                  (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);

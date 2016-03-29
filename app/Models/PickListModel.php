@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use DB;
 use Exception;
 use App\Base\BaseModel;
 use App\Models\Package\ItemModel;
@@ -125,7 +126,7 @@ class PickListModel extends BaseModel
             $stock = new StockModel;
             $arr = $stock->allocateStock($packageitem->item_id, $packageitem->quantity);
             if(!$arr) {
-                continue;
+                throw new Exception('id为'.$package->id.'的package中有未能分配到库存的项');
             }
             foreach($arr as $key => $value)
             {
@@ -155,54 +156,60 @@ class PickListModel extends BaseModel
     public function createPickList($listItemQuantity, $multiQuantity, $logistic_id)
     {
         srand(time());
-        $query = ListItemModel::where('picklist_id','0');
-        if($query->where('type','SINGLE')->count()) {
-            $query->where('type', 'SINGLE')->orderBy('warehouse_position_id')->chunk($listItemQuantity, function($picklistItems) use ($logistic_id){
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
-                foreach($picklistItems as $picklistItem) {
-                    $picklistItem->picklist_id = $obj->id;
-                    $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
-                        $package = PackageModel::find($listItemPackage->package_id);
-                        $package->picklist_id = $obj->id;
-                        $package->status = 'PICKING';
-                        $package->save();
-                    }
-                }
-            });
-         }
-        $query = ListItemModel::where('picklist_id','0');
-        if($query->where('type','SINGLEMULTI')->count()) {
-            $query->where('type', 'SINGLEMULTI')->orderBy('warehouse_position_id')->chunk($listItemQuantity, function($picklistItems) use ($logistic_id){
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
-                foreach($picklistItems as $picklistItem) {
-                    $picklistItem->picklist_id = $obj->id;
-                    $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
-                        $package = PackageModel::find($listItemPackage->package_id);
-                        $package->picklist_id = $obj->id;
-                        $package->status = 'PICKING';
-                        $package->save();
-                    }
-                }
-            });
-        }
-        $query = PackageScoreModel::where('picklist_id','0');
+        $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
         if($query->count()) {
-            $query->orderBy('package_score')->chunk($multiQuantity, function($packageScores) use ($logistic_id){
+            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            foreach($picklists as $picklist) {
+                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                foreach($picklist as $picklistItem) {
+                    $picklistItem->picklist_id = $obj->id;
+                    $picklistItem->save();
+                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                        $package = PackageModel::find($listItemPackage->package_id);
+                        $package->picklist_id = $obj->id;
+                        $package->status = 'PICKING';
+                        $package->save();
+                    }
+                }
+            }
+        }
+        $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
+        if($query->count()) {
+            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            foreach($picklists as $picklist) {
+                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                foreach($picklist as $picklistItem) {
+                    var_dump($listItemQuantity);
+                    var_dump($picklist->toArray());
+                    var_dump('-------------');
+                    $picklistItem->picklist_id = $obj->id;
+                    $picklistItem->save();
+                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                        $package = PackageModel::find($listItemPackage->package_id);
+                        $package->picklist_id = $obj->id;
+                        $package->status = 'PICKING';
+                        $package->save();
+                    }
+                }
+            }
+        }
+        $query = PackageScoreModel::where(['picklist_id'=>'0']);
+        if($query->count()) {            
+            $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
+            foreach($packageScores as $packageScore) {
                 $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
-                foreach($packageScores as $packageScore)
+                foreach($packageScore as $score)
                 {
-                    $packageScore->picklist_id = $obj->id;
-                    $packageScore->save();
-                    $this->createListItems(PackageModel::find($packageScore->package_id));
-                    $package = PackageModel::find($packageScore->package_id);
+                    $score->picklist_id = $obj->id;
+                    $score->save();
+                    $this->createListItems(PackageModel::find($score->package_id));
+                    $package = PackageModel::find($score->package_id);
                     $package->picklist_id = $obj->id;
                     $package->status = 'PICKING';
                     $package->save();
                 }
                 $this->setPickListId($obj->id);
-            });
+            }
         }
     }
 
@@ -216,27 +223,13 @@ class PickListModel extends BaseModel
      */
     public function createPickListFb($listItemQuantity, $multiQuantity)
     {
-        $query = ListItemModel::where('picklist_id','0');
-        if($query->where('type','SINGLE')->count()) {
-            $query->where('type', 'SINGLE')->orderBy('warehouse_position_id')->chunk($listItemQuantity, function($picklistItems){
+        srand(time());
+        $query = ListItemModel::where(['picklist_id'=>'0', 'type'=>'SINGLE']);
+        if($query->count()) {
+            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            foreach($picklists as $picklist) {
                 $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
-                foreach($picklistItems as $picklistItem) {
-                    $picklistItem->picklist_id = $obj->id;
-                    $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
-                        $package = PackageModel::find($listItemPackage->package_id);
-                        $package->picklist_id = $obj->id;
-                        $package->status = 'PICKING';
-                        $package->save();
-                    } 
-                }
-            });
-         }
-        $query = ListItemModel::where('picklist_id','0');
-        if($query->where('type','SINGLEMULTI')->count()) {
-            $query->where('type', 'SINGLEMULTI')->orderBy('warehouse_position_id')->chunk($listItemQuantity, function($picklistItems){
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
-                foreach($picklistItems as $picklistItem) {
+                foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
                     foreach($picklistItem->pickListItemPackage as $listItemPackage) {
@@ -246,24 +239,42 @@ class PickListModel extends BaseModel
                         $package->save();
                     }
                 }
-            });
-        }
-        $query = PackageScoreModel::where('picklist_id','0');
+            }
+         }
+        $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLEMULTI']);
         if($query->count()) {
-            $query->orderBy('package_score')->chunk($multiQuantity, function($packageScores){
+            $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
+            foreach($picklists as $picklist) {
+                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                foreach($picklist as $picklistItem) {
+                    $picklistItem->picklist_id = $obj->id;
+                    $picklistItem->save();
+                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                        $package = PackageModel::find($listItemPackage->package_id);
+                        $package->picklist_id = $obj->id;
+                        $package->status = 'PICKING';
+                        $package->save();
+                    }
+                }
+            }
+        }
+        $query = PackageScoreModel::where(['picklist_id'=>'0']);
+        if($query->count()) {            
+            $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
+            foreach($packageScores as $packageScore) {
                 $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
-                foreach($packageScores as $packageScore)
+                foreach($packageScore as $score)
                 {
-                    $packageScore->picklist_id = $obj->id;
-                    $packageScore->save();
-                    $this->createListItems(PackageModel::find($packageScore->package_id));
-                    $package = PackageModel::find($packageScore->package_id);
+                    $score->picklist_id = $obj->id;
+                    $score->save();
+                    $this->createListItems(PackageModel::find($score->package_id));
+                    $package = PackageModel::find($score->package_id);
                     $package->picklist_id = $obj->id;
                     $package->status = 'PICKING';
                     $package->save();
                 }
                 $this->setPickListId($obj->id);
-            });
+            }
         }
     }
 

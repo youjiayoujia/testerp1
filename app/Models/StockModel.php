@@ -242,7 +242,7 @@ class StockModel extends BaseModel
         foreach($stocks as $stock)
         {
             if($stock->available_quantity > $quantity) {
-                return [[$stock->warehouse_position_id, $quantity]];
+                return [[$stock->warehouse_position_id, $quantity, $stock->id]];
             }
         }
         $arr = [];
@@ -255,15 +255,14 @@ class StockModel extends BaseModel
                 $arr[] = [$stock->warehouse_position_id, $quantity, $stock->id];
                 $quantity -= $quantity;
             }
-            if($quantity != 0) {
-                return '';
-            }
+        }
+        if($quantity != 0) {
+            return 'false';
         }
         if($arr) {
             return $arr;
         } else {
-            return '';
+            return 'false';
         }
-
     }
 }

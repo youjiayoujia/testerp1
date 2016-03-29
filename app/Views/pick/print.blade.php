@@ -15,7 +15,7 @@
         </div>
         <div class='form-group col-lg-2'>
             <label>物流:</label>
-            <input type='text' class='form-control' value={{ $model->logistic ? $model->logistic->logistics_type : '' }}>
+            <input type='text' class='form-control' value={{ $model->logistic ? $model->logistic->logistics_type : '混合物流' }}>
         </div>
         <div class='form-group col-lg-2'>
             <label>拣货人:</label>

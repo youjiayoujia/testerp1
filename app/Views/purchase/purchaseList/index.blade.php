@@ -73,15 +73,21 @@
             <td>
                 <a href="{{ route('purchaseList.show', ['id'=>$purchaseList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
-                </a>
+                </a>       
                 @if($purchaseList->active_status>0)
                 <a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
                      处理异常
                 </a>
                 @endif
+                 @if($purchaseList->status==2)
+                <a href="/purchaseList/stockIn/{{$purchaseList->id}}" class="btn btn-info btn-xs">
+                     入库
+                </a>
+                @endif
                 <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $purchaseList->id }}"
                    data-url="{{ route('purchaseList.destroy', ['id' =>$purchaseList->id]) }}">

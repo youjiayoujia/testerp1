@@ -14,15 +14,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseListModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
+use App\Models\ItemModel;
+use App\Models\StockModel;
+use App\Models\Warehouse\PositionModel;
 
 class PurchaseListController extends Controller
 {
 
-    public function __construct(PurchaseListModel $purchaseList,WarehouseModel $warehouse,SupplierModel $supplier)
+    public function __construct(PurchaseListModel $purchaseList,WarehouseModel $warehouse,SupplierModel $supplier,StockModel $stock,PositionModel $position)
     {
         $this->model = $purchaseList;
 		$this->warehouse = $warehouse;
 		$this->supplier=$supplier;
+		$this->stock=$stock;
+		$this->position=$position;
         $this->mainIndex = route('purchaseList.index');
         $this->mainTitle = '采购对单';
 		$this->viewPath = 'purchase.purchaseList.';
@@ -106,7 +111,7 @@ class PurchaseListController extends Controller
 	{
 		$res=$this->model->find($id);
 		$second_supplier_id=$res->purchaseItem->second_supplier_id;
-		$second_supplier=$this->supplier->find($second_supplier_id);
+		$second_supplier=$this->supplier->find($second_supplier_id);	
 		$response = [
 			'metas' => $this->metas(__FUNCTION__),
 			'abnormal' => $res,
@@ -115,6 +120,43 @@ class PurchaseListController extends Controller
         return view($this->viewPath . 'changeActive', $response);
 			
 	}
+	
+	public function stockIn($id){
+		$response = [
+			'metas' => $this->metas(__FUNCTION__),
+			'model' => $this->model->find($id),
+        ];
+		 return view($this->viewPath . 'stockIn', $response);
+	}
+	
+	public function generateDarCode($id){
+		$purchaseItem=$this->model->find($id);
+		$res=$this->stock->where('item_id',$purchaseItem->purchaseItem->id)->where('warehouse_id',$purchaseItem->warehouse_id)->count();
+		$itemStock=$this->stock->where('item_id',$purchaseItem->purchaseItem->id)->where('warehouse_id',$purchaseItem->warehouse_id)->first();		
+		/*if($res>0){
+			$stockData['all_quantity']=$itemStock->all_quantity+$purchaseItem->arrival_num;
+			$stockData['hold_quantity']=$itemStock->hold_quantity+$purchaseItem->arrival_num;
+			
+		}else{*/
+			$position=$this->position->where('warehouse_id',$purchaseItem->warehouse_id)->get();
+			foreach($position as $key=>$v){
+				$WarehousePositionIds[$key]=$v->id;
+				}
+			$randKey=array_rand($WarehousePositionIds,1);
+			$stockData['warehouse_id']=$purchaseItem->warehouse_id;
+			$stockData['item_id']=$purchaseItem->purchaseItem->id;
+			$stockData['warehouse_position_id']=$WarehousePositionIds[$randKey];
+			$stockData['all_quantity']=$purchaseItem->arrival_num;
+			$stockData['hold_quantity']=$purchaseItem->arrival_num;
+			$stockData['amount']=$purchaseItem->purchase_cost;
+			$stockCreate=$this->stock->create($stockData);
+			$stockId=$stockCreate->id;
+			$item= new ItemModel;
+			$item->find($purchaseItem->purchaseItem->id)->in($stockData['warehouse_position_id'],$purchaseItem->arrival_num, $purchaseItem->purchase_cost, 0,$purchaseItem->purchase_order_id, $remark = '订单采购！');
+		/*}*/
+			//$barcode=$this->stock->where(''=>'',''=>'')->get();
+	}
+	
 }
 
 

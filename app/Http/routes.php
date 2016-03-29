@@ -90,6 +90,8 @@ Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@c
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 
 //采购列表
+Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
+Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::resource('purchaseList', 'Purchase\PurchaseListController');

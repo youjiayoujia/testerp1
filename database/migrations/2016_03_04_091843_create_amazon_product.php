@@ -25,6 +25,7 @@ class CreateAmazonProduct extends Migration
             $table->float('purchase_price')->comment('采购价')->nullable()->default(null);
             $table->float('purchase_carriage')->comment('物流费')->nullable()->default(null);
             $table->float('weight')->comment('重量')->nullable()->default(null);
+            $table->string('fabric')->comment('材质')->nullable()->default(NULL);
             $table->string('remark')->comment('备注')->nullable()->default(null);
             $table->string('image_remark')->comment('图片备注')->nullable()->default(null);
             $table->tinyInteger('status')->comment('审核状态')->nullable()->default(0);

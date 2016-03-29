@@ -7,10 +7,10 @@
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
-        <li><a href="javascript:" class="choseShop" data-channel="1" >Amazon</a></li>
-        <li><a href="javascript:" class="choseShop" data-channel="2">EBay</a></li>
-        <li><a href="javascript:" class="choseShop" data-channel="3">速卖通</a></li>
-        <li><a href="javascript:" class="choseShop" data-channel="4">B2C</a></li>
+        <li><a href="javascript:" class="choseShop" data-channel="1" data-name="Amazon" >Amazon</a></li>
+        <li><a href="javascript:" class="choseShop" data-channel="2" data-name="EBay">EBay</a></li>
+        <li><a href="javascript:" class="choseShop" data-channel="3" data-name="速卖通">速卖通</a></li>
+        <li><a href="javascript:" class="choseShop" data-channel="4" data-name="B2C">B2C</a></li>
     </ul>
 </div>
 
@@ -79,17 +79,15 @@
     @endforeach
 @stop
 @section('childJs')
-    <script type="text/javascript">
-        
-
+    <script type="text/javascript">    
         //批量审核
         $('.choseShop').click(function () {
-            if (confirm("确认审核?")) {
+            if (confirm($(this).data('name')+"确认审核?")) {
                 var url = "{{route('beChosed')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var product_ids = "";
                 var channel_id = $(this).data('channel');
-
+                
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     product_ids += checkbox[i].value+",";
@@ -101,7 +99,7 @@
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        //window.location.reload();                
+                        window.location.reload();                
                     }                  
                 })     
             }

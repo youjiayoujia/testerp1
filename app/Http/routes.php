@@ -31,61 +31,38 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
-/**
- *  InController  controller  route
- */
-Route::get('getitemid', ['uses' => 'Stock\InController@getItemId', 'as' => 'getitemid']);
-Route::get('getposition', ['uses' => 'Stock\InController@ajaxGetPosition', 'as' => 'getposition']);
+//入库
 Route::resource('stockIn', 'Stock\InController');
 
-/**
- * OutController controller route
- */
+//出库
 Route::resource('stockOut', 'Stock\OutController');
 
-/**
- * productSupplier controller route
- */
-
+//供货商
 Route::resource('productSupplier', 'Product\SupplierController');
 
-/**
- * productRequire controller route
- */
+//选款需求
 Route::resource('productRequire', 'Product\RequireController');
 
-/**
- * warehouse controller route
- */
+//仓库
 Route::resource('warehouse', 'WarehouseController');
 
-/**
- * stockAdjustment controller route
- */
-Route::get('adjustadd', ['uses' => 'Stock\AdjustmentController@ajaxAdjustAdd', 'as' => 'adjustadd']);
-Route::get('check', ['uses' => 'Stock\AdjustmentController@ajaxCheck', 'as' => 'check']);
+//库存调整
+Route::get('stockAdjustment/adjustAdd', ['uses' => 'Stock\AdjustmentController@ajaxAdjustAdd', 'as' => 'stockAdjustment.adjustAdd']);
+Route::get('stockAdjustment/check', ['uses' => 'Stock\AdjustmentController@ajaxCheck', 'as' => 'stockAdjustment.check']);
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
-/**
- * warehousePosition controller route
- */
-Route::get('getposition', ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'getposition']);
+//库位
+Route::get('position/getPosition', ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
 Route::resource('warehousePosition', 'Warehouse\PositionController');
 
-/**
- * stock controller route
- */
-Route::get('createtaking', ['uses'=>'StockController@createTaking', 'as'=>'createtaking']);
-Route::get('allotsku', ['uses'=>'StockController@ajaxAllotSku', 'as'=>'allotsku']);
-Route::get('allotoutwarehouse', ['uses'=>'StockController@ajaxAllotOutWarehouse', 'as'=>'allotoutwarehouse']);
-Route::get('getbyposition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'getbyposition']);
-Route::get('getmessage', ['uses'=>'StockController@ajaxGetMessage', 'as'=>'getmessage']);
-Route::get('allotposition', ['uses'=>'StockController@ajaxAllotPosition','as'=>'allotposition']);
-Route::get('allotsku', ['uses' => 'StockController@ajaxAllotSku', 'as' => 'allotsku']);
-Route::get('allotoutwarehouse', ['uses' => 'StockController@ajaxAllotOutWarehouse', 'as' => 'allotoutwarehouse']);
-Route::get('getbyposition', ['uses' => 'StockController@ajaxGetByPosition', 'as' => 'getbyposition']);
-Route::get('getmessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'getmessage']);
-Route::get('allotposition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'allotposition']);
+//库存
+Route::get('stock/createTaking', ['uses'=>'StockController@createTaking', 'as'=>'stock.createTaking']);
+Route::get('stock/allotSku', ['uses'=>'StockController@ajaxAllotSku', 'as'=>'stock.allotSku']);
+Route::get('stock/allotOutWarehouse', ['uses'=>'StockController@ajaxAllotOutWarehouse', 'as'=>'stock.allotOutWarehouse']);
+Route::get('stock/getByPosition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'stock.getByPosition']);
+Route::get('stock/allotPosition', ['uses'=>'StockController@ajaxAllotPosition','as'=>'stock.allotPosition']);
+Route::get('stock/getMessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'stock.getMessage']);
+Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
 Route::resource('stock', 'StockController');
 
 //品类路由
@@ -101,21 +78,18 @@ Route::resource('channel', 'ChannelController');
 Route::resource('channelAccount', 'Channel\AccountController');
 
 
-/**
- *  stock allotment route
- */
-Route::post('checkresult/{id}', ['uses' => 'Stock\AllotmentController@checkResult', 'as' => 'checkresult']);
-Route::get('allotmentover/{id}', ['uses' => 'Stock\AllotmentController@allotmentOver', 'as' => 'allotmentover']);
-Route::post('getlogistics/{id}', ['uses' => 'Stock\AllotmentController@getLogistics', 'as' => 'getlogistics']);
-Route::get('checkout', ['uses' => 'Stock\AllotmentController@checkout', 'as' => 'checkout']);
-Route::get('allotmentnew', ['uses' => 'Stock\AllotmentController@ajaxAllotmentNew', 'as' => 'allotmentnew']);
-Route::get('allotmentcheckout',
-    ['uses' => 'Stock\AllotmentController@ajaxAllotmentCheckOut', 'as' => 'allotmentcheckout']);
-Route::get('add', ['uses' => 'Stock\AllotmentController@ajaxAllotmentAdd', 'as' => 'add']);
-Route::post('checkformupdate/{id}', ['uses' => 'Stock\AllotmentController@checkformupdate', 'as' => 'checkformupdate']);
-Route::get('checkform/{id}', ['uses' => 'Stock\AllotmentController@checkform', 'as' => 'checkform']);
-Route::get('allotmentpick', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotmentpick']);
-Route::get('allotmentcheck/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotmentcheck']);
+//库存调拨
+Route::post('allotment/checkResult/{id}', ['uses' => 'Stock\AllotmentController@checkResult', 'as' => 'allotment.checkResult']);
+Route::get('allotment/over/{id}', ['uses' => 'Stock\AllotmentController@allotmentOver', 'as' => 'allotment.over']);
+Route::post('allotment/getLogistics/{id}', ['uses' => 'Stock\AllotmentController@getLogistics', 'as' => 'allotment.getLogistics']);
+Route::get('allotment/new', ['uses' => 'Stock\AllotmentController@ajaxAllotmentNew', 'as' => 'allotment.new']);
+Route::get('allotment/checkout',
+    ['uses' => 'Stock\AllotmentController@checkout', 'as' => 'allotment.checkout']);
+Route::get('allotment/add', ['uses' => 'Stock\AllotmentController@ajaxAllotmentAdd', 'as' => 'allotment.add']);
+Route::post('allotment/checkformUpdate/{id}', ['uses' => 'Stock\AllotmentController@checkformupdate', 'as' => 'allotment.checkformUpdate']);
+Route::get('allotment/checkform/{id}', ['uses' => 'Stock\AllotmentController@checkform', 'as' => 'allotment.checkform']);
+Route::get('allotment/pick', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
+Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotment.check']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 
 //库存盘点
@@ -149,17 +123,16 @@ Route::get('scanAddTrCode/{logistic_id}',
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 
 //拣货路由
-Route::post('inboxStore/{id}', ['uses'=>'PickListController@inboxStore', 'as'=>'pickList.inboxStore']);
-Route::get('pickListSend/{id}', ['uses'=>'PickListController@pickListSend', 'as'=>'pickList.send']);
-Route::post('createPickStore', ['uses'=>'PickListController@createPickStore', 'as'=>'pickList.createPickStore']);
-Route::get('createpick', ['uses'=>'PickListController@createPick', 'as'=>'pickList.createPick']);
-Route::get('inboxresult', ['uses'=>'PickListController@ajaxInboxResult', 'as'=>'pickList.inboxResult']);
-Route::get('inbox/{id}', ['uses'=>'PickListController@inbox', 'as'=>'pickList.inbox']);
-Route::get('packageitemupdate', ['uses'=>'PickListController@ajaxPackageItemUpdate', 'as'=>'pickList.packageItemUpdate']);
-Route::post('packagestore/{id}', ['uses'=>'PickListController@packageStore', 'as'=>'pickList.packageStore']);
-Route::get('picklistpackage/{id}', ['uses'=>'PickListController@pickListPackage', 'as'=>'pickList.package']);
-Route::get('picklistprint/{id}', ['uses'=>'PickListController@printPickList', 'as'=>'pickList.print']);
-Route::get('type', ['uses'=>'PickListController@ajaxType', 'as'=>'pickList.type']);
+Route::post('pickList/inboxStore/{id}', ['uses'=>'PickListController@inboxStore', 'as'=>'pickList.inboxStore']);
+Route::post('pickList/createPickStore', ['uses'=>'PickListController@createPickStore', 'as'=>'pickList.createPickStore']);
+Route::get('pickList/createPick', ['uses'=>'PickListController@createPick', 'as'=>'pickList.createPick']);
+Route::get('pickList/inboxResult', ['uses'=>'PickListController@ajaxInboxResult', 'as'=>'pickList.inboxResult']);
+Route::get('pickList/inbox/{id}', ['uses'=>'PickListController@inbox', 'as'=>'pickList.inbox']);
+Route::get('pickList/packageItemUpdate', ['uses'=>'PickListController@ajaxPackageItemUpdate', 'as'=>'pickList.packageItemUpdate']);
+Route::post('pickList/packageStore/{id}', ['uses'=>'PickListController@packageStore', 'as'=>'pickList.packageStore']);
+Route::get('pickList/package/{id}', ['uses'=>'PickListController@pickListPackage', 'as'=>'pickList.package']);
+Route::get('pickList/print/{id}', ['uses'=>'PickListController@printPickList', 'as'=>'pickList.print']);
+Route::get('pickList/type', ['uses'=>'PickListController@ajaxType', 'as'=>'pickList.type']);
 Route::resource('pickList', 'PickListController');
 
 //产品管理路由

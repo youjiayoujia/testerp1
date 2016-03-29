@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('getlogistics', ['id'=>$model->id]) }} @stop
+@section('formAction') {{ route('allotment.getLogistics', ['id'=>$model->id]) }} @stop
 @section('formBody')
     <div class='row'>
         <div class="form-group col-lg-4">

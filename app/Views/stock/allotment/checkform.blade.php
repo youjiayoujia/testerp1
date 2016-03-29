@@ -1,6 +1,6 @@
 @extends('common.form')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-@section('formAction') {{ route('checkformupdate', ['id' => $allotment->id]) }} @stop
+@section('formAction') {{ route('allotment.checkformUpdate', ['id' => $allotment->id]) }} @stop
 @section('formBody') 
     <div class='row'>
         <div class="form-group col-lg-4">
@@ -78,7 +78,7 @@
 @stop
 @section('formButton')
 @parent
-<a href="{{ route('allotmentover', ['id'=>$allotment->id]) }}" class='btn btn-info allotmentover'>结束调拨</a>
+<a href="{{ route('allotment.over', ['id'=>$allotment->id]) }}" class='btn btn-info allotmentover'>结束调拨</a>
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){

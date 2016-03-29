@@ -179,9 +179,6 @@ class PickListModel extends BaseModel
             foreach($picklists as $picklist) {
                 $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
                 foreach($picklist as $picklistItem) {
-                    var_dump($listItemQuantity);
-                    var_dump($picklist->toArray());
-                    var_dump('-------------');
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
                     foreach($picklistItem->pickListItemPackage as $listItemPackage) {

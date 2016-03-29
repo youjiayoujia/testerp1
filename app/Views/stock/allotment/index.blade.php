@@ -47,7 +47,7 @@
                 </a>
                 @endif
                 @if($allotment->allotment_status == 'new' && $allotment->check_status == '0')
-                <a href="{{ route('allotmentcheck', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                <a href="{{ route('allotment.check', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>
                     审核调拨单
                 </a>
@@ -62,14 +62,14 @@
                     <span class="glyphicon glyphicon-pencil"></span>
                     new
                 </a>
-                <a href="{{ route('checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
+                <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>
                     确认出库
                 </a>
                 @endif
                 @if($allotment->check_status == '2' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
                     @if($allotment->allotment_status != 'over')
-                    <a href="{{ route('checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                    <a href="{{ route('allotment.checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 对单
                     </a>
                     @endif
@@ -94,7 +94,7 @@ $(document).ready(function(){
         tmp = $(this);
         id = $(this).data('id');
         $.ajax({
-                url:"{{ route('allotmentpick') }}",
+                url:"{{ route('allotment.pick') }}",
                 data:{id:id},
                 dataType:'json',
                 type:'get',
@@ -109,7 +109,7 @@ $(document).ready(function(){
         obj = $(this);
         td = obj.parent();
         $.ajax({
-            url:"{{ route('allotmentnew') }}",
+            url:"{{ route('allotment.new') }}",
             data:{id:id},
             dataType:'json',
             type:'get',

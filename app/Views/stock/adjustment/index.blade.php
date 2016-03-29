@@ -59,7 +59,7 @@ $(document).ready(function(){
                 tmp = $(this);
                 id = tmp.data('id');
                 $.ajax({
-                    url:"{{ route('check') }}",
+                    url:"{{ route('stockAdjustment.check') }}",
                     data:{id:id},
                     dataType:'json',
                     type:'get',

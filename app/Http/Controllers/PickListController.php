@@ -14,6 +14,7 @@ use App\Models\PickListModel;
 use App\Models\PackageModel;
 use App\Models\ChannelModel;
 use App\Models\LogisticsModel;
+use App\Models\Pick\PackageScoreModel;
 
 class PickListController extends Controller
 {
@@ -96,6 +97,41 @@ class PickListController extends Controller
         ];
     
         return view($this->viewPath.'package', $response);
+    }
+
+    /**
+     * 删除 
+     *
+     * @param $id 
+     *
+     */
+    public function destroy($id) 
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $picklistItems = $model->pickListItem;
+        foreach($picklistItems as $picklistItem)
+        {
+            $listItemPackages = $picklistItem->pickListItemPackage;
+            foreach($listItemPackages as $listItemPackage)
+            {
+                $listItemPackage->delete();
+            }
+            $picklistItem->delete();
+        }
+        if($model->type == 'MULTI')
+        {
+            $packages = $model->package;
+            foreach($packages as $package) {
+                $score = PackageScoreModel::where('package_id', $package->id)->first();
+                $score->delete();
+            } 
+        }
+        $model->delete();
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -232,46 +268,33 @@ class PickListController extends Controller
     {   
         if(request()->has('logistic')) {
             foreach(request()->input('logistic') as $logistic_id) {
-                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistic_id'=>$logistic_id, 'is_auto_logistic'=>'1'])->where(function($query){
+                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistic_id'=>$logistic_id, 'is_auto'=>'1'])->where(function($query){
                     if(request()->has('package')) {
                         foreach(request()->input('package') as $key => $package)
-                            if($key == 0)
-                                $query = $query->where('type', $package);
-                            else
-                                $query = $query->orwhere('type', $package);
+                            $query = ($key == 0 ? $query->where('type', $package) : $query->orwhere('type', $package));
                     }
                 })->where(function($query){
                     if(request()->has('channel')) {
                         foreach(request()->input('channel') as $key => $channel)
-                            if($key == 0)
-                                $query = $query->where('channel_id', $channel);
-                            else
-                                $query = $query->orwhere('channel_id', $channle);
+                            $query = ($key == 0 ? $query->where('channel_id', $channel) : $query->orwhere('channel_id', $channel));
                     }
                 })->get();
                 if(count($packages)) {
-                    var_dump($packages->toArray());
                     $this->model->createPickListItems($packages);
                     $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                  (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
                 }
             }
         } else {
-            $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto_logistic'=>'1'])->where(function($query){
+            $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1'])->where(function($query){
                 if(request()->has('package')) {
                     foreach(request()->input('package') as $key => $package)
-                        if($key == 0)
-                            $query = $query->where('type', $package);
-                        else
-                            $query = $query->orwhere('type', $package);
+                        $query = ($key == 0 ? $query->where('type', $package) : $query->orwhere('type', $package));
                 }
             })->where(function($query){
                 if(request()->has('channel')) {
                     foreach(request()->input('channel') as $key => $channel)
-                        if($key == 0)
-                            $query = $query->where('channel_id', $channel);
-                        else
-                            $query = $query->orwhere('channel_id', $channle);
+                        $query = ($key == 0 ? $query->where('channel_id', $channel) : $query->orwhere('channel_id', $channel));
                 }
             })->get();
             if(count($packages)) {
@@ -280,7 +303,7 @@ class PickListController extends Controller
                                              (request()->has('multitext') ? request()->input('multitext') : '20'));
             }
         }
-
+exit;
         return redirect($this->mainIndex);
     }
 }

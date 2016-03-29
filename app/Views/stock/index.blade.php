@@ -41,7 +41,7 @@
 @stop
 @section('tableToolButtons')
 <div class="btn-group">
-    <a class="btn btn-success" href="{{ route('createtaking') }}">
+    <a class="btn btn-success" href="{{ route('stock.createTaking') }}">
         库存盘点
     </a>
 </div>

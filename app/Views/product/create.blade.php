@@ -111,6 +111,10 @@
             </select>
         </div>
         <div class="form-group col-md-3">
+            <label for="color">材质</label>
+            <input class="form-control" id="fabric" placeholder="备注" name='fabric' value="{{ old('fabric') }}">
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
         </div>

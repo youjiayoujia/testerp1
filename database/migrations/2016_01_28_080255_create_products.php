@@ -36,6 +36,7 @@ class CreateProducts extends Migration
             $table->string('package_size')->comment('包装尺寸')->nullable()->default(NULL);
             $table->integer('upload_user')->comment('上传人')->nullable()->default(0);
             $table->string('default_image')->comment('默认图片')->nullable()->default(0);
+            $table->string('fabric')->comment('材质')->nullable()->default(NULL);
             $table->decimal('weight',5,2)->comment('重量')->nullable()->default(0);
             $table->tinyInteger('status')->comment('上下架状态')->nullable()->default(0);
             $table->string('remark')->comment('备注')->nullable()->default(NULL);

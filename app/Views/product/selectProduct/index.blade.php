@@ -52,7 +52,7 @@
             <td><?php if($product->status==0)echo "New";if($product->status==1)echo "Picked";if($product->status==2)echo "Cancel"; ?></td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
-            <td>材质</td>
+            <td>{{ $product->fabric }}</td>
             <td>{{ $product->supplier->name }}</td>
             <td><a href="{{$product->purchase_url}}" >链接</td>
             <td>线下供货商</td>

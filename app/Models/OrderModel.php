@@ -10,6 +10,7 @@
 
 namespace App\Models;
 
+use Tool;
 use App\Base\BaseModel;
 
 class OrderModel extends BaseModel
@@ -136,6 +137,11 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
 
+    public function packages()
+    {
+        return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
+    }
+
     public function channel()
     {
         return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
@@ -144,6 +150,68 @@ class OrderModel extends BaseModel
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
+    }
+
+    public function createPackage($items = [])
+    {
+        $items = $items ? collect($items) : [];
+        $package = [];
+        //channel
+        $package['channel_id'] = $this->channel_id;
+        //assigner
+        $package['assigner_id'] = 1;
+        //judge type
+        if ($items) {
+            if ($items->count() > 1) {
+                $package['type'] = 'MULTI';
+            } else {
+                //package item quantity must not more than order item
+                if ($this->items->find($items->first()['id'])->quantity < $items->first()['quantity']) {
+                    return false;
+                }
+                $package['type'] = $items->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE';
+            }
+        } else {
+            if ($this->items->count() > 1) {
+                $package['type'] = 'MULTI';
+            } else {
+                $package['type'] = $this->items->first()->quantity > 1 ? 'SINGLEMULTI' : 'SINGLE';
+            }
+        }
+        $package['status'] = 'PROCESSING';
+        $package['weight'] = 0;
+        $package['length'] = 0;
+        $package['width'] = 0;
+        $package['height'] = 0;
+        $package['email'] = $this->email;
+        $package['shipping_firstname'] = $this->shipping_firstname;
+        $package['shipping_lastname'] = $this->shipping_lastname;
+        $package['shipping_address'] = $this->shipping_address;
+        $package['shipping_address1'] = $this->shipping_address1;
+        $package['shipping_city'] = $this->shipping_city;
+        $package['shipping_state'] = $this->shipping_state;
+        $package['shipping_country'] = $this->shipping_country;
+        $package['shipping_zipcode'] = $this->shipping_zipcode;
+        $package['shipping_phone'] = $this->shipping_phone;
+        //auto process
+        $package['is_auto'] = 1;
+        //auto assign logsitic
+        $package['is_auto_logistic'] = 1;
+        $this->packages()->create($package);
+        Tool::show($package);
+    }
+
+    public function setPackageItems($items = [])
+    {
+        $items = $items ? collect($items) : [];
+        if ($items) {
+            foreach ($items as $item) {
+            }
+        } else {
+            foreach ($this->items as $item) {
+            }
+        }
+        return false;
     }
 
 }

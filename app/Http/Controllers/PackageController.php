@@ -23,9 +23,15 @@ class PackageController extends Controller
 
     public function store()
     {
-        echo "<pre>";
-        var_dump(request()->all());
-        exit;
+        request()->flash();
+        $order = OrderModel::find(request()->input('order_id'));
+        if ($order) {
+            $this->validate(request(), $this->model->rules('create'));
+            $order->createPackage(request()->input('items'));
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
+        } else {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
+        }
     }
 
     public function ajaxGetOrder()

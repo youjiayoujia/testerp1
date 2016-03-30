@@ -5,12 +5,11 @@
     </div>
     <div class="panel-body" id="itemDiv">
         <div class='row'>
-            <div class="form-group col-lg-1"></div>
             <div class="form-group col-lg-4">
                 <label for="sku" class='control-label'>sku</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
             </div>
-            <div class="form-group col-lg-1">
+            <div class="form-group col-lg-2">
                 <label for="qty" class='control-label'>数量</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
             </div>
@@ -22,13 +21,14 @@
         @foreach($order->items as $item)
             <div class='row'>
                 <div class="form-group col-lg-4">
+                    <input type="hidden" name="items[{{ $item->id }}][id]" value="{{ $item->id }}"/>
                     {{ $item->sku }}
                 </div>
                 <div class="form-group col-lg-1">
-                    <input type="text" class="form-control" name="item[{{ $item->sku }}][quantity]" value="{{ $item->quantity }}"/>
+                    <input type="text" class="form-control" name="items[{{ $item->id }}][quantity]" value="{{ $item->quantity }}"/>
                 </div>
                 <div class="form-group col-lg-6">
-                    <input type="text" class="form-control"/>
+                    <input type="text" class="form-control" name="items[{{ $item->id }}][remark]"/>
                 </div>
             </div>
         @endforeach

@@ -42,8 +42,8 @@
             <td>{{ $order->id }}</td>
             <td>{{ $order->channel_id }}</td>
             <td>{{ $order->channel_account_id }}</td>
-            <td>{{ $order->order_number }}</td>
-            <td>{{ $order->channel_order_number }}</td>
+            <td>{{ $order->ordernum }}</td>
+            <td>{{ $order->channel_ordernum }}</td>
             <td>{{ $order->email }}</td>
             <td>{{ $order->status }}</td>
             <td>{{ $order->active }}</td>

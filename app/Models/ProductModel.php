@@ -24,7 +24,7 @@ class ProductModel extends BaseModel
             'c_name' => 'required',
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
-            'purchase_url' => 'url',
+           // 'purchase_url' => 'url',
             'supplier_id' => 'required',
             'product_size' => 'required',
             'weight' => 'required|numeric',

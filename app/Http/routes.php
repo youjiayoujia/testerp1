@@ -67,7 +67,44 @@ Route::get('stock/getByPosition', ['uses' => 'StockController@ajaxGetByPosition'
 Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
 Route::get('stock/getMessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'stock.getMessage']);
 Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
+
+//采购条目
+Route::any('purchaseItem/changeStatus', 'Purchase\PurchaseItemController@changeStatus');
+Route::any('purchaseItem/form_postCoding', 'Purchase\PurchaseItemController@form_postCoding');
+Route::any('purchaseItem/supplierCost', 'Purchase\PurchaseItemController@supplierCost');
+Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
+Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
+Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
+
+//采购单
+Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
+Route::any('purchaseOrder/purchaseOrderSupplier', 'Purchase\purchaseOrderController@purchaseOrderSupplier');
+Route::any('purchaseOrder/checkProductItems', 'Purchase\purchaseOrderController@checkProductItems');
+Route::any('purchaseOrder/checkedPurchaseItem', 'Purchase\purchaseOrderController@checkedPurchaseItem');
+Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
+Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
+Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
+Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
+
+//采购列表
+Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
+Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
+Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
+Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
+Route::resource('purchaseList', 'Purchase\PurchaseListController');
+
+/**
+ * stock controller route
+ */
+Route::get('allotsku', ['uses'=>'StockController@ajaxAllotSku', 'as'=>'allotsku']);
+Route::get('allotoutwarehouse', ['uses'=>'StockController@ajaxAllotOutWarehouse', 'as'=>'allotoutwarehouse']);
+Route::get('getbyposition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'getbyposition']);
+Route::get('getmessage', ['uses'=>'StockController@ajaxGetMessage', 'as'=>'getmessage']);
+Route::get('allotposition', ['uses'=>'StockController@ajaxAllotPosition','as'=>'allotposition']);
+
 Route::resource('stock', 'StockController');
+
 
 //品类路由
 Route::resource('catalog', 'CatalogController');

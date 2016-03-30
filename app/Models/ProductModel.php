@@ -67,6 +67,7 @@ class ProductModel extends BaseModel
         'product_size',
         'package_size',
         'weight',
+        'fabric',
         'warehouse_id',
         'upload_user',
         'assigner',
@@ -122,6 +123,27 @@ class ProductModel extends BaseModel
     {
         return $this->hasMany('App\Models\Product\ProductFeatureValueModel','product_id');
     }
+
+    public function amazonProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\amazonProductModel','product_id');
+    }
+
+    public function ebayProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\ebayProductModel','product_id');
+    }
+
+    public function aliexpressProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\aliexpressProductModel','product_id');
+    }
+
+    public function b2cProduct()
+    {
+        return $this->hasOne('App\Models\Product\channel\b2cProductModel','product_id');
+    }
+
 
     /**
      * 创建产品
@@ -337,6 +359,11 @@ class ProductModel extends BaseModel
         $this->featureValues()->detach();
         //删除product
         $this->delete();
+    }
+
+    public function updateEditProduct($model,$data)
+    {
+        $model->update($data);
     }
 
 }

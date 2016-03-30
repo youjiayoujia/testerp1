@@ -97,11 +97,11 @@ Route::resource('purchaseList', 'Purchase\PurchaseListController');
 /**
  * stock controller route
  */
-Route::get('allotsku', ['uses'=>'StockController@ajaxAllotSku', 'as'=>'allotsku']);
-Route::get('allotoutwarehouse', ['uses'=>'StockController@ajaxAllotOutWarehouse', 'as'=>'allotoutwarehouse']);
-Route::get('getbyposition', ['uses'=>'StockController@ajaxGetByPosition', 'as'=>'getbyposition']);
-Route::get('getmessage', ['uses'=>'StockController@ajaxGetMessage', 'as'=>'getmessage']);
-Route::get('allotposition', ['uses'=>'StockController@ajaxAllotPosition','as'=>'allotposition']);
+Route::get('allotsku', ['uses' => 'StockController@ajaxAllotSku', 'as' => 'allotsku']);
+Route::get('allotoutwarehouse', ['uses' => 'StockController@ajaxAllotOutWarehouse', 'as' => 'allotoutwarehouse']);
+Route::get('getbyposition', ['uses' => 'StockController@ajaxGetByPosition', 'as' => 'getbyposition']);
+Route::get('getmessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'getmessage']);
+Route::get('allotposition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'allotposition']);
 
 Route::resource('stock', 'StockController');
 
@@ -188,7 +188,25 @@ Route::resource('pickList', 'PickListController');
 //产品管理路由
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as' => 'examine']);
+Route::get('examine', ['uses' => 'ProductController@examine', 'as' => 'examine']);
+Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as' => 'choseShop']);
 Route::resource('product', 'ProductController');
+
+
+//产品渠道
+Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
+//Route::resource('amazonProduct', 'Product\Channel\AmazonController');
+Route::resource('EditProduct', 'Product\EditProductController');
+Route::resource('SelectProduct', 'Product\SelectProductController');
+Route::get('amazonProductEditImage',
+    ['uses' => 'Product\Channel\AmazonController@amazonProductEditImage', 'as' => 'amazonProductEditImage']);
+Route::post('amazonProductUpdateImage',
+    ['uses' => 'Product\Channel\AmazonController@amazonProductUpdateImage', 'as' => 'amazonProductUpdateImage']);
+Route::get('examineAmazonProduct',
+    ['uses' => 'Product\Channel\AmazonController@examineAmazonProduct', 'as' => 'examineAmazonProduct']);
+Route::get('cancelExamineAmazonProduct',
+    ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as' => 'cancelExamineAmazonProduct']);
+
 
 //订单管理路由
 Route::resource('order', 'OrderController');

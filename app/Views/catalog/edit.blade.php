@@ -1,6 +1,7 @@
 @extends('common.form')
 @section('formAction') {{ route('catalog.update', ['id' => $model->id]) }} @stop
 @section('formBody')
+
     <div class="form-group">
         <label for="name">分类名称</label>
         <input class="form-control" id="name" placeholder="名称" name='name' value="{{$model->name}}">
@@ -25,7 +26,9 @@
                     <button type="button" class='btn btn-primary setsvalues'>添加</button>
                 </div>
             @endforeach
-            <button type="button" class="btn btn-primary btn-lg btn-block" id='setadd'>添加set</button>
+        </div>
+        <div class="panel-footer">
+            <div class="create" id="setadd"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>          
     <div class="panel panel-info">
@@ -48,7 +51,9 @@
                     <button type="button" class='btn btn-primary attrvalues'>添加</button>
                 </div>
             @endforeach
-            <button type="button" class="btn btn-primary btn-lg btn-block" id='attradd'>添加variation</button>
+        </div>
+        <div class="panel-footer">
+            <div class="create" id="attradd"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>
     <div class="panel panel-info">
@@ -83,7 +88,9 @@
                     @endif
                 </div>
             @endforeach
-            <button type="button" class="btn btn-primary btn-lg btn-block" id='featureadd'>添加feature</button>
+        </div>
+        <div class="panel-footer">
+            <div class="create" id="featureadd"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>
     <input type='hidden' value='{{count($model->sets)-1}}' id='setnum' name="setnum" >

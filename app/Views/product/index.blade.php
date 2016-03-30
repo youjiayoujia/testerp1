@@ -68,7 +68,6 @@
         </tr>
     @endforeach
 @stop
-
 @section('childJs')
     <script type="text/javascript">
         //单个审核
@@ -95,11 +94,9 @@
                 })
             }
         });
-
         $('.has_check').click(function () {
             alert("该产品已审核");
         });
-
         //批量审核
         $('#batchexamine').click(function () {
             if (confirm("确认审核?")) {
@@ -125,6 +122,20 @@
                     }                    
                 })
             }
+        });
+
+
+        //批量审核
+        $('#choseShop').click(function () {
+            var url = "{{route('choseShop')}}";
+            var checkbox = document.getElementsByName("tribute_id");
+            var product_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if(!checkbox[i].checked)continue;
+                product_ids += checkbox[i].value+",";
+            }
+            product_ids = product_ids.substr(0,(product_ids.length)-1);
+            window.location.href=url+"?product_ids="+product_ids;      
         });
 
         //全选

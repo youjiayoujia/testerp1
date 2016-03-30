@@ -11,6 +11,8 @@
 namespace App\Models;
 
 use App\Base\BaseModel;
+use App\Models\ItemModel as productItem;
+use App\Models\Order\ItemModel;
 
 class OrderModel extends BaseModel
 {
@@ -19,8 +21,8 @@ class OrderModel extends BaseModel
     protected $fillable = [
         'channel_id',
         'channel_account_id',
-        'order_number',
-        'channel_order_number',
+        'ordernum',
+        'channel_ordernum',
         'email',
         'status',
         'active',
@@ -69,40 +71,48 @@ class OrderModel extends BaseModel
     public $searchFields = [
         'channel_id',
         'channel_account_id',
-        'order_number',
+        'ordernum',
         'email',
         'customer_service',
         'operator',
     ];
 
-    public $rules = [
-        'create' => [
-            'channel_id' => 'required',
-            'channel_account_id' => 'required',
-            'order_number' => 'required',
-            'amount' => 'required',
-            'payment' => 'required',
-            'shipping_firstname' => 'required',
-            'billing_firstname' => 'required',
-            'shipping_lastname' => 'required',
-            'billing_lastname' => 'required',
-        ],
-        'update' => [
-            'channel_id' => 'required',
-            'channel_account_id' => 'required',
-            'order_number' => 'required',
-            'amount' => 'required',
-            'payment' => 'required',
-            'shipping_firstname' => 'required',
-            'billing_firstname' => 'required',
-            'shipping_lastname' => 'required',
-            'billing_lastname' => 'required',
-        ],
-    ];
-
     public function rule($request)
     {
-        $arr = [];
+        $arr = [
+            'channel_id' => 'required',
+            'channel_account_id' => 'required',
+            'ordernum' => 'required',
+            'channel_ordernum' => 'required',
+            'email' => 'required',
+            'status' => 'required',
+            'active' => 'required',
+            'affairer' => 'required',
+            'customer_service' => 'required',
+            'operator' => 'required',
+            'ip' => 'required',
+            'address_confirm' => 'required',
+            'affair_time' => 'required',
+            'create_time' => 'required',
+            'currency' => 'required',
+            'rate' => 'required',
+            'amount' => 'required',
+            'amount_product' => 'required',
+            'amount_shipping' => 'required',
+            'amount_coupon' => 'required',
+            'shipping' => 'required',
+            'shipping_firstname' => 'required',
+            'shipping_lastname' => 'required',
+            'shipping_address' => 'required',
+            'shipping_city' => 'required',
+            'shipping_state' => 'required',
+            'shipping_country' => 'required',
+            'shipping_zipcode' => 'required',
+            'shipping_phone' => 'required|digits_between:8,11',
+            'payment' => 'required',
+            'payment_date' => 'required',
+        ];
+
         $buf = $request->all();
         $buf = $buf['arr'];
         foreach ($buf as $key => $val) {
@@ -111,14 +121,24 @@ class OrderModel extends BaseModel
                     $arr['arr.sku.' . $k] = 'required';
                 }
             }
-            if ($key == 'qty') {
+            if ($key == 'quantity') {
                 foreach ($val as $k => $v) {
-                    $arr['arr.qty.' . $k] = 'required';
+                    $arr['arr.quantity.' . $k] = 'required';
                 }
             }
             if ($key == 'price') {
                 foreach ($val as $k => $v) {
                     $arr['arr.price.' . $k] = 'required';
+                }
+            }
+            if ($key == 'status') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.status.' . $k] = 'required';
+                }
+            }
+            if ($key == 'ship_status') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.ship_status.' . $k] = 'required';
                 }
             }
             if ($key == 'is_gift') {
@@ -131,7 +151,7 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
-    public function items()
+    public function orderItem()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
@@ -144,6 +164,91 @@ class OrderModel extends BaseModel
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
+    }
+
+    public function user_affairer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'affairer', 'id');
+    }
+
+    public function user_service()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'customer_service', 'id');
+    }
+
+    public function user_operator()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'operator', 'id');
+    }
+
+    public function getStatusNameAttribute()
+    {
+        $arr = config('order.status');
+        return $arr[$this->status];
+    }
+
+    public function getActiveNameAttribute()
+    {
+        $arr = config('order.active');
+        return $arr[$this->active];
+    }
+
+    public function getIsPartialNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->is_partial];
+    }
+
+    public function getByHandNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->by_hand];
+    }
+
+    public function getIsAffairNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->is_affair];
+    }
+
+    public function getAddressConfirmNameAttribute()
+    {
+        $arr = config('order.address');
+        return $arr[$this->address_confirm];
+    }
+
+    public function items()
+    {
+        return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
+    }
+
+    public function createOrder($data)
+    {
+        $order = $this->create($data);
+        if($data['_token']) {
+            foreach ($data['arr'] as $key => $item) {
+                foreach($item as $k => $v) {
+                    $data['items'][$k][$key] = $v;
+                }
+            }
+            foreach($data['items'] as $item) {
+//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
+                echo $item['order_id']."</br>";
+                ItemModel::create($item);
+//                $order->items->create($item);
+            }
+        }else {
+            foreach($data['items'] as $item) {
+//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
+                echo $item['order_id']."</br>";
+                ItemModel::create($item);
+//                $order->items->create($item);
+            }
+        }
+
+        return $order;
     }
 
 }

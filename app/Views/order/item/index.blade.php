@@ -4,7 +4,7 @@
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="order_id">订单ID</th>
     <th>sku</th>
-    <th class="sort" data-field="qty">数量</th>
+    <th class="sort" data-field="quantity">数量</th>
     <th class="sort" data-field="price">金额</th>
     <th class="sort" data-field="status">订单状态</th>
     <th class="sort" data-field="ship_status">发货状态</th>
@@ -20,7 +20,7 @@
             <td>{{ $item->id }}</td>
             <td>{{ $item->order_id }}</td>
             <td>{{ $item->sku }}</td>
-            <td>{{ $item->qty }}</td>
+            <td>{{ $item->quantity }}</td>
             <td>{{ $item->price }}</td>
             <td>{{ $item->status }}</td>
             <td>{{ $item->ship_status }}</td>

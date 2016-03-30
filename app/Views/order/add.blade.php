@@ -3,7 +3,7 @@
         <input type='text' class="form-control sku" id="arr[sku][{{$current}}]" placeholder="sku" name='arr[sku][{{$current}}]' value="{{ old('arr[sku][$current]') }}">
     </div>
     <div class="form-group col-sm-1">
-        <input type='text' class="form-control qty" id="arr[qty][{{$current}}]" placeholder="数量" name='arr[qty][{{$current}}]' value="{{ old('arr[qty][$current]') }}">
+        <input type='text' class="form-control quantity" id="arr[quantity][{{$current}}]" placeholder="数量" name='arr[quantity][{{$current}}]' value="{{ old('arr[quantity][$current]') }}">
     </div>
     <div class="form-group col-sm-1">
         <input type='text' class="form-control price" id="arr[price][{{$current}}]" placeholder="金额" name='arr[price][{{$current}}]' value="{{ old('arr[price][$current]') }}">

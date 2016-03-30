@@ -17,33 +17,35 @@ class ItemModel extends BaseModel
     protected $table = 'order_items';
 
     protected $fillable = [
-        'order_id',
-        'sku',
-        'qty',
-        'price',
-        'status',
-        'ship_status',
-        'is_gift',
-        'remark',
+        'order_id','item_id','sku','quantity','price',
+        'status','ship_status','is_gift','remark',
     ];
 
     public $searchFields = [
-        'order_id',
-        'sku',
-        'status',
-        'ship_status',
-    ];
-
-    public $rules = [
-        'update' => [
-            'order_id' => 'required',
-            'sku' => 'required',
-        ],
+        'order_id', 'item_id', 'sku', 'status', 'ship_status',
     ];
 
     public function item()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'item_id');
+        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
+    }
+
+    public function getShipStatusNameAttribute()
+    {
+        $arr = config('order.ship_status');
+        return $arr[$this->ship_status];
+    }
+
+    public function getStatusNameAttribute()
+    {
+        $arr = config('order.product_status');
+        return $arr[$this->status];
+    }
+
+    public function getIsGiftNameAttribute()
+    {
+        $arr = config('order.whether');
+        return $arr[$this->is_gift];
     }
 
 }

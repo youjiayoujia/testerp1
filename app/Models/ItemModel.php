@@ -160,7 +160,7 @@ class ItemModel extends BaseModel
             return $stock->out($quantity, $type, $relation_id, $remark);
     }
 
-        /**
+    /**
      * 通过item_id和quantity自动分配库位 
      *
      * @param $item_id $quantity
@@ -169,8 +169,7 @@ class ItemModel extends BaseModel
      */
     public function allocateStock($quantity) 
     {
-        $buf = new StockModel;
-        $stocks = $buf::where(['item_id'=>$this->id])->get();
+        $stocks = $this->stocks()->get();
         foreach($stocks as $stock)
         {
             if($stock->available_quantity > $quantity) {
@@ -187,9 +186,6 @@ class ItemModel extends BaseModel
                 $arr[] = [$stock->warehouse_position_id, $quantity, $stock->id];
                 $quantity -= $quantity;
             }
-        }
-        if($quantity != 0) {
-            return 'false';
         }
         if($arr) {
             return $arr;

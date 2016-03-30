@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use DB;
 use Exception;
 use App\Base\BaseModel;
-use App\Models\Package\ItemModel;
+use App\Models\ItemModel;
+use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\Pick\ListItemModel;
 use App\Models\PackageModel;
 use App\Models\StockModel;
@@ -91,8 +91,7 @@ class PickListModel extends BaseModel
     {
         foreach($package->items as $packageitem)
         {
-            $stock = new StockModel;
-            $arr = $stock->allocateStock($packageitem->item_id, $packageitem->quantity);
+            $arr = ItemModel::find($packageitem->item_id)->allocateStock($packageitem->quantity);
             if(!$arr) {
                 throw new Exception('id为'.$package->id.'的package中有未能分配到库存的项');
             }
@@ -106,7 +105,7 @@ class PickListModel extends BaseModel
                     $query->save();
                     $query->pickListItemPackage()->create(['package_id' => $package->id]);
                 }
-                $stock->where(['item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$value[0]])->first()->hold($value[1]);
+                ItemModel::find($packageitem->item_id)->hold($value[0], $value[1]);
             }   
         }
     }
@@ -123,8 +122,7 @@ class PickListModel extends BaseModel
         $buf = [];
         foreach($package->items as $packageitem)
         {
-            $stock = new StockModel;
-            $arr = $stock->allocateStock($packageitem->item_id, $packageitem->quantity);
+            $arr = ItemModel::find($packageitem->item_id)->allocateStock($packageitem->quantity);
             if(!$arr) {
                 throw new Exception('id为'.$package->id.'的package中有未能分配到库存的项');
             }

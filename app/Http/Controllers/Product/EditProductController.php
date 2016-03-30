@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Http\Controllers\Product;
+
+use App\Models\ProductModel;
+use App\Models\Product\channel\amazonProductModel;
+use App\Models\Product\channel\ebayProductModel;
+use App\Models\Product\channel\aliexpressProductModel;
+use App\Models\Product\channel\b2cProductModel;
+use App\Models\Product\SupplierModel;
+use App\Http\Controllers\Controller;
+
+class EditProductController extends Controller
+{
+
+    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier)
+    {
+        $this->mainIndex = route('EditProduct.index');
+        $this->channelProduct = $amazonProductModel;
+        $this->product = $productModel;
+        $this->supplier = $supplier;
+        $this->mainTitle = '选款产品编辑';
+        $this->viewPath = 'product.EditProduct.';
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $response = [
+            'metas' => $this->metas('index'),
+            'data' => $this->autoList($this->product->where('status','=','1')),
+        ];
+
+        return view( $this->viewPath .'index', $response);
+
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $this->product->find($id),
+            'suppliers' =>$this->supplier->all(),
+        ];
+
+        return view($this->viewPath . 'edit', $response);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update($id)
+    {
+        request()->flash();
+        //$this->validate(request(), $this->model->rules('update',$id));
+        $editStatus = request()->input('edit');
+        $data = request()->all();
+        $data['edit_status'] = $editStatus;
+        $productModel = $this->product->find($id);
+        //$ebayProductModel = $aliexpressProductModel = $b2cProductModel = $amazonProductModel = $this->product->find($id);
+        $this->product->updateEditProduct($productModel->ebayProductModel,$data);
+        $this->product->updateEditProduct($productModel->aliexpressProductModel,$data);
+        $this->product->updateEditProduct($productModel->b2cProductModel,$data);
+        $this->product->updateEditProduct($productModel->amazonProductModel,$data);
+        $productModel->update($data);
+        return redirect($this->mainIndex);
+    }
+     
+}

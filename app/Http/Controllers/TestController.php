@@ -23,33 +23,50 @@ use App\Models\BModel;
 use App\Models\CModel;
 use App\Models\UserModel;
 use App\Models\Pick\ListItemModel;
+use App\Models\PackageModel;
 
 class TestController extends Controller
 {
     public function test()
     {
-        $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLE'])->get();
-        $lists = $query->chunk(2);
-        foreach($lists as $list){
-            foreach($list as $item){
-                echo $item->id.'--';
-                $item->update(['picklist_id'=>'1']);
-            }
-        }
-        exit;
-        // var_dump($query);exit;
-        if($query->count()) {
-            $query->chunk(2, function($picklistItems){
-                var_dump($picklistItems);
-                foreach($picklistItems as $picklistItem) {
-                    echo "<hr>";
-                    // var_dump($picklistItem);
-                    echo $picklistItem->id;
-                    echo "--".$picklistItem->picklist_id;
-                    $picklistItem->update(['picklist_id'=>'1']);
-                }
-            });
-         }
+        // $arr = PackageModel::all();
+        /******************************/
+        // $arr = PackageModel::has('order.channel_id','=',2)->get();
+
+        // var_dump($arr->toArray());
+        /*****************************/
+        $arr = PackageModel::with('order')->where(function($query){
+            var_dump($query->get()->toArray());
+            exit;
+        });
+exit;
+        var_dump($arr->toArray());
+        // foreach($arr as $v){
+        //     var_dump($v);
+        //     echo $v->order->id.$v->order->channel_id."<br>";
+        // }
+        // $query = ListItemModel::where(['picklist_id'=>'0','type'=>'SINGLE'])->get();
+        // $lists = $query->chunk(2);
+        // foreach($lists as $list){
+        //     foreach($list as $item){
+        //         echo $item->id.'--';
+        //         $item->update(['picklist_id'=>'1']);
+        //     }
+        // }
+        // exit;
+        // // var_dump($query);exit;
+        // if($query->count()) {
+        //     $query->chunk(2, function($picklistItems){
+        //         var_dump($picklistItems);
+        //         foreach($picklistItems as $picklistItem) {
+        //             echo "<hr>";
+        //             // var_dump($picklistItem);
+        //             echo $picklistItem->id;
+        //             echo "--".$picklistItem->picklist_id;
+        //             $picklistItem->update(['picklist_id'=>'1']);
+        //         }
+        //     });
+        //  }
     }
 
     public function test1($url)

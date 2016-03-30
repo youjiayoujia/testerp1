@@ -64,11 +64,7 @@
             <td>
                 <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
-                </a>
-                <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑资料
-                </a>
-                
+                </a> 
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">

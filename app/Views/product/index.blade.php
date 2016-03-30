@@ -124,18 +124,6 @@
             }
         });
 
-        //批量审核
-        /*$('#choseShop').click(function () {
-            var url = "{{route('amazonProduct.index')}}";
-            var checkbox = document.getElementsByName("tribute_id");
-            var product_ids = "";
-            for (var i = 0; i < checkbox.length; i++) {
-                if(!checkbox[i].checked)continue;
-                product_ids += checkbox[i].value+",";
-            }
-            product_ids = product_ids.substr(0,(product_ids.length)-1);
-            window.location.href=url+"?product_ids="+product_ids;      
-        });*/
 
         //批量审核
         $('#choseShop').click(function () {

@@ -54,6 +54,11 @@ return [
                     'url' => 'SelectProduct.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '选款产品编辑',
+                    'url' => 'EditProduct.index',
+                    'icon' => '',
+                ],
             ],
             '供应链' => [
                 [

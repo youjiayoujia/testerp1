@@ -361,4 +361,9 @@ class ProductModel extends BaseModel
         $this->delete();
     }
 
+    public function updateEditProduct($model,$data)
+    {
+        $model->update($data);
+    }
+
 }

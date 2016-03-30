@@ -218,6 +218,7 @@ class OrderController extends Controller
         $channelOrders = json_decode($data, true);
         $orders = [];
         foreach ($channelOrders as $key => $channelOrder) {
+            $orders[$key]['_token'] = null;
             $name = substr($url, 11, 6);
             $channels = ChannelModel::where(['name' => $name])->get();
             foreach($channels as $channel) {

@@ -225,34 +225,28 @@ class OrderModel extends BaseModel
     public function createOrder($data)
     {
         $order = $this->create($data);
-        foreach($data['items'] as $item) {
-//            $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
-            $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
-            echo $item['order_id']."</br>";
-            ItemModel::create($item);
-//            $order->items->create($item);
+        if($data['_token']) {
+            foreach ($data['arr'] as $key => $item) {
+                foreach($item as $k => $v) {
+                    $data['items'][$k][$key] = $v;
+                }
+            }
+            foreach($data['items'] as $item) {
+//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
+                echo $item['order_id']."</br>";
+                ItemModel::create($item);
+//                $order->items->create($item);
+            }
+        }else {
+            foreach($data['items'] as $item) {
+//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
+                echo $item['order_id']."</br>";
+                ItemModel::create($item);
+//                $order->items->create($item);
+            }
         }
-
-//        if(request()->ajax()) {
-//            $len = count(array_keys(request()->input('arr.sku')));
-//            $items = request()->input('arr');
-//            for($i=0; $i<$len; $i++) {
-//                foreach($items as $key => $val) {
-//                    $val = array_values($val);
-//                    $data[$key] = $val[$i];
-//                }
-//                $data['item_id'] = productItem::where('sku', $data['sku'])->first()->id;
-//                $data['order_id'] = $order->id;
-//                ItemModel::create($data);
-//            }
-//        }else {
-//        }
-//
-//        foreach ($data['arr'] as $key => $item) {
-//            foreach($item as $k => $v) {
-//                $data['orderitems'][$k][$key] = $v;
-//            }
-//        }
 
         return $order;
     }

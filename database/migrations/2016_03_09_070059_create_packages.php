@@ -14,7 +14,9 @@ class CreatePackages extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('channel_id')->comment('渠道ID');
             $table->integer('order_id')->comment('订单ID');
+            $table->integer('warehouse_id')->comment('仓库ID');
             $table->integer('logistic_id')->comment('物流方式ID');
             $table->integer('picklist_id')->comment('拣货单ID');
             $table->integer('assigner_id')->comment('负责人');
@@ -40,7 +42,7 @@ class CreatePackages extends Migration
             $table->string('shipping_firstname')->comment('发货名字');
             $table->string('shipping_lastname')->comment('发货姓氏');
             $table->string('shipping_address')->comment('发货地址');
-            $table->string('shipping_address1')->comment('发货地址1');
+            $table->string('shipping_address1')->nullable()->comment('发货地址1');
             $table->string('shipping_city')->comment('发货城市');
             $table->string('shipping_state')->comment('发货省/州');
             $table->string('shipping_country')->comment('发货国家/地区');

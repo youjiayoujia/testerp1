@@ -23,10 +23,23 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function store()
+    {
+        request()->flash();
+        $order = OrderModel::find(request()->input('order_id'));
+        if ($order) {
+            $this->validate(request(), $this->model->rules('create'));
+            $order->createPackage(request()->input('items'));
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
+        } else {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
+        }
+    }
+
     public function ajaxGetOrder()
     {
         if (request()->ajax()) {
-            $order = OrderModel::where('order_number', request()->input('ordernum'))->first();
+            $order = OrderModel::where('ordernum', request()->input('ordernum'))->first();
             if ($order) {
                 $response = [
                     'order' => $order,

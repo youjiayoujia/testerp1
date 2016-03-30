@@ -91,7 +91,7 @@
         $(document).on('click', '#create_form', function(){
             warehouse = $('#out_warehouse_id').val();
             $.ajax({
-                url:"{{ route('add') }}",
+                url:"{{ route('allotment.add') }}",
                 data:{current:current, warehouse:warehouse},
                 dataType:'html',
                 type:'get',
@@ -114,7 +114,7 @@
             amount = $('.amount');
             sku = $('.sku');
             $.ajax({
-                url: "{{ route('allotoutwarehouse') }}",
+                url: "{{ route('stock.allotOutWarehouse') }}",
                 data: {warehouse:warehouse},
                 dataType:'json',
                 type:'get',
@@ -153,7 +153,7 @@
             position = $(this).val();
             sku = obj.find('.sku').val();
             $.ajax({
-                url:"{{ route('allotposition' )}}",
+                url:"{{ route('stock.allotPosition' )}}",
                 data: {position:position, item_id:sku},
                 dataType:'json',
                 type:'get',
@@ -182,7 +182,7 @@
             position = obj.find('.warehouse_position_id');
             sku = $(this).val();
             $.ajax({
-                url:"{{ route('allotsku' )}}",
+                url:"{{ route('stock.allotSku' )}}",
                 data: {warehouse:warehouse, item_id:sku},
                 dataType:'json',
                 type:'get',
@@ -237,7 +237,7 @@
                     return;
                 }
                 $.ajax({
-                    url:"{{ route('allotsku') }}",
+                    url:"{{ route('stock.allotSku') }}",
                     data:{warehouse:warehouse, item_id:sku},
                     dataType:'json',
                     'type':'get',

@@ -19,7 +19,7 @@
             <td>{{ $adjust->warehouse ? $adjust->warehouse->name : '' }}</td>
             <td>{{ $adjust->remark }}</td>
             <td>{{ $adjust->adjustByName ? $adjust->adjustByName->name : '' }} </td>
-            <td>{{ $adjust->status == 'Y' ? '已审核' : '未审核' }}</td>
+            <td>{{ $adjust->status == '1' ? '已审核' : '未审核' }}</td>
             <td>{{ $adjust->checkByName ? $adjust->checkByName->name : '' }}</td>
             <td>{{ $adjust->check_time }}</td>
             <td>{{ $adjust->created_at }}</td>
@@ -27,18 +27,18 @@
                 <a href="{{ route('stockAdjustment.show', ['id'=>$adjust->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if($adjust->status != 'Y' )
+                @if($adjust->status != '1' )
                 <a href="{{ route('stockAdjustment.edit', ['id'=>$adjust->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 @endif
                 <a href="javascript:"  class="btn btn-info btn-xs check_time" data-id="{{ $adjust->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    @if($adjust->status == 'Y')已审核
+                    @if($adjust->status == '1')已审核
                     @else未审核
                     @endif
                 </a>
-                @if($adjust->status == 'N')
+                @if($adjust->status == '0')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $adjust->id }}"
                    data-url="{{ route('stockAdjustment.destroy', ['id' => $adjust->id]) }}">
@@ -59,7 +59,7 @@ $(document).ready(function(){
                 tmp = $(this);
                 id = tmp.data('id');
                 $.ajax({
-                    url:"{{ route('check') }}",
+                    url:"{{ route('stockAdjustment.check') }}",
                     data:{id:id},
                     dataType:'json',
                     type:'get',

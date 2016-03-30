@@ -21,13 +21,13 @@
         <label for="type">仓库类型</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='type' value='本地仓库' {{ old('type') ? (old('type') == '本地仓库' ? 'checked' : '') : 'checked' }}>本地仓库
+                <input type='radio' name='type' value='local' {{ old('type') ? (old('type') == 'local' ? 'checked' : '') : 'checked' }}>本地仓库
             </label>   
             <label>
-                <input type='radio' name='type' value='海外仓库' {{ old('type') ? (old('type') == '海外仓库' ? 'checked' : '') : '' }}>海外仓库
+                <input type='radio' name='type' value='oversea' {{ old('type') ? (old('type') == 'oversea' ? 'checked' : '') : '' }}>海外仓库
             </label>
             <label>
-                <input type='radio' name='type' value='第三方仓库' {{ old('type') ? (old('type') == '第三方仓库' ? 'checked' : '') : '' }}>第三方仓库
+                <input type='radio' name='type' value='third' {{ old('type') ? (old('type') == 'third' ? 'checked' : '') : '' }}>第三方仓库
             </label>
         </div>
     </div>
@@ -41,10 +41,10 @@
         <label for="is_available">仓库是否启用</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='is_available' value='Y' {{ old('is_available') ? (old('is_available') == 'Y' ? 'checked' : '') : '' }}>启用
+                <input type='radio' name='is_available' value='1' {{ old('is_available') ? (old('is_available') == '1' ? 'checked' : '') : '' }}>启用
             </label>   
             <label>
-                <input type='radio' name='is_available' value='N' {{ old('is_available') ? (old('is_available') == 'N' ? 'checked' : '') : 'checked' }}>不启用
+                <input type='radio' name='is_available' value='0' {{ old('is_available') ? (old('is_available') == '0' ? 'checked' : '') : 'checked' }}>不启用
             </label>
         </div>    
     </div>
@@ -52,10 +52,10 @@
         <label for="is_default">是否是默认仓库</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='is_default' value='Y' {{ old('is_default') ? (old('is_default') == 'Y' ? 'checked' : '') : '' }}>默认仓库
+                <input type='radio' name='is_default' value='1' {{ old('is_default') ? (old('is_default') == '1' ? 'checked' : '') : '' }}>默认仓库
             </label>   
             <label>
-                <input type='radio' name='is_default' value='N' {{ old('is_default') ? (old('is_default') == 'N' ? 'checked' : '') : 'checked' }}>非默认仓库
+                <input type='radio' name='is_default' value='0' {{ old('is_default') ? (old('is_default') == '0' ? 'checked' : '') : 'checked' }}>非默认仓库
             </label>
         </div>    
     </div>

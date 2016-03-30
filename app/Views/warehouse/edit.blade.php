@@ -19,13 +19,13 @@
         <label for="type">仓库类型</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='type' value='本地仓库' {{old('type') ? (old('type') == '本地仓库' ? 'checked' : '') : ($model->type  == '本地仓库' ? 'checked' : '')}} >本地仓库
+                <input type='radio' name='type' value='local' {{old('type') ? (old('type') == 'local' ? 'checked' : '') : ($model->type  == 'local' ? 'checked' : '')}} >本地仓库
             </label>   
             <label>
-                <input type='radio' name='type' value='海外仓库' {{old('type') ? (old('type') == '海外仓库' ? 'checked' : '') : ($model->type  == '海外仓库' ? 'checked' : '')}}>海外仓库
+                <input type='radio' name='type' value='oversea' {{old('type') ? (old('type') == 'oversea' ? 'checked' : '') : ($model->type  == 'oversea' ? 'checked' : '')}}>海外仓库
             </label>
             <label>
-                <input type='radio' name='type' value='第三方仓库' {{old('type') ? (old('type') == '第三方仓库' ? 'checked' : '') : ($model->type  == '第三方仓库' ? 'checked' : '')}}>第三方仓库
+                <input type='radio' name='type' value='third' {{old('type') ? (old('type') == 'third' ? 'checked' : '') : ($model->type  == 'third' ? 'checked' : '')}}>第三方仓库
             </label>
         </div>
     </div>
@@ -39,10 +39,10 @@
         <label for="is_available">仓库是否启用</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class='radio'>
             <label>
-                <input type='radio' name='is_available' value='Y' {{old('is_available') ? (old('is_available') == 'Y' ? 'checked' : '') : ($model->is_available  == 'Y' ? 'checked' : '')}}>启用
+                <input type='radio' name='is_available' value='1' {{old('is_available') ? (old('is_available') == '1' ? 'checked' : '') : ($model->is_available  == '1' ? 'checked' : '')}}>启用
             </label>   
             <label>
-                <input type='radio' name='is_available' value='N' {{old('is_available') ? (old('is_available') == 'N' ? 'checked' : '') : ($model->is_available  == 'N' ? 'checked' : '')}}>不启用
+                <input type='radio' name='is_available' value='0' {{old('is_available') ? (old('is_available') == '0' ? 'checked' : '') : ($model->is_available  == '0' ? 'checked' : '')}}>不启用
             </label>
         </div>    
     </div>
@@ -50,10 +50,10 @@
         <label for="is_default">是否是默认仓库</label>
         <div class='radio'>
             <label>
-                <input type='radio' name='is_default' value='Y' {{old('is_default') ? (old('is_default') == 'Y' ? 'checked' : '') : ($model->is_default  == 'Y' ? 'checked' : '')}}>默认仓库
+                <input type='radio' name='is_default' value='1' {{old('is_default') ? (old('is_default') == '1' ? 'checked' : '') : ($model->is_default  == '1' ? 'checked' : '')}}>默认仓库
             </label>   
             <label>
-                <input type='radio' name='is_default' value='N' {{old('is_default') ? (old('is_default') == 'N' ? 'checked' : '') : ($model->is_default  == 'N' ? 'checked' : '')}}>非默认仓库
+                <input type='radio' name='is_default' value='0' {{old('is_default') ? (old('is_default') == '0' ? 'checked' : '') : ($model->is_default  == '0' ? 'checked' : '')}}>非默认仓库
             </label>
         </div>    
     </div> 

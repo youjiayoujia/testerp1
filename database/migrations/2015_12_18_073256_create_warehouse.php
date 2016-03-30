@@ -17,10 +17,10 @@ class CreateWarehouse extends Migration
             $table->string('name',128)->comment('仓库名')->default(NULL);
             $table->string('province')->comment('省')->default(NULL);
             $table->string('city')->comment('市')->default(NULL);
-            $table->enum('type', ['本地仓库', '海外仓库', '第三方仓库'])->comment('仓库类型')->default('本地仓库');
+            $table->enum('type', ['local', 'oversea', 'third'])->comment('仓库类型')->default('local');
             $table->integer('volumn')->comment('仓库容积(单位M3)')->default(NULL);
-            $table->enum('is_available', ['N', 'Y'])->comment('仓库是否启用')->default('N');
-            $table->enum('is_default', ['N', 'Y'])->comment('仓库是否是默认仓库')->default('N');
+            $table->enum('is_available', ['0', '1'])->comment('仓库是否启用')->default('0');
+            $table->enum('is_default', ['0', '1'])->comment('仓库是否是默认仓库')->default('0');
             $table->timestamps();
             $table->softdeletes();
         });

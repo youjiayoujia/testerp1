@@ -16,16 +16,16 @@
                 <strong>市</strong>: {{ $model->city }}
             </div>
             <div class="col-lg-2">
-                <strong>类型</strong>: {{ $model->type }}
+                <strong>类型</strong>: {{ $model->type == 'local' ? '本地仓库' : ($model->type == 'oversea' ? '海外仓库' : '第三方仓库') }}
             </div>
             <div class="col-lg-2">
                 <strong>容积(m3)</strong>: {{ $model->volumn }}
             </div>
             <div class="col-lg-2">
-                <strong>是否启用</strong>: {{ $model->is_available == 'Y' ? '是' : '否' }}
+                <strong>是否启用</strong>: {{ $model->is_available == '1' ? '是' : '否' }}
             </div>
             <div class="col-lg-2">
-                <strong>是否是默认仓</strong>: {{ $model->is_default == 'Y' ? '是' : '否' }}
+                <strong>是否是默认仓</strong>: {{ $model->is_default == '1' ? '是' : '否' }}
             </div>
         </div>
     </div>

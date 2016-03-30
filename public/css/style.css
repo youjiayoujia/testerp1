@@ -6,6 +6,10 @@
     padding: 70px 10px 10px;
 }
 
+.tr_bgcolor {
+    background: red ;
+}
+
 .pagination {
     margin: 0px;
 }

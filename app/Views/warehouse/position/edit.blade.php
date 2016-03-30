@@ -27,13 +27,13 @@
     <label for="size">库位大小</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
     <div class='radio'>
         <label>
-            <input type='radio' name='size' value='小' {{ old('size') ? old('size') == '小' ? 'checked' : '' : $model->size == '小' ? 'checked' : '' }}>小
+            <input type='radio' name='size' value='small' {{ old('size') ? old('size') == 'small' ? 'checked' : '' : $model->size == 'small' ? 'checked' : '' }}>小
         </label>   
         <label>
-            <input type='radio' name='size' value='中' {{ old('size') ? old('size') == '中' ? 'checked' : '' : $model->size == '中' ? 'checked' : '' }}>中
+            <input type='radio' name='size' value='middle' {{ old('size') ? old('size') == 'middle' ? 'checked' : '' : $model->size == 'middle' ? 'checked' : '' }}>中
         </label>
         <label>
-            <input type='radio' name='size' value='大' {{ old('size') ? old('size') == '大' ? 'checked' : '' : $model->size == '大' ? 'checked' : '' }}>大
+            <input type='radio' name='size' value='big' {{ old('size') ? old('size') == 'big' ? 'checked' : '' : $model->size == 'big' ? 'checked' : '' }}>大
         </label>
     </div>       
 </div>
@@ -55,10 +55,10 @@
     <label for="is_available">库位是否启用</label>
     <div class='radio'>
         <label>
-            <input type='radio' name='is_available' value='Y' {{ old('is_available') ? old('is_available') == 'Y' ? 'checked' : '' : $model->is_available == 'Y' ? 'checked' : '' }}>启用
+            <input type='radio' name='is_available' value='1' {{ old('is_available') ? old('is_available') == '1' ? 'checked' : '' : $model->is_available == '1' ? 'checked' : '' }}>启用
         </label>   
         <label>
-            <input type='radio' name='is_available' value='N' {{ old('is_available') ? old('is_available') == 'N' ? 'checked' : '' : $model->is_available == 'N' ? 'checked' : '' }}>不启用
+            <input type='radio' name='is_available' value='0' {{ old('is_available') ? old('is_available') == '0' ? 'checked' : '' : $model->is_available == '0' ? 'checked' : '' }}>不启用
         </label>
     </div>    
 </div>

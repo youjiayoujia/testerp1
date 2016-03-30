@@ -18,10 +18,10 @@
             <td>{{ $warehouse->name }}</td>
             <td>{{ $warehouse->province}}</td>
             <td>{{ $warehouse->city}}</td>
-            <td>{{ $warehouse->type }} </td>
+            <td>{{ $warehouse->type == 'local' ? '本地仓库' : ($warehouse->type == 'oversea' ? '海外仓库' : '第三方仓库') }} </td>
             <td>{{ $warehouse->volumn }}(m<small>3</small>)</td>
-            <td>{{ $warehouse->is_available == 'Y' ? '是' : '否'}}</td>
-            <td>{{ $warehouse->is_default == 'Y' ? '是' : '否'}}</td>
+            <td>{{ $warehouse->is_available == '1' ? '是' : '否'}}</td>
+            <td>{{ $warehouse->is_default == '1' ? '是' : '否'}}</td>
             <td>{{ $warehouse->created_at }}</td>
             <td>
                 <a href="{{ route('warehouse.show', ['id'=>$warehouse->id]) }}" class="btn btn-info btn-xs">

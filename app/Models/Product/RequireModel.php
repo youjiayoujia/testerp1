@@ -6,7 +6,7 @@ use App\Base\BaseModel;
 
 class RequireModel extends BaseModel
 {
-	protected $table = 'product_require';
+	protected $table = 'product_requires';
 
 	protected $fillable = [
             'img1', 'img2', 'img3', 'img4', 'img5', 'img6', 
@@ -18,12 +18,12 @@ class RequireModel extends BaseModel
     // 规则验证
     public $rules = [
         'create' => [   
-                'name' => 'required|max:255|unique:product_require,name',
+                'name' => 'required|max:255|unique:product_requires,name',
                 'needer_id' => 'required',
                 'needer_shop_id' => 'required'
         ],
         'update' => [   
-                'name' => 'required|max:255|unique:product_require,name, {id}',
+                'name' => 'required|max:255|unique:product_requires,name, {id}',
                 'needer_id' => 'required',
                 'needer_shop_id' => 'required',
         ]
@@ -49,5 +49,38 @@ class RequireModel extends BaseModel
         $fd->move($path,$dstname);
 
         return "/".$path."/".$dstname;
+    }
+
+    /**
+     * return the relationship  
+     *
+     * @return relation
+     *
+     */
+    public function createdByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'created_by', 'id');
+    }
+
+    /**
+     * return the relationship  
+     *
+     * @return relation
+     *
+     */
+    public function userName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id', 'id');
+    }
+
+    /**
+     * return the relationship  
+     *
+     * @return relation
+     *
+     */
+    public function neederName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'needer_id', 'id');
     }
 }

@@ -107,7 +107,8 @@ class ItemModel extends BaseModel
     public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+        if($quantity)
+            return $stock->in($quantity, $amount, $type, $relation_id, $remark);
     }
 
     /**
@@ -121,7 +122,8 @@ class ItemModel extends BaseModel
     public function hold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->hold($quantity);
+        if($quantity)
+            return $stock->hold($quantity);
     }
 
     /**
@@ -135,7 +137,8 @@ class ItemModel extends BaseModel
     public function unhold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->unhold($quantity);
+        if($quantity)
+            return $stock->unhold($quantity);
     }
 
     /**
@@ -150,9 +153,48 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function out($warehousePosistionId, $quantity, $type, $relation_id, $remark = '')
+    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '1', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        return $stock->out($quantity, $type, $relation_id, $remark);
+        if($quantity)
+            return $stock->out($quantity, $type, $relation_id, $remark);
+    }
+
+        /**
+     * 通过item_id和quantity自动分配库位 
+     *
+     * @param $item_id $quantity
+     * @return array
+     *
+     */
+    public function allocateStock($quantity) 
+    {
+        $buf = new StockModel;
+        $stocks = $buf::where(['item_id'=>$this->id])->get();
+        foreach($stocks as $stock)
+        {
+            if($stock->available_quantity > $quantity) {
+                return [[$stock->warehouse_position_id, $quantity, $stock->id]];
+            }
+        }
+        $arr = [];
+        foreach($stocks as $stock)
+        {
+            if($stock->available_quantity < $quantity) {
+                $quantity -= $stock->available_quantity;
+                $arr[] = [$stock->warehouse_position_id, $stock->available_quantity, $stock->id];
+            } else {
+                $arr[] = [$stock->warehouse_position_id, $quantity, $stock->id];
+                $quantity -= $quantity;
+            }
+        }
+        if($quantity != 0) {
+            return 'false';
+        }
+        if($arr) {
+            return $arr;
+        } else {
+            return 'false';
+        }
     }
 }

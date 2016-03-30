@@ -102,7 +102,7 @@
             amount = $('.amount');
             sku = $('.sku');
             $.ajax({
-                url: "{{ route('allotoutwarehouse') }}",
+                url: "{{ route('stock.allotOutWarehouse') }}",
                 data: {warehouse:warehouse},
                 dataType:'json',
                 type:'get',
@@ -141,7 +141,7 @@
             position = $(this).val();
             sku = obj.find('.sku').val();
             $.ajax({
-                url:"{{ route('allotposition' )}}",
+                url:"{{ route('stock.allotPosition' )}}",
                 data: {position:position, item_id:sku},
                 dataType:'json',
                 type:'get',
@@ -171,7 +171,7 @@
             position = obj.find('.warehouse_position_id');
             sku = $(this).val();
             $.ajax({
-                url:"{{ route('allotsku' )}}",
+                url:"{{ route('stock.allotSku' )}}",
                 data: {warehouse:warehouse, item_id:sku},
                 dataType:'json',
                 type:'get',
@@ -211,7 +211,7 @@
             if($(this).val()) {
                 var reg = /^(\d)+$/gi;
                 if(!reg.test($(this).val())) {
-                    alert('fuck,数量有问题啊');
+                    alert('数量有问题啊');
                     $(this).val('');
                     return;
                 }
@@ -226,7 +226,7 @@
                     return;
                 }
                 $.ajax({
-                    url:"{{ route('allotsku') }}",
+                    url:"{{ route('stock.allotSku') }}",
                     data:{warehouse:warehouse, item_id:sku},
                     dataType:'json',
                     'type':'get',

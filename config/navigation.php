@@ -37,7 +37,7 @@ return [
                     'url' => 'item.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',
@@ -47,6 +47,16 @@ return [
                 [
                     'name' => '选款需求',
                     'url' => 'productRequire.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '选款产品列表',
+                    'url' => 'SelectProduct.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '选款产品编辑',
+                    'url' => 'EditProduct.index',
                     'icon' => '',
                 ],
             ],
@@ -64,17 +74,21 @@ return [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => '订单管理',
-                'url' => 'order.index',
-                'icon' => '',
+            '订单' => [
+                [
+                    'name' => '订单',
+                    'url' => 'order.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => '产品管理',
-                'url' => 'orderItem.index',
-                'icon' => '',
+            '包裹' => [
+                [
+                    'name' => '包裹',
+                    'url' => 'package.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -83,99 +97,147 @@ return [
         'name' => '仓储',
         'icon' => 'home',
         'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '仓库' => [
+                [
+                    'name' => '仓库',
+                    'url' => 'warehouse.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库位',
+                    'url' => 'warehousePosition.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存',
+                    'url' => 'stock.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '入库',
+                    'url' => 'stockIn.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '出库',
+                    'url' => 'stockOut.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存调整',
+                    'url' => 'stockAdjustment.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存调拨',
+                    'url' => 'stockAllotment.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存盘点',
+                    'url' => 'stockTaking.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '盘点调整',
+                    'url' => 'stockTakingAdjustment.index',
+                    'icon' => '',
+                ],
+            ],
+        ],
+    ],
+    //拣货导航
+    [
+        'name' => '拣货',
+        'icon' => 'home',
+        'url' => '',
         'type' => '',
         'subnavigations' => [
             [
-                'name' => '仓库',
-                'url' => 'warehouse.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '库位',
-                'url' => 'warehousePosition.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '库存',
-                'url' => 'stock.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '入库',
-                'url' => 'stockIn.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '出库',
-                'url' => 'stockOut.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '库存调整',
-                'url' => 'stockAdjustment.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '库存调拨',
-                'url' => 'stockAllotment.index',
+                'name' => '拣货',
+                'url' => 'pickList.index',
                 'icon' => '',
             ],
         ],
     ],
-
     //物流导航
     [
         'name' => '物流',
         'icon' => 'plane',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => '物流商',
-                'url' => 'logisticsSupplier.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '物流方式',
-                'url' => 'logistics.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '跟踪号',
-                'url' => 'logisticsCode.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '物流分区报价',
-                'url' => 'logisticsZone.index',
-                'icon' => '',
-            ],
+            '物流管理' => [
+                [
+                    'name' => '物流商',
+                    'url' => 'logisticsSupplier.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '物流方式',
+                    'url' => 'logistics.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '跟踪号',
+                    'url' => 'logisticsCode.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '物流分区报价',
+                    'url' => 'logisticsZone.index',
+                    'icon' => '',
+                ],
+            ]
         ],
     ],
-
     //采购导航
     [
         'name' => '采购',
         'icon' => 'shopping-cart',
-        'url' => 'dashboard.index',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '采购管理' => [
+                [
+                    'name' => '采购需求',
+                    'url' => 'purchaseItem.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购单',
+                    'url' => 'purchaseOrder.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+            ]
+        ],
     ],
     //渠道导航
     [
         'name' => '渠道',
         'icon' => 'transfer',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => '渠道',
-                'url' => 'channel.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '账号',
-                'url' => 'channelAccount.index',
-                'icon' => '',
-            ],
+            '渠道管理' => [
+                [
+                    'name' => '渠道',
+                    'url' => 'channel.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '账号',
+                    'url' => 'channelAccount.index',
+                    'icon' => '',
+                ],
+            ]
         ],
     ],
     //财务导航

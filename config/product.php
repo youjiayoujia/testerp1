@@ -1,6 +1,6 @@
 <?php
 return [
-    //产品需求图片目录
+     //产品需求图片目录
     'requireimage' => 'uploads/require',
     //产品图片配置
     'image' => [
@@ -19,5 +19,15 @@ return [
     	'1'=>'test1',
     	'2'=>'test2',
     	'3'=>'test3',
-    ]
+    ],
+	
+	
+	//产品投诉配置
+	'productcomplaint'=>[
+		'types'=>['质量不好','衣服有污迹','衣服破口','袖子长短不一'],
+		'status'=>[0=>'正常',1=>'受投诉'],
+	],
+	'residualReport'=>[ 
+		'status'=>[0=>'正常',1=>'产品残次'],
+	],
 ];

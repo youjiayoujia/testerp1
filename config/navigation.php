@@ -147,111 +147,110 @@ return [
                 ],
             ],
         ],
-
-        //拣货导航
-        [
-            'name' => '拣货',
-            'icon' => 'home',
-            'url' => '',
-            'type' => '',
-            'subnavigations' => [
+    ],
+    //拣货导航
+    [
+        'name' => '拣货',
+        'icon' => 'home',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '拣货',
+                'url' => 'pickList.index',
+                'icon' => '',
+            ],
+        ],
+    ],
+    //物流导航
+    [
+        'name' => '物流',
+        'icon' => 'plane',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '物流管理' => [
                 [
-                    'name' => '拣货',
-                    'url' => 'pickList.index',
+                    'name' => '物流商',
+                    'url' => 'logisticsSupplier.index',
                     'icon' => '',
                 ],
-            ],
+                [
+                    'name' => '物流方式',
+                    'url' => 'logistics.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '跟踪号',
+                    'url' => 'logisticsCode.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '物流分区报价',
+                    'url' => 'logisticsZone.index',
+                    'icon' => '',
+                ],
+            ]
         ],
-        //物流导航
-        [
-            'name' => '物流',
-            'icon' => 'plane',
-            'url' => '',
-            'type' => 'group',
-            'subnavigations' => [
-                '物流管理' => [
-                    [
-                        'name' => '物流商',
-                        'url' => 'logisticsSupplier.index',
-                        'icon' => '',
-                    ],
-                    [
-                        'name' => '物流方式',
-                        'url' => 'logistics.index',
-                        'icon' => '',
-                    ],
-                    [
-                        'name' => '跟踪号',
-                        'url' => 'logisticsCode.index',
-                        'icon' => '',
-                    ],
-                    [
-                        'name' => '物流分区报价',
-                        'url' => 'logisticsZone.index',
-                        'icon' => '',
-                    ],
-                ]
-            ],
+    ],
+    //采购导航
+    [
+        'name' => '采购',
+        'icon' => 'shopping-cart',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '采购管理' => [
+                [
+                    'name' => '采购需求',
+                    'url' => 'purchaseItem.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购单',
+                    'url' => 'purchaseOrder.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+            ]
         ],
-        //采购导航
-        [
-            'name' => '采购',
-            'icon' => 'shopping-cart',
-            'url' => '',
-            'type' => 'group',
-            'subnavigations' => [
-                '采购管理' => [
-                    [
-                        'name' => '采购需求',
-                        'url' => 'purchaseItem.index',
-                        'icon' => '',
-                    ],
-                    [
-                        'name' => '采购单',
-                        'url' => 'purchaseOrder.index',
-                        'icon' => '',
-                    ],
-                    [
-                        'name' => '采购列表',
-                        'url' => 'purchaseList.index',
-                        'icon' => '',
-                    ],
-                ]
-            ],
+    ],
+    //渠道导航
+    [
+        'name' => '渠道',
+        'icon' => 'transfer',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '渠道管理' => [
+                [
+                    'name' => '渠道',
+                    'url' => 'channel.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '账号',
+                    'url' => 'channelAccount.index',
+                    'icon' => '',
+                ],
+            ]
         ],
-        //渠道导航
-        [
-            'name' => '渠道',
-            'icon' => 'transfer',
-            'url' => '',
-            'type' => 'group',
-            'subnavigations' => [
-                '渠道管理' => [
-                    [
-                        'name' => '渠道',
-                        'url' => 'channel.index',
-                        'icon' => '',
-                    ],
-                    [
-                        'name' => '账号',
-                        'url' => 'channelAccount.index',
-                        'icon' => '',
-                    ],
-                ]
-            ],
-        ],
-        //财务导航
-        [
-            'name' => '财务',
-            'icon' => 'piggy-bank',
-            'url' => 'dashboard.index',
-        ],
-        //客户导航
-        [
-            'name' => '客户',
-            'icon' => 'user',
-            'url' => 'dashboard.index',
-        ],
-    ]
+    ],
+    //财务导航
+    [
+        'name' => '财务',
+        'icon' => 'piggy-bank',
+        'url' => 'dashboard.index',
+    ],
+    //客户导航
+    [
+        'name' => '客户',
+        'icon' => 'user',
+        'url' => 'dashboard.index',
+    ],
 ];
 

@@ -101,7 +101,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                 </a>
                 <?php }elseif($product->edit_status==1){ ?>
-                    <a href="{{ route('amazonProductEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                    <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                     </a>  
                 <?php } ?>

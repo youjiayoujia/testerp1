@@ -39,6 +39,7 @@ class CreateProducts extends Migration
             $table->string('fabric')->comment('材质')->nullable()->default(NULL);
             $table->decimal('weight',5,2)->comment('重量')->nullable()->default(0);
             $table->tinyInteger('status')->comment('上下架状态')->nullable()->default(0);
+            $table->tinyInteger('edit_status')->comment('编辑状态')->nullable()->default(0);
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();

@@ -32,7 +32,7 @@ class EditProductController extends Controller
     {
         $response = [
             'metas' => $this->metas('index'),
-            'data' => $this->autoList($this->product->where('status','=','1')),
+            'data' => $this->autoList($this->product->where('status','>=','1')),
         ];
 
         return view( $this->viewPath .'index', $response);
@@ -72,11 +72,44 @@ class EditProductController extends Controller
         $data['edit_status'] = $editStatus;
         $productModel = $this->product->find($id);
         //$ebayProductModel = $aliexpressProductModel = $b2cProductModel = $amazonProductModel = $this->product->find($id);
-        $this->product->updateEditProduct($productModel->ebayProductModel,$data);
+        /*$this->product->updateEditProduct($productModel->ebayProductModel,$data);
         $this->product->updateEditProduct($productModel->aliexpressProductModel,$data);
         $this->product->updateEditProduct($productModel->b2cProductModel,$data);
-        $this->product->updateEditProduct($productModel->amazonProductModel,$data);
+        $this->product->updateEditProduct($productModel->amazonProductModel,$data);*/
         $productModel->update($data);
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 产品图片编辑界面
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productEditImage()
+    {
+        $id = request()->input('id');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $this->product->find($id),
+        ];
+
+        return view($this->viewPath . 'editImage', $response);
+    }
+
+    /**
+     * 产品图片编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productUpdateImage()
+    {
+        $id = request()->input('id');
+        request()->flash();
+        $ProductModel = $this->product->find($id);
+        $ProductModel->updateProductImage(request()->all(),request()->files);
+
         return redirect($this->mainIndex);
     }
      

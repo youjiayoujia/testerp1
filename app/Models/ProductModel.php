@@ -77,6 +77,7 @@ class ProductModel extends BaseModel
         'package_limit',
         'package_limit_1',
         'status',
+        'edit_status',
         'remark',
         'spu_id',
         'second_supplier_id',
@@ -364,6 +365,19 @@ class ProductModel extends BaseModel
     public function updateEditProduct($model,$data)
     {
         $model->update($data);
+    }
+
+    /**
+     * 编辑渠道产品图片资料
+     * 2016-3-11 14:00:41 YJ
+     * @param array $data ,$files 图片
+     */
+    public function updateProductImage($data,$files = null)
+    {   
+        $imageModel = new ImageModel();
+        $imageModel->imageCreate($data,$files);
+        $data['status'] = 2;
+        $this->update($data);
     }
 
 }

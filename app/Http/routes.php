@@ -129,6 +129,8 @@ Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCod
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
 Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as'=>'choseShop']);
+Route::any('product/editImage', ['uses' => 'Product\EditProductController@productEditImage', 'as'=>'productEditImage']);
+Route::any('product/updateImage', ['uses' => 'Product\EditProductController@productUpdateImage', 'as'=>'productUpdateImage']);
 Route::resource('product', 'ProductController');
 
 
@@ -137,8 +139,8 @@ Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'a
 //Route::resource('amazonProduct', 'Product\Channel\AmazonController');
 Route::resource('EditProduct', 'Product\EditProductController');
 Route::resource('SelectProduct', 'Product\SelectProductController');
-Route::get('amazonProductEditImage', ['uses' => 'Product\Channel\AmazonController@amazonProductEditImage', 'as'=>'amazonProductEditImage']);
-Route::post('amazonProductUpdateImage', ['uses' => 'Product\Channel\AmazonController@amazonProductUpdateImage', 'as'=>'amazonProductUpdateImage']);
+//Route::get('amazonProductEditImage', ['uses' => 'Product\Channel\AmazonController@amazonProductEditImage', 'as'=>'amazonProductEditImage']);
+//Route::post('amazonProductUpdateImage', ['uses' => 'Product\Channel\AmazonController@amazonProductUpdateImage', 'as'=>'amazonProductUpdateImage']);
 Route::get('examineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@examineAmazonProduct', 'as'=>'examineAmazonProduct']);
 Route::get('cancelExamineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as'=>'cancelExamineAmazonProduct']);
 

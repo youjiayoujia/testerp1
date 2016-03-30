@@ -102,7 +102,7 @@ class PurchaseItemModel extends BaseModel
 				$purchaseOrder=$purchaseOrderModel->create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){
-					$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->update(['purchase_order_id'=>$purchaseOrderId]); 
+					$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
 				}				 
 			}
 			return true;

@@ -153,6 +153,16 @@ class PurchaseListController extends Controller
 			$stockId=$stockCreate->id;
 			$item= new ItemModel;
 			$item->find($purchaseItem->purchaseItem->id)->in($stockData['warehouse_position_id'],$purchaseItem->arrival_num, $purchaseItem->purchase_cost, 0,$purchaseItem->purchase_order_id, $remark = '订单采购！');
+			$position=$this->position->find($WarehousePositionIds[$randKey]);
+			$warehouseId=$position->warehouse_id;
+			$warehouseName=$position->name;
+			$sku=$purchaseItem->sku_id;
+			$barCode=$sku.$warehouseId.$warehouseName;
+			//$d = new DNS1D();
+			//$d->setStorPath(__DIR__."/cache/");
+			//echo $d->getBarcodeHTML("9780691147727", "EAN13");
+			//echo DNS1D::getBarcodeSVG("4445645656", "PHARMA2T");
+			//echo $barCode;exit;
 		/*}*/
 			//$barcode=$this->stock->where(''=>'',''=>'')->get();
 	}

@@ -77,12 +77,12 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>
-                <input type="radio" name="is_enable" value="Y">是
+                <input type="radio" name="is_enable" value="1">是
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="is_enable" value="N" checked>否
+                <input type="radio" name="is_enable" value="0" checked>否
             </label>
         </div>
     </div>

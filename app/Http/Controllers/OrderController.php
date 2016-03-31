@@ -54,6 +54,12 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $data = request()->all();
+        foreach ($data['arr'] as $key => $item) {
+            foreach ($item as $k => $v) {
+                $data['items'][$k][$key] = $v;
+            }
+        }
+        unset($data['arr']);
         $this->model->createOrder($data);
 
         return redirect($this->mainIndex);
@@ -218,7 +224,6 @@ class OrderController extends Controller
         $channelOrders = json_decode($data, true);
         $orders = [];
         foreach ($channelOrders as $key => $channelOrder) {
-            $orders[$key]['_token'] = null;
             $name = substr($url, 11, 6);
             $channels = ChannelModel::where(['name' => $name])->get();
             foreach($channels as $channel) {

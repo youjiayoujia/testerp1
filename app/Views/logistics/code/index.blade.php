@@ -17,7 +17,7 @@
             <td>{{ $code->logistics->logistics_type}}</td>
             <td>{{ $code->code }}</td>
             <td>{{ $code->package_id }}</td>
-            <td>{{ $code->status == 'Y' ? '启用' : '未启用'}}</td>
+            <td>{{ $code->status == '1' ? '启用' : '未启用'}}</td>
             <td>{{ substr($code->used_at, 0, 10) }}</td>
             <td>{{ $code->updated_at }}</td>
             <td>{{ $code->created_at }}</td>

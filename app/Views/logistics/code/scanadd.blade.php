@@ -20,27 +20,22 @@
 @section('formAttributes') name='creator'@stop
 @section('formBody')
     <div class="col-lg-4">
-        <strong>当前物流方式</strong>: {{ $logistic->logistics_type }}
+        <strong>当前物流方式</strong>: {{ $logistics->logistics_type }}
     </div>
     <div class="col-lg-4">
-        <strong>当前物流方式简码</strong>: {{ $logistic->short_code }}
+        <strong>当前物流方式简码</strong>: {{ $logistics->short_code }}
     </div>
-    <br />
-    <br />
-    <div class="form-group col-lg-4" style="width:900px;">
+    <br/>
+    <br/>
+    <div class="form-group col-lg-12" style="width:1200px;">
         <label for="url" class="control-label">扫码输入(后回车)：</label>
-        <input type="hidden" name="logistic_id" value="{{ $logistic->id }}">
+        <input type="hidden" name="logistics_id" value="{{ $logistics->id }}">
         <input type="text" id="scan_input" class="form-control" name="scan_input" value="" style="width:300px;">
     </div>
-
-    <div style="width:900px;height:300px;float:left;clear: left;border:1px solid gray;" id="add_delete_div">
-
+    <div class="form-group col-lg-12" style="width:1200px;height:250px;float:left;clear: left;border:1px solid gray;" id="add_delete_div">
     </div>
 @stop
-
 <script type='text/javascript'>
-
-
     function delete_div(that){
         $(that).remove();
     }
@@ -60,11 +55,8 @@
                 $(this).focus();
             }
         });
-
         $("#scan_input").focus().select();
-
     });
-
 
     //阻止表单通过回车键提交
     $(function() {
@@ -79,7 +71,7 @@
                 return false;
             } else {
                 return true;
-            };
+            }
         });
     });
 

@@ -378,6 +378,10 @@ class ProductModel extends BaseModel
         $imageModel->imageCreate($data,$files);
         $data['status'] = 2;
         $this->update($data);
+        //ERP中如果该产品之前没有创建item,就创建item
+        if(empty($this->item->toArray())){
+            $this->createItem();
+        }
     }
 
 }

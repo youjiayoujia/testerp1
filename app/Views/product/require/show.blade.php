@@ -59,7 +59,7 @@
             <strong>期待上传日期</strong>: {{ $model->expected_date }}
         </div>
         <div class="col-lg-2">
-            <strong>需求人id</strong>: {{ $model->needer_id }}
+            <strong>需求人id</strong>: {{ $model->neederName ? $model->neederName->name : '' }}
         </div>
         <div class="col-lg-2">
             <strong>需求店铺id</strong>: {{ $model->needer_shop_id }}
@@ -70,7 +70,7 @@
     <div class="panel-heading">日志信息</div>
     <div class="panel-body">
         <div class="col-lg-2">
-            <strong>创建人</strong>: {{ $model->created_by }}
+            <strong>创建人</strong>: {{ $model->createdByName ? $model->createdByName->name : '' }}
         </div>
         <div class="col-lg-2">
             <strong>创建时间</strong>: {{ $model->created_at }}
@@ -79,7 +79,7 @@
             <strong>状态</strong>: {{ $model->status }}
         </div>
         <div class="col-lg-2">
-            <strong>处理者</strong>: {{ $model->user_id }}
+            <strong>处理者</strong>: {{ $model->userName ? $model->userName->name : '' }}
         </div>
         <div class="col-lg-2">
             <strong>处理时间</strong>: {{ $model->handle_time }}

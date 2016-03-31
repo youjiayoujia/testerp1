@@ -14,6 +14,9 @@ use App\Models\StockModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Stock\TakingModel;
+use App\Models\Stock\TakingAdjustmentModel;
+use App\Models\Stock\TakingFormModel;
 
 class StockController extends Controller
 {
@@ -67,6 +70,23 @@ class StockController extends Controller
         return view($this->viewPath.'edit', $response);
     }
 
+    /**
+     * 盘点更新
+     *
+     * @return
+     *
+     */
+    public function createTaking()
+    {
+        $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
+        $stocks = $this->model->all();
+        foreach($stocks as $stock) 
+        {
+            $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
+        }
+
+        return redirect(route('stockTaking.index'));
+    }
     /**
      * 获取库存对象，通过库位
      * 某仓库某库位的对象里面的所有sku

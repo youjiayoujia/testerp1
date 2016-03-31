@@ -62,7 +62,7 @@
         $('#warehouse_id').change(function(){
             val = $('#warehouse_id').val();
             $.ajax({
-                url: "{{ route('getposition') }}",
+                url: "{{ route('position.getPosition') }}",
                 data: {val:val},
                 dataType:'json',
                 type:'get',

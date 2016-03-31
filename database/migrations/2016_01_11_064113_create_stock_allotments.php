@@ -21,7 +21,7 @@ class CreateStockAllotments extends Migration
             $table->integer('allotment_by')->comment('调拨人')->default(0);
             $table->enum('allotment_status',['new', 'pick', 'out', 'check', 'over'])->default('new');
             $table->integer('check_by')->comment('审核人')->default(0);
-            $table->enum('check_status', ['N', 'FAIL', 'SUCCESS'])->comment('审核状态')->default('N');
+            $table->enum('check_status', ['0', '1', '2'])->comment('审核状态')->default('0');
             $table->date('check_time')->comment('审核时间')->default(NULL);
             $table->integer('checkform_by')->comment('对单人')->default(0);
             $table->date('checkform_time')->comment('对单时间')->default(NULL);

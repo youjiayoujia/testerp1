@@ -113,6 +113,10 @@ class StockModel extends BaseModel
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
 
+    public function stockTakingForm()
+    {
+        return $this->hasOne('App\Models\Stock\TakingFormModel', 'stock_id', 'id');
+    }
     /**
      * add additional attribute according to sku ,get the goods unit cost
      *

@@ -44,15 +44,11 @@ class OutModel extends BaseModel
     public function getRelationNameAttribute()
     {
         if($this->type == 'ADJUSTMENT')
-            if($this->stockAdjustment)
-                return $this->stockAdjustment->adjust_form_id;
-            else
-                return '';
+            return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
         if($this->type == 'ALLOTMENT')
-            if($this->stockAllotment)
-                return $this->stockAllotment->allotment_id;
-            else 
-                return '';
+            return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
+        if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
+            return $this->stockTaking ? $this->stockTaking->taking_id : '';
     }
 
     /**
@@ -97,6 +93,17 @@ class OutModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Stock\AllotmentModel', 'relation_id', 'id');
     }
+
+    /**
+     * get the relation between the two Model
+     * 
+     *  @return relation
+     *
+     */
+    public function stockTaking()
+    {
+        return $this->belongsTo('App\Models\Stock\TakingModel', 'relation_id', 'id');
+    }
     
     /**
      *  make accessor!
@@ -108,6 +115,7 @@ class OutModel extends BaseModel
     public function getTypeNameAttribute()
     {
         $buf = config('out');
-        return $buf[$this->type];
+        if(array_key_exists($this->type, $buf))
+            return $buf[$this->type];
     }
 }

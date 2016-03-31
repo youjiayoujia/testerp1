@@ -45,7 +45,7 @@
                 <strong>调整人</strong>: {{ $adjust->adjustByName ? $adjust->adjustByName->name : '' }}
             </div>
             <div class="col-lg-4">
-                <strong>审核状态</strong>: {{ $adjust->status == 'Y' ? '已审核' : '未审核' }}
+                <strong>审核状态</strong>: {{ $adjust->status == '1' ? '已审核' : '未审核' }}
             </div>
             <div class="col-lg-4">
                 <strong>审核人</strong>: {{ $adjust->checkByName ? $adjust->checkByName->name : '' }}

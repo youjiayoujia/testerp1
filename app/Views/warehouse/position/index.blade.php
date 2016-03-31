@@ -19,11 +19,11 @@
             <td>{{ $position->name }}</td>            
             <td>{{ $position->warehouse ? $position->warehouse->name : '' }}</td>
             <td>{{ $position->remark }} </td>            
-            <td>{{ $position->size }}</td>
+            <td>{{ $position->size == 'small' ? '小' : ($position->size == 'middle' ? '中' : '大') }}</td>
             <td>{{ $position->length }}</td>
             <td>{{ $position->width }}</td>
             <td>{{ $position->height }}</td>
-            <td>{{ $position->is_available == 'Y' ? '是' : '否'}}</td>
+            <td>{{ $position->is_available == '1' ? '是' : '否'}}</td>
             <td>{{ $position->created_at }}</td>
             <td>
                 <a href="{{ route('warehousePosition.show', ['id'=>$position->id]) }}" class="btn btn-info btn-xs">

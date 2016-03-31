@@ -3,8 +3,8 @@
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="channel_id">渠道</th>
     <th class="sort" data-field="channel_account_id">渠道账号</th>
-    <th class="sort" data-field="order_number">订单号</th>
-    <th class="sort" data-field="channel_order_number">渠道订单号</th>
+    <th class="sort" data-field="ordernum">订单号</th>
+    <th class="sort" data-field="channel_ordernum">渠道订单号</th>
     <th>邮箱</th>
     <th>订单状态</th>
     <th>售后状态</th>
@@ -40,33 +40,33 @@
     @foreach($data as $order)
         <tr>
             <td>{{ $order->id }}</td>
-            <td>{{ $order->channel_id }}</td>
-            <td>{{ $order->channel_account_id }}</td>
-            <td>{{ $order->order_number }}</td>
-            <td>{{ $order->channel_order_number }}</td>
+            <td>{{ $order->channel->name }}</td>
+            <td>{{ $order->channelAccount->alias }}</td>
+            <td>{{ $order->ordernum }}</td>
+            <td>{{ $order->channel_ordernum }}</td>
             <td>{{ $order->email }}</td>
-            <td>{{ $order->status }}</td>
-            <td>{{ $order->active }}</td>
+            <td>{{ $order->status_name }}</td>
+            <td>{{ $order->active_name }}</td>
             <td>{{ $order->amount }}</td>
             <td>{{ $order->amount_product }}</td>
             <td>{{ $order->amount_shipping }}</td>
             <td>{{ $order->amount_coupon }}</td>
-            <td>{{ $order->is_partial }}</td>
-            <td>{{ $order->by_hand }}</td>
-            <td>{{ $order->is_affair }}</td>
-            <td>{{ $order->affairer }}</td>
-            <td>{{ $order->customer_service }}</td>
-            <td>{{ $order->operator }}</td>
+            <td>{{ $order->is_partial_name }}</td>
+            <td>{{ $order->by_hand_name }}</td>
+            <td>{{ $order->is_affair_name }}</td>
+            <td>{{ $order->user_affairer->name }}</td>
+            <td>{{ $order->user_service->name }}</td>
+            <td>{{ $order->user_operator->name }}</td>
             <td>{{ $order->payment }}</td>
             <td>{{ $order->currency }}</td>
             <td>{{ $order->rate }}</td>
             <td>{{ $order->ip }}</td>
-            <td>{{ $order->address_confirm }}</td>
+            <td>{{ $order->address_confirm_name }}</td>
             <td>{{ $order->comment }}</td>
             <td>{{ $order->comment1 }}</td>
             <td>{{ $order->remark }}</td>
             <td>{{ $order->import_remark }}</td>
-            <td>{{ $order->shipping }}</td>
+            <td>{{ $order->shipping == 'packet' ? '小包' : '快递' }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->payment_date }}</td>
             <td>{{ $order->affair_time }}</td>

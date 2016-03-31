@@ -84,7 +84,7 @@
         $('#create_form').click(function(){
             warehouse = $('#warehouse_id').val();    
             $.ajax({
-                url:"{{ route('adjustadd') }}",
+                url:"{{ route('stockAdjustment.adjustAdd') }}",
                 data:{current:current, warehouse:warehouse},
                 dataType:'html',
                 type:'get',
@@ -109,7 +109,7 @@
             warehouse_id = $('#warehouse_id').val();
             if(sku && warehouse_id){
                 $.ajax({
-                    url: "{{route('getmessage')}}",
+                    url: "{{route('stock.getMessage')}}",
                     data: {sku:sku, warehouse_id:warehouse_id},
                     dataType: 'json',
                     type: 'get',
@@ -138,7 +138,7 @@
             quantity = block.find('.quantity').val();
             warehouse_id = $('#warehouse_id').val();
             $.ajax({
-                url:"{{route('getbyposition')}}",
+                url:"{{route('stock.getByPosition')}}",
                 data:{position:position},
                 dataType:'json',
                 type:'get',
@@ -182,7 +182,7 @@
             var warehouse_id = $('#warehouse_id').val();
             if(sku && warehouse_id){
                 $.ajax({
-                    url: "{{route('getmessage')}}",
+                    url: "{{route('stock.getMessage')}}",
                     data: {sku:sku, warehouse_id:warehouse_id},
                     dataType: 'json',
                     type: 'get',
@@ -247,7 +247,7 @@
         $(document).on('change', '#warehouse_id', function(){
             val = $(this).val();
             $.ajax({
-                url: "{{ route('getposition') }}",
+                url: "{{ route('position.getPosition') }}",
                 data: {val:val},
                 dataType:'json',
                 type:'get',

@@ -15,13 +15,14 @@ class CreateOrderItems extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('order_id')->comment('订单ID');
+            $table->integer('item_id')->comment('货品ID');
             $table->string('sku')->comment('sku');
-            $table->integer('qty')->comment('数量');
+            $table->integer('quantity')->comment('数量');
             $table->float('price')->comment('金额');
             $table->integer('status')->comment('订单状态');
             $table->integer('ship_status')->comment('发货状态');
             $table->integer('is_gift')->comment('是否赠品');
-            $table->string('remark')->comment('备注');
+            $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

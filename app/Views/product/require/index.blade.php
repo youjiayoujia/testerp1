@@ -28,12 +28,12 @@
             <td>{{ $productRequire->competition_url }}</td>
             <td>{{ $productRequire->remark }}</td>
             <td>{{ $productRequire->expected_date }}</td>
-            <td>{{ $productRequire->needer_id }}</td>
+            <td>{{ $productRequire->neederName ? $productRequire->neederName->name : '' }}</td>
             <td>{{ $productRequire->needer_shop_id }}</td>
-            <td>{{ $productRequire->created_by }}</td>
+            <td>{{ $productRequire->createdByName ? $productRequire->createdByName->name : '' }}</td>
             <td>{{ $productRequire->created_at }}</td>
             <td>{{ $productRequire->status }}</td>
-            <td>{{ $productRequire->user_id }}</td>
+            <td>{{ $productRequire->userName ? $productRequire->userName->name : '' }}</td>
             <td>{{ $productRequire->handle_time }}</td>
             <td>
                 <a href="{{ route('productRequire.show', ['id'=>$productRequire->id]) }}" class="btn btn-info btn-xs">

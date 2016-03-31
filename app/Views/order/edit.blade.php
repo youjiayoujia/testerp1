@@ -21,23 +21,23 @@
             <div class="form-group col-lg-2">
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control" id="channel_account_id">
-                    @foreach($accounts as $account)
-                        <option value="{{$account->id}}" {{$account->id == $model->channel_account_id ? 'selected' : ''}}>
-                            {{$account->alias}}
+                <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
+                    @foreach($aliases as $alias)
+                        <option value="{{$alias->id}}" {{$alias->id == $model->channel_account_id ? 'selected' : ''}}>
+                            {{$alias->alias}}
                         </option>
                     @endforeach
                 </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="order_number" class='control-label'>订单号</label>
+                <label for="ordernum" class='control-label'>订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="order_number" placeholder="订单号" name='order_number' value="{{ old('order_number') ? old('order_number') : $model->order_number }}">
+                <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $model->ordernum }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="channel_order_number" class='control-label'>渠道订单号</label>
+                <label for="channel_ordernum" class='control-label'>渠道订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="channel_order_number" placeholder="渠道订单号" name='channel_order_number' value="{{ old('channel_order_number') ? old('channel_order_number') : $model->channel_order_number }}">
+                <input class="form-control" id="channel_ordernum" placeholder="渠道订单号" name='channel_ordernum' value="{{ old('channel_ordernum') ? old('channel_ordernum') : $model->channel_ordernum }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="email" class='control-label'>邮箱</label>
@@ -117,22 +117,18 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment" class='control-label'>备用字段</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment" placeholder="备用字段" name='comment' value="{{ old('comment') ? old('comment') : $model->comment }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment1" class='control-label'>红人/choies用</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') ? old('comment1') : $model->comment1 }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="remark" class='control-label'>订单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') ? old('remark') : $model->remark }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="import_remark" class='control-label'>导单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') ? old('import_remark') : $model->import_remark }}">
             </div>
             <div class="form-group col-lg-2">
@@ -169,7 +165,7 @@
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }} disabled>否
+                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }}>否
                     </label>
                 </div>
             </div>
@@ -261,7 +257,6 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_address1" class='control-label'>发货地址1</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="shipping_address1" placeholder="发货地址1" name='shipping_address1' value="{{ old('shipping_address1') ? old('shipping_address1') : $model->shipping_address1 }}">
             </div>
             <div class="form-group col-lg-2">
@@ -352,7 +347,7 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
             <div class='row'>
@@ -361,7 +356,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="qty" class='control-label'>数量</label>
+                    <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
@@ -382,7 +377,6 @@
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="remark" class='control-label'>备注</label>
-                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
             @foreach($orderItems as $key => $orderItem)
@@ -391,7 +385,7 @@
                         <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <input type='text' class="form-control qty" id="arr[qty][{{$key}}]" placeholder="数量" name='arr[qty][{{$key}}]' value="{{ old('arr[qty][$key]') ? old('arr[qty][$key]') : $orderItem->qty }}">
+                        <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}">
                     </div>
                     <div class="form-group col-sm-1">
                         <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="金额" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
@@ -449,6 +443,42 @@
             });
             current++;
         });
+
+        $('#channel_id').click(function(){
+            var channel_id = $("#channel_id").val();
+            $.ajax({
+                url : "{{ route('account') }}",
+                data : { id : channel_id },
+                dataType : 'json',
+                type : 'get',
+                success : function(result) {
+                    $('.channel_account_id').html();
+                    str = '';
+                    for(var i=0; i<result.length; i++)
+                        str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                    $('.channel_account_id').html(str);
+                }
+            });
+        });
+
+        $(document).on('blur', '.sku', function(){
+            var tmp = $(this);
+            var sku = $(this).val();
+            $.ajax({
+                url : "{{ route('getMsg') }}",
+                data : {sku : sku},
+                dataType : 'json',
+                type : 'get',
+                success : function(result) {
+                    if(result != 'sku') {
+                        alert('sku有误');
+                        tmp.val('');
+                        return;
+                    }
+                }
+            });
+        });
+
     });
 
     $(document).on('click', '.bt_right', function(){

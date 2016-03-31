@@ -102,4 +102,11 @@ class Tool
         }
         return false;
     }
+
+    public function show($value)
+    {
+        echo "<pre>";
+        var_dump($value);
+        exit;
+    }
 }

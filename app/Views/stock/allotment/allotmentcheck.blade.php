@@ -1,6 +1,6 @@
 @extends('common.form')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-@section('formAction') {{ route('checkresult', ['id'=>$model->id]) }} @stop
+@section('formAction') {{ route('allotment.checkResult', ['id'=>$model->id]) }} @stop
 @section('formBody')
     <div class="panel panel-default">
     <div class="panel-heading">调拨单基础信息</div>

@@ -31,7 +31,7 @@ return [
     ],
 
     //币种
-    'currency' => ['ALL', 'USD', 'GBP', 'EUR'],
+    'currency' => ['USD', 'GBP', 'EUR', 'NOK', 'CAD', 'AUD', 'CHF', 'SEK', 'PLN', 'RUB', 'MXN', 'DKK', 'SAR', 'TWD', 'JPY', 'HKD'],
 
     //种类
     'shipping' => [
@@ -40,7 +40,7 @@ return [
     ],
 
     //支付方式
-    'payment' => ['GC', 'PP', 'OC'],
+    'payment' => ['GC', 'IDEAL', 'OC', 'PP', 'SOFORT'],
 
     //是否
     'whether' => [

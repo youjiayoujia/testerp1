@@ -9,7 +9,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="channel_id" class="form-control" id="channel_id">
                     @foreach($channels as $channel)
-                        <option value="{{$channel->id}}" {{$channel->id == old('$channel->channel->id') ? 'selected' : ''}}>
+                        <option value="{{$channel->id}}" {{ Tool::isSelected('channel_id', $channel->id) }}>
                             {{$channel->name}}
                         </option>
                     @endforeach
@@ -18,7 +18,7 @@
             <div class="form-group col-lg-2">
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control" id="channel_account_id">
+                <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
                             {{$account->alias}}
@@ -27,14 +27,14 @@
                 </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="order_number" class='control-label'>订单号</label>
+                <label for="ordernum" class='control-label'>订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="order_number" placeholder="订单号" name='order_number' value="{{ old('order_number') }}">
+                <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') }}">
             </div>
             <div class="form-group col-lg-2">
-                <label for="channel_order_number" class='control-label'>渠道订单号</label>
+                <label for="channel_ordernum" class='control-label'>渠道订单号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="channel_order_number" placeholder="渠道订单号" name='channel_order_number' value="{{ old('channel_order_number') }}">
+                <input class="form-control" id="channel_ordernum" placeholder="渠道订单号" name='channel_ordernum' value="{{ old('channel_ordernum') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="email" class='control-label'>邮箱</label>
@@ -68,7 +68,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="affairer" class="form-control" id="affairer">
                     @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                        <option value="{{$user->id}}" {{ Tool::isSelected('affairer', $user->id) }}>
                             {{$user->name}}
                         </option>
                     @endforeach
@@ -79,7 +79,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="customer_service" class="form-control" id="customer_service">
                     @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                        <option value="{{$user->id}}" {{ Tool::isSelected('customer_service', $user->id) }}>
                             {{$user->name}}
                         </option>
                     @endforeach
@@ -90,7 +90,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="operator" class="form-control" id="operator">
                     @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == old('$user->user->id') ? 'selected' : ''}}>
+                        <option value="{{$user->id}}" {{ Tool::isSelected('operator', $user->id) }}>
                             {{$user->name}}
                         </option>
                     @endforeach
@@ -114,22 +114,18 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment" class='control-label'>备用字段</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment" placeholder="备用字段" name='comment' value="{{ old('comment') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="comment1" class='control-label'>红人/choies用</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="remark" class='control-label'>订单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="import_remark" class='control-label'>导单备注</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') }}">
             </div>
             <div class="form-group col-lg-2">
@@ -147,12 +143,12 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_partial" value="1">是
+                        <input type="radio" name="is_partial" value="1" {{ old('is_partial') ? (old('is_partial') == "1" ? 'checked' : '') : '' }}>是
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_partial" value="0" checked>否
+                        <input type="radio" name="is_partial" value="0" {{ old('is_partial') ? (old('is_partial') == "0" ? 'checked' : '') : 'checked' }}>否
                     </label>
                 </div>
             </div>
@@ -175,12 +171,12 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_affair" value="1">是
+                        <input type="radio" name="is_affair" value="1" {{ old('is_affair') ? (old('is_affair') == "1" ? 'checked' : '') : '' }}>是
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="is_affair" value="0" checked>否
+                        <input type="radio" name="is_affair" value="0" {{ old('is_affair') ? (old('is_affair') == "0" ? 'checked' : '') : 'checked' }}>否
                     </label>
                 </div>
             </div>
@@ -258,7 +254,6 @@
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_address1" class='control-label'>发货地址1</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="shipping_address1" placeholder="发货地址1" name='shipping_address1' value="{{ old('shipping_address1') }}">
             </div>
             <div class="form-group col-lg-2">
@@ -349,10 +344,8 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            产品信息
-        </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">产品信息</div>
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
@@ -360,7 +353,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="qty" class='control-label'>数量</label>
+                    <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
@@ -381,7 +374,6 @@
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="remark" class='control-label'>备注</label>
-                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
             <div class='row'>
@@ -389,7 +381,7 @@
                     <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input type='text' class="form-control qty" id="arr[qty][0]" placeholder="数量" name='arr[qty][0]' value="{{ old('arr[qty][0]') }}">
+                    <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
                     <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
@@ -436,6 +428,7 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             $('#create_time, #payment_date, #affair_time').cxCalendar();
+
             var current = 1;
             $('#addItem').click(function () {
                 $.ajax({
@@ -449,9 +442,60 @@
                 });
                 current++;
             });
-        });
-        $(document).on('click', '.bt_right', function () {
-            $(this).parent().remove();
+
+            var channel_id = $("#channel_id").val();
+            $.ajax({
+                url : "{{ route('account') }}",
+                data : { id : channel_id },
+                dataType : 'json',
+                type : 'get',
+                success : function(result) {
+                    $('.channel_account_id').html();
+                    str = '';
+                    for(var i=0; i<result.length; i++)
+                        str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                    $('.channel_account_id').html(str);
+                }
+            });
+
+            $('#channel_id').click(function(){
+                var channel_id = $("#channel_id").val();
+                $.ajax({
+                    url : "{{ route('account') }}",
+                    data : { id : channel_id },
+                    dataType : 'json',
+                    type : 'get',
+                    success : function(result) {
+                        $('.channel_account_id').html();
+                        str = '';
+                        for(var i=0; i<result.length; i++)
+                            str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                        $('.channel_account_id').html(str);
+                    }
+                });
+            });
+
+            $(document).on('blur', '.sku', function(){
+                var tmp = $(this);
+                var sku = $(this).val();
+                $.ajax({
+                    url : "{{ route('getMsg') }}",
+                    data : {sku : sku},
+                    dataType : 'json',
+                    type : 'get',
+                    success : function(result) {
+                        if(result != 'sku') {
+                            alert('sku有误');
+                            tmp.val('');
+                            return;
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '.bt_right', function () {
+                $(this).parent().remove();
+            });
         });
     </script>
 @stop

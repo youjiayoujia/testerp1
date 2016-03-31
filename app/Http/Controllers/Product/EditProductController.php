@@ -32,7 +32,7 @@ class EditProductController extends Controller
     {
         $response = [
             'metas' => $this->metas('index'),
-            'data' => $this->autoList($this->product->where('status','>=','0')),
+            'data' => $this->autoList($this->product->where('status','=','1')),
         ];
 
         return view( $this->viewPath .'index', $response);
@@ -71,12 +71,8 @@ class EditProductController extends Controller
         $data = request()->all();
         $data['edit_status'] = $editStatus;
         $productModel = $this->product->find($id);
-        //$ebayProductModel = $aliexpressProductModel = $b2cProductModel = $amazonProductModel = $this->product->find($id);
-        /*$this->product->updateEditProduct($productModel->ebayProductModel,$data);
-        $this->product->updateEditProduct($productModel->aliexpressProductModel,$data);
-        $this->product->updateEditProduct($productModel->b2cProductModel,$data);
-        $this->product->updateEditProduct($productModel->amazonProductModel,$data);*/
         $productModel->update($data);
+        
         return redirect($this->mainIndex);
     }
 

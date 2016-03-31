@@ -157,6 +157,7 @@ Route::get('pickList/print/{id}', ['uses' => 'PickListController@printPickList',
 Route::get('pickList/type', ['uses' => 'PickListController@ajaxType', 'as' => 'pickList.type']);
 Route::resource('pickList', 'PickListController');
 //产品管理路由
+Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
 Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as'=>'choseShop']);
 Route::any('product/editImage', ['uses' => 'Product\EditProductController@productEditImage', 'as'=>'productEditImage']);

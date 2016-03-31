@@ -20,26 +20,25 @@ class PurchaseItemModel extends BaseModel
         'create' => [
             'type' => 'required',
             'purchase_num' => 'required',
-            'platform_id' => 'required',
             'warehouse_id' => 'required',
-            'userid' => 'required',
-			'sku_id' => 'required',
+            'user_id' => 'required',
+			'sku' => 'required',
         ],
         'update' => [
- 			'status' => 'required',
+ 			'purchase_num' => 'required',
         ]
     ];
-    public $searchFields = ['id', 'supplier_id', 'platform_id','warehouse_id','user_id'];
+    public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','costExamineStatus'];
-	public function purchaseItem()
+    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','storageStatus','purchase_cost','costExamineStatus','active'];
+	public function item()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'sku_id','sku');
+        return $this->belongsTo('App\Models\ItemModel', 'sku','sku');
     }
     public function supplier()
     {
@@ -53,79 +52,8 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'purchase_order_id');
     }
-	/**
-     * 创建采购需求
-     *
-     * @param $data
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function purchasestore($data)
-	{
-		$data['lack_num']=$data['purchase_num'];
-		$item=new ItemModel();
-		$productItem=$item->where('sku',$data['sku_id'])->first();
-		$data['supplier_id']=$productItem->supplier_id;
-		$data['cost']=$productItem['purchase_price'];
-		$data['stock']=$productItem['inventory'];
-		$this->create($data);
-	}
 	
-	/**
-     * 跟新采购需求
-     *
-     * @param $id,$data
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
- 	public function purchaseItemUpdate($id,$data)
-	{
-		$purchaseItem=$this->find($id);
-        $arrival_num=$purchaseItem->arrival_num;
-		$purchaseItem->purchase_num=$data['purchase_num'];
-		$purchaseItem->lack_num=$data['purchase_num']-$arrival_num;
-		$purchaseItem->save();
-	}
 	
-	/**
-     *批量创建采购单
-     *
-     * 
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function purchaseOrderCreate()
-	{
-		$warehouse_supplier=$this->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();	
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$purchaseOrderModel =new PurchaseOrderModel;
-				$data['warehouse_id']=$v['warehouse_id'];		 
-				$data['supplier_id']=$v['supplier_id'];
-				$purchaseOrder=$purchaseOrderModel->create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-					$this->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}				 
-			}
-			return true;
-		}else{
-			return false;
-			}
-		$warehouse_nosupplier=$this->select('id','warehouse_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id',0)->get()->toArray();
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$purchaseOrderModel =new PurchaseOrderModel;
-				$data['warehouse_id']=$v['warehouse_id'];	
-				$purchaseOrder=$purchaseOrderModel->create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-				$purchaseItem=$this->find($v['id']);
-				$purchaseItem->purchase_order_id=$v['purchase_order_id'];
-				$purchaseItem->save();
-				}				 
-			}
-			return true;
-		}
-		
-	}
 	/*处理异常状态
 	*
 	* @param $data
@@ -139,17 +67,7 @@ class PurchaseItemModel extends BaseModel
 		$purchaseItem->save();
 	}
 		
-	/*取消订单
-	*
-	* @param $data
-    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
-	
-	public function cancelOrderItem($id){
-		$purchaseItem=$this->find($id);
-		$purchaseItem->purchase_order_id=0;
-		$purchaseItem->save();
-		}
+	 
 	
 	/*上报采购价格
 	*

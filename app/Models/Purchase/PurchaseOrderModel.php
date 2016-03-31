@@ -42,9 +42,9 @@ class PurchaseOrderModel extends BaseModel
 	 public function updatePurchaseOrder($id,$data){
 		 $PurchaseOrder=$this->find($id);
 		 foreach($data as $key=>$v){
-		 $PurchaseOrder->$key=$v;
+			 $PurchaseOrder->$key=$v;
 		 }
-		 $PurchaseOrder->save();
+		 	$PurchaseOrder->save();
 		 }
   	
 	

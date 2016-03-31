@@ -13,13 +13,12 @@
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th>ID</th>
-    <th>Item_ID</th>
+    <th>sku</th>
     <th>采购类型</th>
-    <th>订单id</th>
+    <th>订单itemId</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>采购去向</th>
-    <th>库存数量</th>
     <th>采购需求/采购数目/仍需采购</th>
     <th>shop</th>
     <th>采购条目状态</th>
@@ -31,21 +30,20 @@
     @foreach($data as $purchaseItem)
         <tr>
             <td>{{ $purchaseItem->id }}</td>
-            <td>{{ $purchaseItem->sku_id}}</td>
+            <td>{{ $purchaseItem->sku}}</td>
             @foreach(config('purchase.purchaseItem.type') as $k=>$type)
             	@if($purchaseItem->type == $k)
             	<td>{{ $type }}</td>
                 @endif
             @endforeach
-            <td>{{ $purchaseItem->order_id}}</td>
-            <td><img src="{{ asset($purchaseItem->purchaseItem->product->image->src)}}" height="50px"/></td>
+            <td>{{ $purchaseItem->order_item_id}}</td>
+            <td> <img src="{{ asset($purchaseItem->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseItem->supplier->name}}</td>
             <td>{{ $purchaseItem->warehouse->name}}</td>
-            <td>{{ $purchaseItem->stock}}</td>
             <td>{{ $purchaseItem->purchase_num}}/{{ $purchaseItem->arrival_num}}/{{ $purchaseItem->lack_num}}</td>
-             @foreach(config('purchase.purchaseItem.platforms') as $k=>$platform)
+             @foreach(config('purchase.purchaseItem.channels') as $k=>$channel)
             	@if($purchaseItem->platform_id == $k)
-            	<td>{{ $platform }}</td>
+            	<td>{{ $channel }}</td>
                 @endif
             @endforeach
             @foreach(config('purchase.purchaseItem.status') as $k=>$status)

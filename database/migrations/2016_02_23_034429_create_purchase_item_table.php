@@ -28,8 +28,9 @@ class CreatePurchaseItemTable extends Migration
 			$table->integer('purchase_order_id')->comment('所属采购单ID')->default(NULL);
 			$table->double('postage', 15, 8)->comment('物流费用')->default(NULL);
 			$table->string('post_coding')->comment('物流单号')->default(0);
-			$table->double('purchase_cost', 15, 8)->comment('采购价格')->default(NULL);	
-			$table->integer('active_status')->comment('异常处理状态')->default(NULL);
+			$table->double('purchase_cost', 15, 8)->comment('采购价格')->default(NULL);
+			$table->integer('active')->comment('异常种类')->default(0);	
+			$table->integer('active_status')->comment('异常处理状态')->default(0);
 			$table->string('remark')->comment('异常备注')->default(NULL);
 			$table->date('arrival_time')->comment('到货时间')->default(NULL);
 			$table->integer('user_id')->comment('创建该采购条目者')->default(NULL);

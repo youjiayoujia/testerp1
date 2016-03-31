@@ -238,7 +238,7 @@ class OrderModel extends BaseModel
                 }
             }
             foreach ($data['items'] as $item) {
-//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
                 $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
                 echo $item['order_id'] . "</br>";
                 ItemModel::create($item);
@@ -246,7 +246,7 @@ class OrderModel extends BaseModel
             }
         } else {
             foreach ($data['items'] as $item) {
-//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
                 $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
                 echo $item['order_id'] . "</br>";
                 ItemModel::create($item);

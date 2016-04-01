@@ -7,6 +7,7 @@ use App\Models\Product\channel\amazonProductModel;
 use App\Models\Product\channel\ebayProductModel;
 use App\Models\Product\channel\aliexpressProductModel;
 use App\Models\Product\channel\b2cProductModel;
+use App\Models\Product\productEnglishValueModel;
 use App\Models\Product\SupplierModel;
 use App\Http\Controllers\Controller;
 
@@ -64,7 +65,7 @@ class EditProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update($id)
-    {
+    {   
         request()->flash();
         //$this->validate(request(), $this->model->rules('update',$id));
         $editStatus = request()->input('edit');
@@ -72,6 +73,17 @@ class EditProductController extends Controller
         $data['edit_status'] = $editStatus;
         $productModel = $this->product->find($id);
         $productModel->update($data);
+
+        //更新英文信息
+        $productEnglishValueModel = new productEnglishValueModel();
+        $data['product_id'] = $productModel->id;
+        $english = $productEnglishValueModel->firstOrNew(['product_id'=>$id]);
+        //如果没保存过对应产品ID的英文资料,create，否则就更新
+        if(count($english->toArray())==1){
+            $english->create($data);
+        }else{
+            $english->update($data);
+        }
         
         return redirect($this->mainIndex);
     }

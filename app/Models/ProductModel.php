@@ -145,6 +145,16 @@ class ProductModel extends BaseModel
         return $this->hasOne('App\Models\Product\channel\b2cProductModel','product_id');
     }
 
+    public function productEnglishValue()
+    {
+        return $this->hasOne('App\Models\Product\productEnglishValueModel','product_id');
+    }
+
+    public function imageAll()
+    {
+        return $this->hasMany('App\Models\Product\ImageModel', 'product_id');
+    }
+
 
     /**
      * 创建产品
@@ -376,10 +386,10 @@ class ProductModel extends BaseModel
     {   
         $imageModel = new ImageModel();
         $imageModel->imageCreate($data,$files);
-        $data['status'] = 2;
+        $data['edit_status'] = $data['edit'];
         $this->update($data);
-        //ERP中如果该产品之前没有创建item,就创建item
-        if(empty($this->item->toArray())){
+        //ERP中如果该产品之前没有创建item,并且是审核,就创建item
+        if($data['edit']==2&&empty($this->item->toArray())){
             $this->createItem();
         }
     }

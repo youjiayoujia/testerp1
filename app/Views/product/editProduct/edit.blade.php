@@ -1,6 +1,20 @@
 @extends('common.form')
 @section('formAction') {{ route('EditProduct.update', ['id' => $model->id]) }} @stop
+@section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
+<?php 
+    $check = $model->productEnglishValue;
+    $unedit_reason = '';
+    $market_usd_price = '';
+    $cost_usd_price = '';
+    $sale_usd_price = '';
+    if(!empty($check)){
+        $unedit_reason = $check->unedit_reason;
+        $market_usd_price = $check->market_usd_price;
+        $cost_usd_price = $check->cost_usd_price;
+        $sale_usd_price = $check->sale_usd_price;
+    } 
+?>
 <input type='hidden' value='PUT' name="_method">
 <table class="table table-bordered">
     <tbody>
@@ -111,21 +125,21 @@
         <tr>
             <td><label>择尚拿货价(RMB): </label>{{$model->purchase_price}}</td>
             <td>
-                <label>主表:销售价美元: </label><input type="text" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="">
+                <label>主表:销售价美元: </label><input type="text" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
             </td>
         </tr>
         <tr>
             <td><label>参考现货数量: </label></td>
             <td>
                 <label>主表:市场价美元: </label>
-                <input type="text" class="form-control form55" id="market_usd_price" value="" name="market_usd_price">
+                <input type="text" class="form-control form55" id="market_usd_price" value="{{ old('market_usd_price') ?  old('market_usd_price') : $market_usd_price }}" name="market_usd_price">
             </td>
         </tr>
         <tr>
             <td><label>快递费用(RMB): </label>{{$model->purchase_carriage}}</td>
             <td>
                 <label>主表:成本价美元: </label><span id="p_cost" style="color:red;"></span>
-                <input type="text" class="form-control form55" id="cost_usd_price" value="" name="cost_usd_price">
+                <input type="text" class="form-control form55" id="cost_usd_price" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="cost_usd_price">
             </td>
         </tr>
         <tr>
@@ -135,7 +149,7 @@
         <tr>
             <td><label>信息录入员: </label></td>
             <td>
-                <label>备注不编辑原因: </label><input type="text" class="form-control form55" id="unedit_reason" value="" name="unedit_reason">
+                <label>备注不编辑原因: </label><input type="text" class="form-control form55" id="unedit_reason" value="{{ old('unedit_reason') ?  old('unedit_reason') : $unedit_reason }}" name="unedit_reason">
             </td>
         </tr>
         <tr>
@@ -152,6 +166,6 @@
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success" name='edit' value='0'>保存</button>
-    <button type="submit" class="btn btn-success" name='edit' value='1'>保存并提交</button>
+    <button type="submit" class="btn btn-success" name='edit' value='1'>审核</button>
     <button type="reset" class="btn btn-default">取消</button>
 @show{{-- 表单按钮 --}}

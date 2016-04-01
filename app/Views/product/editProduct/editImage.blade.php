@@ -39,16 +39,32 @@
         </label>
         <input type="file" name='zip'/>
     </div>
-    <script type="text/javascript">
-        function checkType() {
-            var uploadType = $("#checkType [name='uploadType']:checked").val();
-            if (uploadType == 'image') {
-                $('#zipDiv').hide();
-                $('#imageDiv').show();
-            } else {
-                $('#imageDiv').hide();
-                $('#zipDiv').show();
-            }
-        }
-    </script>
+    <?php if(count($model->imageAll->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">产品图片 :</div>
+        <div class="panel-body">
+            <?php foreach($model->imageAll as $image){ ?>
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="300px" >
+            <br>
+            <?php } ?>
+        </div>
+    </div>
+    <?php } ?>
 @stop
+@section('formButton')
+    <button type="submit" class="btn btn-success" name='edit' value='1'>保存</button>
+    <button type="submit" class="btn btn-success" name='edit' value='2'>审核</button>
+    <button type="reset" class="btn btn-default">取消</button>
+@show{{-- 表单按钮 --}}
+<script type="text/javascript">
+    function checkType() {
+        var uploadType = $("#checkType [name='uploadType']:checked").val();
+        if (uploadType == 'image') {
+            $('#zipDiv').hide();
+            $('#imageDiv').show();
+        } else {
+            $('#imageDiv').hide();
+            $('#zipDiv').show();
+        }
+    }
+</script>

@@ -19,10 +19,6 @@
                 物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_cost}}  总成本{{ $model->total_postage + $model->total_cost}}
             </div>
             <div class="form-group col-lg-4">
-                <strong>采购仓库</strong>:
-                {{ $model->warehouse->name}}
-            </div>
-            <div class="form-group col-lg-4">
                 <strong>采购单状态</strong>:
                @foreach(config('purchase.purchaseOrder.status') as $k=>$val)
             	@if($model->status == $k)
@@ -32,19 +28,28 @@
             </div> 
              <div class="form-group col-lg-4">
             	<strong>采购类型</strong>:
-                {{$model->supplier->type}}
-                @if($model->supplier->type == 'online')
+                @if($model->supplier->type == '1')
+                线上采购
                 	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
                 </a>
                 @else
+                线下采购
                 <a href="/purchaseOrder/printOrder/{{$model->id}}" class="btn btn-info btn-xs"> 打印该订单
                 </a>
                 @endif
-            </div>  
+            </div>
             <div class="form-group col-lg-4">
             	<strong>取消采购单</strong>:
                 	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该订单</a>  
-            </div>        
+            </div>
+            <div class="form-group col-lg-4">
+            <strong>采购单运单号</strong>:
+                <input class="form-control" type="text" name='post_coding' value='{{$model->post_coding}}'/>
+            </div>
+            <strong>采购单运费</strong>:
+                <input class="form-control" type="text" name='total_postage' value='{{$model->total_postage}}'/>
+            </div>  
+                    
         </div>
     </div>
      <div class="panel panel-default">
@@ -55,13 +60,11 @@
         <tr>
             <td>采购条目ID</td> 
             <td>采购类型</td> 
-            <td>SKU_ID</td> 
+            <td>SKU</td> 
             <td>样图</td>
             <td>采购数量/已到货数量/仍需采购数量</td>
             <td>状态</td>
             <td>物流单号+物流费</td>
-            <td>采购价格</td>
-            <td>库存</td>
             <td>参考价格</td>
             <td>所属平台</td>
             <td>购买链接</td> 
@@ -79,8 +82,8 @@
                     @endif
                 @endforeach
             </td>
-            <td>{{$purchaseItem->sku_id}}</td>
-            <td><img src="{{ asset($purchaseItem->purchaseItem->product->image->src) }}" width="50px"></td>
+            <td>{{$purchaseItem->sku}}</td>
+            <td><img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px"></td>
             <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
             <td>
            	<select id="itemStatus_{{$purchaseItem->id}}">
@@ -105,10 +108,8 @@
               <a href="javascript:" class="btn btn-info btn-xs form_supplierCost" data-id="{{ $purchaseItem->id }}">
                         <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseItem->id}}'>确认</span>
                     </a></td>    
-            <td>{{$purchaseItem->stock}}</td>
-            <td>{{$purchaseItem->cost}}</td>
             <td>
-                @foreach(config('purchase.purchaseItem.platforms') as $key=>$vo)
+                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
                     @if($purchaseItem->platform_id == $key)
                         {{$vo}}
                     @endif

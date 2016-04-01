@@ -26,7 +26,6 @@ class CreatePurchaseOrderTable extends Migration
 			$table->integer('warehouse_id')->comment('采购条目所属仓库')->default(NULL);
 			$table->double('total_postage', 15, 8)->comment('物流费用')->nullable()->default(NULL);
 			$table->string('post_coding')->comment('物流单号')->nullable()->default(NULL);
-			$table->double('total_cost', 15, 8)->comment('已审核成本价格')->nullable()->default(NULL);
 			$table->double('total_purchase_cost', 15, 8)->comment('采购价格')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();

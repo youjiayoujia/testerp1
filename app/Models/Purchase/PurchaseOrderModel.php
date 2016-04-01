@@ -127,10 +127,10 @@ class PurchaseOrderModel extends BaseModel
 			$supplier_city=$vo->supplier->city;
 			$supplier_address=$vo->supplier->address;
 			$rows[$key]['id']=$vo->id;
-			$rows[$key]['sku_id']=$vo->purchaseItem->sku;
-			$rows[$key]['采购单ID']=$vo->order_id;
-			$rows[$key]['产品名']=$vo->purchaseItem->product->c_name;
-			$rows[$key]['供应商SKU']=$vo->purchaseItem->supplier_id;
+			$rows[$key]['sku']=$vo->sku;
+			$rows[$key]['采购单ID']=$vo->order_item_id;
+			$rows[$key]['产品名']=$vo->item->product->c_name;
+			$rows[$key]['供应商SKU']=$vo->item->supplier_id;
 			$rows[$key]['采购单审核状态']=config('purchase.purchaseOrder.examineStatus.'.$vo->purchaseOrder->examineStatus);
 			$rows[$key]['采购需求']=config('purchase.purchaseOrder.status.'.$vo->status);
 			$rows[$key]['采购数量']=$vo->purchase_num;

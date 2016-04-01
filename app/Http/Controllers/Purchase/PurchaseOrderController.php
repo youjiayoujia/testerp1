@@ -19,12 +19,9 @@ use App\Models\Product\SupplierModel;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder,WarehouseModel $warehouse,PurchaseItemModel $purchaseItem,SupplierModel $supplier )
+    public function __construct(PurchaseOrderModel $purchaseOrder)
     {
         $this->model = $purchaseOrder;
-		$this->warehouse = $warehouse;
-		$this->purchaseItem=$purchaseItem;
-		$this->supplier=$supplier;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
 		$this->viewPath = 'purchase.purchaseOrder.';
@@ -40,24 +37,10 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 	
-	/**
-     * 创建采购单页面
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
 	
-	public function create()
-	{	
-		$response = [
-			'metas' => $this->metas(__FUNCTION__),
-			'warehouse' => $this->warehouse->all(),
-        ];
-        return view($this->viewPath . 'create', $response);		
-	}
 	
  	/**
-     * 创建采购条目页面
+     * 采购页面
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -72,7 +55,7 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'purchaseItems'=>$this->purchaseItem->where('purchase_order_id',$id)->get(),
+			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
         ];
         return view($this->viewPath . 'edit', $response);	
 	}
@@ -92,7 +75,7 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'purchaseItems'=>$this->purchaseItem->where('purchase_order_id',$id)->get(),
+			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -111,72 +94,7 @@ class PurchaseOrderController extends Controller
         return redirect($this->mainIndex);	
 	}
 	
-	/**
-     * ajax获得仓库对应采购需求的供应商
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
 	
-	public function purchaseOrderSupplier()
-	{
-		$warehouse_id=json_decode(request()->get('warehouse_id'));
-		if($warehouse_id==''){
-            return 0;
-      	}else{
-		$data = $this->purchaseItem->all()->where('warehouse_id',$warehouse_id)->toArray();
-			foreach($data as $key=>$value){
-				$supplier_ids[$key]=$value['supplier_id'];
-			}
-		if(!isset($supplier_ids)){
-			return 0;
-		}else{
-			$warehouseSupplier_ids=array_unique($supplier_ids);
-			$i=0;
-			foreach($warehouseSupplier_ids as $key=>$v){
-				$res[$i]=$this->supplier->find($v)->toArray();
-				$i++;
-			}
-			$result['num']=count($res);
-			$result['res']=array_values($res);
-        return $result;	
-		}
-		}
-	}
-	
-	/**
-     * ajax获得仓库对应采购商的所有采购需求
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function checkProductItems()
-	{
-		$warehouse_id=json_decode(request()->get('warehouse_id'));
-		if($warehouse_id==''){
-            return 0;
-      	}else{
-		$data = $this->purchaseItem->all()->where('warehouse_id',$warehouse_id)->where('purchase_order_id','!>',0);
-        return view($this->viewPath . 'ajaxPurchaseItems',['data' => $data]);	
-		}
-	}
-
-	/**
-     * ajax获得仓库对应采购商的已选取的采购条目
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */	
-	public function checkedPurchaseItem()
-	{
-		$purchaseItemIds=explode(',',request()->get('purchaseItemIds'));
-		foreach($purchaseItemIds as $key=>$val){
-		$res[$key] = $this->purchaseItem->find($val);
-		}
-		$data=array_values($res);
-		return view($this->viewPath . 'ajaxCheckedPurchaseItems',['data' => $data]);
-	}
 	
 	
 	/**

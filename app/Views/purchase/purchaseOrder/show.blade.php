@@ -14,6 +14,7 @@
             	<strong>供应商信息</strong>:
                 名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
             </div>
+           @if($model->examineStatus==2)
             <div class="form-group col-lg-4">
             	<strong>采购类型</strong>:
                 {{$model->supplier->type}}
@@ -25,6 +26,7 @@
                 </a>
                 @endif
             </div>
+            @endif
             <div class="form-group col-lg-4">
                 <strong>采购单状态</strong>:
                @foreach(config('purchase.purchaseOrder.status') as $k=>$val)
@@ -32,7 +34,20 @@
             		{{$val}}
                 @endif
             	@endforeach
-            </div>         
+            </div>
+            <div class="form-group col-lg-4">
+                <strong>采购单审核状态</strong>:     
+            	@if($model->examineStatus == 0)
+                    <a href="/purchaseOrder/changeExaminStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核通过
+                </a> 
+                <a href="/purchaseOrder/changeExaminStatus/{{$model->id}}/2" class="btn btn-info btn-xs"> 审核不通过
+                </a>
+                 @elseif($model->examineStatus == 1)
+                 审核不通过
+                 @else
+                 审核通过
+                @endif
+            </div>          
         </div>
     </div>
      <div class="panel panel-default">
@@ -43,13 +58,11 @@
         <tr>
             <td>采购条目ID</td> 
             <td>采购类型</td> 
-            <td>SKU_ID</td> 
+            <td>SKU</td> 
             <td>样图</td>
             <td>采购数量/已到数量/仍需采购数量</td>
             <td>供应商</td>
             <td>仓库</td>
-            <td>核实价格</td>
-            <td>所属平台</td>
             <td>创建人</td>
             <td>创建时间</td>    
         </tr>
@@ -65,19 +78,11 @@
                     @endif
                 @endforeach
             </td>
-            <td>{{$purchaseItem->sku_id}}</td>
-            <td><img src="{{ asset($purchaseItem->purchaseItem->product->image->src) }}" width="50px"></td>
+            <td>{{$purchaseItem->sku}}</td>
+            <td><img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px"></td>
             <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
             <td>{{$purchaseItem->supplier->name}}</td>
             <td>{{$purchaseItem->warehouse->name}}</td>
-            <td>{{$purchaseItem->stock}}</td>
-            <td>
-                @foreach(config('purchase.purchaseItem.platforms') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
             <td>{{$purchaseItem->user_id}}</td>
             <td>{{$purchaseItem->created_at}}</td>  
         </tr>

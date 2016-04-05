@@ -33,6 +33,8 @@
                 <tr>
                     <th>SKU</th>
                     <th>库位</th>
+                    <th>数量</th>
+                    <th>备注</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -40,9 +42,8 @@
                     <tr>
                         <td>{{ $item->item->sku }}</td>
                         <td>{{ $item->warehousePosition->name }}</td>
-                        <td>{{ $item->item->sku }}</td>
-                        <td>{{ $item->item->sku }}</td>
-                        <td>{{ $item->item->sku }}</td>
+                        <td>{{ $item->quantity }}</td>
+                        <td>{{ $item->remark }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -100,6 +101,16 @@
                 <div class="col-lg-3"><strong>国家</strong>: {{ $model->shipping_country }}</div>
                 <div class="col-lg-3"><strong>邮编</strong>: {{ $model->shipping_zipcode }}</div>
                 <div class="col-lg-3"><strong>电话</strong>: {{ $model->shipping_phone }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-warning">
+        <div class="panel-heading">备注</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    {{ $model->remark }}
+                </div>
             </div>
         </div>
     </div>

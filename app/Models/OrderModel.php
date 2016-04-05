@@ -242,64 +242,81 @@ class OrderModel extends BaseModel
 
     public function createPackage($items = [])
     {
-        $items = $items ? collect($items) : [];
-        $package = [];
-        //channel
-        $package['channel_id'] = $this->channel_id;
-        //assigner
-        $package['assigner_id'] = 1;
-        //judge type
+        $items = $this->setPackageItems($items);
         if ($items) {
-            if ($items->count() > 1) {
-                $package['type'] = 'MULTI';
-            } else {
-                //package item quantity must not more than order item
-                if ($this->items->find($items->first()['id'])->quantity < $items->first()['quantity']) {
-                    return false;
+            $package = [];
+            //channel
+            $package['channel_id'] = $this->channel_id;
+            //assigner
+            $package['assigner_id'] = 1;
+            //type
+            $package['type'] = $this->judgePacketType($items);
+            $package['status'] = 'PROCESSING';
+            $package['weight'] = 0;
+            $package['length'] = 0;
+            $package['width'] = 0;
+            $package['height'] = 0;
+            $package['email'] = $this->email;
+            $package['shipping_firstname'] = $this->shipping_firstname;
+            $package['shipping_lastname'] = $this->shipping_lastname;
+            $package['shipping_address'] = $this->shipping_address;
+            $package['shipping_address1'] = $this->shipping_address1;
+            $package['shipping_city'] = $this->shipping_city;
+            $package['shipping_state'] = $this->shipping_state;
+            $package['shipping_country'] = $this->shipping_country;
+            $package['shipping_zipcode'] = $this->shipping_zipcode;
+            $package['shipping_phone'] = $this->shipping_phone;
+            //auto process
+            $package['is_auto'] = 1;
+            //auto assign logsitic
+            $package['is_auto_logistic'] = 1;
+            $package = $this->packages()->create($package);
+            if ($package) {
+                foreach ($items as $item) {
+                    $package->items()->create($item);
                 }
-                $package['type'] = $items->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE';
-            }
-        } else {
-            if ($this->items->count() > 1) {
-                $package['type'] = 'MULTI';
-            } else {
-                $package['type'] = $this->items->first()->quantity > 1 ? 'SINGLEMULTI' : 'SINGLE';
+                return true;
             }
         }
-        $package['status'] = 'PROCESSING';
-        $package['weight'] = 0;
-        $package['length'] = 0;
-        $package['width'] = 0;
-        $package['height'] = 0;
-        $package['email'] = $this->email;
-        $package['shipping_firstname'] = $this->shipping_firstname;
-        $package['shipping_lastname'] = $this->shipping_lastname;
-        $package['shipping_address'] = $this->shipping_address;
-        $package['shipping_address1'] = $this->shipping_address1;
-        $package['shipping_city'] = $this->shipping_city;
-        $package['shipping_state'] = $this->shipping_state;
-        $package['shipping_country'] = $this->shipping_country;
-        $package['shipping_zipcode'] = $this->shipping_zipcode;
-        $package['shipping_phone'] = $this->shipping_phone;
-        //auto process
-        $package['is_auto'] = 1;
-        //auto assign logsitic
-        $package['is_auto_logistic'] = 1;
-        $this->packages()->create($package);
-        Tool::show($package);
+        return false;
     }
 
     public function setPackageItems($items = [])
     {
-        $items = $items ? collect($items) : [];
+        $packageItem = [];
         if ($items) {
-            foreach ($items as $item) {
+            foreach ($items as $key => $item) {
+                if ($item['quantity'] > 0) {
+                    //package item quantity must not more than order item
+                    if ($item['quantity'] > $this->items->find($item['order_item_id'])->quantity) {
+                        return false;
+                    }
+                    $packageItem[$key]['item_id'] = $item['item_id'];
+//                $packageItem[]['warehouse_postion_id'] = 1; //todo
+                    $packageItem[$key]['order_item_id'] = $item['order_item_id'];
+                    $packageItem[$key]['quantity'] = $item['quantity'];
+                    $packageItem[$key]['remark'] = $item['remark'];
+                }
             }
         } else {
-            foreach ($this->items as $item) {
+            foreach ($this->items as $key => $item) {
+                $packageItem[$key]['item_id'] = $item->item_id;
+//                $packageItem[]['warehouse_postion_id'] = 1; //todo
+                $packageItem[$key]['order_item_id'] = $item->id;
+                $packageItem[$key]['quantity'] = $item->quantity;
+                $packageItem[$key]['remark'] = 'REMARK';
             }
         }
-        return false;
+        return $packageItem;
+    }
+
+    public function judgePacketType($items)
+    {
+        $items = collect($items);
+        if ($items->count() > 1) {
+            return 'MULTI';
+        }
+        return $items->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE';
     }
 
 }

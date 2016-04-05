@@ -29,8 +29,11 @@ class PackageController extends Controller
         $order = OrderModel::find(request()->input('order_id'));
         if ($order) {
             $this->validate(request(), $this->model->rules('create'));
-            $order->createPackage(request()->input('items'));
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
+            if ($order->createPackage(request()->input('items'))) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
+            } else {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,请检查包裹产品是否有误'));
+            }
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
         }
@@ -54,8 +57,7 @@ class PackageController extends Controller
     {
         $id = request()->input('id');
         $package = $this->model->find($id);
-        foreach($package->listItemPackage as $itemPackage)
-        {
+        foreach ($package->listItemPackage as $itemPackage) {
             $picklistItem = $itemPackage->picklistItem;
             $item = ItemModel::find($picklistItem->item_id);
             $item->unhold($picklistItem->warehouse_position_id, $picklistItem->quantity);
@@ -78,7 +80,7 @@ class PackageController extends Controller
             'logistics' => LogisticsModel::all(),
         ];
 
-        return view($this->viewPath.'fee', $response);
+        return view($this->viewPath . 'fee', $response);
     }
 
     public function feeStore()
@@ -90,7 +92,11 @@ class PackageController extends Controller
         $model->logistic_id = request()->input('logistic_id');
         $model->status = 'SHIPPED';
         $model->save();
-        $model->manualLogistic()->create(['logistic_code'=>request()->input('logistic_code'), 'fee'=>request()->input('fee'), 'remark'=>request()->input('remark')]);
+        $model->manualLogistic()->create([
+            'logistic_code' => request()->input('logistic_code'),
+            'fee' => request()->input('fee'),
+            'remark' => request()->input('remark')
+        ]);
 
         return redirect($this->mainIndex);
     }

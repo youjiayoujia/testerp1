@@ -66,7 +66,7 @@ class PurchaseItemModel extends BaseModel
 		$productItem=$item->where('sku',$data['sku_id'])->first();
 		$data['supplier_id']=$productItem->supplier_id;
 		$data['cost']=$productItem['purchase_price'];
-		$data['stock']=$productItem['inventory'];
+		$data['stock']=1;//$productItem['inventory'];
 		$this->create($data);
 	}
 	

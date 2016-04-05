@@ -51,14 +51,29 @@ class PackageModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'assigner_id');
     }
 
+    public function channelAccount()
+    {
+        return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id');
+    }
+
     public function order()
     {
         return $this->belongsTo('App\Models\OrderModel', 'order_id');
     }
 
-    public function logistic()
+    public function warehouse()
     {
-        return $this->belongsTo('App\Models\LogisticModel', 'logistic_id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
+    }
+
+    public function picklist()
+    {
+        return $this->belongsTo('App\Models\PickListModel', 'picklist_id');
+    }
+
+    public function logistics()
+    {
+        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id');
     }
 
     public function items()
@@ -75,7 +90,7 @@ class PackageModel extends BaseModel
     {
         return $this->hasMany('App\Models\Package\LogisticModel', 'package_id', 'id');
     }
-    
+
     public function getStatusNameAttribute()
     {
         $arr = config('pick.package');

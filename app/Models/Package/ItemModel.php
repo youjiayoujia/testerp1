@@ -24,8 +24,13 @@ class ItemModel extends BaseModel
         'remark',
     ];
 
-    public function items()
+    public function item()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
+        return $this->belongsTo('App\Models\ItemModel', 'item_id');
+    }
+
+    public function warehousePosition()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id');
     }
 }

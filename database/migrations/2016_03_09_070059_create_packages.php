@@ -14,10 +14,10 @@ class CreatePackages extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('channel_id')->comment('渠道ID');
+            $table->integer('channel_account_id')->comment('渠道账号ID');
             $table->integer('order_id')->comment('订单ID');
             $table->integer('warehouse_id')->comment('仓库ID');
-            $table->integer('logistic_id')->comment('物流方式ID');
+            $table->integer('logistics_id')->comment('物流方式ID');
             $table->integer('picklist_id')->comment('拣货单ID');
             $table->integer('assigner_id')->comment('负责人');
             $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI',])->default('SINGLE')->comment('类型');

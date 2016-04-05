@@ -394,4 +394,15 @@ class ProductModel extends BaseModel
         }
     }
 
+    /**
+     * 渠道产品审核
+     * 2016-3-11 14:00:41 YJ
+     * @param int $status 审核状态
+     */
+    public function examineProduct($status)
+    {   
+        $data['edit_status'] = $status;
+        $this->update($data);
+    }
+
 }

@@ -79,27 +79,14 @@
                 <?php if($product->edit_status==2){ ?>
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
                            data-id="{{ $product->id }}"
-                           data-url="{{route('examineAmazonProduct')}}"
+                           data-url="{{route('examineProduct')}}"
                            data-status="3" >
-                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>审核</span>
-                    </a>
-                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                           data-id="{{ $product->id }}"
-                           data-url="{{route('examineAmazonProduct')}}"
-                           data-status="0" >
-                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>审核不通过</span>
-                    </a>
-                <?php }elseif($product->edit_status==3){ ?>
-                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                           data-id="{{ $product->id }}"
-                           data-url="{{route('examineAmazonProduct')}}"
-                           data-status="0" >
                             <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>撤销审核</span>
                     </a>
-                <?php }elseif($product->edit_status==0){ ?>
+                <?php }elseif($product->edit_status==3||$product->edit_status==0){ ?>
                     <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑资料
-                </a>
+                        <span class="glyphicon glyphicon-pencil"></span> 编辑资料
+                    </a>
                 <?php }elseif($product->edit_status==1){ ?>
                     <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑图片
@@ -117,6 +104,21 @@
 
 @section('childJs')
     <script type="text/javascript">
-       
-        </script>
+    $('.examine_model').click(function () {
+        if (confirm("确认审核?")) {
+            var url = $(this).data('url');;
+            var product_id = $(this).data('id');
+            var status = $(this).data('status');
+            $.ajax({
+                url:url,
+                data:{product_id:product_id,status:status},
+                dataType:'json',
+                type:'get',
+                success:function(result){
+                    
+                }                    
+            })
+        } 
+    });
+    </script>
 @stop

@@ -160,6 +160,7 @@ Route::resource('pickList', 'PickListController');
 Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
 Route::get('examine', ['uses' => 'ProductController@examine', 'as'=>'examine']);
 Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as'=>'choseShop']);
+Route::any('product/examineProduct', ['uses' => 'Product\EditProductController@examineProduct', 'as'=>'examineProduct']);
 Route::any('product/editImage', ['uses' => 'Product\EditProductController@productEditImage', 'as'=>'productEditImage']);
 Route::any('product/updateImage', ['uses' => 'Product\EditProductController@productUpdateImage', 'as'=>'productUpdateImage']);
 Route::resource('product', 'ProductController');
@@ -167,7 +168,7 @@ Route::resource('product', 'ProductController');
 Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
 Route::resource('EditProduct', 'Product\EditProductController');
 Route::resource('SelectProduct', 'Product\SelectProductController');
-Route::get('examineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@examineAmazonProduct', 'as'=>'examineAmazonProduct']);
+//Route::get('examineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@examineAmazonProduct', 'as'=>'examineAmazonProduct']);
 Route::get('cancelExamineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as'=>'cancelExamineAmazonProduct']);
 
 //订单管理路由

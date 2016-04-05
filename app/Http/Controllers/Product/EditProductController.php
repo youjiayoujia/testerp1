@@ -120,5 +120,21 @@ class EditProductController extends Controller
 
         return redirect($this->mainIndex);
     }
+
+    /**
+     * 产品审核
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function examineProduct()
+    {
+        $id = request()->input('product_id');
+        $status = request()->input('status');
+        $productModel = $this->product->find($id);
+        $productModel->examineProduct($status);
+
+        return 1;
+    }
      
 }

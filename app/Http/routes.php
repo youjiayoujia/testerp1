@@ -78,12 +78,11 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 
 //采购单
-Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
+Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\purchaseOrderController@changeExamineStatus');
 Route::any('purchaseOrder/purchaseOrderSupplier', 'Purchase\purchaseOrderController@purchaseOrderSupplier');
 Route::any('purchaseOrder/checkProductItems', 'Purchase\purchaseOrderController@checkProductItems');
 Route::any('purchaseOrder/checkedPurchaseItem', 'Purchase\purchaseOrderController@checkedPurchaseItem');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
-Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
 Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 

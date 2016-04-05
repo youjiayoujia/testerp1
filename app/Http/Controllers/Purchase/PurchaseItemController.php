@@ -85,9 +85,8 @@ class PurchaseItemController extends Controller
         }
         $data=request()->all();
         $this->validate(request(), $this->model->rules('update', $id));
-		$model->lack_num=$data['purchase_num']-$model->arrival_num;
-		$model->purchase_num=$data['purchase_num'];
-        $model->save();
+		$data['lack_num']=$data['purchase_num']-$model->arrival_num;
+        $model->update($data);
         return redirect($this->mainIndex);
     }
 

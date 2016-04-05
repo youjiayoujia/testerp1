@@ -38,9 +38,9 @@
             <div class="form-group col-lg-4">
                 <strong>采购单审核状态</strong>:     
             	@if($model->examineStatus == 0)
-                    <a href="/purchaseOrder/changeExaminStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核通过
+                    <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核不通过
                 </a> 
-                <a href="/purchaseOrder/changeExaminStatus/{{$model->id}}/2" class="btn btn-info btn-xs"> 审核不通过
+                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/2" class="btn btn-info btn-xs"> 审核通过
                 </a>
                  @elseif($model->examineStatus == 1)
                  审核不通过

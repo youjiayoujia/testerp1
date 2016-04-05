@@ -60,7 +60,7 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'edit', $response);	
 	}
 	 
-	  /**
+	/**
      * 详情
      *
      * @param $id
@@ -81,23 +81,6 @@ class PurchaseOrderController extends Controller
     }
 	
 	/**
-     * 创建采购条目
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function store()
-	{	
-		$data=request()->all();
-		$this->model->addPurchaseOrder($data);
-        return redirect($this->mainIndex);	
-	}
-	
-	
-	
-	
-	/**
      * 更新采购单
      *
      * @param $id
@@ -106,8 +89,34 @@ class PurchaseOrderController extends Controller
 	
 	public function update($id)
 	{
+		$model=$this->model->find($id);
+		if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
 		$data=request()->all();
-		$this->model->purchaseItemUpdate($id,$data);
+		$model->update($data);
+		if(isset($data['arr'])){
+			foreach($data['arr'] as $k=>$v){
+				if($v['id']){
+					$purchaseItem=PurchaseItemModel::find($v['id']);
+					$itemPurchasePrice=$purchaseItem->item->product->purchase_price;
+					foreach($v as $key=>$vo){
+						$item[$key]=$vo;	
+					}
+					if($v['active']>0){
+						$item['active_status']=1;
+					}
+					if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
+						$item['costExamineStatus']=2;
+						}else{
+						$item['costExamineStatus']=0;	
+							}
+					$purchaseItem->update($item);
+					unset($item);
+				}
+			}
+		}
+		
         return redirect($this->mainIndex);		
 	}
 	
@@ -118,30 +127,42 @@ class PurchaseOrderController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function examinePurchaseOrder()
+	public function changeExamineStatus($id,$examineStatus)
 	{
-		$purchaseOrderIds=explode(',',request()->get('purchase_ids'));
-		$this->model->updatePurchaseOrderExamine($purchaseOrderIds);
-		return 1;
+		$model=$this->model->find($id);
+		if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+		$data['examineStatus']=$examineStatus;
+		$model->update($data);
+		if($examineStatus==1){
+			$this->model->cancelOrderItems($id);
+		}
+		return redirect($this->mainIndex);
 	}
 	
-	
-	
-	
-		
-	public function printOrder($id)
-	{		
-		echo 111;exit;
-	}
-	
+	/**
+     * 导出采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	public function excelOut($id)
 	{
 		$this->model->purchaseOrderExcelOut($id);	
 	}
-	public function cancelOrder($id){
+	
+	/**
+     * 取消采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function cancelOrder($id)
+	{
 		$this->model->cancelOrderItems($id);
-		 return redirect($this->mainIndex);	
-		}
+		return redirect($this->mainIndex);	
+	}
 }
 
 

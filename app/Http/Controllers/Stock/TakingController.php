@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingFormModel;
 use App\Models\Stock\TakingAdjustmentModel;
+use App\Models\ItemModel;
 
 class TakingController extends Controller
 {
@@ -36,6 +37,9 @@ class TakingController extends Controller
     public function show($id)
     {
         $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -55,6 +59,9 @@ class TakingController extends Controller
     public function edit($id)
     {
         $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         $response= [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -112,21 +119,107 @@ class TakingController extends Controller
     }
 
     /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $takingForms = $model->stockTakingForm;
+        foreach($takingForms as $takingForm)
+        {
+            $takingForm->delete();
+        }
+        $model->delete();
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * ajax审核生成盘点表 
      *
      * @param none 
      * @return json
      *
      */
-    public function ajaxTakingCheck()
+    public function ajaxTakingCreate()
     {
         if(request()->ajax()) {
             $id = request()->input('id');
             $model = $this->model->find($id);
-            $model->update(['adjustment_by'=>'3', 'adjustment_time'=>date('Y-m-d h:m:s', time())]);
+            $model->update(['create_status' => '1', 'adjustment_by'=>'3', 'adjustment_time'=>date('Y-m-d h:m:s', time())]);
             return json_encode('11');
         }
         
         return json_encode('false');
+    }
+
+    /**
+     * 盘点调整审核页面 
+     *
+     * @param $id id号
+     * @return view
+     *
+     */
+    public function takingCheck($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas'=>$this->metas(__FUNCTION__),
+            'model'=>$model,
+            'stockTakingForms' => $model->stockTakingForm,
+        ];
+
+        return view($this->viewPath.'check', $response);
+    }
+
+    /**
+     * 盘点调整审核 
+     *
+     * @param none
+     * @return index
+     *
+     */
+    public function takingCheckResult($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        if(request()->input('result') == 1) {
+            $takingforms = $model->stockTakingForm;
+            foreach($takingforms as $takingform) {
+                if($takingform->stock_taking_status == 'equal') {
+                    continue;
+                }
+                $item = ItemModel::find($takingform->stock->item_id);
+                $warehousePositionId = $takingform->stock->warehouse_position_id;
+                $quantity = abs($takingform->stock->all_quantity - $takingform->quantity);
+                $amount = $quantity*$takingform->stock->unit_cost;
+                $type = $takingform->stock_taking_status;
+                $relation_id = $model->id;
+                if($type == 'more') {
+                    $type = 'INVENTORY_PROFIT';
+                    $item->in($warehousePositionId, $quantity, $amount, $type, $relation_id);
+                }
+                if($type == 'less') {
+                    $type = 'SHORTAGE';
+                    $item->out($warehousePositionId, $quantity, $type, $relation_id);
+                }
+            }
+            $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
+        } else {
+            $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
+        }
+        
+        return redirect($this->mainIndex);
     }
 }

@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picklist_id', 'type', 'status', 'logistic_id', 'pick_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -40,21 +40,25 @@ class PickListModel extends BaseModel
     //查询
     public $searchFields=['picklist_id'];
 
+    //拣货单item关联关系
     public function pickListItem()
     {
         return $this->hasMany('App\Models\Pick\ListItemModel', 'picklist_id', 'id');
     }
 
+    //pacakge关联关系
     public function package()
     {
         return $this->hasMany('App\Models\PackageModel', 'picklist_id', 'id');
     }
 
+    //物流关联关系
     public function logistic()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistic_id', 'id');
     }
 
+    //拣货人关联关系
     public function pickByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'pick_by', 'id');
@@ -91,22 +95,15 @@ class PickListModel extends BaseModel
     {
         foreach($package->items as $packageitem)
         {
-            $arr = ItemModel::find($packageitem->item_id)->allocateStock($packageitem->quantity);
-            if(!$arr) {
-                throw new Exception('id为'.$package->id.'的package中有未能分配到库存的项');
-            }
-            foreach($arr as $key => $value) {
-                $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$value[0], 'picklist_id'=>'0'])->first();
-                if(!$query) {
-                    $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$value[0], 'quantity'=>$value[1]]);
-                    $obj->pickListItemPackage()->create(['package_id' => $package->id]);
-                } else {
-                    $query->quantity += $value[1];
-                    $query->save();
-                    $query->pickListItemPackage()->create(['package_id' => $package->id]);
-                }
-                ItemModel::find($packageitem->item_id)->hold($value[0], $value[1]);
-            }   
+            $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'picklist_id'=>'0'])->first();
+            if(!$query) {
+                $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
+                $obj->pickListItemPackage()->create(['package_id' => $package->id]);
+            } else {
+                $query->quantity += $packageitem->quantity;
+                $query->save();
+                $query->pickListItemPackage()->create(['package_id' => $package->id]);
+            }  
         }
     }
 
@@ -122,16 +119,9 @@ class PickListModel extends BaseModel
         $buf = [];
         foreach($package->items as $packageitem)
         {
-            $arr = ItemModel::find($packageitem->item_id)->allocateStock($packageitem->quantity);
-            if(!$arr) {
-                throw new Exception('id为'.$package->id.'的package中有未能分配到库存的项');
-            }
-            foreach($arr as $key => $value)
-            {
-                $name = PositionModel::find($value[0])->name;
-                $tmp = substr($name,1,1);
-                $buf[] = $tmp;
-            }
+            $name = PositionModel::find($packageitem->warehouse_position_id)->name;
+            $tmp = substr($name,1,1);
+            $buf[] = $tmp;
         }
         $buf = array_unique($buf);
         $num = 0;
@@ -158,7 +148,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['picknum'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
@@ -175,7 +165,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['picknum'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
@@ -192,7 +182,7 @@ class PickListModel extends BaseModel
         if($query->count()) {            
             $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['picknum'=>'pk'.rand()%10000000, 'type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
                 foreach($packageScore as $score)
                 {
                     $score->picklist_id = $obj->id;
@@ -223,7 +213,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                $obj = $this->create(['picknum'=>'pk'.rand()%10000000, 'type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
@@ -240,7 +230,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                $obj = $this->create(['picknum'=>'pk'.rand()%10000000, 'type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
@@ -257,7 +247,7 @@ class PickListModel extends BaseModel
         if($query->count()) {            
             $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
-                $obj = $this->create(['picklist_id'=>'pk'.rand()%10000000, 'type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                $obj = $this->create(['picknum'=>'pk'.rand()%10000000, 'type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
                 foreach($packageScore as $score)
                 {
                     $score->picklist_id = $obj->id;

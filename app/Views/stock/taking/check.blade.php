@@ -1,9 +1,8 @@
 @extends('common.form')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-@section('formAction') {{ route('takingadjustmentcheckresult') }} @stop
+@section('formAction') {{ route('stockTaking.takingCheckResult', ['id' => $model->id]) }} @stop
 @section('formBody')
 <div class="row">
-    <input type='hidden' class="form-control " id="taking_id" placeholder="可用数量" name='taking_id' value="{{ $model->id }}" readonly>
     <div class="form-group col-sm-3">
         <label for="盘点表id" class='control-label'>盘点表id</label>
         <input type='text' class="form-control " placeholder="盘点表id" value="{{ $model->taking_id }}" readonly>

@@ -52,10 +52,10 @@
     <label for="is_available">库位是否启用</label>
     <div class='radio'>
         <label>
-            <input type='radio' name='is_available' value='1' {{ old('is_available') ? (old('is_available') == '1' ? 'checked' :  '') : '' }}>启用
+            <input type='radio' name='is_available' value='1' {{ old('is_available') ? (old('is_available') == '1' ? 'checked' :  '') : 'checked' }}>启用
         </label>   
         <label>
-            <input type='radio' name='is_available' value='0' {{ old('is_available') ? (old('is_available') == '0' ? 'checked' :  '') : 'checked' }}>不启用
+            <input type='radio' name='is_available' value='0' {{ old('is_available') ? (old('is_available') == '0' ? 'checked' :  '') : '' }}>不启用
         </label>
     </div>    
 </div>

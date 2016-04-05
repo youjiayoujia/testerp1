@@ -54,11 +54,19 @@ Route::get('stockAdjustment/check',
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
 //库位
+Route::post('position/excelProcess', ['uses'=>'Warehouse\PositionController@excelProcess', 'as'=>'position.excelProcess']);
+Route::get('position/importByExcel', ['uses'=>'Warehouse\PositionController@importByExcel', 'as'=>'position.importByExcel']);
+Route::get('position/getExcel', ['uses'=>'Warehouse\PositionController@getExcel', 'as'=>'position.getExcel']);
 Route::get('position/getPosition',
     ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
 Route::resource('warehousePosition', 'Warehouse\PositionController');
 
 //库存
+Route::get('stock/getExcel', ['uses'=>'StockController@getExcel', 'as'=>'stock.getExcel']);
+Route::post('stock/excelProcess', ['uses'=>'StockController@excelProcess', 'as'=>'stock.excelProcess']);
+Route::get('stock/importByExcel', ['uses'=>'StockController@importByExcel', 'as'=>'stock.importByExcel']);
+Route::get('stock/ajaxPosition', ['uses'=>'StockController@ajaxPosition', 'as'=>'stock.ajaxPosition']);
+Route::get('stock/ajaxSku', ['uses'=>'StockController@ajaxSku', 'as'=>'stock.ajaxSku']);
 Route::get('stock/createTaking', ['uses' => 'StockController@createTaking', 'as' => 'stock.createTaking']);
 Route::get('stock/allotSku', ['uses' => 'StockController@ajaxAllotSku', 'as' => 'stock.allotSku']);
 Route::get('stock/allotOutWarehouse',
@@ -138,18 +146,10 @@ Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotme
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 
 //库存盘点
-Route::get('quantitycheck', ['uses' => 'Stock\TakingController@ajaxQuantityCheck', 'as' => 'quantitycheck']);
-Route::get('takingcheck', ['uses' => 'Stock\TakingController@ajaxTakingcheck', 'as' => 'takingcheck']);
-Route::post('takingupdate', ['uses' => 'Stock\TakingController@takingUpdate', 'as' => 'takingupdate']);
-Route::get('edittaking', ['uses' => 'Stock\TakingController@editTaking', 'as' => 'edittaking']);
+Route::get('StockTaking/takingCreate', ['uses' => 'Stock\TakingController@ajaxtakingCreate', 'as' => 'stockTaking.takingCreate']);
+Route::get('StockTaking/takingCheck/{id}', ['uses' => 'Stock\TakingController@takingCheck', 'as' => 'stockTaking.takingCheck']);
+Route::post('StockTaking/takingCheckResult/{id}', ['uses' => 'Stock\TakingController@takingCheckResult', 'as' => 'stockTaking.takingCheckResult']);
 Route::resource('stockTaking', 'Stock\TakingController');
-
-//盘点调整
-Route::post('takingadjustmentcheckresult',
-    ['uses' => 'Stock\TakingAdjustmentController@takingAdjustmentCheckResult', 'as' => 'takingadjustmentcheckresult']);
-Route::get('takingadjustmentcheck/{id}',
-    ['uses' => 'Stock\TakingAdjustmentController@takingAdjustmentCheck', 'as' => 'takingadjustmentcheck']);
-Route::resource('stockTakingAdjustment', 'Stock\TakingAdjustmentController');
 
 //物流路由
 Route::resource('logistics', 'LogisticsController');

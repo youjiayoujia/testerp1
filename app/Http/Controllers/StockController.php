@@ -10,6 +10,7 @@
 
 namespace App\Http\Controllers;
 
+use Excel;
 use App\Models\StockModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
@@ -39,11 +40,30 @@ class StockController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::all(),
-            'items' => ItemModel::all(), 
+            'warehouses' => WarehouseModel::where('is_available','1')->get(),
         ];
 
         return view($this->viewPath.'create', $response);
+    }
+
+    /**
+     * 存储
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $stock = $this->model->create(request()->all());
+        $stock->available_quantity = request()->input('all_quantity');
+        $stock->warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
+        $stock->item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
+        $stock->amount = round((request()->input('all_quantity') * request()->input('unit_price')), 2);
+        $stock->save();
+        ItemModel::find($stock->item_id)->in($stock->warehouse_position_id, $stock->all_quantity, $stock->amount);
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -62,12 +82,33 @@ class StockController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'warehouses' => WarehouseModel::all(),
-            'positions' => PositionModel::where('warehouse_id', $model->warehouse_id)->get(),
-            'items' => ItemModel::all(),
+            'warehouses' => WarehouseModel::where('is_available','1')->get(),
         ];
 
         return view($this->viewPath.'edit', $response);
+    }
+
+    /**
+     * 更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $diff_quantity = $model->all_quantity - request()->input('all_quantity');
+        $this->validate(request(), $this->model->rules('update', $id));
+        $model->update(request()->all());
+        $model->warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
+        $model->item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
+        $model->save();
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -98,9 +139,20 @@ class StockController extends Controller
     public function ajaxGetByPosition()
     {
         if(request()->ajax()) {
-            $position = request()->input('position');
-            $obj = StockModel::where(['warehouse_position_id'=>$position])->with('items')->get();
-            return json_encode($obj);
+            $position = PositionModel::where('name', trim(request()->input('position')))->first();
+            $warehouse_position_id = '';
+            if(!count($position)) {
+                return json_encode('position_error');
+            }
+            $warehouse_position_id = $position->id;
+            $sku = trim(request()->input('sku'));
+            $item_id = ItemModel::where('sku', $sku)->first()->id;
+            $obj = StockModel::where(['warehouse_position_id'=>$warehouse_position_id, 'item_id'=>$item_id])->get();
+            if(count($obj)) {
+                return json_encode($obj);
+            } else {
+                return 'false';
+            }
         }
 
         return json_encode('false');
@@ -126,19 +178,17 @@ class StockController extends Controller
                 return json_encode('sku_none');
             }
             $obj = $obj->first();
-            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$obj->id])->get();
+            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$obj->id])->first();
             if(!count($obj1)) {
                 return json_encode('stock_none');
             }
-            $arr[] = $obj;
-            $arr[] = $obj1;
-            foreach($obj1 as $tmp) {
-                $buf = $tmp->position;
-                $arr[2][] = $buf;
+            $arr[] = $obj1->position->name;
+            $arr[] = $obj1->unit_cost;
+            if($arr) {
+                return json_encode($arr);
+            } else {
+                return json_encode('false');
             }
-            if($obj1)
-                $arr[3] = $obj1->first()->unit_cost;
-            return json_encode($arr);
         }
 
         return json_encode('false');
@@ -183,8 +233,8 @@ class StockController extends Controller
     public function ajaxAllotPosition()
     {
         if(request()->ajax()) {
-            $position = request()->input('position');
-            $item_id = $_GET['item_id'];
+            $position = PositionModel::where('name', trim(request()->input('position')))->first()->id;
+            $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
             $obj = StockModel::where(['warehouse_position_id'=>$position, 'item_id'=>$item_id])->first();
             $arr[] = $obj->toArray();
             $arr[] = $obj->unit_cost;
@@ -208,27 +258,113 @@ class StockController extends Controller
     public function ajaxAllotSku()
     {
         if(request()->ajax()) {
-            $warehouse = request()->input('warehouse');
-            $item_id = request()->input('item_id');
+            $warehouse = trim(request()->input('warehouse'));
+            $sku = trim(request()->input('sku'));
+            $item_id = ItemModel::where('sku', $sku)->first()->id;
             $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->first();
             if(!$obj) {
                 return json_encode('none');
             }
-            $arr[] = $obj->toArray();
-            $tmp = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->distinct()->get();
-            if(!$tmp) {
-                return json_eoncode('none');
-            }
-            foreach($tmp as $val) 
-            {
-                $buf = $val->position->toArray();
-                $arr[1][] = $buf;
-            }
-            $arr[2] = $obj->unit_cost;
+            $arr[] = $obj->position->name;
+            $arr[] = $obj->available_quantity;
+            $arr[] = $obj->unit_cost;
             
             return json_encode($arr);
         }
 
         return json_encode('false');
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function ajaxSku()
+    {
+        $sku = request()->input('sku');
+        $count = ItemModel::where('sku', $sku)->count();
+        if($count)
+            return json_encode('true');
+        else 
+            return json_encode('false');
+    }
+
+    /**
+     * ajax请求   position
+     *
+     * @param none
+     * @return boolean
+     *
+     */
+    public function ajaxPosition()
+    {
+        $position = trim(request()->input('position')); 
+        $count = PositionModel::where(['name' => $position, 'is_available'=>'1'])->count();
+        if($count)
+            return json_encode('true');
+        else
+            return json_encode('false');
+    }
+
+    /**
+     * 获取excel表格 
+     *
+     * @param none
+     *
+     */
+    public function getExcel()
+    {
+        $rows = [
+                    [ 
+                     'sku'=>'',
+                     'position'=>'',
+                     'all_quantity'=>'',
+                     'available_quantity'=>'',
+                     'hold_quantity'=>'',
+                     'amount'=>'',
+                    ]
+            ];
+        $name = 'stock';
+        Excel::create($name, function($excel) use ($rows){
+            $nameSheet='投诉列表';
+            $excel->sheet($nameSheet, function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('xls');
+    }
+
+    /**
+     * excel 导入数据
+     *
+     * @param
+     *
+     */
+    public function importByExcel()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'excel', $response);
+    }
+
+    /**
+     * excel 处理
+     *
+     * @param none
+     *
+     */
+    public function excelProcess()
+    {
+        if(request()->hasFile('excel'))
+        {
+           $file = request()->file('excel');
+           $this->model->excelProcess($file);
+        }
+
+        return redirect($this->mainIndex);
     }
 }

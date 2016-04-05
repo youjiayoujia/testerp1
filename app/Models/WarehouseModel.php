@@ -19,7 +19,7 @@ class WarehouseModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'province', 'city', 'type', 'volumn', 'is_available', 'is_default'];
+    protected $fillable = ['name', 'province', 'city', 'address', 'contact_by', 'telephone', 'type', 'volumn', 'is_available', 'is_default'];
 
     // 规则验证
     public $rules = [
@@ -46,6 +46,17 @@ class WarehouseModel extends BaseModel
      */
     public function position()
     {
-        return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouses_id' ,'id');
+        return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouse_id' ,'id');
+    }
+
+    /**
+     * get the relationship
+     * 
+     *  @return
+     *
+     */
+    public function contactByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'contact_by', 'id');
     }
 }

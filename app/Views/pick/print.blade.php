@@ -3,7 +3,7 @@
     <div class='row'>
         <div class='form-group col-lg-2'>
             <label>ID:</label>
-            <input type='text' class='form-control' value="{{ $model->picklist_id }}">
+            <input type='text' class='form-control' value="{{ $model->picknum }}">
         </div>
         <div class='form-group col-lg-2'>
             <label>类型:</label>
@@ -35,7 +35,7 @@
                 <td>{{ $picklistitem->items ? $picklistitem->items->sku : '' }}</td>
                 <td>{{ $picklistitem->position ? $picklistitem->position->name : '' }}</td>
                 <td>{{ $picklistitem->quantity }}</td>
-                <td>{{ $model->picklist_id }}</td>
+                <td>{{ $model->picknum }}</td>
             </tr>
             @endforeach
         </tbody>

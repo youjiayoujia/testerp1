@@ -17,7 +17,7 @@ class CreateProductSupplier extends Migration
             $table->string('name',128)->comment('供货商名称')->default(NULL);
             $table->string('province')->comment('供货商省')->default(NULL);
             $table->string('city')->comment('供货商市')->default(NULL);
-            $table->string('address')->comment('供货商地址，经纬度')->default(NULL);
+            $table->string('address')->comment('供货商地址')->default(NULL);
             $table->enum('type',['1','0'])->comment('是否是线上供货商')->default('0');
             $table->string('url',128)->comment('供货商url')->default(NULL);
             $table->string('telephone')->comment('供货商联系方式')->default(NULL);

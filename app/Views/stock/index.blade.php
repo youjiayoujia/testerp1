@@ -40,10 +40,15 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+@parent
 <div class="btn-group">
-    <a class="btn btn-success" href="{{ route('stock.createTaking') }}">
-        库存盘点
+    <a class="btn btn-info" href="{{ route('stock.getExcel') }}">
+        获取excel
     </a>
 </div>
-@parent
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('stock.importByExcel') }}">
+        excel导入
+    </a>
+</div>
 @stop

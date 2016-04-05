@@ -104,7 +104,7 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark = '')
+    public function in($warehousePosistionId, $quantity, $amount, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if($quantity)
@@ -153,7 +153,7 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '1', $remark = '')
+    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if($quantity)

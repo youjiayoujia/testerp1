@@ -94,18 +94,7 @@ class PurchaseListController extends Controller
         return redirect($this->mainIndex);		
 	}
 	
-	public function addPurchaseOrder()
-	{
-		$isadd=json_decode(request()->get('isadd'));
-		if($isadd==1){ 
-			$res=$this->model->purchaseOrderCreate();
-			if($res  == true){
-			return 1;
-			}else{
-			return 0;	
-				}
-		}
-	}
+	 
 	
 	public function activeChange($id)
 	{

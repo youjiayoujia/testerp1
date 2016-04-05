@@ -129,7 +129,13 @@ class PurchaseItemController extends Controller
 			return true;*/
 		}		
 	}
-		
+	/**
+     * 审核采购价格
+     *
+     * @param $id采购条目id
+	 * @param $costExamineStatus价格审核状态
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
 	public function costExamineStatus($id,$costExamineStatus){
 		$model=$this->model->find($id);
 		$data['costExamineStatus']=$costExamineStatus;
@@ -140,22 +146,9 @@ class PurchaseItemController extends Controller
 		}
 		}	
 		
-	/**
-     * 创建异常
-     *
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */	
-	public function activeCreate(){
-		$data['id']=json_decode(request()->get('purchaseItem_id'));
-		$data['active']=json_decode(request()->get('activeStatus'));
-		$data['active_status']=1;
-		$this->model->changActive($data);
-		return 1;
-	}
 
 	/**
-     * ajax编辑处理异常条目
+     * 去除采购单中异常条目
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -163,53 +156,11 @@ class PurchaseItemController extends Controller
 	public function cancelThisItem($id)
 	{
 		$model=$this->model->find($id);
-		$model->purchase_order_id=0;
-		$model->save();
+		$data['purchase_order_id']=0;
+		$model->update($data);
 	}
 	
-	
-	
-	/**
-     * 回传物流单号和运费
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function form_postCoding()
-	{
-		$data['postCoding']=request()->get('postCoding');
-		$data['purchaseItem_id']=request()->get('purchaseItem_id');
-		$data['postFee']=request()->get('postFee');
-		$this->model->fromPostCoding($data);
-		return 1;
-	}
-	
-	/**
-     * 回传采购价格
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function supplierCost()
-	{
-		$data['supplier_cost']=request()->get('supplierCost');
-		$data['id']=request()->get('purchaseItem_id');
-		$this->model->formSupplierCost($data);
-		return 1;
-	}
-	
-	/**
-     * 更改采购条目状态
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function changeStatus(){
-		$data['itemStatus']=request()->get('itemStatus');
-		$data['purchaseItem_id']=request()->get('purchaseItem_id');
-		$this->model->changeItemStatus($data);
-		return 1;
-	}
+
 }
 
 

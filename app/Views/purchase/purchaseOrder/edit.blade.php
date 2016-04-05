@@ -3,6 +3,7 @@
 @section('formBody')  
  <input type="hidden" name="_method" value="PUT"/>
  <input type="hidden" name="update_userid" value="2"/>
+ <input type="hidden" name="total_purchase_cost" value="0"/>
         <div class="panel-heading">单头</div>
         <div class="panel-body">
             <div class="form-group col-lg-4">
@@ -24,7 +25,7 @@
             </div>
             <div class="form-group col-lg-4">
                 <strong>订单成本</strong>:
-                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_cost}}  总成本{{ $model->total_postage + $model->total_cost}}
+                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>采购单状态</strong>:
@@ -69,6 +70,7 @@
             <td>状态</td>
             <td>物流单号+物流费</td>
             <td>采购价格</td>
+            <td>采购价格审核</td>
             <td>所属平台</td>
             <td>购买链接</td> 
             <td>操作</td>           
@@ -109,7 +111,21 @@
             </td>
             <td>
               <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
- 			</td>    
+ 			</td>
+            <td>
+            @if($purchaseItem->costExamineStatus ==2)
+            	价格审核通过
+            @elseif($purchaseItem->costExamineStatus ==1)
+            	价格审核不通过
+            @else
+             @if($purchaseItem->purchase_cost>0)
+            	<a href="/purchaseItem/costExamineStatus/{{$purchaseItem->id}}/1" class="btn btn-info btn-xs"> 审核不通过
+                </a> 
+                <a href="/purchaseItem/costExamineStatus/{{$purchaseItem->id}}/2" class="btn btn-info btn-xs"> 审核通过
+                </a>
+              @endif
+            @endif
+            </td>    
             <td>
                 @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
                     @if($purchaseItem->platform_id == $key)

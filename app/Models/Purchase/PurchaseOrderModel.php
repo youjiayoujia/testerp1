@@ -30,7 +30,7 @@ class PurchaseOrderModel extends BaseModel
     public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
     
 	 
-    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','examineStatus','post_coding','total_postage'];
+    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid'];
 	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
@@ -46,23 +46,6 @@ class PurchaseOrderModel extends BaseModel
 			 $PurchaseOrder->$key=$v;
 		 }
 		 	$PurchaseOrder->save();
-	}
-	
-	/*上报采购总成本
-	*
-	* @param $data
-    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
-	public function totalCost($purchase_order_id)
-	{
-		$purchaseItem=new PurchaseItemModel;
-		$sumPostage=$purchaseItem->where('purchase_order_id',$purchase_order_id)->where('costExamineStatus',2)->sum('postage');
-		$sumPurchasecost=$purchaseItem->where('purchase_order_id',$purchase_order_id)->where('costExamineStatus',2)->sum('purchase_cost');
-		$totalOrder=$this->find($purchase_order_id);
-		$totalOrder->total_postage=$sumPostage;
-		$totalOrder->total_cost=$sumPurchasecost;
-		$totalOrder->save();
-		
 	}
 	/*取消订单
 	*

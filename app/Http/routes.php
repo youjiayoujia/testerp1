@@ -74,6 +74,7 @@ Route::any('purchaseItem/form_postCoding', 'Purchase\PurchaseItemController@form
 Route::any('purchaseItem/supplierCost', 'Purchase\PurchaseItemController@supplierCost');
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
+Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 

@@ -130,6 +130,16 @@ class PurchaseItemController extends Controller
 		}		
 	}
 		
+	public function costExamineStatus($id,$costExamineStatus){
+		$model=$this->model->find($id);
+		$data['costExamineStatus']=$costExamineStatus;
+		$model->update($data);
+		$num=$this->model->where('purchase_order_id',$model->purchase_order_id)->where('costExamineStatus','<>',2)->count();
+		if($num==0){
+			PurchaseOrderModel::where('id',$model->purchase_order_id)->update(['costExamineStatus'=>2]);
+		}
+		}	
+		
 	/**
      * 创建异常
      *

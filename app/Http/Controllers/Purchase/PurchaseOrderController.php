@@ -52,6 +52,9 @@ class PurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+		if ($model->examineStatus !=2) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -90,16 +93,16 @@ class PurchaseOrderController extends Controller
 	public function update($id)
 	{
 		$model=$this->model->find($id);
-		if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+		if ($model->examineStatus !=2) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
-		$data=request()->all();
-		$model->update($data);
+		$data=request()->all();		
 		if(isset($data['arr'])){
 			foreach($data['arr'] as $k=>$v){
 				if($v['id']){
 					$purchaseItem=PurchaseItemModel::find($v['id']);
 					$itemPurchasePrice=$purchaseItem->item->product->purchase_price;
+					$purchase_num=$purchaseItem->item->product->purchase_num;
 					foreach($v as $key=>$vo){
 						$item[$key]=$vo;	
 					}
@@ -110,13 +113,21 @@ class PurchaseOrderController extends Controller
 						$item['costExamineStatus']=2;
 						}else{
 						$item['costExamineStatus']=0;	
-							}
+					}
+					if($item['status']>0){
+						$data['status']=1;
+						}
 					$purchaseItem->update($item);
+					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
 					unset($item);
 				}
 			}
 		}
-		
+		$num=PurchaseItemModel::where('purchase_order_id',$id)->where('costExamineStatus','<>',2)->count();
+		if($num ==0){
+			$data['costExamineStatus']=2;
+			}	
+		$model->update($data);
         return redirect($this->mainIndex);		
 	}
 	

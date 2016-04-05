@@ -153,20 +153,6 @@
                 </div>
             </div>
             <div class="form-group col-lg-2">
-                <label for="by_hand" class='control-label'>是否手工</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="by_hand" value="1" checked>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="by_hand" value="0" disabled>否
-                    </label>
-                </div>
-            </div>
-            <div class="form-group col-lg-2">
                 <label for="is_affair" class='control-label'>是否做账</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">

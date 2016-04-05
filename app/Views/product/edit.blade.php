@@ -31,14 +31,19 @@
                     @endforeach
                 </div>
                 <div class="form-group" style="margin-left:25px">
-                    <label>编辑图片</label><br>
+                    <?php $key=-1; ?>
                     @foreach($product->imageAll as $key=>$image)
+                        <?php if($product->default_image==$image->id){ ?>
+                            <label>编辑默认图片:</label><br>
+                        <?php }else{ ?>
+                            <label>编辑图片:</label><br>
+                        <?php } ?> 
                         <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image' type='file'/></div>
+                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $image->id ?>' type='file'/></div>
                         <br>
                     @endforeach
                 </div>
-                <?php if($key!=5){ ?>
+                <?php if($key<5){ ?>
                     <div style="margin-left:25px;margin-bottom:15px">
                             <label for="color">上传图片：</label>
                             <?php $j=0;for($i=$key;$i<5;$i++){ ?>

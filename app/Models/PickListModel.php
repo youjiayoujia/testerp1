@@ -93,16 +93,16 @@ class PickListModel extends BaseModel
      */
     public function createListItems($package)
     {
-        foreach($package->items as $packageitem)
+        foreach($package->item as $packageitem)
         {
             $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'picklist_id'=>'0'])->first();
             if(!$query) {
                 $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
-                $obj->pickListItemPackage()->create(['package_id' => $package->id]);
+                $obj->pickListItemPackages()->create(['package_id' => $package->id]);
             } else {
                 $query->quantity += $packageitem->quantity;
                 $query->save();
-                $query->pickListItemPackage()->create(['package_id' => $package->id]);
+                $query->pickListItemPackages()->create(['package_id' => $package->id]);
             }  
         }
     }
@@ -117,7 +117,7 @@ class PickListModel extends BaseModel
     public function getScore($package)
     {
         $buf = [];
-        foreach($package->items as $packageitem)
+        foreach($package->item as $packageitem)
         {
             $name = PositionModel::find($packageitem->warehouse_position_id)->name;
             $tmp = substr($name,1,1);
@@ -152,7 +152,7 @@ class PickListModel extends BaseModel
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                    foreach($picklistItem->pickListItemPackages as $listItemPackage) {
                         $package = PackageModel::find($listItemPackage->package_id);
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
@@ -169,7 +169,7 @@ class PickListModel extends BaseModel
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                    foreach($picklistItem->pickListItemPackages as $listItemPackage) {
                         $package = PackageModel::find($listItemPackage->package_id);
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
@@ -217,7 +217,7 @@ class PickListModel extends BaseModel
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                    foreach($picklistItem->pickListItemPackages as $listItemPackage) {
                         $package = PackageModel::find($listItemPackage->package_id);
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';
@@ -234,7 +234,7 @@ class PickListModel extends BaseModel
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
                     $picklistItem->save();
-                    foreach($picklistItem->pickListItemPackage as $listItemPackage) {
+                    foreach($picklistItem->pickListItemPackages as $listItemPackage) {
                         $package = PackageModel::find($listItemPackage->package_id);
                         $package->picklist_id = $obj->id;
                         $package->status = 'PICKING';

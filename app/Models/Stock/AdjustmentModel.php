@@ -39,7 +39,7 @@ class AdjustmentModel extends BaseModel
      *
      * @return
      */
-    public function adjustment()
+    public function adjustments()
     {
         return $this->hasMany('App\Models\Stock\AdjustFormModel', 'stock_adjustment_id', 'id');
     }

@@ -5,7 +5,7 @@
     <input type='hidden' name='_method' value='PUT'>
     <div class='row'>
         <div class="form-group col-lg-4">
-            <label for="item" class='control-label'>item</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control sku" placeholder="sku" name='sku' value="{{ old('sku') ? old('sku') : ($model->items ? $model->items->sku : '') }}">
         </div>
         <div class="form-group col-sm-4">

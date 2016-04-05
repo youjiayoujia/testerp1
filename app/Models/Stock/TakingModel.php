@@ -30,7 +30,7 @@ class TakingModel extends BaseModel
      *
      * @param none
      */
-    public function stockTakingForm()
+    public function stockTakingForms()
     {
         return $this->hasMany('App\Models\Stock\TakingFormModel', 'stock_taking_id', 'id');
     }

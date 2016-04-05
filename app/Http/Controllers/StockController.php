@@ -284,12 +284,16 @@ class StockController extends Controller
      */
     public function ajaxSku()
     {
-        $sku = request()->input('sku');
-        $count = ItemModel::where('sku', $sku)->count();
-        if($count)
-            return json_encode('true');
-        else 
-            return json_encode('false');
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $count = ItemModel::where('sku', $sku)->count();
+            if($count)
+                return json_encode('true');
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
     }
 
     /**

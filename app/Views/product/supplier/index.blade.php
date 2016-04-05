@@ -4,9 +4,9 @@
     <th>名称</th>
     <th>省</th>
     <th>市</th>
-    <th>经纬度</th>
-    <th>是否是线上供货商</th>
-    <th>线上供货商网址</th>
+    <th>详细地址</th>
+    <th>线上/线下</th>
+    <th>线上网址</th>
     <th class='sort' data-field='telephone'>电话</th>
     <th>采购员</th>
     <th class='sort' data-field='level'>评级</th>

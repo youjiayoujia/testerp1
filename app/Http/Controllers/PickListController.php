@@ -191,8 +191,8 @@ class PickListController extends Controller
      */
     public function ajaxPackageItemUpdate()
     {
-        $package_id = request()->input('package_id');
-        $sku = request()->input('sku');
+        $package_id = trim(request()->input('package_id'));
+        $sku = trim(request()->input('sku'));
         $package = PackageModel::find($package_id);
         if($package) {
             $items = $package->items;

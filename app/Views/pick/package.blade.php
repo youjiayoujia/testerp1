@@ -5,7 +5,7 @@
     <div class='row'>
         <div class='form-group col-lg-2'>
             <label>ID</label>
-            <input type='text' class='form-control' value={{ $model->picklist_id }}>
+            <input type='text' class='form-control' value={{ $model->picknum }}>
         </div>
         <div class='form-group col-lg-2'>
             <label>类型</label>
@@ -81,7 +81,6 @@ $(document).ready(function(){
                                 block.find('.status').text('已包装');
                             }
                         }
-
                         package_id = block.find('.package_id').text();
                         sku = row.find('.sku').text();
                         $.ajax({

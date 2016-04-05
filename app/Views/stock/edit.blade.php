@@ -6,11 +6,7 @@
     <div class='row'>
         <div class="form-group col-lg-4">
             <label for="item" class='control-label'>item</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='item_id' class='form-control'>
-                @foreach($items as $item)
-                <option value={{$item->id}} {{ old('item_id') ? old('item_id') == $item->id ? 'selected' : '' : $item->id == $model->item_id ? 'selected' : '' }}>{{$item->sku}}</option>
-                @endforeach
-            </select>
+            <input type='text' class="form-control sku" placeholder="sku" name='sku' value="{{ old('sku') ? old('sku') : ($model->items ? $model->items->sku : '') }}">
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -23,11 +19,7 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouse_position_id' id='warehouse_position_id' class='form-control'>
-                @foreach($positions as $position)
-                    <option value={{ $position->id }} {{ old('warehouse_position_id') ? old('warehouse_position_id') == $position->id ? 'selected' : '' : $model->warehouse_position_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
-                @endforeach
-            </select>
+            <input type='text' class="form-control warehouse_position_id" placeholder="库位" name='warehouse_position_id' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : ($model->position ? $model->position->name : '') }}">
         </div>
     </div>
     <div class='row'>
@@ -59,19 +51,42 @@
             }
         });
 
-        $('#warehouse_id').change(function(){
-            val = $('#warehouse_id').val();
-            $.ajax({
-                url: "{{ route('position.getPosition') }}",
-                data: {val:val},
-                dataType:'json',
-                type:'get',
-                success:function(result){
-                    $('#warehouse_position_id').empty();
-                    for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i].id+'>'+result[i].name+'</option>').appendTo($('#warehouse_position_id'));
-                }
-            });
+        $('.sku').blur(function(){
+            tmp = $(this);
+            sku = $(this).val();
+            if(sku) {
+                $.ajax({
+                    url:"{{ route('stock.ajaxSku') }}",
+                    data:{sku:sku},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result) {
+                        if(result == 'false') {
+                            alert('sku不存在');
+                            tmp.val('');
+                        }
+                    }
+                })
+            }
+        });
+
+        $('.warehouse_position_id').blur(function(){
+            tmp = $(this);
+            position = $(this).val();
+            if(position) {
+                $.ajax({
+                    url:"{{ route('stock.ajaxPosition') }}",
+                    data:{position:position},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result) {
+                        if(result == 'false') {
+                            alert('库位不存在');
+                            tmp.val('');
+                        }
+                    }
+                })
+            }
         });
     });
 </script>

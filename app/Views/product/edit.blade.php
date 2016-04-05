@@ -30,15 +30,22 @@
                         </div>
                     @endforeach
                 </div>
-                <div style="margin-left:25px;margin-bottom:15px">
-                        <label for="color">上传图片：</label>
-                        <div class='upimage'><input name='image0' type='file'/></div>
-                        <div class='upimage'><input name='image1' type='file'/></div>
-                        <div class='upimage'><input name='image2' type='file'/></div>
-                        <div class='upimage'><input name='image3' type='file'/></div>
-                        <div class='upimage'><input name='image4' type='file'/></div>
-                        <div class='upimage'><input name='image5' type='file'/></div>
-                </div>              
+                <div class="form-group" style="margin-left:25px">
+                    <label>编辑图片</label><br>
+                    @foreach($product->imageAll as $key=>$image)
+                        <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px">
+                        <div class='upimage' style="float:right"><input name='replace_image' type='file'/></div>
+                        <br>
+                    @endforeach
+                </div>
+                <?php if($key!=5){ ?>
+                    <div style="margin-left:25px;margin-bottom:15px">
+                            <label for="color">上传图片：</label>
+                            <?php $j=0;for($i=$key;$i<5;$i++){ ?>
+                                <div class='upimage'><input name='image<?php echo $j ?>' type='file'/></div>
+                            <?php $j++;} ?>
+                    </div>
+                <?php } ?>  
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>

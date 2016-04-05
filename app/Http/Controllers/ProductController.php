@@ -35,7 +35,7 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'suppliers' => $this->supplier->all(),
-            'warehouses' => $this->warehouse->where('type','本地仓库')->get(),
+            'warehouses' => $this->warehouse->where('type','local')->get(),
         ];
 
         return view($this->viewPath . 'create', $response);

@@ -34,7 +34,7 @@
             </div>
              <div class="form-group col-lg-4">
                 <strong>产品名</strong>:
-                {{$model->purchaseItem->product->name}}
+                {{$model->item->product->name}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>采购数量/已到数量/仍需采购数量</strong>:
@@ -42,7 +42,7 @@
             </div>
             <div class="form-group col-lg-4">
            		<strong>产品样图</strong>:
-                <img src="{{ asset($model->purchaseItem->product->image->src) }}" width="100px">
+                <img src="{{ asset($model->item->product->image->src) }}" width="100px">
             </div>
             <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:

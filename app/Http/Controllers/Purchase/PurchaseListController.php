@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseItemModel;
+use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\ItemModel;
@@ -36,43 +37,32 @@ class PurchaseListController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>','0')),
+            'data' => $this->autoList($this->model->where('status','>','0')->orderBy('status')),
         ];
         return view($this->viewPath . 'index', $response);
     }
 	
 	/**
-     * 创建采购条目页面
+     * 对单界面
      *
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-	
-	public function create()
-	{
-		 $response = [
-			'metas' => $this->metas(__FUNCTION__),
-			'warehouse' => WarehouseModel::all(),
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
         ];
-        return view($this->viewPath . 'create', $response);		
-	}
+        return view($this->viewPath . 'edit', $response);
+    }
 	
 	/**
-     * 创建采购条目
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function store()
-	{
-		$data=request()->all();
-		$this->model->purchasestore($data);
-        return redirect($this->mainIndex);		
-	}
-	
-	/**
-     * 采购条目对单
+     * 对单
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -80,8 +70,8 @@ class PurchaseListController extends Controller
 	
 	public function update($id)
 	{
-		$data=request()->all();
-		$this->model->purchaseListUpdate($id,$data);
+		$model=request()->all();
+		$model->uopdate($data);
         return redirect($this->mainIndex);		
 	}
 	
@@ -106,6 +96,28 @@ class PurchaseListController extends Controller
         ];
         return view($this->viewPath . 'changeActive', $response);
 			
+	}
+	/**
+     * 批量对单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function examinePurchaseItem()
+	{
+		$purchaseItemIds=explode(',',request()->get('purchase_ids'));
+		$arrayItems=$this->model->find($purchaseItemIds);
+		foreach($arrayItems as $vo)
+		{
+			$vo->update(['status'=>2,'arrival_num'=>$vo->purchase_num,'lack_num'=>0]);
+			$num=$this->model->where('purchase_order_id',$vo->purchase_order_id)->where('status','<>',2)->count();
+			$purchaseOrder=PurchaseOrderModel::find($vo->purchase_order_id);
+			if($num==0){
+				$purchaseOrder->update(['status'=>3]);
+			}
+		}
+		return 1;
+		
 	}
 	
 	public function stockIn($id){

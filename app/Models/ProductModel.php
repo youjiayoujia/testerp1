@@ -285,8 +285,6 @@ class ProductModel extends BaseModel
                     $this->featureValues()->attach($feature_value_arr);
                 }
             }
-            //echo "<pre>";
-            //print_r($files);exit;
             //更新图片
             $data['product_id'] = $this->id;
             $data['spu_id'] = $spu_id;
@@ -296,18 +294,17 @@ class ProductModel extends BaseModel
             foreach ($files as $key => $file) {
                 if ($file != '') {
                     if(substr($key,0,5)=='image'){
-                        $image_id = $imageModel->singleCreate($data, $file, $key);
-                        //if ($key == 'image0') {
-                        //    $default_image_id = $image_id;
-                        //}                        
+                        $image_id = $imageModel->singleCreate($data, $file, $key);                       
                     }else{
                         $product_image_id = substr($key,14);
                         $imageModel->destroy($product_image_id);
                         $image_id = $imageModel->singleCreate($data, $file, $key);
+                        if($this->default_image==$product_image_id){
+                            $data['default_image'] = $image_id;
+                        }
                     }
                     
                 }
-                //$data['default_image'] = $default_image_id;
             }
             
             $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '':implode(',', $data['carriage_limit_arr']);

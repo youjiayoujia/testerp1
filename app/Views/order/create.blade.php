@@ -153,6 +153,20 @@
                 </div>
             </div>
             <div class="form-group col-lg-2">
+                <label for="by_hand" class='control-label'>是否手工</label>
+                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="by_hand" value="1" checked>是
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="by_hand" value="0" disabled>否
+                    </label>
+                </div>
+            </div>
+            <div class="form-group col-lg-2">
                 <label for="is_affair" class='control-label'>是否做账</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
@@ -375,7 +389,7 @@
                 <div class="form-group col-sm-2">
                     <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
                         @foreach(config('order.product_status') as $product_status_key => $status)
-                            <option value="{{ $product_status_key }}" {{ old('arr[status][0]') == $product_status_key ? 'selected' : '' }}>
+                            <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
                                 {{ $status }}
                             </option>
                         @endforeach

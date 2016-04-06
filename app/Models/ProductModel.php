@@ -390,14 +390,47 @@ class ProductModel extends BaseModel
      */
     public function updateProductImage($data,$files = null)
     {   
+        DB::beginTransaction();
         $imageModel = new ImageModel();
-        $imageModel->imageCreate($data,$files);
+        foreach ($files as $key => $file) {
+            if ($file != '') {
+                if(substr($key,0,5)=='image'){
+                    $image_id = $imageModel->singleCreate($data, $file, $key);                       
+                }else{
+                    $type_array=explode('_',$key);
+                    $type = $type_array[0];
+                    switch ($type) {
+                        case 'ebay':
+                            $data['type'] = 'ebay';
+                            break;
+
+                        case 'amazon':
+                            $data['type'] = 'amazon';
+                            break;
+
+                        case 'aliexpress':
+                            $data['type'] = 'aliexpress';
+                            break;
+
+                        case 'original':
+                            $data['type'] = 'original';
+                            break;
+                    }
+                    $product_image_id = $type_array[2];
+                    $imageModel->destroy($product_image_id);
+                    $image_id = $imageModel->singleCreate($data, $file, $key);
+                }
+                
+            }
+        }
+
         $data['edit_status'] = $data['edit'];
         $this->update($data);
         //ERP中如果该产品之前没有创建item,并且是审核,就创建item
         if($data['edit']==2&&empty($this->item->toArray())){
             $this->createItem();
         }
+        DB::commit();
     }
 
     /**

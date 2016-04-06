@@ -4,12 +4,12 @@
 	<input type='hidden' value='{{$model->id}}' name="id" >
     <input type="hidden" name="user_id" value="1">
     <div class="form-group col-lg-12">
-        <label class='control-label'>SPU ID</label>
-        <input class="form-control" type="text" name='spu_id' value='{{$model->spu_id}}'/>
+        <!--<label class='control-label'>SPU ID</label>-->
+        <input class="form-control" type="hidden" name='spu_id' value='{{$model->spu_id}}'/>
     </div>
     <div class="form-group col-lg-12">
-        <label class='control-label'>产品ID</label>
-        <input class="form-control" type="text" name='product_id' value='{{$model->id}}'/>
+        <!--<label class='control-label'>产品ID</label>-->
+        <input class="form-control" type="hidden" name='product_id' value='{{$model->id}}'/>
     </div>
     <div class="form-group col-lg-12">
         <label for="color">图片类型：</label>
@@ -39,15 +39,53 @@
         </label>
         <input type="file" name='zip'/>
     </div>
-    <?php if(count($model->imageAll->toArray())>0){ ?>
+    <br>
+    <?php if(count($model->imageAll->where("type",'original')->toArray())>0){ ?>
     <div class="panel panel-default">
-        <div class="panel-heading">产品图片 :</div>
-        <div class="panel-body">
-            <?php foreach($model->imageAll as $image){ ?>
-            <img src="{{ asset($image->path) }}/{{$image->name}}" width="300px" >
+        <div class="panel-heading">original :</div>
+        <?php foreach($model->imageAll->where("type",'original') as $image){ ?>
+            <div class="panel-body">
+                <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+                <div class='upimage' style="float:right"><input name='original_image_<?php echo $image->id ?>' type='file'/></div>
+                <br>
+            </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+    <?php if(count($model->imageAll->where("type",'amazon')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">Amazon :</div>
+        <?php foreach($model->imageAll->where("type",'amazon') as $image){ ?>
+            <div class="panel-body">
+                <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+                <div class='upimage' style="float:right"><input name='amazon_image_<?php echo $image->id ?>' type='file'/></div>
+                <br>
+            </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+    <?php if(count($model->imageAll->where("type",'ebay')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">Ebay :</div>
+        <?php foreach($model->imageAll->where("type",'ebay') as $image){ ?>
+            <div class="panel-body">   
+                <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+                <div class='upimage' style="float:right"><input name='ebay_image_<?php echo $image->id ?>' type='file'/></div>
+                <br>
+            </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+    <?php if(count($model->imageAll->where("type",'aliexpress')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">aliexpress :</div>
+        <?php foreach($model->imageAll->where("type",'aliexpress') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='aliexpress_image_<?php echo $image->id ?>' type='file'/></div>
             <br>
-            <?php } ?>
         </div>
+        <?php } ?>
     </div>
     <?php } ?>
 @stop

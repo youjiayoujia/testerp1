@@ -64,4 +64,14 @@ class TakingModel extends BaseModel
     {
         return $this->belongsTo('App\Models\UserModel', 'stock_taking_by', 'id');
     }
+
+    /**
+     * get the relationship between the two module 
+     *
+     * @param none
+     */
+    public function adjustmentByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'adjustment_by', 'id');
+    }
 }

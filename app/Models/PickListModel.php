@@ -93,7 +93,7 @@ class PickListModel extends BaseModel
      */
     public function createListItems($package)
     {
-        foreach($package->item as $packageitem)
+        foreach($package->items as $packageitem)
         {
             $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'picklist_id'=>'0'])->first();
             if(!$query) {
@@ -117,7 +117,7 @@ class PickListModel extends BaseModel
     public function getScore($package)
     {
         $buf = [];
-        foreach($package->item as $packageitem)
+        foreach($package->items as $packageitem)
         {
             $name = PositionModel::find($packageitem->warehouse_position_id)->name;
             $tmp = substr($name,1,1);

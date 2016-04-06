@@ -94,9 +94,9 @@ class AllotmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['stock_allotment_id'] = $obj->id;
-            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>$buf['warehouse_position_id']])->first()->id;
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
-            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
+            $buf['item_id'] = ItemModel::where('sku', trim($buf['sku']))->first()->id;
             AllotmentFormModel::create($buf);
             $item = ItemModel::find($buf['item_id']);
             $item->hold($buf['warehouse_position_id'], $buf['quantity']);

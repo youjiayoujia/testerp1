@@ -27,9 +27,6 @@
                 <a href="{{ route('stock.show', ['id'=>$stock->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('stock.edit', ['id'=>$stock->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $stock->id }}"
                    data-url="{{ route('stock.destroy', ['id' => $stock->id]) }}">

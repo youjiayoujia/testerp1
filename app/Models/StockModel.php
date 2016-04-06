@@ -53,7 +53,7 @@ class StockModel extends BaseModel
             'warehouse_id' => 'required|integer',
             'warehouse_position_id' => 'required',
             'all_quantity' => 'required|integer',
-            'unit_price' => 'required|numeric',
+            'amount' => 'required|numeric',
         ],
     ];
 

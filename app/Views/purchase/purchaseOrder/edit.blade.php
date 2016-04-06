@@ -140,10 +140,19 @@
             @if($purchaseItem->active ==1)
             <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> 
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
+            @elseif($purchaseItem->active > 1)
+             @foreach(config('purchase.purchaseItem.active') as $key=>$v)
+             	@if($key ==$purchaseItem->active)
+            	{{$v}}
+            	@endif
+             @endforeach
+            <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @else
             <select name="arr[{{$k}}][active]}">
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)
+             	@if($key < 3)
             	<option value="{{$key}}" >{{$v}}</option>
+            	@endif
              @endforeach
             </select>
              @endif

@@ -102,7 +102,7 @@ class PurchaseOrderController extends Controller
 				if($v['id']){
 					$purchaseItem=PurchaseItemModel::find($v['id']);
 					$itemPurchasePrice=$purchaseItem->item->product->purchase_price;
-					$purchase_num=$purchaseItem->item->product->purchase_num;
+					$purchase_num=$purchaseItem->purchase_num;
 					foreach($v as $key=>$vo){
 						$item[$key]=$vo;	
 					}
@@ -111,12 +111,12 @@ class PurchaseOrderController extends Controller
 					}
 					if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
 						$item['costExamineStatus']=2;
-						}else{
+					}else{
 						$item['costExamineStatus']=0;	
 					}
 					if($item['status']>0){
 						$data['status']=1;
-						}
+					}
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
 					unset($item);
@@ -128,7 +128,7 @@ class PurchaseOrderController extends Controller
 			$data['costExamineStatus']=2;
 			}	
 		$model->update($data);
-        return redirect($this->mainIndex);		
+        return redirect( route('purchaseOrder.edit', $id));		
 	}
 	
 	/**
@@ -174,6 +174,23 @@ class PurchaseOrderController extends Controller
 		$this->model->cancelOrderItems($id);
 		return redirect($this->mainIndex);	
 	}
+	
+	/**
+     * 批量审核采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function examinePurchaseOrder(){
+		$purchaseOrderIds=request()->get('purchase_ids');
+		$arrayIds=explode(',',$purchaseOrderIds);
+		$purchaseOrders=$this->model->find($arrayIds);
+			foreach($purchaseOrders as $vo){
+				$vo->update(['examineStatus'=>2]);
+				}
+		return 1;
+		}
+		
 }
 
 

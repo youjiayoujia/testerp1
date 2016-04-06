@@ -11,7 +11,7 @@
 namespace App\Http\Controllers\Purchase;
 
 use App\Http\Controllers\Controller;
-use App\Models\Purchase\PurchaseListModel;
+use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\ItemModel;
@@ -21,11 +21,9 @@ use App\Models\Warehouse\PositionModel;
 class PurchaseListController extends Controller
 {
 
-    public function __construct(PurchaseListModel $purchaseList,WarehouseModel $warehouse,SupplierModel $supplier,StockModel $stock,PositionModel $position)
+    public function __construct(PurchaseItemModel $purchaseList,StockModel $stock,PositionModel $position)
     {
         $this->model = $purchaseList;
-		$this->warehouse = $warehouse;
-		$this->supplier=$supplier;
 		$this->stock=$stock;
 		$this->position=$position;
         $this->mainIndex = route('purchaseList.index');
@@ -38,7 +36,7 @@ class PurchaseListController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model->where('status','>','0')),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -54,7 +52,7 @@ class PurchaseListController extends Controller
 	{
 		 $response = [
 			'metas' => $this->metas(__FUNCTION__),
-			'warehouse' => $this->warehouse->all(),
+			'warehouse' => WarehouseModel::all(),
         ];
         return view($this->viewPath . 'create', $response);		
 	}
@@ -100,7 +98,7 @@ class PurchaseListController extends Controller
 	{
 		$res=$this->model->find($id);
 		$second_supplier_id=$res->purchaseItem->second_supplier_id;
-		$second_supplier=$this->supplier->find($second_supplier_id);	
+		$second_supplier=SupplierModel::find($second_supplier_id);	
 		$response = [
 			'metas' => $this->metas(__FUNCTION__),
 			'abnormal' => $res,

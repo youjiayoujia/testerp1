@@ -144,7 +144,8 @@ class PurchaseItemController extends Controller
 		if($num==0){
 			PurchaseOrderModel::where('id',$model->purchase_order_id)->update(['costExamineStatus'=>2]);
 		}
-		}	
+		return redirect( route('purchaseOrder.edit', $model->purchase_order_id));	
+	}	
 		
 
 	/**
@@ -156,8 +157,17 @@ class PurchaseItemController extends Controller
 	public function cancelThisItem($id)
 	{
 		$model=$this->model->find($id);
+		$purchaseOrderId=$model->purchase_order_id;
 		$data['purchase_order_id']=0;
 		$model->update($data);
+		$num=$this->model->where('purchase_order_id',$purchaseOrderId)->count();
+		if($num==0)
+		{
+			PurchaseOrderModel::destroy($purchaseOrderId);	
+			return redirect(route('purchaseOrder.index'));
+		}else{
+			return redirect( route('purchaseOrder.edit', $purchaseOrderId));
+		}
 	}
 	
 

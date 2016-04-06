@@ -78,6 +78,7 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 
 //采购单
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\purchaseOrderController@changeExamineStatus');
+Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
 Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');

@@ -55,8 +55,8 @@ class ZoneController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'countries'=>CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
-            'selectedCountries'=>$selectedCountries,
+            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'selectedCountries' => $selectedCountries,
         ];
         return view($this->viewPath . 'edit', $response);
     }

@@ -60,7 +60,7 @@ class CodeController extends Controller
 
     /**
      * 批量上传物流号页面
-     * @param $logistic_id
+     * @param $logistics_id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function batchAddTrCode($logistics_id)
@@ -79,8 +79,8 @@ class CodeController extends Controller
      */
     public function batchAddTrCodeFn()
     {
-        if(request()->has('logistic_id')){
-            $logistic_id = request()->input('logistic_id');
+        if(request()->has('logistics_id')){
+            $logistics_id = request()->input('logistics_id');
         }else{
             return redirect('batchAddTrCode')->with('alert', $this->alert('danger', $this->mainTitle . '未选择物流方式.'));
         }
@@ -90,13 +90,13 @@ class CodeController extends Controller
             if (request()->file('trackingnos')->isValid()) {
                 $file = request()->file('trackingnos');
                 $destinationPath = public_path() . '/uploads/logistics/codes';
-                $fileName = date("Y-m-d", time()) . '-' . rand(100, 999) . '-' . $file->getClientOriginalName();
+                $fileName = date("Y-m-d", time()) . '-' . rand(100000, 999999) . '-' . $file->getClientOriginalName();
                 request()->file('trackingnos')->move($destinationPath, $fileName);
             }else{
-                return redirect('batchAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger',  '文件非法'));
+                return redirect('batchAddTrCode/'.$logistics_id)->with('alert', $this->alert('danger',  '文件非法'));
             }
         }else{
-            return redirect('batchAddTrCode/'.$logistic_id)->with('alert', $this->alert('danger',  '未上传任何文件'));
+            return redirect('batchAddTrCode/'.$logistics_id)->with('alert', $this->alert('danger',  '未上传任何文件'));
         }
 
         //写操作
@@ -113,7 +113,7 @@ class CodeController extends Controller
                     $repeatNumber++;
                 }else{
                     $nowTime = date('Y-m-d H:i:s',time());
-                    $data = ['logistics_id'=>$logistic_id, 'code'=>$data[0], 'status'=>"N", 'created_at'=>$nowTime, 'updated_at'=>$nowTime];
+                    $data = ['logistics_id'=>$logistics_id, 'code'=>$data[0], 'status'=>"0", 'created_at'=>$nowTime, 'updated_at'=>$nowTime];
                     //插入
                     $this->model->create($data);
                     $successNumber++;
@@ -137,7 +137,7 @@ class CodeController extends Controller
 
     /**
      * 扫描录入物流号页面
-     * @param $logistic_id
+     * @param $logistics_id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function scanAddTrCode($logistics_id)
@@ -156,8 +156,8 @@ class CodeController extends Controller
      */
     public function scanAddTrCodeFn()
     {
-        if(request()->has('logistic_id')){
-            $logistic_id = request()->input('logistic_id');
+        if(request()->has('logistics_id')){
+            $logistics_id = request()->input('logistics_id');
         }else{
             return redirect('batchAddTrCode')->with('alert', $this->alert('danger', $this->mainTitle . '未选择物流方式.'));
         }
@@ -181,7 +181,7 @@ class CodeController extends Controller
                     $repeatNumber++;
                 }else{
                     $nowTime = date('Y-m-d H:i:s',time());
-                    $data = ['logistics_id'=>$logistic_id, 'code'=>$input_code, 'status'=>"N", 'created_at'=>$nowTime, 'updated_at'=>$nowTime];
+                    $data = ['logistics_id'=>$logistics_id, 'code'=>$input_code, 'status'=>"0", 'created_at'=>$nowTime, 'updated_at'=>$nowTime];
                     $this->model->create($data);
                     $successNumber++;
                 }
@@ -198,7 +198,7 @@ class CodeController extends Controller
             return redirect('logisticsCode')->with('alert', $this->alert('success', $content));
 
         }else{
-            return redirect('scanAddTrCode/'.$logistic_id)->with('alert', $this->alert('success',  '未输入任何物流号！'));
+            return redirect('scanAddTrCode/'.$logistics_id)->with('alert', $this->alert('success',  '未输入任何物流号！'));
         }
     }
 }

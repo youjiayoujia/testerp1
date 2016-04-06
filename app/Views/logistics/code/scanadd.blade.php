@@ -19,20 +19,22 @@
 @section('formAction') {{ route('scanAddTrCodeFn') }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
-    <div class="col-lg-4">
-        <strong>当前物流方式</strong>: {{ $logistics->logistics_type }}
+    <div class="row">
+        <div class="col-lg-4">
+            <strong>当前物流方式</strong>: {{ $logistics->logistics_type }}
+        </div>
+        <div class="col-lg-4">
+            <strong>当前物流方式简码</strong>: {{ $logistics->short_code }}
+        </div>
+        <br/>
+        <br/>
+        <div class="form-group col-lg-12" style="width:1200px;">
+            <label for="url" class="control-label">扫码输入(后回车)：</label>
+            <input type="hidden" name="logistics_id" value="{{ $logistics->id }}">
+            <input type="text" id="scan_input" class="form-control" name="scan_input" value="" style="width:300px;">
+        </div>
     </div>
-    <div class="col-lg-4">
-        <strong>当前物流方式简码</strong>: {{ $logistics->short_code }}
-    </div>
-    <br/>
-    <br/>
-    <div class="form-group col-lg-12" style="width:1200px;">
-        <label for="url" class="control-label">扫码输入(后回车)：</label>
-        <input type="hidden" name="logistics_id" value="{{ $logistics->id }}">
-        <input type="text" id="scan_input" class="form-control" name="scan_input" value="" style="width:300px;">
-    </div>
-    <div class="form-group col-lg-12" style="width:1200px;height:250px;float:left;clear: left;border:1px solid gray;" id="add_delete_div">
+    <div class="form-group col-lg-12" style="width:1200px;height:250px;float:left;clear:left;border:1px solid gray;" id="add_delete_div">
     </div>
 @stop
 <script type='text/javascript'>

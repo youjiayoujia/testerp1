@@ -22,7 +22,7 @@ class CreateLogisticses extends Migration
             $table->string('type')->comment('物流商物流方式')->default(NULL);
             $table->string('url')->comment('物流追踪网址')->default(NULL);
             $table->string('api_docking')->comment('API对接方式')->default(NULL);
-            $table->enum('is_enable', ['N', 'Y'])->comment('是否启用')->default(NULL);
+            $table->integer('is_enable')->comment('是否启用')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

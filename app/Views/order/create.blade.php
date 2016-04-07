@@ -106,7 +106,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="address_confirm" id="address_confirm">
                     @foreach(config('order.address') as $address_key => $address)
-                        <option value="{{ $address_key }}" {{ old('address_confirm') == $address_key ? 'selected' : '' }}>
+                        <option value="{{ $address_key }}" {{ $address_key == '1' ? 'selected' : '' }}>
                             {{ $address }}
                         </option>
                     @endforeach
@@ -152,7 +152,7 @@
                     </label>
                 </div>
             </div>
-            <div class="form-group col-lg-2">
+            <div class="form-group col-lg-2" id="hand">
                 <label for="by_hand" class='control-label'>是否手工</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
@@ -428,6 +428,9 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             $('#create_time, #payment_date, #affair_time').cxCalendar();
+
+            //隐藏
+            document.getElementById('hand').style.display='none';
 
             var current = 1;
             $('#addItem').click(function () {

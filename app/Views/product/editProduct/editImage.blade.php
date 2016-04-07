@@ -88,12 +88,44 @@
         <?php } ?>
     </div>
     <?php } ?>
+
+    <!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               请填写审核不通过原因
+            </h4>
+         </div>
+         <input type="text" class="modal-body" name="image_edit_not_pass_remark" style="margin:10px 0px 10px 50px;width:500px;" value="{{ old('image_edit_not_pass_remark') ?  old('image_edit_not_pass_remark') : $model->image_edit_not_pass_remark }}"/>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">关闭
+            </button>
+            <button type="submit" class="btn btn-primary" name='edit' value='5'>
+               提交
+            </button>
+         </div>
+      </div>
+</div>
+</div>
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success" name='edit' value='1'>保存</button>
-    <button type="submit" class="btn btn-success" name='edit' value='2'>审核</button>
+    <button type="submit" class="btn btn-success" name='edit' value='2'>审核通过</button>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">图片审核不通过</button>
     <button type="reset" class="btn btn-default">取消</button>
+    
 @show{{-- 表单按钮 --}}
+
+
+
 <script type="text/javascript">
     function checkType() {
         var uploadType = $("#checkType [name='uploadType']:checked").val();

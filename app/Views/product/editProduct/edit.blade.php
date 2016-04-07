@@ -163,9 +163,36 @@
 
     </tbody>
 </table>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               请填写资料审核不通过原因
+            </h4>
+         </div>
+         <input type="text" class="modal-body" name="data_edit_not_pass_remark" style="margin:10px 0px 10px 50px;width:500px;" value="{{ old('data_edit_not_pass_remark') ?  old('data_edit_not_pass_remark') : $model->data_edit_not_pass_remark }}"/>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">关闭
+            </button>
+            <button type="submit" class="btn btn-primary" name='edit' value='4'>
+               提交
+            </button>
+         </div>
+      </div>
+</div>
+</div>
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success" name='edit' value='0'>保存</button>
-    <button type="submit" class="btn btn-success" name='edit' value='1'>审核</button>
+    <button type="submit" class="btn btn-success" name='edit' value='1'>资料审核通过</button>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
     <button type="reset" class="btn btn-default">取消</button>
 @show{{-- 表单按钮 --}}

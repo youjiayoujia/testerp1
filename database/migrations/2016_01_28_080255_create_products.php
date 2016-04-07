@@ -41,6 +41,8 @@ class CreateProducts extends Migration
             $table->tinyInteger('status')->comment('上下架状态')->nullable()->default(0);
             $table->tinyInteger('edit_status')->comment('编辑状态')->nullable()->default(0);
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
+            $table->string('image_edit_not_pass_remark')->comment('图片审核不通过备注')->nullable()->default(NULL);
+            $table->string('data_edit_not_pass_remark')->comment('资料审核不通过备注')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -67,7 +67,19 @@
 
                 case '3':
                     ?>
-                    <td>审核通过</td>
+                    <td>撤销审核</td>
+                    <?php
+                    break;
+
+                case '4':
+                    ?>
+                    <td>资料审核不通过</td>
+                    <?php
+                    break;
+
+                case '5':
+                    ?>
+                    <td>图片审核不通过</td>
                     <?php
                     break;
             } ?>
@@ -83,11 +95,11 @@
                            data-status="3" >
                             <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>撤销审核</span>
                     </a>
-                <?php }elseif($product->edit_status==3||$product->edit_status==0){ ?>
+                <?php }elseif($product->edit_status==3||$product->edit_status==0||$product->edit_status==4){ ?>
                     <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                     </a>
-                <?php }elseif($product->edit_status==1){ ?>
+                <?php }elseif($product->edit_status==1||$product->edit_status==5){ ?>
                     <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                     </a>  

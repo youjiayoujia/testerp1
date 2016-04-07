@@ -79,6 +79,8 @@ class ProductModel extends BaseModel
         'status',
         'edit_status',
         'remark',
+        'image_edit_not_pass_remark',
+        'data_edit_not_pass_remark',
         'spu_id',
         'second_supplier_id',
         'supplier_sku'

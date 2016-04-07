@@ -50,7 +50,7 @@
             @foreach($adjustments as $key => $adjustment)
                 <div class='row'>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $adjustment->items->sku }}">
+                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $adjustment->item->sku }}">
                     </div>
                     <div class='form-group col-sm-2'>
                         <select name='arr[type][{{$key}}]' class='form-control type'>

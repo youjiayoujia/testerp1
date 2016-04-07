@@ -1,7 +1,5 @@
-@extends('common.form')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-@section('formAction') {{ route('stockTaking.takingCheckResult', ['id' => $model->id]) }} @stop
-@section('formBody')
+@extends('common.detail')
+@section('detailBody')
 <div class="row">
     <div class="form-group col-sm-3">
         <label for="盘点表id" class='control-label'>盘点表id</label>
@@ -75,15 +73,6 @@
             </div>
             @endif
         @endforeach
-    </div>
-</div>
-<div class='form-group row'>
-    <div class='col-lg-4'>
-        <label for='checkout'>审核结果</label>
-        <select name='result' class='form-control'>
-            <option value='1'>审核通过</option>
-            <option value='0'>拒绝</option>
-        </select>
     </div>
 </div>
 @stop

@@ -146,6 +146,7 @@ Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotme
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 
 //库存盘点
+Route::get('StockTaking/takingAdjustmentShow/{id}', ['uses'=>'Stock\TakingController@takingAdjustmentShow', 'as'=>'StockTaking.takingAdjustmentShow']);
 Route::get('StockTaking/takingCreate', ['uses' => 'Stock\TakingController@ajaxtakingCreate', 'as' => 'stockTaking.takingCreate']);
 Route::get('StockTaking/takingCheck/{id}', ['uses' => 'Stock\TakingController@takingCheck', 'as' => 'stockTaking.takingCheck']);
 Route::post('StockTaking/takingCheckResult/{id}', ['uses' => 'Stock\TakingController@takingCheckResult', 'as' => 'stockTaking.takingCheckResult']);

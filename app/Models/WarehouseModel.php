@@ -44,7 +44,7 @@ class WarehouseModel extends BaseModel
      *  @return
      *
      */
-    public function position()
+    public function positions()
     {
         return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouse_id' ,'id');
     }

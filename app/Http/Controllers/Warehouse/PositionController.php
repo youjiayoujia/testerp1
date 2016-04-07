@@ -79,8 +79,8 @@ class PositionController extends Controller
         $model->update(request()->all());
         if(request()->input('is_available') == '0')
         {
-            if($model->stock) {
-                $stocks = $model->stock;
+            if($model->stocks) {
+                $stocks = $model->stocks;
                 foreach($stocks as $stock) {
                     $stock->delete();
                 }
@@ -102,8 +102,8 @@ class PositionController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        if($model->stock) {
-            $stocks = $model->stock;
+        if($model->stocks) {
+            $stocks = $model->stocks;
             foreach($stocks as $stock) {
                 $stock->delete();
             }

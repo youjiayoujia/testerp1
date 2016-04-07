@@ -28,12 +28,9 @@ use App\Models\PackageModel;
 
 class TestController extends Controller
 {
-
     public function test()
     {
-        $users = UserModel::firstOrCreate(['name' => 'dj132', 'email' => '3114@qq.com']);
-
-        var_dump($users->toArray());exit;
+        var_dump(request('id'));
     }
 /**
      * 投诉excel导出
@@ -116,8 +113,8 @@ class TestController extends Controller
 //         //  }
 //     }
 
-    public function test1($url)
-    {
-        var_dump($url);
-    }
+    // public function test1($url)
+    // {
+    //     var_dump($url);
+    // }
 }

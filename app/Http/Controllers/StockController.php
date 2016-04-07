@@ -55,59 +55,9 @@ class StockController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $stock = $this->model->create(request()->all());
-        $stock->available_quantity = request()->input('all_quantity');
-        $stock->warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        $stock->item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
-        $stock->amount = round((request()->input('all_quantity') * request()->input('unit_price')), 2);
-        $stock->save();
-        ItemModel::find($stock->item_id)->in($stock->warehouse_position_id, $stock->all_quantity, $stock->amount);
-
-        return redirect($this->mainIndex);
-    }
-
-    /**
-     * 跳转数据编辑页
-     *
-     * @param $id integer 记录id
-     * @return view
-     *
-     */
-    public function edit($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'warehouses' => WarehouseModel::where('is_available','1')->get(),
-        ];
-
-        return view($this->viewPath.'edit', $response);
-    }
-
-    /**
-     * 更新
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function update($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        request()->flash();
-        $diff_quantity = $model->all_quantity - request()->input('all_quantity');
-        $this->validate(request(), $this->model->rules('update', $id));
-        $model->update(request()->all());
-        $model->warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        $model->item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
-        $model->save();
-
+        $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
+        $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
+        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_price'));
         return redirect($this->mainIndex);
     }
 
@@ -284,12 +234,16 @@ class StockController extends Controller
      */
     public function ajaxSku()
     {
-        $sku = request()->input('sku');
-        $count = ItemModel::where('sku', $sku)->count();
-        if($count)
-            return json_encode('true');
-        else 
-            return json_encode('false');
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $count = ItemModel::where('sku', $sku)->count();
+            if($count)
+                return json_encode('true');
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
     }
 
     /**

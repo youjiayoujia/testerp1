@@ -89,7 +89,7 @@ class PackageController extends Controller
         $model->logistic_id = request()->input('logistic_id');
         $model->status = 'SHIPPED';
         $model->save();
-        $model->manualLogistic()->create(['logistic_code'=>request()->input('logistic_code'), 'fee'=>request()->input('fee'), 'remark'=>request()->input('remark')]);
+        $model->manualLogistics()->create(['logistic_code'=>request()->input('logistic_code'), 'fee'=>request()->input('fee'), 'remark'=>request()->input('remark')]);
 
         return redirect($this->mainIndex);
     }

@@ -11,19 +11,19 @@
         <tr>
             <td class='col-lg-1'>销售渠道</td>
             <td class='row'>
-            <input type='checkbox' name='channel' class='channel_all'>全部
+            <input type='checkbox' name='channel' class='channel_all' checked='true'>全部
             @foreach($channels as $channel)
-                <input type='checkbox' name='channel[]' class='channel' value={{$channel->id}}>{{$channel->name}}
+                <input type='checkbox' name='channel[]' class='channel' value="{{$channel->id}}" checked='true'>{{$channel->name}}
             @endforeach
             </td>
         </tr>
         <tr>
             <td class='col-lg-1'>包裹类型</td>
             <td class='row'>
-            <input type='checkbox' class='package_all'>全部
-            <input type='checkbox' name='package[]' class='package' value='SINGLE'>单单
-            <input type='checkbox' name='package[]' class='package' value='SINGLEMULTI'>单多
-            <input type='checkbox' name='package[]' class='package' value='MULTI'>多多
+            <input type='checkbox' class='package_all' checked='true'>全部
+            <input type='checkbox' name='package[]' class='package' value='SINGLE' checked='true'>单单
+            <input type='checkbox' name='package[]' class='package' value='SINGLEMULTI' checked='true'>单多
+            <input type='checkbox' name='package[]' class='package' value='MULTI' checked='true'>多多
             </td>
         </tr>
     </table>
@@ -34,14 +34,14 @@
                 <td>邮递方式</td>
             </tr>
             <tr>
-                <td><input type='checkbox' class='logistic_all'>全部</td>
+                <td><input type='checkbox' class='logistic_all' checked='true'>全部</td>
             </tr>
             <tr>
                 <td><input type='checkbox' class='mixed'>混合物流</td>
             </tr>
             @foreach($logistics as $logistic)
             <tr>
-                <td><input type='checkbox' name='logistic[]' class='logistic' value={{$logistic->id}}>{{$logistic->logistics_type}}</td>
+                <td><input type='checkbox' name='logistic[]' class='logistic' value="{{$logistic->id}}" checked='true'>{{$logistic->logistics_type}}</td>
             </tr>
             @endforeach
         </table>

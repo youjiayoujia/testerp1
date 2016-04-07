@@ -53,7 +53,7 @@ class PositionModel extends BaseModel
     }
 
     //库存关联关系
-    public function stock()
+    public function stocks()
     {
         return $this->hasMany('App\Models\StockModel', 'warehouse_position_id', 'id');
     }
@@ -84,7 +84,6 @@ class PositionModel extends BaseModel
             $data = $reader->toArray();
             foreach($data as $position)
             {
-
                 if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->count()) {
                     continue;
                 }

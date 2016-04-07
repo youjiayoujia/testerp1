@@ -16,6 +16,8 @@ use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingFormModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\ItemModel;
+use App\Models\Stock\InModel;
+use App\Models\Stock\OutModel;
 
 class TakingController extends Controller
 {
@@ -43,7 +45,9 @@ class TakingController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'stockTakingForms'=>$model->stockTakingForm,
+            'stockTakingForms'=>$model->stockTakingForms,
+            'stockins' => InModel::where(['type'=>'INVENTORY_PROFIT', 'relation_id'=>$id])->with('stock')->get(),
+            'stockouts' => OutModel::where(['type'=>'SHORTAGE', 'relation_id'=>$id])->with('stock')->get(),
         ];
 
         return view($this->viewPath.'show', $response);
@@ -65,10 +69,25 @@ class TakingController extends Controller
         $response= [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'takingForms' => $model->stockTakingForm
+            'takingForms' => $model->stockTakingForms
         ];
 
         return view($this->viewPath.'edit', $response);
+    }
+
+    public function takingAdjustmentShow($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas'=>$this->metas(__FUNCTION__),
+            'model'=>$model,
+            'stockTakingForms' => $model->stockTakingForms,
+        ];
+
+        return view($this->viewPath.'takingAdjustmentShow', $response);
     }
 
     /**
@@ -130,7 +149,7 @@ class TakingController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $takingForms = $model->stockTakingForm;
+        $takingForms = $model->stockTakingForms;
         foreach($takingForms as $takingForm)
         {
             $takingForm->delete();
@@ -175,7 +194,7 @@ class TakingController extends Controller
         $response = [
             'metas'=>$this->metas(__FUNCTION__),
             'model'=>$model,
-            'stockTakingForms' => $model->stockTakingForm,
+            'stockTakingForms' => $model->stockTakingForms,
         ];
 
         return view($this->viewPath.'check', $response);
@@ -195,7 +214,7 @@ class TakingController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         if(request()->input('result') == 1) {
-            $takingforms = $model->stockTakingForm;
+            $takingforms = $model->stockTakingForms;
             foreach($takingforms as $takingform) {
                 if($takingform->stock_taking_status == 'equal') {
                     continue;
@@ -215,7 +234,7 @@ class TakingController extends Controller
                     $item->out($warehousePositionId, $quantity, $type, $relation_id);
                 }
             }
-            $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            $model->update(['check_by'=>4, 'check_status'=>'2', 'check_time'=>date('Y-m-d h:m:s', time())]);
         } else {
             $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
         }

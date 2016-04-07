@@ -15,7 +15,7 @@
             <td>{{ $taking->taking_id}}</td>
             <td>{{ $taking->stockTakingByName ? $taking->stockTakingByName->name : '' }}</td>
             <td>{{ $taking->stock_taking_time }}</td>
-            <td>{{ $taking->check_status ? ($taking->check_status == '1' ? '未通过' : 审核通过) : '未审核'}}</td>
+            <td>{{ $taking->check_status ? ($taking->check_status == '1' ? '审核未通过' : '审核通过') : '未审核'}}</td>
             <td>{{ $taking->created_at }}</td>
             <td>
                 <a href="{{ route('stockTaking.show', ['id'=>$taking->id]) }}" class="btn btn-info btn-xs">
@@ -29,6 +29,11 @@
                 @if(!$taking->check_status && !$taking->create_status && $taking->create_taking_adjustment == '1')
                     <a href="javascript:" class='btn btn-info btn-xs create_form'>
                         <span class="glyphicon glyphicon-eye-open"></span> 生成调整单
+                    </a>
+                @endif
+                @if(!$taking->check_status && $taking->create_status)
+                    <a href="{{ route('StockTaking.takingAdjustmentShow', ['id'=>$taking->id])}}" class='btn btn-info btn-xs'>
+                        <span class="glyphicon glyphicon-eye-open"></span> 调整单
                     </a>
                 @endif
                 @if($taking->check_status == '0' && $taking->create_status == '1')

@@ -74,12 +74,12 @@ class WarehouseController extends Controller
         $model->update(request()->all());
         if(request()->input('is_available') == '0')
         {
-            if($model->position) {
-                $positions = $model->position;
+            if($model->positions) {
+                $positions = $model->positions;
                 foreach($positions as $position)
                 {
                     if($position->stock) {
-                        $stocks = $position->stock;
+                        $stocks = $position->stocks;
                         foreach($stocks as $stock) {
                             $stock->delete();
                         }
@@ -105,11 +105,11 @@ class WarehouseController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         if($model->position) {
-            $positions = $model->position;
+            $positions = $model->positions;
             foreach($positions as $position)
             {
                 if($position->stock) {
-                    $stocks = $position->stock;
+                    $stocks = $position->stocks;
                     foreach($stocks as $stock) {
                         $stock->delete();
                     }

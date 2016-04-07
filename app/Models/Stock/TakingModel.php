@@ -30,7 +30,7 @@ class TakingModel extends BaseModel
      *
      * @param none
      */
-    public function stockTakingForm()
+    public function stockTakingForms()
     {
         return $this->hasMany('App\Models\Stock\TakingFormModel', 'stock_taking_id', 'id');
     }
@@ -63,5 +63,15 @@ class TakingModel extends BaseModel
     public function stockTakingByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'stock_taking_by', 'id');
+    }
+
+    /**
+     * get the relationship between the two module 
+     *
+     * @param none
+     */
+    public function adjustmentByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'adjustment_by', 'id');
     }
 }

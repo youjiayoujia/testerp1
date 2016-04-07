@@ -15,7 +15,7 @@
     <div class="form-group col-lg-4">
         <label for="warehouse_id">仓库</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="warehouse_id" class="form-control">
+        <select name="warehouse_id" class="form-control" id="warehouse_id">
             @foreach($warehouses as $warehouse)
                 <option value="{{$warehouse->id}}" {{$warehouse->id == $model->warehouse_id ? 'selected' : ''}}>
                     {{$warehouse->name}}
@@ -26,7 +26,7 @@
     <div class="form-group col-lg-4">
         <label for="logistics_supplier_id">物流商</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="logistics_supplier_id" class="form-control">
+        <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
             @foreach($suppliers as $supplier)
                 <option value="{{$supplier->id}}" {{$supplier->id == $model->logistics_supplier_id ? 'selected' : ''}}>
                     {{$supplier->name}}
@@ -77,12 +77,12 @@
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>
-                <input type="radio" name="is_enable" value="Y" {{ $model->is_enable == 'Y' ? 'checked' : '' }}>是
+                <input type="radio" name="is_enable" value="1" {{ $model->is_enable == '1' ? 'checked' : '' }}>是
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="is_enable" value="N" {{ $model->is_enable == 'N' ? 'checked' : '' }}>否
+                <input type="radio" name="is_enable" value="0" {{ $model->is_enable == '0' ? 'checked' : '' }}>否
             </label>
         </div>
     </div>

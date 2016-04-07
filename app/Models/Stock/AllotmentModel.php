@@ -100,7 +100,7 @@ class AllotmentModel extends BaseModel
      *  @return
      *
      */
-    public function allotmentform()
+    public function allotmentforms()
     {
         return $this->hasMany('App\Models\Stock\AllotmentFormModel', 'stock_allotment_id', 'id');
     }

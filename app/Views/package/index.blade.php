@@ -35,7 +35,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 发货
                 </a>
                 @endif
-                @if($package->is_auto_logistic == '0' && $package->status != 'SHIPPED')
+                @if($package->is_auto == '0' && $package->status != 'SHIPPED')
                 <a href="{{ route('package.manualLogistic', ['id'=>$package->id])}}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 手工发货
                 </a>

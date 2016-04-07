@@ -29,7 +29,7 @@ class AllotmentFormModel extends BaseModel
      */
     public function allotment()
     {
-        return $this->hasMany('App\Models\Stock\AllotmentModel', 'stock_allotment_id', 'id');
+        return $this->belongsTo('App\Models\Stock\AllotmentModel', 'stock_allotment_id', 'id');
     }
 
     /**
@@ -58,7 +58,7 @@ class AllotmentFormModel extends BaseModel
      *
      * @return 
      */
-    public function items()
+    public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }

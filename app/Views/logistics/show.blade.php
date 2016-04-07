@@ -31,7 +31,7 @@
                 <strong>API对接方式</strong>: {{ $model->api_docking }}
             </div>
             <div class="col-lg-4">
-                <strong>是否启用</strong>: {{ $model->is_enable == 'Y' ? '是' : '否' }}
+                <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
         </div>
     </div>

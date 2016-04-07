@@ -24,7 +24,7 @@ class ItemModel extends BaseModel
         'remark',
     ];
 
-    public function items()
+    public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }

@@ -27,9 +27,6 @@
                 <a href="{{ route('stock.show', ['id'=>$stock->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('stock.edit', ['id'=>$stock->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $stock->id }}"
                    data-url="{{ route('stock.destroy', ['id' => $stock->id]) }}">
@@ -40,10 +37,15 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+@parent
 <div class="btn-group">
-    <a class="btn btn-success" href="{{ route('stock.createTaking') }}">
-        库存盘点
+    <a class="btn btn-info" href="{{ route('stock.getExcel') }}">
+        获取excel
     </a>
 </div>
-@parent
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('stock.importByExcel') }}">
+        excel导入
+    </a>
+</div>
 @stop

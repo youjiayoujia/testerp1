@@ -9,17 +9,13 @@
         </select>
     </div>
     <div class='form-group col-sm-2'>
-        <select name='arr[warehouse_position_id][{{$current}}]' id='arr[warehouse_position_id][{{$current}}]' class='form-control warehouse_position_id'>
-            @foreach($positions as $position)
-                <option value={{$position->id}}>{{$position->name}}</option>
-            @endforeach
-        </select>
+        <input type='text' name='arr[warehouse_position_id][{{$current}}]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][$current]') }}">
     </div>
     <div class='form-group col-sm-2'>
         <input type='text' class='form-control quantity' id='arr[quantity][{{$current}}]' placeholder='数量' name='arr[quantity][{{$current}}]' value='{{ old('arr[quantity][$current]') }}'>
     </div>
-    <div class='form-group col-sm-2'>
-        <input type='text' class='form-control amount' id='arr[amount][{{$current}}]' placeholder='总金额' name='arr[amount][{{$current}}]' value='{{ old('arr[amount][$current]') }}'>
+    <div class="form-group col-sm-2">
+        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$current}}]" placeholder="单价" name='arr[unit_cost][{{$current}}]' value="{{ old('arr[unit_cost][$current]') }}">
     </div>
     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
 </div>

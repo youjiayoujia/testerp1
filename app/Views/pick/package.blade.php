@@ -5,7 +5,7 @@
     <div class='row'>
         <div class='form-group col-lg-2'>
             <label>ID</label>
-            <input type='text' class='form-control' value={{ $model->picklist_id }}>
+            <input type='text' class='form-control' value={{ $model->picknum }}>
         </div>
         <div class='form-group col-lg-2'>
             <label>类型</label>
@@ -40,7 +40,7 @@
                     @if($key == '0')
                     <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
                     @endif
-                    <td class='sku col-lg-6'>{{ $packageitem->items ? $packageitem->items->sku : '' }}</td>
+                    <td class='sku col-lg-6'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                     <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
                     <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
                     @if($key == '0')
@@ -81,7 +81,6 @@ $(document).ready(function(){
                                 block.find('.status').text('已包装');
                             }
                         }
-
                         package_id = block.find('.package_id').text();
                         sku = row.find('.sku').text();
                         $.ajax({
@@ -92,7 +91,6 @@ $(document).ready(function(){
                             success:function(result) {
                             }
                         });
-                    exit;
                     }
                 }
             });

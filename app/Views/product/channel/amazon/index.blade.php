@@ -65,43 +65,43 @@
                     <?php
                     break;
             } ?>
-            <td>{{ $amazonProduct->created_at }}</td>
+            <td>{{ $product->created_at }}</td>
             <td>
-                <a href="{{ route('amazonProduct.show', ['id'=>$amazonProduct->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('EditProduct.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <?php if($amazonProduct->status==2){ ?>
+                <?php if($product->status==2){ ?>
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                           data-id="{{ $amazonProduct->id }}"
+                           data-id="{{ $product->id }}"
                            data-url="{{route('examineAmazonProduct')}}"
                            data-status="3" >
-                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>审核</span>
+                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>审核</span>
                     </a>
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                           data-id="{{ $amazonProduct->id }}"
+                           data-id="{{ $product->id }}"
                            data-url="{{route('examineAmazonProduct')}}"
                            data-status="0" >
-                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>审核不通过</span>
+                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>审核不通过</span>
                     </a>
-                <?php }elseif($amazonProduct->status==3){ ?>
+                <?php }elseif($product->status==3){ ?>
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                           data-id="{{ $amazonProduct->id }}"
+                           data-id="{{ $product->id }}"
                            data-url="{{route('examineAmazonProduct')}}"
                            data-status="0" >
-                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$amazonProduct->id}}'>撤销审核</span>
+                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>撤销审核</span>
                     </a>
-                <?php }elseif($amazonProduct->status==0){ ?>
-                    <a href="{{ route('amazonProduct.edit', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
+                <?php }elseif($product->status==0){ ?>
+                    <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                 </a>
-                <?php }elseif($amazonProduct->status==1){ ?>
-                    <a href="{{ route('amazonProductEditImage', ['id'=>$amazonProduct->id]) }}" class="btn btn-warning btn-xs">
+                <?php }elseif($product->status==1){ ?>
+                    <a href="{{ route('amazonProductEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                     </a>  
                 <?php } ?>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $amazonProduct->id }}"
-                   data-url="{{ route('amazonProduct.destroy', ['id' => $amazonProduct->id]) }}">
+                   data-id="{{ $product->id }}"
+                   data-url="{{ route('EditProduct.destroy', ['id' => $product->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

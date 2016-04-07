@@ -7,6 +7,7 @@ use App\Models\Product\channel\amazonProductModel;
 use App\Models\Product\channel\ebayProductModel;
 use App\Models\Product\channel\aliexpressProductModel;
 use App\Models\Product\channel\b2cProductModel;
+use App\Models\Product\productEnglishValueModel;
 use App\Models\Product\SupplierModel;
 use App\Http\Controllers\Controller;
 
@@ -64,20 +65,76 @@ class EditProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update($id)
-    {
+    {   
         request()->flash();
         //$this->validate(request(), $this->model->rules('update',$id));
         $editStatus = request()->input('edit');
         $data = request()->all();
         $data['edit_status'] = $editStatus;
         $productModel = $this->product->find($id);
-        //$ebayProductModel = $aliexpressProductModel = $b2cProductModel = $amazonProductModel = $this->product->find($id);
-        $this->product->updateEditProduct($productModel->ebayProductModel,$data);
-        $this->product->updateEditProduct($productModel->aliexpressProductModel,$data);
-        $this->product->updateEditProduct($productModel->b2cProductModel,$data);
-        $this->product->updateEditProduct($productModel->amazonProductModel,$data);
         $productModel->update($data);
+
+        //更新英文信息
+        $productEnglishValueModel = new productEnglishValueModel();
+        $data['product_id'] = $productModel->id;
+        $english = $productEnglishValueModel->firstOrNew(['product_id'=>$id]);
+        //如果没保存过对应产品ID的英文资料,create，否则就更新
+        if(count($english->toArray())==1){
+            $english->create($data);
+        }else{
+            $english->update($data);
+        }
+        
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 产品图片编辑界面
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productEditImage()
+    {
+        $id = request()->input('id');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $this->product->find($id),
+        ];
+
+        return view($this->viewPath . 'editImage', $response);
+    }
+
+    /**
+     * 产品图片编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productUpdateImage()
+    {
+        $id = request()->input('id');
+        request()->flash();
+        $ProductModel = $this->product->find($id);
+        $ProductModel->updateProductImage(request()->all(),request()->files);
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 产品审核
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function examineProduct()
+    {
+        $id = request()->input('product_id');
+        $status = request()->input('status');
+        $productModel = $this->product->find($id);
+        $productModel->examineProduct($status);
+
+        return 1;
     }
      
 }

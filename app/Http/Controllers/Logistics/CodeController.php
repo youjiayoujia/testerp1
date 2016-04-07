@@ -63,12 +63,12 @@ class CodeController extends Controller
      * @param $logistic_id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function batchAddTrCode($logistic_id)
+    public function batchAddTrCode($logistics_id)
     {
-        $logistic = LogisticsModel::find($logistic_id);
+        $logistics = LogisticsModel::find($logistics_id);
         $response = [
             'metas' => $this->metas(__FUNCTION__, '导入号码池'),
-            'logistic' => $logistic,
+            'logistics' => $logistics,
         ];
         return view($this->viewPath . 'batchadd', $response);
     }
@@ -140,12 +140,12 @@ class CodeController extends Controller
      * @param $logistic_id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function scanAddTrCode($logistic_id)
+    public function scanAddTrCode($logistics_id)
     {
-        $logistic = LogisticsModel::find($logistic_id);
+        $logistics = LogisticsModel::find($logistics_id);
         $response = [
             'metas' => $this->metas(__FUNCTION__, '扫描-号码池'),
-            'logistic' => $logistic,
+            'logistics' => $logistics,
         ];
         return view($this->viewPath . 'scanadd', $response);
     }

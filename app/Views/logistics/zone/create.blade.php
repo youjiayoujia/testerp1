@@ -73,7 +73,7 @@
     <div class="form-group col-lg-3" style="clear:left;">
         <label for="country_id" class="control-label">已有国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="country_id" class="form-control" multiple style="height:600px;width:400px;">
+        <select name="country_id" class="form-control" multiple style="height:600px;width:400px;" id="country_id">
             @foreach($countries as $country)
                 <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
                     {{ $country->name }}
@@ -84,15 +84,13 @@
 
     <div class="form-group col-lg-4" style="">
         <label for="country_id" class="control-label">已选国家</label>
-        <select class="form-control" id="dselectCountry" multiple  style="height:600px;width:400px;">
-
+        <select class="form-control" name="dselectCountry" multiple  style="height:600px;width:400px;" id="dselectCountry">
 
         </select>
     </div>
     <div style="display:none">
         <textarea class="form-control" rows="3" type="hidden" id="country_id" placeholder="国家" name='country_id' readonly>{{ old('country_id') }}</textarea>
     </div>
-
 @stop
 <script type="text/javascript">
 

@@ -31,7 +31,7 @@ class ListItemModel extends BaseModel
         ]
     ];
 
-    public function pickListItemPackage()
+    public function pickListItemPackages()
     {
         return $this->hasMany('App\Models\Pick\ListItemPackageModel', 'picklist_item_id', 'id');
     }

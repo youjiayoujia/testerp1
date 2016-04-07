@@ -3,7 +3,7 @@
     <div class='row'>
         <div class='form-group col-lg-2'>
             <label>ID</label>
-            <input type='text' class='form-control' value={{ $model->picklist_id }}>
+            <input type='text' class='form-control' value={{ $model->picknum }}>
         </div>
         <div class='form-group col-lg-2'>
             <label>类型</label>
@@ -28,7 +28,7 @@
                     @if($key == '0')
                     <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-4'>{{ $package->id }}</td>
                     @endif
-                    <td class='sku col-lg-4'>{{ $packageitem->items ? $packageitem->items->sku : '' }}</td>
+                    <td class='sku col-lg-4'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                     <td class='quantity col-lg-4'>{{ $packageitem->quantity}}</td>
                 </tr>
             @endforeach

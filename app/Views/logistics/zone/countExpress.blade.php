@@ -13,7 +13,7 @@
             <div class="form-group col-lg-4">
                 <label for="logistics_id">物流方式</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="logistics_id" class="form-control">
+                <select name="logistics_id" class="form-control" id="logistics_id">
                     @foreach($logistics as $logisticses)
                         <option value="{{$logisticses->id}}" {{$logisticses->id == $zone->logistics_id ? 'selected' : ''}} disabled>
                             {{$logisticses->logistics_type}}
@@ -24,7 +24,7 @@
             <div class="form-group col-lg-4">
                 <label for="country_id">国家</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="country_id" class="form-control">
+                <select name="country_id" class="form-control" id="country_id">
                     @foreach($country as $countries)
                         <option value="{{$countries->id}}" {{$countries->id == $zone->country_id ? 'selected' : ''}} disabled>
                             {{$countries->name}}

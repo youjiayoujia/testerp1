@@ -19,8 +19,8 @@
             <select name="city" onChange = "select()" class='form-control'></select>
         </div>
          <div class="form-group col-lg-2">
-            <label for="address">经纬度</label>
-            <input type='text' class="form-control" id="address" placeholder="经纬度" name='address' value="{{ old('address') ?  old('address') : $model->address }}">
+            <label for="address">详细地址</label>
+            <input type='text' class="form-control" id="address" placeholder="详细地址" name='address' value="{{ old('address') ?  old('address') : $model->address }}">
         </div>
         <div class="form-group col-lg-4">
             <label for="type">是否是线上供货商(否/是)</label>

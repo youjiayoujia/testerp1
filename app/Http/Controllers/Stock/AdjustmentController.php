@@ -46,7 +46,7 @@ class AdjustmentController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjustments' => $model->adjustment,
+            'adjustments' => $model->adjustments,
             'adjust' => $model,
         ];
         
@@ -64,7 +64,7 @@ class AdjustmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -94,6 +94,8 @@ class AdjustmentController extends Controller
             }
             $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['stock_adjustment_id'] = $obj->id;
+            $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             AdjustFormModel::create($buf);
         }
 
@@ -116,9 +118,9 @@ class AdjustmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'adjustments' => $model->adjustment,
-            'warehouses' => WarehouseModel::all(),
-            'positions' =>PositionModel::where('warehouse_id', $model->warehouse_id)->get()->toArray(),
+            'adjustments' => $model->adjustments,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -137,7 +139,7 @@ class AdjustmentController extends Controller
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
-        $obj = $this->model->find($id)->adjustment;
+        $obj = $this->model->find($id)->adjustments;
         $obj_len = count($obj);
         $this->model->find($id)->update($buf);
         for($i=0; $i<$len; $i++)
@@ -150,7 +152,9 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $id;
-            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
+            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
+            $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {
@@ -171,7 +175,7 @@ class AdjustmentController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach($obj->adjustment as $val)
+        foreach($obj->adjustments as $val)
             $val->delete();
         $obj->delete($id);
 
@@ -192,7 +196,7 @@ class AdjustmentController extends Controller
             $warehouse = request()->input('warehouse');
             $response = [
                 'current' => $current,
-                'positions' => PositionModel::where('warehouse_id', $warehouse)->get(),
+                'positions' => PositionModel::where(['warehouse_id' => $warehouse, 'is_available' => '1'])->get(),
             ];
 
             return view($this->viewPath.'add', $response);
@@ -216,7 +220,7 @@ class AdjustmentController extends Controller
             echo json_encode([$time, $obj->checkByName->name]);
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
-            $buf = $obj->adjustment->toArray();
+            $buf = $obj->adjustments->toArray();
             DB::beginTransaction();
             try {
                 for($i=0;$i<count($buf);$i++) {

@@ -85,11 +85,11 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 
 
 //采购单
-Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\purchaseOrderController@changeExamineStatus');
-Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
-Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
-Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
-Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
+Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
+Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
+Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
+Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
+Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');

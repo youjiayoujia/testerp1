@@ -30,7 +30,8 @@ class TestController extends Controller
 {
     public function test()
     {
-        var_dump(request('id'));
+        $item = ItemModel::where(['sku' => 'YNcqg-蓝-'])->first();
+        var_dump($item->toArray());exit;
     }
 /**
      * 投诉excel导出

@@ -67,7 +67,7 @@ class CodeController extends Controller
     {
         $logistics = LogisticsModel::find($logistics_id);
         $response = [
-            'metas' => $this->metas(__FUNCTION__, '导入号码池'),
+            'metas' => $this->metas(__FUNCTION__, '导入-号码池'),
             'logistics' => $logistics,
         ];
         return view($this->viewPath . 'batchadd', $response);

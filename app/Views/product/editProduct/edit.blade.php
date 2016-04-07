@@ -1,95 +1,216 @@
 @extends('common.form')
 @section('formAction') {{ route('EditProduct.update', ['id' => $model->id]) }} @stop
+@section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
+<?php 
+    $check = $model->productEnglishValue;
+    $unedit_reason = '';
+    $market_usd_price = '';
+    $cost_usd_price = '';
+    $sale_usd_price = '';
+    if(!empty($check)){
+        $unedit_reason = $check->unedit_reason;
+        $market_usd_price = $check->market_usd_price;
+        $cost_usd_price = $check->cost_usd_price;
+        $sale_usd_price = $check->sale_usd_price;
+    } 
+?>
 <input type='hidden' value='PUT' name="_method">
-<div class='row'>
-    <div class="form-group col-md-3">
-        <label for="size">item</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" disabled="disabled" id="name" placeholder="sku" name='sku' value="{{ old('sku') ?  old('sku') : $model->sku }}">
-    </div> 
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <td>泽尚SKU</td>
+            <td></td>
+        </tr>
+        <tr>
+         <td>status:picked</td>
+         <td></td>
+        </tr>
+        <tr>
+        <td>备注:{{$model->remark}}</td>
+         <td>
+            <label style="width:80px">主表:英文名: </label>
+            <textarea class="form-control form55" style="width:300px;" id="s_en_name" value="" name="s_en_name"></textarea>
+            <br><label style="width:80px"></label>
+        </td>
+        </tr>
+        <tr>
+            <td><label>产品中文名: </label>{{$model->c_name}}</td>
+            <td><label>主表:中文名: </label><input type="text" class="form-control form55" style="width:300px;" id="s_cn_name" value="" name="s_cn_name"></td>
+        </tr>
+        <tr>
+            <td><label>图片备注: </label></td>
+            <td><lable>store:</lable>
+                <input type="text" class="form-control form55" style="width:300px;" id="" value="" name="store">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>图片URL: </label>
+                <?php if(isset($model->image->name)){ ?>
+                    <a target='_blank' href='{{ asset($model->image->path) }}/{{$model->image->name}}'>{{ asset($model->image->path) }}/{{$model->image->name}}</a>
+                <?php }
+                else{ ?>
+                无图片
+                <?php } ?>
+            </td>
+            <td>
+                <?php if(isset($model->image->name)){ ?>
+                <img src="{{ asset($model->image->path) }}/{{$model->image->name}}" width="150px" >
+                <?php }else{ ?>
+                    无图片
+                <?php } ?>
+            </td>
+        </tr>
+        <tr>
+            <td><label>颜色: </label></td>
+            <td>
+                <label>Filter_attributes: </label>
+                <br>
+                <textarea class="vLargeTextField" cols="50" id="s_filter_attributes" name="s_filter_attributes" rows="3"></textarea>
+            </td>
+        </tr>
+        <!--<tr>
+            <td><label>尺码: </label></td>
+            <td></td>
+        </tr>
+        -->
+        <tr>
+            <td><label>尺码描述: </label></td>
+            <td>
+                <label>主表:简短描述(brief): </label>
+                <br>
+                <textarea class="vLargeTextField" cols="50" id="s_brief" name="s_brief" rows="3"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td><label>材质: </label></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label>是否有弹性: </label><br>
+                <label>拉链: </label>
+            </td>
 
-    <div class="form-group col-md-3">
-        <label for="size">产品英文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="name" placeholder="产品name" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
-    </div>
-    <div class="form-group col-md-3">
-        <label for="color">产品中文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
-    </div>
-    <div class="form-group col-md-3">
-        <label for="color">产品别名中文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
-    </div>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label>配件说明: </label>{{$model->description}}</td>
+            <td>
+                <label>主表:描述(description): </label>
+                <br>
+                <textarea class="vLargeTextField" cols="50" id="s_description" name="s_description" rows="3"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td><label>净重: </label>{{$model->weight}} kg</td>
+            <td>
+                <label>主表:重量: </label>
+                <input type="text" class="form-control form55" id="s_weight" value="0.0" name="s_weight">
+            </td>
+        </tr>
+        <tr>
+            <td><label>主供货商: </label>{{$model->supplier->name}}</td>
+            <td><label>factory:</label>{{$model->supplier->name}}</td>
+        </tr>
+        <tr>
+            <td><label>供货商地址: </label><a target='_blank' href='{{$model->purchase_url}}'>{{$model->purchase_url}}</a></td>
+            <td><label>taobao_url: </label><a target='_blank' href='{{$model->purchase_url}}'>{{$model->purchase_url}}</a></td>
+        </tr>
+        <tr>
+            <td><label>供应商货号: </label>{{$model->supplier_sku}}</td>
+            <td>
+                <label>supplier_sku: </label>{{$model->supplier_sku}}
+            </td>
+        </tr>
+        <tr>
+            <td><label>择尚拿货价(RMB): </label>{{$model->purchase_price}}</td>
+            <td>
+                <label>主表:销售价美元: </label><input type="text" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
+            </td>
+        </tr>
+        <tr>
+            <td><label>参考现货数量: </label></td>
+            <td>
+                <label>主表:市场价美元: </label>
+                <input type="text" class="form-control form55" id="market_usd_price" value="{{ old('market_usd_price') ?  old('market_usd_price') : $market_usd_price }}" name="market_usd_price">
+            </td>
+        </tr>
+        <tr>
+            <td><label>快递费用(RMB): </label>{{$model->purchase_carriage}}</td>
+            <td>
+                <label>主表:成本价美元: </label><span id="p_cost" style="color:red;"></span>
+                <input type="text" class="form-control form55" id="cost_usd_price" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="cost_usd_price">
+            </td>
+        </tr>
+        <tr>
+            <td><label>是否透明: </label></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label>信息录入员: </label></td>
+            <td>
+                <label>备注不编辑原因: </label><input type="text" class="form-control form55" id="unedit_reason" value="{{ old('unedit_reason') ?  old('unedit_reason') : $unedit_reason }}" name="unedit_reason">
+            </td>
+        </tr>
+        <tr>
+            <td><label>选款人ID: </label>{{$model->upload_user}}</td>
+            <td></td>
+        </tr>
+        <?php if($model->data_edit_not_pass_remark!=''){ ?>
+            <tr>
+                <td><label>资料审核不通过原因: </label></td>
+                <td>
+                    <label>{{$model->data_edit_not_pass_remark}}</label>
+                </td>
+            </tr>
+        <?php } ?>
+
+        <?php if($model->image_edit_not_pass_remark!=''){ ?>
+            <tr>
+                <td><label>图片审核不通过原因: </label></td>
+                <td>
+                    <label>{{$model->image_edit_not_pass_remark}} </label>
+                </td>
+            </tr>
+        <?php } ?>
+        <tr>
+            <td colspan="2"><label>上传时间: </label>{{$model->created_at}}</td>
+            
+        </tr>
+
+    </tbody>
+</table>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               请填写资料审核不通过原因
+            </h4>
+         </div>
+         <input type="text" class="modal-body" name="data_edit_not_pass_remark" style="margin:10px 0px 10px 50px;width:500px;" value="{{ old('data_edit_not_pass_remark') ?  old('data_edit_not_pass_remark') : $model->data_edit_not_pass_remark }}"/>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">关闭
+            </button>
+            <button type="submit" class="btn btn-primary" name='edit' value='4'>
+               提交
+            </button>
+         </div>
+      </div>
 </div>
-<div class='row'>
-    <div class="form-group col-md-3">
-        <label for="color">产品别名英文</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
-    </div>
-    <div class="form-group col-md-3">
-        <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select id="supplier_id" class="form-control" name="supplier_id">
-            @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == $model->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
-            @endforeach
-        </select>
-    </div>   
-    <div class="form-group col-md-3">
-        <label for="size">供应商信息</label>
-        <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $model->supplier_info }}">
-    </div>        
-    <div class="form-group col-md-3"><label for="color">辅供应商</label>
-        <select  class="form-control" name="second_supplier_id">
-            <option value="0"></option>
-            @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == $model->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
-            @endforeach
-        </select>
-    </div>
-</div>
-<div class='row'>
-    <div class="form-group col-md-3">
-        <label for="color">供应商sku</label>
-        <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
-    </div>
-    <div class="form-group col-md-3">
-        <label for="color">采购链接</label>
-        <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
-    </div>
-    <div class="form-group col-md-1">
-        <label for="size">采购价</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="purchase_price" placeholder="采购价" name='purchase_price' value="{{ old('purchase_price') ?  old('purchase_price') : $model->purchase_price }}">
-    </div>
-    <div class="form-group col-md-1">
-        <label for="color">采购物流费</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $model->purchase_carriage }}">
-    </div>
-    <div class="form-group col-md-1">
-        <label for="size">产品尺寸</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="product_size" placeholder="产品尺寸" name='product_size' value="{{ old('product_size') ?  old('product_size') : $model->product_size }}">
-    </div>
-    <div class="form-group col-md-1">
-        <label for="color">产品包装尺寸</label>
-        <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $model->package_size }}">
-    </div>
-    <div class="form-group col-md-1">
-        <label for="size">产品重量</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
-    </div>
-</div>
-<div class='row'>
-    <div class="form-group col-md-3">
-        <label for="color">备注</label>
-        <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
-    </div>
-    <div class="form-group col-md-3">
-        <label for="color">图片备注</label>
-        <input class="form-control" id="image_remark" placeholder="图片备注" name='image_remark' value="{{ old('image_remark') ?  old('image_remark') : $model->image_remark }}">
-    </div> 
 </div>
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success" name='edit' value='0'>保存</button>
-    <button type="submit" class="btn btn-success" name='edit' value='1'>保存并提交</button>
+    <button type="submit" class="btn btn-success" name='edit' value='1'>资料审核通过</button>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
     <button type="reset" class="btn btn-default">取消</button>
 @show{{-- 表单按钮 --}}

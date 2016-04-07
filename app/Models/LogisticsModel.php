@@ -26,7 +26,7 @@ class LogisticsModel extends BaseModel
         'logistics_supplier_id',
         'type',
         'url',
-        'api_docking',
+        'docking',
         'is_enable'
     ];
 
@@ -40,7 +40,7 @@ class LogisticsModel extends BaseModel
             'logistics_supplier_id' => 'required',
             'type' => 'required',
             'url' => 'required',
-            'api_docking' => 'required',
+            'docking' => 'required',
             'is_enable' => 'required',
         ],
         'update' => [
@@ -51,7 +51,7 @@ class LogisticsModel extends BaseModel
             'logistics_supplier_id' => 'required',
             'type' => 'required',
             'url' => 'required',
-            'api_docking' => 'required',
+            'docking' => 'required',
             'is_enable' => 'required',
         ],
     ];

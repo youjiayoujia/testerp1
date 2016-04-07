@@ -86,6 +86,7 @@
         </div>
         <div class="form-group col-lg-4" style="clear:right;">
             <label for="country_id" class="control-label">已选国家</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" id="dselectCountry" multiple style="height:300px;width:400px;">
                 @foreach($selectedCountries as $selectedCountry)
                     <option class="form-control thecountry" value="{{ $selectedCountry }}" onclick="deleteCountry( this )">

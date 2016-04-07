@@ -14,7 +14,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="logistics_id" class="form-control" id="logistics_id" onclick="checkShipping()">
                 @foreach($logisticses as $logistics)
-                    <option value="{{ $logistics->id }}" {{ old('logistics_id') ? old('logistics_id') == $logistics->id ? 'selected' : '' : ''}}>
+                    <option value="{{ $logistics->id }}" {{ Tool::isSelected('logistics_id', $logistics->id) }}>
                         {{ $logistics->logistics_type }}
                     </option>
                 @endforeach
@@ -85,6 +85,7 @@
         </div>
         <div class="form-group col-lg-4" style="clear:right;">
             <label for="country_id" class="control-label">已选国家</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" id="dselectCountry" multiple  style="height:300px;width:400px;">
 
             </select>

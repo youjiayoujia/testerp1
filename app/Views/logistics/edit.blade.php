@@ -46,6 +46,17 @@
             <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') ? old('url') : $model->url}}">
         </div>
         <div class="form-group col-lg-4">
+            <label for="docking" class="control-label">对接方式</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="docking" id="docking">
+                @foreach(config('logistics.docking') as $docking)
+                    <option value="{{ $docking }}" {{ old('docking') ? (old('docking') == $docking ? 'selected' : '') : ($model->docking == $docking ? 'selected' : '') }}>
+                        {{ $docking }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-4">
             <label for="species" class="control-label">种类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
@@ -56,20 +67,6 @@
             <div class="radio">
                 <label>
                     <input type="radio" name="species" value="packet" {{ $model->species == 'packet' ? 'checked' : '' }}>小包
-                </label>
-            </div>
-        </div>
-        <div class="form-group col-lg-4">
-            <label for="api_docking" class="control-label">API对接方式</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="api_docking" value="物流api" {{ $model->api_docking == '物流api' ? 'checked' : '' }}>物流api
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="api_docking" value="号码池" {{ $model->api_docking == '号码池' ? 'checked' : '' }}>号码池
                 </label>
             </div>
         </div>

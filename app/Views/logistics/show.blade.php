@@ -28,7 +28,7 @@
                 <strong>物流追踪网址</strong>: {{ $model->url }}
             </div>
             <div class="col-lg-4">
-                <strong>API对接方式</strong>: {{ $model->api_docking }}
+                <strong>对接方式</strong>: {{ $model->docking }}
             </div>
             <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}

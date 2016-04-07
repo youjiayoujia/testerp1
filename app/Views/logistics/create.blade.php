@@ -18,7 +18,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="warehouse_id" class="form-control" id="warehouse_id">
                 @foreach($warehouses as $warehouse)
-                    <option value="{{$warehouse->id}}" {{$warehouse->id == old('$warehouses->warehouse->id') ? 'selected' : ''}}>
+                    <option value="{{$warehouse->id}}" {{ Tool::isSelected('warehouse_id', $warehouse->id) }}>
                         {{$warehouse->name}}
                     </option>
                 @endforeach
@@ -29,7 +29,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
                 @foreach($suppliers as $supplier)
-                    <option value="{{$supplier->id}}" {{$supplier->id == old('$suppliers->supplier->id') ? 'selected' : ''}}>
+                    <option value="{{$supplier->id}}" {{ Tool::isSelected('logistics_supplier_id', $supplier->id) }}>
                         {{$supplier->name}}
                     </option>
                 @endforeach
@@ -46,6 +46,17 @@
             <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
         </div>
         <div class="form-group col-lg-4">
+            <label for="docking" class="control-label">对接方式</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="docking" id="docking">
+                @foreach(config('logistics.docking') as $docking)
+                    <option value="{{ $docking }}" {{ old('docking') == $docking ? 'selected' : '' }}>
+                        {{ $docking }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-4">
             <label for="species" class="control-label">种类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
@@ -56,20 +67,6 @@
             <div class="radio">
                 <label>
                     <input type="radio" name="species" value="packet" {{ old('species') ? (old('species') == 'packet' ? 'checked' : '') : 'checked' }}>小包
-                </label>
-            </div>
-        </div>
-        <div class="form-group col-lg-4">
-            <label for="api_docking" class="control-label">API对接方式</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="api_docking" value="物流api">物流api
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="api_docking" value="号码池" checked>号码池
                 </label>
             </div>
         </div>

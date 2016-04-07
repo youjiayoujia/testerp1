@@ -77,21 +77,17 @@ Route::get('stock/getMessage', ['uses' => 'StockController@ajaxGetMessage', 'as'
 Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
 
 //采购条目
-Route::any('purchaseItem/changeStatus', 'Purchase\PurchaseItemController@changeStatus');
-Route::any('purchaseItem/form_postCoding', 'Purchase\PurchaseItemController@form_postCoding');
-Route::any('purchaseItem/supplierCost', 'Purchase\PurchaseItemController@supplierCost');
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
-Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
 Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
+Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+
 
 //采购单
+Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\purchaseOrderController@changeExamineStatus');
 Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
-Route::any('purchaseOrder/purchaseOrderSupplier', 'Purchase\purchaseOrderController@purchaseOrderSupplier');
-Route::any('purchaseOrder/checkProductItems', 'Purchase\purchaseOrderController@checkProductItems');
-Route::any('purchaseOrder/checkedPurchaseItem', 'Purchase\purchaseOrderController@checkedPurchaseItem');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
-Route::any('purchaseOrder/printOrder/{id}', 'Purchase\purchaseOrderController@printOrder');
 Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
 Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 
@@ -100,6 +96,7 @@ Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn
 Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
+Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
 
 /**

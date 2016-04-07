@@ -25,7 +25,7 @@
             @if($model->type==0)
             <div class="form-group col-lg-4">
                 <strong>订单号</strong>:
-                {{$model->order_id}}
+                {{$model->order_item_id}}
             </div>
             @endif
             <div class="form-group col-lg-4">
@@ -34,7 +34,7 @@
             </div>
              <div class="form-group col-lg-4">
                 <strong>产品名</strong>:
-                {{$model->purchaseItem->product->name}}
+                {{$model->item->product->name}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>生成条码</strong>:

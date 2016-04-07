@@ -30,7 +30,7 @@ class PurchaseOrderModel extends BaseModel
     public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
     
 	 
-    protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','examineStatus'];
+    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid'];
 	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
@@ -39,64 +39,13 @@ class PurchaseOrderModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
-	 public function updatePurchaseOrder($id,$data){
+	
+	public function updatePurchaseOrder($id,$data){
 		 $PurchaseOrder=$this->find($id);
 		 foreach($data as $key=>$v){
-		 $PurchaseOrder->$key=$v;
+			 $PurchaseOrder->$key=$v;
 		 }
-		 $PurchaseOrder->save();
-		 }
-  	
-	
-	
-	public function addPurchaseOrder($data)
-	{
-		$checkedItem=explode(',',$data['checkedPurchaseItems']);
-		if(!empty($data['checkedPurchaseItems'])){
-		$dataArray['user_id']=$data['user_id'];
-		$dataArray['warehouse_id']=$data['warehouse_id'];
-		$dataArray['supplier_id']=$data['supplier_id'];
-		$purchaseOrderId=$this->create($dataArray);
-		foreach($checkedItem as $key=>$v){
-		$purchaseItemModel= new PurchaseItemModel;
-		$purchaseItem=$purchaseItemModel->find($v);
-		$purchaseItem['purchase_order_id']=$purchaseOrderId->id;
-		$purchaseItem->purchase_order_id=$purchaseItem['purchase_order_id'];
-		$purchaseItem->save();
-		}
-		}
-	}
-
-	/*审核采购单
-	*
-	* @param $data
-    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
-	public function updatePurchaseOrderExamine($purchaseOrderIds)
-	{
-		foreach($purchaseOrderIds as $key=>$v){
-			$this->where('id',$v)->update(['examineStatus'=>2]);
-		}
-	
-	}
-	
-
-	
-	/*上报采购总成本
-	*
-	* @param $data
-    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
-	public function totalCost($purchase_order_id)
-	{
-		$purchaseItem=new PurchaseItemModel;
-		$sumPostage=$purchaseItem->where('purchase_order_id',$purchase_order_id)->where('costExamineStatus',2)->sum('postage');
-		$sumPurchasecost=$purchaseItem->where('purchase_order_id',$purchase_order_id)->where('costExamineStatus',2)->sum('purchase_cost');
-		$totalOrder=$this->find($purchase_order_id);
-		$totalOrder->total_postage=$sumPostage;
-		$totalOrder->total_cost=$sumPurchasecost;
-		$totalOrder->save();
-		
+		 	$PurchaseOrder->save();
 	}
 	/*取消订单
 	*
@@ -127,10 +76,10 @@ class PurchaseOrderModel extends BaseModel
 			$supplier_city=$vo->supplier->city;
 			$supplier_address=$vo->supplier->address;
 			$rows[$key]['id']=$vo->id;
-			$rows[$key]['sku_id']=$vo->purchaseItem->sku;
-			$rows[$key]['采购单ID']=$vo->order_id;
-			$rows[$key]['产品名']=$vo->purchaseItem->product->c_name;
-			$rows[$key]['供应商SKU']=$vo->purchaseItem->supplier_id;
+			$rows[$key]['sku']=$vo->sku;
+			$rows[$key]['采购单ID']=$vo->order_item_id;
+			$rows[$key]['产品名']=$vo->item->product->c_name;
+			$rows[$key]['供应商SKU']=$vo->item->supplier_id;
 			$rows[$key]['采购单审核状态']=config('purchase.purchaseOrder.examineStatus.'.$vo->purchaseOrder->examineStatus);
 			$rows[$key]['采购需求']=config('purchase.purchaseOrder.status.'.$vo->status);
 			$rows[$key]['采购数量']=$vo->purchase_num;

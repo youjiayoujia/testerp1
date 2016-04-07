@@ -9,11 +9,6 @@
         <a class="btn btn-info" id="orderExcelOut"> 导出采购单
         </a>
     </div>
-    <div class="btn-group">
-        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
-            <i class="glyphicon glyphicon-plus"></i> 新增
-        </a>
-    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
 	<th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
@@ -64,20 +59,11 @@
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                @if($purchaseOrder->examineStatus == 2)
                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    <span class="glyphicon glyphicon-pencil"></span>去采购
                 </a>
-                 @if($purchaseOrder->status == 0)
-                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                       data-id="{{ $purchaseOrder->id }}">
-                        <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$purchaseOrder->id}}'>审核</span>
-                    </a>
-                @else
-                    <a href="javascript:" class="btn btn-info btn-xs has_check">
-                        <span class="glyphicon glyphicon-check"></span> <span>已审核</span>
-                    </a>
-                @endif
-                
+                @endif       
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $purchaseOrder->id }}"
                    data-url="{{ route('purchaseOrder.destroy', ['id' =>$purchaseOrder->id]) }}">
@@ -87,36 +73,10 @@
         </tr>
     @endforeach
 
-    <script type="text/javascript">
-        //单个审核
-        $('.examine_model').click(function () {
-            var purchase_id = $(this).data('id');
-            if($(".examine_"+purchase_id).hasClass("hasexamine_"+purchase_id)){
-                alert("该采购单已审核");return;
-            }
-            if (confirm("确认审核?")) {
-                var url = "purchaseOrder/examinePurchaseOrder";
-                $.ajax({
-                    url:url,
-                    data:{purchase_ids:purchase_id},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){
-                        if(result==1){
-                            $(".examine_"+purchase_id).text("已审核");
-                            $(".examine_"+purchase_id).addClass("hasexamine_"+purchase_id);
-                       }else{
-                            alert("审核失败");
-                       }                     
-                    }                  
-                })
-            }
-        });
-
+<script type="text/javascript"> 
         $('.has_check').click(function () {
             alert("该产品已审核");
         });
-
         //批量审核
         $('#batchexamine').click(function () {
             if (confirm("确认审核?")) {

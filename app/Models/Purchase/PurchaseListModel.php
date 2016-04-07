@@ -38,9 +38,9 @@ class PurchaseListModel extends BaseModel
      */
 	 
     protected $fillable = ['type','status','order_id','sku_id','supplier_id','stock','purchase_num','arrival_num','lack_num','platform_id','user_id','update_userid','warehouse_id','purchase_order_id','postage','cost','purchase_cost','costExamineStatus'];
-	public function purchaseItem()
+	public function item()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'sku_id','sku');
+        return $this->belongsTo('App\Models\ItemModel', 'sku','sku');
     }
     public function supplier()
     {

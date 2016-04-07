@@ -207,7 +207,7 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '采购列表',
+                    'name' => '对单',
                     'url' => 'purchaseList.index',
                     'icon' => '',
                 ],

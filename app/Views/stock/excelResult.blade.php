@@ -7,7 +7,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">详细情况</div>
+        <div class="panel-heading">失败记录</div>
         <div class="panel-body">
             <div class='row'>
                 <div class='col-lg-2'><label>sku</label></div>

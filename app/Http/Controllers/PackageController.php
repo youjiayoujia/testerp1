@@ -54,12 +54,11 @@ class PackageController extends Controller
     {
         $id = request()->input('id');
         $package = $this->model->find($id);
-        foreach($package->listItemPackage as $itemPackage)
+        foreach($package->items as $packageItem)
         {
-            $picklistItem = $itemPackage->picklistItem;
-            $item = ItemModel::find($picklistItem->item_id);
-            $item->unhold($picklistItem->warehouse_position_id, $picklistItem->quantity);
-            $item->out($picklistItem->warehouse_position_id, $picklistItem->quantity);
+            $item = ItemModel::find($packageItem->item_id);
+            $item->unhold($packageItem->warehouse_position_id, $packageItem->picked_quantity);
+            $item->out($packageItem->warehouse_position_id, $packageItem->picked_quantity);
         }
         $package->status = 'SHIPPED';
         $package->save();
@@ -90,7 +89,7 @@ class PackageController extends Controller
         $model->logistic_id = request()->input('logistic_id');
         $model->status = 'SHIPPED';
         $model->save();
-        $model->manualLogistic()->create(['logistic_code'=>request()->input('logistic_code'), 'fee'=>request()->input('fee'), 'remark'=>request()->input('remark')]);
+        $model->manualLogistics()->create(['logistic_code'=>request()->input('logistic_code'), 'fee'=>request()->input('fee'), 'remark'=>request()->input('remark')]);
 
         return redirect($this->mainIndex);
     }

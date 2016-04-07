@@ -140,11 +140,6 @@ return [
                     'url' => 'stockTaking.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '盘点调整',
-                    'url' => 'stockTakingAdjustment.index',
-                    'icon' => '',
-                ],
             ],
         ],
     ],
@@ -212,7 +207,7 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '采购列表',
+                    'name' => '对单',
                     'url' => 'purchaseList.index',
                     'icon' => '',
                 ],

@@ -26,7 +26,7 @@
             <td>{{ $logistics->type }}</td>
             <td>{{ $logistics->url }}</td>
             <td>{{ $logistics->api_docking }}</td>
-            <td>{{ $logistics->is_enable == 'Y' ? '是' : '否' }}</td>
+            <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
             <td>{{ $logistics->created_at }}</td>
             <td>{{ $logistics->updated_at }}</td>
             <td>

@@ -73,7 +73,7 @@
     <div class="form-group col-lg-2" style="clear:left;">
         <label for="country_id" class="control-label">已有国家</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <select name="country_id" class="form-control" multiple style="height:600px;width:400px;">
+        <select name="country_id" class="form-control" multiple style="height:600px;width:400px;" id="country_id">
             @foreach($countries as $country)
                 <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
                     {{ $country->name }}
@@ -83,9 +83,11 @@
     </div>
     <div class="form-group col-lg-4" style="margin-left: 100px;">
         <label for="country_id" class="control-label">已选国家</label>
-        <select class="form-control" id="dselectCountry" multiple  style="height:600px;width:400px;">
+        <select class="form-control" name="dselectCountry" id="dselectCountry" multiple  style="height:600px;width:400px;">
             @foreach($selectedCountries as $selectedCountry)
-                <option class="form-control thecountry" value="{{ $selectedCountry  }}" onclick="deleteCountry( this )">{{ $selectedCountry }}</option>
+                <option class="form-control thecountry" value="{{ $selectedCountry }}" onclick="deleteCountry( this )">
+                    {{ $selectedCountry }}
+                </option>
             @endforeach
         </select>
     </div>

@@ -21,7 +21,7 @@
             <td>{{ $supplier->name }}</td>
             <td>{{ $supplier->customer_id }}</td>
             <td>{{ $supplier->secret_key }}</td>
-            <td>{{ $supplier->is_api == 'Y' ? '有' : '没有' }}</td>
+            <td>{{ $supplier->is_api == '1' ? '有' : '没有' }}</td>
             <td>{{ $supplier->client_manager }}</td>
             <td>{{ $supplier->manager_tel }}</td>
             <td>{{ $supplier->technician }}</td>

@@ -16,7 +16,7 @@
                 <strong>包裹ID</strong>: {{ $model->package_id }}
             </div>
             <div class="col-lg-4">
-                <strong>状态</strong>: {{ $model->status == 'Y' ? '启用' : '未启用' }}
+                <strong>状态</strong>: {{ $model->status == '1' ? '启用' : '未启用' }}
             </div>
             <div class="col-lg-4">
                 <strong>使用时间</strong>: {{ $model->used_at }}

@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use DB;
+use Excel;
 use Exception;
 use App\Base\BaseModel;
 use App\Models\Stock\InModel;
 use App\Models\Stock\OutModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\ItemModel;
+use App\Models\WarehouseModel;
 
 class StockModel extends BaseModel
 {
@@ -42,18 +45,14 @@ class StockModel extends BaseModel
     public $rules = [
         'create' => [
             'warehouse_id' => 'required|integer',
-            'warehouse_position_id' => 'required|integer',
+            'warehouse_position_id' => 'required',
             'all_quantity' => 'required|integer',
-            'available_quantity' => 'required|integer',
-            'hold_quantity' => 'required|integer',
-            'amount' => 'required|numeric',
+            'unit_price' => 'required|numeric',
         ],
         'update' => [
             'warehouse_id' => 'required|integer',
-            'warehouse_position_id' => 'required|integer',
+            'warehouse_position_id' => 'required',
             'all_quantity' => 'required|integer',
-            'available_quantity' => 'required|integer',
-            'hold_quantity' => 'required|integer',
             'amount' => 'required|numeric',
         ],
     ];
@@ -227,5 +226,51 @@ class StockModel extends BaseModel
             'relation_id' => $relation_id,
             'remark' => $remark
         ]);
+    }
+
+    /**
+     * 整体流程处理excel
+     *
+     * @param $file 文件指针 
+     *
+     */
+    public function excelProcess($file)
+    {
+        $path = config('setting.stockExcelPath');
+        !file_exists($path.'stockExcelProcess.xls') or unlink($path.'stockExcelProcess.xls');
+        $file->move($path, 'stockExcelProcess.xls');
+        return $this->excelDataProcess($path.'stockExcelProcess.xls');
+    }
+
+    /**
+     * 处理excel数据
+     *
+     * @param $path excel文件路径
+     *
+     */
+    public function excelDataProcess($path)
+    {
+        Excel::load($path, function($reader) {
+            $data = $reader->toArray();
+            foreach($data as $stock)
+            {
+                if(!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
+                    continue;
+                }
+                $tmp_position = PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->first();
+                if(!ItemModel::where(['sku' => $stock['sku']])->count()) {
+                    continue;
+                }
+                $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
+                if(StockModel::where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->count()) {
+                    continue;
+                }
+                $buf = $this->create($stock);
+                $buf->update(['warehouse_position_id' => $tmp_position->id, 'item_id' => $tmp_item->id]);
+                $buf->update(['warehouse_id'=>PositionModel::find($buf->warehouse_position_id)->warehouse->id]);
+            }
+        });
+
+        return;
     }
 }

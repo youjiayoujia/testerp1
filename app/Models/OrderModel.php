@@ -231,27 +231,10 @@ class OrderModel extends BaseModel
     public function createOrder($data)
     {
         $order = $this->create($data);
-        if ($data['_token']) {
-            foreach ($data['arr'] as $key => $item) {
-                foreach ($item as $k => $v) {
-                    $data['items'][$k][$key] = $v;
-                }
-            }
-            foreach ($data['items'] as $item) {
-//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
-                $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
-                echo $item['order_id'] . "</br>";
-                ItemModel::create($item);
-//                $order->items->create($item);
-            }
-        } else {
-            foreach ($data['items'] as $item) {
-//                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
-                $item['order_id'] = OrderModel::where(['ordernum' => $data['ordernum']])->first()->id;
-                echo $item['order_id'] . "</br>";
-                ItemModel::create($item);
-//                $order->items->create($item);
-            }
+        foreach ($data['items'] as $item) {
+//            $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+            $order->items()->create($item);
+
         }
 
         return $order;

@@ -31,17 +31,17 @@
         <label for="used_at" class="control-label">使用时间</label>
         <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') ? old('used_at') : $model->used_at }}">
     </div>
-    <div class="form-group col-lg-3">
+    <div class="form-group col-lg-12">
         <label for="status" class="control-label">状态</label>
         <small class="text-danger glyphicon glyphicon-asterisk"></small>
         <div class="radio">
             <label>
-                <input type="radio" name="status" value="Y" {{ $model->status == 'Y' ? 'checked' : '' }}>启用
+                <input type="radio" name="status" value="1" {{ $model->status == '1' ? 'checked' : '' }}>启用
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" name="status" value="N" {{ $model->status == 'N' ? 'checked' : '' }}>未启用
+                <input type="radio" name="status" value="0" {{ $model->status == '0' ? 'checked' : '' }}>未启用
             </label>
         </div>
     </div>

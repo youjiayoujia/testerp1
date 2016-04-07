@@ -70,10 +70,11 @@
                 <textarea class="vLargeTextField" cols="50" id="s_filter_attributes" name="s_filter_attributes" rows="3"></textarea>
             </td>
         </tr>
-        <tr>
+        <!--<tr>
             <td><label>尺码: </label></td>
             <td></td>
         </tr>
+        -->
         <tr>
             <td><label>尺码描述: </label></td>
             <td>
@@ -156,6 +157,23 @@
             <td><label>选款人ID: </label>{{$model->upload_user}}</td>
             <td></td>
         </tr>
+        <?php if($model->data_edit_not_pass_remark!=''){ ?>
+            <tr>
+                <td><label>资料审核不通过原因: </label></td>
+                <td>
+                    <label>{{$model->data_edit_not_pass_remark}}</label>
+                </td>
+            </tr>
+        <?php } ?>
+
+        <?php if($model->image_edit_not_pass_remark!=''){ ?>
+            <tr>
+                <td><label>图片审核不通过原因: </label></td>
+                <td>
+                    <label>{{$model->image_edit_not_pass_remark}} </label>
+                </td>
+            </tr>
+        <?php } ?>
         <tr>
             <td colspan="2"><label>上传时间: </label>{{$model->created_at}}</td>
             

@@ -145,34 +145,43 @@ class PurchaseListController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-	public function generateDarCode($id){
+	/*public function generateDarCode($id){
 		$model=$this->model->find($id);
-		$res=InModel::where('relation_id',$id)->get()->toArray();		
-		if(isset($res)){
+		$res=InModel::where('relation_id',$id)->count();			
+		if($res>0){
 			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '已生成条码.'));		
 		}else{
-			$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
-			foreach($position as $key=>$v){
-				$WarehousePositionIds[$key]=$v->id;
+			$stock_num=StockModel::where('warehouse_id',$model->warehouse_id)->where('item_id',$model->item->id)->count();
+			if($stock_num>0){
+				$res=StockModel::where('warehouse_id',$model->warehouse_id)->where('item_id',$model->item->id)->get();
+				foreach($res as $key=>$v){
+					$WarehousePositionIds[$key]=$v->warehouse_position_id;
+				}
+					
+			}else{
+				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
+					foreach($position as $key=>$v){
+						$WarehousePositionIds[$key]=$v->id;
+					}
+				$randKey=array_rand($WarehousePositionIds,1);
+				$stockData['warehouse_id']=$model->warehouse_id;
+				$stockData['item_id']=$model->item->id;
+				$stockData['warehouse_position_id']=$WarehousePositionIds[$randKey];
+				$stockData['all_quantity']=$model->arrival_num;
+				$stockData['hold_quantity']=$model->arrival_num;
+				$stockData['amount']=$model->purchase_cost;
+				$stockCreate=StockModel::create($stockData);
+				$stockId=$stockCreate->id;
+				ItemModel::find($model->item->id)->in($stockData['warehouse_position_id'],$model->arrival_num, $model->purchase_cost*$model->purchase_num, 0,$model->id, $remark = '订单采购！');
+				$position=PositionModel::find($WarehousePositionIds[$randKey]);
+				$warehouseId=$position->warehouse_id;
+				$warehouseName=$position->name;
+				$sku=$model->sku;
+				$barCode=$sku.$warehouseId.$warehouseName;
+				echo $barCode;
 			}
-			$randKey=array_rand($WarehousePositionIds,1);
-			$stockData['warehouse_id']=$model->warehouse_id;
-			$stockData['item_id']=$model->item->id;
-			$stockData['warehouse_position_id']=$WarehousePositionIds[$randKey];
-			$stockData['all_quantity']=$model->arrival_num;
-			$stockData['hold_quantity']=$model->arrival_num;
-			$stockData['amount']=$model->purchase_cost;
-			$stockCreate=StockModel::create($stockData);
-			$stockId=$stockCreate->id;
-			ItemModel::find($model->item->id)->in($stockData['warehouse_position_id'],$model->arrival_num, $model->purchase_cost*$model->purchase_num, 0,$model->id, $remark = '订单采购！');
-			$position=PositionModel::find($WarehousePositionIds[$randKey]);
-			$warehouseId=$position->warehouse_id;
-			$warehouseName=$position->name;
-			$sku=$model->sku;
-			$barCode=$sku.$warehouseId.$warehouseName;
-			echo $barCode;
 		}
-	}
+	}*/
 	
 }
 

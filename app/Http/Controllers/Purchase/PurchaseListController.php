@@ -17,16 +17,15 @@ use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
+use App\Models\Stock\InModel;
 use App\Models\Warehouse\PositionModel;
 
 class PurchaseListController extends Controller
 {
 
-    public function __construct(PurchaseItemModel $purchaseList,StockModel $stock,PositionModel $position)
+    public function __construct(PurchaseItemModel $purchaseList)
     {
         $this->model = $purchaseList;
-		$this->stock=$stock;
-		$this->position=$position;
         $this->mainIndex = route('purchaseList.index');
         $this->mainTitle = '采购对单';
 		$this->viewPath = 'purchase.purchaseList.';
@@ -70,8 +69,16 @@ class PurchaseListController extends Controller
 	
 	public function update($id)
 	{
-		$model=request()->all();
-		$model->uopdate($data);
+		$data=request()->all();
+		$model=$this->model->find($id);
+		if($data['arrival_num']==$model->purchase_num){
+			$data['lack_num']=0;
+			$data['status']=2;
+		}
+		if($data['active']>0){
+			$data['active_status']=1;
+		}
+		$model->update($data);
         return redirect($this->mainIndex);		
 	}
 	
@@ -87,7 +94,7 @@ class PurchaseListController extends Controller
 	public function activeChange($id)
 	{
 		$res=$this->model->find($id);
-		$second_supplier_id=$res->purchaseItem->second_supplier_id;
+		$second_supplier_id=$res->item->second_supplier_id;
 		$second_supplier=SupplierModel::find($second_supplier_id);	
 		$response = [
 			'metas' => $this->metas(__FUNCTION__),
@@ -119,7 +126,12 @@ class PurchaseListController extends Controller
 		return 1;
 		
 	}
-	
+	/**
+     * 对单入库
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	public function stockIn($id){
 		$response = [
 			'metas' => $this->metas(__FUNCTION__),
@@ -127,43 +139,39 @@ class PurchaseListController extends Controller
         ];
 		 return view($this->viewPath . 'stockIn', $response);
 	}
-	
+	/**
+     * 生成条码
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	public function generateDarCode($id){
-		$purchaseItem=$this->model->find($id);
-		$res=$this->stock->where('item_id',$purchaseItem->purchaseItem->id)->where('warehouse_id',$purchaseItem->warehouse_id)->count();
-		$itemStock=$this->stock->where('item_id',$purchaseItem->purchaseItem->id)->where('warehouse_id',$purchaseItem->warehouse_id)->first();		
-		/*if($res>0){
-			$stockData['all_quantity']=$itemStock->all_quantity+$purchaseItem->arrival_num;
-			$stockData['hold_quantity']=$itemStock->hold_quantity+$purchaseItem->arrival_num;
-			
-		}else{*/
-			$position=$this->position->where('warehouse_id',$purchaseItem->warehouse_id)->get();
+		$model=$this->model->find($id);
+		$res=InModel::where('relation_id',$id)->get()->toArray();		
+		if(isset($res)){
+			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '已生成条码.'));		
+		}else{
+			$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
 			foreach($position as $key=>$v){
 				$WarehousePositionIds[$key]=$v->id;
-				}
+			}
 			$randKey=array_rand($WarehousePositionIds,1);
-			$stockData['warehouse_id']=$purchaseItem->warehouse_id;
-			$stockData['item_id']=$purchaseItem->purchaseItem->id;
+			$stockData['warehouse_id']=$model->warehouse_id;
+			$stockData['item_id']=$model->item->id;
 			$stockData['warehouse_position_id']=$WarehousePositionIds[$randKey];
-			$stockData['all_quantity']=$purchaseItem->arrival_num;
-			$stockData['hold_quantity']=$purchaseItem->arrival_num;
-			$stockData['amount']=$purchaseItem->purchase_cost;
-			$stockCreate=$this->stock->create($stockData);
+			$stockData['all_quantity']=$model->arrival_num;
+			$stockData['hold_quantity']=$model->arrival_num;
+			$stockData['amount']=$model->purchase_cost;
+			$stockCreate=StockModel::create($stockData);
 			$stockId=$stockCreate->id;
-			$item= new ItemModel;
-			$item->find($purchaseItem->purchaseItem->id)->in($stockData['warehouse_position_id'],$purchaseItem->arrival_num, $purchaseItem->purchase_cost, 0,$purchaseItem->purchase_order_id, $remark = '订单采购！');
-			$position=$this->position->find($WarehousePositionIds[$randKey]);
+			ItemModel::find($model->item->id)->in($stockData['warehouse_position_id'],$model->arrival_num, $model->purchase_cost*$model->purchase_num, 0,$model->id, $remark = '订单采购！');
+			$position=PositionModel::find($WarehousePositionIds[$randKey]);
 			$warehouseId=$position->warehouse_id;
 			$warehouseName=$position->name;
-			$sku=$purchaseItem->sku_id;
+			$sku=$model->sku;
 			$barCode=$sku.$warehouseId.$warehouseName;
-			//$d = new DNS1D();
-			//$d->setStorPath(__DIR__."/cache/");
-			//echo $d->getBarcodeHTML("9780691147727", "EAN13");
-			//echo DNS1D::getBarcodeSVG("4445645656", "PHARMA2T");
-			//echo $barCode;exit;
-		/*}*/
-			//$barcode=$this->stock->where(''=>'',''=>'')->get();
+			echo $barCode;
+		}
 	}
 	
 }

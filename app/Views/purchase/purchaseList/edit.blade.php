@@ -32,15 +32,15 @@
     </div>
     <div class="row">
     <div class="form-group col-lg-3">
-            <label >报残:</label>
-           <select  class="form-control" name="active_status" id='type' onChange="reportwait(this.id)">
-            @foreach(config('purchase.purchaseItem.active_status.3') as $k=>$v)
-            	<option value="{{$k}}" >{{ $v }}</option>
+            <label >异常:</label>
+           <select  class="form-control" name="active" id='type' onChange="reportwait(this.id)">
+            @foreach(config('purchase.purchaseItem.active') as $k=>$v)
+            	<option value="{{$k}}" @if($k==$model->active) selected @endif>{{ $v }}</option>   
             @endforeach
             </select>
     </div>
     <div class="form-group col-lg-3" >
-        <label for="URL">报残备注：</label>
+        <label for="URL">备注：</label>
         <input type="text" class="form-control"  name="remark" value=""/>
     </div>
     </div>

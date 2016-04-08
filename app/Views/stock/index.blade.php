@@ -7,6 +7,7 @@
     <th class='sort' data-field='all_quantity'>总数量</th>
     <th class='sort' data-field='available_quantity'>可用数量</th>
     <th class='sort' data-field='hold_quantity'>hold数量</th>
+    <th class='sort' data-field='unit_cost'>单价</th>
     <th class='sort' data-field='amount'>总金额</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
@@ -21,6 +22,7 @@
             <td>{{ $stock->all_quantity}}</td>
             <td>{{ $stock->available_quantity}}</td>
             <td>{{ $stock->hold_quantity}}</td>
+            <td>{{ round($stock->amount/$stock->all_quantity, 2) }}</td>
             <td>{{ $stock->amount}}</td>
             <td>{{ $stock->created_at }}</td>
             <td>

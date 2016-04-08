@@ -12,62 +12,12 @@ namespace App\Models;
 
 use Tool;
 use App\Base\BaseModel;
-use App\Models\ItemModel as productItem;
-use App\Models\Order\ItemModel;
 
 class OrderModel extends BaseModel
 {
     protected $table = 'orders';
 
-    protected $fillable = [
-        'channel_id',
-        'channel_account_id',
-        'ordernum',
-        'channel_ordernum',
-        'email',
-        'status',
-        'active',
-        'amount',
-        'amount_product',
-        'amount_shipping',
-        'amount_coupon',
-        'is_partial',
-        'by_hand',
-        'is_affair',
-        'affairer',
-        'customer_service',
-        'operator',
-        'payment',
-        'currency',
-        'rate',
-        'ip',
-        'address_confirm',
-        'comment',
-        'comment1',
-        'remark',
-        'import_remark',
-        'shipping',
-        'shipping_firstname',
-        'shipping_lastname',
-        'shipping_address',
-        'shipping_address1',
-        'shipping_city',
-        'shipping_state',
-        'shipping_country',
-        'shipping_zipcode',
-        'shipping_phone',
-        'billing_firstname',
-        'billing_lastname',
-        'billing_address',
-        'billing_city',
-        'billing_state',
-        'billing_country',
-        'billing_zipcode',
-        'billing_phone',
-        'payment_date',
-        'affair_time',
-        'create_time',
-    ];
+    protected $guarded = [];
 
     public $searchFields = [
         'channel_id',
@@ -240,71 +190,109 @@ class OrderModel extends BaseModel
         return $order;
     }
 
+    /**
+     * @param array $items
+     * @return bool
+     * todo:更新订单状态
+     * todo:判断订单是否要生成包裹
+     * todo:订单优先级
+     * todo:判断订单是否需要拆单先发
+     * todo:判断订单是否要hold库存
+     */
     public function createPackage($items = [])
     {
         $items = $this->setPackageItems($items);
         if ($items) {
-            $package = [];
-            //channel
-            $package['channel_id'] = $this->channel_id;
-            //assigner
-            $package['assigner_id'] = 1;
-            //type
-            $package['type'] = $this->judgePacketType($items);
-            $package['status'] = 'PROCESSING';
-            $package['weight'] = 0;
-            $package['length'] = 0;
-            $package['width'] = 0;
-            $package['height'] = 0;
-            $package['email'] = $this->email;
-            $package['shipping_firstname'] = $this->shipping_firstname;
-            $package['shipping_lastname'] = $this->shipping_lastname;
-            $package['shipping_address'] = $this->shipping_address;
-            $package['shipping_address1'] = $this->shipping_address1;
-            $package['shipping_city'] = $this->shipping_city;
-            $package['shipping_state'] = $this->shipping_state;
-            $package['shipping_country'] = $this->shipping_country;
-            $package['shipping_zipcode'] = $this->shipping_zipcode;
-            $package['shipping_phone'] = $this->shipping_phone;
-            //auto process
-            $package['is_auto'] = 1;
-            //auto assign logsitic
-            $package['is_auto_logistic'] = 1;
-            $package = $this->packages()->create($package);
-            if ($package) {
-                foreach ($items as $item) {
-                    $package->items()->create($item);
+            foreach ($items as $warehouseId => $packageItems) {
+                $package = [];
+                //channel
+                $package['channel_account_id'] = $this->channel_account_id;
+                //warehouse
+                $package['warehouse_id'] = $warehouseId;
+                //assigner
+                $package['assigner_id'] = 1;
+                //type
+                $package['type'] = $this->judgePacketType($packageItems);
+                $package['email'] = $this->email;
+                $package['shipping_firstname'] = $this->shipping_firstname;
+                $package['shipping_lastname'] = $this->shipping_lastname;
+                $package['shipping_address'] = $this->shipping_address;
+                $package['shipping_address1'] = $this->shipping_address1;
+                $package['shipping_city'] = $this->shipping_city;
+                $package['shipping_state'] = $this->shipping_state;
+                $package['shipping_country'] = $this->shipping_country;
+                $package['shipping_zipcode'] = $this->shipping_zipcode;
+                $package['shipping_phone'] = $this->shipping_phone;
+                $package = $this->packages()->create($package);
+                if ($package) {
+                    $packageWeight = 0;
+                    foreach ($packageItems as $packageItem) {
+                        $packageWeight += $packageItem['weight'];
+                        $package->items()->create($packageItem);
+                    }
+                    $package->update(['weight' => $packageWeight]);
                 }
-                return true;
             }
+            return true;
         }
         return false;
     }
 
+    /**
+     * @param array $items
+     * @return array|bool
+     * todo:默认仓库,默认同仓库
+     * todo:hold库存,unhold库存
+     * todo:生成采购需求
+     */
     public function setPackageItems($items = [])
     {
         $packageItem = [];
         if ($items) {
             foreach ($items as $key => $item) {
                 if ($item['quantity'] > 0) {
+                    $orderItem = $this->items->find($item['order_item_id']);
                     //package item quantity must not more than order item
-                    if ($item['quantity'] > $this->items->find($item['order_item_id'])->quantity) {
+                    if ($item['quantity'] > $orderItem->quantity) {
+                        exit('包裹产品数量不能大于订单产品数量');
+                    }
+//                    $stocks = $orderItem->item->assignStock($item['quantity']);
+                    $stocks = $orderItem->item->stocks;
+                    if ($stocks) {
+                        foreach ($stocks as $warehouseId => $stock) {
+                            foreach ($stock as $warehousePositionId => $value) {
+                                $key = $orderItem->item_id . '-' . $warehousePositionId;
+                                $packageItem[$warehouseId][$key]['item_id'] = $orderItem->item_id;
+                                $packageItem[$warehouseId][$key]['warehouse_position_id'] = $warehousePositionId;
+                                $packageItem[$warehouseId][$key]['order_item_id'] = $orderItem->id;
+                                $packageItem[$warehouseId][$key]['quantity'] = $value['quantity'];
+                                $packageItem[$warehouseId][$key]['weight'] = $value['weight'];
+                                $packageItem[$warehouseId][$key]['remark'] = $item['remark'];
+                            }
+                        }
+                    } else {
                         return false;
                     }
-                    $packageItem[$key]['item_id'] = $item['item_id'];
-//                $packageItem[]['warehouse_postion_id'] = 1; //todo
-                    $packageItem[$key]['order_item_id'] = $item['order_item_id'];
-                    $packageItem[$key]['quantity'] = $item['quantity'];
-                    $packageItem[$key]['remark'] = $item['remark'];
                 }
             }
         } else {
             foreach ($this->items as $key => $item) {
-                $packageItem[$key]['item_id'] = $item->item_id;
-//                $packageItem[]['warehouse_postion_id'] = 1; //todo
-                $packageItem[$key]['order_item_id'] = $item->id;
-                $packageItem[$key]['quantity'] = $item->quantity;
-                $packageItem[$key]['remark'] = 'REMARK';
+                $stocks = $item->item->assignStock($item->quantity);
+                if ($stocks) {
+                    foreach ($stocks as $warehouseId => $stock) {
+                        foreach ($stock as $warehousePositionId => $value) {
+                            $key = $item->item_id . '-' . $warehousePositionId;
+                            $packageItem[$warehouseId][$key]['item_id'] = $item->item_id;
+                            $packageItem[$warehouseId][$key]['warehouse_position_id'] = $warehousePositionId;
+                            $packageItem[$warehouseId][$key]['order_item_id'] = $item->id;
+                            $packageItem[$warehouseId][$key]['quantity'] = $value['quantity'];
+                            $packageItem[$warehouseId][$key]['weight'] = $value['weight'];
+                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                        }
+                    }
+                } else {
+                    return false;
+                }
             }
         }
         return $packageItem;

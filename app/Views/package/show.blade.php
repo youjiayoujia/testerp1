@@ -31,6 +31,7 @@
             <table class="table">
                 <thead>
                 <tr>
+                    <th></th>
                     <th>SKU</th>
                     <th>库位</th>
                     <th>数量</th>
@@ -40,6 +41,7 @@
                 <tbody>
                 @foreach($model->items as $item)
                     <tr>
+                        <td><img src="{{ asset($item->item->image) }}" width="100"></td>
                         <td>{{ $item->item->sku }}</td>
                         <td>{{ $item->warehousePosition->name }}</td>
                         <td>{{ $item->quantity }}</td>

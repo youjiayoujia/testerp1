@@ -23,6 +23,7 @@ class CreatePackages extends Migration
             $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI',])->default('SINGLE')->comment('类型');
             $table->enum('status',
                 [
+                    'NEW',
                     'PROCESSING',
                     'PICKING',
                     'PICKED',
@@ -30,12 +31,12 @@ class CreatePackages extends Migration
                     'PACKED',
                     'SHIPPED',
                     'ERROR'
-                ])->default('PROCESSING')->comment('状态');
-            $table->decimal('cost', 10, 4)->comment('物流成本');
-            $table->decimal('weight', 10, 4)->comment('重量');
-            $table->decimal('length', 10, 4)->comment('长');
-            $table->decimal('width', 10, 4)->comment('宽');
-            $table->decimal('height', 10, 4)->comment('高');
+                ])->default('NEW')->comment('状态');
+            $table->decimal('cost', 10, 2)->comment('物流成本');
+            $table->decimal('weight', 10, 2)->comment('重量');
+            $table->decimal('length', 10, 2)->comment('长');
+            $table->decimal('width', 10, 2)->comment('宽');
+            $table->decimal('height', 10, 2)->comment('高');
             $table->string('tracking_no')->comment('追踪号');
             $table->string('tracking_link')->comment('追踪链接');
             $table->string('email')->comment('Email');
@@ -48,8 +49,7 @@ class CreatePackages extends Migration
             $table->string('shipping_country')->comment('发货国家/地区');
             $table->string('shipping_zipcode')->comment('发货邮编');
             $table->string('shipping_phone')->comment('发货电话');
-            $table->enum('is_auto', [0, 1])->default(1)->comment('是否自动发货');
-            $table->enum('is_auto_logistic', [0, 1])->default(1)->comment('自动分配物流');
+            $table->enum('is_auto', [0, 1])->default(0)->comment('是否自动发货');
             $table->text('remark')->comment('备注');
             $table->timestamp('logistic_assigned_at')->comment('物流分配时间');
             $table->timestamp('printed_at')->comment('打印面单时间');

@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Models\Product\SupplierModel;
+use Tool;
 use App\Base\BaseModel;
 use App\Models\Warehouse\PositionModel;
 use Exception;
@@ -18,31 +18,7 @@ class ItemModel extends BaseModel
         'update' => []
     ];
 
-    protected $fillable = [
-        'product_id',
-        'sku',
-        'weight',
-        'inventory',
-        'name',
-        'c_name',
-        'alias_name',
-        'alias_cname',
-        'catalog_id',
-        'supplier_id',
-        'supplier_sku',
-        'second_supplier_id',
-        'supplier_info',
-        'purchase_url'
-        ,
-        'purchase_price',
-        'purchase_carriage',
-        'product_size',
-        'package_size',
-        'carriage_limit',
-        'package_limit',
-        'status',
-        'remark'
-    ];
+    protected $guarded = [];
 
     public function product()
     {
@@ -65,6 +41,11 @@ class ItemModel extends BaseModel
     public function stocks()
     {
         return $this->hasMany('App\Models\StockModel', 'item_id');
+    }
+
+    public function getImageAttribute()
+    {
+        return $this->product->image->path . $this->product->image->name;
     }
 
     /**
@@ -107,8 +88,9 @@ class ItemModel extends BaseModel
     public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+        }
     }
 
     /**
@@ -122,8 +104,9 @@ class ItemModel extends BaseModel
     public function hold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->hold($quantity);
+        }
     }
 
     /**
@@ -137,8 +120,9 @@ class ItemModel extends BaseModel
     public function unhold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->unhold($quantity);
+        }
     }
 
     /**
@@ -156,41 +140,40 @@ class ItemModel extends BaseModel
     public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '1', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->out($quantity, $type, $relation_id, $remark);
+        }
     }
 
     /**
-     * 通过item_id和quantity自动分配库位 
+     * 通过item_id和quantity自动分配库存
      *
-     * @param $item_id $quantity
+     * @param $quantity
      * @return array
      *
      */
-    public function allocateStock($quantity) 
+    public function assignStock($quantity)
     {
-        $stocks = $this->stocks()->get();
-        foreach($stocks as $stock)
-        {
-            if($stock->available_quantity > $quantity) {
-                return [[$stock->warehouse_position_id, $quantity, $stock->id]];
-            }
-        }
-        $arr = [];
-        foreach($stocks as $stock)
-        {
-            if($stock->available_quantity < $quantity) {
-                $quantity -= $stock->available_quantity;
-                $arr[] = [$stock->warehouse_position_id, $stock->available_quantity, $stock->id];
-            } else {
-                $arr[] = [$stock->warehouse_position_id, $quantity, $stock->id];
-                $quantity -= $quantity;
-            }
-        }
-        if($arr) {
-            return $arr;
+        $stocks = [];
+        $stock = $this->stocks->where('available_quantity', '>=', $quantity)->first();
+        if ($stock) {
+            $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+            $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
         } else {
-            return 'false';
+            if ($this->stocks->sum('available_quantity') >= $quantity) {
+                foreach ($this->stocks as $stock) {
+                    if ($stock->available_quantity < $quantity) {
+                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $stock->available_quantity;
+                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $stock->available_quantity;
+                        $quantity -= $stock->available_quantity;
+                    } else {
+                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
+                        break;
+                    }
+                }
+            }
         }
+        return $stocks;
     }
 }

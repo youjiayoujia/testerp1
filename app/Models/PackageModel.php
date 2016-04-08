@@ -14,37 +14,7 @@ class PackageModel extends BaseModel
         'update' => [],
     ];
 
-    protected $fillable = [
-        'order_id',
-        'logsitic_id',
-        'picklist_id',
-        'assigner_id',
-        'status',
-        'cost',
-        'weight',
-        'length',
-        'width',
-        'height',
-        'tracking_no',
-        'tracking_link',
-        'email',
-        'shipping_firstname',
-        'shipping_lastname',
-        'shipping_address',
-        'shipping_address1',
-        'shipping_city',
-        'shipping_state',
-        'shipping_country',
-        'shipping_zipcode',
-        'shipping_phone',
-        'is_auto',
-        'is_auto_logistic',
-        'remark',
-        'logistic_assigned_at',
-        'printed_at',
-        'shipped_at',
-        'delivered_at',
-    ];
+    protected $guarded = [];
 
     public function assigner()
     {

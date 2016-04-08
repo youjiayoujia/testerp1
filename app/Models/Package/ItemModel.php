@@ -17,6 +17,7 @@ class ItemModel extends BaseModel
 
     protected $fillable = [
         'item_id',
+        'warehouse_position_id',
         'package_id',
         'order_item_id',
         'quantity',

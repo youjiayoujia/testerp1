@@ -19,8 +19,8 @@ class CreateOrderItems extends Migration
             $table->string('sku')->comment('sku');
             $table->integer('quantity')->comment('数量');
             $table->float('price')->comment('金额');
-            $table->integer('status')->comment('订单状态');
-            $table->integer('ship_status')->comment('发货状态');
+            $table->integer('status')->comment('是否有效');
+            $table->string('ship_status')->comment('发货状态');
             $table->integer('is_gift')->comment('是否赠品');
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->timestamps();

@@ -19,8 +19,8 @@ class CreateOrders extends Migration
             $table->string('ordernum')->comment('订单号');
             $table->string('channel_ordernum')->comment('渠道订单号');
             $table->string('email')->comment('邮箱');
-            $table->integer('status')->comment('订单状态');
-            $table->integer('active')->comment('售后状态');
+            $table->string('status')->comment('订单状态');
+            $table->string('active')->comment('售后状态');
             $table->double('amount', 15, 2)->comment('收款金额');
             $table->double('amount_product', 15, 2)->comment('产品金额');
             $table->double('amount_shipping', 15, 2)->comment('订单运费');

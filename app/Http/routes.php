@@ -157,15 +157,16 @@ Route::resource('logisticsSupplier', 'Logistics\SupplierController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
+Route::get('poolQuantity', ['uses' => 'LogisticsController@poolQuantity', 'as' => 'poolQuantity']);
 Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
 Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
 Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);
 Route::get('countExpress/{id}', ['uses' => 'Logistics\ZoneController@countExpress', 'as' => 'countExpress']);
 Route::get('countPacket/{id}', ['uses' => 'Logistics\ZoneController@countPacket', 'as' => 'countPacket']);
-Route::get('batchAddTrCode/{logistic_id}',
+Route::get('batchAddTrCode/{logistics_id}',
     ['uses' => 'Logistics\CodeController@batchAddTrCode', 'as' => 'batchAddTrCode']);
 Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCodeFn', 'as' => 'logisticsCodeFn']);
-Route::get('scanAddTrCode/{logistic_id}',
+Route::get('scanAddTrCode/{logistics_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 

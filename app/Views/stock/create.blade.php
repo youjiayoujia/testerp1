@@ -27,8 +27,8 @@
             <input type='text' class="form-control all_quantity" id="all_quantity" placeholder="总数量" name='all_quantity' value="{{ old('all_quantity') }}">
         </div>
         <div class="form-group col-sm-3">
-            <label for="unit_price" class='control-label'>单价(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control unit_price" id="unit_price" placeholder="单价" name='unit_price' value="{{ old('unit_price') }}">
+            <label for="unit_cost" class='control-label'>单价(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control unit_cost" id="unit_cost" placeholder="单价" name='unit_cost' value="{{ old('unit_cost') }}">
         </div>
     </div>
 @stop

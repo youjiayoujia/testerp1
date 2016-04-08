@@ -157,11 +157,11 @@ class PositionController extends Controller
             ];
         $name = 'warehouse_position';
         Excel::create($name, function($excel) use ($rows){
-            $nameSheet='投诉列表';
+            $nameSheet='库位';
             $excel->sheet($nameSheet, function($sheet) use ($rows){
                 $sheet->fromArray($rows);
             });
-        })->download('xls');
+        })->download('csv');
     }
 
     /**
@@ -190,9 +190,12 @@ class PositionController extends Controller
         if(request()->hasFile('excel'))
         {
            $file = request()->file('excel');
-           $this->model->excelProcess($file);
+           $errors = $this->model->excelProcess($file);
+           $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'errors' => $errors,
+            ];
+            return view($this->viewPath.'excelResult', $response);
         }
-
-        return redirect($this->mainIndex);
     }
 }

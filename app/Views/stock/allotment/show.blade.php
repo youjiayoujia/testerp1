@@ -38,7 +38,7 @@
     @foreach($allotments as $allotment)
     <div class='row'>
         <div class="col-lg-2">
-            <strong>sku</strong>: {{ $allotment->items ? $allotment->items->sku : '' }}
+            <strong>sku</strong>: {{ $allotment->item ? $allotment->item->sku : '' }}
         </div>
         <div class="col-lg-2">
             <strong>库位</strong>: {{ $allotment->position ? $allotment->position->name : '' }}

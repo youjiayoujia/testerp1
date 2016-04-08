@@ -157,6 +157,7 @@ Route::resource('logisticsSupplier', 'Logistics\SupplierController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
+Route::get('poolQuantity', ['uses' => 'LogisticsController@poolQuantity', 'as' => 'poolQuantity']);
 Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
 Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
 Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);

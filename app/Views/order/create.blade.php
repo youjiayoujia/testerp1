@@ -131,12 +131,12 @@
             <div class="form-group col-lg-2">
                 <label for="affair_time" class='control-label'>做账时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') }}">
+                <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') }}" readonly>
             </div>
             <div class="form-group col-lg-2">
                 <label for="create_time" class='control-label'>定义时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="create_time" placeholder="定义时间" name='create_time' value="{{ old('create_time') }}">
+                <input class="form-control" id="create_time" placeholder="定义时间" name='create_time' value="{{ old('create_time') }}" readonly>
             </div>
             <div class="form-group col-lg-2">
                 <label for="is_partial" class='control-label'>是否分批发货</label>
@@ -340,7 +340,7 @@
             <div class="form-group col-lg-2">
                 <label for="payment_date" class='control-label'>支付时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">
+                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}" readonly>
             </div>
         </div>
     </div>

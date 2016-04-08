@@ -1,4 +1,7 @@
 @extends('common.form')
+
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+
 @section('formAction') {{ route('logistics.store') }} @stop
 @section('formAttributes') name='creator'@stop
 @section('formBody')
@@ -57,6 +60,33 @@
             </select>
         </div>
         <div class="form-group col-lg-4">
+            <label for="template" class="control-label">面单模版</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="template" id="template">
+                @foreach(config('logistics.template') as $template)
+                    <option value="{{ $template }}" {{ old('template') == $template ? 'selected' : '' }}>
+                        {{ $template }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="return_address" class="control-label">回邮地址</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="return_address" id="return_address">
+                @foreach(config('logistics.return_address') as $return_address)
+                    <option value="{{ $return_address }}" {{ old('return_address') == $return_address ? 'selected' : '' }}>
+                        {{ $return_address }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-4" id="pool_quantity">
+            <label for="pool_quantity" class="control-label">号码池数量</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="pool_quantity" placeholder="号码池数量" name='pool_quantity' value="{{ old('pool_quantity') }}">
+        </div>
+        <div class="form-group col-lg-4">
             <label for="species" class="control-label">种类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
@@ -86,3 +116,20 @@
         </div>
     </div>
 @stop
+<script type='text/javascript'>
+    $(document).ready(function () {
+        var logistics_supplier_id = $("#logistics_supplier_id").val();
+        $.ajax({
+            url : "{{ route('poolQuantity') }}",
+            data : { id : logistics_supplier_id },
+            dataType : 'json',
+            type : 'get',
+            success : function(result) {
+                $('#pool_quantity').val(result);
+            }
+        });
+
+        //隐藏
+        document.getElementById('pool_quantity').style.display='none';
+    });
+</script>

@@ -8,10 +8,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logistics\CodeModel;
 use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
-
 
 class LogisticsController extends Controller
 {
@@ -66,6 +66,14 @@ class LogisticsController extends Controller
         $id = request()->input("id");
         $buf =$this->model->find($id)->species;
         return json_encode($buf);
+    }
+
+    /**
+     * 获取号码池数量
+     */
+    public function poolQuantity()
+    {
+
     }
 
 }

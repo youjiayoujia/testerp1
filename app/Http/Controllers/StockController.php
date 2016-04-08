@@ -210,6 +210,9 @@ class StockController extends Controller
         if(request()->ajax()) {
             $warehouse = trim(request()->input('warehouse'));
             $sku = trim(request()->input('sku'));
+            if(!ItemModel::where('sku', $sku)->count()) {
+                return json_encode('none');
+            }
             $item_id = ItemModel::where('sku', $sku)->first()->id;
             $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->first();
             if(!$obj) {

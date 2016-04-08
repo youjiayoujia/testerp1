@@ -217,7 +217,7 @@ class AdjustmentController extends Controller
             $time = date('Y-m-d',time());       
             $obj = $this->model->find($id);
             $obj->update(['status'=>'1', 'check_time'=>$time, 'check_by'=>'2']); 
-            echo json_encode([$time, $obj->checkByName->name]);
+            echo json_encode([$time, $obj->checkByName ? $obj->checkByName->name : '']);
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustments->toArray();

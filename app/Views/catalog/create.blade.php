@@ -2,7 +2,7 @@
 @section('formAction') {{ route('catalog.store') }} @stop
 @section('formBody')
     <div class="form-group">
-        <label for="name">分类名称</label>
+        <label for="name">分类名称</label>(品类英文名（主要）和品类中文名 例如裙子(dress))
         <input class="form-control" id="name" placeholder="名称" name='name' value="{{old('name')}}">
     </div>
     <div class="panel panel-info">
@@ -38,6 +38,7 @@
 @stop
 
 @section('pageJs')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-validator/0.5.3/js/bootstrapValidator.js"></script>
     <script type="text/javascript">
         {{-- 删除属性列  --}}
         $(document).on('click','.delete-row',function(){
@@ -133,5 +134,54 @@
             $("#featurenum").val(num);
             $(".features").last().after("<div class='form-group form-inline features'>类型：<select name='features["+num+"][type]' class='form-control featype'><option value='1'>文本</option><option value='2'>单选</option><option value='3'>多选</option></select>属性名：<div class='form-group '><input class='form-control'  placeholder='属性名'  name='features["+num+"][name]' ></div><div class='form-group fhide_"+num+" ' style='display:none' title='cannotremove'> 属性值：<input type='text' class='form-control'  placeholder='属性值' name='features["+num+"][value][name][][name]'></div><button type='button' class='btn btn-primary featurevalues ajaxinput fhide_"+num+"' style='display:none'>添加</button><button type='button' class='btn btn-outline btn-danger delete-row' style='float:right'><i class='glyphicon glyphicon-trash '></i></button></div></div>");
         });
+
+
+    $(document).ready(function() {
+        $('form').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                name: {
+                    message: 'The username is not valid',
+                    validators: {
+                        notEmpty: {
+                            message: '品类catalog不能为空'
+                        },
+                    }
+                },
+
+                email: {
+                validators: {
+                    notEmpty: {
+                        message: 'The email is required and cannot be empty'
+                    },
+                    emailAddress: {
+                        message: 'The input is not a valid email address'
+                    }
+                }
+            }
+                
+            }
+        });
+
+        $("#name").blur(function(){
+            var catalog_name = $(this).val();
+            var url = "{{route('checkName')}}";
+            $.ajax({
+                    url:url,
+                    data:{catalog_name:catalog_name},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        if(result)alert("该分类名已经存在");              
+                    }                  
+            })  
+        })
+    });
+
     </script>
 @stop

@@ -76,4 +76,16 @@ class CatalogController extends Controller
         $catalogModel->destoryCatalog();
         return redirect(route('catalog.index'));
     }
+
+    /**
+     * 检查分类名是否存在
+     * 2015-12-18 14:47:08 YJ
+     * @param  int $id
+     * @return Illuminate\Http\RedirectResponse Object
+     */
+    public function checkName()
+    {
+        $catalog_name = request()->input('catalog_name');
+        return $this->model->checkName($catalog_name);
+    }
 }

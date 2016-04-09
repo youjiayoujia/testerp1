@@ -16,7 +16,7 @@ class CatalogController extends Controller
     {
         $this->model = $catalog;
         $this->mainIndex = route('catalog.index');
-        $this->mainTitle = '分类';
+        $this->mainTitle = '品类Category';
         $this->viewPath = 'catalog.';
     }
 

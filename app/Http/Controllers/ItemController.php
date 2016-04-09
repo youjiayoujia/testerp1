@@ -21,7 +21,7 @@ class ItemController extends Controller
         $this->supplier  = $supplier;
         $this->product   = $product;
         $this->mainIndex = route('item.index');
-        $this->mainTitle = 'item';
+        $this->mainTitle = '产品Item';
         $this->viewPath  = 'item.';
     }
 

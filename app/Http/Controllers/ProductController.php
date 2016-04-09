@@ -25,7 +25,7 @@ class ProductController extends Controller
         $this->catalog = $catalog;
         $this->warehouse = $warehouse;
         $this->mainIndex = route('product.index');
-        $this->mainTitle = '产品';
+        $this->mainTitle = '选款Model';
         $this->viewPath = 'product.';
     }
 

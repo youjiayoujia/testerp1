@@ -23,17 +23,17 @@ return [
         'subnavigations' => [
             '产品管理' => [
                 [
-                    'name' => '品类',
+                    'name' => '品类Category',
                     'url' => 'catalog.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '产品',
+                    'name' => '选款Model',
                     'url' => 'product.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '货品',
+                    'name' => '产品Item',
                     'url' => 'item.index',
                     'icon' => '',
                 ],

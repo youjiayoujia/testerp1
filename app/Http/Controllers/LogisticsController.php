@@ -58,24 +58,36 @@ class LogisticsController extends Controller
         return view($this->viewPath . 'edit', $response);
     }
 
-//    public function index()
-//    {
-//        request()->flash();
-//        $arr = CodeModel::distinct()->get(['logistics_id']);
-//        foreach($arr as $key => $value)
-//        {
-//            $all = CodeModel::where('logistics_id', $value['logistics_id'])->count();
-//            $used = CodeModel::where(['logistics_id'=>$value['logistics_id'], 'status'=>'1'])->count();
-//            var_dump($all.' '.$used);
-//            exit;
-//        }
-//        var_dump($arr->toArray());exit;
-//        $response = [
-//            'metas' => $this->metas(__FUNCTION__),
-//            'data' => $this->autoList($this->model),
-//        ];
-//        return view($this->viewPath . 'index', $response);
-//    }
+    /**
+     * 更新号码池数量
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $array = CodeModel::distinct()->get(['logistics_id']);
+        foreach($array as $key => $value)
+        {
+            $all = CodeModel::where(['logistics_id' => $value['logistics_id']])->count();
+            $used = CodeModel::where(['logistics_id' => $value['logistics_id'], 'status' => '1'])->count();
+            $unused = $all - $used;
+            $pool_quantity = $unused."/".$used."/".$all;
+            $arr = LogisticsModel::where(['id' => $value['logistics_id']])->get()->toArray();
+            if(count($arr)) {
+                foreach($arr as $k => $val)
+                {
+                    $model = $this->model->find($val['id']);
+                    $val['pool_quantity'] = $pool_quantity;
+                    $model->update(['pool_quantity' => $val['pool_quantity']]);
+                }
+            }
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
 
     /**
      *ajax获取zone
@@ -86,16 +98,5 @@ class LogisticsController extends Controller
         $buf =$this->model->find($id)->species;
         return json_encode($buf);
     }
-
-    /**
-     * 获取号码池数量
-     */
-//    public function poolQuantity()
-//    {
-//        $logisticses = LogisticsModel::all();
-//        echo "<pre>";
-//        var_dump($logisticses);
-//        echo "</pre>";exit;
-//    }
 
 }

@@ -7,7 +7,7 @@
         <input class="form-control" id="name" placeholder="名称" name='name' value="{{$model->name}}">
     </div>
     <div class="panel panel-info">
-        <div class="panel-heading">Set属性</div>
+        <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>
         <div class="panel-body setfirst">
             @foreach($model->sets as $key=>$set)
                 <div class="form-group form-inline sets" id='setkey_0'>
@@ -32,7 +32,7 @@
         </div>
     </div>          
     <div class="panel panel-info">
-        <div class="panel-heading">variation属性</div>      
+        <div class="panel-heading">variation属性(不影响产品图片但影响销售的属性 例如:产品尺寸)</div>      
         <div class="panel-body variationfirst">
             @foreach($model->variations as $key=>$attr)
                 <div class="form-group form-inline attrs" id='attrkey_0'>
@@ -57,7 +57,7 @@
         </div>
     </div>
     <div class="panel panel-info">
-        <div class="panel-heading">Feature属性</div>
+        <div class="panel-heading">Feature属性(产品附加的属性 例如:是否能水洗,是否有弹性等)</div>
         <div class="panel-body featurefirst">
             @foreach($model->features as $key=>$feature)
                 <div class="form-group form-inline features" id='featurekey_0'>

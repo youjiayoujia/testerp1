@@ -82,23 +82,26 @@ class PurchaseListController extends Controller
         return redirect($this->mainIndex);		
 	}
 	
-	public function updateActive($id)
-	{
-		$data=request()->all();
-		$this->model->activeUpdate($id,$data);
-        return redirect($this->mainIndex);		
-	}
 	
-	 
+	
+	 /**
+     * 处理异常界面
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	
 	public function activeChange($id)
 	{
-		$res=$this->model->find($id);
-		$second_supplier_id=$res->item->second_supplier_id;
+		$model=$this->model->find($id);
+		if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+		$second_supplier_id=$model->item->second_supplier_id;
 		$second_supplier=SupplierModel::find($second_supplier_id);	
 		$response = [
 			'metas' => $this->metas(__FUNCTION__),
-			'abnormal' => $res,
+			'abnormal' => $model,
 			'second_supplier'=>$second_supplier,
         ];
         return view($this->viewPath . 'changeActive', $response);
@@ -126,6 +129,29 @@ class PurchaseListController extends Controller
 		return 1;
 		
 	}
+	
+	/**
+     * 处理异常
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function updateActive($id)
+	{
+		$data=request()->all();
+		$model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+		if($data['active_status']==0){
+			$data['active']=0;
+			}
+		$this->model->update($data);
+		if($model->active == 1 && $data['newSupplier']){
+			ItemModel::where('sku',$model->sku)->update(['supplier_id'=>$data['newSupplier']]);
+			}
+        return redirect($this->mainIndex);		
+	}
 	/**
      * 对单入库
      *
@@ -145,7 +171,7 @@ class PurchaseListController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-	/*public function generateDarCode($id){
+	public function generateDarCode($id){
 		$model=$this->model->find($id);
 		$res=InModel::where('relation_id',$id)->count();			
 		if($res>0){
@@ -155,9 +181,16 @@ class PurchaseListController extends Controller
 			if($stock_num>0){
 				$res=StockModel::where('warehouse_id',$model->warehouse_id)->where('item_id',$model->item->id)->get();
 				foreach($res as $key=>$v){
-					$WarehousePositionIds[$key]=$v->warehouse_position_id;
+					$stockInIds[$key]=$v->id;
 				}
-					
+				$randKey=array_rand($stockInIds,1);
+				$stock=StockModel::find($stockInIds[$randKey]);
+				ItemModel::find($model->item->id)->in($stock->warehouse_position_id,$model->arrival_num, $model->purchase_cost*$model->purchase_num, 0,$model->id, $remark = '订单采购！');
+				$warehouseId=$position->warehouse_id;
+				$warehouseName=$position->name;
+				$sku=$model->sku;
+				$barCode=$sku.$warehouseId.$warehouseName;
+				echo $barCode;
 			}else{
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
 					foreach($position as $key=>$v){
@@ -181,7 +214,7 @@ class PurchaseListController extends Controller
 				echo $barCode;
 			}
 		}
-	}*/
+	}
 	
 }
 

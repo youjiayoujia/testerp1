@@ -37,7 +37,7 @@
                 @endif
             @endforeach
             <td>{{ $purchaseItem->order_item_id}}</td>
-            <td> <img src="{{ asset($purchaseItem->item->product->image->src)}}" height="50px"/></td>
+            <td> <img src="{{ $purchaseItem->item->product->image->src}}" height="50px"/></td>
             <td>{{ $purchaseItem->supplier->name}}</td>
             <td>{{ $purchaseItem->warehouse->name}}</td>
             <td>{{ $purchaseItem->purchase_num}}/{{ $purchaseItem->arrival_num}}/{{ $purchaseItem->lack_num}}</td>

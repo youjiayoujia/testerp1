@@ -24,7 +24,7 @@
     <div class="row">
     <div class="form-group col-lg-4">
         <label >处理状态:</label>
-        <select name="status"  >
+        <select name="active_status"  >
         @if($abnormal->active==1)
         @foreach(config('purchase.purchaseItem.active_status.1') as $key => $v)
                <option value="{{$key}}" @if($abnormal->active_status==$key) selected @endif>{{$v}}</option>

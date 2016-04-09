@@ -18,7 +18,7 @@ class SupplierModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'url', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level'];
+    protected $fillable = ['name', 'url', 'company', 'official_url', 'contact_name', 'email', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level_id'];
 
     //查询
     public $searchFields = ['name','telephone']; 
@@ -55,5 +55,15 @@ class SupplierModel extends BaseModel
     public function createdByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'created_by', 'id');
+    }
+
+    /**
+     * return the relation between the two module 
+     *
+     * @return relation
+     */
+    public function levelByName()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierLevelModel', 'level_id', 'id');
     }
 }

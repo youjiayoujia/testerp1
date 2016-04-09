@@ -2,12 +2,14 @@
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th>名称</th>
-    <th>省</th>
-    <th>市</th>
+    <th>公司</th>
     <th>详细地址</th>
-    <th>线上/线下</th>
-    <th>线上网址</th>
+    <th>供货商类型</th>
+    <th>销售网址</th>
+    <th>供货商官网</th>
+    <th>联系人</th>
     <th class='sort' data-field='telephone'>电话</th>
+    <th>电子邮件</th>
     <th>采购员</th>
     <th class='sort' data-field='level'>评级</th>
     <th>创建人</th>
@@ -19,14 +21,16 @@
         <tr>
             <td>{{ $supplier->id }}</td>
             <td>{{ $supplier->name }}</td>
-            <td>{{ $supplier->province}}</td>
-            <td>{{ $supplier->city}}</td>
+            <td>{{ $supplier->company }}</td>
             <td>{{ $supplier->address }}</td>
-            <td>{{ $supplier->type == '0' ? '线下' : '线上'}} </td>
+            <td>{{ $supplier->type ? ($supplier->type == '1' ? '线上' : '做货') : '线下' }} </td>
             <td>{{ $supplier->url }}</td>
+            <td>{{ $supplier->official_url }}</td>
+            <<td>{{ $supplier->contact_name }}</td>
             <td>{{ $supplier->telephone }}</td>
+            <td>{{ $supplier->email }}</td>
             <td>{{ $supplier->purchaseName ? $supplier->purchaseName->name : '' }}</td>
-            <td>{{ $supplier->level }}</td>
+            <td>{{ $supplier->levelByName ? $supplier->levelByName->name : '' }}</td>
             <td>{{ $supplier->createdByName ? $supplier->createdByName->name : '' }}</td>
             <td>{{ $supplier->created_at }}</td>
             <td>
@@ -44,4 +48,12 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('tableToolButtons')
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('supplierLevel.index') }}">
+        <i class="glyphicon glyphicon-plus"></i> 供货商评级
+    </a>
+</div>
+@parent
 @stop

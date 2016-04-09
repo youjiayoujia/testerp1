@@ -37,7 +37,12 @@ Route::resource('stockIn', 'Stock\InController');
 //出库
 Route::resource('stockOut', 'Stock\OutController');
 
+//供货商评级
+Route::resource('supplierLevel', 'Product\SupplierLevelController');
+
 //供货商
+Route::post('productSupplier/levelStore', ['uses'=>'Product\SupplierController@levelStore', 'as'=>'productSupplier.levelStore']);
+Route::get('productSupplier/createLevel', ['uses'=>'Product\SupplierController@createLevel', 'as'=>'productSupplier.createLevel']);
 Route::resource('productSupplier', 'Product\SupplierController');
 
 //选款需求

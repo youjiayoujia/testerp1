@@ -2,19 +2,16 @@
 @section('tableHeader')
     <th><input type='checkbox' name='select_all[]' class='select_all'></th>
     <th class='sort' data-field='id'>ID</th>
-    <th>选款名</th>
-    <th>省</th>
-    <th>市</th>
-    <th>颜色</th>
-    <th>材料</th>
-    <th>工艺</th>
-    <th>配件</th>
+    <th>产品名</th>
+    <th>品类</th>
+    <th>货源地(省)</th>
+    <th>货源地(市)</th>
     <th>类似款sku</th>
     <th>竞争产品url</th>
-    <th>选款备注</th>
+    <th>需求描述</th>
     <th class='sort' data-field='expected_date'>期待上传时间</th>
-    <th>需求人</th>
-    <th>需求店铺</th>
+    <th>需求渠道</th>
+    <th>需求帐号</th>
     <th>创建人</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>处理状态</th>
@@ -28,12 +25,9 @@
             <td><input type='checkbox' name='select[]' class='select_single'></td>
             <td>{{ $productRequire->id }}</td>     
             <td>{{ $productRequire->name }}</td>
+            <td>{{ $productRequire->catalogByName ? $productRequire->catalogByName->name : '' }}</td>
             <td>{{ $productRequire->province }}</td>
             <td>{{ $productRequire->city }}</td>
-            <td>{{ $productRequire->color }}</td>
-            <td>{{ $productRequire->material }}</td>
-            <td>{{ $productRequire->technique }}</td>
-            <td>{{ $productRequire->parts  }}</td>  
             <td>{{ $productRequire->similar_sku }}</td>
             <td>{{ $productRequire->competition_url }}</td>
             <td>{{ $productRequire->remark }}</td>
@@ -42,7 +36,7 @@
             <td>{{ $productRequire->needer_shop_id }}</td>
             <td>{{ $productRequire->createdByName ? $productRequire->createdByName->name : '' }}</td>
             <td>{{ $productRequire->created_at }}</td>
-            <td>{{ $productRequire->status ? ($productRequire->status == '1' ? '未找到' : '已找到') : '未处理'}}</td>
+            <td>{{ $productRequire->status ? ($productRequire->status == '1' ? '未找到' : '已找到') : '新需求'}}</td>
             <td>{{ $productRequire->userName ? $productRequire->userName->name : '' }}</td>
             <td>{{ $productRequire->handle_time }}</td>
             <td>
@@ -94,7 +88,7 @@
                 dataType:'json',
                 type:'get',
                 success:function(result) {
-                    alert(result);
+                    location.reload();
                 }
             })
         });

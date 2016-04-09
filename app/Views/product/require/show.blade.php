@@ -33,18 +33,32 @@
                 <strong>图片6</strong>: <img src="{{ $model->img6 }}" alt='' class='img-rounded' width='170px' height='100px'/>
             </div>
         @endif
-        
         <div class="col-lg-2">
             <strong>ID</strong>: {{ $model->id }}
         </div>
         <div class="col-lg-2">
-            <strong>名称</strong>: {{ $model->name }}
+            <strong>产品名</strong>: {{ $model->name }}
+        </div>
+        <div class="col-lg-2">
+            <strong>品类</strong>: {{ $model->catalogByName ? $model->catalogByName->name : '' }}
         </div>
         <div class="col-lg-1">
-            <strong>省</strong>: {{ $model->province }}
+            <strong>货源地(省)</strong>: {{ $model->province }}
         </div>
         <div class="col-lg-1">
-            <strong>市</strong>: {{ $model->city }}
+            <strong>货源地(市)</strong>: {{ $model->city }}
+        </div>
+        <div class="col-lg-1">
+            <strong>颜色</strong>: {{ $model->color }}
+        </div>
+        <div class="col-lg-1">
+            <strong>材料</strong>: {{ $model->material }}
+        </div>
+        <div class="col-lg-1">
+            <strong>工艺</strong>: {{ $model->technique }}
+        </div>
+        <div class="col-lg-1">
+            <strong>配件</strong>: {{ $model->parts }}
         </div>
         <div class="col-lg-2">
             <strong>类似款sku</strong>: {{ $model->similar_sku }}
@@ -53,16 +67,16 @@
             <strong>竞争产品url</strong>: {{ $model->competition_url }}
         </div>
         <div class="col-lg-2">
-            <strong>选款备注</strong>: {{ $model->remark }}
+            <strong>需求描述</strong>: {{ $model->remark }}
         </div>
         <div class="col-lg-2">
             <strong>期待上传日期</strong>: {{ $model->expected_date }}
         </div>
         <div class="col-lg-2">
-            <strong>需求人id</strong>: {{ $model->neederName ? $model->neederName->name : '' }}
+            <strong>需求渠道</strong>: {{ $model->neederName ? $model->neederName->name : '' }}
         </div>
         <div class="col-lg-2">
-            <strong>需求店铺id</strong>: {{ $model->needer_shop_id }}
+            <strong>需求帐号</strong>: {{ $model->needer_shop_id }}
         </div>
     </div>
 </div>

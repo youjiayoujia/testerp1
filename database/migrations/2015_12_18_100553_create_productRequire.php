@@ -25,6 +25,7 @@ class CreateProductRequire extends Migration
             $table->string('technique')->comment('工艺')->default(NULL);
             $table->string('parts')->comment('配件')->default(NULL);
             $table->string('name',128)->comment('产品名字')->default(NULL);
+            $table->integer('catalog_id')->comment('品类id')->default(NULL);
             $table->string('province')->comment('省')->default(NULL);
             $table->string('city')->comment('市')->default(NULL);
             $table->string('similar_sku')->comment('相似的sku')->nullable()->default(NULL);

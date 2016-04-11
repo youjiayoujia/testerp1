@@ -201,6 +201,7 @@ class OrderModel extends BaseModel
      */
     public function createPackage($items = [])
     {
+        $items = $this->getStocks($items);
         $items = $this->setPackageItems($items);
         if ($items) {
             foreach ($items as $warehouseId => $packageItems) {
@@ -238,6 +239,54 @@ class OrderModel extends BaseModel
         return false;
     }
 
+    public function getStocks($items)
+    {
+        if ($items) {
+            $able = [];
+            foreach ($items as $key => $item) {
+                if ($item['quantity'] > 0) {
+                    $orderItem = $this->items->find($item['order_item_id']);
+                    //package item quantity must not more than order item
+                    if ($item['quantity'] > $orderItem->quantity) {
+                        exit('包裹产品数量不能大于订单产品数量');
+                    }
+//                    $stocks = $orderItem->item->assignStock($item['quantity']);
+                    $stocks = $orderItem->item->stocks;
+                    $defaultWarehouseStock = $stocks->where('warehouse_id', $orderItem->item->product->warehouse_id);
+                    $otherWarehouseStock = $stocks->where('warehouse_id', '<',
+                        $orderItem->item->product->warehouse_id);
+                    Tool::show($otherWarehouseStock);
+                    //获取默认仓库单库位库存
+                    $defaultSingleStock = $defaultWarehouseStock
+                        ->where('available_quantity', '>=', $item['quantity'])->first();
+                    if ($defaultSingleStock) {
+                        $able[$key][] = [$defaultSingleStock];
+                    }
+                    //获取默认仓库多库位库存
+                    $defaultMultiStocksCount = $defaultWarehouseStock->sum('available_quantity');
+                    if ($defaultMultiStocksCount > $item['quantity']) {
+                        foreach ($defaultWarehouseStock as $defaultMultiStock) {
+                            $able[$key][] = [$defaultMultiStock];
+                        }
+                    }
+                    //获取其它仓库单库位库存
+                    $otherSingleStocks = $otherWarehouseStock
+                        ->where('available_quantity', '>=', $item['quantity'])->get('*');
+                    if ($otherSingleStocks) {
+                        foreach ($otherSingleStocks as $otherSingleStock) {
+                            $able[$key][] = [$otherSingleStock];
+                        }
+                    }
+                    //获取其它仓库多库位库存
+                    $otherMultiStocksCount = $stocks
+                        ->groupBy('warehouse_id');
+
+
+                }
+            }
+        }
+    }
+
     /**
      * @param array $items
      * @return array|bool
@@ -257,7 +306,7 @@ class OrderModel extends BaseModel
                         exit('包裹产品数量不能大于订单产品数量');
                     }
 //                    $stocks = $orderItem->item->assignStock($item['quantity']);
-                    $stocks = $orderItem->item->stocks;
+                    $stocks = $orderItem->item->assignStock($item->quantity);
                     if ($stocks) {
                         foreach ($stocks as $warehouseId => $stock) {
                             foreach ($stock as $warehousePositionId => $value) {

@@ -1,9 +1,9 @@
 @extends('common.table')
 @section('tableToolButtons')
     <div class="btn-group">
-        <a class="btn btn-info" id="batchexamine">
+        <!--<a class="btn btn-info" id="batchexamine">
             <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
-        </a>
+        </a>-->
     </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -48,7 +48,7 @@
                 <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                @if(!$product->status)
+                <!--@if(!$product->status)
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
                        data-id="{{ $product->id }}"
                        data-url="{{route('examine')}}">
@@ -58,7 +58,7 @@
                     <a href="javascript:" class="btn btn-info btn-xs has_check">
                         <span class="glyphicon glyphicon-check"></span> <span>已审核</span>
                     </a>
-                @endif
+                @endif-->
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">

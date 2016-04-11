@@ -40,6 +40,7 @@ class ItemModel extends BaseModel
         'package_size',
         'carriage_limit',
         'package_limit',
+        'warehouse_id',
         'status',
         'remark'
     ];

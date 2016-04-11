@@ -40,10 +40,10 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-md-3">
+        <!--<div class="form-group col-md-3">
             <label for="size">供应商信息</label>
             <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $model->supplier_info }}">
-        </div>
+        </div>-->
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -104,7 +104,16 @@
                 </label>
             @endforeach
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-3">
+            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select  class="form-control" name="warehouse_id">
+                <option value="0"></option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ $model->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
         </div>

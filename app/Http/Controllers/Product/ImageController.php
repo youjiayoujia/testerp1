@@ -11,7 +11,7 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
-use App\Models\product\ImageModel;
+use App\Models\Product\ImageModel;
 
 class ImageController extends Controller
 {

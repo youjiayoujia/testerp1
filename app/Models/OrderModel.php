@@ -201,8 +201,8 @@ class OrderModel extends BaseModel
      */
     public function createPackage()
     {
-        $items = $this->getStocks();
-        $items = $this->setPackageItems($items);
+        $items = $this->setPackageItems();
+        Tool::show($items);
         if ($items) {
             foreach ($items as $warehouseId => $packageItems) {
                 $package = [];
@@ -239,19 +239,6 @@ class OrderModel extends BaseModel
         return false;
     }
 
-    public function getStocks()
-    {
-        switch ($this->type) {
-            case 'SINGLE':
-                $orderItem = $this->items->first();
-                //获取
-                $orderItem->item->stocks;
-                break;
-            case 'MULTI':
-                break;
-        }
-    }
-
     /**
      * @param array $items
      * @return array|bool
@@ -259,37 +246,10 @@ class OrderModel extends BaseModel
      * todo:hold库存,unhold库存
      * todo:生成采购需求
      */
-    public function setPackageItems($items = [])
+    public function setPackageItems()
     {
         $packageItem = [];
-        if ($items) {
-            foreach ($items as $key => $item) {
-                if ($item['quantity'] > 0) {
-                    $orderItem = $this->items->find($item['order_item_id']);
-                    //package item quantity must not more than order item
-                    if ($item['quantity'] > $orderItem->quantity) {
-                        exit('包裹产品数量不能大于订单产品数量');
-                    }
-//                    $stocks = $orderItem->item->assignStock($item['quantity']);
-                    $stocks = $orderItem->item->assignStock($item->quantity);
-                    if ($stocks) {
-                        foreach ($stocks as $warehouseId => $stock) {
-                            foreach ($stock as $warehousePositionId => $value) {
-                                $key = $orderItem->item_id . '-' . $warehousePositionId;
-                                $packageItem[$warehouseId][$key]['item_id'] = $orderItem->item_id;
-                                $packageItem[$warehouseId][$key]['warehouse_position_id'] = $warehousePositionId;
-                                $packageItem[$warehouseId][$key]['order_item_id'] = $orderItem->id;
-                                $packageItem[$warehouseId][$key]['quantity'] = $value['quantity'];
-                                $packageItem[$warehouseId][$key]['weight'] = $value['weight'];
-                                $packageItem[$warehouseId][$key]['remark'] = $item['remark'];
-                            }
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-            }
-        } else {
+        if ($this->is_multi) { //多产品
             foreach ($this->items as $key => $item) {
                 $stocks = $item->item->assignStock($item->quantity);
                 if ($stocks) {
@@ -307,6 +267,24 @@ class OrderModel extends BaseModel
                 } else {
                     return false;
                 }
+            }
+        } else { //单产品
+            $orderItem = $this->items->first();
+            $stocks = $orderItem->item->assignStock($orderItem->quantity);
+            if ($stocks) {
+                foreach ($stocks as $warehouseId => $stock) {
+                    foreach ($stock as $warehousePositionId => $value) {
+                        $key = $orderItem->item_id . '-' . $warehousePositionId;
+                        $packageItem[$warehouseId][$key]['item_id'] = $orderItem->item_id;
+                        $packageItem[$warehouseId][$key]['warehouse_position_id'] = $warehousePositionId;
+                        $packageItem[$warehouseId][$key]['order_item_id'] = $orderItem->id;
+                        $packageItem[$warehouseId][$key]['quantity'] = $value['quantity'];
+                        $packageItem[$warehouseId][$key]['weight'] = $value['weight'];
+                        $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                    }
+                }
+            } else {
+                return false;
             }
         }
         return $packageItem;

@@ -145,35 +145,79 @@ class ItemModel extends BaseModel
         }
     }
 
-    /**
-     * 通过item_id和quantity自动分配库存
-     *
-     * @param $quantity
-     * @return array
-     *
-     */
     public function assignStock($quantity)
     {
-        $stocks = [];
-        $stock = $this->stocks->where('available_quantity', '>=', $quantity)->first();
-        if ($stock) {
-            $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
-            $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
-        } else {
-            if ($this->stocks->sum('available_quantity') >= $quantity) {
-                foreach ($this->stocks as $stock) {
+        $result = [];
+        $stocks = $this->stocks;
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            $warehouseStocks = $stocks->groupBy('warehouse_id');
+            $defaultStocks = $warehouseStocks->get($this->warehouse_id);
+            //默认仓库单库位
+            $stock = $defaultStocks->first(function ($key, $value) use ($quantity) {
+                return $value->available_quantity >= $quantity ? $value : false;
+            });
+            if ($stock) {
+                $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+                $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
+                return $result;
+            }
+            //默认仓库多库位
+            if ($defaultStocks->sum('available_quantity') >= $quantity) {
+                foreach ($defaultStocks as $stock) {
                     if ($stock->available_quantity < $quantity) {
-                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $stock->available_quantity;
-                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $stock->available_quantity;
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $stock->available_quantity;
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $stock->available_quantity;
                         $quantity -= $stock->available_quantity;
                     } else {
-                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
-                        $stocks[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
                         break;
                     }
                 }
+                return $result;
             }
+            //其它仓库单库位
+            $stock = $stocks->first(function ($key, $value) use ($quantity) {
+                return $value->available_quantity >= $quantity ? $value : false;
+            });
+            if ($stock) {
+                $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+                $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
+                return $result;
+            }
+            //其它仓库多库位
+            $otherStocks = $warehouseStocks
+                ->first(function ($key, $value) use ($quantity) {
+                    return $value->sum('available_quantity') >= $quantity ? $value : false;
+                });
+            if ($otherStocks) {
+                foreach ($otherStocks as $stock) {
+                    if ($stock->available_quantity < $quantity) {
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $stock->available_quantity;
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $stock->available_quantity;
+                        $quantity -= $stock->available_quantity;
+                    } else {
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+                        $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
+                        break;
+                    }
+                }
+                return $result;
+            }
+            //所有仓库和库位
+            foreach ($stocks as $stock) {
+                if ($stock->available_quantity < $quantity) {
+                    $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $stock->available_quantity;
+                    $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $stock->available_quantity;
+                    $quantity -= $stock->available_quantity;
+                } else {
+                    $result[$stock->warehouse_id][$stock->warehouse_position_id]['quantity'] = $quantity;
+                    $result[$stock->warehouse_id][$stock->warehouse_position_id]['weight'] = $this->weight * $quantity;
+                    break;
+                }
+            }
+            return $result;
         }
-        return $stocks;
+        return false;
     }
 }

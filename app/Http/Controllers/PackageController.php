@@ -29,7 +29,7 @@ class PackageController extends Controller
         $order = OrderModel::find(request()->input('order_id'));
         if ($order) {
             $this->validate(request(), $this->model->rules('create'));
-            if ($order->createPackage(request()->input('items'))) {
+            if ($order->createPackage()) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
             } else {
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足'));

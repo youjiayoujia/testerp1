@@ -51,12 +51,12 @@ class PackageModel extends BaseModel
         return $this->hasMany('App\Models\Package\ItemModel', 'package_id');
     }
 
-    public function listItemPackage()
+    public function listItemPackages()
     {
         return $this->hasMany('App\Models\Pick\ListItemPackageModel', 'package_id', 'id');
     }
 
-    public function manualLogistic()
+    public function manualLogistics()
     {
         return $this->hasMany('App\Models\Package\LogisticModel', 'package_id', 'id');
     }

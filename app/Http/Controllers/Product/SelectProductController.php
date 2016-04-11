@@ -90,9 +90,6 @@ class SelectProductController extends Controller
         foreach($product_id_arr as $product_id){
             $productModel = $this->product->find($product_id);
             //ERP中如果该产品之前没有创建item,就创建item
-            if(empty($productModel->item->toArray())){
-                $productModel->createItem();
-            }
             $data = [];
             //如果该渠道之前没有被选中过,创建该渠道下的product
             switch ($channel_id) {
@@ -130,6 +127,8 @@ class SelectProductController extends Controller
             }
             
         }
+        $data['status'] = 1;
+        $productModel->update($data);
 
         return 1;
     }

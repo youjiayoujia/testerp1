@@ -53,7 +53,7 @@ class AdjustFormModel extends BaseModel
      * @return
      *
      */
-    public function items()
+    public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }

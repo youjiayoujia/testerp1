@@ -19,7 +19,12 @@ class CatalogModel extends BaseModel
     public $searchFields = ['name'];
 
     public $rules = [
-        'create' => ['name' => 'required|unique:catalogs,name'],
+        'create' => ['name' => 'required|unique:catalogs,name',
+                     'sets.0.name' => 'required',
+                     'sets.0.value.name.0.name' => 'required',
+                     'variations.0.name' => 'required',
+                     'variations.0.value.name.0.name' => 'required',
+                    ],
         'update' => ['name' => 'required|unique:catalogs,name,{id}']
     ];
 

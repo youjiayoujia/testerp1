@@ -11,7 +11,7 @@
     <div class="form-group col-sm-2">
         <select class="form-control status" name="arr[status][{{$current}}]" id="arr[status][{{$current}}]">
             @foreach(config('order.product_status') as $product_status_key => $status)
-                <option value="{{ $product_status_key }}" {{ old('arr[status][$current]') == $product_status_key ? 'selected' : '' }}>
+                <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
                     {{ $status }}
                 </option>
             @endforeach

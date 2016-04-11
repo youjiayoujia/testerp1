@@ -40,6 +40,24 @@
         </div>
     </div>
     <div class='row'>
+        <div class="form-group col-lg-3">
+            <label for="color" class='control-label'>颜色</label>
+            <input type='text' class="form-control" placeholder="颜色" name='color' value="{{ old('color') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="material" class='control-label'>材料</label>
+            <input type='text' class="form-control" placeholder="材料" name='material' value="{{ old('material') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="technique" class='control-label'>工艺</label>
+            <input type='text' class="form-control" id="technique" placeholder="工艺" name='technique' value="{{ old('technique') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="parts" class='control-label'>配件</label>
+            <input type='text' class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') }}">
+        </div>
+    </div>
+    <div class='row'>
         <div class="form-group col-lg-3"> 
             <label for="similar_sku" class='control-label'>类似款sku</label>
             <input type='text' class="form-control" id="similar_sku" placeholder="类似款sku" name='similar_sku' value="{{ old('similar_sku') }}">

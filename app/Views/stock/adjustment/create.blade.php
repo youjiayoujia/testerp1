@@ -26,11 +26,9 @@
             <textarea class='form-control remark' name='remark' id='remark'>{{ old('remark') }}</textarea>
         </div>
     </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            sku
-        </div>
-        <div class='panel-body'>
+    <div class="panel panel-info">
+        <div class="panel-heading">sku</div>
+        <div class="panel-body add_row">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -45,7 +43,7 @@
                     <label for="quantity" class='control-label'>数量</label>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <label for="amount" class='control-label'>单价(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
             <div class='row'>
@@ -59,37 +57,34 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <select name='arr[warehouse_position_id][0]' id='arr[warehouse_position_id][0]' class='form-control warehouse_position_id'>
-                    </select>
+                    <input type='text' name='arr[warehouse_position_id][0]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="总金额" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}">
+                    <input type='text' class="form-control unit_cost" id="arr[unit_cost][0]" placeholder="单价" name='arr[unit_cost][0]' value="{{ old('arr[unit_cost][0]') }}">
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
-            <div class='form-group addpanel'>
-                <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>
-                    <span class='glyphicon glyphicon-plus'>新增</span>
-                </a>
-            </div>
+        </div>
+        <div class="panel-footer create_form">
+            <div class="create"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
         var current = 1;    
-        $('#create_form').click(function(){
-            warehouse = $('#warehouse_id').val();    
+        $(document).on('click', '.create_form', function(){
+            warehouse = $('#warehouse_id').val();
             $.ajax({
                 url:"{{ route('stockAdjustment.adjustAdd') }}",
                 data:{current:current, warehouse:warehouse},
                 dataType:'html',
                 type:'get',
                 success:function(result) {
-                    $('.addpanel').before(result);
+                    $('.add_row').children('div:last').after(result);
                 }
             });
             current++;
@@ -99,12 +94,11 @@
             $(this).parent().remove();
         });
 
-        $(document).on('blur', '.quantity,.amount', function(){
+        $(document).on('blur', '.unit_cost', function(){
             tmp = $(this);
             block = tmp.parent().parent();
             type = block.find('.type').val();
-            quantity = block.find('.quantity').val();
-            amount = block.find('.amount').val();
+            unit_cost = block.find('.unit_cost').val();
             sku = block.find('.sku').val();
             warehouse_id = $('#warehouse_id').val();
             if(sku && warehouse_id){
@@ -114,15 +108,10 @@
                     dataType: 'json',
                     type: 'get',
                     success: function(result){
-                        if(type == 'OUT' && quantity) {
-                            block.find('.amount').val((parseFloat(quantity)*result[3]).toFixed('3'));
-                            return;
-                        }
-                        if(type == 'IN' && quantity && amount) {
-                            if(amount/quantity > result[3]*1.3 || amount/quantity < result[3]*0.7) {
-                                alert('fuck,调整单价超出范围,库存单价'+result[3]);
-                                block.find('.quantity').val('');
-                                block.find('.amount').val('');
+                        if(type == 'IN' && unit_cost) {
+                            if(unit_cost > result[1]*1.3 || unit_cost < result[1]*0.7) {
+                                alert('调整单价超出范围0.7-1.3,库存单价为'+result[1]);
+                                block.find('.unit_cost').val('');
                             }
                         }
                     }
@@ -135,44 +124,33 @@
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();
-            quantity = block.find('.quantity').val();
-            warehouse_id = $('#warehouse_id').val();
-            $.ajax({
-                url:"{{route('stock.getByPosition')}}",
-                data:{position:position},
-                dataType:'json',
-                type:'get',
-                success:function(result){
-                    if(block.find('.type').val() == 'OUT' && sku) {
-                        flag = 0;
-                        available_quantity = '';
-                        for(var i=0;i<result.length;i++) {
-                            if(result[i].items.sku == sku) {
-                                available_quantity = result[i].available_quantity;
-                                flag = 1;
-                            }
-                        }
-                        if(flag == 0) {
-                            alert('sku和库位不匹配');
-                            block.find('.sku').val('');
+            type = block.find('.type').val();
+            if(position) {
+                $.ajax({
+                    url:"{{route('stock.getByPosition')}}",
+                    data:{position:position, sku:sku},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        if(result == 'position_error') {
+                            alert('库位不存在');
+                            tmp.val('');
                             return;
                         }
-                        if(quantity && available_quantity < quantity) {
-                            alert('数量超出了库存数量');
-                            block.find('.quantity').val('');
-                            block.find('.amount').val(''); 
-                            return;                       
+                        if(type == 'OUT' &&　result == false) {
+                            alert('库位没有相应库存');
+                            tmp.val('');
                         }
                     }
-                }
-            })
+                });
+            }
         });
 
         $(document).on('change', '.type', function(){
             if($(this).val() == 'IN')
-                $(this).parent().parent().find('.amount').attr('readonly', false);
+                $(this).parent().parent().find('.unit_cost').attr('readonly', false);
             else
-                $(this).parent().parent().find('.amount').attr('readonly', true);
+                $(this).parent().parent().find('.unit_cost').attr('readonly', true);
         });
 
         $(document).on('blur', '.sku', function(){
@@ -192,49 +170,23 @@
                             tmp.val('');
                             return;
                         }
-                        if(result == 'stock_none'  && block.find('.type').val() == 'OUT') {
-                            alert('该sku没有对应的库存了');
-                            tmp.val('');
-                            return;
-                        }
-                        var str = '';
-                        var position = block.find('.warehouse_position_id').val();
-                        var flag = 0;
-                        for(var i=0;i<result[2].length;i++) {
-                            str +="<option value="+result[2][i].id+">"+result[2][i].name+"</option>";
-                            if(result[2][i].id == position)
-                                flag = 1;
-                        }
-                        if(flag == 0 && result != 'stock_none' && block.find('.type').val() == 'OUT') {
-                            block.find('.warehouse_position_id').empty();
-                            block.find('.warehouse_position_id').html(str);
-                            block.find('.quantity').val('');
-                            block.find('.amount').val('');
-                            return;
-                        }
-                        available_amount = '';
-                        for(var i=0;i<result[1].length;i++) {
-                            if(position == result[1][i].warehouse_position_id && warehouse_id == result[1][i].warehouse_id) {
-                                available_amount = result[1][i].available_quantity;
-                            }
-                        }
-                        if(block.find('.type').val() == 'OUT' && block.find('.quantity').val()) {
-                            if(parseFloat(block.find('.quantity').val()) > available_amount) {
-                                alert('fuck，该库位数量不足啊，'+available_amount);
-                                block.find('.quantity').val('');
-                                block.find('.amount').val('');
+                        if(result == 'stock_none') {
+                            if(block.find('.type').val() == 'OUT') {
+                                alert('该sku没有对应的库存了');
+                                tmp.val('');
+                                return;
+                            } else {
                                 return;
                             }
-                            block.find('.amount').val((block.find('.quantity').val()*result[3]).toFixed('3'));
                         }
+                        block.find('.warehouse_position_id').val(result[0]);
+                        block.find('.unit_cost').val(result[1]);                    
                         if(block.find('.type').val() == 'IN') {
-                            quantity = block.find('.quantity').val();
-                            amount = block.find('.amount').val();
-                            if(quantity && amount) {
-                                if(amount/quantity > result[3]*1.3 || amount/quantity < result[3]*0.6) {
-                                    alert('单价变动超出范围,库存单价'+result[3]);
-                                    block.find('.quantity').val('');
-                                    block.find('.amount').val('');
+                            unit_cost = block.find('.unit_cost').val();
+                            if(unit_cost) {
+                                if(unit_cost > result[1]*1.3 || unit_cost < result[1]*0.6) {
+                                    alert('单价变动超出范围,库存单价'+result[1]);
+                                    block.find('.unit_cost').val('');
                                     return;
                                 }
                             }
@@ -245,23 +197,12 @@
         });
 
         $(document).on('change', '#warehouse_id', function(){
-            val = $(this).val();
-            $.ajax({
-                url: "{{ route('position.getPosition') }}",
-                data: {val:val},
-                dataType:'json',
-                type:'get',
-                success:function(result){
-                    $('.warehouse_position_id').empty();
-                    for(var i=0;i<result.length;i++)
-                        $('<option value='+result[i]['id']+'>'+result[i]['name']+'</option>').appendTo($('.warehouse_position_id'));
-                    $('.type').val('IN');
-                    $('.amount').attr('readonly', false);
-                    $('.quantity').val('');
-                    $('.amount').val('');
-                    $('.sku').val('');
-                }
-            });
+            $('.warehouse_position_id').val('');
+            $('.type').val('IN');
+            $('.unit_price').attr('readonly', false);
+            $('.quantity').val('');
+            $('.unit_price').val('');
+            $('.sku').val('');
         });
         
         $('#check_time').cxCalendar();

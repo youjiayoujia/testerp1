@@ -106,7 +106,7 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="address_confirm" id="address_confirm">
                     @foreach(config('order.address') as $address_key => $address)
-                        <option value="{{ $address_key }}" {{ old('address_confirm') == $address_key ? 'selected' : '' }}>
+                        <option value="{{ $address_key }}" {{ $address_key == '1' ? 'selected' : '' }}>
                             {{ $address }}
                         </option>
                     @endforeach
@@ -131,12 +131,12 @@
             <div class="form-group col-lg-2">
                 <label for="affair_time" class='control-label'>做账时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') }}">
+                <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') }}" readonly>
             </div>
             <div class="form-group col-lg-2">
                 <label for="create_time" class='control-label'>定义时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="create_time" placeholder="定义时间" name='create_time' value="{{ old('create_time') }}">
+                <input class="form-control" id="create_time" placeholder="定义时间" name='create_time' value="{{ old('create_time') }}" readonly>
             </div>
             <div class="form-group col-lg-2">
                 <label for="is_partial" class='control-label'>是否分批发货</label>
@@ -152,7 +152,7 @@
                     </label>
                 </div>
             </div>
-            <div class="form-group col-lg-2">
+            <div class="form-group col-lg-2" id="hand">
                 <label for="by_hand" class='control-label'>是否手工</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <div class="radio">
@@ -340,7 +340,7 @@
             <div class="form-group col-lg-2">
                 <label for="payment_date" class='control-label'>支付时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">
+                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}" readonly>
             </div>
         </div>
     </div>
@@ -389,7 +389,7 @@
                 <div class="form-group col-sm-2">
                     <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
                         @foreach(config('order.product_status') as $product_status_key => $status)
-                            <option value="{{ $product_status_key }}" {{ old('arr[status][0]') == $product_status_key ? 'selected' : '' }}>
+                            <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
                                 {{ $status }}
                             </option>
                         @endforeach
@@ -428,6 +428,9 @@
     <script type='text/javascript'>
         $(document).ready(function () {
             $('#create_time, #payment_date, #affair_time').cxCalendar();
+
+            //隐藏
+            document.getElementById('hand').style.display='none';
 
             var current = 1;
             $('#addItem').click(function () {

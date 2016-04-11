@@ -81,4 +81,48 @@ class RequireController extends Controller
         return redirect(route('productRequire.index'));
     }
 
+    /**
+     * ajax 处理请求 
+     *
+     * @return json
+     *
+     */
+    public function ajaxProcess()
+    {
+        $id = request()->input('id');
+        $status = request()->input('status');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        if($status == 1) {
+            $model->update(['status'=>'1']);
+        } else {
+            $model->update(['status'=>'2']);
+        }
+
+        return json_encode($status);
+    }
+
+    /**
+     * ajax 批量处理请求 
+     *
+     * @return json
+     *
+     */
+    public function ajaxQuantityProcess()
+    {
+        $buf = request()->input('buf');
+        $status = request()->input('status');
+        foreach($buf as $v)
+        {
+            $model = $this->model->find($v);
+            if($model->status) {
+                continue;
+            }
+            $model->update(['status'=>$status]);
+        }
+
+        return json_encode('success');
+    }
 }

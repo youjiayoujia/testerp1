@@ -52,7 +52,7 @@ class ImageModel extends BaseModel
      */
     public function singleCreate($data, $file = null, $key)
     {
-        $data['type'] = 'original';
+        if(!array_key_exists('type',$data))$data['type'] = 'original';
         if ($data['type'] != 'public') {
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['type'] . '/';
         } else {

@@ -6,3 +6,10 @@ storage/
 
 #idea
 .idea/
+
+#ENV
+.env
+
+#Hook
+public/hook
+~

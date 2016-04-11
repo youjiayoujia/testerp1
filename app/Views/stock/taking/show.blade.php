@@ -58,6 +58,60 @@
         </div>
     </div>
     <div class="panel panel-default">
+        <div class="panel-heading">出库信息 : {{ $model->outwarehouse ? $model->outwarehouse->name : '' }}</div>
+        <div class="panel-body">
+        @foreach($stockouts as $stockout)
+            <div class='row'>
+                <div class="col-lg-2">
+                    <strong>sku</strong>: {{ $stockout->stock ? $stockout->stock->items ? $stockout->stock->items->sku : '' : '' }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>出库仓库</strong>: {{ $stockout->stock ? $stockout->stock->warehouse ? $stockout->stock->warehouse->name : '' : '' }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>出库库位</strong>: {{ $stockout->stock ? $stockout->stock->position ? $stockout->stock->position->name : '' : '' }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>出库数量</strong>: {{ $stockout->quantity }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>出库金额(￥)</strong>: {{ $stockout->amount }}
+                </div>
+                <div class="col-lg-2">
+                    <strong>出库时间</strong>: {{ $stockout->created_at }}
+                </div>
+            </div>
+        @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">入库信息 : {{ $model->inwarehouse ? $model->inwarehouse->name : '' }}</div>
+        <div class="panel-body">
+        @foreach($stockins as $stockin)
+        <div class='row'>
+            <div class="col-lg-2">
+                <strong>sku</strong>: {{ $stockin->stock ? $stockin->stock->items ? $stockin->stock->items->sku : '' : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库仓库</strong>: {{ $stockin->stock ? $stockin->stock->warehouse ? $stockin->stock->warehouse->name : '' : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库库位</strong>: {{ $stockin->stock ? $stockin->stock->position ? $stockin->stock->position->name : '' : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库数量</strong>: {{ $stockin->quantity }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库金额(￥)</strong>: {{ $stockin->amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>入库时间</strong>: {{ $stockin->created_at }}
+            </div>
+        </div>
+        @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-4">

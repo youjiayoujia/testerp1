@@ -13,7 +13,7 @@
     @foreach($data as $pickList)
         <tr>
             <td>{{ $pickList->id }}</td>
-            <td>{{ $pickList->picklist_id }}</td>
+            <td>{{ $pickList->picknum }}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
             <td>{{ $pickList->logistic ? $pickList->logistic->logistics_type : '混合物流'}}</td>
             <td>{{ $pickList->status_name }}</td>

@@ -114,7 +114,7 @@ class PickListController extends Controller
         $picklistItems = $model->pickListItem;
         foreach($picklistItems as $picklistItem)
         {
-            $listItemPackages = $picklistItem->pickListItemPackage;
+            $listItemPackages = $picklistItem->pickListItemPackages;
             foreach($listItemPackages as $listItemPackage)
             {
                 $listItemPackage->delete();
@@ -191,14 +191,14 @@ class PickListController extends Controller
      */
     public function ajaxPackageItemUpdate()
     {
-        $package_id = request()->input('package_id');
-        $sku = request()->input('sku');
+        $package_id = trim(request()->input('package_id'));
+        $sku = trim(request()->input('sku'));
         $package = PackageModel::find($package_id);
         if($package) {
             $items = $package->items;
             $flag = 1;
             foreach($items as $item) {
-                if($item->items->sku == $sku && ($item->picked_quantity + 1) <= $item->quantity) {
+                if($item->item->sku == $sku && ($item->picked_quantity + 1) <= $item->quantity) {
                     $item->picked_quantity += 1;
                     $item->save();
                 }

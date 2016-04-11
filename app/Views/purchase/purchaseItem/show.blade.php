@@ -6,6 +6,9 @@
             <div class="form-group col-lg-4">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
+            <div class="form-group col-lg-4">
+                <strong>SKU</strong>: {{ $model->sku}}
+            </div>
              <div class="form-group col-lg-4">
                 <strong>采购类型</strong>:
                @foreach(config('purchase.purchaseItem.type') as $k=>$v)
@@ -25,7 +28,7 @@
             @if($model->type==0)
             <div class="form-group col-lg-4">
                 <strong>订单号</strong>:
-                {{$model->order_id}}
+                {{$model->order_item_id}}
             </div>
             @endif
             <div class="form-group col-lg-4">
@@ -34,7 +37,7 @@
             </div>
              <div class="form-group col-lg-4">
                 <strong>产品名</strong>:
-                {{$model->purchaseItem->product->name}}
+                {{$model->item->product->c_name}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>采购数量/已到数量/仍需采购数量</strong>:
@@ -42,7 +45,7 @@
             </div>
             <div class="form-group col-lg-4">
            		<strong>产品样图</strong>:
-                <img src="{{ asset($model->purchaseItem->product->image->src) }}" width="100px">
+                <img src="{{ asset($model->item->product->image->src) }}" width="100px">
             </div>
             <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:

@@ -25,6 +25,9 @@
                 <strong>hold数量</strong>: {{ $model->hold_quantity }}
             </div>
             <div class="col-lg-2">
+                <strong>单价(￥)</strong>: {{ round($model->amount/$model->all_quantity, 2) }}
+            </div>
+            <div class="col-lg-2">
                 <strong>总金额(￥)</strong>: {{ $model->amount }}
             </div>
         </div>

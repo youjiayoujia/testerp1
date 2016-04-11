@@ -20,7 +20,7 @@
             @foreach($adjustments as $adjustment)
             <div class='row'>
                 <div class="col-lg-2">
-                    <strong>sku</strong>: {{ $adjustment->items->sku }}
+                    <strong>sku</strong>: {{ $adjustment->item->sku }}
                 </div>
                 <div class="col-lg-2">
                     <strong>type</strong>: {{ $adjustment->type == 'IN' ? '入库' : '出库'}}

@@ -239,8 +239,8 @@ class OrderController extends Controller
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['channel_ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['email'] = $channelOrder['email'];
-            $orders[$key]['status'] = 1;
-            $orders[$key]['active'] = 1;
+            $orders[$key]['status'] = 'new';
+            $orders[$key]['active'] = 'normal';
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
@@ -283,7 +283,7 @@ class OrderController extends Controller
                 $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];
                 $orders[$key]['items'][$itemKey]['price'] = $channelOrderItem['price'];
                 $orders[$key]['items'][$itemKey]['status'] = 1;
-                $orders[$key]['items'][$itemKey]['ship_status'] = 1;
+                $orders[$key]['items'][$itemKey]['ship_status'] = 'not_shipped';
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
                 $arr = $channelOrder['orderitems'];
                 $len = count($arr);

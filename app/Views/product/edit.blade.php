@@ -166,14 +166,7 @@
                     </label>
             @endforeach
         </div>
-        <!--<div class="form-group col-md-3">
-            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select  class="form-control" name="warehouse_id">
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" {{ $product->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
-                @endforeach
-            </select>
-        </div>-->
+        
         <div class="form-group col-md-3">
             <label for="color">描述</label>
             <input class="form-control" id="description" placeholder="备注" name='description' value="{{ old('description') ?  old('description') : $product->description }}">

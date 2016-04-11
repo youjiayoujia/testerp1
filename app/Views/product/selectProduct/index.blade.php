@@ -78,7 +78,7 @@
     <script type="text/javascript">    
         //批量审核
         $('.choseShop').click(function () {
-            if (confirm($(this).data('name')+"确认审核?")) {
+            if (confirm($(this).data('name')+"确认选中?")) {
                 var url = "{{route('beChosed')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var product_ids = "";

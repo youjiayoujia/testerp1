@@ -28,11 +28,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '选款Model',
-                    'url' => 'product.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '产品Item',
                     'url' => 'item.index',
                     'icon' => '',
@@ -47,6 +42,11 @@ return [
                 [
                     'name' => '选款需求',
                     'url' => 'productRequire.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '选款Model',
+                    'url' => 'product.index',
                     'icon' => '',
                 ],
                 [

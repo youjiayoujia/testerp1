@@ -11,19 +11,17 @@ use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
 use App\Models\ChannelModel;
-use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
 {
 
-    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,WarehouseModel $warehouse)
+    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog)
     {
         $this->model = $product;
         $this->supplier = $supplier;
         $this->catalog = $catalog;
-        $this->warehouse = $warehouse;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
         $this->viewPath = 'product.';
@@ -35,7 +33,6 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'suppliers' => $this->supplier->all(),
-            'warehouses' => $this->warehouse->where('type','local')->get(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -91,7 +88,6 @@ class ProductController extends Controller
             'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
-            'warehouses' => $this->warehouse->where('type','本地仓库')->get(),
         ];
 
         return view($this->viewPath . 'edit', $response);

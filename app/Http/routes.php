@@ -98,7 +98,8 @@ Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@ac
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
-
+//异常采购
+Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
 /**
  * stock controller route
  */

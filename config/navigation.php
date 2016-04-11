@@ -211,6 +211,11 @@ return [
                     'url' => 'purchaseList.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '采购异常',
+                    'url' => 'purchaseAbnormal.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],

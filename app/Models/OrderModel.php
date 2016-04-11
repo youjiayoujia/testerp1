@@ -251,11 +251,11 @@ class OrderModel extends BaseModel
                         exit('包裹产品数量不能大于订单产品数量');
                     }
 //                    $stocks = $orderItem->item->assignStock($item['quantity']);
-                    $stocks = $orderItem->item->stocks;
-                    $defaultWarehouseStock = $stocks->where('warehouse_id', $orderItem->item->product->warehouse_id);
-                    $otherWarehouseStock = $stocks->where('warehouse_id', '<',
-                        $orderItem->item->product->warehouse_id);
-                    Tool::show($otherWarehouseStock);
+                    $stocks = $orderItem->item->stocks();
+                    $defaultWarehouseStock = $stocks
+                        ->where('warehouse_id', $orderItem->item->product->warehouse_id);
+                    $otherWarehouseStock = $stocks
+                        ->where('warehouse_id', '<>', $orderItem->item->product->warehouse_id);
                     //获取默认仓库单库位库存
                     $defaultSingleStock = $defaultWarehouseStock
                         ->where('available_quantity', '>=', $item['quantity'])->first();
@@ -263,25 +263,21 @@ class OrderModel extends BaseModel
                         $able[$key][] = [$defaultSingleStock];
                     }
                     //获取默认仓库多库位库存
-                    $defaultMultiStocksCount = $defaultWarehouseStock->sum('available_quantity');
-                    if ($defaultMultiStocksCount > $item['quantity']) {
+                    $defaultMultiStocksSum = $defaultWarehouseStock->sum('available_quantity');
+                    if ($defaultMultiStocksSum > $item['quantity']) {
                         foreach ($defaultWarehouseStock as $defaultMultiStock) {
                             $able[$key][] = [$defaultMultiStock];
                         }
                     }
                     //获取其它仓库单库位库存
-                    $otherSingleStocks = $otherWarehouseStock
-                        ->where('available_quantity', '>=', $item['quantity'])->get('*');
-                    if ($otherSingleStocks) {
-                        foreach ($otherSingleStocks as $otherSingleStock) {
-                            $able[$key][] = [$otherSingleStock];
-                        }
+                    $otherSingleStock = $otherWarehouseStock
+                        ->where('available_quantity', '>=', $item['quantity'])->first();
+                    if ($otherSingleStock) {
+                        $able[$key][] = [$otherSingleStock];
                     }
                     //获取其它仓库多库位库存
-                    $otherMultiStocksCount = $stocks
+                    $otherMultiStocksSum = $stocks
                         ->groupBy('warehouse_id');
-
-
                 }
             }
         }

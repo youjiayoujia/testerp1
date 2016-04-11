@@ -106,7 +106,31 @@ class PurchaseListController extends Controller
         ];
         return view($this->viewPath . 'changeActive', $response);
 			
+	}	
+	
+	/**
+     * 处理异常
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function updateActive($id)
+	{
+		$data=request()->all();
+		$model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+		if($data['active_status']==0){
+			$data['active']=0;
+			}
+		$model->update($data);
+		if($model->active == 1 && $data['newSupplier']){
+			ItemModel::where('sku',$model->sku)->update(['supplier_id'=>$data['newSupplier']]);
+			}
+        return redirect($this->mainIndex);		
 	}
+	
 	/**
      * 批量对单
      *
@@ -128,29 +152,6 @@ class PurchaseListController extends Controller
 		}
 		return 1;
 		
-	}
-	
-	/**
-     * 处理异常
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function updateActive($id)
-	{
-		$data=request()->all();
-		$model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-		if($data['active_status']==0){
-			$data['active']=0;
-			}
-		$this->model->update($data);
-		if($model->active == 1 && $data['newSupplier']){
-			ItemModel::where('sku',$model->sku)->update(['supplier_id'=>$data['newSupplier']]);
-			}
-        return redirect($this->mainIndex);		
 	}
 	/**
      * 对单入库

@@ -11,7 +11,7 @@
     <th class='sort' data-field='telephone'>电话</th>
     <th>电子邮件</th>
     <th>采购员</th>
-    <th class='sort' data-field='level'>评级</th>
+    <th class='sort' data-field='level'>供货商等级</th>
     <th>创建人</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>

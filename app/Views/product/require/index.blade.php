@@ -43,10 +43,10 @@
                 <a href="{{ route('productRequire.show', ['id'=>$productRequire->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                @if(!$productRequire->status)
                 <a href="{{ route('productRequire.edit', ['id'=>$productRequire->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                @if(!$productRequire->status)
                 <a href='javascript:' class='btn btn-primary btn-xs process' data-status='2' data-id="{{ $productRequire->id }}">
                     <span class="glyphicon glyphicon-eye-open"></span>找到
                 </a>

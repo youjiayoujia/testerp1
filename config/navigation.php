@@ -155,6 +155,11 @@ return [
                 'url' => 'pickList.index',
                 'icon' => '',
             ],
+            [
+                'name' => '拣货单异常',
+                'url' => 'errorList.index',
+                'icon' => '',
+            ],
         ],
     ],
     //物流导航

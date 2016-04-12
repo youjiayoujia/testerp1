@@ -6,10 +6,10 @@
             <div class="col-lg-2">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>sku</strong>: {{ $model->items ? $model->items->sku : '' }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : ''}}
             </div>
             <div class="col-lg-2">

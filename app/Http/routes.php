@@ -177,6 +177,10 @@ Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 
+//拣货单异常
+Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);
+Route::resource('errorList', 'Picklist\ErrorListController');
+
 //拣货路由
 Route::post('pickList/inboxStore/{id}', ['uses' => 'PickListController@inboxStore', 'as' => 'pickList.inboxStore']);
 Route::post('pickList/createPickStore',
@@ -222,6 +226,10 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::post('package/exportData', ['uses' => 'PackageController@exportData', 'as'=>'package.exportData']);
+Route::get('package/shippingStatistics', ['uses'=>'PackageController@shippingStatistics', 'as'=>'package.shippingStatistics']);
+Route::get('package/ajaxShippingExec', ['uses'=>'PackageController@ajaxShippingExec', 'as'=>'package.ajaxShippingExec']);
+Route::get('package/shipping', ['uses'=>'PackageController@shipping', 'as'=>'package.shipping']);
 Route::post('package/feeStore', ['uses' => 'PackageController@feeStore', 'as' => 'package.feeStore']);
 Route::get('package/manualLogistic/{id}',
     ['uses' => 'PackageController@manualLogistic', 'as' => 'package.manualLogistic']);

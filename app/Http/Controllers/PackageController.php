@@ -93,4 +93,60 @@ class PackageController extends Controller
 
         return redirect($this->mainIndex);
     }
+
+    /**
+     * 跳转发货页面 
+     *
+     * @param none 
+     * @return view
+     *
+     */
+    public function shipping()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath.'shipping', $response);
+    }
+
+    /**
+     * 执行发货
+     *
+     * @param none 
+     * @return json
+     *
+     */
+    public function ajaxShippingExec()
+    {
+        $track_no = request()->input('trackno');
+        $logistic_id = request()->input('logistic_id');
+        $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
+        if(!$package) {
+            return json_encode(false);
+        }
+        if($package->logistic_id != $logistic_id) {
+            return json_encode('logistic_error');
+        }
+        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time())]);
+        return json_encode(true);
+    }
+
+    public function shippingStatistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'statistics', $response);
+    }
+
+    public function exportData()
+    {
+        $start_time = request()->input('start_time');
+        $end_time = request()->input('end_time');
+        $packages = PackageModel::whereBetween('shipped_at', [$start_time, $end_time])->get();
+        $this->model->exportData($packages);
+    }
 }

@@ -42,22 +42,22 @@
         <div class="col-lg-2">
             <strong>品类</strong>: {{ $model->catalogByName ? $model->catalogByName->name : '' }}
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <strong>货源地(省)</strong>: {{ $model->province }}
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <strong>货源地(市)</strong>: {{ $model->city }}
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <strong>颜色</strong>: {{ $model->color }}
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <strong>材料</strong>: {{ $model->material }}
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <strong>工艺</strong>: {{ $model->technique }}
         </div>
-        <div class="col-lg-1">
+        <div class="col-lg-2">
             <strong>配件</strong>: {{ $model->parts }}
         </div>
         <div class="col-lg-2">

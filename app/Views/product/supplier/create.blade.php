@@ -68,7 +68,7 @@
             <input class="form-control" id="purchase_id" placeholder="采购者id" name='purchase_id' value="{{ old('purchase_id') }}">
         </div>
         <div class="form-group col-lg-4">
-            <label for="level">供货商评级</label>
+            <label for="level">供货商等级</label>
             <select name='level_id' class='form-control'>
             @foreach($levels as $level)
                 <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $level->id ? 'selected' : '') : '' }}> {{$level->name}} </option>

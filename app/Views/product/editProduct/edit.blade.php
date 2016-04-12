@@ -38,6 +38,7 @@
             <label style="width:80px">主表:英文名: </label>
             <textarea class="form-control form55" style="width:300px;" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
             <br><label style="width:80px"></label>
+            <span class="msg">0 characters</span>
         </td>
         </tr>
         <tr>
@@ -130,9 +131,26 @@
             </td>
         </tr>
         <tr>
-            <td><label>拿货价(RMB): </label>{{$model->purchase_price}}</td>
+            <td><label>拿货价(RMB): </label><span id="we_cost">{{$model->purchase_price}}</span></td>
             <td>
-                <label>主表:销售价美元: </label><input type="text" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
+                <label>主表:销售价美元: </label><input type="text" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}"><a href="#" id="price_calculate">价格试算</a>
+                <div id="price_calculate_div" style="display:none;">
+                    <table cellspacing="1" cellpadding="1" border="1">
+                        <tr><td>采购成本</td><td>价格系数</td><td>重量</td><td>重量系数</td><td>快递费用</td><td>销售价美元</td><td>成本价美元</td><td>利润率</td><td>实际价格</td><td>实际利润率</td></tr>
+                        <tr>
+                            <td id="c_cost">1</td>
+                            <td id="c_price_coe">1</td>
+                            <td id="c_weight">1</td>
+                            <td id="c_weight_coe">1</td>
+                            <td id="c_ship_price">2</td>
+                            <td id="c_pprice">3</td>
+                            <td id="c_pcost">4</td>
+                            <td id="c_profit">
+                                <td id="r_price">5</td>
+                                <td id="r_profit">5</td>
+                            </tr>
+                    </table>
+                </div
             </td>
         </tr>
         <tr>
@@ -143,7 +161,7 @@
             </td>
         </tr>
         <tr>
-            <td><label>快递费用(RMB): </label>{{$model->purchase_carriage}}</td>
+            <td><label>快递费用(RMB): </label><span id="ship_price">{{$model->purchase_carriage}}</span></td>
             <td>
                 <label>主表:成本价美元: </label><span id="p_cost" style="color:red;"></span>
                 <input type="text" class="form-control form55" id="cost_usd_price" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="cost_usd_price">
@@ -220,3 +238,67 @@
     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
     <button type="reset" class="btn btn-default">取消</button>
 @show{{-- 表单按钮 --}}
+
+@section('pageJs')
+    <script type="text/javascript">
+        $('#name').keyup( function() {
+            $('.msg').html($(this).val().length + ' characters');
+        });
+
+        $("#price_calculate").click(function(){
+            $("#price_calculate_div").toggle();
+            return false;
+        })
+
+    function ajax_price()
+    {
+        var price = document.getElementById('we_cost').innerHTML;
+        var weight = document.getElementById('weight').value;
+        var ship_price = document.getElementById('ship_price').innerHTML;
+        var real_price = document.getElementById('sale_usd_price').value;
+        if(real_price.length == 0)
+            real_price = 0;
+        var type = 'price';
+        $.ajax({
+            type:"POST",
+            url :"/tribute/ajax_price",
+            data:"type=" + type + "&price=" + price + "&weight=" + weight + "&ship_price=" + ship_price + "&real_price=" + real_price,
+            dataType:"json",
+            success:function(res){
+                if(real_price <= 0)
+                    document.getElementById('s_price').value = res.p_price
+                document.getElementById('c_cost').innerHTML = res.price
+                document.getElementById('c_price_coe').innerHTML = res.price_coe
+                document.getElementById('c_weight').innerHTML = res.weight
+                document.getElementById('c_weight_coe').innerHTML = res.weight_coe
+                document.getElementById('c_pprice').innerHTML = res.p_price
+                document.getElementById('c_profit').innerHTML = res.profit
+                document.getElementById('r_price').innerHTML = res.r_price
+                document.getElementById('r_profit').innerHTML = res.r_profit
+            }
+        });
+        return false;
+    }
+
+    function ajax_cost()
+    {
+        var cost = document.getElementById('we_cost').innerHTML;
+        var ship_price = document.getElementById('ship_price').innerHTML;
+        var weight = document.getElementById('s_weight').value;
+        var type = 'cost';
+        $.ajax({
+            type:"POST",
+            url :"/tribute/ajax_price",
+            data:"type=" + type + "&cost=" + cost + "&ship_price=" + ship_price + "&weight=" + weight,
+            dataType:"json",
+            success:function(res){
+                document.getElementById('p_cost').innerHTML = res.p_cost
+                document.getElementById('s_cost').value = res.p_cost
+                document.getElementById('c_pcost').innerHTML = res.p_cost
+                document.getElementById('c_ship_price').innerHTML = res.ship_price
+            }
+        });
+        return false;
+    }
+    </script>
+@stop

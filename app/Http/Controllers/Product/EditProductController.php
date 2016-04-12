@@ -136,5 +136,68 @@ class EditProductController extends Controller
 
         return 1;
     }
+
+    /**
+     * 
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function price()
+    {
+        $rate = 6.2;
+        $type = request()->input('type');
+        $price = float(request()->input('price'));
+        $weight = float(request()->input('weight'));
+        //价格系数
+        $price_coe = 1.4;
+        if($price<30){
+            $price_coe = 2.2;
+        }elseif($price<50){
+            $price_coe = 1.98;
+        }
+        elseif($price<100){
+            $price_coe = 1.97;
+        }
+        elseif($price<150){
+            $price_coe = 1.95;
+        }
+        elseif($price<200){
+            $price_coe = 1.9;
+        }
+        elseif($price<250){
+            $price_coe = 1.7;
+        }
+        elseif($price<300){
+            $price_coe = 1.7;
+        }
+        elseif($price<350){
+            $price_coe = 1.6;
+        }
+        elseif($price<400){
+            $price_coe = 1.5;
+        }
+        
+        //重量系数
+        $weight_coe = 1.3
+        if($weight < 0.5){
+            $weight_coe = 2.6;
+        }elseif($weight < 1){
+            $weight_coe = 2.5;
+        }
+        elseif($weight < 1.5){
+            $weight_coe = 1.8;              
+        }
+        elseif($weight < 2){
+            $weight_coe = 1.6;               
+        }
+
+        $ship_price = request()->input('ship_price');
+        $real_price = request()->input('real_price');
+
+        $result = [];
+        
+        return 1;
+    }
      
 }

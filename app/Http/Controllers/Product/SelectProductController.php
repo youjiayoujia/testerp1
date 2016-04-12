@@ -166,20 +166,5 @@ class SelectProductController extends Controller
         return redirect($this->mainIndex);
     }
 
-    /**
-     * 产品审核
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function examineAmazonProduct()
-    {
-        $id = request()->input('product_ids');
-        $status = request()->input('status');
-        $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->examineAmazonProduct($status);
-
-        return 1;
-    }
      
 }

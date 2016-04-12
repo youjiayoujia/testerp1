@@ -59,6 +59,11 @@ return [
                     'url' => 'EditProduct.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '选款产品审核',
+                    'url' => 'ExamineProduct.index',
+                    'icon' => '',
+                ],
             ],
             '供应链' => [
                 [

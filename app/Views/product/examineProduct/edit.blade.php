@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('EditProduct.update', ['id' => $model->id]) }} @stop
+@section('formAction') {{ route('ExamineProduct.update', ['id' => $model->id]) }} @stop
 @section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
 <?php 
@@ -8,6 +8,12 @@
     $market_usd_price = '';
     $cost_usd_price = '';
     $sale_usd_price = '';
+    $name = '';
+    $c_name = '';
+    $store = '';
+    $filter_attributes = '';
+    $brief = '';
+    $description = '';
     if(!empty($check)){
         $unedit_reason = $check->unedit_reason;
         $market_usd_price = $check->market_usd_price;
@@ -20,6 +26,7 @@
         $brief = $check->brief;
         $description = $check->description;
     } 
+
 ?>
 <input type='hidden' value='PUT' name="_method">
 <table class="table table-bordered">
@@ -224,7 +231,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">关闭
             </button>
-            <button type="submit" class="btn btn-primary" name='edit' value='4'>
+            <button type="submit" class="btn btn-primary" name='examine' value='1'>
                提交
             </button>
          </div>
@@ -233,8 +240,10 @@
 </div>
 @stop
 @section('formButton')
-    <button type="submit" class="btn btn-success" name='edit' value='0'>保存</button>
-    <button type="reset" class="btn btn-default">取消</button>
+    
+    <button type="submit" class="btn btn-success" name='examine' value='3'>资料审核通过</button>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
+    
 @show{{-- 表单按钮 --}}
 
 @section('pageJs')

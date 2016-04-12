@@ -77,6 +77,7 @@ class ProductModel extends BaseModel
         'package_limit_1',
         'status',
         'edit_status',
+        'examine_status',
         'remark',
         'image_edit_not_pass_remark',
         'data_edit_not_pass_remark',

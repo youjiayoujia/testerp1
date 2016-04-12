@@ -68,7 +68,6 @@ class ProductModel extends BaseModel
         'package_size',
         'weight',
         'fabric',
-        'warehouse_id',
         'upload_user',
         'assigner',
         'default_image',
@@ -149,7 +148,7 @@ class ProductModel extends BaseModel
 
     public function productEnglishValue()
     {
-        return $this->hasOne('App\Models\Product\productEnglishValueModel','product_id');
+        return $this->hasOne('App\Models\Product\ProductEnglishValueModel','product_id');
     }
 
     public function imageAll()

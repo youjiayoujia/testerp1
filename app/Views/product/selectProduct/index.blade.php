@@ -1,9 +1,10 @@
 @extends('common.table')
+@section('tableTitle') {{ $metas['title'] }} <font color="red">（操作说明：勾选产品，点击选中，下拉选择一个shop即可）</font> @stop{{-- 列表标题 --}}
 @section('tableToolButtons')
 
-<div class="btn-group" role="group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        选中shop
+<div class="btn-group" role="group" style="float:left">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        选中
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
@@ -78,7 +79,7 @@
     <script type="text/javascript">    
         //批量审核
         $('.choseShop').click(function () {
-            if (confirm($(this).data('name')+"确认审核?")) {
+            if (confirm($(this).data('name')+"确认选中?")) {
                 var url = "{{route('beChosed')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var product_ids = "";

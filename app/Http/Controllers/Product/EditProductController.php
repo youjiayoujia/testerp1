@@ -7,7 +7,7 @@ use App\Models\Product\channel\amazonProductModel;
 use App\Models\Product\channel\ebayProductModel;
 use App\Models\Product\channel\aliexpressProductModel;
 use App\Models\Product\channel\b2cProductModel;
-use App\Models\Product\productEnglishValueModel;
+use App\Models\Product\ProductEnglishValueModel;
 use App\Models\Product\SupplierModel;
 use App\Http\Controllers\Controller;
 
@@ -21,7 +21,7 @@ class EditProductController extends Controller
         $this->product = $productModel;
         $this->supplier = $supplier;
         $this->mainTitle = '选款产品编辑';
-        $this->viewPath = 'product.EditProduct.';
+        $this->viewPath = 'product.editProduct.';
     }
 
     /**
@@ -75,9 +75,9 @@ class EditProductController extends Controller
         $productModel->update($data);
 
         //更新英文信息
-        $productEnglishValueModel = new productEnglishValueModel();
+        $ProductEnglishValueModel = new ProductEnglishValueModel();
         $data['product_id'] = $productModel->id;
-        $english = $productEnglishValueModel->firstOrNew(['product_id'=>$id]);
+        $english = $ProductEnglishValueModel->firstOrNew(['product_id'=>$id]);
         //如果没保存过对应产品ID的英文资料,create，否则就更新
         if(count($english->toArray())==1){
             $english->create($data);

@@ -11,17 +11,8 @@
     <div class="form-group col-sm-2">
         <select class="form-control status" name="arr[status][{{$current}}]" id="arr[status][{{$current}}]">
             @foreach(config('order.product_status') as $product_status_key => $status)
-                <option value="{{ $product_status_key }}" {{ old('arr[status][$current]') == $product_status_key ? 'selected' : '' }}>
+                <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
                     {{ $status }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-    <div class="form-group col-sm-2">
-        <select class="form-control ship_status" name="arr[ship_status][{{$current}}]" id="arr[ship_status][{{$current}}]">
-            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$current]') == $ship_status_key ? 'selected' : '' }}>
-                    {{ $ship_status }}
                 </option>
             @endforeach
         </select>
@@ -37,6 +28,15 @@
     </div>
     <div class="form-group col-sm-2">
         <input type='text' class="form-control remark" id="arr[remark][{{$current}}]" placeholder="备注" name='arr[remark][{{$current}}]' value="{{ old('arr[remark][$current]') }}">
+    </div>
+    <div class="form-group col-sm-2">
+        <select class="form-control ship_status" name="arr[ship_status][{{$current}}]" id="arr[ship_status][{{$current}}]">
+            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
+                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$current]') == $ship_status_key ? 'selected' : '' }}>
+                    {{ $ship_status }}
+                </option>
+            @endforeach
+        </select>
     </div>
     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
 </div>

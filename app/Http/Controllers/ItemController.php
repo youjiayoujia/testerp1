@@ -12,16 +12,18 @@ namespace App\Http\Controllers;
 use App\Models\ItemModel;
 use App\Models\ProductModel;
 use App\Models\Product\SupplierModel;
+use App\Models\WarehouseModel;
 
 class ItemController extends Controller
 {
-    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product)
+    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse)
     {
         $this->model     = $item;
         $this->supplier  = $supplier;
         $this->product   = $product;
+        $this->warehouse = $warehouse;
         $this->mainIndex = route('item.index');
-        $this->mainTitle = 'item';
+        $this->mainTitle = '产品Item';
         $this->viewPath  = 'item.';
     }
 
@@ -41,6 +43,7 @@ class ItemController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'suppliers' => $this->supplier->all(),
+            'warehouses' => $this->warehouse->where('type','local')->get(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

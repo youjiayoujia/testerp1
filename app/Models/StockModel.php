@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use DB;
-use Excel;
+use Maatwebsite\Excel\Facades\Excel; 
 use Exception;
 use App\Base\BaseModel;
 use App\Models\Stock\InModel;
@@ -47,14 +47,8 @@ class StockModel extends BaseModel
             'warehouse_id' => 'required|integer',
             'warehouse_position_id' => 'required',
             'all_quantity' => 'required|integer',
-            'unit_price' => 'required|numeric',
-        ],
-        'update' => [
-            'warehouse_id' => 'required|integer',
-            'warehouse_position_id' => 'required',
-            'all_quantity' => 'required|integer',
-            'amount' => 'required|numeric',
-        ],
+            'unit_cost' => 'required|numeric',
+        ]
     ];
 
     /**
@@ -237,9 +231,9 @@ class StockModel extends BaseModel
     public function excelProcess($file)
     {
         $path = config('setting.stockExcelPath');
-        !file_exists($path.'stockExcelProcess.xls') or unlink($path.'stockExcelProcess.xls');
-        $file->move($path, 'stockExcelProcess.xls');
-        return $this->excelDataProcess($path.'stockExcelProcess.xls');
+        !file_exists($path.'stockExcelProcess.csv') or unlink($path.'stockExcelProcess.csv');
+        $file->move($path, 'stockExcelProcess.csv');
+        return $this->excelDataProcess($path.'stockExcelProcess.csv');
     }
 
     /**
@@ -250,27 +244,54 @@ class StockModel extends BaseModel
      */
     public function excelDataProcess($path)
     {
-        Excel::load($path, function($reader) {
-            $data = $reader->toArray();
-            foreach($data as $stock)
-            {
-                if(!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
-                    continue;
-                }
-                $tmp_position = PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->first();
-                if(!ItemModel::where(['sku' => $stock['sku']])->count()) {
-                    continue;
-                }
-                $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-                if(StockModel::where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->count()) {
-                    continue;
-                }
-                $buf = $this->create($stock);
-                $buf->update(['warehouse_position_id' => $tmp_position->id, 'item_id' => $tmp_item->id]);
-                $buf->update(['warehouse_id'=>PositionModel::find($buf->warehouse_position_id)->warehouse->id]);
+        $fd = fopen($path, 'r');
+        $arr = [];
+        while(!feof($fd))
+        {
+            $row = fgetcsv($fd);
+            $arr[] = $row;
+        }
+        fclose($fd);
+        if(!$arr[count($arr)-1]) {
+            unset($arr[count($arr)-1]);
+        }
+        $arr = $this->transfer_arr($arr);
+        $error[] = $arr;
+        foreach($arr as $key=> $stock)
+        {
+            $stock['position'] = iconv('gb2312','utf-8',$stock['position']);
+            if(!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
+                $error[] = $key;
+                continue;
             }
-        });
+            $stock['sku']=iconv('gb2312','utf-8',$stock['sku']);
+            $tmp_position = PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->first();
+            if(!ItemModel::where(['sku' => $stock['sku']])->count()) {
+                $error[] = $key;
+                continue;
+            }
+            $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
+            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost']);
+        }
 
-        return;
+        return $error;
+    }
+
+    public function transfer_arr($arr)
+    {
+        $buf = [];
+        foreach($arr as $key => $value)
+        {
+            $tmp = [];
+            if($key != 0) {
+                foreach($value as $k => $v)
+                {
+                    $tmp[$arr[0][$k]] = $v;
+                }
+            $buf[] = $tmp;
+            }
+        }
+
+        return $buf;
     }
 }

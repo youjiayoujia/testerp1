@@ -32,10 +32,14 @@
                 </div>
                 <div class="form-group" style="margin-left:25px">
                     <label>编辑默认图片:</label><br>
+                    <?php if($product->default_image!=0){ ?>
                     <img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="120px">
                         <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
                         <br>
-                    <?php $key=-1; ?>
+                        <?php }else{ ?>
+                            <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
+                        <?php } ?>
+                    <?php $key=0; ?>
                     @foreach($product->imageAll as $key=>$image)
                         <?php if($product->default_image==$image->id){continue;}else{ ?>
                             <label>编辑图片:</label><br>
@@ -104,10 +108,10 @@
                 @endforeach
             </select>
         </div>   
-        <div class="form-group col-md-3">
+        <!--<div class="form-group col-md-3">
             <label for="size">供应商信息</label>
             <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $product->supplier_info }}">
-        </div>  
+        </div>-->  
     </div>
 
     <div class='row'>  
@@ -133,8 +137,8 @@
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $product->purchase_carriage }}">
         </div>
         <div class="form-group col-md-1">
-            <label for="size">产品尺寸(m³)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="产品尺寸" name='product_size' value="{{ old('product_size') ?  old('product_size') : $product->product_size }}">
+            <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $product->product_size }}">
         </div>
         <div class="form-group col-md-1">
             <label for="color">产品包装尺寸(m³)</label>
@@ -166,14 +170,7 @@
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-3">
-            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select  class="form-control" name="warehouse_id">
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" {{ $product->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
-                @endforeach
-            </select>
-        </div>
+        
         <div class="form-group col-md-3">
             <label for="color">描述</label>
             <input class="form-control" id="description" placeholder="备注" name='description' value="{{ old('description') ?  old('description') : $product->description }}">

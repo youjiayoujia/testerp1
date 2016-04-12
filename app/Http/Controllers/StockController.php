@@ -10,7 +10,7 @@
 
 namespace App\Http\Controllers;
 
-use Excel;
+use Maatwebsite\Excel\Facades\Excel; 
 use App\Models\StockModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
@@ -57,7 +57,7 @@ class StockController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
         $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_price'));
+        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_cost'));
         return redirect($this->mainIndex);
     }
 
@@ -210,6 +210,9 @@ class StockController extends Controller
         if(request()->ajax()) {
             $warehouse = trim(request()->input('warehouse'));
             $sku = trim(request()->input('sku'));
+            if(!ItemModel::where('sku', $sku)->count()) {
+                return json_encode('none');
+            }
             $item_id = ItemModel::where('sku', $sku)->first()->id;
             $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->first();
             if(!$obj) {
@@ -278,16 +281,16 @@ class StockController extends Controller
                      'all_quantity'=>'',
                      'available_quantity'=>'',
                      'hold_quantity'=>'',
-                     'amount'=>'',
+                     'unit_cost'=>'',
                     ]
             ];
         $name = 'stock';
         Excel::create($name, function($excel) use ($rows){
-            $nameSheet='投诉列表';
+            $nameSheet='库存';
             $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
+                $sheet->with($rows);
             });
-        })->download('xls');
+        })->download('csv');
     }
 
     /**
@@ -315,10 +318,13 @@ class StockController extends Controller
     {
         if(request()->hasFile('excel'))
         {
-           $file = request()->file('excel');
-           $this->model->excelProcess($file);
+            $file = request()->file('excel');
+            $errors = $this->model->excelProcess($file);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'errors' => $errors,
+            ];
+            return view($this->viewPath.'excelResult', $response);
         }
-
-        return redirect($this->mainIndex);
     }
 }

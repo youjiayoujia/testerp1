@@ -188,4 +188,16 @@ class CatalogModel extends BaseModel
         return $data;
     }
 
+    /**
+     * 检查品类名是否已存在
+     * 2016-4-9 17:21:17 YJ
+     * @param string $catalog_name 品类名
+     * @return array
+     */
+    public function checkName($catalog_name)
+    {
+        $result = $this->where("name",$catalog_name)->get();
+        return count($result);
+    }
+
 }

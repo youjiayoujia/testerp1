@@ -78,24 +78,86 @@ class PositionModel extends BaseModel
      * @param $path excel文件路径
      *
      */
+    // public function excelDataProcess($path)
+    // {
+    //     Excel::load($path, function($reader) {
+    //         $data = $reader->toArray();
+    //         foreach($data as $position)
+    //         {
+    //             if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->count()) {
+    //                 continue;
+    //             }
+    //             if(PositionModel::where(['name' => trim($position['name'])])->count()) {
+    //                 continue;
+    //             }
+    //             $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->first();
+    //             $tmp = $this->create($position);
+    //             $tmp->update(['warehouse_id' => $tmp_warehouse->id]);
+    //         }
+    //     });
+
+    //     return;
+    // }
+    /**
+     * 处理excel数据
+     *
+     * @param $path excel文件路径
+     *
+     */
     public function excelDataProcess($path)
     {
-        Excel::load($path, function($reader) {
-            $data = $reader->toArray();
-            foreach($data as $position)
-            {
-                if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->count()) {
-                    continue;
-                }
-                if(PositionModel::where(['name' => trim($position['name'])])->count()) {
-                    continue;
-                }
-                $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->first();
-                $tmp = $this->create($position);
-                $tmp->update(['warehouse_id' => $tmp_warehouse->id]);
+        $fd = fopen($path, 'r');
+        $arr = [];
+        while(!feof($fd))
+        {
+            $row = fgetcsv($fd);
+            $arr[] = $row;
+        }
+        fclose($fd);
+        if(!$arr[count($arr)-1]) {
+            unset($arr[count($arr)-1]);
+        }
+        $arr = $this->transfer_arr($arr);
+        $error[] = $arr;
+        foreach($arr as $key=> $position)
+        {
+            $position['warehouse'] = iconv('gb2312','utf-8',$position['warehouse']);
+            $position['remark'] = iconv('gb2312','utf-8',$position['remark']);
+            if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available'=>'1'])->count()) {
+                $error[] = $key;
+                continue;
             }
-        });
+            $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available'=>'1'])->first();
+            $position['name']=iconv('gb2312','utf-8',$position['name']);
+            if(PositionModel::where(['name' => trim($position['name'])])->count()) {
+                $tmp_position = PositionModel::where(['name' => trim($position['name'])])->first();
+                $tmp_position->update($position);
+                $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
+                continue;
+            }
 
-        return;
+            $tmp_position = $this->create($position);
+            $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
+        }
+
+        return $error;
+    }
+
+    public function transfer_arr($arr)
+    {
+        $buf = [];
+        foreach($arr as $key => $value)
+        {
+            $tmp = [];
+            if($key != 0) {
+                foreach($value as $k => $v)
+                {
+                    $tmp[$arr[0][$k]] = $v;
+                }
+            $buf[] = $tmp;
+            }
+        }
+
+        return $buf;
     }
 }

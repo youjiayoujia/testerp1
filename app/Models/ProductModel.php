@@ -148,7 +148,7 @@ class ProductModel extends BaseModel
 
     public function productEnglishValue()
     {
-        return $this->hasOne('App\Models\Product\productEnglishValueModel','product_id');
+        return $this->hasOne('App\Models\Product\ProductEnglishValueModel','product_id');
     }
 
     public function imageAll()

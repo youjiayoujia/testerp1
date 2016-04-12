@@ -140,6 +140,11 @@ return [
                     'url' => 'stockTaking.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '库存结转',
+                    'url' => 'stockCarryOver.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -158,6 +163,20 @@ return [
             [
                 'name' => '拣货单异常',
                 'url' => 'errorList.index',
+                'icon' => '',
+            ],
+        ],
+    ],
+    //拣货导航
+    [
+        'name' => '汇率',
+        'icon' => 'home',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '汇率',
+                'url' => 'currency.index',
                 'icon' => '',
             ],
         ],

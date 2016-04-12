@@ -25,7 +25,7 @@ class StockController extends Controller
     {
         $this->model = $stock;
         $this->mainIndex = route('stock.index');
-        $this->mainTitle = '库存';
+        $this->mainTitle = '库存开帐';
         $this->viewPath = 'stock.';
     }
 

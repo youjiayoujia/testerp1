@@ -31,11 +31,17 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
+//汇率
+Route::resource('currency', 'CurrencyController');
+
 //入库
 Route::resource('stockIn', 'Stock\InController');
 
 //出库
 Route::resource('stockOut', 'Stock\OutController');
+
+//供货商变更历史
+Route::resource('supplierChangeHistory', 'Product\supplierChangeHistoryController');
 
 //供货商评级
 Route::resource('supplierLevel', 'Product\SupplierLevelController');
@@ -54,10 +60,11 @@ Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 
 //库存调整
+Route::post('stockAdjustment/checkResult/{id}', ['uses'=>'Stock\AdjustmentController@checkResult', 'as'=>'stockAdjustment.checkResult']);
 Route::get('stockAdjustment/adjustAdd',
     ['uses' => 'Stock\AdjustmentController@ajaxAdjustAdd', 'as' => 'stockAdjustment.adjustAdd']);
-Route::get('stockAdjustment/check',
-    ['uses' => 'Stock\AdjustmentController@ajaxCheck', 'as' => 'stockAdjustment.check']);
+Route::get('stockAdjustment/check/{id}',
+    ['uses' => 'Stock\AdjustmentController@Check', 'as' => 'stockAdjustment.check']);
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
 //库位
@@ -151,6 +158,12 @@ Route::get('allotment/checkform/{id}',
 Route::get('allotment/pick', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
 Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotment.check']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
+
+//库存结转
+Route::post('stockCarryOver/showStockView', ['uses'=>'Stock\CarryOverController@showStockView', 'as'=>'stockCarryOver.showStockView']);
+Route::get('stockCarryOver/showStock', ['uses'=>'Stock\CarryOverController@showStock', 'as'=>'stockCarryOver.showStock']);
+Route::get('stockCarryOver/ajaxCreateCarryOver', ['uses'=>'Stock\CarryOverController@ajaxCreateCarryOver', 'as'=>'stockCarryOver.ajaxCreateCarryOver']);
+Route::resource('stockCarryOver', 'Stock\CarryOverController');
 
 //库存盘点
 Route::get('StockTaking/takingAdjustmentShow/{id}', ['uses'=>'Stock\TakingController@takingAdjustmentShow', 'as'=>'StockTaking.takingAdjustmentShow']);

@@ -13,7 +13,8 @@ namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product\SupplierModel;
-use App\Models\product\SupplierLevelModel;
+use App\Models\Product\SupplierLevelModel;
+use App\Models\Product\SupplierChangeHistoryModel;
 
 class SupplierController extends Controller
 {
@@ -41,6 +42,24 @@ class SupplierController extends Controller
     }
 
     /**
+     * 存储
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $model = $this->model->create(request()->all());
+        SupplierChangeHistoryModel::create([              
+            'supplier_id' => $model->id,
+            'to' =>request()->input('purchase_id'),
+            'adjust_by' => '3',
+        ]);
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * 编辑
      *
      * @param $id
@@ -60,6 +79,39 @@ class SupplierController extends Controller
         return view($this->viewPath . 'edit', $response);
     }
 
+    /**
+     * 更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        if($model->purchase_id != request('purchase_id')) {
+            SupplierChangeHistoryModel::create([              
+                'supplier_id' => $id,
+                'from' => $model->purchase_id,
+                'to' =>request()->input('purchase_id'),
+                'adjust_by' => '3',
+            ]);
+        }
+        $model->update(request()->all());
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 跳转创建供货商等级 
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function createLevel()
     {
         $response = [
@@ -69,6 +121,13 @@ class SupplierController extends Controller
         return view($this->viewPath.'createLevel', $response);
     }
 
+    /**
+     * 等级save 
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function levelStore()
     {
         SupplierLevelModel::create(request()->all());

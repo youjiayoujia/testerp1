@@ -30,11 +30,11 @@
         <div class="panel-heading">sku</div>
         <div class="panel-body add_row">
             <div class='row'>
-                <div class="form-group col-sm-2">
-                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                </div>
                 <div class='form-group col-sm-2'>
                     <label>出入库类型</label>
+                </div>
+                <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -47,14 +47,14 @@
                 </div>
             </div>
             <div class='row'>
-                <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
-                </div>
                 <div class='form-group col-sm-2'>
                     <select name='arr[type][0]' class='form-control type'>
                         <option value='IN' {{ old('arr[type][0]') == 'IN' ? 'selected' : '' }}>入库</option>
                         <option value='OUT' {{ old('arr[type][0]') == 'OUT' ? 'selected' : '' }}>出库</option>
                     </select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
                     <input type='text' name='arr[warehouse_position_id][0]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][0]') }}">

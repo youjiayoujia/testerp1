@@ -14,6 +14,7 @@ use Excel;
 use Session;
 use Illuminate\Http\Request;
 use App\Models\WarehouseModel;
+use App\Models\CurrencyModel;
 
 class TestController extends Controller
 {
@@ -27,13 +28,8 @@ class TestController extends Controller
 
     public function test()
     {
-        $name = '发货复查';
-        $rows = ['1'=>'2'];
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='发货复查';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');
+        $cu = new CurrencyModel;
+        $tmp = $cu->getRate('  dCAD');
+        var_dump($tmp);
     }
 }

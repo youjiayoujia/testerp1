@@ -26,7 +26,7 @@
             <td>{{ $supplier->type ? ($supplier->type == '1' ? '线上' : '做货') : '线下' }} </td>
             <td>{{ $supplier->url }}</td>
             <td>{{ $supplier->official_url }}</td>
-            <<td>{{ $supplier->contact_name }}</td>
+            <td>{{ $supplier->contact_name }}</td>
             <td>{{ $supplier->telephone }}</td>
             <td>{{ $supplier->email }}</td>
             <td>{{ $supplier->purchaseName ? $supplier->purchaseName->name : '' }}</td>
@@ -50,6 +50,11 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('supplierChangeHistory.index') }}">
+         采购员变更历史
+    </a>
+</div>
 <div class="btn-group">
     <a class="btn btn-success" href="{{ route('supplierLevel.index') }}">
         <i class="glyphicon glyphicon-plus"></i> 供货商评级

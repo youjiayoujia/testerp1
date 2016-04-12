@@ -90,7 +90,7 @@
         buf[0] = "{{ old('province') ? old('province') : $model->province }}" ;
         buf[1] = "{{ old('city') ? old('city') : $model->city }}" ;
         init(buf[0],buf[1]);
-
+        
         $('.radio').click(function(){
             if($(this).find(':radio:checked').val() != '1') {
                 $(this).parent().parent().next().find('.url').val('');

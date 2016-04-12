@@ -61,7 +61,7 @@
             <td>采购类型</td> 
             <td>SKU</td> 
             <td>样图</td>
-            <td>采购数量/已到货数量/仍需采购数量</td>
+            <td>采购数量</td>
             <td>状态</td>
             <td>物流单号+物流费</td>
             <td>采购价格</td>
@@ -90,7 +90,7 @@
              暂无图片
              @endif
             </td>
-            <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
+            <td>{{$purchaseItem->purchase_num}}</td>
             <td>
            	<select name="arr[{{$k}}][status]" >
              @foreach(config('purchase.purchaseItem.status') as $key=>$v)

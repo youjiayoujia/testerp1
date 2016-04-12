@@ -14,6 +14,8 @@ class AddExcerptToPurchaseItemsTable extends Migration
     {
         Schema::table('purchase_items', function (Blueprint $table) {
             $table->date('start_buying_time')->nullable()->after('arrival_time');
+			$table->string('bar_code')->nullable()->after('arrival_time');
+			$table->int('storage_qty')->nullable()->after('arrival_time');
         });
     }
     /**
@@ -25,6 +27,8 @@ class AddExcerptToPurchaseItemsTable extends Migration
     {
         Schema::table('purchase_items', function (Blueprint $table) {
             $table->dropColumn(['start_buying_time']);
+			$table->dropColumn(['bar_code']);
+			$table->dropColumn(['storage_qty']);
         });
     }
 }

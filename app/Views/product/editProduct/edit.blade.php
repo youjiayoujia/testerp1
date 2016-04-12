@@ -12,14 +12,20 @@
         $unedit_reason = $check->unedit_reason;
         $market_usd_price = $check->market_usd_price;
         $cost_usd_price = $check->cost_usd_price;
-        $sale_usd_price = $check->sale_usd_price;
+        $sale_usd_price = $check->sale_usd_price; 
+        $name = $check->name;
+        $c_name = $check->c_name;
+        $store = $check->store;
+        $filter_attributes = $check->filter_attributes;
+        $brief = $check->brief;
+        $description = $check->description;
     } 
 ?>
 <input type='hidden' value='PUT' name="_method">
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <td>泽尚SKU</td>
+            <td>SKU</td>
             <td></td>
         </tr>
         <tr>
@@ -30,18 +36,18 @@
         <td>备注:{{$model->remark}}</td>
          <td>
             <label style="width:80px">主表:英文名: </label>
-            <textarea class="form-control form55" style="width:300px;" id="s_en_name" value="" name="s_en_name"></textarea>
+            <textarea class="form-control form55" style="width:300px;" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
             <br><label style="width:80px"></label>
         </td>
         </tr>
         <tr>
             <td><label>产品中文名: </label>{{$model->c_name}}</td>
-            <td><label>主表:中文名: </label><input type="text" class="form-control form55" style="width:300px;" id="s_cn_name" value="" name="s_cn_name"></td>
+            <td><label>主表:中文名: </label><input type="text" class="form-control form55" style="width:300px;" id="c_name" value="{{ old('c_name') ?  old('c_name') : $c_name }}" name="c_name"></td>
         </tr>
         <tr>
             <td><label>图片备注: </label></td>
             <td><lable>store:</lable>
-                <input type="text" class="form-control form55" style="width:300px;" id="" value="" name="store">
+                <input type="text" class="form-control form55" style="width:300px;" id="store" value="{{ old('store') ?  old('store') : $store }}" name="store">
             </td>
         </tr>
         <tr>
@@ -67,7 +73,7 @@
             <td>
                 <label>Filter_attributes: </label>
                 <br>
-                <textarea class="vLargeTextField" cols="50" id="s_filter_attributes" name="s_filter_attributes" rows="3"></textarea>
+                <textarea class="vLargeTextField" cols="50" id="filter_attributes" name="filter_attributes" rows="3" >{{ old('filter_attributes') ?  old('filter_attributes') : $filter_attributes }}</textarea>
             </td>
         </tr>
         <!--<tr>
@@ -80,7 +86,7 @@
             <td>
                 <label>主表:简短描述(brief): </label>
                 <br>
-                <textarea class="vLargeTextField" cols="50" id="s_brief" name="s_brief" rows="3"></textarea>
+                <textarea class="vLargeTextField" cols="50" id="brief" name="brief" rows="3">{{ old('brief') ?  old('brief') : $brief }}</textarea>
             </td>
         </tr>
         <tr>
@@ -99,14 +105,14 @@
             <td>
                 <label>主表:描述(description): </label>
                 <br>
-                <textarea class="vLargeTextField" cols="50" id="s_description" name="s_description" rows="3"></textarea>
+                <textarea class="vLargeTextField" cols="50" id="description" name="description" rows="3" >{{ old('description') ?  old('description') : $description }}</textarea>
             </td>
         </tr>
         <tr>
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
                 <label>主表:重量: </label>
-                <input type="text" class="form-control form55" id="s_weight" value="0.0" name="s_weight">
+                <input type="text" class="form-control form55" id="weight" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="weight">
             </td>
         </tr>
         <tr>
@@ -124,7 +130,7 @@
             </td>
         </tr>
         <tr>
-            <td><label>择尚拿货价(RMB): </label>{{$model->purchase_price}}</td>
+            <td><label>拿货价(RMB): </label>{{$model->purchase_price}}</td>
             <td>
                 <label>主表:销售价美元: </label><input type="text" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
             </td>

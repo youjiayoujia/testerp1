@@ -32,10 +32,14 @@
                 </div>
                 <div class="form-group" style="margin-left:25px">
                     <label>编辑默认图片:</label><br>
+                    <?php if($product->default_image!=0){ ?>
                     <img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="120px">
                         <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
                         <br>
-                    <?php $key=-1; ?>
+                        <?php }else{ ?>
+                            <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
+                        <?php } ?>
+                    <?php $key=0; ?>
                     @foreach($product->imageAll as $key=>$image)
                         <?php if($product->default_image==$image->id){continue;}else{ ?>
                             <label>编辑图片:</label><br>

@@ -78,6 +78,7 @@ class PurchaseListController extends Controller
 		if($data['active']>0){
 			$data['active_status']=1;
 		}
+		$data['arrival_time']=date('Y-m-d h:i:s',time());
 		$model->update($data);
         return redirect($this->mainIndex);		
 	}
@@ -143,7 +144,7 @@ class PurchaseListController extends Controller
 		$arrayItems=$this->model->find($purchaseItemIds);
 		foreach($arrayItems as $vo)
 		{
-			$vo->update(['status'=>2,'arrival_num'=>$vo->purchase_num,'lack_num'=>0]);
+			$vo->update(['status'=>2,'arrival_num'=>$vo->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
 			$num=$this->model->where('purchase_order_id',$vo->purchase_order_id)->where('status','<>',2)->count();
 			$purchaseOrder=PurchaseOrderModel::find($vo->purchase_order_id);
 			if($num==0){

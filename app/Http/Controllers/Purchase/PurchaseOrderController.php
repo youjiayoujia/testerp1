@@ -91,7 +91,7 @@ class PurchaseOrderController extends Controller
      */
 	
 	public function update($id)
-	{
+	{//echo date('Y-m-d h:i:s',time());exit;
 		$model=$this->model->find($id);
 		if ($model->examineStatus !=2) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
@@ -117,6 +117,7 @@ class PurchaseOrderController extends Controller
 					if($item['status']>0){
 						$data['status']=1;
 					}
+					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
 					unset($item);
@@ -126,7 +127,8 @@ class PurchaseOrderController extends Controller
 		$num=PurchaseItemModel::where('purchase_order_id',$id)->where('costExamineStatus','<>',2)->count();
 		if($num ==0){
 			$data['costExamineStatus']=2;
-			}	
+			}
+		$data['start_buying_time']=date('Y-m-d h:i:s',time());	
 		$model->update($data);
         return redirect( route('purchaseOrder.edit', $id));		
 	}
@@ -164,21 +166,19 @@ class PurchaseOrderController extends Controller
 	}
 	
 	/**
-     * 取消采购单
+     * 导出采购单
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */	
-	public function cancelOrder($id)
-	{	$num=purchaseItemModel::where('purchase_order_id',$id)->where('status','>',2)->count();
-		if($num>0){
-			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
-			}
-		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
-		$this->model->destroy($id);
-		return redirect($this->mainIndex);	
+     */
+	public function purchaseOrdersOut()
+	{
+		 $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		return view($this->viewPath.'excelOut',$response);	
 	}
-	
+
 	/**
      * 批量审核采购单
      *

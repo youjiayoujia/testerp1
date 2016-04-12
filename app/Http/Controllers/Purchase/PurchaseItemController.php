@@ -180,9 +180,9 @@ class PurchaseItemController extends Controller
 		if($num==0)
 		{
 			PurchaseOrderModel::destroy($purchaseOrderId);	
-			return redirect(route('purchaseOrder.index'));
+			return redirect(route('purchaseOrderAbnormal.index'));
 		}else{
-			return redirect( route('purchaseOrder.edit', $purchaseOrderId));
+			return redirect( route('purchaseOrderAbnormal.edit', $purchaseOrderId));
 		}
 	}
 	

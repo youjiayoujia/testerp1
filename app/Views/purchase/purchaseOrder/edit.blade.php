@@ -38,12 +38,7 @@
              <div class="form-group col-lg-4">
             	<strong>导出该订单</strong>:
                 	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>
-                
-            </div>
-         <div class="form-group col-lg-4">
-            	<strong>取消采购单</strong>:
-                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该订单</a>  
+                </a>     
             </div>
          <div class="form-group col-lg-4">
             <strong>采购单运单号</strong>:

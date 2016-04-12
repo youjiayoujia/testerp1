@@ -38,11 +38,7 @@
                     <span class="glyphicon glyphicon-pencil"></span>去处理
                 </a>
                 @endif       
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $purchaseOrder->id }}"
-                   data-url="{{ route('purchaseOrder.destroy', ['id' =>$purchaseOrder->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+               
             </td>
         </tr>
     @endforeach

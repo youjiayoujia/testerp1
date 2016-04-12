@@ -71,11 +71,7 @@
                 <a href="{{ route('purchaseItem.edit', ['id'=>$purchaseItem->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $purchaseItem->id }}"
-                   data-url="{{ route('purchaseItem.destroy', ['id' =>$purchaseItem->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+                
             </td>
         </tr>
     @endforeach

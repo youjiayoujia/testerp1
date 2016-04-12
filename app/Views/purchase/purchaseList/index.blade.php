@@ -98,12 +98,6 @@
                 <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $purchaseList->id }}"
-                   data-url="{{ route('purchaseList.destroy', ['id' =>$purchaseList->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
             </td>
             @endif
         </tr>

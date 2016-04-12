@@ -86,9 +86,9 @@
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>       
                 @if($purchaseList->active_status>0)
-                <a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
+                <!--<a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
                      处理异常
-                </a>
+                </a>-->
                 @endif
                  @if($purchaseList->status==2)
                 <a href="/purchaseList/stockIn/{{$purchaseList->id}}" class="btn btn-info btn-xs">

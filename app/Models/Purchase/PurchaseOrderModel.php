@@ -30,7 +30,7 @@ class PurchaseOrderModel extends BaseModel
     public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
     
 	 
-    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid'];
+    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid','start_buying_time'];
 	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
@@ -47,17 +47,6 @@ class PurchaseOrderModel extends BaseModel
 		 }
 		 	$PurchaseOrder->save();
 	}
-	/*取消订单
-	*
-	* @param $id
-    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
-	public function cancelOrderItems($id){
-		$purchaseItem=new PurchaseItemModel;
-		$purchaseItem->where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
-		$this->destroy($id);
-	}
-	
 	/**
      * 导出单张采购单为单张excel
      *

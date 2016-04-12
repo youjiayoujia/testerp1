@@ -21,11 +21,8 @@ Route::resource('productImage', 'Product\ImageController');
 Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
-//品类
 Route::resource('brand', 'brandController');
-Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as'=>'checkName']);
 Route::resource('catalog', 'CatalogController');
-
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -44,8 +41,6 @@ Route::resource('stockOut', 'Stock\OutController');
 Route::resource('productSupplier', 'Product\SupplierController');
 
 //选款需求
-Route::get('productRequire/ajaxQuantityProcess', ['uses'=>'Product\RequireController@ajaxQuantityProcess', 'as'=>'productRequire.ajaxQuantityProcess']);
-Route::get('productRequire/ajaxProcess', ['uses'=>'Product\RequireController@ajaxProcess', 'as'=>'productRequire.ajaxProcess']);
 Route::resource('productRequire', 'Product\RequireController');
 
 //仓库
@@ -90,11 +85,12 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 
 
 //采购单
-Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
-Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
-Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
-Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
-Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
+Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\purchaseOrderController@changeExamineStatus');
+Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
+Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
+Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
+Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\purchaseOrderController@purchaseOrdersOut');
+Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
 
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
@@ -103,7 +99,10 @@ Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@ac
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
-
+//异常条目采购
+Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
+//异常单采购
+Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
 /**
  * stock controller route
  */
@@ -160,16 +159,15 @@ Route::resource('logisticsSupplier', 'Logistics\SupplierController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
-Route::get('poolQuantity', ['uses' => 'LogisticsController@poolQuantity', 'as' => 'poolQuantity']);
 Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
 Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
 Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);
 Route::get('countExpress/{id}', ['uses' => 'Logistics\ZoneController@countExpress', 'as' => 'countExpress']);
 Route::get('countPacket/{id}', ['uses' => 'Logistics\ZoneController@countPacket', 'as' => 'countPacket']);
-Route::get('batchAddTrCode/{logistics_id}',
+Route::get('batchAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@batchAddTrCode', 'as' => 'batchAddTrCode']);
 Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCodeFn', 'as' => 'logisticsCodeFn']);
-Route::get('scanAddTrCode/{logistics_id}',
+Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 

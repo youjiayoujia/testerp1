@@ -6,7 +6,7 @@
         </a>
     </div>
     <div class="btn-group" >
-        <a class="btn btn-info" id="orderExcelOut"> 导出采购单
+        <a href="/purchaseOrder/purchaseOrdersOut" class="btn btn-info" id="orderExcelOut"> 采购单导出
         </a>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -64,11 +64,7 @@
                     <span class="glyphicon glyphicon-pencil"></span>去采购
                 </a>
                 @endif       
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $purchaseOrder->id }}"
-                   data-url="{{ route('purchaseOrder.destroy', ['id' =>$purchaseOrder->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+                
             </td>
         </tr>
     @endforeach

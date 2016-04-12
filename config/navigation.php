@@ -212,8 +212,13 @@ return [
                     'icon' => '',
                 ],
 				[
-                    'name' => '采购异常',
+                    'name' => '异常采购条目',
                     'url' => 'purchaseAbnormal.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '异常采购单',
+                    'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
                 ],
             ]

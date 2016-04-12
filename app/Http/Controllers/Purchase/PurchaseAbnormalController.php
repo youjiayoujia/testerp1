@@ -24,7 +24,7 @@ class PurchaseAbnormalController extends Controller
     {
         $this->model = $purchaseItem;
         $this->mainIndex = route('purchaseAbnormal.index');
-        $this->mainTitle = '采购需求';
+        $this->mainTitle = '异常采购需求';
 		$this->viewPath = 'purchase.purchaseAbnormal.';
     }
     
@@ -90,7 +90,7 @@ class PurchaseAbnormalController extends Controller
     }
 	
 	/**
-     * 更新采购条目
+     * 处理异常采购条目
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -113,101 +113,6 @@ class PurchaseAbnormalController extends Controller
         return redirect($this->mainIndex);
     }
 
-	/**
-     * ajax批量生成采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function addPurchaseOrder()
-	{
-		$purchaseIds=explode(',',request()->get('purchase_ids'));
-		 if(!empty(request()->get('purchase_ids'))){
-			$warehouse_supplier=$this->model->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->whereIn('id',$purchaseIds)->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
-			if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$data['warehouse_id']=$v['warehouse_id'];		 
-				$data['supplier_id']=$v['supplier_id'];
-				$purchaseOrder=PurchaseOrderModel::create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-					$this->model->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->whereIn('id',$purchaseIds)->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}				 
-			}
-			
-		}
-			 }else{ 
-		$warehouse_supplier=$this->model->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$data['warehouse_id']=$v['warehouse_id'];		 
-				$data['supplier_id']=$v['supplier_id'];
-				$purchaseOrder=PurchaseOrderModel::create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-					$this->model->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}				 
-			}
-			
-		}
-		/*$warehouse_nosupplier=$this->model->select('id','warehouse_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id',0)->get()->toArray();
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$purchaseOrderModel =new PurchaseOrderModel;
-				$data['warehouse_id']=$v['warehouse_id'];	
-				$purchaseOrder=$purchaseOrderModel->create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-				$purchaseItem=$this->find($v['id']);
-				$purchaseItem->purchase_order_id=$v['purchase_order_id'];
-				$purchaseItem->save();
-				}				 
-			}
-			return 1;*/
-			}
-		return 1;
-		 		
-	}
-	/**
-     * 审核采购价格
-     *
-     * @param $id采购条目id
-	 * @param $costExamineStatus价格审核状态
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */	
-	public function costExamineStatus($id,$costExamineStatus){
-		$model=$this->model->find($id);
-		$data['costExamineStatus']=$costExamineStatus;
-		$model->update($data);
-		$num=$this->model->where('purchase_order_id',$model->purchase_order_id)->where('costExamineStatus','<>',2)->count();
-		if($num==0){
-			PurchaseOrderModel::where('id',$model->purchase_order_id)->update(['costExamineStatus'=>2]);
-		}
-		return redirect( route('purchaseOrder.edit', $model->purchase_order_id));	
-	}	
-		
-
-	/**
-     * 去除采购单中异常条目
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function cancelThisItem($id)
-	{
-		$model=$this->model->find($id);
-		$purchaseOrderId=$model->purchase_order_id;
-		$data['purchase_order_id']=0;
-		$model->update($data);
-		$num=$this->model->where('purchase_order_id',$purchaseOrderId)->count();
-		if($num==0)
-		{
-			PurchaseOrderModel::destroy($purchaseOrderId);	
-			return redirect(route('purchaseOrder.index'));
-		}else{
-			return redirect( route('purchaseOrder.edit', $purchaseOrderId));
-		}
-	}
 	
 
 }

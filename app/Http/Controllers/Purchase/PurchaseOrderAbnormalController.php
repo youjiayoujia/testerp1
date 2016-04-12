@@ -16,23 +16,24 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
 
-class PurchaseOrderController extends Controller
+class PurchaseOrderAbnormalController extends Controller
 {
 
     public function __construct(PurchaseOrderModel $purchaseOrder)
     {
         $this->model = $purchaseOrder;
-        $this->mainIndex = route('purchaseOrder.index');
-        $this->mainTitle = '采购单';
-		$this->viewPath = 'purchase.purchaseOrder.';
+        $this->mainIndex = route('purchaseOrderAbnormal.index');
+        $this->mainTitle = '异常采购单';
+		$this->viewPath = 'purchase.purchaseOrderAbnormal.';
     }
     
 	
 	public function index()
     {
+		$purchaseAbnormalOrder=PurchaseItemModel::select('purchase_order_id')->where('active','>',0)->where('purchase_order_id','>','0')->groupBy('purchase_order_id')->get()->toArray();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model->whereIn('id',$purchaseAbnormalOrder)),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -170,12 +171,8 @@ class PurchaseOrderController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */	
 	public function cancelOrder($id)
-	{	$num=purchaseItemModel::where('purchase_order_id',$id)->where('status','>',2)->count();
-		if($num>0){
-			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
-			}
-		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
-		$this->model->destroy($id);
+	{
+		$this->model->cancelOrderItems($id);
 		return redirect($this->mainIndex);	
 	}
 	

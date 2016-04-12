@@ -138,7 +138,7 @@
             </td>  
 			<td>
             @if($purchaseItem->active ==1)
-            <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> 
+            报缺
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @elseif($purchaseItem->active > 1)
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)

@@ -57,6 +57,11 @@ class OrderController extends Controller
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
+                if(count($item) >= 2) {
+                    $data['is_multi'] = 1;
+                }else {
+                    $data['is_multi'] = 0;
+                }
             }
         }
         unset($data['arr']);
@@ -278,6 +283,7 @@ class OrderController extends Controller
             $orders[$key]['billing_zipcode'] = $channelOrder['billing_zip'];
             $orders[$key]['billing_phone'] = $channelOrder['billing_phone'];
             $orders[$key]['payment_date'] = $channelOrder['payment_date'];
+            $orders[$key]['transaction_number'] = $channelOrder['trans_id'];
             foreach ($channelOrder['orderitems'] as $itemKey => $channelOrderItem) {
                 $orders[$key]['items'][$itemKey]['item_id'] = 0;
                 $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];
@@ -285,6 +291,11 @@ class OrderController extends Controller
                 $orders[$key]['items'][$itemKey]['status'] = 1;
                 $orders[$key]['items'][$itemKey]['ship_status'] = 'not_shipped';
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
+                if(count($channelOrder['orderitems']) >= 2) {
+                    $orders[$key]['is_multi'] = 1;
+                }else {
+                    $orders[$key]['is_multi'] = 0;
+                }
                 $arr = $channelOrder['orderitems'];
                 $len = count($arr);
                 for($i=0; $i<$len; $i++) {

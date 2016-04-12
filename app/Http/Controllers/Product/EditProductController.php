@@ -179,7 +179,7 @@ class EditProductController extends Controller
         }
         
         //重量系数
-        $weight_coe = 1.3
+        $weight_coe = 1.3;
         if($weight < 0.5){
             $weight_coe = 2.6;
         }elseif($weight < 1){
@@ -196,7 +196,7 @@ class EditProductController extends Controller
         $real_price = request()->input('real_price');
 
         $result = [];
-        
+
         return 1;
     }
      

@@ -103,6 +103,11 @@ Route::resource('purchaseList', 'Purchase\PurchaseListController');
 Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
 //异常单采购
 Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
+//采购入库e
+Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');
+Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseStockIn');
+Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
+Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 /**
  * stock controller route
  */

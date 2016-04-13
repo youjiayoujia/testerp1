@@ -64,7 +64,7 @@ class PurchaseAbnormalController extends Controller
 		$data=request()->all();
 		$data['skus']=explode('#',$data['sku']);
 		foreach($data['skus'] as $k=>$sku){
-			$this->model->where('sku',$sku)->update(['active'=>$data['active'],'active_status'=>1]);
+			$this->model->where('sku',$sku)->where('status','<',2)->update(['active'=>$data['active'],'active_status'=>1]);
 		}
 		return redirect($this->mainIndex);
 	}

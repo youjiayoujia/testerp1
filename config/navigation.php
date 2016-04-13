@@ -207,8 +207,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '对单',
+                    'name' => '采购对单',
                     'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '采购入库',
+                    'url' => 'purchaseStockIn.index',
                     'icon' => '',
                 ],
 				[

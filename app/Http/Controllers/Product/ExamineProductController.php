@@ -32,7 +32,7 @@ class ExamineProductController extends Controller
     {
         $response = [
             'metas' => $this->metas('index'),
-            'data' => $this->autoList($this->product->where('status','>=','0')),
+            'data' => $this->autoList($this->product->where('edit_status','image_unedited')->orWhere('edit_status','image_edited')),
         ];
 
         return view( $this->viewPath .'index', $response);

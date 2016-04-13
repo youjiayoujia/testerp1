@@ -76,6 +76,24 @@ class SelectProductController extends Controller
     }
 
     /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->product->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $data['edit_status'] = 'canceled';
+        $model->update($data);
+        $model->destroy($id);
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * 产品选中
      *
      * @param  int  $id
@@ -127,7 +145,7 @@ class SelectProductController extends Controller
             }
             
         }
-        $data['status'] = 1;
+        $data['edit_status'] = "picked";
         $productModel->update($data);
 
         return 1;

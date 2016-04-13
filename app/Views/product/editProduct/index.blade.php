@@ -6,10 +6,9 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="{{ DataList::filtersEncode(['status','=','0']) }}">未编辑产品</a></li>
-                <li><a href="{{ DataList::filtersEncode(['status','=','1']) }}">未编辑图片</a></li>
-                <li><a href="{{ DataList::filtersEncode(['status','=','2']) }}">待审核</a></li>
-                <li><a href="{{ DataList::filtersEncode(['status','=','3']) }}">已审核</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">选中资料未编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','data_edited']) }}">选中资料已编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
             </ul>
     </div>  
 @stop{{-- 工具按钮 --}}
@@ -19,7 +18,6 @@
     <th class="sort" data-field="model">MODEL</th>
     <th>分类</th>
     <th>图片</th>
-    <th>状态</th>
     <th>选中shop</th>
     <th class="sort" data-field="c_name">中文名称</th>
     <th>材质</th>
@@ -38,7 +36,6 @@
             <td>{{ $product->model }}</td>
             <td>{{ $product->catalog->name }}</td>
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
-            <td><?php if($product->status==0)echo "New";if($product->status==1)echo "Picked";if($product->status==2)echo "Cancel"; ?></td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->fabric }}</td>
@@ -47,39 +44,39 @@
             <td>{{ $product->purchase_price }}</td>
             <td>{{ $product->upload_user }}</td>
             <?php switch ($product->edit_status) {
-                case '0':
+                case '':
                     ?>
-                    <td>未编辑资料</td>
+                    <td>新品上传</td>
                     <?php
                     break;
 
-                case '1':
+                case 'canceled':
                     ?>
-                    <td>已编辑资料</td>
+                    <td>取消</td>
                     <?php
                     break;
 
-                case '2':
+                case 'picked':
                     ?>
-                    <td>已编辑图片</td>
+                    <td>选中</td>
                     <?php
                     break;
 
-                case '3':
+                case 'data_edited':
                     ?>
-                    <td>撤销审核</td>
+                    <td>资料已编辑</td>
                     <?php
                     break;
 
-                case '4':
+                case 'image_edited':
                     ?>
-                    <td>资料审核不通过</td>
+                    <td>图片已编辑</td>
                     <?php
                     break;
 
-                case '5':
+                case 'image_unedited':
                     ?>
-                    <td>图片审核不通过</td>
+                    <td>图片不编辑</td>
                     <?php
                     break;
             } ?>
@@ -88,18 +85,11 @@
                 <a href="{{ route('EditProduct.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <?php if($product->edit_status==2){ ?>
-                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                           data-id="{{ $product->id }}"
-                           data-url="{{route('examineProduct')}}"
-                           data-status="3" >
-                            <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>撤销审核</span>
-                    </a>
-                <?php }elseif($product->edit_status==3||$product->edit_status==0||$product->edit_status==4){ ?>
+                <?php if(($product->edit_status=='picked'||$product->edit_status=='data_edited'||$product->edit_status=="image_edited"||$product->edit_status=="image_unedited")&&$product->examine_status!='pass'){ ?>
                     <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                     </a>
-                <?php }elseif($product->edit_status==1||$product->edit_status==5){ ?>
+                <?php } if(($product->edit_status=="data_edited"||$product->edit_status=="image_edited")&&$product->examine_status!='pass'){ ?>
                     <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                     </a>  

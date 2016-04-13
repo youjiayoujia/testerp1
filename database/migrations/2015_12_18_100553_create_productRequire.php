@@ -25,6 +25,7 @@ class CreateProductRequire extends Migration
             $table->string('technique')->comment('工艺')->default(NULL);
             $table->string('parts')->comment('配件')->default(NULL);
             $table->string('name',128)->comment('产品名字')->default(NULL);
+            $table->integer('catalog_id')->comment('品类id')->default(NULL);
             $table->string('province')->comment('省')->default(NULL);
             $table->string('city')->comment('市')->default(NULL);
             $table->string('similar_sku')->comment('相似的sku')->nullable()->default(NULL);
@@ -35,7 +36,7 @@ class CreateProductRequire extends Migration
             $table->integer('needer_shop_id')->comment('需求店铺id')->default(NULL);
             $table->string('created_by')->comment('创建人')->default(NULL);
             $table->enum('status',['0', '1', '2'])->comment('处理状态')->default('0');
-            $table->integer('user_id')->comment('处理人id')->nullable()->default(NULL);
+            $table->integer('handle_id')->comment('处理人id')->nullable()->default(NULL);
             $table->date('handle_time')->comment('处理时间')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();

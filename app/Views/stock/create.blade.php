@@ -58,12 +58,12 @@
             position = $(this).val();
             if(position) {
                 $.ajax({
-                    url:"{{ route('stock.ajaxPosition') }}",
+                    url:"{{ route('position.ajaxCheckPosition') }}",
                     data:{position:position},
                     dataType:'json',
                     type:'get',
                     success:function(result) {
-                        if(result == 'false') {
+                        if(result == false) {
                             alert('库位不存在');
                             tmp.val('');
                         }

@@ -93,7 +93,8 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'pickListItems' => $model->pickListItem,
-            'packages' => $model->package
+            'packages' => $model->package,
+            'logistics' => LogisticsModel::all(),
         ];
     
         return view($this->viewPath.'package', $response);

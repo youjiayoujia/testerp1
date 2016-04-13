@@ -19,7 +19,7 @@
             <td>{{ $adjust->warehouse ? $adjust->warehouse->name : '' }}</td>
             <td>{{ $adjust->remark }}</td>
             <td>{{ $adjust->adjustByName ? $adjust->adjustByName->name : '' }} </td>
-            <td>{{ $adjust->status == '1' ? '已审核' : '未审核' }}</td>
+            <td>{{ $adjust->status ? ($adjust->status == '1' ? '未通过' : '已通过') : '未审核' }}</td>
             <td>{{ $adjust->checkByName ? $adjust->checkByName->name : '' }}</td>
             <td>{{ $adjust->check_time }}</td>
             <td>{{ $adjust->created_at }}</td>
@@ -27,17 +27,15 @@
                 <a href="{{ route('stockAdjustment.show', ['id'=>$adjust->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                @if($adjust->status != '1' )
+                @if(!$adjust->status)
                 <a href="{{ route('stockAdjustment.edit', ['id'=>$adjust->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                @endif
-                <a href="javascript:"  class="btn btn-info btn-xs check_time" data-id="{{ $adjust->id }}">
+                <a href="{{ route('stockAdjustment.check', ['id'=>$adjust->id]) }}"  class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    @if($adjust->status == '1')已审核
-                    @else未审核
-                    @endif
+                    审核
                 </a>
+                @endif
                 @if($adjust->status == '0')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $adjust->id }}"
@@ -48,36 +46,4 @@
             </td>
         </tr>
     @endforeach
-@stop
-@section('childJs')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-<script type='text/javascript'>
-$(document).ready(function(){    
-    $('.check_time').click(function(){
-        if($(this).parent().parent().find('td:eq(5)').text() == '未审核') {
-            if(confirm('确认审核?')) {
-                tmp = $(this);
-                id = tmp.data('id');
-                $.ajax({
-                    url:"{{ route('stockAdjustment.check') }}",
-                    data:{id:id},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){
-                        tmp.next().hide();
-                        tmp.html("<span class='glyphicon glyphicon-pencil'></span> 已审核");
-                        check = tmp.parent().prev().prev();
-                        tmp.prev().remove();
-                        check.text(result[0]);
-                        check.prev().text(result[1]);
-                        check.prev().prev().text('已审核');
-                    }
-                });
-            }
-        } else {
-            alert('已审核');
-        }
-    });
-});
-</script>
 @stop

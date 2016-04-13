@@ -25,7 +25,7 @@ class StockController extends Controller
     {
         $this->model = $stock;
         $this->mainIndex = route('stock.index');
-        $this->mainTitle = '库存';
+        $this->mainTitle = '库存开帐';
         $this->viewPath = 'stock.';
     }
 
@@ -57,7 +57,7 @@ class StockController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
         $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_cost'));
+        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_cost'), 'MAKE_ACCOUNT');
         return redirect($this->mainIndex);
     }
 
@@ -88,24 +88,24 @@ class StockController extends Controller
      */
     public function ajaxGetByPosition()
     {
-        if(request()->ajax()) {
-            $position = PositionModel::where('name', trim(request()->input('position')))->first();
-            $warehouse_position_id = '';
-            if(!count($position)) {
-                return json_encode('position_error');
+            $position = PositionModel::where(['name' => trim(request()->input('position')), 'is_available' => '1'])->first();
+            if(!$position) {
+                return json_encode(false);
             }
+            $warehouse_id = request()->input('warehouse_id');
+            $type = request()->input('type');
             $warehouse_position_id = $position->id;
             $sku = trim(request()->input('sku'));
             $item_id = ItemModel::where('sku', $sku)->first()->id;
-            $obj = StockModel::where(['warehouse_position_id'=>$warehouse_position_id, 'item_id'=>$item_id])->get();
-            if(count($obj)) {
-                return json_encode($obj);
-            } else {
-                return 'false';
+            $obj = StockModel::where(['warehouse_position_id'=>$warehouse_position_id, 'item_id'=>$item_id])->first();
+            if($obj) {
+                return json_encode($obj->available_quantity);
             }
-        }
-
-        return json_encode('false');
+            if(StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->count() < 2) {
+                return json_encode('0');
+            } else {
+                return json_encode(false);
+            }
     }
 
     /**
@@ -120,28 +120,23 @@ class StockController extends Controller
      */
     public function ajaxGetMessage()
     {
-        if(request()->ajax()) {
             $sku = request()->input('sku');
             $warehouse_id = request()->input('warehouse_id');
-            $obj = ItemModel::where(['sku'=>$sku])->get();
-            if(!count($obj)) {
+            $obj = ItemModel::where(['sku'=>$sku])->first();
+            if(!$obj) {
                 return json_encode('sku_none');
             }
-            $obj = $obj->first();
-            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$obj->id])->first();
+            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$obj->id])->with('position')->get();
             if(!count($obj1)) {
                 return json_encode('stock_none');
             }
-            $arr[] = $obj1->position->name;
-            $arr[] = $obj1->unit_cost;
+            $arr[] = $obj1->toArray();
+            $arr[] = $obj1->first()->unit_cost;
             if($arr) {
                 return json_encode($arr);
             } else {
                 return json_encode('false');
             }
-        }
-
-        return json_encode('false');
     }
 
     /**
@@ -183,7 +178,11 @@ class StockController extends Controller
     public function ajaxAllotPosition()
     {
         if(request()->ajax()) {
-            $position = PositionModel::where('name', trim(request()->input('position')))->first()->id;
+            $position = PositionModel::where('name', trim(request()->input('position')))->first();
+            if(!$position) {
+                return json_encode(false);
+            }
+            $position = $position->id;
             $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
             $obj = StockModel::where(['warehouse_position_id'=>$position, 'item_id'=>$item_id])->first();
             $arr[] = $obj->toArray();
@@ -195,7 +194,7 @@ class StockController extends Controller
             }
         }
 
-        return json_encode('false');
+        return json_encode(false);
     }
 
     /**
@@ -214,13 +213,13 @@ class StockController extends Controller
                 return json_encode('none');
             }
             $item_id = ItemModel::where('sku', $sku)->first()->id;
-            $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->first();
-            if(!$obj) {
+            $obj = StockModel::where(['warehouse_id'=>$warehouse, 'item_id'=>$item_id])->with('position')->get();
+            if(!count($obj)) {
                 return json_encode('none');
             }
-            $arr[] = $obj->position->name;
-            $arr[] = $obj->available_quantity;
-            $arr[] = $obj->unit_cost;
+            $arr[] = $obj;
+            $arr[] = $obj->first()->available_quantity;
+            $arr[] = $obj->first()->unit_cost;
             
             return json_encode($arr);
         }
@@ -258,12 +257,20 @@ class StockController extends Controller
      */
     public function ajaxPosition()
     {
-        $position = trim(request()->input('position')); 
-        $count = PositionModel::where(['name' => $position, 'is_available'=>'1'])->count();
-        if($count)
-            return json_encode('true');
+        $sku = trim(request()->input('sku'));
+        $obj = ItemModel::where('sku', $sku)->first();
+        if(!$obj) {
+            return json_encode(false);
+        }
+        $position = PositionModel::where(['name' => trim(request()->input('position')), 'is_available'=>'1'])->first();
+        if(!$position) {
+            return json_encode(false);
+        }
+        $stock = StockModel::where(['item_id'=>$obj->id, 'warehouse_position_id'=>$position->id])->first();
+        if($stock)
+            return json_encode($stock->available_quantity);
         else
-            return json_encode('false');
+            return json_encode(false);
     }
 
     /**

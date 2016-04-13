@@ -238,7 +238,7 @@ class OrderController extends Controller
                     $orders[$key]['channel_account_id'] = $account['id'];
                     $orders[$key]['customer_service'] = $account['customer_service_id'];
                     $orders[$key]['operator'] = $account['operator_id'];
-                    $orders[$key]['affairer'] = 2;
+                    $orders[$key]['affairer'] = NULL;
                 }
             }
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];

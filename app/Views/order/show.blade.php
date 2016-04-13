@@ -55,7 +55,7 @@
                 <strong>渠道创建时间</strong>: {{ $model->create_time }}
             </div>
             <div class="col-lg-2">
-                <strong>做账时间</strong>: {{ $model->affair_time }}
+                <strong>做账时间</strong>: {{ $model->affair_time == '0000-00-00' ? '' : $model->affair_time }}
             </div>
             <div class="col-lg-2">
                 <strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}

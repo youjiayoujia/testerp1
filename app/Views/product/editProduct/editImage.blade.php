@@ -89,6 +89,58 @@
     </div>
     <?php } ?>
 
+    <?php if(count($model->imageAll->where("type",'public')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">public :</div>
+        <?php foreach($model->imageAll->where("type",'public') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='public_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if(count($model->imageAll->where("type",'choies')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">choies :</div>
+        <?php foreach($model->imageAll->where("type",'choies') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='choies_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if(count($model->imageAll->where("type",'wish')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">wish :</div>
+        <?php foreach($model->imageAll->where("type",'wish') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='wish_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if(count($model->imageAll->where("type",'lazada')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">lazada :</div>
+        <?php foreach($model->imageAll->where("type",'lazada') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='lazada_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
     <!-- 模态框（Modal） -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
    aria-labelledby="myModalLabel" aria-hidden="true">

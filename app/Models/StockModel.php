@@ -271,7 +271,11 @@ class StockModel extends BaseModel
                 continue;
             }
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost']);
+            if(StockModel::where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->count()) {
+                $error[] = $key;
+                continue;
+            }
+            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost'], 'MAKE_ACCOUNT');
         }
 
         return $error;

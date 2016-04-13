@@ -6,6 +6,11 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class='row'>
+        <div class="form-group col-lg-4">
+            <label for="img" class='control-label'>参考图片:</label>
+        </div>
+    </div>
+    <div class='row'>
         <div class='form-group col-lg-4'>
             @if($model->img1)
             <img src="{{ $model->img1 }}" width='170px' height='100px'/> 
@@ -47,18 +52,22 @@
     </div>
     <div class='row'>
         <div class="form-group col-lg-3">
-            <label for="name" class='control-label'>选款需求名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') ? old('name') : $model->name}}">
+            <label for="name" class='control-label'>产品名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="name" placeholder="产品名" name='name' value="{{ old('name') ? old('name') : $model->name}}">
         </div>
         <div class="form-group col-lg-3">
-            <label for='province'>省份</label> <select name="province" onChange = "select()" class='form-control'></select>　
+            <label for="name" class='control-label'>品类</label>
+            <select name='catalog_id' class='form-control'>
+                @foreach($catalogs as $catalog)
+                    <option value="{{ $catalog->id }}" {{ old('catalog_id') ? (old('catalog_id') == $catalog->id ? 'selected' : '') : ($model->catalog_id == $catalog->id ? 'selected' : '') }}>{{ $catalog->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for='province'>货源地(省)</label> <select name="province" onChange = "select()" class='form-control'></select>　
         </div>
         <div class='form-group col-lg-3'> 
-            <label for='city'>城市</label> <select name="city" onChange = "select()" class='form-control'></select>
-        </div>
-         <div class="form-group col-lg-3">
-            <label for="sku" class='control-label'>类似款sku</label>
-            <input type='text' class="form-control" id="sku" placeholder="类似款sku" name='sku' value="{{ old('sku') ? old('sku') : $model->similar_sku}}">
+            <label for='city'>货源地(市)</label> <select name="city" onChange = "select()" class='form-control'></select>
         </div>
     </div>
     <div class='row'>
@@ -81,28 +90,32 @@
     </div>
     <div class='row'>
         <div class="form-group col-lg-3">
+            <label for="sku" class='control-label'>类似款sku</label>
+            <input type='text' class="form-control" id="sku" placeholder="类似款sku" name='sku' value="{{ old('sku') ? old('sku') : $model->similar_sku}}">
+        </div>
+        <div class="form-group col-lg-3">
             <label for="competition_url" class='control-label'>竞争产品url</label>
             <input type='text' class="form-control" id="competition_url" placeholder="竞争产品url" name='competition_url' value="{{ old('competition_url') ? old('competition_url') : $model->competition_url }}">
         </div>
         <div class="form-group col-lg-3">
-            <label for="remark" class='control-label'>需求备注</label>
-            <input type='text' class="form-control" id="remark" placeholder="需求备注" name='remark' value="{{ old('remark') ? old('remark') : $model->remark }}">
+            <label for="remark" class='control-label'>需求描述</label>
+            <input type='text' class="form-control" id="remark" placeholder="需求描述" name='remark' value="{{ old('remark') ? old('remark') : $model->remark }}">
         </div>
         <div class='form-group col-lg-3'>
             <label for="expected_date">期待上传日期</label>
             <input id="expected_date" class='form-control' name='expected_date' type="text" value=" {{ old('expected_date') ? old('expected_date') : $model->expected_date }}">
         </div>
-        <div class="form-group col-lg-3">
-            <label for="needer_id">需求者id</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="needer_id" placeholder="需求者id" name='needer_id' value="{{ old('needer_id') ? old('needer_id') : $model->needer_id }}">
-        </div>
     </div>
     <div class='row'>
-        <div class="form-group col-lg-6">
-            <label for="needer_shop_id">需求店铺id</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="needer_shop_id" placeholder="需求店铺id" name='needer_shop_id' value="{{ old('needer_shop_id') ? old('needer_shop_id') : $model->needer_shop_id}}">
+        <div class="form-group col-lg-4">
+            <label for="needer_id">需求渠道</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="needer_id" placeholder="需求渠道" name='needer_id' value="{{ old('needer_id') ? old('needer_id') : $model->needer_id }}">
         </div>
-        <div class='form-group col-lg-6'>
+        <div class="form-group col-lg-4">
+            <label for="needer_shop_id">需求帐号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="needer_shop_id" placeholder="需求帐号" name='needer_shop_id' value="{{ old('needer_shop_id') ? old('needer_shop_id') : $model->needer_shop_id}}">
+        </div>
+        <div class='form-group col-lg-4'>
             <label for='created_by'>创建人</label>
             <input type='text' class='form-control' id='created_by' placeholder='创建人' name='created_by' value="{{ old('created_by') ? old('craeted_by') : $model->created_by }}" readonly>
         </div>

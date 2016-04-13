@@ -183,7 +183,7 @@
                 <strong>退款金额</strong>: {{ $model->refund_amount }}
             </div>
             <div class="col-lg-2">
-                <strong>退款时间</strong>: {{ $model->refund_time }}
+                <strong>退款时间</strong>: {{ $model->refund_time == '0000-00-00' ? '' : $model->refund_time }}
             </div>
         </div>
     </div>

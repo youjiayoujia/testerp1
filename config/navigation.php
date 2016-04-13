@@ -201,6 +201,11 @@ return [
                     'url' => 'purchaseItem.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '采购条目',
+                    'url' => 'purchaseItemList.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',

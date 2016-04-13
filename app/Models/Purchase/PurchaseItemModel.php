@@ -28,7 +28,7 @@ class PurchaseItemModel extends BaseModel
  			'purchase_num' => 'required',
         ]
     ];
-    public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
+    public $searchFields = ['id','sku','supplier_id','warehouse_id','user_id'];
     /**
      * The attributes that are mass assignable.
      *

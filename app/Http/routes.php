@@ -85,12 +85,12 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 
 
 //采购单
-Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\purchaseOrderController@changeExamineStatus');
-Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\purchaseOrderController@examinePurchaseOrder');
-Route::any('purchaseOrder/excelOut/{id}', 'Purchase\purchaseOrderController@excelOut');
-Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\purchaseOrderController@cancelOrder');
-Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\purchaseOrderController@purchaseOrdersOut');
-Route::resource('purchaseOrder', 'Purchase\purchaseOrderController');
+Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
+Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
+Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
+Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
+Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
+Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
@@ -103,11 +103,13 @@ Route::resource('purchaseList', 'Purchase\PurchaseListController');
 Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
 //异常单采购
 Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
-//采购入库e
+//采购入库
 Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');
 Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseStockIn');
 Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
 Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
+//采购条目
+Route::resource('purchaseItemList', 'Purchase\purchaseItemListController');
 /**
  * stock controller route
  */

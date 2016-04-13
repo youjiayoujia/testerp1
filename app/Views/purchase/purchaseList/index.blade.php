@@ -17,7 +17,7 @@
     <th>采购需求/采购数目/仍需采购</th>
     <th>shop</th>
     <th>采购条目状态</th>
-    <th>对单</th>
+    <th>创建时间</th>
     <th>异常状态</th>
     <th>操作</th>
 @stop
@@ -90,11 +90,7 @@
                      处理异常
                 </a>-->
                 @endif
-                 @if($purchaseList->status==2)
-                <a href="/purchaseList/stockIn/{{$purchaseList->id}}" class="btn btn-info btn-xs">
-                     入库
-                </a>
-                @endif
+                 
                 <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>

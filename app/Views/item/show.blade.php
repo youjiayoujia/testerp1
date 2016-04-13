@@ -67,6 +67,50 @@
     </div>
 
     <div class="panel panel-default">
+        <div class="panel-heading"> :</div>
+        <div class="panel-body">
+            <?php 
+                $inventory = 0;
+                $amount = 0;
+                foreach($model->stocks as $stock){
+                    $inventory += $stock->all_quantity;
+                    $amount += $stock->amount;
+                }
+                $baoque="false";
+                $baodeng = "false";
+                $tuhuobuyi = "false";
+                $canci = "false";
+                $purchaseArray = $model->purchase->toArray();
+                foreach ($purchaseArray as $arr) {
+                    if($arr['active']==1&&$arr['active_status']>0)$baoque="true";
+                    if($arr['active']==2&&$arr['active_status']>0)$baodeng="true";
+                    if($arr['active']==3&&$arr['active_status']>0)$canci="true";
+                    if($arr['active']==4&&$arr['active_status']>0)$tuhuobuyi="true";
+                }
+            ?>
+            <div class="col-lg-2">
+                <strong>库存</strong>: {{ $inventory }}
+            </div>
+            <div class="col-lg-2">
+                <strong>库存金额</strong>: {{ $amount }}
+            </div>
+
+            <div class="col-lg-2">
+                <strong>报缺状态</strong>: {{$baoque}}
+            </div>
+            <div class="col-lg-2">
+                <strong>报等状态</strong>: {{$baodeng}}
+            </div>
+            <div class="col-lg-2">
+                <strong>残次品</strong>: {{$canci}}
+            </div>
+            <div class="col-lg-2">
+                <strong>图货不一</strong>: {{$tuhuobuyi}}
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
         <div class="panel-heading">物流信息 :</div>
         <div class="panel-body">
             <div class="col-lg-3">

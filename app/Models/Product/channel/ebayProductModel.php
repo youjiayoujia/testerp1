@@ -20,7 +20,7 @@ class ebayProductModel extends BaseModel
      * @var array
      */
     protected $fillable = ['product_id','choies_info','name','c_name','supplier_id','supplier_sku','product_sale_url','purchase_sale_url',
-                            'purchase_price','purchase_carriage','weight','supplier_info','remark','image_remark','status','edit_status'];
+                            'purchase_price','purchase_carriage','weight','supplier_info','remark','image_remark','status'];
 
     public $rules = [
         'create' => [

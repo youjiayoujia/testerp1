@@ -143,10 +143,10 @@ class SelectProductController extends Controller
                     # code...
                     break;
             }
-            
+            $data['edit_status'] = "picked";
+            $productModel->update($data);
         }
-        $data['edit_status'] = "picked";
-        $productModel->update($data);
+        
 
         return 1;
     }

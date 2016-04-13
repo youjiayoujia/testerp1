@@ -71,12 +71,37 @@ class ExamineProductController extends Controller
         $productModel = $this->product->find($id);
         $data['examine_status'] = $examineStatus;
         $productModel->update($data);
-
+        //ERP中如果该产品之前没有创建item,并且是审核,就创建item
+        if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){
+            $productModel->createItem();
+        }
         return redirect($this->mainIndex);
         
         
     }
 
+    /**
+     * 批量审核
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function examineAll()
+    {
+        $examine_status = request()->input('examine_status');
+        $product_ids = request()->input('product_ids');
+        $product_id_arr = explode(',', $product_ids);
+        foreach ($product_id_arr as $id) {
+            $productModel = $this->product->find($id);
+            $data['examine_status'] = $examine_status;
+            $productModel->update($data);
+            if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){
+                $productModel->createItem();
+            }
+        }
+
+        return 1;
+    }
     
      
 }

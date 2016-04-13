@@ -13,10 +13,15 @@
             </ul>
     </div>  
 
-<div class="btn-group">
-        <a class="btn btn-success" href="">
-            <i class="glyphicon glyphicon-plus"></i> 批量审核
-        </a>
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        批量审核
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="javascript:" class="shenhe" data-status="pass" data-name="审核通过" >通过</a></li>
+        <li><a href="javascript:" class="shenhe" data-status="notpass" data-name="审核不通过">不通过</a></li>
+    </ul>
 </div>
 
 @stop{{-- 工具按钮 --}}
@@ -77,12 +82,12 @@
 @section('childJs')
     <script type="text/javascript">    
         //批量审核
-        $('.choseShop').click(function () {
-            if (confirm($(this).data('name')+"确认选中?")) {
-                var url = "{{route('beChosed')}}";
+        $('.shenhe').click(function () {
+            if (confirm("确认"+$(this).data('name')+"?")) {
+                var url = "{{route('productExamineAll')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var product_ids = "";
-                var channel_id = $(this).data('channel');
+                var examine_status = $(this).data('status');
                 
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
@@ -91,11 +96,11 @@
                 product_ids = product_ids.substr(0,(product_ids.length)-1);
                 $.ajax({
                     url:url,
-                    data:{product_ids:product_ids,channel_id:channel_id},
+                    data:{product_ids:product_ids,examine_status:examine_status},
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        window.location.reload();                
+                        window.location.reload();             
                     }                  
                 })     
             }

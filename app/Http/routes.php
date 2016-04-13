@@ -68,6 +68,7 @@ Route::get('stockAdjustment/check/{id}',
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
 //库位
+Route::get('position/ajaxCheckPosition', ['uses'=>'Warehouse\PositionController@ajaxCheckPosition', 'as'=>'position.ajaxCheckPosition']);
 Route::post('position/excelProcess', ['uses'=>'Warehouse\PositionController@excelProcess', 'as'=>'position.excelProcess']);
 Route::get('position/importByExcel', ['uses'=>'Warehouse\PositionController@importByExcel', 'as'=>'position.importByExcel']);
 Route::get('position/getExcel', ['uses'=>'Warehouse\PositionController@getExcel', 'as'=>'position.getExcel']);
@@ -155,7 +156,7 @@ Route::post('allotment/checkformUpdate/{id}',
     ['uses' => 'Stock\AllotmentController@checkformupdate', 'as' => 'allotment.checkformUpdate']);
 Route::get('allotment/checkform/{id}',
     ['uses' => 'Stock\AllotmentController@checkform', 'as' => 'allotment.checkform']);
-Route::get('allotment/pick', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
+Route::get('allotment/pick/{id}', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
 Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotment.check']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
 

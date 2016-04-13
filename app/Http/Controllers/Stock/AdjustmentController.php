@@ -11,6 +11,7 @@
 namespace App\Http\Controllers\Stock;
 
 use DB;
+use Exception;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
@@ -44,12 +45,26 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $adjustmentforms = $model->adjustments;
+        $access_quantity = [];
+        foreach($adjustmentforms as $key => $adjustmentform)
+        {
+            $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
+            if($stock) {
+                $access_quantity[] = $stock->available_quantity;
+            } else {
+                $access_quantity[] = 0;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
             'adjustments' => $model->adjustments,
-            'adjust' => $model,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+            'access_quantity' => $access_quantity,
         ];
-        
+
         return view($this->viewPath.'show', $response);
     }
 
@@ -115,12 +130,24 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $adjustmentforms = $model->adjustments;
+        $access_quantity = [];
+        foreach($adjustmentforms as $key => $adjustmentform)
+        {
+            $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
+            if($stock) {
+                $access_quantity[] = $stock->available_quantity;
+            } else {
+                $access_quantity[] = 0;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'adjustments' => $model->adjustments,
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
             'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+            'access_quantity' => $access_quantity,
         ];
 
         return view($this->viewPath.'edit', $response);

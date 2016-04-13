@@ -18,7 +18,7 @@
             <td>{{ $model->adjustByName ? $model->adjustByName->name : '' }}</td>
             <td>{{ $model->created_at }}</td>
             <td>
-                <a href="{{ route('supplierLevel.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('supplierChangeHistory.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
             </td>

@@ -22,7 +22,7 @@ class SupplierChangeHistoryModel extends BaseModel
 
     public function supplierName()
     {
-        return $this->belongsTo('App\Models\UserModel', 'supplier_id', 'id');
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id', 'id');
     }
 
     public function adjustByName()

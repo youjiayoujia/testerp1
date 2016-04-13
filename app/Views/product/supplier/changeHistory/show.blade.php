@@ -7,10 +7,19 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>名称</strong>: {{ $model->name }}
+                <strong>供货商</strong>: {{ $model->supplierName? $model->supplierName->name : '' }}
             </div>
-            <div class="col-lg-3">
-                <strong>描述</strong>: {{ $model->description }}
+            <div class="col-lg-2">
+                <strong>原采购员</strong>: {{ $model->fromName? $model->fromName->name : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>变更采购员</strong>: {{ $model->toName? $model->toName->name : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>调整人</strong>: {{ $model->adjustByName? $model->adjustByName->name : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>调整时间</strong>: {{ $model->created_at }}
             </div>            
         </div>
     </div>

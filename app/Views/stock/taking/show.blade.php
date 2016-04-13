@@ -20,42 +20,34 @@
     <div class="panel panel-default">
         <div class="panel-heading">盘点表信息</div>
         <div class="panel-body">
-            @foreach($stockTakingForms as $stockTakingForm)
-            @if($stockTakingForm->stock_taking_status == 'less' && $stockTakingForm->stock_taking_yn == 0)
-            <div class='row tr_bgcolor'>
-            @else
-            <div class='row'>
-            @endif
-                <div class="col-lg-1">
-                    <strong>sku</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->items ? $stockTakingForm->stock->items->sku : '' : ''}}
-                </div>
-                <div class="col-lg-1">
-                    <strong>仓库</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->warehouse ? $stockTakingForm->stock->warehouse->name : '' : ''}}
-                </div>
-                <div class="col-lg-1">
-                    <strong>库位</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->position ? $stockTakingForm->stock->position->name : '' : ''}}
-                </div>
-                <div class="col-lg-1">
-                    <strong>可用数量</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->available_quantity : '' }}
-                </div>
-                <div class="col-lg-1">
-                    <strong>hold数量</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->hold_quantity : '' }}
-                </div>
-                <div class="col-lg-2">
-                    <strong>总数量</strong>: {{ $stockTakingForm->stock ? $stockTakingForm->stock->all_quantity : '' }}
-                </div> 
-                <div class="col-lg-2">
-                    <strong>实盘数量</strong>: {{ $stockTakingForm->quantity }}
-                </div> 
-                <div class="col-lg-2">
-                    <strong>盘点状态</strong>: {{ $stockTakingForm->stock_taking_status == 'more' ? '盘盈' : ($stockTakingForm->stock_taking_status == 'equal' ? '不处理' : '盘亏') }}
-                </div> 
-                <div class="col-lg-1">
-                    <strong>是否盘点更新</strong>: {{ $stockTakingForm->stock_taking_yn == '1' ? '是' : '否' }}
-                </div> 
-            </div> 
-            @endforeach
-        </div>
+        <table class='table table-bordered'>
+            <thead>
+                <th>sku</th>
+                <th>仓库</th>
+                <th>库位</th>
+                <th>可用数量</th>
+                <th>hold数量</th>
+                <th>总数量</th>
+                <th>实盘数量</th>
+                <th>盘点状态</th>
+                <th>是否盘点更新</th>
+            </thead>
+            <tbody>
+                @foreach($stockTakingForms as $stockTakingForm)
+                <tr>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->items ? $stockTakingForm->stock->items->sku : '' : ''}}</td>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->warehouse ? $stockTakingForm->stock->warehouse->name : '' : ''}}</td>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->position ? $stockTakingForm->stock->position->name : '' : ''}}</td>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->available_quantity : '' }}</td>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->hold_quantity : '' }}</td>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->all_quantity : '' }}</td>
+                    <td>{{ $stockTakingForm->quantity }}</td>
+                    <td>{{ $stockTakingForm->stock_taking_status == 'more' ? '盘盈' : ($stockTakingForm->stock_taking_status == 'equal' ? '不处理' : '盘亏') }}</td>
+                    <td>{{ $stockTakingForm->stock_taking_yn == '1' ? '是' : '否' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">出库信息 : {{ $model->outwarehouse ? $model->outwarehouse->name : '' }}</div>

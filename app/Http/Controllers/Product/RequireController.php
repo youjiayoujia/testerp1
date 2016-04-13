@@ -132,9 +132,9 @@ class RequireController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         if($status == 1) {
-            $model->update(['status'=>'1']);
+            $model->update(['status'=>'1', 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
         } else {
-            $model->update(['status'=>'2']);
+            $model->update(['status'=>'2', 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
         }
 
         return json_encode($status);
@@ -156,7 +156,7 @@ class RequireController extends Controller
             if($model->status) {
                 continue;
             }
-            $model->update(['status'=>$status]);
+            $model->update(['status'=>$status, 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
         }
 
         return json_encode('success');

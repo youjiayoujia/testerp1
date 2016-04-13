@@ -109,7 +109,7 @@ Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseSt
 Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
 Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 //采购条目
-Route::resource('purchaseItemList', 'Purchase\purchaseItemListController');
+Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
 /**
  * stock controller route
  */

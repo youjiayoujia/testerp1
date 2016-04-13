@@ -231,7 +231,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">关闭
             </button>
-            <button type="submit" class="btn btn-primary" name='examine' value='1'>
+            <button type="submit" class="btn btn-primary" name='examine' value='notpass'>
                提交
             </button>
          </div>
@@ -240,10 +240,15 @@
 </div>
 @stop
 @section('formButton')
-    
-    <button type="submit" class="btn btn-success" name='examine' value='3'>资料审核通过</button>
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
-    
+    <?php if($model->examine_status==''||$model->examine_status=='notpass'||$model->examine_status=='canceled'){ ?>
+        <button type="submit" class="btn btn-success" name='examine' value='pass'>资料审核通过</button>
+    <?php } ?>
+    <?php if($model->examine_status==''||$model->examine_status=='canceled'){ ?>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
+    <?php } ?>
+    <?php if($model->examine_status=='pass'){ ?>
+        <button type="submit" class="btn btn-success" name='examine' value='canceled'>撤销审核</button>
+    <?php } ?>
 @show{{-- 表单按钮 --}}
 
 @section('pageJs')

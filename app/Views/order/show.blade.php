@@ -58,7 +58,7 @@
                 <strong>做账时间</strong>: {{ $model->affair_time }}
             </div>
             <div class="col-lg-2">
-                <strong>做账人员</strong>: {{ $model->userAffairer->name }}
+                <strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffair->name : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>是否做账</strong>: {{ $model->is_affair_name }}

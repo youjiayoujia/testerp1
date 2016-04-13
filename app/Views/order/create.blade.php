@@ -119,7 +119,7 @@
             <div class="form-group col-lg-2">
                 <label for="create_time" class='control-label'>渠道创建时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="create_time" placeholder="渠道创建时间" name='create_time' value="{{ old('create_time') }}" readonly>
+                <input class="form-control" id="create_time" placeholder="渠道创建时间" name='create_time' value="{{ old('create_time') }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="affair_time" class='control-label'>做账时间</label>
@@ -243,7 +243,7 @@
             <div class="form-group col-lg-2">
                 <label for="payment_date" class='control-label'>支付时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}" readonly>
+                <input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">
             </div>
         </div>
     </div>
@@ -494,6 +494,9 @@
                     }
                 });
                 current++;
+                if(current >= 1) {
+                    $('.sub').prop('disabled', false);
+                }
             });
 
             var channel_id = $("#channel_id").val();
@@ -548,7 +551,16 @@
 
             $(document).on('click', '.bt_right', function () {
                 $(this).parent().remove();
+                current--;
+                if(current < 1) {
+                    $('.sub').prop('disabled', true);
+                    alert('请输入sku');
+                }
             });
         });
     </script>
 @stop
+@section('formButton')
+    <button type="submit" class="btn btn-success sub">提交</button>
+    <button type="reset" class="btn btn-default">取消</button>
+@show

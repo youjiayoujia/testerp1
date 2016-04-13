@@ -19,7 +19,7 @@ class SelectProductController extends Controller
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
         $this->supplier = $supplier;
-        $this->mainTitle = '选款产品';
+        $this->mainTitle = '选款选中';
         $this->viewPath = 'product.selectProduct.';
     }
 

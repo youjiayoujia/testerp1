@@ -50,7 +50,7 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '选款产品列表',
+                    'name' => '选款选中',
                     'url' => 'SelectProduct.index',
                     'icon' => '',
                 ],

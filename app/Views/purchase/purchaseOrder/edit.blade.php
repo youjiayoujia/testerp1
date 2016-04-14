@@ -37,8 +37,13 @@
             </div> 
              <div class="form-group col-lg-4">
             	<strong>导出该订单</strong>:
+                @if($model->supplier->type==1)
                 	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>     
+                </a>
+                @else
+                <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
+                </a>
+                @endif     
             </div>
          <div class="form-group col-lg-4">
             <strong>采购单运单号</strong>:

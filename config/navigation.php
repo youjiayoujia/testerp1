@@ -225,14 +225,24 @@ return [
                     'url' => 'purchaseItem.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '采购条目',
+                    'url' => 'purchaseItemList.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '对单',
+                    'name' => '采购对单',
                     'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '采购入库',
+                    'url' => 'purchaseStockIn.index',
                     'icon' => '',
                 ],
 				[

@@ -160,7 +160,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">关闭
             </button>
-            <button type="submit" class="btn btn-primary" name='edit' value='5'>
+            <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
                提交
             </button>
          </div>
@@ -169,9 +169,8 @@
 </div>
 @stop
 @section('formButton')
-    <button type="submit" class="btn btn-success" name='edit' value='1'>保存</button>
-    <button type="submit" class="btn btn-success" name='edit' value='2'>审核通过</button>
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">图片审核不通过</button>
+    <button type="submit" class="btn btn-success" name='edit_status' value='image_edited'>保存</button>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">图片不编辑</button>
     <button type="reset" class="btn btn-default">取消</button>
     
 @show{{-- 表单按钮 --}}

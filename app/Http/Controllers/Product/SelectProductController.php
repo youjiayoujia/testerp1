@@ -19,7 +19,7 @@ class SelectProductController extends Controller
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
         $this->supplier = $supplier;
-        $this->mainTitle = '选款产品';
+        $this->mainTitle = '选款选中';
         $this->viewPath = 'product.selectProduct.';
     }
 
@@ -76,6 +76,24 @@ class SelectProductController extends Controller
     }
 
     /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->product->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $data['edit_status'] = 'canceled';
+        $model->update($data);
+        $model->destroy($id);
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * 产品选中
      *
      * @param  int  $id
@@ -125,10 +143,10 @@ class SelectProductController extends Controller
                     # code...
                     break;
             }
-            
+            $data['edit_status'] = "picked";
+            $productModel->update($data);
         }
-        $data['status'] = 1;
-        $productModel->update($data);
+        
 
         return 1;
     }
@@ -166,20 +184,5 @@ class SelectProductController extends Controller
         return redirect($this->mainIndex);
     }
 
-    /**
-     * 产品审核
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function examineAmazonProduct()
-    {
-        $id = request()->input('product_ids');
-        $status = request()->input('status');
-        $amazonProductModel = $this->model->find($id);
-        $amazonProductModel->examineAmazonProduct($status);
-
-        return 1;
-    }
      
 }

@@ -55,6 +55,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
+    public function purchase()
+    {
+        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku','sku');
+    }
+
     public function updateItem($data)
     {
         $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',', $data['carriage_limit_arr']);

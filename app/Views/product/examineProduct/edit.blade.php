@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('EditProduct.update', ['id' => $model->id]) }} @stop
+@section('formAction') {{ route('ExamineProduct.update', ['id' => $model->id]) }} @stop
 @section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
 <?php 
@@ -26,6 +26,7 @@
         $brief = $check->brief;
         $description = $check->description;
     } 
+
 ?>
 <input type='hidden' value='PUT' name="_method">
 <table class="table table-bordered">
@@ -42,19 +43,19 @@
         <td>备注:{{$model->remark}}</td>
          <td>
             <label style="width:80px">主表:英文名: </label>
-            <textarea class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> style="width:300px;" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
+            <textarea class="form-control form55" disabled="disabled" style="width:300px;" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
             <br><label style="width:80px"></label>
             <span class="msg">0 characters</span>
         </td>
         </tr>
         <tr>
             <td><label>产品中文名: </label>{{$model->c_name}}</td>
-            <td><label>主表:中文名: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" style="width:300px;" id="c_name" value="{{ old('c_name') ?  old('c_name') : $c_name }}" name="c_name"></td>
+            <td><label>主表:中文名: </label><input type="text" disabled="disabled" class="form-control form55" style="width:300px;" id="c_name" value="{{ old('c_name') ?  old('c_name') : $c_name }}" name="c_name"></td>
         </tr>
         <tr>
             <td><label>图片备注: </label></td>
             <td><lable>store:</lable>
-                <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> style="width:300px;" id="store" value="{{ old('store') ?  old('store') : $store }}" name="store">
+                <input type="text" class="form-control form55" disabled="disabled" style="width:300px;" id="store" value="{{ old('store') ?  old('store') : $store }}" name="store">
             </td>
         </tr>
         <tr>
@@ -80,7 +81,7 @@
             <td>
                 <label>Filter_attributes: </label>
                 <br>
-                <textarea class="vLargeTextField" cols="50" id="filter_attributes" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> name="filter_attributes" rows="3" >{{ old('filter_attributes') ?  old('filter_attributes') : $filter_attributes }}</textarea>
+                <textarea class="vLargeTextField" disabled="disabled" cols="50" id="filter_attributes" name="filter_attributes" rows="3" >{{ old('filter_attributes') ?  old('filter_attributes') : $filter_attributes }}</textarea>
             </td>
         </tr>
         <!--<tr>
@@ -93,7 +94,7 @@
             <td>
                 <label>主表:简短描述(brief): </label>
                 <br>
-                <textarea class="vLargeTextField" cols="50" id="brief" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> name="brief" rows="3">{{ old('brief') ?  old('brief') : $brief }}</textarea>
+                <textarea class="vLargeTextField" disabled="disabled" cols="50" id="brief" name="brief" rows="3">{{ old('brief') ?  old('brief') : $brief }}</textarea>
             </td>
         </tr>
         <tr>
@@ -112,14 +113,14 @@
             <td>
                 <label>主表:描述(description): </label>
                 <br>
-                <textarea class="vLargeTextField" cols="50" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="description" name="description" rows="3" >{{ old('description') ?  old('description') : $description }}</textarea>
+                <textarea class="vLargeTextField" disabled="disabled" cols="50" id="description" name="description" rows="3" >{{ old('description') ?  old('description') : $description }}</textarea>
             </td>
         </tr>
         <tr>
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
                 <label>主表:重量: </label>
-                <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="weight" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="weight">
+                <input type="text" disabled="disabled" class="form-control form55" id="weight" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="weight">
             </td>
         </tr>
         <tr>
@@ -139,7 +140,7 @@
         <tr>
             <td><label>拿货价(RMB): </label><span id="we_cost">{{$model->purchase_price}}</span></td>
             <td>
-                <label>主表:销售价美元: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}"><a href="#" id="price_calculate">价格试算</a>
+                <label>主表:销售价美元: </label><input type="text" disabled="disabled" class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}"><a href="#" id="price_calculate">价格试算</a>
                 <div id="price_calculate_div" style="display:none;">
                     <table cellspacing="1" cellpadding="1" border="1">
                         <tr><td>采购成本</td><td>价格系数</td><td>重量</td><td>重量系数</td><td>快递费用</td><td>销售价美元</td><td>成本价美元</td><td>利润率</td><td>实际价格</td><td>实际利润率</td></tr>
@@ -163,14 +164,14 @@
             <td><label>参考现货数量: </label></td>
             <td>
                 <label>主表:市场价美元: </label>
-                <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="market_usd_price" value="{{ old('market_usd_price') ?  old('market_usd_price') : $market_usd_price }}" name="market_usd_price">
+                <input type="text" disabled="disabled" class="form-control form55" id="market_usd_price" value="{{ old('market_usd_price') ?  old('market_usd_price') : $market_usd_price }}" name="market_usd_price">
             </td>
         </tr>
         <tr>
             <td><label>快递费用(RMB): </label><span id="ship_price">{{$model->purchase_carriage}}</span></td>
             <td>
                 <label>主表:成本价美元: </label><span id="p_cost" style="color:red;"></span>
-                <input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" id="cost_usd_price" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="cost_usd_price">
+                <input type="text" disabled="disabled" class="form-control form55" id="cost_usd_price" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="cost_usd_price">
             </td>
         </tr>
         <tr>
@@ -180,7 +181,7 @@
         <tr>
             <td><label>信息录入员: </label></td>
             <td>
-                <label>备注不编辑原因: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" id="unedit_reason" value="{{ old('unedit_reason') ?  old('unedit_reason') : $unedit_reason }}" name="unedit_reason">
+                <label>备注不编辑原因: </label><input type="text" disabled="disabled" class="form-control form55" id="unedit_reason" value="{{ old('unedit_reason') ?  old('unedit_reason') : $unedit_reason }}" name="unedit_reason">
             </td>
         </tr>
         <tr>
@@ -230,7 +231,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">关闭
             </button>
-            <button type="submit" class="btn btn-primary" name='edit' value='4'>
+            <button type="submit" class="btn btn-primary" name='examine' value='notpass'>
                提交
             </button>
          </div>
@@ -239,9 +240,14 @@
 </div>
 @stop
 @section('formButton')
-<?php if($model->examine_status!='pass'){ ?>
-    <button type="submit" class="btn btn-success" name='edit_status' value='data_edited'>保存</button>
-    <button type="reset" class="btn btn-default">取消</button>
+    <?php if($model->examine_status==''||$model->examine_status=='notpass'||$model->examine_status=='revocation'){ ?>
+        <button type="submit" class="btn btn-success" name='examine' value='pass'>资料审核通过</button>
+    <?php } ?>
+    <?php if($model->examine_status==''||$model->examine_status=='revocation'){ ?>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
+    <?php } ?>
+    <?php if($model->examine_status=='pass'){ ?>
+        <button type="submit" class="btn btn-success" name='examine' value='revocation'>撤销审核</button>
     <?php } ?>
 @show{{-- 表单按钮 --}}
 

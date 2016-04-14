@@ -26,14 +26,14 @@ class EditProductController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
+     * //todo:过滤条件的问题
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
         $response = [
             'metas' => $this->metas('index'),
-            'data' => $this->autoList($this->product->where('status','=','1')),
+            'data' => $this->autoList($this->product->where('edit_status','!=','canceled')->where('edit_status','!=','')),
         ];
 
         return view( $this->viewPath .'index', $response);
@@ -58,6 +58,26 @@ class EditProductController extends Controller
     }
 
     /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->product->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'suppliers' =>$this->supplier->all(),
+        ];
+        return view($this->viewPath . 'show', $response);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -67,13 +87,17 @@ class EditProductController extends Controller
     public function update($id)
     {   
         request()->flash();
-        //$this->validate(request(), $this->model->rules('update',$id));
+
         $editStatus = request()->input('edit');
         $data = request()->all();
-        $data['edit_status'] = $editStatus;
+        //echo '<pre>';
+        //print_r($data);
+        
         $productModel = $this->product->find($id);
+        //print_r($data);
         $productModel->update($data);
 
+//exit;
         //更新英文信息
         $ProductEnglishValueModel = new ProductEnglishValueModel();
         $data['product_id'] = $productModel->id;

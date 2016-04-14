@@ -77,6 +77,7 @@ class ProductModel extends BaseModel
         'package_limit_1',
         'status',
         'edit_status',
+        'examine_status',
         'remark',
         'image_edit_not_pass_remark',
         'data_edit_not_pass_remark',
@@ -425,12 +426,9 @@ class ProductModel extends BaseModel
             }
         }
 
-        $data['edit_status'] = $data['edit'];
+        $data['edit_status'] = $data['edit_status'];
         $this->update($data);
-        //ERP中如果该产品之前没有创建item,并且是审核,就创建item
-        if($data['edit']==2&&empty($this->item->toArray())){
-            $this->createItem();
-        }
+        
         DB::commit();
     }
 

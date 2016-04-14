@@ -225,6 +225,8 @@ Route::any('product/examineProduct', ['uses' => 'Product\EditProductController@e
 Route::any('product/editImage', ['uses' => 'Product\EditProductController@productEditImage', 'as'=>'productEditImage']);
 Route::any('product/updateImage', ['uses' => 'Product\EditProductController@productUpdateImage', 'as'=>'productUpdateImage']);
 Route::resource('product', 'ProductController');
+Route::any('examineProduct/examineAll', ['uses' => 'Product\ExamineProductController@examineAll', 'as'=>'productExamineAll']);
+Route::resource('ExamineProduct', 'Product\ExamineProductController');
 
 //产品渠道
 Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);

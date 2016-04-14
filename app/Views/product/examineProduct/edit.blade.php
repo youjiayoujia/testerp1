@@ -102,8 +102,13 @@
             <td></td>
         </tr>
         <tr>
-            <td><label>是否有弹性: </label><br>
-                <label>拉链: </label>
+            <td>
+                @foreach($model->featureTextValues as $featureModel)
+                    <div class="col-lg-3">
+                        <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
+                    </div>
+                    <br>
+                @endforeach
             </td>
 
             <td></td>

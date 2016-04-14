@@ -52,6 +52,8 @@ Route::get('productSupplier/createLevel', ['uses'=>'Product\SupplierController@c
 Route::resource('productSupplier', 'Product\SupplierController');
 
 //选款需求
+Route::get('productRequire/ajaxQuantityProcess', ['uses'=>'Product\RequireController@ajaxQuantityProcess', 'as'=>'productRequire.ajaxQuantityProcess']);
+Route::get('productRequire/ajaxProcess', ['uses'=>'Product\RequireController@ajaxProcess', 'as'=>'productRequire.ajaxProcess']);
 Route::resource('productRequire', 'Product\RequireController');
 
 //仓库

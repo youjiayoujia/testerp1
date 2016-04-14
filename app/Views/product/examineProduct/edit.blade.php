@@ -204,7 +204,7 @@
 
         <?php if($model->image_edit_not_pass_remark!=''){ ?>
             <tr>
-                <td><label>图片审核不通过原因: </label></td>
+                <td><label>图片不编辑原因: </label></td>
                 <td>
                     <label>{{$model->image_edit_not_pass_remark}} </label>
                 </td>

@@ -372,15 +372,21 @@ class AllotmentController extends Controller
      * @return json
      *
      */
-    public function allotmentpick()
+    public function allotmentpick($id)
     {
-        if(request()->ajax()) {
-            $id = request()->input('id');
-            $this->model->find($id)->update(['allotment_status'=>'pick']);
-            return json_encode('11');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        
-        return json_encode('false');
+        $model->update(['allotment_status'=>'pick']);
+        $allotmentforms = AllotmentFormModel::where('stock_allotment_id', $id)->orderBy('warehouse_position_id')->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'allotmentforms' => $allotmentforms,
+        ];
+
+        return view($this->viewPath.'printAllotment', $response);
     }
 
     /**

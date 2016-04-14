@@ -1,2 +1,6 @@
 name,warehouse,remark,size,length,width,height,is_available,备注
-NA2-101,南京仓,上海,middle,13,12,12,1,"warehouse正常的仓库名,size:big/middle/small 对应大中小,is_available:0/1 是否启用 0=否"
+NA2-102,南京仓,test,middle,12,12,12,1,"warehouse正常的仓库名,size:big/middle/small 对应大中小,is_available:0/1 是否启用 0=否"
+NC3-103,南京仓,test1,big,16,16,16,0,
+SA1-101,上海仓,test2,big,16,16,16,1,
+SB2-102,上海仓,test3,middle,12,12,12,1,
+SC3-103,上海仓,test4,big,16,16,16,0,

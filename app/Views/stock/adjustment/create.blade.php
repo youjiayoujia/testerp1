@@ -30,14 +30,17 @@
         <div class="panel-heading">sku</div>
         <div class="panel-body add_row">
             <div class='row'>
-                <div class="form-group col-sm-2">
-                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                </div>
                 <div class='form-group col-sm-2'>
                     <label>出入库类型</label>
                 </div>
                 <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-2">
                     <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-1">
+                    <label for="access_quantity" class='control-label'>可用数量</label>
                 </div>
                 <div class="form-group col-sm-2">
                     <label for="quantity" class='control-label'>数量</label>
@@ -47,9 +50,6 @@
                 </div>
             </div>
             <div class='row'>
-                <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
-                </div>
                 <div class='form-group col-sm-2'>
                     <select name='arr[type][0]' class='form-control type'>
                         <option value='IN' {{ old('arr[type][0]') == 'IN' ? 'selected' : '' }}>入库</option>
@@ -57,7 +57,13 @@
                     </select>
                 </div>
                 <div class="form-group col-sm-2">
+                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+                </div>
+                <div class="form-group col-sm-2 position_html">
                     <input type='text' name='arr[warehouse_position_id][0]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][0]') }}">
+                </div>
+                <div class="form-group col-sm-1">
+                    <input type='text' class="form-control access_quantity" id="arr[access_quantity][0]" placeholder="可用数量" name='arr[access_quantity][0]' value="{{ old('arr[access_quantity][0]') }}" readonly>
                 </div>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
@@ -121,6 +127,7 @@
 
         $(document).on('blur', '.warehouse_position_id', function(){
             tmp = $(this);
+            warehouse_id = $('#warehous_id').val();
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();
@@ -128,36 +135,53 @@
             if(position) {
                 $.ajax({
                     url:"{{route('stock.getByPosition')}}",
-                    data:{position:position, sku:sku},
+                    data:{position:position, sku:sku, type:type, warehouse_id:warehouse_id},
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        if(result == 'position_error') {
-                            alert('库位不存在');
+                        if(result == false) {
+                            alert('库位超过两个或库存不存在');
                             tmp.val('');
                             return;
                         }
-                        if(type == 'OUT' &&　result == false) {
-                            alert('库位没有相应库存');
-                            tmp.val('');
-                        }
+                        block.find('.access_quantity').val(result);
                     }
                 });
             }
         });
 
+        $(document).on('blur', '.quantity', function(){
+            tmp = $(this);
+            block = tmp.parent().parent();
+            access_quantity = block.find('.access_quantity').val();
+            quantity = block.find('.quantity').val();
+            if(quantity) {
+                if(parseInt(quantity) > parseInt(access_quantity)) {
+                    alert('数量超出可用数量');
+                    tmp.val('');
+                }
+            }
+        });
+
         $(document).on('change', '.type', function(){
+            block = $(this).parent().parent();
             if($(this).val() == 'IN')
                 $(this).parent().parent().find('.unit_cost').attr('readonly', false);
-            else
+            else {
                 $(this).parent().parent().find('.unit_cost').attr('readonly', true);
+            }
+            block.find('.sku').val('');
+            block.find('.quantity').val('');
+            block.find('.unit_cost').val('');
         });
 
         $(document).on('blur', '.sku', function(){
             var tmp = $(this);
             var block = $(this).parent().parent();
+            var type = block.find('.type').val();
             var sku = $(this).val();
             var warehouse_id = $('#warehouse_id').val();
+            var position_name = block.find('.warehouse_position_id').prop('name');
             if(sku && warehouse_id){
                 $.ajax({
                     url: "{{route('stock.getMessage')}}",
@@ -175,21 +199,28 @@
                                 alert('该sku没有对应的库存了');
                                 tmp.val('');
                                 return;
-                            } else {
-                                return;
                             }
                         }
-                        block.find('.warehouse_position_id').val(result[0]);
-                        block.find('.unit_cost').val(result[1]);                    
-                        if(block.find('.type').val() == 'IN') {
-                            unit_cost = block.find('.unit_cost').val();
-                            if(unit_cost) {
-                                if(unit_cost > result[1]*1.3 || unit_cost < result[1]*0.6) {
-                                    alert('单价变动超出范围,库存单价'+result[1]);
-                                    block.find('.unit_cost').val('');
-                                    return;
-                                }
+                        if(type == 'IN') {
+                            block.find('.position_html').html("<input type='text' name='"+position_name+"' class='form-control' placeholder='库位'>");
+                            block.find('.access_quantity').val('');
+                            block.find('.quantity').val('');
+                            block.find('.unit_cost').val('');
+                        } else {
+                            str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
+                            str += "</select>";
+                            block.find('.position_html').html(str);
+                            block.find('.access_quantity').val('');
+                            block.find('.unit_cost').val('');
+                            str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
+                            for(i=0; i<result[0].length; i++)
+                            {
+                                str += "<option value='"+result[0][i]['position']['name']+"'>"+result[0][i]['position']['name']+"</option>";
                             }
+                            str += "</select>";
+                            block.find('.position_html').html(str);
+                            block.find('.access_quantity').val(result[0][0]['available_quantity']);
+                            block.find('.unit_cost').val(result[1]);
                         }
                     } 
                 });

@@ -17,7 +17,7 @@
     <th>采购需求/采购数目/仍需采购</th>
     <th>shop</th>
     <th>采购条目状态</th>
-    <th>对单</th>
+    <th>创建时间</th>
     <th>异常状态</th>
     <th>操作</th>
 @stop
@@ -31,7 +31,7 @@
                 <input type="checkbox" name="purchaseList_id"  value="{{$purchaseList->id}}" isexamine="0" >
                 @endif
             </td>
-        @if($purchaseList->purchase_order_id > 0)
+        
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->sku}}</td>
             @foreach(config('purchase.purchaseItem.type') as $k=>$type)
@@ -86,26 +86,16 @@
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>       
                 @if($purchaseList->active_status>0)
-                <a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
+                <!--<a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
                      处理异常
-                </a>
+                </a>-->
                 @endif
-                 @if($purchaseList->status==2)
-                <a href="/purchaseList/stockIn/{{$purchaseList->id}}" class="btn btn-info btn-xs">
-                     入库
-                </a>
-                @endif
+                 
                 <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $purchaseList->id }}"
-                   data-url="{{ route('purchaseList.destroy', ['id' =>$purchaseList->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
             </td>
-            @endif
+          
         </tr>
     @endforeach
    <script type="text/javascript"> 

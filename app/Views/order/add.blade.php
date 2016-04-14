@@ -17,15 +17,6 @@
             @endforeach
         </select>
     </div>
-    <div class="form-group col-sm-2">
-        <select class="form-control ship_status" name="arr[ship_status][{{$current}}]" id="arr[ship_status][{{$current}}]">
-            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$current]') == $ship_status_key ? 'selected' : '' }}>
-                    {{ $ship_status }}
-                </option>
-            @endforeach
-        </select>
-    </div>
     <div class="form-group col-sm-1">
         <select class="form-control is_gift" name="arr[is_gift][{{$current}}]" id="arr[is_gift][{{$current}}]">
             @foreach(config('order.whether') as $is_gift_key => $is_gift)
@@ -37,6 +28,15 @@
     </div>
     <div class="form-group col-sm-2">
         <input type='text' class="form-control remark" id="arr[remark][{{$current}}]" placeholder="备注" name='arr[remark][{{$current}}]' value="{{ old('arr[remark][$current]') }}">
+    </div>
+    <div class="form-group col-sm-2">
+        <select class="form-control ship_status" name="arr[ship_status][{{$current}}]" id="arr[ship_status][{{$current}}]">
+            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
+                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$current]') == $ship_status_key ? 'selected' : '' }}>
+                    {{ $ship_status }}
+                </option>
+            @endforeach
+        </select>
     </div>
     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
 </div>

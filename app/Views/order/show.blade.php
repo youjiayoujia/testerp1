@@ -28,19 +28,16 @@
                 <strong>售后状态</strong>: {{ $model->active_name }}
             </div>
             <div class="col-lg-2">
-                <strong>做账人员</strong>: {{ $model->user_affairer->name }}
+                <strong>客服人员</strong>: {{ $model->userService->name }}
             </div>
             <div class="col-lg-2">
-                <strong>客服人员</strong>: {{ $model->user_service->name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>运营人员</strong>: {{ $model->user_operator->name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>IP地址</strong>: {{ $model->ip }}
+                <strong>运营人员</strong>: {{ $model->userOperator->name }}
             </div>
             <div class="col-lg-2">
                 <strong>地址验证</strong>: {{ $model->address_confirm_name }}
+            </div>
+            <div class="col-lg-2">
+                <strong>IP地址</strong>: {{ $model->ip }}
             </div>
             <div class="col-lg-2">
                 <strong>备用字段</strong>: {{ $model->comment }}
@@ -55,25 +52,31 @@
                 <strong>导单备注</strong>: {{ $model->import_remark }}
             </div>
             <div class="col-lg-2">
-                <strong>是否分批发货</strong>: {{ $model->is_partial_name }}
+                <strong>渠道创建时间</strong>: {{ $model->create_time }}
             </div>
             <div class="col-lg-2">
-                <strong>是否手工</strong>: {{ $model->by_hand_name }}
+                <strong>做账时间</strong>: {{ $model->affair_time == '0000-00-00' ? '' : $model->affair_time }}
+            </div>
+            <div class="col-lg-2">
+                <strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>是否做账</strong>: {{ $model->is_affair_name }}
             </div>
             <div class="col-lg-2">
-                <strong>做账时间</strong>: {{ $model->affair_time }}
+                <strong>是否分批发货</strong>: {{ $model->is_partial_name }}
             </div>
             <div class="col-lg-2">
-                <strong>定义时间</strong>: {{ $model->create_time }}
+                <strong>是否手工</strong>: {{ $model->by_hand_name }}
             </div>
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">金额信息</div>
+        <div class="panel-heading">支付信息</div>
         <div class="panel-body">
+            <div class="col-lg-2">
+                <strong>支付方式</strong>: {{ $model->payment }}
+            </div>
             <div class="col-lg-2">
                 <strong>币种</strong>: {{ $model->currency }}
             </div>
@@ -81,16 +84,22 @@
                 <strong>汇率</strong>: {{ $model->rate }}
             </div>
             <div class="col-lg-2">
-                <strong>收款金额</strong>: {{ $model->amount }}
+                <strong>总金额</strong>: {{ $model->amount }}
             </div>
             <div class="col-lg-2">
                 <strong>产品金额</strong>: {{ $model->amount_product }}
             </div>
             <div class="col-lg-2">
-                <strong>订单运费</strong>: {{ $model->amount_shipping }}
+                <strong>运费</strong>: {{ $model->amount_shipping }}
             </div>
             <div class="col-lg-2">
                 <strong>折扣金额</strong>: {{ $model->amount_coupon }}
+            </div>
+            <div class="col-lg-2">
+                <strong>交易号</strong>: {{ $model->transaction_number }}
+            </div>
+            <div class="col-lg-2">
+                <strong>支付时间</strong>: {{ $model->payment_date }}
             </div>
         </div>
     </div>
@@ -130,11 +139,8 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">支付信息</div>
+        <div class="panel-heading">账单信息</div>
         <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>支付方式</strong>: {{ $model->payment }}
-            </div>
             <div class="col-lg-2">
                 <strong>账单名字</strong>: {{ $model->billing_firstname }}
             </div>
@@ -159,8 +165,25 @@
             <div class="col-lg-2">
                 <strong>账单电话</strong>: {{ $model->billing_phone }}
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">退款信息</div>
+        <div class="panel-body">
             <div class="col-lg-2">
-                <strong>支付时间</strong>: {{ $model->payment_date }}
+                <strong>退款方式</strong>: {{ $model->refund }}
+            </div>
+            <div class="col-lg-2">
+                <strong>退款币种</strong>: {{ $model->refund_currency }}
+            </div>
+            <div class="col-lg-2">
+                <strong>客户账户</strong>: {{ $model->refund_account }}
+            </div>
+            <div class="col-lg-2">
+                <strong>退款金额</strong>: {{ $model->refund_amount }}
+            </div>
+            <div class="col-lg-2">
+                <strong>退款时间</strong>: {{ $model->refund_time == '0000-00-00' ? '' : $model->refund_time }}
             </div>
         </div>
     </div>
@@ -182,13 +205,13 @@
                         <strong>是否有效</strong> : {{ $orderItem->status_name }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>发货状态</strong> : {{ $orderItem->ship_status_name }}
-                    </div>
-                    <div class="col-lg-2">
                         <strong>是否赠品</strong> : {{ $orderItem->is_gift_name }}
                     </div>
                     <div class="col-lg-2">
                         <strong>备注</strong> : {{ $orderItem->remark }}
+                    </div>
+                    <div class="col-lg-2">
+                        <strong>发货状态</strong> : {{ $orderItem->ship_status_name }}
                     </div>
                 </div>
             @endforeach

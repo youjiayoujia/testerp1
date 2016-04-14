@@ -37,13 +37,13 @@
             </div> 
              <div class="form-group col-lg-4">
             	<strong>导出该订单</strong>:
+                @if($model->supplier->type==1)
                 	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
                 </a>
-                
-            </div>
-         <div class="form-group col-lg-4">
-            	<strong>取消采购单</strong>:
-                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该订单</a>  
+                @else
+                <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
+                </a>
+                @endif     
             </div>
          <div class="form-group col-lg-4">
             <strong>采购单运单号</strong>:
@@ -66,7 +66,7 @@
             <td>采购类型</td> 
             <td>SKU</td> 
             <td>样图</td>
-            <td>采购数量/已到货数量/仍需采购数量</td>
+            <td>采购数量</td>
             <td>状态</td>
             <td>物流单号+物流费</td>
             <td>采购价格</td>
@@ -95,7 +95,7 @@
              暂无图片
              @endif
             </td>
-            <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
+            <td>{{$purchaseItem->purchase_num}}</td>
             <td>
            	<select name="arr[{{$k}}][status]" >
              @foreach(config('purchase.purchaseItem.status') as $key=>$v)
@@ -138,7 +138,7 @@
             </td>  
 			<td>
             @if($purchaseItem->active ==1)
-            <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a> 
+            报缺
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @elseif($purchaseItem->active > 1)
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)

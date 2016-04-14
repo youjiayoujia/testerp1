@@ -1,7 +1,7 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group">
-        <a class="btn btn-info" onClick="addPurchaseOrder()">
+	 <div class="btn-group">
+        <a class="btn btn-info" id="checkPurchaseItem">
             <i class="glyphicon glyphicon-ok-circle"></i> 批量生成采购单
         </a>
     </div>
@@ -12,7 +12,8 @@
     </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th>ID</th>
+    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
+    ID</th>
     <th>sku</th>
     <th>采购类型</th>
     <th>订单itemId</th>
@@ -29,7 +30,13 @@
 @section('tableBody')
     @foreach($data as $purchaseItem)
         <tr>
-            <td>{{ $purchaseItem->id }}</td>
+            <td>
+             @if($purchaseItem->purchase_order_id >0)
+                <input type="checkbox" name="purchaseItem_id"  value="{{$purchaseItem->id}}" isexamine="1" >
+                @else
+                <input type="checkbox" name="purchaseItem_id"  value="{{$purchaseItem->id}}" isexamine="0" >
+                @endif
+            {{ $purchaseItem->id }}</td>
             <td>{{ $purchaseItem->sku}}</td>
             @foreach(config('purchase.purchaseItem.type') as $k=>$type)
             	@if($purchaseItem->type == $k)
@@ -37,7 +44,7 @@
                 @endif
             @endforeach
             <td>{{ $purchaseItem->order_item_id}}</td>
-            <td> <img src="{{ asset($purchaseItem->item->product->image->src)}}" height="50px"/></td>
+            <td> <img src="{{ $purchaseItem->item->product->image->src}}" height="50px"/></td>
             <td>{{ $purchaseItem->supplier->name}}</td>
             <td>{{ $purchaseItem->warehouse->name}}</td>
             <td>{{ $purchaseItem->purchase_num}}/{{ $purchaseItem->arrival_num}}/{{ $purchaseItem->lack_num}}</td>
@@ -64,37 +71,51 @@
                 <a href="{{ route('purchaseItem.edit', ['id'=>$purchaseItem->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $purchaseItem->id }}"
-                   data-url="{{ route('purchaseItem.destroy', ['id' =>$purchaseItem->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+                
             </td>
         </tr>
     @endforeach
    
   
 
- <script type="text/javascript">
-	 function addPurchaseOrder(){ 
-            if (confirm("确认生成采购单?")) {
-                var url = "addPurchaseOrder";
-				var isadd = 1;
+ <script type="text/javascript">		 
+	$('#checkPurchaseItem').click(function () {
+            if (confirm("是否将选择的条目生成采购单?")) {
+                var checkbox = document.getElementsByName("purchaseItem_id");
+                var purchase_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    if(checkbox[i].getAttribute('isexamine')==1){
+                        alert("id为"+checkbox[i].value+"的条目已经生成采购单了");
+                        return;
+                    }
+                    purchase_ids += checkbox[i].value+",";
+                }
+                purchase_ids = purchase_ids.substr(0,(purchase_ids.length)-1);
                 $.ajax({
-                    url:url,
-                    data:{isadd:isadd},
+                    url:'addPurchaseOrder',
+                    data:{purchase_ids:purchase_ids},
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                      if(result == true){
-						  alert('成功生成订单！');
-						   window.location.reload();
-						}else{
-							alert('生成订单失败！');
-						}
+                        window.location.reload();
                     }                    
                 })
             }
-		 }
+        });	 
+	//全选
+        function quanxuan()
+        {
+          var collid = document.getElementById("checkall");
+          var coll = document.getElementsByName("purchaseItem_id");
+          if (collid.checked){
+             for(var i = 0; i < coll.length; i++)
+               coll[i].checked = true;
+          }else{
+             for(var i = 0; i < coll.length; i++)
+               coll[i].checked = false;
+          }
+        }	 
+		 
 	</script>
 @stop

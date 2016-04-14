@@ -135,6 +135,27 @@ class PositionController extends Controller
     }
 
     /**
+     * 获取库位信息,return 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function ajaxCheckPosition()
+    {
+        if(request()->ajax()) {
+            $position = trim(request()->input('position'));
+            $buf = $this->model->where(['is_available'=>'1', 'name'=>$position])->first();
+            if($buf)
+                return json_encode(true);
+            else
+                return json_encode(false);
+        }
+        
+        return json_encode(false);
+    }
+
+    /**
      * 获取excel表格 
      *
      * @param none

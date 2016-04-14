@@ -34,7 +34,7 @@
     <th>图片</th>
     <th>选中shop</th>
     <th class="sort" data-field="c_name">中文名称</th>
-    <th>材质</th>
+    <th>描述</th>
     <th>线上供货商</th>
     <th>线上供货商链接</th>
     <th>线下供货商</th>
@@ -42,6 +42,7 @@
     <th>拿货价</th>
     <th>参考现货数量</th>
     <th>审核状态</th>
+    <th>审核不通过原因</th>
     <th>选款人ID</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
@@ -62,7 +63,7 @@
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
-            <td>{{ $product->fabric }}</td>
+            <td>{{ $product->description }}</td>
             <td>{{ $product->supplier->name }}</td>
             <td><a href="{{$product->purchase_url}}" >链接</td>
             <td>线下供货商</td>
@@ -77,6 +78,7 @@
                     if($product->examine_status=='revocation'){echo "撤销审核";}
                 ?>
             </td>
+            <td>{{$product->data_edit_not_pass_remark}}</td>
             <td>{{ $product->upload_user }}</td>
             <td>{{ $product->created_at }}</td>
             <td>

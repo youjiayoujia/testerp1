@@ -54,6 +54,13 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $data = request()->all();
+        if($data['refund_account'] == null) {
+            $data['refund'] = '';
+            $data['refund_currency'] = '';
+            $data['refund_account'] = '';
+            $data['refund_amount'] = '';
+            $data['refund_time'] = '';
+        }
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
@@ -104,6 +111,13 @@ class OrderController extends Controller
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
+        if($buf['refund_account'] == null) {
+            $buf['refund'] = '';
+            $buf['refund_currency'] = '';
+            $buf['refund_account'] = '';
+            $buf['refund_amount'] = '';
+            $buf['refund_time'] = '';
+        }
         $obj = $this->model->find($id)->orderItem;
         $obj_len = count($obj);
         $this->model->find($id)->update($buf);
@@ -115,7 +129,12 @@ class OrderController extends Controller
                 $buf[$key] = $val[$i];
             }
             $buf['order_id'] = $id;
-            $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
+            if(count(productItem::where('sku', $buf['sku'])->get())) {
+                $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
+            }else{
+                $buf['item_id'] = 0;
+            }
+
             $obj[$i]->update($buf);
         }
         while ($i != $obj_len) {
@@ -238,7 +257,7 @@ class OrderController extends Controller
                     $orders[$key]['channel_account_id'] = $account['id'];
                     $orders[$key]['customer_service'] = $account['customer_service_id'];
                     $orders[$key]['operator'] = $account['operator_id'];
-                    $orders[$key]['affairer'] = 2;
+                    $orders[$key]['affairer'] = NULL;
                 }
             }
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
@@ -249,7 +268,7 @@ class OrderController extends Controller
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
-            $orders[$key]['affair_time'] = date('Y-m-d');
+            $orders[$key]['affair_time'] = NULL;
             $orders[$key]['create_time'] = $channelOrder['date_purchased'];
             $orders[$key]['is_partial'] = 0;
             $orders[$key]['by_hand'] = 0;

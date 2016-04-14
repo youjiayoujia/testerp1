@@ -133,6 +133,7 @@
                 <label for="affairer">做账人员</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select name="affairer" class="form-control" id="affairer">
+                    <option value="NULL"></option>
                     @foreach($users as $user)
                         <option value="{{$user->id}}" {{$user->id == $model->affairer ? 'selected' : ''}}>
                             {{$user->name}}
@@ -476,6 +477,20 @@
         $('#refund').val(payment);
         var currency = $('#currency').val();
         $('#refund_currency').val(currency);
+
+        var refund_time = $('#refund_time').val();
+        if(refund_time == '0000-00-00') {
+            $('#refund').val(null);
+            $('#refund_currency').val(null);
+            $('#refund_account').val(null);
+            $('#refund_amount').val(null);
+            $('#refund_time').val(null);
+        }
+
+        var affair_time = $('#affair_time').val();
+        if(affair_time == '0000-00-00') {
+            $('#affair_time').val('');
+        }
 
         var current = 1;
         $('#create_form').click(function(){

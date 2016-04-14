@@ -69,7 +69,7 @@
             <td>{{ $order->shipping == 'packet' ? '小包' : '快递' }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->payment_date }}</td>
-            <td>{{ $order->affair_time }}</td>
+            <td>{{ $order->affair_time == '0000-00-00' ? '' : $order->affair_time }}</td>
             <td>{{ $order->create_time }}</td>
             <td>{{ $order->created_at }}</td>
             <td>{{ $order->updated_at }}</td>

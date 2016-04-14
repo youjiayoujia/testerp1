@@ -55,10 +55,10 @@
                 <strong>渠道创建时间</strong>: {{ $model->create_time }}
             </div>
             <div class="col-lg-2">
-                <strong>做账时间</strong>: {{ $model->affair_time }}
+                <strong>做账时间</strong>: {{ $model->affair_time == '0000-00-00' ? '' : $model->affair_time }}
             </div>
             <div class="col-lg-2">
-                <strong>做账人员</strong>: {{ $model->userAffairer->name }}
+                <strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>是否做账</strong>: {{ $model->is_affair_name }}
@@ -167,7 +167,6 @@
             </div>
         </div>
     </div>
-
     <div class="panel panel-default">
         <div class="panel-heading">退款信息</div>
         <div class="panel-body">
@@ -184,12 +183,10 @@
                 <strong>退款金额</strong>: {{ $model->refund_amount }}
             </div>
             <div class="col-lg-2">
-                <strong>退款时间</strong>: {{ $model->refund_time }}
+                <strong>退款时间</strong>: {{ $model->refund_time == '0000-00-00' ? '' : $model->refund_time }}
             </div>
         </div>
     </div>
-
-
     <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">

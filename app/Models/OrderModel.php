@@ -114,7 +114,7 @@ class OrderModel extends BaseModel
             'shipping_state' => 'required',
             'shipping_country' => 'required',
             'shipping_zipcode' => 'required',
-            'shipping_phone' => 'required|digits_between:8,11',
+            'shipping_phone' => 'required',
             'payment' => 'required',
             'payment_date' => 'required',
         ];

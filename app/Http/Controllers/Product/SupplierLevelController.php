@@ -12,7 +12,7 @@
 namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
-use App\Models\product\SupplierLevelModel;
+use App\Models\Product\SupplierLevelModel;
 
 class SupplierLevelController extends Controller
 {

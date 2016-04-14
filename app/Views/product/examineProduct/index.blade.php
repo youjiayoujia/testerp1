@@ -9,7 +9,7 @@
                 <li><a href="{{ DataList::filtersEncode(['examine_status','=','']) }}">未审核</a></li>
                 <li><a href="{{ DataList::filtersEncode(['examine_status','=','pass']) }}">审核通过</a></li>
                 <li><a href="{{ DataList::filtersEncode(['examine_status','=','notpass']) }}">审核不通过</a></li>
-                <li><a href="{{ DataList::filtersEncode(['examine_status','=','canceled']) }}">撤销审核</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','revocation']) }}">撤销审核</a></li>
             </ul>
     </div>  
 
@@ -21,6 +21,7 @@
     <ul class="dropdown-menu">
         <li><a href="javascript:" class="shenhe" data-status="pass" data-name="审核通过" >通过</a></li>
         <li><a href="javascript:" class="shenhe" data-status="notpass" data-name="审核不通过">不通过</a></li>
+        <li><a href="javascript:" class="shenhe" data-status="revocation" data-name="撤销审核">撤销审核</a></li>
     </ul>
 </div>
 
@@ -68,7 +69,14 @@
             <td>无</td>
             <td>{{ $product->purchase_price }}</td>
             <td>待确定</td>
-            <td>{{$product->examine_status}}</td>
+            <td>
+                <?php 
+                    if($product->examine_status=='pass'){echo "审核通过";}
+                    if($product->examine_status=='notpass'){echo "审核不通过";}
+                    if($product->examine_status=='canceled'){echo "取消";}
+                    if($product->examine_status=='revocation'){echo "撤销审核";}
+                ?>
+            </td>
             <td>{{ $product->upload_user }}</td>
             <td>{{ $product->created_at }}</td>
             <td>

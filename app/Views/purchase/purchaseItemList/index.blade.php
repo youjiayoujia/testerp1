@@ -10,18 +10,18 @@
     <th>产品图片</th>
     <th>供应商-采购链接</th>
     <th>采购去向</th>
+    <th>库存</th>
     <th>采购需求/采购数目/仍需采购</th>
-    <th>shop</th>
     <th>采购条目状态</th>
     <th>入库状态</th>
+    <th>入库数量</th>
     <th>异常状态</th>
+    <th>备注</th>
     <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $purchaseList)
         <tr>
-        
-        @if($purchaseList->purchase_order_id > 0)
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->sku}}</td>
             @foreach(config('purchase.purchaseItem.type') as $k=>$type)
@@ -39,12 +39,8 @@
             @endif
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
+            <td>{{ $purchaseList->all_quantity}}</td>
             <td>{{ $purchaseList->purchase_num}}/{{ $purchaseList->arrival_num}}/{{ $purchaseList->lack_num}}</td>
-             @foreach(config('purchase.purchaseItem.channels') as $k=>$platform)
-            	@if($purchaseList->platform_id == $k)
-            	<td>{{ $platform }}</td>
-                @endif
-            @endforeach
             @foreach(config('purchase.purchaseItem.status') as $k=>$status)
             	@if($purchaseList->status == $k)
             	<td>{{ $status }}</td>
@@ -57,6 +53,7 @@
                 
                 @endif
             @endforeach</td>
+            <td>{{$purchaseList->storage_qty}}</td>
             <td> 
            @foreach(config('purchase.purchaseItem.active') as $k=>$vo)
             	@if($purchaseList->active == $k)  
@@ -82,6 +79,7 @@
             @endforeach
             @endif
             </td>
+            <td>{{$purchaseList->remark}}</td>
             <td>
                 <a href="{{ route('purchaseItemList.show', ['id'=>$purchaseList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
@@ -92,7 +90,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
             </td>
-            @endif
+            
         </tr>
     @endforeach
 @stop

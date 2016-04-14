@@ -36,8 +36,11 @@ class PurchaseItemListController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>','0')->where('storageStatus','0')->orderBy('status')),
+            'data' => $this->autoList($this->model),
         ];
+		foreach($response['data'] as $key=>$vo){
+			$response['data'][$key]['all_quantity']=StockModel::where('item_id',$vo->item->id)->sum('all_quantity');
+			}
         return view($this->viewPath . 'index', $response);
     }
 	

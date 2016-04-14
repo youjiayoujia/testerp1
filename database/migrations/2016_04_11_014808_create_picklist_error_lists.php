@@ -18,7 +18,7 @@ class CreatePicklistErrorLists extends Migration
             $table->integer('package_id')->comment('package id号')->default(0);
             $table->enum('status', ['0', '1'])->comment('状态')->default(0);
             $table->integer('process_by')->comment('处理人')->default(0);
-            $table->timestamp('process_time')->comment('处理时间')->default(0);
+            $table->timestamp('process_time')->comment('处理时间')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -31,7 +31,7 @@
                 <input type="checkbox" name="purchaseList_id"  value="{{$purchaseList->id}}" isexamine="0" >
                 @endif
             </td>
-        @if($purchaseList->purchase_order_id > 0)
+        
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->sku}}</td>
             @foreach(config('purchase.purchaseItem.type') as $k=>$type)
@@ -95,7 +95,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
             </td>
-            @endif
+          
         </tr>
     @endforeach
    <script type="text/javascript"> 

@@ -36,8 +36,10 @@ class PurchaseListController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>','0')->orderBy('status')),
+            'data' => $this->autoList($this->model->where('status','>',0)->orderBy('status')),
         ];
+		//$response['data']=$response['data']->toArray();
+		//print_r($response['data']);exit;
         return view($this->viewPath . 'index', $response);
     }
 	

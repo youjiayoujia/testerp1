@@ -103,7 +103,6 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
 Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
-Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 
@@ -117,6 +116,7 @@ Route::resource('purchaseList', 'Purchase\PurchaseListController');
 //异常条目采购
 Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
 //异常单采购
+Route::any('purchaseOrderAbnormal/cancelOrder/{id}', 'Purchase\PurchaseOrderAbnormalController@cancelOrder');
 Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
 //采购入库
 Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');

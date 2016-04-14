@@ -31,6 +31,17 @@
     </div>
 
     <div class="panel panel-default">
+        <div class="panel-heading">Feature属性:</div>
+        <div class="panel-body">
+            @foreach($model->product->featureTextValues as $featureModel)
+            <div class="col-lg-3">
+                <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
+            </div>
+            @endforeach
+        </div> 
+    </div>
+
+    <div class="panel panel-default">
         <div class="panel-heading">供应商信息 :</div>
         <div class="panel-body">
             <div class="col-lg-3">

@@ -120,5 +120,7 @@
                coll[i].checked = false;
           }
         }
+
+        
     </script>
 @stop

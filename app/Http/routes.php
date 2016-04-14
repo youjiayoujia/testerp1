@@ -41,7 +41,7 @@ Route::resource('stockIn', 'Stock\InController');
 Route::resource('stockOut', 'Stock\OutController');
 
 //供货商变更历史
-Route::resource('supplierChangeHistory', 'Product\supplierChangeHistoryController');
+Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryController');
 
 //供货商评级
 Route::resource('supplierLevel', 'Product\SupplierLevelController');

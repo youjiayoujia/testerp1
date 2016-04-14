@@ -9,16 +9,18 @@ use App\Models\Product\channel\aliexpressProductModel;
 use App\Models\Product\channel\b2cProductModel;
 use App\Models\Product\ProductEnglishValueModel;
 use App\Models\Product\SupplierModel;
+use App\Models\CurrencyModel;
 use App\Http\Controllers\Controller;
 
 class EditProductController extends Controller
 {
 
-    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier)
+    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier,CurrencyModel $currencyModel)
     {
         $this->mainIndex = route('EditProduct.index');
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
+        $this->currency = $currencyModel;
         $this->supplier = $supplier;
         $this->mainTitle = '选款产品编辑';
         $this->viewPath = 'product.editProduct.';
@@ -169,7 +171,7 @@ class EditProductController extends Controller
      */
     public function price()
     {
-        $rate = 6.2;
+        $rate = $this->currency->getRate('USD');
         $type = request()->input('type');
         $price = (float)request()->input('price');
         $weight = (float)request()->input('weight');

@@ -9,7 +9,7 @@
                 <li><a href="{{ DataList::filtersEncode(['examine_status','=','']) }}">未审核</a></li>
                 <li><a href="{{ DataList::filtersEncode(['examine_status','=','pass']) }}">审核通过</a></li>
                 <li><a href="{{ DataList::filtersEncode(['examine_status','=','notpass']) }}">审核不通过</a></li>
-                <li><a href="{{ DataList::filtersEncode(['examine_status','=','canceled']) }}">撤销审核</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','revocation']) }}">撤销审核</a></li>
             </ul>
     </div>  
 
@@ -21,6 +21,7 @@
     <ul class="dropdown-menu">
         <li><a href="javascript:" class="shenhe" data-status="pass" data-name="审核通过" >通过</a></li>
         <li><a href="javascript:" class="shenhe" data-status="notpass" data-name="审核不通过">不通过</a></li>
+        <li><a href="javascript:" class="shenhe" data-status="revocation" data-name="撤销审核">撤销审核</a></li>
     </ul>
 </div>
 
@@ -33,7 +34,7 @@
     <th>图片</th>
     <th>选中shop</th>
     <th class="sort" data-field="c_name">中文名称</th>
-    <th>材质</th>
+    <th>描述</th>
     <th>线上供货商</th>
     <th>线上供货商链接</th>
     <th>线下供货商</th>
@@ -41,6 +42,7 @@
     <th>拿货价</th>
     <th>参考现货数量</th>
     <th>审核状态</th>
+    <th>审核不通过原因</th>
     <th>选款人ID</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
@@ -61,14 +63,22 @@
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
-            <td>{{ $product->fabric }}</td>
+            <td>{{ $product->description }}</td>
             <td>{{ $product->supplier->name }}</td>
             <td><a href="{{$product->purchase_url}}" >链接</td>
             <td>线下供货商</td>
             <td>无</td>
             <td>{{ $product->purchase_price }}</td>
             <td>待确定</td>
-            <td>{{$product->examine_status}}</td>
+            <td>
+                <?php 
+                    if($product->examine_status=='pass'){echo "审核通过";}
+                    if($product->examine_status=='notpass'){echo "审核不通过";}
+                    if($product->examine_status=='canceled'){echo "取消";}
+                    if($product->examine_status=='revocation'){echo "撤销审核";}
+                ?>
+            </td>
+            <td>{{$product->data_edit_not_pass_remark}}</td>
             <td>{{ $product->upload_user }}</td>
             <td>{{ $product->created_at }}</td>
             <td>
@@ -120,5 +130,7 @@
                coll[i].checked = false;
           }
         }
+
+        
     </script>
 @stop

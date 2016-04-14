@@ -242,3 +242,71 @@
     
 @show{{-- 表单按钮 --}}
 
+@section('pageJs')
+    <script type="text/javascript">
+        $(document).ready(function(){
+            ajax_price();
+            ajax_cost();
+        })
+
+        $('#name').keyup( function() {
+            $('.msg').html($(this).val().length + ' characters');
+        });
+
+        $("#price_calculate").click(function(){
+            $("#price_calculate_div").toggle();
+            return false;
+        })
+
+    function ajax_price()
+    {
+        var price = document.getElementById('we_cost').innerHTML;
+        var weight = document.getElementById('weight').value;
+        var ship_price = document.getElementById('ship_price').innerHTML;
+        var real_price = document.getElementById('sale_usd_price').value;
+        if(real_price.length == 0)
+            real_price = 0;
+        var type = 'price';
+        $.ajax({
+            type:"POST",
+            url :"{{route('productPrice')}}",
+            data:"type=" + type + "&price=" + price + "&weight=" + weight + "&ship_price=" + ship_price + "&real_price=" + real_price,
+            dataType:"json",
+            success:function(res){
+                if(real_price <= 0)
+                document.getElementById('sale_usd_price').value = res.sale_price
+                document.getElementById('c_cost').innerHTML = res.price
+                document.getElementById('c_price_coe').innerHTML = res.price_coe
+                document.getElementById('c_weight').innerHTML = res.weight
+                document.getElementById('c_weight_coe').innerHTML = res.weight_coe
+                document.getElementById('c_pprice').innerHTML = res.sale_price
+                document.getElementById('c_profit').innerHTML = res.profit
+                document.getElementById('r_price').innerHTML = res.r_price
+                document.getElementById('r_profit').innerHTML = res.r_profit
+            }
+        });
+        return false;
+    }
+
+    function ajax_cost()
+    {
+        var cost = document.getElementById('we_cost').innerHTML;
+        var ship_price = document.getElementById('ship_price').innerHTML;
+        var weight = document.getElementById('weight').value;
+        var type = 'cost';
+        $.ajax({
+            type:"POST",
+            url :"{{route('productPrice')}}",
+            data:"type=" + type + "&cost=" + cost + "&ship_price=" + ship_price + "&weight=" + weight,
+            dataType:"json",
+            success:function(res){
+                document.getElementById('p_cost').innerHTML = res.p_cost
+                document.getElementById('cost_usd_price').value = res.p_cost
+                document.getElementById('c_pcost').innerHTML = res.p_cost
+                document.getElementById('c_ship_price').innerHTML = res.ship_price
+            }
+        });
+        return false;
+    }
+    </script>
+@stop

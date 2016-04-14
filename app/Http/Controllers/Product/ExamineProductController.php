@@ -66,13 +66,11 @@ class ExamineProductController extends Controller
     public function update($id)
     {
         request()->flash();
-        //$this->validate(request(), $this->model->rules('update',$id));
-        $examineStatus = request()->input('examine');
         $productModel = $this->product->find($id);
-        $data['examine_status'] = $examineStatus;
+        $data = request()->input();
         $productModel->update($data);
         //ERP中如果该产品之前没有创建item,并且是审核,就创建item
-        if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){
+        if($data['examine']=='pass'&&empty($productModel->item->toArray())){
             $productModel->createItem();
         }
         return redirect($this->mainIndex);

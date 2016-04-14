@@ -232,6 +232,7 @@ Route::resource('ExamineProduct', 'Product\ExamineProductController');
 
 //产品渠道
 Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
+Route::any('product/price', ['uses' => 'Product\EditProductController@price', 'as'=>'productPrice']);
 Route::resource('EditProduct', 'Product\EditProductController');
 Route::resource('SelectProduct', 'Product\SelectProductController');
 Route::get('cancelExamineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as'=>'cancelExamineAmazonProduct']);

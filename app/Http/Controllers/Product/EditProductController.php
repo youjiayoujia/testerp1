@@ -9,16 +9,18 @@ use App\Models\Product\channel\aliexpressProductModel;
 use App\Models\Product\channel\b2cProductModel;
 use App\Models\Product\ProductEnglishValueModel;
 use App\Models\Product\SupplierModel;
+use App\Models\CurrencyModel;
 use App\Http\Controllers\Controller;
 
 class EditProductController extends Controller
 {
 
-    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier)
+    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier,CurrencyModel $currencyModel)
     {
         $this->mainIndex = route('EditProduct.index');
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
+        $this->currency = $currencyModel;
         $this->supplier = $supplier;
         $this->mainTitle = '选款产品编辑';
         $this->viewPath = 'product.editProduct.';
@@ -169,10 +171,10 @@ class EditProductController extends Controller
      */
     public function price()
     {
-        $rate = 6.2;
+        $rate = $this->currency->getRate('USD');
         $type = request()->input('type');
-        $price = float(request()->input('price'));
-        $weight = float(request()->input('weight'));
+        $price = (float)request()->input('price');
+        $weight = (float)request()->input('weight');
         //价格系数
         $price_coe = 1.4;
         if($price<30){
@@ -215,13 +217,41 @@ class EditProductController extends Controller
         elseif($weight < 2){
             $weight_coe = 1.6;               
         }
-
-        $ship_price = request()->input('ship_price');
-        $real_price = request()->input('real_price');
-
         $result = [];
+        //运费
+        $ship_price = request()->input('ship_price');
+        //销售价美元
+        $real_price = request()->input('real_price');
+        $price_temp = round(($price * $price_coe + $weight * $weight_coe * 110 + 10) / $rate, 2);
+        //计算出来的销售价美元
+        $sale_price = intval($price_temp)+0.99;
+        //利润
+        $profit = round(($sale_price * $rate - $price - $weight * 120 - $ship_price) / ($sale_price * $rate), 4);
+        
+        $result['sale_price'] = $sale_price;
+        $result['price'] = $price;
+        $result['price_coe'] = $price_coe;
+        $result['weight'] = $weight;
+        $result['weight_coe'] = $weight_coe;
+        $result['profit'] = $profit;
 
-        return 1;
+        if($real_price>0){
+            $r_profit = round(($real_price * $rate - $price - $weight * 120 - $ship_price) / ($real_price * $rate), 4);
+            $result['r_price'] = $real_price;
+            $result['r_profit'] = $r_profit;
+        }else{
+            $result['r_price'] = $sale_price;
+            $result['r_profit'] = $profit;
+        }
+        if($type=='cost'){
+            $cost = request()->input('cost');
+            $p_cost = round(($cost + $ship_price + $weight * 110 + 10) / $rate, 2);
+            $result['p_cost'] = $p_cost;
+            $result['cost'] = $cost;
+            $result['ship_price'] = $ship_price;
+        }
+
+        return $result;
     }
      
 }

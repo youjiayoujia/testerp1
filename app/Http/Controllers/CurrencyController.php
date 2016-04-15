@@ -19,7 +19,7 @@ class CurrencyController extends Controller
     {
         $this->model = $currency;
         $this->mainIndex = route('currency.index');
-        $this->mainTitle = '仓库';
+        $this->mainTitle = '汇率';
         $this->viewPath = 'currency.';
     }
 }

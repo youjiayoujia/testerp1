@@ -7,7 +7,7 @@
         <div class="form-group col-lg-1">
             <label for="ID" class='control-label'>ID</label>
         </div>
-        <div class="form-group col-lg-1">
+        <div class="form-group col-lg-2">
             <label for="sku" class='control-label'>sku</label>
         </div>
         <div class="form-group col-lg-2">
@@ -22,7 +22,7 @@
         <div class="form-group col-lg-1">
             <label for="hold数量" class='control-label'>hold数量</label>
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-1">
             <label for="总数量" class='control-label'>总数量</label>
         </div>
         <div class="form-group col-lg-2">
@@ -39,7 +39,7 @@
             <div class="form-group col-lg-1">
                 <input type='text' name='arr[id][{{$key}}]' class='form-control' value="{{ $takingForm->id }}"readonly>
             </div>
-            <div class="form-group col-lg-1">
+            <div class="form-group col-lg-2">
                 <input type='text' name='arr[sku][{{$key}}]' class='form-control' value="{{ $takingForm->stock ? $takingForm->stock->items ? $takingForm->stock->items->sku : '' : '' }}" readonly>
             </div>
             <div class="form-group col-lg-2">
@@ -54,7 +54,7 @@
             <div class="form-group col-lg-1">
                 <input type='text' name='arr[hold_quantity][{{$key}}]' class='form-control' value="{{ $takingForm->stock ? $takingForm->stock->hold_quantity : '' }}" readonly>
             </div>
-            <div class="form-group col-lg-2">
+            <div class="form-group col-lg-1">
                 <input type='text' name='arr[all_quantity][{{$key}}]' class='form-control all_quantity' value="{{ $takingForm->stock ? $takingForm->stock->all_quantity : '' }}" readonly>
             </div>
             <div class="form-group col-lg-2">

@@ -10,16 +10,18 @@ use App\Models\Product\channel\b2cProductModel;
 use App\Models\Product\ProductEnglishValueModel;
 use App\Models\Product\SupplierModel;
 use App\Models\CurrencyModel;
+use App\Models\Product\ImageModel;
 use App\Http\Controllers\Controller;
 
 class EditProductController extends Controller
 {
 
-    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier,CurrencyModel $currencyModel)
+    public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier,CurrencyModel $currencyModel,ImageModel $imageModel)
     {
         $this->mainIndex = route('EditProduct.index');
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
+        $this->image = $imageModel;
         $this->currency = $currencyModel;
         $this->supplier = $supplier;
         $this->mainTitle = '选款产品编辑';
@@ -141,9 +143,14 @@ class EditProductController extends Controller
     {
         $id = request()->input('id');
         request()->flash();
-        $ProductModel = $this->product->find($id);
-        $ProductModel->updateProductImage(request()->all(),request()->files);
-
+        $data = request()->all();
+        if($data['uploadType']=='image'){
+            $ProductModel = $this->product->find($id);
+            $ProductModel->updateProductImage($data,request()->files);
+        }else{
+            $this->image->imageCreate(request()->all(), request()->files);
+        }
+        
         return redirect($this->mainIndex);
     }
 

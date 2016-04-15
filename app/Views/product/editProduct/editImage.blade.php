@@ -152,7 +152,7 @@
                   &times;
             </button>
             <h4 class="modal-title" id="myModalLabel">
-               请填写审核不通过原因
+               请填写图片不编辑原因
             </h4>
          </div>
          <input type="text" class="modal-body" name="image_edit_not_pass_remark" style="margin:10px 0px 10px 50px;width:500px;" value="{{ old('image_edit_not_pass_remark') ?  old('image_edit_not_pass_remark') : $model->image_edit_not_pass_remark }}"/>

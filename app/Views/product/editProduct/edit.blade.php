@@ -143,8 +143,9 @@
         </tr>
         <tr>
             <td><label>拿货价(RMB): </label><span id="we_cost">{{$model->purchase_price}}</span></td>
-            <td>
-                <label>主表:销售价美元: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}"><a href="#" id="price_calculate">价格试算</a>
+            <td style="width:927px">
+                <label>主表:销售价美元: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
+                <a href="#" id="price_calculate">价格试算</a>
                 <div id="price_calculate_div" style="display:none;">
                     <table cellspacing="1" cellpadding="1" border="1">
                         <tr><td>采购成本</td><td>价格系数</td><td>重量</td><td>重量系数</td><td>快递费用</td><td>销售价美元</td><td>成本价美元</td><td>利润率</td><td>实际价格</td><td>实际利润率</td></tr>

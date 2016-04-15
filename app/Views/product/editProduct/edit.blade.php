@@ -31,7 +31,7 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <td>SKU</td>
+            <td>MODEL:{{$model->model}}</td>
             <td></td>
         </tr>
         <tr>
@@ -76,30 +76,34 @@
             </td>
         </tr>
         <tr>
-            <td><label>颜色: </label></td>
+            <td><label>颜色: </label>
+                <?php echo substr($model->model, strpos($model->model, '-')+1,strlen($model->model)-1) ?>
+            </td>
             <td>
                 <label>Filter_attributes: </label>
                 <br>
                 <textarea class="vLargeTextField" cols="50" id="filter_attributes" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> name="filter_attributes" rows="3" >{{ old('filter_attributes') ?  old('filter_attributes') : $filter_attributes }}</textarea>
             </td>
         </tr>
-        <!--<tr>
-            <td><label>尺码: </label></td>
-            <td></td>
-        </tr>
-        -->
+        
         <tr>
-            <td><label>尺码描述: </label></td>
+            <td><label>尺码描述: </label>
+                <?php 
+                    $size = "";
+                    foreach($model->variationValues->toArray() as $key=>$arr){
+                        $size .= $arr['name'].",";
+                        
+                    }
+                    echo substr($size,0,strlen($size)-1);
+                 ?>
+            </td>
             <td>
                 <label>主表:简短描述(brief): </label>
                 <br>
                 <textarea class="vLargeTextField" cols="50" id="brief" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> name="brief" rows="3">{{ old('brief') ?  old('brief') : $brief }}</textarea>
             </td>
         </tr>
-        <tr>
-            <td><label>材质: </label></td>
-            <td></td>
-        </tr>
+        
         <tr>
             <td>
                 @foreach($model->featureTextValues as $featureModel)
@@ -143,8 +147,9 @@
         </tr>
         <tr>
             <td><label>拿货价(RMB): </label><span id="we_cost">{{$model->purchase_price}}</span></td>
-            <td>
-                <label>主表:销售价美元: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}"><a href="#" id="price_calculate">价格试算</a>
+            <td style="width:927px">
+                <label>主表:销售价美元: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
+                <a href="#" id="price_calculate">价格试算</a>
                 <div id="price_calculate_div" style="display:none;">
                     <table cellspacing="1" cellpadding="1" border="1">
                         <tr><td>采购成本</td><td>价格系数</td><td>重量</td><td>重量系数</td><td>快递费用</td><td>销售价美元</td><td>成本价美元</td><td>利润率</td><td>实际价格</td><td>实际利润率</td></tr>

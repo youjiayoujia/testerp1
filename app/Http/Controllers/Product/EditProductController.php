@@ -37,7 +37,7 @@ class EditProductController extends Controller
     {
         $response = [
             'metas' => $this->metas('index'),
-            'data' => $this->autoList($this->product->where('edit_status','!=','canceled')->where('edit_status','!=','')),
+            'data' => $this->autoList($this->product, $this->product->where('edit_status','!=','canceled')->where('edit_status','!=','')),
         ];
 
         return view( $this->viewPath .'index', $response);

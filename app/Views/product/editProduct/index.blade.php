@@ -2,15 +2,27 @@
 @section('tableToolButtons')
     <div class="btn-group" role="group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="glyphicon glyphicon-filter"></i> 过滤
+                <i class="glyphicon glyphicon-filter"></i> 查询编辑状态
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">选中资料未编辑</a></li>
-                <li><a href="{{ DataList::filtersEncode(['edit_status','=','data_edited']) }}">选中资料已编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">资料未编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','data_edited']) }}">资料已编辑</a></li>
                 <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
             </ul>
     </div>  
+    <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="glyphicon glyphicon-filter"></i> 查询审核状态
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','pass']) }}">通过</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','notpass']) }}">未通过</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','']) }}">未审核</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','revocation']) }}">撤销</a></li>
+            </ul>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     
@@ -25,7 +37,9 @@
     <th>线上供货商地址</th>
     <th>拿货价</th>
     <th>选款人ID</th>
-    <th>状态</th>
+    <th>编辑状态</th>
+    <th>审核状态</th>
+    <th>审核不通过原因</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
 @stop
@@ -80,6 +94,34 @@
                     <?php
                     break;
             } ?>
+            <?php switch ($product->examine_status) {
+                case 'pass':
+                    ?>
+                    <td>通过</td>
+                    <?php
+                    break;
+
+                case 'notpass':
+                    ?>
+                    <td class="notremark">未通过</td>
+                    
+                    <?php
+                    break;
+
+                case '':
+                    ?>
+                    <td>未审核</td>
+                    <?php
+                    break;
+
+                case 'revocation':
+                    ?>
+                    <td>撤销</td>
+                    <?php
+                    break;
+
+            } ?>
+            <td>{{ $product->data_edit_not_pass_remark }}</td>
             <td>{{ $product->created_at }}</td>
             <td>
                 <a href="{{ route('EditProduct.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
@@ -121,6 +163,12 @@
                 }                    
             })
         } 
+    });
+
+    $(".notremark").hover(function(){
+        $(".show_remark").css("display","block");
+        },function(){
+        //alert(45)
     });
     </script>
 @stop

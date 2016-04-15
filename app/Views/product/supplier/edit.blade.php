@@ -75,14 +75,14 @@
                 <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
             @endforeach
             </select>
-       </div>
-       <div class='form-group col-lg-4'>
+        </div>
+        <div class='form-group col-lg-4'>
             <label name='created_by' class='control-group'>
                 创建人
             </label>
-            <input class='form-control' type='text' value='' name='created_by' id = 'created_by' readonly/>
-       </div>
-   </div>
+            <input class='form-control' type='text' value='1' name='created_by' id = 'created_by' readonly/>
+        </div>
+    </div>
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){

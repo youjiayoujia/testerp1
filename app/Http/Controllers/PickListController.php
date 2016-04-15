@@ -24,6 +24,7 @@ class PickListController extends Controller
         $this->mainIndex = route('pickList.index');
         $this->mainTitle = '拣货';
         $this->viewPath = 'pick.';
+        $this->middleware('stockIOStatus');
     }
 
     /**

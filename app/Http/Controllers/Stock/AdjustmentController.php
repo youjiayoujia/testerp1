@@ -30,6 +30,7 @@ class AdjustmentController extends Controller
         $this->mainIndex = route('stockAdjustment.index');
         $this->mainTitle = '库存调整';
         $this->viewPath = 'stock.adjustment.';
+        $this->middleware('stockIOStatus');
     }
 
     /**
@@ -279,39 +280,4 @@ class AdjustmentController extends Controller
         }
         return redirect($this->mainIndex);
     }
-    /**
-     * 处理ajax请求参数,审核
-     *
-     * @param none
-     * @return json|time
-     *
-     */
-    // public function check()
-    // {
-    //         $id = request()->input('id');
-    //         $time = date('Y-m-d',time());       
-    //         $obj = $this->model->find($id);
-    //         $obj->update(['status'=>'1', 'check_time'=>$time, 'check_by'=>'2']); 
-    //         echo json_encode([$time, $obj->checkByName ? $obj->checkByName->name : '']);
-    //         $obj->relation_id = $obj->id;
-    //         $arr = $obj->toArray();
-    //         $buf = $obj->adjustments->toArray();
-    //         DB::beginTransaction();
-    //         try {
-    //             for($i=0;$i<count($buf);$i++) {
-    //                 $tmp = array_merge($arr,$buf[$i]);
-    //                 $item = ItemModel::find($tmp['item_id']);
-    //                 if($tmp['type'] == 'IN') {
-    //                     $tmp['type'] = 'ADJUSTMENT';
-    //                     $item->in($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['amount'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
-    //                 } else {
-    //                     $tmp['type'] = 'ADJUSTMENT';
-    //                     $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
-    //                 }
-    //             }
-    //         } catch (Exception $e) {
-    //             DB::rollback();
-    //         }
-    //         DB::commit();
-    // }
 }

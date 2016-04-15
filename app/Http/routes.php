@@ -21,8 +21,9 @@ Route::resource('productImage', 'Product\ImageController');
 Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
-Route::resource('brand', 'brandController');
-Route::resource('catalog', 'CatalogController');
+
+Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as'=>'checkName']);
+
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');

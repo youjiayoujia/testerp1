@@ -1,6 +1,10 @@
 @extends('common.table')
 @section('tableToolButtons')
-
+ <div class="btn-group">
+        <a href="/purchaseItemList/reduction" class="btn btn-info" id="batchexamine">
+             还原采购条目
+        </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
 	

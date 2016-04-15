@@ -78,7 +78,37 @@ class PurchaseItemListController extends Controller
 		$model->update($data);
         return redirect($this->mainIndex);		
 	}
-
+	/**
+     * 批量还原采购需求
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseItemReduction(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		
+        return view($this->viewPath . 'itemReduction', $response);
+		}
+		
+	/**
+     * 批量还原采购需求
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function reductionUpdate(){
+		$data=request()->all();
+		$updateIds=explode('#',$data['purchaseItemIds']);
+		$items=$this->model->find($updateIds);
+		foreach($items as $key=>$item){
+			if($item->status < 2){
+				$item->update(['status'=>0,]);
+			}
+		}
+		return redirect($this->mainIndex);
+	}
 }
 
 

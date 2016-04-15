@@ -77,30 +77,36 @@
             </td>
         </tr>
         <tr>
-            <td><label>颜色: </label></td>
+            <td><label>颜色: </label>
+                <?php echo substr($model->model, strpos($model->model, '-')+1,strlen($model->model)-1) ?>
+            </td>
             <td>
                 <label>Filter_attributes: </label>
                 <br>
                 <textarea class="vLargeTextField" disabled="disabled" cols="50" id="filter_attributes" name="filter_attributes" rows="3" >{{ old('filter_attributes') ?  old('filter_attributes') : $filter_attributes }}</textarea>
             </td>
         </tr>
-        <!--<tr>
-            <td><label>尺码: </label></td>
-            <td></td>
-        </tr>
-        -->
+        
         <tr>
-            <td><label>尺码描述: </label></td>
+            <td>
+                <label>尺码描述: </label>
+                <?php 
+                    $size = "";
+                    foreach($model->variationValues->toArray() as $key=>$arr){
+                        $size .= $arr['name'].",";
+                        
+                    }
+                    echo substr($size,0,strlen($size)-1);
+                 ?>
+
+            </td>
             <td>
                 <label>主表:简短描述(brief): </label>
                 <br>
                 <textarea class="vLargeTextField" disabled="disabled" cols="50" id="brief" name="brief" rows="3">{{ old('brief') ?  old('brief') : $brief }}</textarea>
             </td>
         </tr>
-        <tr>
-            <td><label>材质: </label></td>
-            <td></td>
-        </tr>
+        
         <tr>
             <td>
                 @foreach($model->featureTextValues as $featureModel)

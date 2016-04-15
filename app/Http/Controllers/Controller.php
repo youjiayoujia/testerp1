@@ -36,9 +36,9 @@ abstract class Controller extends BaseController
         return view('common.alert', $response)->render();
     }
 
-    public function autoList($model, $fields = ['*'], $pageSize = null)
+    public function autoList($model, $fields = ['*'], $pageSize = null,$list=null)
     {
-        $list = $model;
+        $list = $list ? $list : $model;
         if (request()->has('keywords')) {
             $keywords = request()->input('keywords');
             $searchFields = $model->searchFields;

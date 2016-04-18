@@ -23,6 +23,18 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+//        $order = OrderModel::find(1);
+//        for ($i = 0; $i < 2000; $i++) {
+//            $order->createPackage();
+//        }
+        return view($this->viewPath . 'create', $response);
+    }
+
     public function store()
     {
         request()->flash();

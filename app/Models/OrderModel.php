@@ -202,7 +202,6 @@ class OrderModel extends BaseModel
     public function createPackage()
     {
         $items = $this->setPackageItems();
-        Tool::show($items);
         if ($items) {
             foreach ($items as $warehouseId => $packageItems) {
                 $package = [];
@@ -213,7 +212,8 @@ class OrderModel extends BaseModel
                 //assigner
                 $package['assigner_id'] = 1;
                 //type
-                $package['type'] = $this->judgePacketType($packageItems);
+                $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
+                $package['weight'] = collect($packageItems)->sum('weight');
                 $package['email'] = $this->email;
                 $package['shipping_firstname'] = $this->shipping_firstname;
                 $package['shipping_lastname'] = $this->shipping_lastname;
@@ -226,12 +226,9 @@ class OrderModel extends BaseModel
                 $package['shipping_phone'] = $this->shipping_phone;
                 $package = $this->packages()->create($package);
                 if ($package) {
-                    $packageWeight = 0;
                     foreach ($packageItems as $packageItem) {
-                        $packageWeight += $packageItem['weight'];
                         $package->items()->create($packageItem);
                     }
-                    $package->update(['weight' => $packageWeight]);
                 }
             }
             return true;
@@ -242,61 +239,88 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
-     * todo:默认仓库,默认同仓库
-     * todo:hold库存,unhold库存
+     * todo:出库
      * todo:生成采购需求
      */
     public function setPackageItems()
     {
-        $packageItem = [];
         if ($this->is_multi) { //多产品
-            foreach ($this->items as $key => $item) {
-                $stocks = $item->item->assignStock($item->quantity);
-                if ($stocks) {
-                    foreach ($stocks as $warehouseId => $stock) {
-                        foreach ($stock as $warehousePositionId => $value) {
-                            $key = $item->item_id . '-' . $warehousePositionId;
-                            $packageItem[$warehouseId][$key]['item_id'] = $item->item_id;
-                            $packageItem[$warehouseId][$key]['warehouse_position_id'] = $warehousePositionId;
-                            $packageItem[$warehouseId][$key]['order_item_id'] = $item->id;
-                            $packageItem[$warehouseId][$key]['quantity'] = $value['quantity'];
-                            $packageItem[$warehouseId][$key]['weight'] = $value['weight'];
-                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
-                        }
-                    }
-                } else {
-                    return false;
-                }
-            }
+            $packageItem = $this->setMultiPackageItem();
         } else { //单产品
-            $orderItem = $this->items->first();
-            $stocks = $orderItem->item->assignStock($orderItem->quantity);
-            if ($stocks) {
-                foreach ($stocks as $warehouseId => $stock) {
-                    foreach ($stock as $warehousePositionId => $value) {
-                        $key = $orderItem->item_id . '-' . $warehousePositionId;
-                        $packageItem[$warehouseId][$key]['item_id'] = $orderItem->item_id;
-                        $packageItem[$warehouseId][$key]['warehouse_position_id'] = $warehousePositionId;
-                        $packageItem[$warehouseId][$key]['order_item_id'] = $orderItem->id;
-                        $packageItem[$warehouseId][$key]['quantity'] = $value['quantity'];
-                        $packageItem[$warehouseId][$key]['weight'] = $value['weight'];
-                        $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
-                    }
-                }
-            } else {
-                return false;
-            }
+            $packageItem = $this->setSinglePackageItem();
         }
         return $packageItem;
     }
 
-    public function judgePacketType($items)
+    //设置单产品订单包裹产品
+    public function setSinglePackageItem()
     {
-        $items = collect($items);
-        if ($items->count() > 1) {
-            return 'MULTI';
+        $packageItem = [];
+        $orderItem = $this->items->first();
+        $stocks = $orderItem->item->assignStock($orderItem->quantity);
+        if ($stocks) {
+            foreach ($stocks as $warehouseId => $stock) {
+                foreach ($stock as $key => $value) {
+                    $packageItem[$warehouseId][$key] = $value;
+                    $packageItem[$warehouseId][$key]['order_item_id'] = $orderItem->id;
+                    $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                }
+            }
+        } else {
+            return false;
         }
-        return $items->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE';
+        return $packageItem;
+    }
+
+    //设置多产品订单包裹产品
+    public function setMultiPackageItem()
+    {
+        $packageItem = [];
+        $stocks = [];
+        //根据仓库满足库存数量进行排序
+        $warehouses = [];
+        foreach ($this->items as $orderItem) {
+            $itemStocks = $orderItem->item->matchStock($orderItem->quantity);
+            if ($itemStocks) {
+                foreach ($itemStocks as $itemStock) {
+                    foreach ($itemStock as $warehouseId => $stock) {
+                        if (isset($warehouses[$warehouseId])) {
+                            $warehouses[$warehouseId] += 1;
+                        } else {
+                            $warehouses[$warehouseId] = 1;
+                        }
+                    }
+                }
+                $stocks[$orderItem->id] = $itemStocks;
+            } else {
+                return false;
+            }
+        }
+        krsort($warehouses);
+        //set package item
+        foreach ($stocks as $orderItemId => $itemStocks) {
+            foreach ($itemStocks as $type => $itemStock) {
+                if ($type == 'SINGLE') {
+                    $stock = collect($itemStock)->sortByDesc(function ($value, $key) use ($warehouses) {
+                        return $warehouses[$key];
+                    })->first();
+                    foreach ($stock as $key => $value) {
+                        $packageItem[$value['warehouse_id']][$key] = $value;
+                        $packageItem[$value['warehouse_id']][$key]['order_item_id'] = $orderItemId;
+                        $packageItem[$value['warehouse_id']][$key]['remark'] = 'REMARK';
+                    }
+                } else {
+                    foreach ($itemStock as $warehouseId => $warehouseStock) {
+                        foreach ($warehouseStock as $key => $value) {
+                            $packageItem[$warehouseId][$key] = $value;
+                            $packageItem[$warehouseId][$key]['order_item_id'] = $orderItemId;
+                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                        }
+                    }
+                }
+            }
+        }
+        return $packageItem;
     }
 
 }

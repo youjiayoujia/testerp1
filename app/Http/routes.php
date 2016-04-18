@@ -21,10 +21,8 @@ Route::resource('productImage', 'Product\ImageController');
 Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
-//品类
-Route::resource('brand', 'brandController');
+
 Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as'=>'checkName']);
-Route::resource('catalog', 'CatalogController');
 
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -34,13 +32,24 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
+//汇率
+Route::resource('currency', 'CurrencyController');
+
 //入库
 Route::resource('stockIn', 'Stock\InController');
 
 //出库
 Route::resource('stockOut', 'Stock\OutController');
 
+//供货商变更历史
+Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryController');
+
+//供货商评级
+Route::resource('supplierLevel', 'Product\SupplierLevelController');
+
 //供货商
+Route::post('productSupplier/levelStore', ['uses'=>'Product\SupplierController@levelStore', 'as'=>'productSupplier.levelStore']);
+Route::get('productSupplier/createLevel', ['uses'=>'Product\SupplierController@createLevel', 'as'=>'productSupplier.createLevel']);
 Route::resource('productSupplier', 'Product\SupplierController');
 
 //选款需求
@@ -52,13 +61,15 @@ Route::resource('productRequire', 'Product\RequireController');
 Route::resource('warehouse', 'WarehouseController');
 
 //库存调整
+Route::post('stockAdjustment/checkResult/{id}', ['uses'=>'Stock\AdjustmentController@checkResult', 'as'=>'stockAdjustment.checkResult']);
 Route::get('stockAdjustment/adjustAdd',
     ['uses' => 'Stock\AdjustmentController@ajaxAdjustAdd', 'as' => 'stockAdjustment.adjustAdd']);
-Route::get('stockAdjustment/check',
-    ['uses' => 'Stock\AdjustmentController@ajaxCheck', 'as' => 'stockAdjustment.check']);
+Route::get('stockAdjustment/check/{id}',
+    ['uses' => 'Stock\AdjustmentController@Check', 'as' => 'stockAdjustment.check']);
 Route::resource('stockAdjustment', 'Stock\AdjustmentController');
 
 //库位
+Route::get('position/ajaxCheckPosition', ['uses'=>'Warehouse\PositionController@ajaxCheckPosition', 'as'=>'position.ajaxCheckPosition']);
 Route::post('position/excelProcess', ['uses'=>'Warehouse\PositionController@excelProcess', 'as'=>'position.excelProcess']);
 Route::get('position/importByExcel', ['uses'=>'Warehouse\PositionController@importByExcel', 'as'=>'position.importByExcel']);
 Route::get('position/getExcel', ['uses'=>'Warehouse\PositionController@getExcel', 'as'=>'position.getExcel']);
@@ -93,7 +104,7 @@ Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
 Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
-Route::any('purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
+Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 
 //采购列表
@@ -103,7 +114,18 @@ Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@ac
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
-
+//异常条目采购
+Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
+//异常单采购
+Route::any('purchaseOrderAbnormal/cancelOrder/{id}', 'Purchase\PurchaseOrderAbnormalController@cancelOrder');
+Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
+//采购入库
+Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');
+Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseStockIn');
+Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
+Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
+//采购条目
+Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
 /**
  * stock controller route
  */
@@ -143,9 +165,15 @@ Route::post('allotment/checkformUpdate/{id}',
     ['uses' => 'Stock\AllotmentController@checkformupdate', 'as' => 'allotment.checkformUpdate']);
 Route::get('allotment/checkform/{id}',
     ['uses' => 'Stock\AllotmentController@checkform', 'as' => 'allotment.checkform']);
-Route::get('allotment/pick', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
+Route::get('allotment/pick/{id}', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
 Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotment.check']);
 Route::resource('stockAllotment', 'Stock\AllotmentController');
+
+//库存结转
+Route::post('stockCarryOver/showStockView', ['uses'=>'Stock\CarryOverController@showStockView', 'as'=>'stockCarryOver.showStockView']);
+Route::get('stockCarryOver/showStock', ['uses'=>'Stock\CarryOverController@showStock', 'as'=>'stockCarryOver.showStock']);
+Route::get('stockCarryOver/ajaxCreateCarryOver', ['uses'=>'Stock\CarryOverController@ajaxCreateCarryOver', 'as'=>'stockCarryOver.ajaxCreateCarryOver']);
+Route::resource('stockCarryOver', 'Stock\CarryOverController');
 
 //库存盘点
 Route::get('StockTaking/takingAdjustmentShow/{id}', ['uses'=>'Stock\TakingController@takingAdjustmentShow', 'as'=>'StockTaking.takingAdjustmentShow']);
@@ -160,18 +188,21 @@ Route::resource('logisticsSupplier', 'Logistics\SupplierController');
 Route::resource('logisticsCode', 'Logistics\CodeController');
 Route::resource('logisticsZone', 'Logistics\ZoneController');
 Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
-Route::get('poolQuantity', ['uses' => 'LogisticsController@poolQuantity', 'as' => 'poolQuantity']);
 Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
 Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
 Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);
 Route::get('countExpress/{id}', ['uses' => 'Logistics\ZoneController@countExpress', 'as' => 'countExpress']);
 Route::get('countPacket/{id}', ['uses' => 'Logistics\ZoneController@countPacket', 'as' => 'countPacket']);
-Route::get('batchAddTrCode/{logistics_id}',
+Route::get('batchAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@batchAddTrCode', 'as' => 'batchAddTrCode']);
 Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCodeFn', 'as' => 'logisticsCodeFn']);
-Route::get('scanAddTrCode/{logistics_id}',
+Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
+
+//拣货单异常
+Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);
+Route::resource('errorList', 'Picklist\ErrorListController');
 
 //拣货路由
 Route::post('pickList/inboxStore/{id}', ['uses' => 'PickListController@inboxStore', 'as' => 'pickList.inboxStore']);
@@ -197,9 +228,12 @@ Route::any('product/examineProduct', ['uses' => 'Product\EditProductController@e
 Route::any('product/editImage', ['uses' => 'Product\EditProductController@productEditImage', 'as'=>'productEditImage']);
 Route::any('product/updateImage', ['uses' => 'Product\EditProductController@productUpdateImage', 'as'=>'productUpdateImage']);
 Route::resource('product', 'ProductController');
+Route::any('examineProduct/examineAll', ['uses' => 'Product\ExamineProductController@examineAll', 'as'=>'productExamineAll']);
+Route::resource('ExamineProduct', 'Product\ExamineProductController');
 
 //产品渠道
 Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
+Route::any('product/price', ['uses' => 'Product\EditProductController@price', 'as'=>'productPrice']);
 Route::resource('EditProduct', 'Product\EditProductController');
 Route::resource('SelectProduct', 'Product\SelectProductController');
 Route::get('cancelExamineAmazonProduct', ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as'=>'cancelExamineAmazonProduct']);
@@ -211,6 +245,10 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::post('package/exportData', ['uses' => 'PackageController@exportData', 'as'=>'package.exportData']);
+Route::get('package/shippingStatistics', ['uses'=>'PackageController@shippingStatistics', 'as'=>'package.shippingStatistics']);
+Route::get('package/ajaxShippingExec', ['uses'=>'PackageController@ajaxShippingExec', 'as'=>'package.ajaxShippingExec']);
+Route::get('package/shipping', ['uses'=>'PackageController@shipping', 'as'=>'package.shipping']);
 Route::post('package/feeStore', ['uses' => 'PackageController@feeStore', 'as' => 'package.feeStore']);
 Route::get('package/manualLogistic/{id}',
     ['uses' => 'PackageController@manualLogistic', 'as' => 'package.manualLogistic']);

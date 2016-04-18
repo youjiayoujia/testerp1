@@ -13,7 +13,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="logistics_id" class="form-control">
                 @foreach($logisticses as $logistics)
-                    <option value="{{ $logistics->id }}" {{ $logistics->id == old('$logisticses->logistics->id') ? 'selected' : '' }}>
+                    <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : '' }}>
                         {{ $logistics->logistics_type }}
                     </option>
                 @endforeach

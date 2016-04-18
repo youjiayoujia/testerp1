@@ -89,6 +89,58 @@
     </div>
     <?php } ?>
 
+    <?php if(count($model->imageAll->where("type",'public')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">public :</div>
+        <?php foreach($model->imageAll->where("type",'public') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='public_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if(count($model->imageAll->where("type",'choies')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">choies :</div>
+        <?php foreach($model->imageAll->where("type",'choies') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='choies_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if(count($model->imageAll->where("type",'wish')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">wish :</div>
+        <?php foreach($model->imageAll->where("type",'wish') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='wish_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
+    <?php if(count($model->imageAll->where("type",'lazada')->toArray())>0){ ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">lazada :</div>
+        <?php foreach($model->imageAll->where("type",'lazada') as $image){ ?>
+        <div class="panel-body">   
+            <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px" >
+            <div class='upimage' style="float:right"><input name='lazada_image_<?php echo $image->id ?>' type='file'/></div>
+            <br>
+        </div>
+        <?php } ?>
+    </div>
+    <?php } ?>
+
     <!-- 模态框（Modal） -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
    aria-labelledby="myModalLabel" aria-hidden="true">
@@ -100,7 +152,7 @@
                   &times;
             </button>
             <h4 class="modal-title" id="myModalLabel">
-               请填写审核不通过原因
+               请填写图片不编辑原因
             </h4>
          </div>
          <input type="text" class="modal-body" name="image_edit_not_pass_remark" style="margin:10px 0px 10px 50px;width:500px;" value="{{ old('image_edit_not_pass_remark') ?  old('image_edit_not_pass_remark') : $model->image_edit_not_pass_remark }}"/>
@@ -108,7 +160,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">关闭
             </button>
-            <button type="submit" class="btn btn-primary" name='edit' value='5'>
+            <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
                提交
             </button>
          </div>
@@ -117,9 +169,8 @@
 </div>
 @stop
 @section('formButton')
-    <button type="submit" class="btn btn-success" name='edit' value='1'>保存</button>
-    <button type="submit" class="btn btn-success" name='edit' value='2'>审核通过</button>
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">图片审核不通过</button>
+    <button type="submit" class="btn btn-success" name='edit_status' value='image_edited'>保存</button>
+    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">图片不编辑</button>
     <button type="reset" class="btn btn-default">取消</button>
     
 @show{{-- 表单按钮 --}}

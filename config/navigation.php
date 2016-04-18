@@ -50,13 +50,18 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '选款产品列表',
+                    'name' => '选款选中',
                     'url' => 'SelectProduct.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '选款产品编辑',
                     'url' => 'EditProduct.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '选款产品审核',
+                    'url' => 'ExamineProduct.index',
                     'icon' => '',
                 ],
             ],
@@ -140,6 +145,11 @@ return [
                     'url' => 'stockTaking.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '库存结转',
+                    'url' => 'stockCarryOver.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -153,6 +163,25 @@ return [
             [
                 'name' => '拣货',
                 'url' => 'pickList.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '拣货单异常',
+                'url' => 'errorList.index',
+                'icon' => '',
+            ],
+        ],
+    ],
+    //拣货导航
+    [
+        'name' => '汇率',
+        'icon' => 'home',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '汇率',
+                'url' => 'currency.index',
                 'icon' => '',
             ],
         ],
@@ -201,14 +230,34 @@ return [
                     'url' => 'purchaseItem.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '采购条目',
+                    'url' => 'purchaseItemList.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '对单',
+                    'name' => '采购对单',
                     'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '采购入库',
+                    'url' => 'purchaseStockIn.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '异常采购条目',
+                    'url' => 'purchaseAbnormal.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '异常采购单',
+                    'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
                 ],
             ]

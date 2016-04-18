@@ -22,7 +22,7 @@
             <td>{{ $stock->all_quantity}}</td>
             <td>{{ $stock->available_quantity}}</td>
             <td>{{ $stock->hold_quantity}}</td>
-            <td>{{ round($stock->amount/$stock->all_quantity, 2) }}</td>
+            <td>{{ $stock->all_quantity ? round($stock->amount/$stock->all_quantity, 2) : '' }}</td>
             <td>{{ $stock->amount}}</td>
             <td>{{ $stock->created_at }}</td>
             <td>

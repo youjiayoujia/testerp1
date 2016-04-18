@@ -9,10 +9,10 @@
             <div class="col-lg-2">
                 <strong>名称</strong>: {{ $model->name }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>仓库名</strong>: {{ $model->warehouse ? $model->warehouse->name : '' }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>备注</strong>: {{ $model->remark }}
             </div>
             <div class="col-lg-2">

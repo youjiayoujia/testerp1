@@ -55,6 +55,19 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('package.shipping') }}">
+        执行发货
+    </a>
+</div>
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('package.shippingStatistics') }}">
+        发货统计
+    </a>
+</div>
+@parent
+@stop
 @section('childJs')
     <script type='text/javascript'>
         $(document).ready(function () {

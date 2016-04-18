@@ -10,6 +10,7 @@
 
 namespace App\Http\Controllers\Stock;
 
+use Cache;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\TakingModel;
@@ -239,6 +240,7 @@ class TakingController extends Controller
             $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
         }
         
+        Cache::store('file')->forever('stockIOStatus', '1');
         return redirect($this->mainIndex);
     }
 }

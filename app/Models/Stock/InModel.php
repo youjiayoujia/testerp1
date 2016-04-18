@@ -96,6 +96,8 @@ class InModel extends BaseModel
             return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
         if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
             return $this->stockTaking ? $this->stockTaking->taking_id : '';
+        if($this->type == 'MAKE_ACCOUNT')
+            return '库存导入';
     }
 
     /**

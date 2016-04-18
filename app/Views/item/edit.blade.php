@@ -87,6 +87,30 @@
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="form-group col-md-1">
+            <label for="color">库存</label>
+            <?php 
+                $inventory = 0;
+                $amount = 0;
+                foreach($model->stocks as $stock){
+                    $inventory += $stock->all_quantity;
+                    $amount += $stock->amount;
+                } 
+            ?>
+            <input disabled="disabled" class="form-control" id="inventory" placeholder="库存" name='inventory' value="{{ old('inventory') ?  old('inventory') : $inventory }}">
+        </div>
+
+        <div class="form-group col-md-1">
+            <label for="size">库存总金额</label>
+            <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') : $amount }}">
+        </div>
+
+    </div>
+
+
     <div class="row">
         <div class="form-group col-md-3">
             <label for="color">物流限制</label>

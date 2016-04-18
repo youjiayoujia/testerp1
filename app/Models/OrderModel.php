@@ -16,8 +16,9 @@ use App\Base\BaseModel;
 class OrderModel extends BaseModel
 {
     protected $table = 'orders';
-
+    
     protected $guarded = [];
+
 
     public $searchFields = [
         'channel_id',
@@ -38,15 +39,13 @@ class OrderModel extends BaseModel
             'email' => 'required',
             'status' => 'required',
             'active' => 'required',
-            'affairer' => 'required',
             'customer_service' => 'required',
             'operator' => 'required',
-            'ip' => 'required',
             'address_confirm' => 'required',
-            'affair_time' => 'required',
             'create_time' => 'required',
             'currency' => 'required',
             'rate' => 'required',
+            'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
             'amount_shipping' => 'required',
@@ -59,7 +58,7 @@ class OrderModel extends BaseModel
             'shipping_state' => 'required',
             'shipping_country' => 'required',
             'shipping_zipcode' => 'required',
-            'shipping_phone' => 'required|digits_between:8,11',
+            'shipping_phone' => 'required',
             'payment' => 'required',
             'payment_date' => 'required',
         ];
@@ -122,17 +121,17 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
     }
 
-    public function user_affairer()
+    public function userAffairer()
     {
         return $this->belongsTo('App\Models\UserModel', 'affairer', 'id');
     }
 
-    public function user_service()
+    public function userService()
     {
         return $this->belongsTo('App\Models\UserModel', 'customer_service', 'id');
     }
 
-    public function user_operator()
+    public function userOperator()
     {
         return $this->belongsTo('App\Models\UserModel', 'operator', 'id');
     }

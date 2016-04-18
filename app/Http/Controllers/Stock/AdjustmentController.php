@@ -11,6 +11,7 @@
 namespace App\Http\Controllers\Stock;
 
 use DB;
+use Exception;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
@@ -29,6 +30,7 @@ class AdjustmentController extends Controller
         $this->mainIndex = route('stockAdjustment.index');
         $this->mainTitle = '库存调整';
         $this->viewPath = 'stock.adjustment.';
+        $this->middleware('stockIOStatus');
     }
 
     /**
@@ -44,12 +46,26 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $adjustmentforms = $model->adjustments;
+        $access_quantity = [];
+        foreach($adjustmentforms as $key => $adjustmentform)
+        {
+            $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
+            if($stock) {
+                $access_quantity[] = $stock->available_quantity;
+            } else {
+                $access_quantity[] = 0;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
             'adjustments' => $model->adjustments,
-            'adjust' => $model,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+            'access_quantity' => $access_quantity,
         ];
-        
+
         return view($this->viewPath.'show', $response);
     }
 
@@ -115,12 +131,24 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $adjustmentforms = $model->adjustments;
+        $access_quantity = [];
+        foreach($adjustmentforms as $key => $adjustmentform)
+        {
+            $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
+            if($stock) {
+                $access_quantity[] = $stock->available_quantity;
+            } else {
+                $access_quantity[] = 0;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'adjustments' => $model->adjustments,
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
             'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+            'access_quantity' => $access_quantity,
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -203,21 +231,30 @@ class AdjustmentController extends Controller
         }
     }
 
-    /**
-     * 处理ajax请求参数,审核
-     *
-     * @param none
-     * @return json|time
-     *
-     */
-    public function ajaxCheck()
+    public function check($id)
     {
-        if(request()->ajax()) {
-            $id = request()->input('id');
-            $time = date('Y-m-d',time());       
-            $obj = $this->model->find($id);
-            $obj->update(['status'=>'1', 'check_time'=>$time, 'check_by'=>'2']); 
-            echo json_encode([$time, $obj->checkByName ? $obj->checkByName->name : '']);
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'adjustments' => $model->adjustments,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+        ];
+
+        return view($this->viewPath.'check', $response);
+    }
+
+    public function checkResult($id)
+    {
+        $result = request('result');
+        $obj = $this->model->find($id);
+        if($result) {       
+            
+            $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']); 
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustments->toArray();
@@ -238,6 +275,9 @@ class AdjustmentController extends Controller
                 DB::rollback();
             }
             DB::commit();
+        } else {
+            $obj->update(['status'=>'1', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']);
         }
+        return redirect($this->mainIndex);
     }
 }

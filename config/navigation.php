@@ -65,13 +65,6 @@ return [
                     'icon' => '',
                 ],
             ],
-            '供应链' => [
-                [
-                    'name' => '供货商',
-                    'url' => 'productSupplier.index',
-                    'icon' => '',
-                ],
-            ],
         ],
     ],
     //订单导航
@@ -224,6 +217,13 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
+            '供应链' => [
+                    [
+                        'name' => '供货商',
+                        'url' => 'productSupplier.index',
+                        'icon' => '',
+                    ],
+                ],
             '采购管理' => [
                 [
                     'name' => '采购需求',

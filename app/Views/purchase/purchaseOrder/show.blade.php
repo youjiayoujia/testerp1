@@ -53,6 +53,11 @@
      <div class="panel panel-default">
         <div class="panel-heading">单身</div>
         <div class="panel-body">
+        <div class="row">
+         <div class="form-group col-lg-4">
+                <strong>未入库条目</strong>:
+            </div>
+            </div>
      <table class="table table-bordered table-striped table-hover sortable">
     <thead>
         <tr>
@@ -67,6 +72,7 @@
     </thead>
     <tbody>
         @foreach($purchaseItems as $purchaseItem)
+        @if($purchaseItem->storageStatus == 0)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
             <td>
@@ -82,6 +88,7 @@
             <td>{{$purchaseItem->user_id}}</td>
             <td>{{$purchaseItem->created_at}}</td>  
         </tr>
+        @endif
         @endforeach
     </tbody>
     </table>

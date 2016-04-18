@@ -59,6 +59,11 @@
      <div class="panel panel-default">
         <div class="panel-heading">单身</div>
         <div class="panel-body">
+        <div class="row">
+         <div class="form-group col-lg-4">
+                <strong>未入库条目</strong>:
+            </div>
+            </div>
     <table class="table table-bordered table-striped table-hover sortable">
     <thead>
         <tr>
@@ -78,6 +83,7 @@
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)
+         @if($purchaseItem->storageStatus == 0)
         <tr> 
             <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
             <td>
@@ -138,13 +144,13 @@
             </td>  
 			<td>
             @if($purchaseItem->active ==1 )
-            @if($purchaseItem->active_status ==1 )
-            报缺
-            @elseif($purchaseItem->active ==2 )
-           	核实报缺
-            @else
-            正常
-            @endif
+                @if($purchaseItem->active_status ==1 )
+                报缺
+                @elseif($purchaseItem->active_status ==2 )
+                核实报缺
+                @else
+                正常
+                @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @elseif($purchaseItem->active > 1)
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)
@@ -164,6 +170,87 @@
              @endif
             </td>
         </tr>
+        @endif
+        @endforeach
+    </tbody>
+    </table>
+    <div class="row">
+         <div class="form-group col-lg-4">
+                <strong>已入库条目</strong>:
+            </div>
+            </div>
+    <table class="table table-bordered table-striped table-hover sortable">
+    <thead>
+        <tr>
+            <td>采购条目ID</td> 
+            <td>采购类型</td> 
+            <td>SKU</td> 
+            <td>样图</td>
+            <td>入库状态</td>
+            <td>已入库数量</td>
+            <td>物流单号+物流费</td>
+            <td>采购价格</td>
+            <td>采购价格审核</td>
+            <td>所属平台</td>
+            <td>购买链接</td>           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($purchaseItems as $k=>$purchaseItem)
+         @if($purchaseItem->storageStatus > 0)
+        <tr> 
+            <td>{{$purchaseItem->id}}</td>
+            <td>
+                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
+                    @if($purchaseItem->type == $key)
+                        {{$v}}
+                    @endif
+                @endforeach
+            </td>
+            <td>{{$purchaseItem->sku}}</td>
+            <td>
+            @if($purchaseItem->item->product->default_image>0) 
+            <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
+             @else
+             暂无图片
+             @endif
+            </td>
+            <td>
+           
+             @foreach(config('purchase.purchaseItem.storageStatus') as $key=>$v)
+             	@if($key < 2)
+            	 @if($purchaseItem->storageStatus == $key) {{$v}} @endif
+                @endif
+             @endforeach 
+             </td>
+            <td>{{$purchaseItem->storage_qty}}</td>
+            <td>
+            物流单号：{{$purchaseItem->post_coding}}
+            物流费：{{$purchaseItem->postage}}
+            </td>
+            <td>
+              {{$purchaseItem->purchase_cost}}
+ 			</td>
+            <td>
+            @if($purchaseItem->costExamineStatus ==2)
+            	价格审核通过
+            @elseif($purchaseItem->costExamineStatus ==1)
+            	价格审核不通过
+            @endif
+            </td>    
+            <td>
+                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
+                    @if($purchaseItem->platform_id == $key)
+                        {{$vo}}
+                    @endif
+                @endforeach
+            </td>
+             <td>
+            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
+            </td>  
+			
+        </tr>
+        @endif
         @endforeach
     </tbody>
     </table>

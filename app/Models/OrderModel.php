@@ -16,7 +16,7 @@ use App\Base\BaseModel;
 class OrderModel extends BaseModel
 {
     protected $table = 'orders';
-    
+
     protected $guarded = [];
 
 

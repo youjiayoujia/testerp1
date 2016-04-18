@@ -12,6 +12,7 @@ namespace App\Models;
 
 use Tool;
 use App\Base\BaseModel;
+use Illuminate\Support\Facades\DB;
 
 class OrderModel extends BaseModel
 {
@@ -202,6 +203,7 @@ class OrderModel extends BaseModel
     {
         $items = $this->setPackageItems();
         if ($items) {
+            DB::beginTransaction();
             foreach ($items as $warehouseId => $packageItems) {
                 $package = [];
                 //channel
@@ -226,10 +228,20 @@ class OrderModel extends BaseModel
                 $package = $this->packages()->create($package);
                 if ($package) {
                     foreach ($packageItems as $packageItem) {
-                        $package->items()->create($packageItem);
+                        $newPackageItem = $package->items()->create($packageItem);
+                        try {
+                            $newPackageItem->item->out(
+                                $packageItem['warehouse_position_id'],
+                                $packageItem['quantity'],
+                                'PACKAGE',
+                                $newPackageItem->id);
+                        } catch (Exception $e) {
+                            DB::rollBack();
+                        }
                     }
                 }
             }
+            DB::commit();
             return true;
         }
         return false;
@@ -238,7 +250,6 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
-     * todo:出库
      * todo:生成采购需求
      */
     public function setPackageItems()

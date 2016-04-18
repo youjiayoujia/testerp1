@@ -25,6 +25,11 @@ class ItemModel extends BaseModel
         'remark',
     ];
 
+    public function package()
+    {
+        return $this->belongsTo('App\Models\PackageModel', 'package_id');
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id');

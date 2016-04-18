@@ -226,7 +226,13 @@ class OrderModel extends BaseModel
                 $package = $this->packages()->create($package);
                 if ($package) {
                     foreach ($packageItems as $packageItem) {
-                        $package->items()->create($packageItem);
+                        $newPackageItem = $package->items()->create($packageItem);
+                        $newPackageItem->item->out(
+                            $packageItem['warehouse_position_id'],
+                            $packageItem['quantity'],
+                            'Package',
+                            $newPackageItem->id
+                        );
                     }
                 }
             }

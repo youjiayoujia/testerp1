@@ -209,6 +209,7 @@ class StockModel extends BaseModel
         $this->all_quantity -= $quantity;
         $this->available_quantity -= $quantity;
         $this->amount -= $quantity * $this->unit_cost;
+        var_dump($this->unit_cost);exit;
         if ($this->available_quantity < 0 || $this->amount < 0) {
             throw new Exception('出库时数量和金额有问题');
         }

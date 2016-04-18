@@ -7,6 +7,9 @@ storage/
 #database
 public/adminer.php
 
+#Uploads
+public/uploads
+
 #idea
 .idea/
 

@@ -83,6 +83,9 @@ class PurchaseItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+		if ($model->status >1) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '已对单不能修改数量.'));
+        }
         $data=request()->all();
         $this->validate(request(), $this->model->rules('update', $id));
 		$data['lack_num']=$data['purchase_num']-$model->arrival_num;

@@ -105,6 +105,7 @@ Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\Pu
 Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
+Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 
 //采购列表
@@ -125,6 +126,9 @@ Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseSt
 Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
 Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 //采购条目
+Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
+Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
+Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
 Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
 /**
  * stock controller route

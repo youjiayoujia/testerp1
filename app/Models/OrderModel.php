@@ -17,7 +17,9 @@ class OrderModel extends BaseModel
 {
     protected $table = 'orders';
 
-    protected $guarded = [];
+    protected $guarded = [
+        'items',
+    ];
 
 
     public $searchFields = [

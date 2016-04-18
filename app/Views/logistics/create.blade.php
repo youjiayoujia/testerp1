@@ -118,17 +118,6 @@
 @stop
 <script type='text/javascript'>
     $(document).ready(function () {
-        var logistics_supplier_id = $("#logistics_supplier_id").val();
-        $.ajax({
-            url : "{{ route('poolQuantity') }}",
-            data : { id : logistics_supplier_id },
-            dataType : 'json',
-            type : 'get',
-            success : function(result) {
-                $('#pool_quantity').val(result);
-            }
-        });
-
         //隐藏
         document.getElementById('pool_quantity').style.display='none';
     });

@@ -31,5 +31,10 @@ return [
         'create' => '新增',
         'edit' => '编辑',
     ],
+
+    //库位excel地址
+    'excelPath' => './uploads/excel/',
+
+    'stockExcelPath' => './uploads/stockExcel/',
 ];
 

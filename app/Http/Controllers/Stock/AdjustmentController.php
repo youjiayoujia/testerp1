@@ -11,6 +11,7 @@
 namespace App\Http\Controllers\Stock;
 
 use DB;
+use Exception;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
@@ -29,6 +30,7 @@ class AdjustmentController extends Controller
         $this->mainIndex = route('stockAdjustment.index');
         $this->mainTitle = '库存调整';
         $this->viewPath = 'stock.adjustment.';
+        $this->middleware('stockIOStatus');
     }
 
     /**
@@ -44,12 +46,26 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $adjustmentforms = $model->adjustments;
+        $access_quantity = [];
+        foreach($adjustmentforms as $key => $adjustmentform)
+        {
+            $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
+            if($stock) {
+                $access_quantity[] = $stock->available_quantity;
+            } else {
+                $access_quantity[] = 0;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'adjustments' => $model->adjustment,
-            'adjust' => $model,
+            'model' => $model,
+            'adjustments' => $model->adjustments,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+            'access_quantity' => $access_quantity,
         ];
-        
+
         return view($this->viewPath.'show', $response);
     }
 
@@ -64,7 +80,7 @@ class AdjustmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -94,6 +110,8 @@ class AdjustmentController extends Controller
             }
             $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['stock_adjustment_id'] = $obj->id;
+            $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             AdjustFormModel::create($buf);
         }
 
@@ -113,12 +131,24 @@ class AdjustmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $adjustmentforms = $model->adjustments;
+        $access_quantity = [];
+        foreach($adjustmentforms as $key => $adjustmentform)
+        {
+            $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
+            if($stock) {
+                $access_quantity[] = $stock->available_quantity;
+            } else {
+                $access_quantity[] = 0;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'adjustments' => $model->adjustment,
-            'warehouses' => WarehouseModel::all(),
-            'positions' =>PositionModel::where('warehouse_id', $model->warehouse_id)->get()->toArray(),
+            'adjustments' => $model->adjustments,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+            'access_quantity' => $access_quantity,
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -137,7 +167,7 @@ class AdjustmentController extends Controller
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
-        $obj = $this->model->find($id)->adjustment;
+        $obj = $this->model->find($id)->adjustments;
         $obj_len = count($obj);
         $this->model->find($id)->update($buf);
         for($i=0; $i<$len; $i++)
@@ -150,7 +180,9 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $id;
-            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->get()->first()->id;
+            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
+            $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {
@@ -171,7 +203,7 @@ class AdjustmentController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach($obj->adjustment as $val)
+        foreach($obj->adjustments as $val)
             $val->delete();
         $obj->delete($id);
 
@@ -192,31 +224,40 @@ class AdjustmentController extends Controller
             $warehouse = request()->input('warehouse');
             $response = [
                 'current' => $current,
-                'positions' => PositionModel::where('warehouse_id', $warehouse)->get(),
+                'positions' => PositionModel::where(['warehouse_id' => $warehouse, 'is_available' => '1'])->get(),
             ];
 
             return view($this->viewPath.'add', $response);
         }
     }
 
-    /**
-     * 处理ajax请求参数,审核
-     *
-     * @param none
-     * @return json|time
-     *
-     */
-    public function ajaxCheck()
+    public function check($id)
     {
-        if(request()->ajax()) {
-            $id = request()->input('id');
-            $time = date('Y-m-d',time());       
-            $obj = $this->model->find($id);
-            $obj->update(['status'=>'1', 'check_time'=>$time, 'check_by'=>'2']); 
-            echo json_encode([$time, $obj->checkByName->name]);
+        $model = $this->model->find($id);
+        if(!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'adjustments' => $model->adjustments,
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
+        ];
+
+        return view($this->viewPath.'check', $response);
+    }
+
+    public function checkResult($id)
+    {
+        $result = request('result');
+        $obj = $this->model->find($id);
+        if($result) {       
+            
+            $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']); 
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
-            $buf = $obj->adjustment->toArray();
+            $buf = $obj->adjustments->toArray();
             DB::beginTransaction();
             try {
                 for($i=0;$i<count($buf);$i++) {
@@ -234,6 +275,9 @@ class AdjustmentController extends Controller
                 DB::rollback();
             }
             DB::commit();
+        } else {
+            $obj->update(['status'=>'1', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']);
         }
+        return redirect($this->mainIndex);
     }
 }

@@ -9,10 +9,10 @@ class RequireModel extends BaseModel
 	protected $table = 'product_requires';
 
 	protected $fillable = [
-            'img1', 'img2', 'img3', 'img4', 'img5', 'img6', 
+            'img1', 'img2', 'img3', 'img4', 'img5', 'img6', 'color', 'material', 'technique', 'parts',
             'name', 'province', 'city', 'similar_sku', 'competition_url', 
             'remark', 'expected_date', 'needer_id', 'needer_shop_id', 
-            'created_by', 'status', 'user_id', 'handle_time'
+            'created_by', 'status', 'handle_id', 'handle_time', 'catalog_id'
             ];
 
     // 规则验证
@@ -70,7 +70,7 @@ class RequireModel extends BaseModel
      */
     public function userName()
     {
-        return $this->belongsTo('App\Models\UserModel', 'user_id', 'id');
+        return $this->belongsTo('App\Models\UserModel', 'handle_id', 'id');
     }
 
     /**
@@ -82,5 +82,16 @@ class RequireModel extends BaseModel
     public function neederName()
     {
         return $this->belongsTo('App\Models\UserModel', 'needer_id', 'id');
+    }
+
+    /**
+     * return the relationship  
+     *
+     * @return relation
+     *
+     */
+    public function catalogByName()
+    {
+        return $this->belongsTo('App\Models\CatalogModel', 'catalog_id', 'id');
     }
 }

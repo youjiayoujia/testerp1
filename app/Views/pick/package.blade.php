@@ -5,7 +5,7 @@
     <div class='row'>
         <div class='form-group col-lg-2'>
             <label>ID</label>
-            <input type='text' class='form-control' value={{ $model->picklist_id }}>
+            <input type='text' class='form-control' value={{ $model->picknum }}>
         </div>
         <div class='form-group col-lg-2'>
             <label>类型</label>
@@ -24,6 +24,41 @@
             <button type='button' class='btn btn-info search'>确认</button>
         </div>
     </div>
+    <div class='row'>
+        <div class='form-group col-lg-1'>
+            <label for='remark'>原面单重新打印:</label>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input type='text' class='form-control re_package_id' placeholder='package_id'>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input type='text' class='form-control re_trackno' placeholder='trackno'>
+        </div>
+        <div class='form-group'>
+            <button type='button' class='btn btn-info re_print'>重新打印</button>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='form-group col-lg-1'>
+            <label for='remark'>更新物流面单重新打印:</label>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input type='text' class='form-control change_package_id' placeholder='package_id'>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input type='text' class='form-control change_trackno' placeholder='trackno'>
+        </div>
+        <div class='form-group col-lg-2'>
+            <select class='form-control' name='new_logistic'>
+            @foreach($logistics as $logistic)
+                <option value="{{ $logistic->id }}">{{ $logistic->logistics_type }}</option>
+            @endforeach
+            </select>
+        </div>
+        <div class='form-group'>
+            <button type='button' class='btn btn-info change_print'>重新打印</button>
+        </div>
+    </div>
     <table class='table table-bordered table-condensed'>
         <thead>
             <td class='col-lg-2'>package ID</td>
@@ -40,7 +75,7 @@
                     @if($key == '0')
                     <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
                     @endif
-                    <td class='sku col-lg-6'>{{ $packageitem->items ? $packageitem->items->sku : '' }}</td>
+                    <td class='sku col-lg-6'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                     <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
                     <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
                     @if($key == '0')
@@ -81,7 +116,6 @@ $(document).ready(function(){
                                 block.find('.status').text('已包装');
                             }
                         }
-
                         package_id = block.find('.package_id').text();
                         sku = row.find('.sku').text();
                         $.ajax({
@@ -92,7 +126,6 @@ $(document).ready(function(){
                             success:function(result) {
                             }
                         });
-                    exit;
                     }
                 }
             });

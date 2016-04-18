@@ -5,13 +5,14 @@
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
+    <div class="row">
     <div class="form-group col-lg-4">
-        <label for="sku_id">sku_id:</label>
-        {{$abnormal->sku_id}}
+        <label for="sku_id">sku:</label>
+        {{$abnormal->sku}}
     </div>
     <div class="form-group col-lg-4">
         <label for="">产品默认图片:</label>
-        <img src="{{asset($abnormal->purchaseItem->product->image->src)}}" height="50px"/>
+        <img src="{{asset($abnormal->item->product->image->src)}}" height="50px"/>
     </div>
      <div class="form-group col-lg-4">
         <label >异常状态:</label>
@@ -19,23 +20,25 @@
                @if($abnormal->active == $key) {{$v}} @endif
         @endforeach    
     </div>
+    </div>
+    <div class="row">
     <div class="form-group col-lg-4">
         <label >处理状态:</label>
-        <select name="status"  >
+        <select name="active_status"  >
         @if($abnormal->active==1)
-        @foreach(config('purchase.productAbnormal.status.1') as $key => $v)
+        @foreach(config('purchase.purchaseItem.active_status.1') as $key => $v)
                <option value="{{$key}}" @if($abnormal->active_status==$key) selected @endif>{{$v}}</option>
         @endforeach
         @elseif($abnormal->active==2)
-        @foreach(config('purchase.productAbnormal.status.2') as $key => $v)
+        @foreach(config('purchase.purchaseItem.active_status.2') as $key => $v)
                <option value="{{$key}}" @if($abnormal->active_status==$key) selected @endif>{{$v}}</option>
         @endforeach
         @elseif($abnormal->active==3)
-        @foreach(config('purchase.productAbnormal.status.3') as $key => $v)
+        @foreach(config('purchase.purchaseItem.active_status.3') as $key => $v)
                <option value="{{$key}}" @if($abnormal->active_status==$key) selected @endif>{{$v}}</option>
         @endforeach
         @elseif($abnormal->active==4)
-        @foreach(config('purchase.productAbnormal.status.4') as $key => $v)
+        @foreach(config('purchase.purchaseItem.active_status.4') as $key => $v)
                <option value="{{$key}}" @if($abnormal->active_status==$key) selected @endif>{{$v}}</option>
         @endforeach
         @endif
@@ -68,6 +71,7 @@
         <input type="file" name='newImage' value=""/>
     </div>
     @endif
+    </div>
     <script type="text/javascript">
 	 $(document).ready(function(){
         $('#waiting_date').cxCalendar();

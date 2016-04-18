@@ -19,7 +19,12 @@ class CatalogModel extends BaseModel
     public $searchFields = ['name'];
 
     public $rules = [
-        'create' => ['name' => 'required|unique:catalogs,name'],
+        'create' => ['name' => 'required|unique:catalogs,name',
+                     'sets.0.name' => 'required',
+                     'sets.0.value.name.0.name' => 'required',
+                     'variations.0.name' => 'required',
+                     'variations.0.value.name.0.name' => 'required',
+                    ],
         'update' => ['name' => 'required|unique:catalogs,name,{id}']
     ];
 
@@ -181,6 +186,18 @@ class CatalogModel extends BaseModel
         $data['models'] = $modelSet;
         
         return $data;
+    }
+
+    /**
+     * 检查品类名是否已存在
+     * 2016-4-9 17:21:17 YJ
+     * @param string $catalog_name 品类名
+     * @return array
+     */
+    public function checkName($catalog_name)
+    {
+        $result = $this->where("name",$catalog_name)->get();
+        return count($result);
     }
 
 }

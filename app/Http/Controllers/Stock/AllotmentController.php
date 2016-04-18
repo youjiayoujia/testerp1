@@ -31,6 +31,7 @@ class AllotmentController extends Controller
         $this->mainIndex = route('stockAllotment.index');
         $this->mainTitle = '库存调拨';
         $this->viewPath = 'stock.allotment.';
+        $this->middleware('stockIOStatus');
     }
 
     /**
@@ -45,7 +46,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $this->model->find($id),
-            'allotments' =>$this->model->find($id)->allotmentform,
+            'allotments' =>$this->model->find($id)->allotmentforms,
             'stockins' => InModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
             'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
             'logisticses' => AllotmentLogisticsModel::where('allotment_id', $id)->get(),
@@ -65,7 +66,7 @@ class AllotmentController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where('is_available', '1')->get(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -82,7 +83,7 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.item_id')));
+        $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
@@ -94,9 +95,11 @@ class AllotmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['stock_allotment_id'] = $obj->id;
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
+            $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
+            $buf['item_id'] = ItemModel::where('sku', trim($buf['sku']))->first()->id;
             AllotmentFormModel::create($buf);
             $item = ItemModel::find($buf['item_id']);
-
             $item->hold($buf['warehouse_position_id'], $buf['quantity']);
         }
 
@@ -116,12 +119,12 @@ class AllotmentController extends Controller
         if(!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $allotment = $model->allotmentform;
+        $allotment = $model->allotmentforms;
         $arr = [];
         $available_quantity = [];
         foreach($allotment as $key => $value) 
         {
-            $obj = StockModel::where(['warehouse_id'=>$model->out_warehouse_id, 'item_id'=>$value->items->id])->get();
+            $obj = StockModel::where(['warehouse_position_id'=>$value->warehouse_position_id, 'item_id'=>$value->item_id])->get();
             $available_quantity[] =  $obj->first()->available_quantity;
             $buf = [];
             foreach($obj as $v)
@@ -133,7 +136,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $model,
-            'warehouses' => WarehouseModel::all(),
+            'warehouses' => WarehouseModel::where(['is_available'=>'1'])->get(),
             'skus' => StockModel::where(['warehouse_id'=>$model->out_warehouse_id])->distinct()->with('items')->get(['item_id']),
             'positions' => $arr,
             'allotmentforms' => $allotment, 
@@ -154,9 +157,9 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.item_id')));
+        $len = count(array_keys(request()->input('arr.sku')));
         $buf = request()->all();
-        $obj = $this->model->find($id)->allotmentform;
+        $obj = $this->model->find($id)->allotmentforms;
         $obj_len = count($obj);
         $this->model->find($id)->update($buf);
         $arr = request()->input('arr');
@@ -169,6 +172,9 @@ class AllotmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['stock_allotment_id'] = $id;
+            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
+            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>$buf['warehouse_position_id']])->first()->id;
+            $buf['amount'] = round($buf['unit_cost'] * $buf['quantity'], 3);
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {
@@ -189,7 +195,7 @@ class AllotmentController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach($obj->allotmentform as $val) {
+        foreach($obj->allotmentforms as $val) {
             $item = ItemModel::find($val->item_id);
             $item->unhold($val->warehouse_position_id, $val->quantity);
             $val->delete();
@@ -262,7 +268,7 @@ class AllotmentController extends Controller
             $model->update(['allotment_status'=>'out']);
             $model->relation_id = $model->id;
             $arr = $model->toArray();
-            $buf = $model->allotmentform->toArray();
+            $buf = $model->allotmentforms->toArray();
             for($i=0;$i<count($buf);$i++) {
                 $tmp = array_merge($arr, $buf[$i]);
                 $tmp['type'] = 'ALLOTMENT';
@@ -300,7 +306,7 @@ class AllotmentController extends Controller
     public function allotmentCheck($id)
     {   
         $model = $this->model->find($id);
-        $allotmentform = $model->allotmentform;
+        $allotmentform = $model->allotmentforms;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -367,15 +373,21 @@ class AllotmentController extends Controller
      * @return json
      *
      */
-    public function allotmentpick()
+    public function allotmentpick($id)
     {
-        if(request()->ajax()) {
-            $id = request()->input('id');
-            $this->model->find($id)->update(['allotment_status'=>'pick']);
-            return json_encode('11');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        
-        return json_encode('false');
+        $model->update(['allotment_status'=>'pick']);
+        $allotmentforms = AllotmentFormModel::where('stock_allotment_id', $id)->orderBy('warehouse_position_id')->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'allotmentforms' => $allotmentforms,
+        ];
+
+        return view($this->viewPath.'printAllotment', $response);
     }
 
     /**
@@ -392,9 +404,9 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'allotment' => $obj,
-            'allotmentforms' => $obj->allotmentform,
+            'allotmentforms' => $obj->allotmentforms,
             'warehouses' => WarehouseModel::all(),
-            'positions' => PositionModel::where(['warehouse_id'=>$obj->in_warehouse_id])->get(),
+            'positions' => PositionModel::where(['is_available'=>'1', 'warehouse_id'=>$obj->in_warehouse_id])->get(),
         ];
 
         return view($this->viewPath.'checkform', $response);
@@ -413,7 +425,7 @@ class AllotmentController extends Controller
 
         $arr = request()->all();
         $this->model->find($id)->update(['checkform_by'=>'3']);
-        $obj = $this->model->find($id)->allotmentform;
+        $obj = $this->model->find($id)->allotmentforms;
         DB::beginTransaction();
         try {
             $buf[] = $arr['arr']['new_receive_quantity'];

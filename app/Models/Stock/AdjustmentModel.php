@@ -39,7 +39,7 @@ class AdjustmentModel extends BaseModel
      *
      * @return
      */
-    public function adjustment()
+    public function adjustments()
     {
         return $this->hasMany('App\Models\Stock\AdjustFormModel', 'stock_adjustment_id', 'id');
     }
@@ -85,12 +85,12 @@ class AdjustmentModel extends BaseModel
             if($key == 'amount')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.amount.'.$k] ='required|numeric';
+                    $arr['arr.unit_cost.'.$k] ='required|numeric';
                 }
             if($key == 'warehouse_position_id')
                 foreach($val as $k => $v)
                 {
-                    $arr['arr.warehouse_position_id.'.$k] = 'required|integer';
+                    $arr['arr.warehouse_position_id.'.$k] = 'required';
                 }
         }
 

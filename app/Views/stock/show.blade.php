@@ -6,10 +6,10 @@
             <div class="col-lg-2">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>sku</strong>: {{ $model->items ? $model->items->sku : '' }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : ''}}
             </div>
             <div class="col-lg-2">
@@ -23,6 +23,9 @@
             </div>
             <div class="col-lg-2">
                 <strong>hold数量</strong>: {{ $model->hold_quantity }}
+            </div>
+            <div class="col-lg-2">
+                <strong>单价(￥)</strong>: {{ round($model->amount/$model->all_quantity, 2) }}
             </div>
             <div class="col-lg-2">
                 <strong>总金额(￥)</strong>: {{ $model->amount }}

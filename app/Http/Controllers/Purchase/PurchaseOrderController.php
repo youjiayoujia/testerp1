@@ -19,12 +19,9 @@ use App\Models\Product\SupplierModel;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder,WarehouseModel $warehouse,PurchaseItemModel $purchaseItem,SupplierModel $supplier )
+    public function __construct(PurchaseOrderModel $purchaseOrder)
     {
         $this->model = $purchaseOrder;
-		$this->warehouse = $warehouse;
-		$this->purchaseItem=$purchaseItem;
-		$this->supplier=$supplier;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
 		$this->viewPath = 'purchase.purchaseOrder.';
@@ -40,24 +37,10 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 	
-	/**
-     * 创建采购单页面
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
 	
-	public function create()
-	{	
-		$response = [
-			'metas' => $this->metas(__FUNCTION__),
-			'warehouse' => $this->warehouse->all(),
-        ];
-        return view($this->viewPath . 'create', $response);		
-	}
 	
  	/**
-     * 创建采购条目页面
+     * 采购页面
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -69,15 +52,18 @@ class PurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+		if ($model->examineStatus !=2) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'purchaseItems'=>$this->purchaseItem->where('purchase_order_id',$id)->get(),
+			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
         ];
         return view($this->viewPath . 'edit', $response);	
 	}
 	 
-	  /**
+	/**
      * 详情
      *
      * @param $id
@@ -92,92 +78,10 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'purchaseItems'=>$this->purchaseItem->where('purchase_order_id',$id)->get(),
+			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
         ];
         return view($this->viewPath . 'show', $response);
     }
-	
-	/**
-     * 创建采购条目
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function store()
-	{	
-		$data=request()->all();
-		$this->model->addPurchaseOrder($data);
-        return redirect($this->mainIndex);	
-	}
-	
-	/**
-     * ajax获得仓库对应采购需求的供应商
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function purchaseOrderSupplier()
-	{
-		$warehouse_id=json_decode(request()->get('warehouse_id'));
-		if($warehouse_id==''){
-            return 0;
-      	}else{
-		$data = $this->purchaseItem->all()->where('warehouse_id',$warehouse_id)->toArray();
-			foreach($data as $key=>$value){
-				$supplier_ids[$key]=$value['supplier_id'];
-			}
-		if(!isset($supplier_ids)){
-			return 0;
-		}else{
-			$warehouseSupplier_ids=array_unique($supplier_ids);
-			$i=0;
-			foreach($warehouseSupplier_ids as $key=>$v){
-				$res[$i]=$this->supplier->find($v)->toArray();
-				$i++;
-			}
-			$result['num']=count($res);
-			$result['res']=array_values($res);
-        return $result;	
-		}
-		}
-	}
-	
-	/**
-     * ajax获得仓库对应采购商的所有采购需求
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function checkProductItems()
-	{
-		$warehouse_id=json_decode(request()->get('warehouse_id'));
-		if($warehouse_id==''){
-            return 0;
-      	}else{
-		$data = $this->purchaseItem->all()->where('warehouse_id',$warehouse_id)->where('purchase_order_id','!>',0);
-        return view($this->viewPath . 'ajaxPurchaseItems',['data' => $data]);	
-		}
-	}
-
-	/**
-     * ajax获得仓库对应采购商的已选取的采购条目
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */	
-	public function checkedPurchaseItem()
-	{
-		$purchaseItemIds=explode(',',request()->get('purchaseItemIds'));
-		foreach($purchaseItemIds as $key=>$val){
-		$res[$key] = $this->purchaseItem->find($val);
-		}
-		$data=array_values($res);
-		return view($this->viewPath . 'ajaxCheckedPurchaseItems',['data' => $data]);
-	}
-	
 	
 	/**
      * 更新采购单
@@ -187,10 +91,46 @@ class PurchaseOrderController extends Controller
      */
 	
 	public function update($id)
-	{
-		$data=request()->all();
-		$this->model->purchaseItemUpdate($id,$data);
-        return redirect($this->mainIndex);		
+	{//echo date('Y-m-d h:i:s',time());exit;
+		$model=$this->model->find($id);
+		if ($model->examineStatus !=2) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
+        }
+		$data=request()->all();		
+		if(isset($data['arr'])){
+			foreach($data['arr'] as $k=>$v){
+				if($v['id']){
+					$purchaseItem=PurchaseItemModel::find($v['id']);
+					$itemPurchasePrice=$purchaseItem->item->product->purchase_price;
+					$purchase_num=$purchaseItem->purchase_num;
+					foreach($v as $key=>$vo){
+						$item[$key]=$vo;	
+					}
+					if($v['active']>0){
+						$item['active_status']=1;
+					}
+					if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
+						$item['costExamineStatus']=2;
+					}else{
+						$item['costExamineStatus']=0;	
+					}
+					if($item['status']>0){
+						$data['status']=1;
+					}
+					$item['start_buying_time']=date('Y-m-d h:i:s',time());
+					$purchaseItem->update($item);
+					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
+					unset($item);
+				}
+			}
+		}
+		$num=PurchaseItemModel::where('purchase_order_id',$id)->where('costExamineStatus','<>',2)->count();
+		if($num ==0){
+			$data['costExamineStatus']=2;
+			}
+		$data['start_buying_time']=date('Y-m-d h:i:s',time());	
+		$model->update($data);
+        return redirect( route('purchaseOrder.edit', $id));		
 	}
 	
 	/**
@@ -200,30 +140,61 @@ class PurchaseOrderController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function examinePurchaseOrder()
+	public function changeExamineStatus($id,$examineStatus)
 	{
-		$purchaseOrderIds=explode(',',request()->get('purchase_ids'));
-		$this->model->updatePurchaseOrderExamine($purchaseOrderIds);
-		return 1;
+		$model=$this->model->find($id);
+		if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+		$data['examineStatus']=$examineStatus;
+		$model->update($data);
+		if($examineStatus==1){
+			$this->model->cancelOrderItems($id);
+		}
+		return redirect($this->mainIndex);
 	}
 	
-	
-	
-	
-		
-	public function printOrder($id)
-	{		
-		echo 111;exit;
-	}
-	
+	/**
+     * 导出采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	public function excelOut($id)
 	{
 		$this->model->purchaseOrderExcelOut($id);	
 	}
-	public function cancelOrder($id){
-		$this->model->cancelOrderItems($id);
-		 return redirect($this->mainIndex);	
+	
+	/**
+     * 导出采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseOrdersOut()
+	{
+		 $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		return view($this->viewPath.'excelOut',$response);	
+	}
+
+	/**
+     * 批量审核采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function examinePurchaseOrder(){
+		$purchaseOrderIds=request()->get('purchase_ids');
+		$arrayIds=explode(',',$purchaseOrderIds);
+		$purchaseOrders=$this->model->find($arrayIds);
+			foreach($purchaseOrders as $vo){
+				$vo->update(['examineStatus'=>2]);
+				}
+		return 1;
 		}
+		
 }
 
 

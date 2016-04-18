@@ -68,7 +68,6 @@ class ProductModel extends BaseModel
         'package_size',
         'weight',
         'fabric',
-        'warehouse_id',
         'upload_user',
         'assigner',
         'default_image',
@@ -77,7 +76,11 @@ class ProductModel extends BaseModel
         'package_limit',
         'package_limit_1',
         'status',
+        'edit_status',
+        'examine_status',
         'remark',
+        'image_edit_not_pass_remark',
+        'data_edit_not_pass_remark',
         'spu_id',
         'second_supplier_id',
         'supplier_sku'
@@ -142,6 +145,16 @@ class ProductModel extends BaseModel
     public function b2cProduct()
     {
         return $this->hasOne('App\Models\Product\channel\b2cProductModel','product_id');
+    }
+
+    public function productEnglishValue()
+    {
+        return $this->hasOne('App\Models\Product\ProductEnglishValueModel','product_id');
+    }
+
+    public function imageAll()
+    {
+        return $this->hasMany('App\Models\Product\ImageModel', 'product_id');
     }
 
 
@@ -282,12 +295,18 @@ class ProductModel extends BaseModel
             $imageModel = new ImageModel();
             foreach ($files as $key => $file) {
                 if ($file != '') {
-                    $image_id = $imageModel->singleCreate($data, $file, $key);
-                    if ($key == 'image0') {
-                        $default_image_id = $image_id;
+                    if(substr($key,0,5)=='image'){
+                        $image_id = $imageModel->singleCreate($data, $file, $key);                       
+                    }else{
+                        $product_image_id = substr($key,14);
+                        $imageModel->destroy($product_image_id);
+                        $image_id = $imageModel->singleCreate($data, $file, $key);
+                        if($this->default_image==$product_image_id){
+                            $data['default_image'] = $image_id;
+                        }
                     }
+                    
                 }
-                $data['default_image'] = $default_image_id;
             }
             
             $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '':implode(',', $data['carriage_limit_arr']);
@@ -364,6 +383,64 @@ class ProductModel extends BaseModel
     public function updateEditProduct($model,$data)
     {
         $model->update($data);
+    }
+
+    /**
+     * 编辑渠道产品图片资料
+     * 2016-3-11 14:00:41 YJ
+     * @param array $data ,$files 图片
+     */
+    public function updateProductImage($data,$files = null)
+    {   
+        DB::beginTransaction();
+        $imageModel = new ImageModel();
+        foreach ($files as $key => $file) {
+            if ($file != '') {
+                if(substr($key,0,5)=='image'){
+                    $image_id = $imageModel->singleCreate($data, $file, $key);                       
+                }else{
+                    $type_array=explode('_',$key);
+                    $type = $type_array[0];
+                    switch ($type) {
+                        case 'ebay':
+                            $data['type'] = 'ebay';
+                            break;
+
+                        case 'amazon':
+                            $data['type'] = 'amazon';
+                            break;
+
+                        case 'aliexpress':
+                            $data['type'] = 'aliexpress';
+                            break;
+
+                        case 'original':
+                            $data['type'] = 'original';
+                            break;
+                    }
+                    $product_image_id = $type_array[2];
+                    $imageModel->destroy($product_image_id);
+                    $image_id = $imageModel->singleCreate($data, $file, $key);
+                }
+                
+            }
+        }
+
+        $data['edit_status'] = $data['edit_status'];
+        $this->update($data);
+        
+        DB::commit();
+    }
+
+    /**
+     * 渠道产品审核
+     * 2016-3-11 14:00:41 YJ
+     * @param int $status 审核状态
+     */
+    public function examineProduct($status)
+    {   
+        $data['edit_status'] = $status;
+        $this->update($data);
     }
 
 }

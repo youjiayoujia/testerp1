@@ -1,9 +1,10 @@
 @extends('common.table')
+@section('tableTitle') {{ $metas['title'] }} <font color="red">（操作说明：勾选产品，点击选中，下拉选择一个shop即可）</font> @stop{{-- 列表标题 --}}
 @section('tableToolButtons')
 
-<div class="btn-group" role="group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        选中shop
+<div class="btn-group" role="group" style="float:left">
+    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        选中
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
@@ -49,7 +50,7 @@
             <td>{{ $product->model }}</td>
             <td>{{ $product->catalog->name }}</td>
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
-            <td><?php if($product->status==0)echo "New";if($product->status==1)echo "Picked";if($product->status==2)echo "Cancel"; ?></td>
+            <td><?php if($product->edit_status=="")echo "New";if($product->edit_status=="picked")echo "Picked";if($product->edit_status=="canceled")echo "Cancel"; ?></td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->fabric }}</td>
@@ -67,7 +68,7 @@
                 </a> 
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
-                   data-url="{{ route('product.destroy', ['id' => $product->id]) }}">
+                   data-url="{{ route('SelectProduct.destroy', ['id' => $product->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>
@@ -78,7 +79,7 @@
     <script type="text/javascript">    
         //批量审核
         $('.choseShop').click(function () {
-            if (confirm($(this).data('name')+"确认审核?")) {
+            if (confirm($(this).data('name')+"确认选中?")) {
                 var url = "{{route('beChosed')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var product_ids = "";

@@ -9,11 +9,20 @@
             <div class="col-lg-2">
                 <strong>名称</strong>: {{ $model->name }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>省</strong>: {{ $model->province }}
             </div>
-            <div class="col-lg-1">
+            <div class="col-lg-2">
                 <strong>市</strong>: {{ $model->city }}
+            </div>
+            <div class="col-lg-2">
+                <strong>详细地址</strong>: {{ $model->address }}
+            </div>
+            <div class="col-lg-2">
+                <strong>联系人</strong>: {{ $model->contactByName ? $model->contactByName->name : '' }}
+            </div>
+            <div class="col-lg-2">
+                <strong>联系电话</strong>: {{ $model->telephone }}
             </div>
             <div class="col-lg-2">
                 <strong>类型</strong>: {{ $model->type == 'local' ? '本地仓库' : ($model->type == 'oversea' ? '海外仓库' : '第三方仓库') }}

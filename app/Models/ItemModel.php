@@ -40,6 +40,7 @@ class ItemModel extends BaseModel
         'package_size',
         'carriage_limit',
         'package_limit',
+        'warehouse_id',
         'status',
         'remark'
     ];
@@ -52,6 +53,11 @@ class ItemModel extends BaseModel
     public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+
+    public function purchase()
+    {
+        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku','sku');
     }
 
     public function updateItem($data)
@@ -104,7 +110,7 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function in($warehousePosistionId, $quantity, $amount, $type, $relation_id, $remark = '')
+    public function in($warehousePosistionId, $quantity, $amount, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if($quantity)
@@ -153,7 +159,7 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '1', $remark = '')
+    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if($quantity)

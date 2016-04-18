@@ -14,7 +14,7 @@ class CreatePicklists extends Migration
     {
         Schema::create('picklists', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('picklist_id')->comment('拣货单号')->default(NULL);
+            $table->string('picknum')->comment('拣货单号')->default(NULL);
             $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI'])->comment('拣货单类型')->default('SINGLE');
             $table->enum('status', ['NONE', 'PICKING', 'PICKED', 'INBOXING', 'INBOXED', 'PACKAGEING', 'PACKAGED'])->comment('拣货单状态')->default('NONE');
             $table->integer('logistic_id')->comment('物流号')->default(0);

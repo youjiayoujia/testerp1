@@ -16,7 +16,7 @@ class CatalogController extends Controller
     {
         $this->model = $catalog;
         $this->mainIndex = route('catalog.index');
-        $this->mainTitle = '分类';
+        $this->mainTitle = '品类Category';
         $this->viewPath = 'catalog.';
     }
 
@@ -75,5 +75,17 @@ class CatalogController extends Controller
         $catalogModel = $this->model->find($id);
         $catalogModel->destoryCatalog();
         return redirect(route('catalog.index'));
+    }
+
+    /**
+     * 检查分类名是否存在
+     * 2015-12-18 14:47:08 YJ
+     * @param  int $id
+     * @return Illuminate\Http\RedirectResponse Object
+     */
+    public function checkName()
+    {
+        $catalog_name = request()->input('catalog_name');
+        return $this->model->checkName($catalog_name);
     }
 }

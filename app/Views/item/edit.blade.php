@@ -40,10 +40,10 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-md-3">
+        <!--<div class="form-group col-md-3">
             <label for="size">供应商信息</label>
             <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $model->supplier_info }}">
-        </div>
+        </div>-->
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -87,6 +87,30 @@
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="form-group col-md-1">
+            <label for="color">库存</label>
+            <?php 
+                $inventory = 0;
+                $amount = 0;
+                foreach($model->stocks as $stock){
+                    $inventory += $stock->all_quantity;
+                    $amount += $stock->amount;
+                } 
+            ?>
+            <input disabled="disabled" class="form-control" id="inventory" placeholder="库存" name='inventory' value="{{ old('inventory') ?  old('inventory') : $inventory }}">
+        </div>
+
+        <div class="form-group col-md-1">
+            <label for="size">库存总金额</label>
+            <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') : $amount }}">
+        </div>
+
+    </div>
+
+
     <div class="row">
         <div class="form-group col-md-3">
             <label for="color">物流限制</label>
@@ -104,7 +128,16 @@
                 </label>
             @endforeach
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-3">
+            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select  class="form-control" name="warehouse_id">
+                <option value="0"></option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ $model->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
         </div>

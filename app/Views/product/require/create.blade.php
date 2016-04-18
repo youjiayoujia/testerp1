@@ -6,6 +6,11 @@
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
     <div class='row'>
+        <div class="form-group col-lg-4">
+            <label for="img" class='control-label'>参考图片:</label>
+        </div>
+    </div>
+    <div class='row'>
         <div class='form-group col-lg-2'>
             <input id="img1" name='img1' class="file" type="file">
         </div>
@@ -26,17 +31,43 @@
         </div>    
     </div>
     <div class='row'>
-        <div class="form-group col-lg-4">
-            <label for="name" class='control-label'>需求名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="name" placeholder="选款需求名" name='name' value="{{ old('name') }}">
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>产品名</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="name" placeholder="产品名" name='name' value="{{ old('name') }}">
         </div>
-        <div class="form-group col-lg-4">
-            <label for='province'>省份</label> 
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>品类</label>
+            <select name='catalog_id' class='form-control'>
+                @foreach($catalogs as $catalog)
+                    <option value="{{ $catalog->id }}" {{ old('catalog_id') ? (old('catalog_id') == $catalog->id ? 'selected' : '') : '' }}>{{ $catalog->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for='province'>货源地(省)</label> 
             <select name="province" onChange = "select()" class='form-control'></select>　
         </div>
-        <div class=' form-group col-lg-4'> 
-            <label for='city'>城市</label> 
+        <div class=' form-group col-lg-3'> 
+            <label for='city'>货源地(市)</label> 
             <select name="city" onChange = "select()" class='form-control'></select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-lg-3">
+            <label for="color" class='control-label'>颜色</label>
+            <input type='text' class="form-control" placeholder="颜色" name='color' value="{{ old('color') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="material" class='control-label'>材料</label>
+            <input type='text' class="form-control" placeholder="材料" name='material' value="{{ old('material') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="technique" class='control-label'>工艺</label>
+            <input type='text' class="form-control" id="technique" placeholder="工艺" name='technique' value="{{ old('technique') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="parts" class='control-label'>配件</label>
+            <input type='text' class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') }}">
         </div>
     </div>
     <div class='row'>
@@ -49,8 +80,8 @@
             <input type='text' class="form-control" id="competition_url" placeholder="竞争产品url" name='competition_url' value="{{ old('competition_url') }}">
         </div>
          <div class="form-group col-lg-3">
-            <label for="remark" class='control-label'>需求备注</label>
-            <input type='text' class="form-control" id="remark" placeholder="需求备注" name='remark' value="{{ old('remark') }}">
+            <label for="remark" class='control-label'>需求描述</label>
+            <input type='text' class="form-control" id="remark" placeholder="需求描述" name='remark' value="{{ old('remark') }}">
         </div>
         <div class='form-group col-lg-3'>
             <label for="expected_date">期望上传日期</label>
@@ -59,12 +90,12 @@
     </div>
     <div class='row'>
         <div class="form-group col-lg-4">
-            <label for="needer_id">需求人</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="needer_id" placeholder="需求者id" name='needer_id' value="{{ old('needer_id') }}">
+            <label for="needer_id">需求渠道</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="needer_id" placeholder="需求渠道" name='needer_id' value="{{ old('needer_id') }}">
         </div>
         <div class="form-group col-lg-4">
-            <label for="needer_shop_id">需求店铺</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="needer_shop_id" placeholder="需求店铺id" name='needer_shop_id' value="{{ old('needer_shop_id') }}">
+            <label for="needer_shop_id">需求帐号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="needer_shop_id" placeholder="需求帐号" name='needer_shop_id' value="{{ old('needer_shop_id') }}">
         </div>
         <div class="form-group col-lg-4">
             <label for="created_by">创建人</label>

@@ -40,7 +40,7 @@
                 <div class='row'>
                     <div class='form-group col-sm-1'>
                         <label for='sku' class='control-label'>sku</label>
-                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[item_id][{{$key}}]' value='{{ $allotmentform->items->sku }}' readonly>
+                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[item_id][{{$key}}]' value='{{ $allotmentform->item->sku }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='quantity' class='control-label'>实发数量</label>

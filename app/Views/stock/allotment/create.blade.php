@@ -1,6 +1,5 @@
 @extends('common.form')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
 @section('formAction') {{ route('stockAllotment.store') }} @stop
 @section('formBody')
     <div class='row'>
@@ -35,11 +34,9 @@
         <label for="remark" class='control-label'>备注</label>
         <textarea name='remark' class='form-control'>{{ old('remark') }}</textarea>
     </div>
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            列表
-        </div>
-        <div class='panel-body'>
+    <div class="panel panel-info">
+        <div class="panel-heading">列表</div>
+        <div class="panel-body add_row">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku">sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -54,17 +51,15 @@
                     <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="amount" class='control-label'>总金额(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <label for="amount" class='control-label'>单价(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
             </div>
             <div class='row'>
                 <div class="form-group col-sm-2">
-                    <select name='arr[item_id][0]' id='arr[sku][0]' class='form-control sku'>
-                    </select>
+                    <input type='text' class="form-control sku" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
-                <div class="form-group col-sm-2">
-                    <select name='arr[warehouse_position_id][0]' id='arr[warehouse_position_id][0]' class='form-control warehouse_position_id'>
-                    </select>
+                <div class="form-group col-sm-2 position_html">
+                    <input type='text' class="form-control warehouse_position_id" placeholder="库位" name='arr[warehouse_position_id][0]' value="{{ old('arr[warehouse_position_id][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control access_quantity" placeholder="可用数量" name='arr[access_quantity][0]' value="{{ old('arr[access_quantity][0]') }}" readonly>
@@ -73,22 +68,20 @@
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control amount" id="arr[amount][0]" placeholder="总金额" name='arr[amount][0]' value="{{ old('arr[amount][0]') }}" readonly>
+                    <input type='text' class="form-control unit_cost" id="arr[unit_cost][0]" placeholder="单价" name='arr[unit_cost][0]' value="{{ old('arr[unit_cost][0]') }}" readonly>
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
-            <div class='row addpanel'>
-                <a href='javascript:' class='btn btn-primary col-sm-12' id='create_form'>
-                    <span class='glyphicon glyphicon-plus'>新增</span>
-                </a>
-            </div>
         </div>
-    </div>  
+        <div class="panel-footer create_form">
+            <div class="create"><i class="glyphicon glyphicon-plus"></i></div>
+        </div>
+    </div> 
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){
         current = 1;
-        $(document).on('click', '#create_form', function(){
+        $(document).on('click', '.create_form', function(){
             warehouse = $('#out_warehouse_id').val();
             $.ajax({
                 url:"{{ route('allotment.add') }}",
@@ -96,7 +89,7 @@
                 dataType:'html',
                 type:'get',
                 success:function(result) {
-                    $('.addpanel').before(result);
+                    $('.add_row').children('div:last').after(result);
                     current++;
                 }
             })
@@ -106,116 +99,114 @@
             $(this).parent().remove();
         });
 
+        $(document).on('change', '#out_warehouse_id, #in_warehouse_id', function(){
+            out_warehouse = $('#out_warehouse_id').val();
+            in_warehouse = $('#in_warehouse_id').val();
+            if(out_warehouse && in_warehouse && out_warehouse == in_warehouse)
+            {
+                alert('调入调出仓库不能相同');
+            }
+        });
+
         $(document).on('change', '#out_warehouse_id', function(){
-            warehouse = $('#out_warehouse_id').val();
-            obj = $(this).parent();
-            position = $('.warehouse_position_id');
-            quantity = $('.quantity');
-            amount = $('.amount');
-            sku = $('.sku');
-            $.ajax({
-                url: "{{ route('stock.allotOutWarehouse') }}",
-                data: {warehouse:warehouse},
-                dataType:'json',
-                type:'get',
-                success:function(result){
-                    sku.empty();
-                    position.empty();
-                    quantity.val('');
-                    amount.val('');
-                    if(result != 'none') {
-                        str = '';
-                        str1 = '';
-                        for(var i=0;i<result[2].length;i++) 
-                        {
-                            str += '<option value='+result[2][i]['id']+'>'+result[2][i]['name']+'</option>';
-                        }
-                        for(var i=0;i<result[0].length;i++)
-                        {
-                            str1 += '<option value='+result[0][i]['items']['id']+'>'+result[0][i]['items']['sku']+'</option>';
-                        }
-                        if(result[1]) {
-                            $('.access_quantity').val(result[1]['available_quantity']); 
+            $('.sku').val('');
+            $('.warehouse_position_id').val('');
+            $('.access_quantity').val('');
+            $('.quantity').val('');
+            $('.unit_cost').val('');
+        });
+
+        $(document).on('blur', '.warehouse_position_id,.sku', function(){
+            block = $(this).parent().parent();
+            sku = block.find('.sku').val();
+            position = block.find('.warehouse_position_id').val();
+            if(sku && position) {
+                $.ajax({
+                    url:"{{ route('stock.allotPosition' )}}",
+                    data: {position:position, sku:sku},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result) {
+                        if(result != 'none') {
+                            block.find('.access_quantity').val(result[0]['available_quantity']);
+                            if(block.find('.quantity').val() && block.find('.quantity').val() > result[0]['available_quantity']) 
+                            {
+                                alert('数量超过了可用数量');
+                                block.find('.quantity').val('');
+                            }
                         } else {
-                            $('.access_quantity').val('');
-                            sku.empty();
+                            block.find('.access_quantity').val('');
+                            block.find('.quantity').val('');
                         }
-                        $(str).appendTo(position);
-                        $(str1).appendTo(sku);
                     }
-                }
-            });
+                });
+            }
         });
 
         $(document).on('change', '.warehouse_position_id', function(){
-            obj = $(this).parent().parent();
+            block = $(this).parent().parent();
+            tmp = $(this);
             warehouse = $('#out_warehouse_id').val();
             position = $(this).val();
-            sku = obj.find('.sku').val();
-            $.ajax({
-                url:"{{ route('stock.allotPosition' )}}",
-                data: {position:position, item_id:sku},
-                dataType:'json',
-                type:'get',
-                success:function(result) {
-                    if(result != 'none') {
-                        obj.find('.access_quantity').val(result[0]['available_quantity']);
-                        if(obj.find('.quantity').val() && obj.find('.quantity').val() > result[0]['available_quantity']) 
-                        {
-                            alert('数量超过了可用数量');
-                            obj.find('.quantity').val('');
-                            obj.find('.amount').val('');
-                        }
-                    } else {
-                        obj.find('.access_quantity').val('');
-                        obj.find('.item_id').val('');
-                        obj.find('.quantity').val('');
-                        obj.find('.amount').val('');
-                    }
-                }
-            });
-        });
-
-        $(document).on('change', '.sku', function(){
-            obj = $(this).parent().parent();
-            warehouse = $('#out_warehouse_id').val();
-            position = obj.find('.warehouse_position_id');
-            sku = $(this).val();
-            $.ajax({
-                url:"{{ route('stock.allotSku' )}}",
-                data: {warehouse:warehouse, item_id:sku},
-                dataType:'json',
-                type:'get',
-                success:function(result) {
-                    if(result != 'none') {
-                        str = '';
-                        position.empty();
-                        obj.find('.access_quantity').val(result[0]['available_quantity']);
-                        for(var i=0;i<result[1].length;i++) 
-                        {
-                            str +="<option value="+result[1][i]['id']+">"+result[1][i]['name']+"</option>";
-                        }
-                        if(obj.find('.quantity').val() && parseInt(obj.find('.quantity').val()) > parseInt(obj.find('.access_quantity').val()))
-                        {
-                            alert('超出库存数量');
-                            obj.find('.quantity').val('');
-                            obj.find('.amount').val('');
-                            $(str).appendTo(position);
+            sku = block.find('.sku').val();
+            if(position) {
+                $.ajax({
+                    url:"{{ route('stock.ajaxPosition') }}",
+                    data:{position:position, sku:sku},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result) {
+                        if(result == 'false') {
+                            alert('sku或库存不存在');
+                            tmp.val('');
+                            block.find('.access_quantity').val('');
+                            block.find('.quantity').val('');
                             return;
                         }
-                        if(obj.find('.quantity').val() && parseInt(obj.find('.quantity').val()) < parseInt(obj.find('.access_quantity').val()))
-                        {
-                            obj.find('.amount').val((result[2]*parseInt(obj.find('.quantity').val())).toFixed('3'));
-                        }
-                        $(str).appendTo(position);
-                    } else {
-                        alert('sku对应没有库存');
-                        position.empty();
-                        obj.find('access_quantity').val('');
-                        obj.find('.amount').val('');
+                        block.find('.access_quantity').val(result);
                     }
-                }
-            });
+                })
+            }
+        });
+
+        $(document).on('blur', '.sku', function(){
+            tmp = $(this);
+            block = $(this).parent().parent();
+            warehouse = $('#out_warehouse_id').val();
+            position = block.find('.warehouse_position_id');
+            position_name = position.prop('name');
+            sku = $(this).val();
+            if(sku) {
+                $.ajax({
+                    url:"{{ route('stock.allotSku' )}}",
+                    data: {warehouse:warehouse, sku:sku},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result) {
+                        if(result == 'none') {
+                            alert('sku有误或对应没有库存');
+                            tmp.val('');
+                            return;
+                        }
+                        if(result != false) {
+                            str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
+                            str += "</select>";
+                            block.find('.position_html').html(str);
+                            block.find('.access_quantity').val('');
+                            block.find('.unit_cost').val('');
+                            str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
+                            for(i=0; i<result[0].length; i++)
+                            {
+                                str += "<option value='"+result[0][i]['position']['name']+"'>"+result[0][i]['position']['name']+"</option>";
+                            }
+                            str += "</select>";
+                            block.find('.position_html').html(str);
+                            block.find('.access_quantity').val(result[0][0]['available_quantity']);
+                            block.find('.unit_cost').val(result[1]);
+                        }
+                    }
+                });
+            }
         });
 
         $(document).on('blur', '.quantity', function(){
@@ -227,29 +218,12 @@
                     return;
                 }
                 obj = $(this).parent().parent();
-                warehouse =  $('#out_warehouse_id').val();
-                position = obj.find('.warehouse_position_id').val();
-                sku = obj.find('.sku').val();
                 if($(this).val() > parseInt(obj.find('.access_quantity').val())) {
                     alert('超出可用数量');
                     $(this).val('');
-                    obj.find('.amount').val('');
                     return;
                 }
-                $.ajax({
-                    url:"{{ route('stock.allotSku') }}",
-                    data:{warehouse:warehouse, item_id:sku},
-                    dataType:'json',
-                    'type':'get',
-                    success:function(result){
-                        if(result != 'none') {
-                            obj.find('.amount').val((result[2]*obj.find('.quantity').val()).toFixed('3'));
-                        }
-                    }
-                });
             }
         });
-
-        $('#allotment_time').cxCalendar();
     });
 </script>

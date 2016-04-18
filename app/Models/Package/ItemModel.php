@@ -17,6 +17,7 @@ class ItemModel extends BaseModel
 
     protected $fillable = [
         'item_id',
+        'warehouse_position_id',
         'package_id',
         'order_item_id',
         'quantity',
@@ -26,6 +27,11 @@ class ItemModel extends BaseModel
 
     public function item()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
+        return $this->belongsTo('App\Models\ItemModel', 'item_id');
+    }
+
+    public function warehousePosition()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id');
     }
 }

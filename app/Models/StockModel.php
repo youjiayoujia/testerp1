@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use DB;
-use Maatwebsite\Excel\Facades\Excel; 
+use Maatwebsite\Excel\Facades\Excel;
 use Exception;
 use App\Base\BaseModel;
 use App\Models\Stock\InModel;
@@ -110,6 +110,7 @@ class StockModel extends BaseModel
     {
         return $this->hasOne('App\Models\Stock\TakingFormModel', 'stock_id', 'id');
     }
+
     /**
      * add additional attribute according to sku ,get the goods unit cost
      *
@@ -119,15 +120,8 @@ class StockModel extends BaseModel
      */
     public function getUnitCostAttribute()
     {
-        $obj = $this->where('item_id', $this->item_id)->get()->toArray();
-        $money = '';
-        $amount = '';
-        for ($i = 0; $i < count($obj); $i++) {
-            $money += $obj[$i]['amount'];
-            $amount += $obj[$i]['all_quantity'];
-        }
-
-        return round($money / $amount, 3);
+        $stocks = $this->where('item_id', $this->item_id)->get();
+        return round($stocks->sum('amount') / $stocks->sum('all_quantity'), 3);
     }
 
     /**
@@ -206,17 +200,17 @@ class StockModel extends BaseModel
      */
     public function out($quantity, $type, $relation_id, $remark)
     {
+        $price = $this->unit_cost;
         $this->all_quantity -= $quantity;
         $this->available_quantity -= $quantity;
-        $this->amount -= $quantity * $this->unit_cost;
-        var_dump($this->unit_cost);exit;
+        $this->amount -= $quantity * $price;
         if ($this->available_quantity < 0 || $this->amount < 0) {
             throw new Exception('出库时数量和金额有问题');
         }
         $this->save();
         $this->stockOut()->create([
             'quantity' => $quantity,
-            'amount' => $quantity * $this->unit_cost,
+            'amount' => $quantity * $price,
             'type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
@@ -226,15 +220,15 @@ class StockModel extends BaseModel
     /**
      * 整体流程处理excel
      *
-     * @param $file 文件指针 
+     * @param $file 文件指针
      *
      */
     public function excelProcess($file)
     {
         $path = config('setting.stockExcelPath');
-        !file_exists($path.'stockExcelProcess.csv') or unlink($path.'stockExcelProcess.csv');
+        !file_exists($path . 'stockExcelProcess.csv') or unlink($path . 'stockExcelProcess.csv');
         $file->move($path, 'stockExcelProcess.csv');
-        return $this->excelDataProcess($path.'stockExcelProcess.csv');
+        return $this->excelDataProcess($path . 'stockExcelProcess.csv');
     }
 
     /**
@@ -247,36 +241,39 @@ class StockModel extends BaseModel
     {
         $fd = fopen($path, 'r');
         $arr = [];
-        while(!feof($fd))
-        {
+        while (!feof($fd)) {
             $row = fgetcsv($fd);
             $arr[] = $row;
         }
         fclose($fd);
-        if(!$arr[count($arr)-1]) {
-            unset($arr[count($arr)-1]);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
         }
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
-        foreach($arr as $key=> $stock)
-        {
-            $stock['position'] = iconv('gb2312','utf-8',$stock['position']);
-            if(!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
+        foreach ($arr as $key => $stock) {
+            $stock['position'] = iconv('gb2312', 'utf-8', $stock['position']);
+            if (!PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->count()) {
                 $error[] = $key;
                 continue;
             }
-            $stock['sku']=iconv('gb2312','utf-8',$stock['sku']);
+            $stock['sku'] = iconv('gb2312', 'utf-8', $stock['sku']);
             $tmp_position = PositionModel::where(['name' => trim($stock['position']), 'is_available' => '1'])->first();
-            if(!ItemModel::where(['sku' => $stock['sku']])->count()) {
+            if (!ItemModel::where(['sku' => $stock['sku']])->count()) {
                 $error[] = $key;
                 continue;
             }
             $tmp_item = ItemModel::where(['sku' => trim($stock['sku'])])->first();
-            if(StockModel::where(['item_id' => $tmp_item->id, 'warehouse_position_id' => $tmp_position->id])->count()) {
+            if (StockModel::where([
+                'item_id' => $tmp_item->id,
+                'warehouse_position_id' => $tmp_position->id
+            ])->count()
+            ) {
                 $error[] = $key;
                 continue;
             }
-            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost'], 'MAKE_ACCOUNT');
+            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost'],
+                'MAKE_ACCOUNT');
         }
 
         return $error;
@@ -285,15 +282,13 @@ class StockModel extends BaseModel
     public function transfer_arr($arr)
     {
         $buf = [];
-        foreach($arr as $key => $value)
-        {
+        foreach ($arr as $key => $value) {
             $tmp = [];
-            if($key != 0) {
-                foreach($value as $k => $v)
-                {
+            if ($key != 0) {
+                foreach ($value as $k => $v) {
                     $tmp[$arr[0][$k]] = $v;
                 }
-            $buf[] = $tmp;
+                $buf[] = $tmp;
             }
         }
 

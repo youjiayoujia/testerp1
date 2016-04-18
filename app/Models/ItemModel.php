@@ -32,7 +32,7 @@ class ItemModel extends BaseModel
 
     public function purchase()
     {
-        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku','sku');
+        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku', 'sku');
     }
 
     public function updateItem($data)
@@ -96,6 +96,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->in($quantity, $amount, $type, $relation_id, $remark);
         }
+        return false;
     }
 
     /**
@@ -112,6 +113,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->hold($quantity);
         }
+        return false;
     }
 
     /**
@@ -128,6 +130,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->unhold($quantity);
         }
+        return false;
     }
 
     /**
@@ -148,6 +151,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
+        return false;
     }
 
     //分配库存

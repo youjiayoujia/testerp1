@@ -4,6 +4,9 @@ vendor/
 #Storage
 storage/
 
+#database
+public/adminer.php
+
 #idea
 .idea/
 

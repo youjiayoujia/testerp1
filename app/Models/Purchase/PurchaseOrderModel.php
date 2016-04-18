@@ -96,38 +96,40 @@ class PurchaseOrderModel extends BaseModel
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function purchaseOrdersExcelIn($id)
+	public function excelOrdersOut($purchaseOrderIds)
 	{
-		$name='采购单'.$id;
-		$purchaseItemModel= new PurchaseItemModel;
-		$res=$purchaseItemModel->where('purchase_order_id',$id)->get();
-		$rows ='';
+		$name='采购单';
+		$rows='';
+		foreach($purchaseOrderIds as $k=>$v){
+		$res=PurchaseItemModel::where('purchase_order_id',$v->purchase_order_id)->get();
 		foreach($res as $key=>$vo){
 			$supplier_province=$vo->supplier->province;
 			$supplier_city=$vo->supplier->city;
 			$supplier_address=$vo->supplier->address;
-			$rows[$key]['id']=$vo->id;
-			$rows[$key]['sku_id']=$vo->purchaseItem->sku;
-			$rows[$key]['采购单ID']=$vo->order_id;
-			$rows[$key]['产品名']=$vo->purchaseItem->product->c_name;
-			$rows[$key]['供应商SKU']=$vo->purchaseItem->supplier_id;
-			$rows[$key]['采购单审核状态']=config('purchase.purchaseOrder.examineStatus.'.$vo->purchaseOrder->examineStatus);
-			$rows[$key]['采购需求']=config('purchase.purchaseOrder.status.'.$vo->status);
-			$rows[$key]['采购数量']=$vo->purchase_num;
-			$rows[$key]['到货数量']=$vo->arrival_num;
-			$rows[$key]['仍需采购数量']=$vo->lack_num;
-			$rows[$key]['供应商链接']='http://'.$vo->supplier->url;
-			$rows[$key]['供应商商名']=$vo->supplier->name;
-			$rows[$key]['供应商电话']=$vo->supplier->telephone;
-			$rows[$key]['供应商地址']=$supplier_province.$supplier_city.$supplier_address;
-			$rows[$key]['审核单价']=$vo->cost;
+			$rows[$k][$key]['id']=$vo->id;
+			$rows[$k][$key]['sku']=$vo->item->sku;
+			$rows[$k][$key]['采购单ID']=$vo->order_item_id;
+			$rows[$k][$key]['产品名']=$vo->item->product->c_name;
+			$rows[$k][$key]['供应商SKU']=$vo->item->supplier_id;
+			//$rows[$k][$key]['采购单审核状态']=config('purchase.purchaseOrder.examineStatus.'.$vo->purchaseOrder->examineStatus);
+			$rows[$k][$key]['采购需求']=config('purchase.purchaseOrder.status.'.$vo->status);
+			$rows[$k][$key]['采购数量']=$vo->purchase_num;
+			$rows[$k][$key]['到货数量']=$vo->arrival_num;
+			$rows[$k][$key]['仍需采购数量']=$vo->lack_num;
+			$rows[$k][$key]['供应商链接']='http://'.$vo->supplier->url;
+			$rows[$k][$key]['供应商商名']=$vo->supplier->name;
+			$rows[$k][$key]['供应商电话']=$vo->supplier->telephone;
+			$rows[$k][$key]['供应商地址']=$supplier_province.$supplier_city.$supplier_address;
+			$rows[$k][$key]['审核单价']=$vo->cost;
 		
 		}
+		}
 		Excel::create($name, function($excel) use ($rows) {
-			$nameSheet='采购单';
-			$excel->sheet($nameSheet, function($sheet) use ($rows) {
-				$sheet->fromArray($rows);
+			foreach($rows as $k=>$row){
+			$excel->sheet('采购单'.$k, function($sheet) use ($row) {
+				$sheet->fromArray($row);
 			});
+			}
 		})->download('xls');	
 		}
 }

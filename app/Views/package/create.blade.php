@@ -6,6 +6,10 @@
             <label for="ordernum" class='control-label'>订单号</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') }}" onblur="return getOrder($(this));">
+            <small class="text-danger" style="display:none;" id="errorMsg">
+                <i class="glyphicon glyphicon-exclamation-sign"></i>
+                订单不存在
+            </small>
         </div>
     </div>
     <div class="row">
@@ -16,6 +20,7 @@
 @section('pageJs')
     <script type="text/javascript">
         function getOrder(obj) {
+            $('#errorMsg').hide();
             $.post(
                     '{{ route("package.ajaxGetOrder") }}',
                     {ordernum: obj.val()},
@@ -24,7 +29,7 @@
                             $('#itemDiv').html(response);
                             $('#ordernum').attr('disabled', 'disabled');
                         } else {
-                            alert("Can't find this order.");
+                            $('#errorMsg').show();
                         }
                     }, 'html'
             );

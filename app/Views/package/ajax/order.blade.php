@@ -21,7 +21,7 @@
         @foreach($order->items as $item)
             <div class='row'>
                 <div class="form-group col-lg-4">
-                    <input type="hidden" name="items[{{ $item->id }}][id]" value="{{ $item->id }}"/>
+                    <input type="hidden" name="items[{{ $item->id }}][order_item_id]" value="{{ $item->id }}"/>
                     {{ $item->sku }}
                 </div>
                 <div class="form-group col-lg-1">

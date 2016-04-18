@@ -23,14 +23,29 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+//        $order = OrderModel::find(1);
+//        for ($i = 0; $i < 2000; $i++) {
+//            $order->createPackage();
+//        }
+        return view($this->viewPath . 'create', $response);
+    }
+
     public function store()
     {
         request()->flash();
         $order = OrderModel::find(request()->input('order_id'));
         if ($order) {
             $this->validate(request(), $this->model->rules('create'));
-            $order->createPackage(request()->input('items'));
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
+            if ($order->createPackage()) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
+            } else {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足'));
+            }
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
         }
@@ -54,8 +69,8 @@ class PackageController extends Controller
     {
         $id = request()->input('id');
         $package = $this->model->find($id);
-        foreach($package->items as $packageItem)
-        {
+
+        foreach ($package->items as $packageItem) {
             $item = ItemModel::find($packageItem->item_id);
             $item->unhold($packageItem->warehouse_position_id, $packageItem->picked_quantity);
             $item->out($packageItem->warehouse_position_id, $packageItem->picked_quantity);
@@ -77,7 +92,7 @@ class PackageController extends Controller
             'logistics' => LogisticsModel::all(),
         ];
 
-        return view($this->viewPath.'fee', $response);
+        return view($this->viewPath . 'fee', $response);
     }
 
     public function feeStore()
@@ -89,7 +104,11 @@ class PackageController extends Controller
         $model->logistic_id = request()->input('logistic_id');
         $model->status = 'SHIPPED';
         $model->save();
-        $model->manualLogistics()->create(['logistic_code'=>request()->input('logistic_code'), 'fee'=>request()->input('fee'), 'remark'=>request()->input('remark')]);
+        $model->manualLogistics()->create([
+            'logistic_code' => request()->input('logistic_code'),
+            'fee' => request()->input('fee'),
+            'remark' => request()->input('remark')
+        ]);
 
         return redirect($this->mainIndex);
     }

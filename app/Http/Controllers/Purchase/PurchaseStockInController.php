@@ -27,7 +27,7 @@ class PurchaseStockInController extends Controller
     {
         $this->model = $purchaseStockIn;
         $this->mainIndex = route('purchaseStockIn.index');
-        $this->mainTitle = '采购对单';
+        $this->mainTitle = '采购入库';
 		$this->viewPath = 'purchase.purchaseStockIn.';
     }
     

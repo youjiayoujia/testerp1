@@ -103,10 +103,12 @@ class Tool
         return false;
     }
 
-    public function show($value)
+    public function show($value, $type = true)
     {
         echo "<pre>";
         var_dump($value);
-        exit;
+        if ($type == true) {
+            exit;
+        }
     }
 }

@@ -15,6 +15,7 @@ class CreatePackageItems extends Migration
         Schema::create('package_items', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('item_id')->comment('货品ID');
+            $table->integer('warehouse_position_id')->comment('库位ID');
             $table->integer('package_id')->comment('包裹ID');
             $table->integer('order_item_id')->comment('订单产品ID');
             $table->integer('quantity')->comment('数量');

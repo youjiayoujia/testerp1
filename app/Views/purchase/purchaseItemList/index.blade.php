@@ -101,6 +101,11 @@
                 <a href="{{ route('purchaseItemList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                @if($purchaseList->status == 1)
+                 <a href="/purchaseItemList/itemReductionUpdate/{{$purchaseList->id}}" class="btn btn-danger btn-xs">
+                     还原该采购条目
+                </a>
+                @endif
             </td>
             
         </tr>

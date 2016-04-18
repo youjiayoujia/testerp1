@@ -125,6 +125,7 @@ Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 //采购条目
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
 Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
+Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
 Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
 /**
  * stock controller route

@@ -103,12 +103,35 @@ class PurchaseItemListController extends Controller
 		$updateIds=explode('#',$data['purchaseItemIds']);
 		$items=$this->model->find($updateIds);
 		foreach($items as $key=>$item){
-			if($item->status < 2){
-				$item->update(['status'=>0,]);
+			if($item->status == 1){
+				$item->update(['status'=>0]);
 			}
+			$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
+			if($orderItemNum ==0){
+				PurchaseOrderModel::where('id',$item->purchase_order_id)->update(['status'=>0]);	
+				}
 		}
 		return redirect($this->mainIndex);
 	}
+	
+	/**
+     * 单个还原采购需求
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function itemReductionUpdate($id){	 
+		$item=$this->model->find($id);
+			if($item->status == 1){
+				$item->update(['status'=>0]);
+			}
+			$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
+			if($orderItemNum ==0){
+				PurchaseOrderModel::where('id',$item->purchase_order_id)->update(['status'=>0]);	
+				}
+		return redirect($this->mainIndex);
+	}
+	
 }
 
 

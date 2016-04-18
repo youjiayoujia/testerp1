@@ -13,6 +13,8 @@ namespace App\Http\Controllers\Logistics;
 use App\Http\Controllers\Controller;
 use App\Models\Logistics\RuleModel;
 use App\Models\CountryModel;
+use App\Models\OrderModel;
+use App\Models\PackageModel;
 
 class RuleController extends Controller
 {
@@ -57,6 +59,24 @@ class RuleController extends Controller
             'selectedCountries' => $selectedCountries,
         ];
         return view($this->viewPath . 'edit', $response);
+    }
+
+    /**
+     * 物流规则
+     * @param $packageId
+     */
+    public function logisticsRule($packageId)
+    {
+        $packages = PackageModel::where(['id' => $packageId])->get();
+        foreach($packages as $package) {
+            $weight = $package['weight'];
+            $orderId = $package['order_id'];
+            $orders = OrderModel::where(['id' => $orderId])->get();
+            foreach($orders as $order) {
+                $amount = $order['amount'];
+                RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->get();
+            }
+        }
     }
 
 }

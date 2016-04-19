@@ -35,6 +35,7 @@ class ItemModel extends BaseModel
         'purchase_url',
         'purchase_price',
         'purchase_carriage',
+        'cost',
         'product_size',
         'package_size',
         'carriage_limit',
@@ -70,6 +71,16 @@ class ItemModel extends BaseModel
     public function stocks()
     {
         return $this->hasMany('App\Models\StockModel', 'item_id');
+    }
+
+    public function getAllQuantityAttribute()
+    {
+        $quantity = 0;
+        foreach($this->stocks as $stock){
+            $quantity += $stock->all_quantity;
+        }
+        
+        return $quantity;
     }
 
     public function getImageAttribute()

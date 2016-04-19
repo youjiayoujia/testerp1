@@ -194,7 +194,21 @@ class PurchaseOrderController extends Controller
 				}
 		return 1;
 		}
-		
+	/**
+     * 批量审核采购单
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function excelOrderOut($num){
+		if($num==0){
+			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->distinct('purchase_order_id')->get();
+		}else{
+			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->where('start_buying_time','<',date('Y-m-d',(time()-3600*24*$num)))->distinct('purchase_order_id')->get();
+		}
+		$this->model->excelOrdersOut($purchaseOrderIds);
+			
+	}
 }
 
 

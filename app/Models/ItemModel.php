@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Models\Product\SupplierModel;
+use Tool;
 use App\Base\BaseModel;
 use App\Models\Warehouse\PositionModel;
 use Exception;
@@ -32,8 +32,7 @@ class ItemModel extends BaseModel
         'supplier_sku',
         'second_supplier_id',
         'supplier_info',
-        'purchase_url'
-        ,
+        'purchase_url',
         'purchase_price',
         'purchase_carriage',
         'product_size',
@@ -57,7 +56,7 @@ class ItemModel extends BaseModel
 
     public function purchase()
     {
-        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku','sku');
+        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku', 'sku');
     }
 
     public function updateItem($data)
@@ -71,6 +70,11 @@ class ItemModel extends BaseModel
     public function stocks()
     {
         return $this->hasMany('App\Models\StockModel', 'item_id');
+    }
+
+    public function getImageAttribute()
+    {
+        return $this->product->image->path . $this->product->image->name;
     }
 
     /**
@@ -113,8 +117,10 @@ class ItemModel extends BaseModel
     public function in($warehousePosistionId, $quantity, $amount, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+        }
+        return false;
     }
 
     /**
@@ -128,8 +134,10 @@ class ItemModel extends BaseModel
     public function hold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->hold($quantity);
+        }
+        return false;
     }
 
     /**
@@ -143,8 +151,10 @@ class ItemModel extends BaseModel
     public function unhold($warehousePosistionId, $quantity)
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->unhold($quantity);
+        }
+        return false;
     }
 
     /**
@@ -162,41 +172,96 @@ class ItemModel extends BaseModel
     public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
-        if($quantity)
+        if ($quantity) {
             return $stock->out($quantity, $type, $relation_id, $remark);
+        }
+        return false;
     }
 
-    /**
-     * 通过item_id和quantity自动分配库位 
-     *
-     * @param $item_id $quantity
-     * @return array
-     *
-     */
-    public function allocateStock($quantity) 
+    //分配库存
+    public function assignStock($quantity)
     {
-        $stocks = $this->stocks()->get();
-        foreach($stocks as $stock)
-        {
-            if($stock->available_quantity > $quantity) {
-                return [[$stock->warehouse_position_id, $quantity, $stock->id]];
-            }
-        }
-        $arr = [];
-        foreach($stocks as $stock)
-        {
-            if($stock->available_quantity < $quantity) {
-                $quantity -= $stock->available_quantity;
-                $arr[] = [$stock->warehouse_position_id, $stock->available_quantity, $stock->id];
+        $stocks = $this->stocks->sortByDesc('available_quantity');
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            $warehouseStocks = $stocks->groupBy('warehouse_id');
+            //默认仓库
+            $defaultStocks = $warehouseStocks->get($this->warehouse_id);
+            if ($defaultStocks->sum('available_quantity') >= $quantity) {
+                $gotStocks = $defaultStocks;
             } else {
-                $arr[] = [$stock->warehouse_position_id, $quantity, $stock->id];
-                $quantity -= $quantity;
+                //其它仓库
+                $otherStocks = $warehouseStocks
+                    ->first(function ($key, $value) use ($quantity) {
+                        return $value->sum('available_quantity') >= $quantity ? $value : false;
+                    });
+                $gotStocks = $otherStocks ? $otherStocks : $stocks;
             }
+            $result = [];
+            foreach ($gotStocks as $stock) {
+                if ($stock->available_quantity < $quantity) {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                    $quantity -= $stock->available_quantity;
+                } else {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    break;
+                }
+            }
+            return $result;
         }
-        if($arr) {
-            return $arr;
-        } else {
-            return 'false';
+        return false;
+    }
+
+    //匹配库存
+    public function matchStock($quantity)
+    {
+        $result = [];
+        $stocks = $this->stocks->sortByDesc('available_quantity');
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            //单仓库
+            foreach ($stocks->groupBy('warehouse_id') as $warehouseID => $warehouseStocks) {
+                if ($warehouseStocks->sum('available_quantity') >= $quantity) {
+                    $warehouseStock = [];
+                    $matchQuantity = $quantity;
+                    foreach ($warehouseStocks as $stock) {
+                        if ($stock->available_quantity < $matchQuantity) {
+                            $warehouseStock[$stock->id] = $this->setStockData($stock);
+                            $matchQuantity -= $stock->available_quantity;
+                        } else {
+                            $warehouseStock[$stock->id] = $this->setStockData($stock, $matchQuantity);;
+                            break;
+                        }
+                    }
+                    $result['SINGLE'][$warehouseID] = $warehouseStock;
+                    continue;
+                }
+            }
+            //多仓库
+            if (!$result) {
+                $warehouseStock = [];
+                foreach ($stocks as $stock) {
+                    if ($stock->available_quantity < $quantity) {
+                        $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                        $quantity -= $stock->available_quantity;
+                    } else {
+                        $warehouseStock[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                        break;
+                    }
+                }
+                $result['MULTI'] = $warehouseStock;
+            }
+            return $result;
         }
+        return false;
+    }
+
+    public function setStockData($stock, $quantity = null)
+    {
+        $quantity = $quantity ? $quantity : $stock->available_quantity;
+        $stockData['item_id'] = $this->id;
+        $stockData['warehouse_id'] = $stock->warehouse_id;
+        $stockData['warehouse_position_id'] = $stock->warehouse_position_id;
+        $stockData['quantity'] = $quantity;
+        $stockData['weight'] = $this->weight * $quantity;
+        return $stockData;
     }
 }

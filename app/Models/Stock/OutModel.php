@@ -24,11 +24,11 @@ class OutModel extends BaseModel
 
     // 用于查询
     public $searchFields = ['quantity'];
-    
+
     /**
      *  get the relationship between the two module
      *
-     *  @return connection
+     * @return connection
      */
     public function warehouse()
     {
@@ -36,25 +36,36 @@ class OutModel extends BaseModel
     }
 
     /**
-     * accessor get the relation name 
+     * accessor get the relation name
      *
      * @return name
      *
      */
     public function getRelationNameAttribute()
     {
-        if($this->type == 'ADJUSTMENT')
-            return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
-        if($this->type == 'ALLOTMENT')
-            return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
-        if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
-            return $this->stockTaking ? $this->stockTaking->taking_id : '';
+        switch ($this->type) {
+            case 'ADJUSTMENT':
+                return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
+                break;
+            case 'ALLOTMENT':
+                return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
+                break;
+            case 'INVENTORY_PROFIT':
+                return $this->stockTaking ? $this->stockTaking->taking_id : '';
+                break;
+            case 'SHORTAGE':
+                return $this->stockTaking ? $this->stockTaking->taking_id : '';
+                break;
+            case 'PACKAGE':
+                return $this->packageItem ? $this->packageItem->package->order->ordernum . ' : ' . $this->packageItem->package->id : '';
+                break;
+        }
     }
 
     /**
-     *  get the relationship between the two module 
+     *  get the relationship between the two module
      *
-     *  @return connection
+     * @return connection
      */
     public function position()
     {
@@ -62,9 +73,9 @@ class OutModel extends BaseModel
     }
 
     /**
-     * return the relationship between the two module 
+     * return the relationship between the two module
      *
-     *  @return
+     * @return
      *
      */
     public function stock()
@@ -73,9 +84,9 @@ class OutModel extends BaseModel
     }
 
     /**
-     *  get the relation between the two Model 
+     *  get the relation between the two Model
      *
-     *  @return none
+     * @return none
      *
      */
     public function stockAdjustment()
@@ -85,8 +96,8 @@ class OutModel extends BaseModel
 
     /**
      * get the relation between the two Model
-     * 
-     *  @return relation
+     *
+     * @return relation
      *
      */
     public function stockAllotment()
@@ -96,26 +107,32 @@ class OutModel extends BaseModel
 
     /**
      * get the relation between the two Model
-     * 
-     *  @return relation
+     *
+     * @return relation
      *
      */
     public function stockTaking()
     {
         return $this->belongsTo('App\Models\Stock\TakingModel', 'relation_id', 'id');
     }
-    
+
+    public function packageItem()
+    {
+        return $this->belongsTo('App\Models\Package\ItemModel', 'relation_id', 'id');
+    }
+
     /**
      *  make accessor!
      *  get the name by key in config.
      *
-     *  @return name(by type)
-     *  
+     * @return name(by type)
+     *
      */
     public function getTypeNameAttribute()
     {
         $buf = config('out');
-        if(array_key_exists($this->type, $buf))
+        if (array_key_exists($this->type, $buf)) {
             return $buf[$this->type];
+        }
     }
 }

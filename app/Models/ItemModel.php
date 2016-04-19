@@ -35,6 +35,7 @@ class ItemModel extends BaseModel
         'purchase_url',
         'purchase_price',
         'purchase_carriage',
+        'cost',
         'product_size',
         'package_size',
         'carriage_limit',

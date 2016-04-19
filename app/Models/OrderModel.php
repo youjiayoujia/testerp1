@@ -253,6 +253,7 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
+     * todo:订单产品状态判断
      */
     public function setPackageItems()
     {

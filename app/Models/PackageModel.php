@@ -13,7 +13,7 @@ class PackageModel extends BaseModel
     public $searchFields = ['email'];
 
     public $rules = [
-        'create' => ['order_id' => 'required'],
+        'create' => ['ordernum' => 'required'],
         'update' => [],
     ];
 

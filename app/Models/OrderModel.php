@@ -193,6 +193,7 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return bool
+     * todo:生成采购需求
      * todo:更新订单状态
      * todo:判断订单是否要生成包裹
      * todo:订单优先级
@@ -243,6 +244,8 @@ class OrderModel extends BaseModel
             }
             DB::commit();
             return true;
+        } else { //生成采购需求
+
         }
         return false;
     }
@@ -250,7 +253,6 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
-     * todo:生成采购需求
      */
     public function setPackageItems()
     {

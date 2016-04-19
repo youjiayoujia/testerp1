@@ -38,7 +38,8 @@ class PackageController extends Controller
     public function store()
     {
         request()->flash();
-        $order = OrderModel::find(request()->input('order_id'));
+//        $order = OrderModel::find(request()->input('order_id'));
+        $order = OrderModel::where('ordernum', '=', request()->input('ordernum'))->first();
         if ($order) {
             $this->validate(request(), $this->model->rules('create'));
             if ($order->createPackage()) {
@@ -114,9 +115,9 @@ class PackageController extends Controller
     }
 
     /**
-     * 跳转发货页面 
+     * 跳转发货页面
      *
-     * @param none 
+     * @param none
      * @return view
      *
      */
@@ -127,13 +128,13 @@ class PackageController extends Controller
             'logistics' => LogisticsModel::all(),
         ];
 
-        return view($this->viewPath.'shipping', $response);
+        return view($this->viewPath . 'shipping', $response);
     }
 
     /**
      * 执行发货
      *
-     * @param none 
+     * @param none
      * @return json
      *
      */
@@ -142,10 +143,10 @@ class PackageController extends Controller
         $track_no = request()->input('trackno');
         $logistic_id = request()->input('logistic_id');
         $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
-        if(!$package) {
+        if (!$package) {
             return json_encode(false);
         }
-        if($package->logistic_id != $logistic_id) {
+        if ($package->logistic_id != $logistic_id) {
             return json_encode('logistic_error');
         }
         $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time())]);
@@ -158,7 +159,7 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
         ];
 
-        return view($this->viewPath.'statistics', $response);
+        return view($this->viewPath . 'statistics', $response);
     }
 
     public function exportData()

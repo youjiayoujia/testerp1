@@ -260,7 +260,14 @@ return [
                     'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
                 ],
-            ]
+            ],
+            '供应链' => [
+                [
+                    'name' => '供货商',
+                    'url' => 'productSupplier.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //渠道导航

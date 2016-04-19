@@ -181,9 +181,8 @@ class OrderModel extends BaseModel
     public function createOrder($data)
     {
         $order = $this->create($data);
-
         foreach ($data['items'] as $item) {
-//            $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+            $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
             $order->items()->create($item);
         }
 

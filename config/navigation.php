@@ -302,6 +302,22 @@ return [
         'name' => '客户',
         'icon' => 'user',
         'url' => 'dashboard.index',
+        'type' => 'group',
+        'subnavigations' => [
+            '用户' => [
+                [
+                    'name' => '用户列表',
+                    'url' => 'channel.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '添加用户',
+                    'url' => 'channelAccount.index',
+                    'icon' => '',
+                ],
+            ]
+        ],
+
     ],
 ];
 

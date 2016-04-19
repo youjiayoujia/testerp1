@@ -65,6 +65,28 @@ return [
                     'icon' => '',
                 ],
             ],
+			 '通关报关' => [
+                [
+                    'name' => 'home',
+                    'url' => 'customsClearance.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '三宝产品',
+                    'url' => 'product.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '三宝package',
+                    'url' => 'SelectProduct.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '中邮运单号列表',
+                    'url' => 'EditProduct.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //订单导航

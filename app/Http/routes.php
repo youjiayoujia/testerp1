@@ -56,7 +56,8 @@ Route::resource('productSupplier', 'Product\SupplierController');
 Route::get('productRequire/ajaxQuantityProcess', ['uses'=>'Product\RequireController@ajaxQuantityProcess', 'as'=>'productRequire.ajaxQuantityProcess']);
 Route::get('productRequire/ajaxProcess', ['uses'=>'Product\RequireController@ajaxProcess', 'as'=>'productRequire.ajaxProcess']);
 Route::resource('productRequire', 'Product\RequireController');
-
+//通关报关
+Route::resource('customsClearance', 'CustomsClearance\CustomsClearanceController');
 //仓库
 Route::resource('warehouse', 'WarehouseController');
 
@@ -129,7 +130,7 @@ Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
 Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
 Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
-Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController'); 
 /**
  * stock controller route
  */

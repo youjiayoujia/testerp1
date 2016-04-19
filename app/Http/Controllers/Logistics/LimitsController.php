@@ -13,7 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Logistics\LimitsModel;
 
 
-class CodeController extends Controller
+class LimitsController extends Controller
 {
     public function __construct(LimitsModel $limits)
     {

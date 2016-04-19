@@ -14,7 +14,7 @@ use App\Base\BaseModel;
 
 class LimitsModel extends BaseModel
 {
-    protected $table = 'logistics_codes';
+    protected $table = 'logistics_limits';
 
     protected $fillable = [
         'name'

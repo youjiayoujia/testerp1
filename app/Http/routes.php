@@ -22,7 +22,7 @@ Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
 //包装限制
-Route::resource('logisticsLimits', 'Logistics\LimitsController');
+Route::resource('wrapLimits', 'WrapLimitsController');
 
 
 Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as'=>'checkName']);

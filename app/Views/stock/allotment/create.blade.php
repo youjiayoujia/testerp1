@@ -202,7 +202,7 @@
                             str += "</select>";
                             block.find('.position_html').html(str);
                             block.find('.access_quantity').val(result[0][0]['available_quantity']);
-                            block.find('.unit_cost').val(result[1]);
+                            block.find('.unit_cost').val(result[2]);
                         }
                     }
                 });

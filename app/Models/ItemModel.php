@@ -18,7 +18,31 @@ class ItemModel extends BaseModel
         'update' => []
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'product_id',
+        'sku',
+        'weight',
+        'inventory',
+        'name',
+        'c_name',
+        'alias_name',
+        'alias_cname',
+        'catalog_id',
+        'supplier_id',
+        'supplier_sku',
+        'second_supplier_id',
+        'supplier_info',
+        'purchase_url',
+        'purchase_price',
+        'purchase_carriage',
+        'product_size',
+        'package_size',
+        'carriage_limit',
+        'package_limit',
+        'warehouse_id',
+        'status',
+        'remark'
+    ];
 
     public function product()
     {

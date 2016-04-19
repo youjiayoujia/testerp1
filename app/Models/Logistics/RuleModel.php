@@ -16,7 +16,7 @@ class RuleModel extends BaseModel
 {
     protected $table = 'logistics_rules';
 
-    public $searchFields = ['country', 'weight_from', 'weight_to', 'order_amount', 'is_clearance', 'priority'];
+    public $searchFields = ['country', 'weight_from', 'weight_to', 'order_amount', 'is_clearance', 'priority', 'type_id'];
 
     protected $fillable = [
         'country',
@@ -25,6 +25,7 @@ class RuleModel extends BaseModel
         'order_amount',
         'is_clearance',
         'priority',
+        'type_id',
     ];
 
     public $rules = [
@@ -35,6 +36,7 @@ class RuleModel extends BaseModel
             'order_amount' => 'required',
             'is_clearance' => 'required',
             'priority' => 'required',
+            'type_id' => 'required',
         ],
         'update' => [
             'country' => 'required',
@@ -43,7 +45,13 @@ class RuleModel extends BaseModel
             'order_amount' => 'required',
             'is_clearance' => 'required',
             'priority' => 'required',
+            'type_id' => 'required',
         ],
     ];
+
+    public function logistics()
+    {
+        return $this->belongsTo('App\Models\LogisticsModel', 'type_id', 'id');
+    }
 
 }

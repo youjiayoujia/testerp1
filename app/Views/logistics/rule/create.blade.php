@@ -5,6 +5,17 @@
 @section('formBody')
     <div class="row">
         <div class="form-group col-lg-2">
+            <label for="type_id">物流方式</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name="type_id" class="form-control" id="type_id">
+                @foreach($logisticses as $logistics)
+                    <option value="{{$logistics->id}}" {{ Tool::isSelected('type_id', $logistics->id) }}>
+                        {{$logistics->type}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-2">
             <label for="priority" class="control-label">优先级</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="priority" placeholder="优先级" name='priority' value="{{ old('priority') }}">

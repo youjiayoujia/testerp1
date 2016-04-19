@@ -6,6 +6,17 @@
     <input type="hidden" name="_method" value="PUT"/>
     <div class="row">
         <div class="form-group col-lg-2">
+            <label for="type_id">仓库</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name="type_id" class="form-control" id="type_id">
+                @foreach($logisticses as $logisticse)
+                    <option value="{{$logisticse->id}}" {{$logisticse->id == $model->type_id ? 'selected' : ''}}>
+                        {{$logisticse->type}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-2">
             <label for="priority" class="control-label">优先级</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="priority" placeholder="优先级" name='priority' value="{{ old('priority') ? old('priority') : $model->priority }}">

@@ -14,6 +14,7 @@ class CreateLogisticsRules extends Migration
     {
         Schema::create('logistics_rules', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('type_id')->comment('物流方式');
             $table->integer('priority')->comment('优先级');
             $table->string('country')->comment('国家');
             $table->double('weight_from', 15, 2)->comment('重量从');

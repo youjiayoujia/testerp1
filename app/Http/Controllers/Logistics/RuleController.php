@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Logistics;
 use App\Http\Controllers\Controller;
 use App\Models\Logistics\RuleModel;
 use App\Models\CountryModel;
+use App\Models\LogisticsModel;
 use App\Models\OrderModel;
 use App\Models\PackageModel;
 
@@ -34,6 +35,7 @@ class RuleController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
+            'logisticses' => LogisticsModel::all(),
             'countries' => countryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
         ];
         return view($this->viewPath . 'create', $response);
@@ -55,6 +57,7 @@ class RuleController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'logisticses' => LogisticsModel::all(),
             'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
             'selectedCountries' => $selectedCountries,
         ];

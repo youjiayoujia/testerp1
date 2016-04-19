@@ -7,6 +7,9 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
+                <strong>物流方式</strong>: {{ $model->logistics->type }}
+            </div>
+            <div class="col-lg-2">
                 <strong>优先级</strong>: {{ $model->priority }}
             </div>
             <div class="col-lg-2">

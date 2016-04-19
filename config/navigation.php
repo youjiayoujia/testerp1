@@ -72,21 +72,12 @@ return [
         'name' => '订单',
         'icon' => 'list-alt',
         'url' => '',
-        'type' => 'group',
+        'type' => '',
         'subnavigations' => [
-            '订单' => [
-                [
-                    'name' => '订单',
-                    'url' => 'order.index',
-                    'icon' => '',
-                ],
-            ],
-            '包裹' => [
-                [
-                    'name' => '包裹',
-                    'url' => 'package.index',
-                    'icon' => '',
-                ],
+            [
+                'name' => '订单',
+                'url' => 'order.index',
+                'icon' => '',
             ],
         ],
     ],
@@ -97,7 +88,24 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
-            '仓库' => [
+            '发货' => [
+                [
+                    'name' => '包裹',
+                    'url' => 'package.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货',
+                    'url' => 'pickList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货单异常',
+                    'url' => 'errorList.index',
+                    'icon' => '',
+                ],
+            ],
+            '仓储' => [
                 [
                     'name' => '仓库',
                     'url' => 'warehouse.index',
@@ -146,39 +154,6 @@ return [
             ],
         ],
     ],
-    //拣货导航
-    [
-        'name' => '拣货',
-        'icon' => 'home',
-        'url' => '',
-        'type' => '',
-        'subnavigations' => [
-            [
-                'name' => '拣货',
-                'url' => 'pickList.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '拣货单异常',
-                'url' => 'errorList.index',
-                'icon' => '',
-            ],
-        ],
-    ],
-    //拣货导航
-    [
-        'name' => '汇率',
-        'icon' => 'home',
-        'url' => '',
-        'type' => '',
-        'subnavigations' => [
-            [
-                'name' => '汇率',
-                'url' => 'currency.index',
-                'icon' => '',
-            ],
-        ],
-    ],
     //物流导航
     [
         'name' => '物流',
@@ -217,20 +192,13 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
-            '供应链' => [
-                    [
-                        'name' => '供货商',
-                        'url' => 'productSupplier.index',
-                        'icon' => '',
-                    ],
-                ],
             '采购管理' => [
                 [
                     'name' => '采购需求',
                     'url' => 'purchaseItem.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '采购条目',
                     'url' => 'purchaseItemList.index',
                     'icon' => '',
@@ -245,17 +213,17 @@ return [
                     'url' => 'purchaseList.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '采购入库',
                     'url' => 'purchaseStockIn.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '异常采购条目',
                     'url' => 'purchaseAbnormal.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '异常采购单',
                     'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
@@ -302,6 +270,30 @@ return [
         'name' => '客户',
         'icon' => 'user',
         'url' => 'dashboard.index',
+    ],
+    //系统导航
+    [
+        'name' => '系统',
+        'icon' => 'cog',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '汇率',
+                'url' => 'currency.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '物流限制',
+                'url' => 'logisticsLimits.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '包装限制',
+                'url' => 'wrapLimits.index',
+                'icon' => '',
+            ],
+        ],
     ],
 ];
 

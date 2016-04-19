@@ -30,7 +30,7 @@ class AdjustmentController extends Controller
         $this->mainIndex = route('stockAdjustment.index');
         $this->mainTitle = '库存调整';
         $this->viewPath = 'stock.adjustment.';
-        $this->middleware('stockIOStatus');
+        $this->middleware('StockIOStatus');
     }
 
     /**

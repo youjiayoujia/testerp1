@@ -28,7 +28,8 @@ class LogisticsModel extends BaseModel
         'url',
         'docking',
         'pool_quantity',
-        'is_enable'
+        'is_enable',
+        'limit',
     ];
 
 

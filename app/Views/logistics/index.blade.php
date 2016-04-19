@@ -10,6 +10,7 @@
     <th>物流追踪网址</th>
     <th>对接方式</th>
     <th>号码池数量(未用/已用/总数)</th>
+    <th>物流限制</th>
     <th>是否启用</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -28,6 +29,7 @@
             <td>{{ $logistics->url }}</td>
             <td>{{ $logistics->docking }}</td>
             <td>{{ $logistics->pool_quantity }}</td>
+            <td>{{ $logistics->limit }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
             <td>{{ $logistics->created_at }}</td>
             <td>{{ $logistics->updated_at }}</td>

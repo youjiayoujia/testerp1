@@ -1,4 +1,5 @@
 @extends('common.form')
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('logistics.update', ['id' => $model->id]) }} @stop
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
@@ -85,4 +86,73 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="form-group col-lg-4" style="clear:left;">
+            <label for="limit" class="control-label">已有限制</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select name="limit" class="form-control" multiple style="height:300px;width:400px;">
+                @foreach($limits as $limit)
+                    <option class="form-control" value="{{ $limit->id }}" {{ old('limit') ? old('limit') == $limit->id ? 'selected' : '' : ''}} onclick="addLimit( this )">
+                        {{ $limit->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-4" style="clear:right;">
+            <label for="limit" class="control-label">已选限制</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" id="dselectLimit" multiple  style="height:300px;width:400px;">
+                @foreach($selectedLimits as $selectedLimit)
+                    <option class="form-control thelimit" value="{{ $selectedLimit }}" onclick="deleteLimit( this )">
+                        {{ $selectedLimit }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div style="display:none">
+            <textarea class="form-control" rows="3" type="hidden" id="limit" placeholder="物流限制" name='limit' readonly>{{ old('limit') }}</textarea>
+        </div>
+    </div>
 @stop
+<script type="text/javascript">
+    $(document).ready(function() {
+        getPostLimit();
+    });
+
+    function getPostLimit(){
+        var selectLimit = "";
+        $(".thelimit").each(function(){
+            selectLimit += $.trim($(this).html()) + ",";
+        });
+        selectLimit = selectLimit.substring(0,selectLimit.length - 1);
+        $("#limit").html(selectLimit);
+    }
+
+    // 检测是否被选
+    function checkWhetherSelected(that) {
+        var selectLimit = [];
+        $(".thelimit").each(function () {
+            selectLimit.push($(this).val());
+        });
+
+        var status = selectLimit.indexOf($(that).val());
+        if (status >= 0) {
+            return true;
+        } else if (status < 0) {
+            return false;
+        }
+    }
+
+    function addLimit(that){
+        if(!checkWhetherSelected(that)) {
+            var limitHtml = '<option class="form-control thelimit" value="' + $(that).val() + '" onclick="deleteLimit( this )">' + $(that).html() + '</option>';
+            $("#dselectLimit").append(limitHtml);
+            getPostLimit();
+        }
+    }
+
+    function deleteLimit(that){
+        $(that).remove();
+        getPostLimit();
+    }
+</script>

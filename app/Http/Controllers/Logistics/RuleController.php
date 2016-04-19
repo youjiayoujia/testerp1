@@ -11,10 +11,12 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
+use App\Models\ItemModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\CountryModel;
 use App\Models\LogisticsModel;
 use App\Models\OrderModel;
+use App\Models\Package\ItemModel as packageItemModel;
 use App\Models\PackageModel;
 
 class RuleController extends Controller
@@ -36,7 +38,7 @@ class RuleController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses' => LogisticsModel::all(),
-            'countries' => countryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -70,16 +72,16 @@ class RuleController extends Controller
      */
     public function logisticsRule($packageId)
     {
-        $packages = PackageModel::where(['id' => $packageId])->get();
-        foreach($packages as $package) {
-            $weight = $package['weight'];
-            $orderId = $package['order_id'];
-            $orders = OrderModel::where(['id' => $orderId])->get();
-            foreach($orders as $order) {
-                $amount = $order['amount'];
-                RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->get();
-            }
-        }
+        $package = PackageModel::where(['id' => $packageId])->get();
+        $weight = $package['weight'];
+        $orderId = $package['order_id'];
+        $packageItem = packageItemModel::where(['package_id' => $packageId])->get();
+        $itemId = $packageItem['item_id'];
+        $item = ItemModel::where(['id' => $itemId])->get();
+        $order = OrderModel::where(['id' => $orderId])->get();
+        $amount = $order['amount'];
+        RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->get();
+
     }
 
 }

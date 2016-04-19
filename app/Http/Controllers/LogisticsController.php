@@ -34,6 +34,7 @@ class LogisticsController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
+            'limits' => LogisticsLimitModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -54,6 +55,8 @@ class LogisticsController extends Controller
             'model' => $logistic,
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
+            'limits' => LogisticsLimitModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+//            'selectedlimits' => $selectedLimit,
         ];
         return view($this->viewPath . 'edit', $response);
     }

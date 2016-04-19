@@ -18,7 +18,31 @@ class ItemModel extends BaseModel
         'update' => []
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'product_id',
+        'sku',
+        'weight',
+        'inventory',
+        'name',
+        'c_name',
+        'alias_name',
+        'alias_cname',
+        'catalog_id',
+        'supplier_id',
+        'supplier_sku',
+        'second_supplier_id',
+        'supplier_info',
+        'purchase_url',
+        'purchase_price',
+        'purchase_carriage',
+        'product_size',
+        'package_size',
+        'carriage_limit',
+        'package_limit',
+        'warehouse_id',
+        'status',
+        'remark'
+    ];
 
     public function product()
     {
@@ -32,7 +56,7 @@ class ItemModel extends BaseModel
 
     public function purchase()
     {
-        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku','sku');
+        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku', 'sku');
     }
 
     public function updateItem($data)
@@ -96,6 +120,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->in($quantity, $amount, $type, $relation_id, $remark);
         }
+        return false;
     }
 
     /**
@@ -112,6 +137,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->hold($quantity);
         }
+        return false;
     }
 
     /**
@@ -128,6 +154,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->unhold($quantity);
         }
+        return false;
     }
 
     /**
@@ -148,6 +175,7 @@ class ItemModel extends BaseModel
         if ($quantity) {
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
+        return false;
     }
 
     //分配库存

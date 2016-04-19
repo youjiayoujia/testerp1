@@ -12,16 +12,14 @@ namespace App\Models;
 
 use Tool;
 use App\Base\BaseModel;
+use Illuminate\Support\Facades\DB;
 
 class OrderModel extends BaseModel
 {
     protected $table = 'orders';
 
-    protected $guarded = [
-        'items',
-    ];
-
-
+    protected $guarded = ['items'];
+    
     public $searchFields = [
         'channel_id',
         'channel_account_id',
@@ -182,7 +180,6 @@ class OrderModel extends BaseModel
     public function createOrder($data)
     {
         $order = $this->create($data);
-
         foreach ($data['items'] as $item) {
             $id = ItemModel::where('sku', $item['sku'])->first()->id;
             if(!count($id)) {
@@ -199,8 +196,9 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return bool
+     * todo:生成采购需求
+     * * todo:判断订单状态
      * todo:更新订单状态
-     * todo:判断订单是否要生成包裹
      * todo:订单优先级
      * todo:判断订单是否需要拆单先发
      * todo:判断订单是否要hold库存
@@ -209,6 +207,7 @@ class OrderModel extends BaseModel
     {
         $items = $this->setPackageItems();
         if ($items) {
+            DB::beginTransaction();
             foreach ($items as $warehouseId => $packageItems) {
                 $package = [];
                 //channel
@@ -233,11 +232,23 @@ class OrderModel extends BaseModel
                 $package = $this->packages()->create($package);
                 if ($package) {
                     foreach ($packageItems as $packageItem) {
-                        $package->items()->create($packageItem);
+                        $newPackageItem = $package->items()->create($packageItem);
+                        try {
+                            $newPackageItem->item->out(
+                                $packageItem['warehouse_position_id'],
+                                $packageItem['quantity'],
+                                'PACKAGE',
+                                $newPackageItem->id);
+                        } catch (Exception $e) {
+                            DB::rollBack();
+                        }
                     }
                 }
             }
+            DB::commit();
             return true;
+        } else { //生成采购需求
+
         }
         return false;
     }
@@ -245,8 +256,6 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
-     * todo:出库
-     * todo:生成采购需求
      */
     public function setPackageItems()
     {
@@ -286,7 +295,7 @@ class OrderModel extends BaseModel
         //根据仓库满足库存数量进行排序
         $warehouses = [];
         foreach ($this->items as $orderItem) {
-            $itemStocks = $orderItem->item->matchStock($orderItem->quantity);
+            $itemStocks = $orderItem->item ? $orderItem->item->matchStock($orderItem->quantity) : false;
             if ($itemStocks) {
                 foreach ($itemStocks as $itemStock) {
                     foreach ($itemStock as $warehouseId => $stock) {

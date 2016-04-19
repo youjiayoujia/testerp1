@@ -31,7 +31,7 @@ class AllotmentController extends Controller
         $this->mainIndex = route('stockAllotment.index');
         $this->mainTitle = '库存调拨';
         $this->viewPath = 'stock.allotment.';
-        $this->middleware('stockIOStatus');
+        $this->middleware('StockIOStatus');
     }
 
     /**

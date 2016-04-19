@@ -28,7 +28,7 @@ class StockController extends Controller
         $this->mainIndex = route('stock.index');
         $this->mainTitle = '库存开帐';
         $this->viewPath = 'stock.';
-        $this->middleware('stockIOStatus');
+        $this->middleware('StockIOStatus');
     }
 
     /**

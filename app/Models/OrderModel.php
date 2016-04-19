@@ -193,8 +193,8 @@ class OrderModel extends BaseModel
      * @param array $items
      * @return bool
      * todo:生成采购需求
+     * * todo:判断订单状态
      * todo:更新订单状态
-     * todo:判断订单是否要生成包裹
      * todo:订单优先级
      * todo:判断订单是否需要拆单先发
      * todo:判断订单是否要hold库存

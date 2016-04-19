@@ -291,7 +291,7 @@ class OrderModel extends BaseModel
         //根据仓库满足库存数量进行排序
         $warehouses = [];
         foreach ($this->items as $orderItem) {
-            $itemStocks = $orderItem->item->matchStock($orderItem->quantity);
+            $itemStocks = $orderItem->item ? $orderItem->item->matchStock($orderItem->quantity) : false;
             if ($itemStocks) {
                 foreach ($itemStocks as $itemStock) {
                     foreach ($itemStock as $warehouseId => $stock) {

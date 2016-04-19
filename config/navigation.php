@@ -307,12 +307,12 @@ return [
             '用户' => [
                 [
                     'name' => '用户列表',
-                    'url' => 'channel.index',
+                    'url' => 'user.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '添加用户',
-                    'url' => 'channelAccount.index',
+                    'url' => 'user.create',
                     'icon' => '',
                 ],
             ]

@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Logistics\CodeModel;
+use App\Models\Logistics\LimitsModel;
 use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
@@ -34,7 +35,7 @@ class LogisticsController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
-            'limits' => LogisticsLimitModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -47,6 +48,8 @@ class LogisticsController extends Controller
     public function edit($id)
     {
         $logistic = $this->model->find($id);
+        $selectedLimit = $logistic->limit;
+        $selectedLimits = explode(",",$selectedLimit);
         if (!$logistic) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -55,10 +58,11 @@ class LogisticsController extends Controller
             'model' => $logistic,
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
-            'limits' => LogisticsLimitModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
-//            'selectedlimits' => $selectedLimit,
+            'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
+            'selectedLimits' => $selectedLimits,
         ];
         return view($this->viewPath . 'edit', $response);
+
     }
 
     /**

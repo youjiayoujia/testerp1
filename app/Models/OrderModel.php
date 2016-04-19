@@ -19,7 +19,7 @@ class OrderModel extends BaseModel
     protected $table = 'orders';
 
     protected $guarded = ['items'];
-    
+
     public $searchFields = [
         'channel_id',
         'channel_account_id',

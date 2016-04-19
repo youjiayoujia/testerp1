@@ -45,7 +45,7 @@ class CarryOverController extends Controller
                     'begin_quantity' => $begin_quantity,
                     'begin_amount' => $begin_amount,
                     'over_quantity' => $stock->all_quantity,
-                    'over_amount' => $stock->amount,
+                    'over_amount' => $stock->all_quantity * $stock->unit_cost,
                     'carry_over_time' => date('Y-m-d h:i:s', time()),
                 ]);
         }

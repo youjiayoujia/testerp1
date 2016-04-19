@@ -25,10 +25,10 @@
                 <strong>hold数量</strong>: {{ $model->hold_quantity }}
             </div>
             <div class="col-lg-2">
-                <strong>单价(￥)</strong>: {{ round($model->amount/$model->all_quantity, 2) }}
+                <strong>单价(￥)</strong>: {{ $model->unit_cost }}
             </div>
             <div class="col-lg-2">
-                <strong>总金额(￥)</strong>: {{ $model->amount }}
+                <strong>总金额(￥)</strong>: {{ round($model->all_quantity * $model->unit_cost, 3) }}
             </div>
         </div>
     </div>

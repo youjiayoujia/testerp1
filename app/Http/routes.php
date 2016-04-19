@@ -21,8 +21,12 @@ Route::resource('productImage', 'Product\ImageController');
 Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
+//包装限制
+Route::resource('logisticsLimits', 'Logistics\LimitsController');
+
 
 Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as'=>'checkName']);
+
 
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -185,6 +189,9 @@ Route::get('StockTaking/takingCreate', ['uses' => 'Stock\TakingController@ajaxta
 Route::get('StockTaking/takingCheck/{id}', ['uses' => 'Stock\TakingController@takingCheck', 'as' => 'stockTaking.takingCheck']);
 Route::post('StockTaking/takingCheckResult/{id}', ['uses' => 'Stock\TakingController@takingCheckResult', 'as' => 'stockTaking.takingCheckResult']);
 Route::resource('stockTaking', 'Stock\TakingController');
+
+//物流限制
+Route::resource('logisticsLimits', 'Logistics\LimitsController');
 
 //物流路由
 Route::resource('logistics', 'LogisticsController');

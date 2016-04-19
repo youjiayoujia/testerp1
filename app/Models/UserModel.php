@@ -37,6 +37,18 @@ class UserModel extends BaseModel implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+    public $rules = [
+        'create' => [
+            'name' => 'required',
+            'email' => 'required|unique:users,email',
+            'password' => 'required',
+        ],
+        'update' => [
+            'name' => 'required',
+            'email' => 'required|unique:users,email,{id}',
+            'password' => 'required',
+        ]
+    ];
 
     public function channelAccounts()
     {

@@ -273,3 +273,6 @@ Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
 Route::get('getChoiesOrder', ['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);
 Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
 Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
+
+//用户路由
+Route::resource('user', 'UserController');

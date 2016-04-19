@@ -165,7 +165,7 @@ return [
             ],
         ],
     ],
-    //拣货导航
+    //汇率导航
     [
         'name' => '汇率',
         'icon' => 'home',
@@ -302,6 +302,34 @@ return [
         'name' => '客户',
         'icon' => 'user',
         'url' => 'dashboard.index',
+    ],
+    //物流限制
+    [
+        'name' => '物流限制',
+        'icon' => 'home',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '物流限制',
+                'url' => 'logisticsLimits.index',
+                'icon' => '',
+            ],
+        ],
+    ],
+    //包装限制
+    [
+        'name' => '包装限制',
+        'icon' => 'home',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '包装限制',
+                'url' => 'wrapLimits.index',
+                'icon' => '',
+            ],
+        ],
     ],
 ];
 

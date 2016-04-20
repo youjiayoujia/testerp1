@@ -181,12 +181,13 @@ class OrderModel extends BaseModel
     {
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            $id = ItemModel::where('sku', $item['sku'])->first()->id;
-            if(!count($id)) {
+            $obj = ItemModel::where('sku', $item['sku'])->get();
+            if(!count($obj)) {
                 $item['item_id'] = 0;
                 $order->update(['status' => 'error']);
+            }else {
+                $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
-            $item['item_id'] = $id;
             $order->items()->create($item);
         }
 

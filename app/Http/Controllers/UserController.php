@@ -16,7 +16,7 @@ class UserController extends Controller
     {
         $this->model = $user;
         $this->mainIndex = route('user.index');
-        $this->mainTitle = '用户s';
+        $this->mainTitle = '用户';
         $this->viewPath = 'user.';
         
     }

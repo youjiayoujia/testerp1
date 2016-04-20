@@ -262,6 +262,11 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '打印采购单',
+                    'url' => 'printPurchaseOrder.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '采购对单',
                     'url' => 'purchaseList.index',

@@ -108,7 +108,10 @@ Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@exce
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
 Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
-
+//打印采购单
+Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');
+Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
+Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
 Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');

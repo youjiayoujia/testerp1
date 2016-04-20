@@ -15,6 +15,7 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
+use App\Models\Product\SupplierModel;
 
 class PurchaseItemController extends Controller
 {
@@ -108,6 +109,8 @@ class PurchaseItemController extends Controller
 			foreach($warehouse_supplier as $key=>$v){
 				$data['warehouse_id']=$v['warehouse_id'];		 
 				$data['supplier_id']=$v['supplier_id'];
+				$supplier=SupplierModel::find($v['supplier_id']);
+				$data['assigner']=$supplier->purchase_id;
 				$purchaseOrder=PurchaseOrderModel::create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){
@@ -122,6 +125,8 @@ class PurchaseItemController extends Controller
 			foreach($warehouse_supplier as $key=>$v){
 				$data['warehouse_id']=$v['warehouse_id'];		 
 				$data['supplier_id']=$v['supplier_id'];
+				$supplier=SupplierModel::find($v['supplier_id']);
+				$data['assigner']=$supplier->purchase_id;
 				$purchaseOrder=PurchaseOrderModel::create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){

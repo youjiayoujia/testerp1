@@ -103,8 +103,8 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" id="dselectLimit" multiple  style="height:300px;width:400px;">
                 @foreach($selectedLimits as $selectedLimit)
-                    <option class="form-control thelimit" value="{{ $selectedLimit }}" onclick="deleteLimit( this )">
-                        {{ $selectedLimit }}
+                    <option class="form-control thelimit" value="{{ $selectedLimit->id }}" onclick="deleteLimit( this )">
+                        {{ $selectedLimit->name }}
                     </option>
                 @endforeach
             </select>
@@ -122,7 +122,7 @@
     function getPostLimit(){
         var selectLimit = "";
         $(".thelimit").each(function(){
-            selectLimit += $.trim($(this).html()) + ",";
+            selectLimit += $.trim($(this).attr('value')) + ",";
         });
         selectLimit = selectLimit.substring(0,selectLimit.length - 1);
         $("#limit").html(selectLimit);

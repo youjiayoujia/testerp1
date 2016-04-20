@@ -11,6 +11,7 @@
 namespace App\Models;
 
 use App\Base\BaseModel;
+use App\Models\Logistics\LimitsModel;
 
 class LogisticsModel extends BaseModel
 {
@@ -82,6 +83,27 @@ class LogisticsModel extends BaseModel
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+    }
+
+    public function logisticsLimit()
+    {
+        return $this->belongsTo('App\Models\Logistics\LimitsModel', 'limit', 'id');
+    }
+
+    /**
+     * 遍历物流限制
+     */
+    public function limit($limit)
+    {
+        $str = '';
+        foreach(explode(",", $limit) as $value) {
+            $limits = LimitsModel::where(['id' => $value])->get();
+            foreach($limits as $limit) {
+                $val = $limit['name'];
+                $str = $str.$val.',';
+            }
+        }
+        return substr($str, 0, -1);
     }
 
 }

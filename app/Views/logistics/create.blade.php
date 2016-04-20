@@ -148,7 +148,7 @@
     function getPostLimit(){
         var selectLimit = "";
         $(".thelimit").each(function(){
-            selectLimit += $.trim($(this).html()) + ",";
+            selectLimit += $.trim($(this).attr('value')) + ",";
         });
         selectLimit = selectLimit.substring(0,selectLimit.length - 1);
         $("#limit").html(selectLimit);

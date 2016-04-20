@@ -48,8 +48,8 @@ class LogisticsController extends Controller
     public function edit($id)
     {
         $logistic = $this->model->find($id);
-        $selectedLimit = $logistic->limit;
-        $selectedLimits = explode(",",$selectedLimit);
+        $limits = explode(",",$logistic->limit);
+        $selectedLimits = LimitsModel::whereIn('id', $limits)->get();
         if (!$logistic) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }

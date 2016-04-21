@@ -6,8 +6,9 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">资料未编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">被选中</a></li>
                 <li><a href="{{ DataList::filtersEncode(['edit_status','=','data_edited']) }}">资料已编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_edited']) }}">图片已编辑</a></li>
                 <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
             </ul>
     </div>  

@@ -214,6 +214,7 @@ Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCo
 Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
+Route::resource('logisticsRule', 'Logistics\RuleController');
 
 //拣货单异常
 Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);

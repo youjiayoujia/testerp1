@@ -20,7 +20,6 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items'];
 
-
     public $searchFields = [
         'channel_id',
         'channel_account_id',
@@ -182,7 +181,13 @@ class OrderModel extends BaseModel
     {
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+            $obj = ItemModel::where('sku', $item['sku'])->get();
+            if(!count($obj)) {
+                $item['item_id'] = 0;
+                $order->update(['status' => 'error']);
+            }else {
+                $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
+            }
             $order->items()->create($item);
         }
 

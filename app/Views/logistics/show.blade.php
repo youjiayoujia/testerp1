@@ -33,6 +33,9 @@
             <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
+            <div class="col-lg-12">
+                <strong>物流限制</strong>: {{ $model->limit($model->limit) }}
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

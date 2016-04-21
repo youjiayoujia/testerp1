@@ -204,6 +204,11 @@ return [
                     'url' => 'logisticsZone.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流分配规则',
+                    'url' => 'logisticsRule.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],

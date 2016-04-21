@@ -302,7 +302,13 @@ class OrderController extends Controller
             $orders[$key]['billing_zipcode'] = $channelOrder['billing_zip'];
             $orders[$key]['billing_phone'] = $channelOrder['billing_phone'];
             $orders[$key]['payment_date'] = $channelOrder['payment_date'];
+            $orders[$key]['refund'] = NULL;
+            $orders[$key]['refund_currency'] = NULL;
+            $orders[$key]['refund_account'] = NULL;
+            $orders[$key]['refund_amount'] = NULL;
+            $orders[$key]['refund_time'] = NULL;
             $orders[$key]['transaction_number'] = $channelOrder['trans_id'];
+            $orders[$key]['cele_admin'] = $channelOrder['cele_admin'];
             foreach ($channelOrder['orderitems'] as $itemKey => $channelOrderItem) {
                 $orders[$key]['items'][$itemKey]['item_id'] = 0;
                 $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];

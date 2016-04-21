@@ -36,5 +36,17 @@ return [
     'excelPath' => './uploads/excel/',
 
     'stockExcelPath' => './uploads/stockExcel/',
+
+    'modules' =>[
+        'amazon' => [
+            'AWSAccessKeyId' => 'AKIAJE7QKBLWVEGMZRJQ',
+            'SignatureVersion' => '2',
+            'MarketplaceId.Id.1' => 'ATVPDKIKX0DER',
+            'SellerId' => 'A3THBIK7QYKUUV',
+            'SignatureMethod' => 'HmacSHA256',
+            'Timestamp' => gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time()),
+            'Version' => '2013-09-01',
+        ],
+    ],
 ];
 

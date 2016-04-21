@@ -102,14 +102,9 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->logistic_id = request()->input('logistic_id');
+        $model->update(request()->all());
         $model->status = 'SHIPPED';
         $model->save();
-        $model->manualLogistics()->create([
-            'logistic_code' => request()->input('logistic_code'),
-            'fee' => request()->input('fee'),
-            'remark' => request()->input('remark')
-        ]);
 
         return redirect($this->mainIndex);
     }

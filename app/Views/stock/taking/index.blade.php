@@ -8,6 +8,7 @@
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
 @stop
+@section('tableTitle') @parent <font color='red'>(库存盘点时，出入库相关操作会冻结，完毕解冻)</font>@stop
 @section('tableBody')
     @foreach($data as $taking)
         <tr>

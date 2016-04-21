@@ -37,9 +37,9 @@ class CreateProducts extends Migration
             $table->string('default_image')->comment('默认图片')->nullable()->default(0);
             $table->string('description')->comment('描述')->nullable()->default(NULL);
             $table->decimal('weight',5,2)->comment('重量')->nullable()->default(0);
-            $table->tinyInteger('status')->comment('上下架状态')->nullable()->default(0);
-            $table->tinyInteger('edit_status')->comment('编辑状态')->nullable()->default(0);
-            $table->string('examine_status')->comment('审核状态')->nullable()->default(0);
+            $table->string('status')->comment('上下架状态')->nullable()->default(0);
+            $table->string('edit_status')->comment('编辑状态')->nullable()->default(NULL);
+            $table->string('examine_status')->comment('审核状态')->nullable()->default(NULL);
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->string('image_edit_not_pass_remark')->comment('图片审核不通过备注')->nullable()->default(NULL);
             $table->string('data_edit_not_pass_remark')->comment('资料审核不通过备注')->nullable()->default(NULL);

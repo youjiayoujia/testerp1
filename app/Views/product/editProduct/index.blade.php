@@ -56,7 +56,7 @@
             <td>{{ $product->supplier->name }}</td>
             <td>{{ $product->supplier_info }}</td>
             <td>{{ $product->purchase_price }}</td>
-            <td>{{ $product->upload_user }}</td>
+            <td>{{ $product->upload_user }}({{$product->user->name}})</td>
             <?php switch ($product->edit_status) {
                 case '':
                     ?>

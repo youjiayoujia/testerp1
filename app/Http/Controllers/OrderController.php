@@ -308,6 +308,7 @@ class OrderController extends Controller
             $orders[$key]['refund_amount'] = NULL;
             $orders[$key]['refund_time'] = NULL;
             $orders[$key]['transaction_number'] = $channelOrder['trans_id'];
+            $orders[$key]['cele_admin'] = $channelOrder['cele_admin'];
             foreach ($channelOrder['orderitems'] as $itemKey => $channelOrderItem) {
                 $orders[$key]['items'][$itemKey]['item_id'] = 0;
                 $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];

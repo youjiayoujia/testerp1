@@ -18,6 +18,7 @@ use App\Models\LogisticsModel;
 use App\Models\OrderModel;
 use App\Models\Package\ItemModel as packageItemModel;
 use App\Models\PackageModel;
+use App\Models\ProductModel;
 
 class RuleController extends Controller
 {
@@ -72,14 +73,31 @@ class RuleController extends Controller
      */
     public function logisticsRule($packageId)
     {
-        $package = PackageModel::where(['id' => $packageId])->get();
-        $weight = $package['weight'];
-        $orderId = $package['order_id'];
-        $packageItem = packageItemModel::where(['package_id' => $packageId])->get();
-        $itemId = $packageItem['item_id'];
-        $item = ItemModel::where(['id' => $itemId])->get();
-        $order = OrderModel::where(['id' => $orderId])->get();
-        $amount = $order['amount'];
+        $packageItems = packageItemModel::where(['package_id' => $packageId])->get();
+        foreach($packageItems as $packageItem) {
+            $itemId = $packageItem['item_id'];
+            $items = ItemModel::where(['id' => $itemId])->get();
+            foreach($items as $item) {
+                $productId = $item['product_id'];
+                $products = ProductModel::where(['id' => $productId])->get();
+                foreach($products as $product) {
+                    $packageLimit = $product['package_limit'];
+                }
+            }
+        }
+        $orderId = null;
+        $weight = null;
+        $amount = null;
+        $packages = PackageModel::where(['id' => $packageId])->get();
+        foreach($packages as $package) {
+            $weight = $package['weight'];
+            $orderId = $package['order_id'];
+        }
+        $orders = OrderModel::where(['id' => $orderId])->get();
+        foreach($orders as $order) {
+            $amount = $order['amount'];
+        }
+
         RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->get();
 
     }

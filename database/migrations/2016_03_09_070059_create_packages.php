@@ -14,6 +14,7 @@ class CreatePackages extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('channel_id')->comment('渠道ID');
             $table->integer('channel_account_id')->comment('渠道账号ID');
             $table->integer('order_id')->comment('订单ID');
             $table->integer('warehouse_id')->comment('仓库ID');

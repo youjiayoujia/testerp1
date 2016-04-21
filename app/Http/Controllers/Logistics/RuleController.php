@@ -39,7 +39,7 @@ class RuleController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses' => LogisticsModel::all(),
-            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'abbreviation']),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -61,7 +61,7 @@ class RuleController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'logisticses' => LogisticsModel::all(),
-            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'abbreviation']),
             'selectedCountries' => $selectedCountries,
         ];
         return view($this->viewPath . 'edit', $response);
@@ -73,21 +73,11 @@ class RuleController extends Controller
      */
     public function logisticsRule($packageId)
     {
-        $packageItems = packageItemModel::where(['package_id' => $packageId])->get();
-        foreach($packageItems as $packageItem) {
-            $itemId = $packageItem['item_id'];
-            $items = ItemModel::where(['id' => $itemId])->get();
-            foreach($items as $item) {
-                $productId = $item['product_id'];
-                $products = ProductModel::where(['id' => $productId])->get();
-                foreach($products as $product) {
-                    $packageLimit = $product['package_limit'];
-                }
-            }
-        }
         $orderId = null;
         $weight = null;
         $amount = null;
+        $isClearance = null;
+        $shippingCountry = null;
         $packages = PackageModel::where(['id' => $packageId])->get();
         foreach($packages as $package) {
             $weight = $package['weight'];
@@ -96,9 +86,40 @@ class RuleController extends Controller
         $orders = OrderModel::where(['id' => $orderId])->get();
         foreach($orders as $order) {
             $amount = $order['amount'];
+            $amountShipping = $order['amount_shipping'];
+            $celeAdmin = $order['cele_admin'];
+            $shippingCountry = $order['shipping_country'];
+            if($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
+                $isClearance = 1;
+            }else{
+                $isClearance = 0;
+            }
         }
-
-        RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->get();
+        $rules = RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->where(['is_clearance' => $isClearance])->get();
+        foreach($rules as $rule) {
+            $countries = explode(",", $rule['country']);
+            $logisticsId = $rule['type_id'];
+            foreach($countries as $country) {
+                if($shippingCountry == $country) {
+                    $logisticses = LogisticsModel::where(['id' => $logisticsId])->get();
+                    foreach($logisticses as $logistics) {
+                        $limit = $logistics['limit'];
+                        $packageItems = packageItemModel::where(['package_id' => $packageId])->get();
+                        foreach($packageItems as $packageItem) {
+                            $itemId = $packageItem['item_id'];
+                            $items = ItemModel::where(['id' => $itemId])->get();
+                            foreach($items as $item) {
+                                $productId = $item['product_id'];
+                                $products = ProductModel::where(['id' => $productId])->get();
+                                foreach($products as $product) {
+                                    $packageLimit = $product['package_limit'];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     }
 

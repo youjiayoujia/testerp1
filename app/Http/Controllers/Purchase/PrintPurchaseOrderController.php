@@ -59,7 +59,7 @@ class PrintPurchaseOrderController extends Controller
      */
 	public function checkWarehouse(){
 		$warehouseId=request()->get('warehouseId');
-		$purchaseOrderIds=$this->model->select('id')->where('warehouse_id',$warehouseId)->where('assigner',12)->groupBy('warehouse_id')->get()->toArray();
+		$purchaseOrderIds=$this->model->select('id')->where('warehouse_id',$warehouseId)->where('assigner',12)->get()->toArray();
 		$purchaseItemSkus=$this->purchaseItem->select('sku','id')->whereIn('purchase_order_id',$purchaseOrderIds)->where('status',0)->get()->toArray();
 		$spus='';
 		$spu='';
@@ -77,7 +77,8 @@ class PrintPurchaseOrderController extends Controller
 				}
 				$j++;
 				$spus[$i]['item'][$j]=$this->purchaseItem->find($vo['id']);	
-			}
+				$spus[$i]['item'][$j]['size']=$skuArray[2];
+			}	
 		return view($this->viewPath . 'purchaseItemList',['data' => $spus]); 
 	}
 	/**

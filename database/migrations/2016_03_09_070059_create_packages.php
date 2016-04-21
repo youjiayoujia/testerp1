@@ -50,7 +50,7 @@ class CreatePackages extends Migration
             $table->string('shipping_country')->comment('发货国家/地区');
             $table->string('shipping_zipcode')->comment('发货邮编');
             $table->string('shipping_phone')->comment('发货电话');
-            $table->enum('is_auto', [0, 1])->default(0)->comment('是否自动发货');
+            $table->enum('is_auto', [0, 1])->default(1)->comment('是否自动发货');
             $table->text('remark')->comment('备注');
             $table->timestamp('logistic_assigned_at')->comment('物流分配时间');
             $table->timestamp('printed_at')->comment('打印面单时间');

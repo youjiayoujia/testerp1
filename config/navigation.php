@@ -270,6 +270,22 @@ return [
         'name' => '客户',
         'icon' => 'user',
         'url' => 'dashboard.index',
+        'type' => 'group',
+        'subnavigations' => [
+            '用户' => [
+                [
+                    'name' => '用户列表',
+                    'url' => 'user.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '添加用户',
+                    'url' => 'user.create',
+                    'icon' => '',
+                ],
+            ]
+        ],
+
     ],
     //系统导航
     [

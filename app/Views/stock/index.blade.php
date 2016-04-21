@@ -22,8 +22,8 @@
             <td>{{ $stock->all_quantity}}</td>
             <td>{{ $stock->available_quantity}}</td>
             <td>{{ $stock->hold_quantity}}</td>
-            <td>{{ $stock->all_quantity ? round($stock->amount/$stock->all_quantity, 2) : '' }}</td>
-            <td>{{ $stock->amount}}</td>
+            <td>{{ $stock->unit_cost }}</td>
+            <td>{{ round($stock->all_quantity * $stock->unit_cost, 3) }}</td>
             <td>{{ $stock->created_at }}</td>
             <td>
                 <a href="{{ route('stock.show', ['id'=>$stock->id]) }}" class="btn btn-info btn-xs">

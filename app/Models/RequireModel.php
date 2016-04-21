@@ -29,9 +29,18 @@ class RequireModel extends BaseModel
 
     protected $rules = [];
 
-    public function channelAccount()
+    public function order()
     {
-        return $this->hasMany('App\Models\Channel\AccountModel', 'channel_id', 'id');
+        return $this->belongsTo('App\Models\OrderModel', 'order_id');
     }
 
+    public function orderItem()
+    {
+        return $this->belongsTo('App\Models\Order\ItemModel', 'order_item_id');
+    }
+
+    public function item()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'item_id');
+    }
 }

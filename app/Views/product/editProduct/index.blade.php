@@ -32,7 +32,7 @@
     <th>图片</th>
     <th>选中shop</th>
     <th class="sort" data-field="c_name">中文名称</th>
-    <th>材质</th>
+    <th>描述</th>
     <th>线上供货商</th>
     <th>线上供货商地址</th>
     <th>拿货价</th>
@@ -52,11 +52,11 @@
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
-            <td>{{ $product->fabric }}</td>
+            <td>{{ $product->description }}</td>
             <td>{{ $product->supplier->name }}</td>
             <td>{{ $product->supplier_info }}</td>
             <td>{{ $product->purchase_price }}</td>
-            <td>{{ $product->upload_user }}({{$product->user->name}})</td>
+            <td>{{ $product->upload_user }}</td>
             <?php switch ($product->edit_status) {
                 case '':
                     ?>

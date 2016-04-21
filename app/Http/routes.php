@@ -60,7 +60,8 @@ Route::resource('productSupplier', 'Product\SupplierController');
 Route::get('productRequire/ajaxQuantityProcess', ['uses'=>'Product\RequireController@ajaxQuantityProcess', 'as'=>'productRequire.ajaxQuantityProcess']);
 Route::get('productRequire/ajaxProcess', ['uses'=>'Product\RequireController@ajaxProcess', 'as'=>'productRequire.ajaxProcess']);
 Route::resource('productRequire', 'Product\RequireController');
-
+//通关报关
+Route::resource('customsClearance', 'CustomsClearance\CustomsClearanceController');
 //仓库
 Route::resource('warehouse', 'WarehouseController');
 
@@ -111,7 +112,10 @@ Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@exce
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
 Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
-
+//打印采购单
+Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');
+Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
+Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
 Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
@@ -133,7 +137,7 @@ Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
 Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
 Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
-Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController'); 
 /**
  * stock controller route
  */
@@ -210,6 +214,7 @@ Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCo
 Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
+Route::resource('logisticsRule', 'Logistics\RuleController');
 
 //拣货单异常
 Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);

@@ -64,6 +64,7 @@ class CreateOrders extends Migration
             $table->string('refund_currency')->comment('退款币种')->nullable()->default(NULL);
             $table->string('refund_account')->comment('客户账户')->nullable()->default(NULL);
             $table->string('refund_amount')->comment('退款金额')->nullable()->default(NULL);
+            $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->date('refund_time')->comment('退款时间')->nullable()->default(NULL);
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间')->nullable()->default(NULL);

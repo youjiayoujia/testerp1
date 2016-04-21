@@ -169,7 +169,7 @@
                             </tr>
                     </table>
                 </div
-            </td>
+            ></td>
         </tr>
         <tr>
             <td><label>参考现货数量: </label></td>

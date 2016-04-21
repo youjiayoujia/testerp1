@@ -65,7 +65,7 @@
             <td>采购类型</td> 
             <td>SKU</td> 
             <td>样图</td>
-            <td>采购数量/已到数量/仍需采购数量</td>
+            <td>采购数量</td>
             <td>创建人</td>
             <td>创建时间</td>    
         </tr>
@@ -84,7 +84,7 @@
             </td>
             <td>{{$purchaseItem->sku}}</td>
             <td><img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px"></td>
-            <td>{{$purchaseItem->purchase_num}}/{{$purchaseItem->arrival_num}}/{{$purchaseItem->lack_num}}</td>
+            <td>{{$purchaseItem->purchase_num}}</td>
             <td>{{$purchaseItem->user_id}}</td>
             <td>{{$purchaseItem->created_at}}</td>  
         </tr>

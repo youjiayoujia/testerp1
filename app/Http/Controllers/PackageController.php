@@ -28,9 +28,11 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-//        $order = OrderModel::find(1);
-//        for ($i = 0; $i < 2000; $i++) {
-//            $order->createPackage();
+//        $order = OrderModel::find(2);
+//        for ($i = 0; $i < 200; $i++) {
+//            foreach (OrderModel::all() as $order) {
+//                $order->createPackage();
+//            }
 //        }
         return view($this->viewPath . 'create', $response);
     }
@@ -45,7 +47,7 @@ class PackageController extends Controller
             if ($order->createPackage()) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
             } else {
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足'));
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足. 已生成订单需求.'));
             }
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));

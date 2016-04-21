@@ -177,6 +177,11 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
 
+    public function requires()
+    {
+        return $this->hasMany('App\Models\RequireModel', 'order_id');
+    }
+
     public function createOrder($data)
     {
         $order = $this->create($data);
@@ -248,8 +253,15 @@ class OrderModel extends BaseModel
             }
             DB::commit();
             return true;
-        } else { //生成采购需求
-
+        } else { //生成订单需求
+            foreach ($this->items as $item) {
+                $require = [];
+                $require['item_id'] = $item->item_id;
+                $require['order_item_id'] = $item->id;
+                $require['sku'] = $item->sku;
+                $require['quantity'] = $item->quantity;
+                $this->requires()->create($require);
+            }
         }
         return false;
     }
@@ -257,6 +269,7 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
+     * todo:订单产品状态判断
      */
     public function setPackageItems()
     {

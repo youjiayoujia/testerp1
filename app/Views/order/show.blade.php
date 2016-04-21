@@ -199,7 +199,7 @@
                         <strong>数量</strong> : {{ $orderItem->quantity }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>金额</strong> : {{ $orderItem->price }}
+                        <strong>单价</strong> : {{ $orderItem->price }}
                     </div>
                     <div class="col-lg-2">
                         <strong>是否有效</strong> : {{ $orderItem->status_name }}

@@ -394,7 +394,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="price" class='control-label'>金额</label>
+                    <label for="price" class='control-label'>单价</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
@@ -421,7 +421,7 @@
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
+                    <input type='text' class="form-control price" id="arr[price][0]" placeholder="单价" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
                     <select class="form-control status" name="arr[status][0]" id="arr[status][0]">

@@ -6,7 +6,7 @@
         <input type='text' class="form-control quantity" id="arr[quantity][{{$current}}]" placeholder="数量" name='arr[quantity][{{$current}}]' value="{{ old('arr[quantity][$current]') }}">
     </div>
     <div class="form-group col-sm-1">
-        <input type='text' class="form-control price" id="arr[price][{{$current}}]" placeholder="金额" name='arr[price][{{$current}}]' value="{{ old('arr[price][$current]') }}">
+        <input type='text' class="form-control price" id="arr[price][{{$current}}]" placeholder="单价" name='arr[price][{{$current}}]' value="{{ old('arr[price][$current]') }}">
     </div>
     <div class="form-group col-sm-2">
         <select class="form-control status" name="arr[status][{{$current}}]" id="arr[status][{{$current}}]">

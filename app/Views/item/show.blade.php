@@ -48,7 +48,7 @@
                 <strong>供应商ID</strong>: {{ $model->supplier_id }}
             </div>
             <div class="col-lg-3">
-                <strong>供应商名</strong>: {{ $model->product->supplier->name }}
+                <strong>供应商名</strong>: {{ $model->supplier->name }}
             </div>
             <div class="col-lg-3">
                 <strong>供应商信息</strong>: {{ $model->supplier_info }}

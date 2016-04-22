@@ -21,7 +21,7 @@ class ClosePurchaseOrderController extends Controller
     {
         $this->model = $purchaseOrder;
         $this->mainIndex = route('closePurchaseOrder.index');
-        $this->mainTitle = '未结算采购单';
+        $this->mainTitle = '采购单结算';
 		$this->viewPath = 'purchase.closePurchaseOrder.';
     }
     
@@ -30,7 +30,7 @@ class ClosePurchaseOrderController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('close_status',0)->where('status',1)),
+            'data' => $this->autoList($this->model->where('status','>',0)),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -51,7 +51,7 @@ class ClosePurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
 		if ($model->examineStatus !=2) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '成本未审核通过的采购单.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

@@ -10,7 +10,7 @@
    	<th>供应商</th>
     <th>采购去向</th>
     <th>结算状态</th>
-    <th>创建时间</th>
+    <th>采购总金额+物流费</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -40,7 +40,7 @@
                 @endif
             @endforeach
                     
-            <td>{{ $purchaseOrder->created_at }}</td>
+            <td>{{ $purchaseOrder->total_purchase_cost}}+{{ $purchaseOrder->total_postage}}</td>
             <td>
                 <a href="{{ route('closePurchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"> 去结算

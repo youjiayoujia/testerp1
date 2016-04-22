@@ -268,7 +268,7 @@ return [
                     'icon' => '',
                 ],
 				[
-                    'name' => '未结算采购单',
+                    'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',
                     'icon' => '',
                 ],

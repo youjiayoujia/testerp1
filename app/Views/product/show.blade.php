@@ -56,6 +56,9 @@
                 <strong>主供应商</strong>: {{ $model->supplier->name }}
             </div>
             <div class="col-lg-3">
+                <strong>销售链接</strong>: <a href="http://{{ $model->product_sale_url }}" target="_blank">{{ $model->product_sale_url }}</a>
+            </div>
+            <div class="col-lg-3">
                 <strong>采购链接</strong>: <a href="http://{{ $model->purchase_url }}" target="_blank">{{ $model->purchase_url }}</a>
             </div>
             <div class="col-lg-3">

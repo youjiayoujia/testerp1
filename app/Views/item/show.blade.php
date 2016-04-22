@@ -63,6 +63,9 @@
         <div class="panel-heading">采购信息 :</div>
         <div class="panel-body">
             <div class="col-lg-3">
+                <strong>销售链接</strong>: {{ $model->product->product_sale_url }}
+            </div>
+            <div class="col-lg-3">
                 <strong>采购链接</strong>: {{ $model->purchase_url }}
             </div>
             <div class="col-lg-3">
@@ -161,6 +164,9 @@
             </div>
             <div class="col-lg-3">
                 <strong>备注</strong>: {{ $model->remark }}
+            </div>
+            <div class="col-lg-3">
+                <strong>状态</strong>: <?php if($model->is_sale==1){echo "可售";}else{echo "不可售";} ?>
             </div>
         </div>
     </div>

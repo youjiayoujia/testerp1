@@ -184,7 +184,8 @@ Route::resource('stockAllotment', 'Stock\AllotmentController');
 //库存结转
 Route::post('stockCarryOver/showStockView', ['uses'=>'Stock\CarryOverController@showStockView', 'as'=>'stockCarryOver.showStockView']);
 Route::get('stockCarryOver/showStock', ['uses'=>'Stock\CarryOverController@showStock', 'as'=>'stockCarryOver.showStock']);
-Route::get('stockCarryOver/ajaxCreateCarryOver', ['uses'=>'Stock\CarryOverController@ajaxCreateCarryOver', 'as'=>'stockCarryOver.ajaxCreateCarryOver']);
+Route::get('stockCarryOver/createCarryOver', ['uses'=>'Stock\CarryOverController@createCarryOver', 'as'=>'stockCarryOver.createCarryOver']);
+Route::post('stockCarryOver/createCarryOverResult', ['uses'=>'Stock\CarryOverController@createCarryOverResult', 'as'=>'stockCarryOver.createCarryOverResult']);
 Route::resource('stockCarryOver', 'Stock\CarryOverController');
 
 //库存盘点

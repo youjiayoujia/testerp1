@@ -163,11 +163,18 @@
                 ?>
             </div>
             <div class="col-lg-3">
-                <strong>备注</strong>: {{ $model->remark }}
-            </div>
-            <div class="col-lg-3">
                 <strong>状态</strong>: <?php if($model->is_sale==1){echo "可售";}else{echo "不可售";} ?>
             </div>
+            <div class="col-lg-3">
+                <strong>投诉比例</strong>: 
+            </div>
+            <div class="col-lg-3">
+                <strong>退款率</strong>: 
+            </div>
+            <div class="col-lg-3">
+                <strong>备注</strong>: {{ $model->remark }}
+            </div>
+            
         </div>
     </div>
 @stop

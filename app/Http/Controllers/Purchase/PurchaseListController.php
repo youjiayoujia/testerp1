@@ -73,9 +73,14 @@ class PurchaseListController extends Controller
 	{
 		$data=request()->all();
 		$model=$this->model->find($id);
+		$examinePurchaseItem=PurchaseOrderModel::find($model->purchase_order_id);
+		if ($examinePurchaseItem->close_status < 1) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未结算采购条目不能对单.'));
+        }
 		if($data['arrival_num']==$model->purchase_num){
 			$data['lack_num']=0;
 			$data['status']=2;
+			$this->	generateDarCode($id);
 		}
 		if($data['active']>0){
 			$data['active_status']=1;
@@ -148,6 +153,7 @@ class PurchaseListController extends Controller
 		{	
 			if($vo->active_status < 1 && $vo->costExamineStatus ==2){
 			$vo->update(['status'=>2,'arrival_num'=>$vo->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
+			$this->	generateDarCode($vo->id);
 			$num=$this->model->where('purchase_order_id',$vo->purchase_order_id)->where('status','<>',2)->count();
 			$purchaseOrder=PurchaseOrderModel::find($vo->purchase_order_id);
 			if($num==0){
@@ -199,6 +205,10 @@ class PurchaseListController extends Controller
 				echo $barCode;
 			}else{
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
+				$position_num=PositionModel::where('warehouse_id',$model->warehouse_id)->count();
+				if($position_num == 0){
+					return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
+					}
 					foreach($position as $key=>$v){
 						$WarehousePositionIds[$key]=$v->id;
 					}

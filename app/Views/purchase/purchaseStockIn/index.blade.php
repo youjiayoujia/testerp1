@@ -80,11 +80,7 @@
                 <a href="{{ route('purchaseStockIn.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                      入库
                 </a>
-                @if(!$purchaseList->bar_code)
-                 <a href="/purchaseStockIn/generateDarCode/{{$purchaseList->id}}" class="btn btn-info btn-xs ">
-                     生成库位入库
-                </a>
-                @endif
+                
             </td>       
         </tr>
     @endforeach

@@ -91,7 +91,7 @@ class PurchaseOrderController extends Controller
      */
 	
 	public function update($id)
-	{//echo date('Y-m-d h:i:s',time());exit;
+	{
 		$model=$this->model->find($id);
 		if ($model->examineStatus !=2) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
@@ -114,9 +114,16 @@ class PurchaseOrderController extends Controller
 					}else{
 						$item['costExamineStatus']=0;	
 					}
+					if(!$item['post_coding'] && $item['status'] >0){
+						$item['post_coding']=$data['post_coding'];
+						}
+						if($item['postage']!= $purchaseItem->postage && $item['postage']>0){
+							$data['total_postage']+=$item['postage']-$purchaseItem->postage;
+							}
 					if($item['status']>0){
 						$data['status']=1;
 					}
+					
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;

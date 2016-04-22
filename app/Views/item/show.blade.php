@@ -48,7 +48,7 @@
                 <strong>供应商ID</strong>: {{ $model->supplier_id }}
             </div>
             <div class="col-lg-3">
-                <strong>供应商名</strong>: {{ $model->product->supplier->name }}
+                <strong>供应商名</strong>: {{ $model->supplier->name }}
             </div>
             <div class="col-lg-3">
                 <strong>供应商信息</strong>: {{ $model->supplier_info }}
@@ -163,11 +163,18 @@
                 ?>
             </div>
             <div class="col-lg-3">
-                <strong>备注</strong>: {{ $model->remark }}
-            </div>
-            <div class="col-lg-3">
                 <strong>状态</strong>: <?php if($model->is_sale==1){echo "可售";}else{echo "不可售";} ?>
             </div>
+            <div class="col-lg-3">
+                <strong>投诉比例</strong>: 
+            </div>
+            <div class="col-lg-3">
+                <strong>退款率</strong>: 
+            </div>
+            <div class="col-lg-3">
+                <strong>备注</strong>: {{ $model->remark }}
+            </div>
+            
         </div>
     </div>
 @stop

@@ -33,7 +33,7 @@
     <th>图片</th>
     <th>选中shop</th>
     <th class="sort" data-field="c_name">中文名称</th>
-    <th>描述</th>
+    <th>材质</th>
     <th>线上供货商</th>
     <th>线上供货商地址</th>
     <th>拿货价</th>

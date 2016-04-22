@@ -19,20 +19,19 @@ class CarryOverModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['carry_over_time', 'stock_id', 'begin_quantity', 'begin_amount', 'over_quantity', 'over_amount', 'created_at'];
+    protected $fillable = ['carry_over_time', 'date', 'warehouse_id'];
 
 
     //查询
-    public $searchFields = ['carry_over_time'];
-    
-    /**
-     * get the relationship between the two module 
-     *
-     * @return
-     *
-     */
-    public function stock()
+    public $searchFields = ['date'];
+
+    public function warehouse()
     {
-        return $this->belongsTo('App\Models\StockModel', 'stock_id', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+    }
+
+    public function forms()
+    {
+        return $this->hasMany('App\Models\Stock\CarryOverFormsModel', 'parent_id', 'id');
     }
 }

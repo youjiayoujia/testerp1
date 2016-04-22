@@ -122,10 +122,27 @@
         $("#country_id").html(selectCountry);
     }
 
+    // 检测是否被选
+    function checkWhetherSelected(that) {
+        var selectCountry = [];
+        $(".thecountry").each(function () {
+            selectCountry.push($(this).val());
+        });
+
+        var status = selectCountry.indexOf($(that).val());
+        if (status >= 0) {
+            return true;
+        } else if (status < 0) {
+            return false;
+        }
+    }
+
     function addCountry(that){
-        var countryHtml = '<option class="form-control thecountry" value="' + $(that).html() + '" onclick="deleteCountry( this )">' + $(that).html() + '</option>';
-        $("#dselectCountry").append(countryHtml);
-        getPostCountry();
+        if(!checkWhetherSelected(that)) {
+            var countryHtml = '<option class="form-control thecountry" value="' + $(that).val() + '" onclick="deleteCountry( this )">' + $(that).html() + '</option>';
+            $("#dselectCountry").append(countryHtml);
+            getPostCountry();
+        }
     }
 
     function deleteCountry(that){

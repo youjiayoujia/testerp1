@@ -69,6 +69,7 @@ class ProductModel extends BaseModel
         'weight',
         'description',
         'upload_user',
+        'selector_id',
         'assigner',
         'default_image',
         'carriage_limit',
@@ -105,6 +106,11 @@ class ProductModel extends BaseModel
     public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'upload_user');
     }
 
     public function item()
@@ -156,6 +162,8 @@ class ProductModel extends BaseModel
     {
         return $this->hasMany('App\Models\Product\ImageModel', 'product_id');
     }
+
+
 
 
     /**

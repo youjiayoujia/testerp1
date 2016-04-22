@@ -65,6 +65,28 @@ return [
                     'icon' => '',
                 ],
             ],
+			 '通关报关' => [
+                [
+                    'name' => 'home',
+                    'url' => 'customsClearance.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '三宝产品',
+                    'url' => 'product.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '三宝package',
+                    'url' => 'SelectProduct.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '中邮运单号列表',
+                    'url' => 'EditProduct.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //订单导航
@@ -182,6 +204,11 @@ return [
                     'url' => 'logisticsZone.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流分配规则',
+                    'url' => 'logisticsRule.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],
@@ -206,6 +233,11 @@ return [
                 [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '打印采购单',
+                    'url' => 'printPurchaseOrder.index',
                     'icon' => '',
                 ],
                 [

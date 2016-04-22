@@ -23,6 +23,7 @@ class CreateLogisticses extends Migration
             $table->string('url')->comment('物流追踪网址')->default(NULL);
             $table->string('docking')->comment('对接方式')->default(NULL);
             $table->string('pool_quantity')->comment('号码池数量')->nullable()->default(NULL);
+            $table->string('limit')->comment('物流限制')->nullable()->default(NULL);
             $table->integer('is_enable')->comment('是否启用')->default(NULL);
             $table->timestamps();
             $table->softDeletes();

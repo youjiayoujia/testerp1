@@ -48,5 +48,7 @@ return [
             'Version' => '2013-09-01',
         ],
     ],
+
+    'AWS_SECRET_ACCESS_KEY' => 'gH13dKCgTtBloKPhHFIBmDTv/sbNoUNJkWIMK/Je',
 ];
 

@@ -4,7 +4,7 @@ $param = array();
 $param['AWSAccessKeyId'] = 'AKIAJE7QKBLWVEGMZRJQ';
 $param['Action'] = 'ListOrders';
 $param['MarketplaceId.Id.1'] = 'ATVPDKIKX0DER';
-$param['FulfillmentChannel.Channel.1'] = 'MFN';
+//$param['FulfillmentChannel.Channel.1'] = 'MFN';
 $param['OrderStatus.Status.1'] = 'Unshipped';
 $param['OrderStatus.Status.2'] = 'PartiallyShipped';
 $param['SignatureVersion'] = '2';
@@ -24,12 +24,10 @@ foreach ($param as $key => $val) {
 sort($url);
 
 $arr   = implode('&', $url);
-
 $sign  = 'GET' . "\n";
 $sign .= 'mws.amazonservices.com' . "\n";
 $sign .= '/Orders/2013-09-01' . "\n";
 $sign .= $arr;
-
 $signature = hash_hmac("sha256", $sign, 'gH13dKCgTtBloKPhHFIBmDTv/sbNoUNJkWIMK/Je', true);
 $signature = urlencode(base64_encode($signature));
 

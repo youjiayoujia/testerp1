@@ -11,7 +11,6 @@
  */
 
 Route::get('test', 'TestController@test');
-Route::get('test1/{url}', ['uses' => 'TestController@test1', 'as' => 'test1']);
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 //产品图片路由

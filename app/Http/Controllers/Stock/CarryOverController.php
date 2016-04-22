@@ -121,6 +121,7 @@ class CarryOverController extends Controller
             } catch (Exception $e) {
                 DB::rollback();
             }
+            DB::commit();
         }
 
         return redirect($this->mainIndex);

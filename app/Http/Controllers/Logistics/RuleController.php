@@ -73,54 +73,35 @@ class RuleController extends Controller
      */
     public function logisticsRule($packageId)
     {
-        $orderId = null;
-        $weight = null;
-        $amount = null;
-        $isClearance = null;
-        $shippingCountry = null;
-        $packages = PackageModel::where(['id' => $packageId])->get();
-        foreach($packages as $package) {
-            $weight = $package['weight'];
-            $orderId = $package['order_id'];
+        $weight = PackageModel::where(['id' => $packageId])->get('weight');
+        $shippingCountry = PackageModel::where(['id' => $packageId])->get('shipping_country');
+        $orderId = PackageModel::where(['id' => $packageId])->get('order_id');
+        $amount = OrderModel::where(['id' => $orderId])->get('amount');
+        $amountShipping = OrderModel::where(['id' => $orderId])->get('amount_shipping');
+        $celeAdmin = OrderModel::where(['id' => $orderId])->get('cele_admin');
+        if($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
+            $isClearance = 1;
+        }else{
+            $isClearance = 0;
         }
-        $orders = OrderModel::where(['id' => $orderId])->get();
-        foreach($orders as $order) {
-            $amount = $order['amount'];
-            $amountShipping = $order['amount_shipping'];
-            $celeAdmin = $order['cele_admin'];
-            $shippingCountry = $order['shipping_country'];
-            if($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
-                $isClearance = 1;
-            }else{
-                $isClearance = 0;
-            }
-        }
-        $rules = RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->where(['is_clearance' => $isClearance])->get();
+        $rules = RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->where(['is_clearance' => $isClearance])->orderBy('priority', 'desc')->get();
         foreach($rules as $rule) {
-            $countries = explode(",", $rule['country']);
             $logisticsId = $rule['type_id'];
-            foreach($countries as $country) {
-                if($shippingCountry == $country) {
-                    $logisticses = LogisticsModel::where(['id' => $logisticsId])->get();
-                    foreach($logisticses as $logistics) {
-                        $limit = $logistics['limit'];
-                        $packageItems = packageItemModel::where(['package_id' => $packageId])->get();
-                        foreach($packageItems as $packageItem) {
-                            $itemId = $packageItem['item_id'];
-                            $items = ItemModel::where(['id' => $itemId])->get();
-                            foreach($items as $item) {
-                                $productId = $item['product_id'];
-                                $products = ProductModel::where(['id' => $productId])->get();
-                                foreach($products as $product) {
-                                    $packageLimit = $product['package_limit'];
-                                }
-                            }
-                        }
-                    }
-                }
+            $limit = LogisticsModel::where(['id' => $logisticsId])->get('limit');
+            $packageItems = packageItemModel::where(['package_id' => $packageId])->get();
+            $packageLimits = [];
+            foreach($packageItems as $packageItem) {
+                $itemId = $packageItem['item_id'];
+                $productId = ItemModel::where(['id' => $itemId])->get('product_id');
+                $packageLimit = ProductModel::where(['id' => $productId])->get('package_limit');
+                $packageLimits = array_merge($packageLimits, explode(",", $packageLimit))->unique();
+            }
+            if(explode(",", $rule['country'])->contains($shippingCountry) && $packageLimits->contains(explode(",", $limit)) == false) {
+                $model = PackageModel::where(['id' => $packageId])->get();
+                $model->update(['logistics_id' => $logisticsId]);
+                break;
             }
         }
-
     }
 
 }

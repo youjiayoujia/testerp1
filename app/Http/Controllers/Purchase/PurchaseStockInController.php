@@ -73,7 +73,7 @@ class PurchaseStockInController extends Controller
         return view($this->viewPath . 'stockIn', $response);
     }
 	/**
-     * 对单界面
+     * 批量入库
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -85,7 +85,9 @@ class PurchaseStockInController extends Controller
 			$data['storage_qty']=1;
 		}
 		$purchaseItemList=$this->model->where('sku',$data['sku'])->where('status','2')->orderby('storageStatus')->get();
+		
 		foreach($purchaseItemList as $key=>$vo){
+			if($vo->bar_code){
 			if($data['storageInType']==1){
 				if(($data['storage_qty']+$vo->storage_qty) < $vo->purchase_num){
 					$storage['storage_qty']=$vo->storage_qty+$data['storage_qty'];
@@ -110,7 +112,8 @@ class PurchaseStockInController extends Controller
 					$storage['storageStatus']=2;
 					$data['storage_qty']=$data['storage_qty']-$vo->purchase_num;				
 				}
-				}
+			}
+		}
 					
 				$this->model->find($vo->id)->update($storage);
 				if($data['storage_qty'] == 0){
@@ -118,13 +121,14 @@ class PurchaseStockInController extends Controller
 					}
 				
 			}
+	
        $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
         return view($this->viewPath . 'stockIn', $response);
     }
 	/**
-     * 对单
+     * 单件入库
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector

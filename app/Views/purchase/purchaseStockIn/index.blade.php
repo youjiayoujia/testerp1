@@ -17,7 +17,7 @@
     <th>采购条目状态</th>
     <th>入库状态</th>
     <th>异常状态</th>
-    <th>操作</th>
+    <!--<th>操作</th>-->
 @stop
 @section('tableBody')
     @foreach($data as $purchaseList)
@@ -76,12 +76,12 @@
             @endforeach
             @endif
             </td>
-            <td>
+           <!-- <td>
                 <a href="{{ route('purchaseStockIn.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                      入库
                 </a>
                 
-            </td>       
+            </td>    -->   
         </tr>
     @endforeach
 @stop

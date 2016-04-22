@@ -123,7 +123,10 @@
                 @endforeach
             </select>
         </div>
-
+        <div class="form-group col-md-3">
+            <label for="color">销售链接</label>
+            <input class="form-control" id="product_sale_url" placeholder="销售链接" name='product_sale_url' value="{{ old('product_sale_url') ?  old('product_sale_url') : $product->product_sale_url }}">
+        </div>
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $product->purchase_url }}">

@@ -141,5 +141,12 @@
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
         </div>
+        <div class="form-group col-md-3">
+            <label for="color">是否可售</label>
+            <select  class="form-control" name="is_sale">
+                <option value="1" >可售</option>
+                <option value="0" {{ $model->is_sale == 0 ? 'selected' : '' }}>不可售</option>
+            </select>
+        </div>
     </div>
 @stop

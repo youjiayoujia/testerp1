@@ -67,42 +67,61 @@ class CarryOverController extends Controller
             if($latest >= $tmp_timestamp) {
                 throw new Exception('日期有误，该日期可能已经月结过');
             }
-            $below35Days = strtotime('-35 day');
-            if($below35Days > $latest) {
+            $below40Days = (strtotime('now') - strtotime('-40 day'));
+            if(($tmp_timestamp - $below40Days) > $latest) {
                 throw new Exception('日期有误，可能上个月月结没做');
             }
+            $carryOverNewObj = $this->model->create([
+                    'date' => date('Y-m', $tmp_timestamp),
+                ]);
             DB::beginTransaction();
             try {
-                $carryOverNewObj = $this->model->create([
-                        'date' => date('Y-m', $tmp_timestamp),
-                    ]);
                 $carryOverForms = $carryOver->forms;
-                $stocks = StockModel::all();
-                foreach($stocks as $stock)
+                foreach($carryOverForms as $carryOverForm) {
+                    $carryOverNewObj->forms()->create(['stock_id'=>$carryOverForm->stock_id, 
+                                                    'begin_quantity' => $carryOverForm->over_quantity,
+                                                    'begin_amount' => $carryOverForm->over_amount]);
+                }
+                $stockIns = InModel::whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $tmp_timestamp)])->get();
+                $stockOuts = OutModel::whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $tmp_timestamp)])->get();
+                if(count($stockIns)) 
                 {
-                    $tmp = '';
-                    foreach($carryOverForms as $carryOverForm) {
-                        if($carryOverForm->stock_id == $stock->id) {
-                            $tmp = $carryOverForm;
-                            break;
+                    foreach($stockIns as $stockIn)
+                    {
+                        foreach($carryOverForms as $carryOverForm)
+                        {
+                            if($carryOverForm->stock_id == $stockIn->stock_id) {
+                                $carryOverForm->over_quantity += $stockIn->quantity;
+                                $carryOverForm->over_amount += $stockIn->amount;
+                                break;
+                            }
                         }
                     }
-                    if($tmp) {
-                        $begin_quantity = $tmp->over_quantity;
-                        $begin_amount = $tmp->over_amount;
-                        $carryOverNewObj->forms()->create([
-                                'stock_id' => $carryOverForm->stock_id,
-                                'begin_quantity' => $begin_quantity,
-                                'begin_amount' => $begin_amount,
-                                'over_quantity' => $stock->all_quantity,
-                                'over_amount' => $stock->all_quantity * $stock->unit_cost,
-                            ]);
+                }
+                if(count($stockOuts)) 
+                {
+                    foreach($stockOuts as $stockOut)
+                    {
+                        foreach($carryOverForms as $carryOverForm)
+                        {
+                            if($carryOverForm->stock_id == $stockOut->stock_id) {
+                                $carryOverForm->over_quantity -= $stockOut->quantity;
+                                $carryOverForm->over_amount -= $stockOut->amount;
+                                break;
+                            }
+                        }
                     }
+                }
+                foreach($carryOverForms as $carryOverForm) {
+                    $carryOverNewObj->forms->where('stock_id', $carryOverForm->stock_id)->first()->update([
+                                                                        'over_quantity' => $carryOverForm->over_quantity,
+                                                                        'over_amount' => $carryOverForm->over_amount]);
                 }
             } catch (Exception $e) {
                 DB::rollback();
             }
             DB::commit();
+
         } else {
             DB::beginTransaction();
             try {
@@ -144,7 +163,7 @@ class CarryOverController extends Controller
         if(!$objCarryOver) {
             throw new Exception('该时间段没有库存');
         }
-        $carryOverTime = date('Y-m-d G:i:s', (strtotime($objCarryOver->date)+strtotime('+1 month')));
+        $carryOverTime = date('Y-m-d G:i:s', (strtotime($objCarryOver->date)+(strtotime('+1 month')-strtotime('now'))));
         $carryOverForms = $objCarryOver->forms;
         $stockIns = InModel::whereBetween('created_at', [$carryOverTime, $stockTime])->get();
         $stockOuts = OutModel::whereBetween('created_at', [$carryOverTime, $stockTime])->get();

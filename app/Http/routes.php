@@ -102,6 +102,7 @@ Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\Pu
 Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
+Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 
 //采购列表

@@ -138,13 +138,13 @@
             </td>  
 			<td>
             @if($purchaseItem->active ==1 )
-            @if($purchaseItem->active_status ==1 )
-            报缺
-            @elseif($purchaseItem->active ==2 )
-           	核实报缺
-            @else
-            正常
-            @endif
+                @if($purchaseItem->active_status ==1 )
+                报缺
+                @elseif($purchaseItem->active_status ==2 )
+                核实报缺
+                @else
+                正常
+                @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @elseif($purchaseItem->active > 1)
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)

@@ -7,6 +7,7 @@
     <th>ID</th>
     <th>Item_ID</th>
     <th>采购类型</th>
+    <th>成本审核</th>
     <th>产品图片</th>
     <th>供应商-采购链接</th>
     <th>采购去向</th>
@@ -24,12 +25,19 @@
         <tr>
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->sku}}</td>
-            @foreach(config('purchase.purchaseItem.type') as $k=>$type)
+            <td>@foreach(config('purchase.purchaseItem.type') as $k=>$type)
             	@if($purchaseList->type == $k)
-            	<td>{{ $type }}</td>
+            	{{ $type }}
                 @endif
             @endforeach
-           
+           </td>
+           <td>
+           @foreach(config('purchase.purchaseItem.costExamineStatus') as $k=>$costExamineStatu)
+            	@if($purchaseList->costExamineStatus == $k)
+            	{{$costExamineStatu}}
+                @endif
+            @endforeach
+           </td>
             <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}
             @if($purchaseList->supplier->type ==1)

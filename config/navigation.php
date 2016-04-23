@@ -240,6 +240,11 @@ return [
                     'url' => 'printPurchaseOrder.index',
                     'icon' => '',
                 ],
+				[
+                    'name' => '采购单结算',
+                    'url' => 'closePurchaseOrder.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '采购对单',
                     'url' => 'purchaseList.index',

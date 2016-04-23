@@ -103,7 +103,8 @@ Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@active
 Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
 Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
-
+//未结算订单
+Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
 //采购单
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');

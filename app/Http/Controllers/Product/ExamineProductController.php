@@ -32,7 +32,7 @@ class ExamineProductController extends Controller
     {
         $response = [
             'metas' => $this->metas('index'),
-            'data' => $this->autoList($this->product, $this->product->where('edit_status','image_unedited')->orWhere('edit_status','image_edited')),
+            'data' => $this->autoList($this->product, $this->product->whereIn('edit_status',array('image_unedited','image_edited'))),
         ];
 
         return view( $this->viewPath .'index', $response);
@@ -70,7 +70,7 @@ class ExamineProductController extends Controller
         $data = request()->input();
         $productModel->update($data);
         //ERP中如果该产品之前没有创建item,并且是审核,就创建item
-        if($data['examine']=='pass'&&empty($productModel->item->toArray())){
+        if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){
             $productModel->createItem();
         }
         return redirect($this->mainIndex);

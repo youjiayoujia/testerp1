@@ -2,6 +2,10 @@
 @section('formAction') {{ route('product.store') }} @stop
 @section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
+<?php 
+//echo '<pre>';
+  //          print_r($logisticsLimit);exit;
+?>
     <div class="form-group">
         <label for="catalog_id">分类</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select id="catalog_id" class="form-control" name="catalog_id">
@@ -56,6 +60,10 @@
         </div>
 
         <div class="form-group col-md-3">
+            <label for="color">销售链接</label>
+            <input class="form-control" id="product_sale_url" placeholder="销售链接" name='product_sale_url' value="{{ old('product_sale_url') }}">
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') }}">
         </div>
@@ -88,17 +96,17 @@
     <div class='row'>
         <div class="form-group col-md-3">
             <label for="color">物流限制</label>  
-                @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+                @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}'>{{$carriage_limit}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}'>{{$carriage_limit->name}}
                     </label>
                 @endforeach   
         </div>
         <div class="form-group col-md-3">
             <label for="color">包装限制</label>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+            @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}'>{{$package_limit}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}'>{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>

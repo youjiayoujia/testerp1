@@ -16,7 +16,8 @@ return [
         'arrived' => '货物到齐',
         'shipped' => '发货完成',
         'completed' => '订单完成',
-        'cancel' => '取消订单'
+        'cancel' => '取消订单',
+        'error' => '订单异常',
     ],
 
     //售后状态

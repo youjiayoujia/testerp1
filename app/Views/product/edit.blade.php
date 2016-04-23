@@ -123,7 +123,10 @@
                 @endforeach
             </select>
         </div>
-
+        <div class="form-group col-md-3">
+            <label for="color">销售链接</label>
+            <input class="form-control" id="product_sale_url" placeholder="销售链接" name='product_sale_url' value="{{ old('product_sale_url') ?  old('product_sale_url') : $product->product_sale_url }}">
+        </div>
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $product->purchase_url }}">
@@ -156,17 +159,17 @@
     <div class='row'>
         <div class="form-group col-md-3">
             <label for="color">物流限制</label>
-            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+            @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}' {{ in_array($carriage_key, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
                     </label>
             @endforeach
         </div>
         <div class="form-group col-md-3">
             <label for="color">包装限制</label>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+            @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}' {{ in_array($package_key, explode(',',$product->package_limit))? 'checked' : '' }} >{{$package_limit}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>

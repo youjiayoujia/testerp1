@@ -78,14 +78,24 @@
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">修改密码</a></li>
-                        <li><a href="/auth/logout">注销</a></li>
-                    </ul>
+                    @if(!empty(request()->user()))
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-user" aria-hidden="true">{{request()->user()->name}}</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">修改密码</a></li>
+                            <li><a href="/auth/logout">注销</a></li>
+                        </ul>
+                    @else
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/auth/login">登录</a></li>
+                        </ul>
+                    @endif
                 </li>
+                
             </ul>
         </div>
     </div>

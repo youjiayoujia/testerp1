@@ -117,7 +117,10 @@
             <td></td>
         </tr>
         <tr>
-            <td><label>配件说明: </label>{{$model->description}}</td>
+            <td><label>材质: </label>
+            <br>
+                <textarea class="vLargeTextField" cols="50" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="product_description" name="product_description" rows="3" >{{ old('product_description') ?  old('product_description') : $model->description }}</textarea>
+            </td>
             <td>
                 <label>主表:描述(description): </label>
                 <br>

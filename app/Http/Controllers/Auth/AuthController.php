@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 class AuthController extends Controller
 {
     protected $redirectPath = '/';
-    protected $loginPath = '/login';
+    protected $loginPath = 'auth/login';
     /*
     |--------------------------------------------------------------------------
     | Registration & Login Controller
@@ -41,7 +41,7 @@ class AuthController extends Controller
      * @param  array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    public function validator(array $data)
     {
         return Validator::make($data, [
             'name' => 'required|max:255',
@@ -56,7 +56,7 @@ class AuthController extends Controller
      * @param  array $data
      * @return User
      */
-    protected function create(array $data)
+    public function create(array $data = [])
     {
         return User::create([
             'name' => $data['name'],

@@ -120,7 +120,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><label>配件说明: </label>{{$model->description}}</td>
+            <td><label>材质: </label>{{$model->description}}</td>
             <td>
                 <label>主表:描述(description): </label>
                 <br>
@@ -242,7 +242,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">关闭
             </button>
-            <button type="submit" class="btn btn-primary" name='examine' value='notpass'>
+            <button type="submit" class="btn btn-primary" name='examine_status' value='notpass'>
                提交
             </button>
          </div>
@@ -252,13 +252,13 @@
 @stop
 @section('formButton')
     <?php if($model->examine_status==''||$model->examine_status=='notpass'||$model->examine_status=='revocation'){ ?>
-        <button type="submit" class="btn btn-success" name='examine' value='pass'>资料审核通过</button>
+        <button type="submit" class="btn btn-success" name='examine_status' value='pass'>资料审核通过</button>
     <?php } ?>
     <?php if($model->examine_status==''||$model->examine_status=='revocation'){ ?>
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">资料审核不通过</button>
     <?php } ?>
     <?php if($model->examine_status=='pass'){ ?>
-        <button type="submit" class="btn btn-success" name='examine' value='revocation'>撤销审核</button>
+        <button type="submit" class="btn btn-success" name='examine_status' value='revocation'>撤销审核</button>
     <?php } ?>
 @show{{-- 表单按钮 --}}
 

@@ -117,7 +117,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><label>配件说明: </label>{{$model->description}}</td>
+            <td><label>材质: </label>{{$model->description}}</td>
             <td>
                 <label>主表:描述(description): </label>
                 <br>

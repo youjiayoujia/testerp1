@@ -175,7 +175,7 @@
             block.find('.unit_cost').val('');
         });
 
-        $(document).on('blur', '.sku', function(){
+        $(document).on('change', '.sku', function(){
             var tmp = $(this);
             var block = $(this).parent().parent();
             var type = block.find('.type').val();

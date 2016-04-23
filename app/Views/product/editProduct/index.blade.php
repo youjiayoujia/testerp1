@@ -6,8 +6,9 @@
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">资料未编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">被选中</a></li>
                 <li><a href="{{ DataList::filtersEncode(['edit_status','=','data_edited']) }}">资料已编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_edited']) }}">图片已编辑</a></li>
                 <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
             </ul>
     </div>  
@@ -52,7 +53,7 @@
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
-            <td>{{ $product->fabric }}</td>
+            <td>{{ $product->description }}</td>
             <td>{{ $product->supplier->name }}</td>
             <td>{{ $product->supplier_info }}</td>
             <td>{{ $product->purchase_price }}</td>

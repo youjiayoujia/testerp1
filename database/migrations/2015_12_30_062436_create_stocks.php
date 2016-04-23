@@ -20,7 +20,6 @@ class CreateStocks extends Migration
             $table->integer('all_quantity')->comment('总数量')->default(NULL);
             $table->integer('available_quantity')->comment('可用数量')->default(NULL);
             $table->integer('hold_quantity')->comment('hold库存')->default(NULL);
-            $table->float('amount')->comment('总金额')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -28,9 +28,11 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-//        $order = OrderModel::find(1);
-//        for ($i = 0; $i < 2000; $i++) {
-//            $order->createPackage();
+//        $order = OrderModel::find(2);
+//        for ($i = 0; $i < 200; $i++) {
+//            foreach (OrderModel::all() as $order) {
+//                $order->createPackage();
+//            }
 //        }
         return view($this->viewPath . 'create', $response);
     }
@@ -38,13 +40,14 @@ class PackageController extends Controller
     public function store()
     {
         request()->flash();
-        $order = OrderModel::find(request()->input('order_id'));
+//        $order = OrderModel::find(request()->input('order_id'));
+        $order = OrderModel::where('ordernum', '=', request()->input('ordernum'))->first();
         if ($order) {
             $this->validate(request(), $this->model->rules('create'));
             if ($order->createPackage()) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
             } else {
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足'));
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足. 已生成订单需求.'));
             }
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
@@ -101,22 +104,17 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->logistic_id = request()->input('logistic_id');
+        $model->update(request()->all());
         $model->status = 'SHIPPED';
         $model->save();
-        $model->manualLogistics()->create([
-            'logistic_code' => request()->input('logistic_code'),
-            'fee' => request()->input('fee'),
-            'remark' => request()->input('remark')
-        ]);
 
         return redirect($this->mainIndex);
     }
 
     /**
-     * 跳转发货页面 
+     * 跳转发货页面
      *
-     * @param none 
+     * @param none
      * @return view
      *
      */
@@ -127,13 +125,13 @@ class PackageController extends Controller
             'logistics' => LogisticsModel::all(),
         ];
 
-        return view($this->viewPath.'shipping', $response);
+        return view($this->viewPath . 'shipping', $response);
     }
 
     /**
      * 执行发货
      *
-     * @param none 
+     * @param none
      * @return json
      *
      */
@@ -142,10 +140,10 @@ class PackageController extends Controller
         $track_no = request()->input('trackno');
         $logistic_id = request()->input('logistic_id');
         $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
-        if(!$package) {
+        if (!$package) {
             return json_encode(false);
         }
-        if($package->logistic_id != $logistic_id) {
+        if ($package->logistic_id != $logistic_id) {
             return json_encode('logistic_error');
         }
         $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time())]);
@@ -158,7 +156,7 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
         ];
 
-        return view($this->viewPath.'statistics', $response);
+        return view($this->viewPath . 'statistics', $response);
     }
 
     public function exportData()

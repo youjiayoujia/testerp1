@@ -21,8 +21,12 @@ Route::resource('productImage', 'Product\ImageController');
 Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
 Route::resource('reportedMissing', 'Product\ReportedMissingController');
 
+//包装限制
+Route::resource('wrapLimits', 'WrapLimitsController');
+
 
 Route::any('catalog/checkName', ['uses' => 'CatalogController@checkName', 'as'=>'checkName']);
+
 
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -181,7 +185,8 @@ Route::resource('stockAllotment', 'Stock\AllotmentController');
 //库存结转
 Route::post('stockCarryOver/showStockView', ['uses'=>'Stock\CarryOverController@showStockView', 'as'=>'stockCarryOver.showStockView']);
 Route::get('stockCarryOver/showStock', ['uses'=>'Stock\CarryOverController@showStock', 'as'=>'stockCarryOver.showStock']);
-Route::get('stockCarryOver/ajaxCreateCarryOver', ['uses'=>'Stock\CarryOverController@ajaxCreateCarryOver', 'as'=>'stockCarryOver.ajaxCreateCarryOver']);
+Route::get('stockCarryOver/createCarryOver', ['uses'=>'Stock\CarryOverController@createCarryOver', 'as'=>'stockCarryOver.createCarryOver']);
+Route::post('stockCarryOver/createCarryOverResult', ['uses'=>'Stock\CarryOverController@createCarryOverResult', 'as'=>'stockCarryOver.createCarryOverResult']);
 Route::resource('stockCarryOver', 'Stock\CarryOverController');
 
 //库存盘点
@@ -190,6 +195,9 @@ Route::get('StockTaking/takingCreate', ['uses' => 'Stock\TakingController@ajaxta
 Route::get('StockTaking/takingCheck/{id}', ['uses' => 'Stock\TakingController@takingCheck', 'as' => 'stockTaking.takingCheck']);
 Route::post('StockTaking/takingCheckResult/{id}', ['uses' => 'Stock\TakingController@takingCheckResult', 'as' => 'stockTaking.takingCheckResult']);
 Route::resource('stockTaking', 'Stock\TakingController');
+
+//物流限制
+Route::resource('logisticsLimits', 'Logistics\LimitsController');
 
 //物流路由
 Route::resource('logistics', 'LogisticsController');
@@ -208,6 +216,7 @@ Route::post('logisticsCodeFn', ['uses' => 'Logistics\CodeController@batchAddTrCo
 Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
+Route::resource('logisticsRule', 'Logistics\RuleController');
 
 //拣货单异常
 Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);
@@ -271,3 +280,6 @@ Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
 Route::get('getChoiesOrder', ['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);
 Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
 Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
+
+//用户路由
+Route::resource('user', 'UserController');

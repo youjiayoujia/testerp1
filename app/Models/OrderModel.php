@@ -20,7 +20,6 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items'];
 
-
     public $searchFields = [
         'channel_id',
         'channel_account_id',
@@ -178,12 +177,22 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
 
+    public function requires()
+    {
+        return $this->hasMany('App\Models\RequireModel', 'order_id');
+    }
+
     public function createOrder($data)
     {
         $order = $this->create($data);
-
         foreach ($data['items'] as $item) {
-//            $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
+            $obj = ItemModel::where('sku', $item['sku'])->get();
+            if(!count($obj)) {
+                $item['item_id'] = 0;
+                $order->update(['status' => 'error']);
+            }else {
+                $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
+            }
             $order->items()->create($item);
         }
 
@@ -193,8 +202,9 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return bool
+     * todo:生成采购需求
+     * * todo:判断订单状态
      * todo:更新订单状态
-     * todo:判断订单是否要生成包裹
      * todo:订单优先级
      * todo:判断订单是否需要拆单先发
      * todo:判断订单是否要hold库存
@@ -243,6 +253,15 @@ class OrderModel extends BaseModel
             }
             DB::commit();
             return true;
+        } else { //生成订单需求
+            foreach ($this->items as $item) {
+                $require = [];
+                $require['item_id'] = $item->item_id;
+                $require['order_item_id'] = $item->id;
+                $require['sku'] = $item->sku;
+                $require['quantity'] = $item->quantity;
+                $this->requires()->create($require);
+            }
         }
         return false;
     }
@@ -250,7 +269,7 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
-     * todo:生成采购需求
+     * todo:订单产品状态判断
      */
     public function setPackageItems()
     {
@@ -290,7 +309,7 @@ class OrderModel extends BaseModel
         //根据仓库满足库存数量进行排序
         $warehouses = [];
         foreach ($this->items as $orderItem) {
-            $itemStocks = $orderItem->item->matchStock($orderItem->quantity);
+            $itemStocks = $orderItem->item ? $orderItem->item->matchStock($orderItem->quantity) : false;
             if ($itemStocks) {
                 foreach ($itemStocks as $itemStock) {
                     foreach ($itemStock as $warehouseId => $stock) {

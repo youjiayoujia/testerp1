@@ -101,9 +101,12 @@ Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition'
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
 Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
-Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
-
+//采购需求
+Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
+Route::resource('require', 'Purchase\RequireController');
+//未结算订单
+Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
 //采购单
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
@@ -119,6 +122,7 @@ Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
 Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
+Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
@@ -184,7 +188,8 @@ Route::resource('stockAllotment', 'Stock\AllotmentController');
 //库存结转
 Route::post('stockCarryOver/showStockView', ['uses'=>'Stock\CarryOverController@showStockView', 'as'=>'stockCarryOver.showStockView']);
 Route::get('stockCarryOver/showStock', ['uses'=>'Stock\CarryOverController@showStock', 'as'=>'stockCarryOver.showStock']);
-Route::get('stockCarryOver/ajaxCreateCarryOver', ['uses'=>'Stock\CarryOverController@ajaxCreateCarryOver', 'as'=>'stockCarryOver.ajaxCreateCarryOver']);
+Route::get('stockCarryOver/createCarryOver', ['uses'=>'Stock\CarryOverController@createCarryOver', 'as'=>'stockCarryOver.createCarryOver']);
+Route::post('stockCarryOver/createCarryOverResult', ['uses'=>'Stock\CarryOverController@createCarryOverResult', 'as'=>'stockCarryOver.createCarryOverResult']);
 Route::resource('stockCarryOver', 'Stock\CarryOverController');
 
 //库存盘点
@@ -215,6 +220,7 @@ Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 Route::resource('logisticsRule', 'Logistics\RuleController');
+Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
 
 //拣货单异常
 Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);

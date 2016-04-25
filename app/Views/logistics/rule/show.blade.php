@@ -25,7 +25,7 @@
                 <strong>是否通关</strong>: {{ $model->is_clearance == '1' ? '是' : '否' }}
             </div>
             <div class="col-lg-12">
-                <strong>国家</strong>: {{ $model->country }}
+                <strong>国家</strong>: {{ $model->country($model->country) }}
             </div>
         </div>
     </div>

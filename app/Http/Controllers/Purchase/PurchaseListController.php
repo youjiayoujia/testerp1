@@ -73,9 +73,14 @@ class PurchaseListController extends Controller
 	{
 		$data=request()->all();
 		$model=$this->model->find($id);
+		$examinePurchaseItem=PurchaseOrderModel::find($model->purchase_order_id);
+		if ($examinePurchaseItem->close_status < 1) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未结算采购条目不能对单.'));
+        }
 		if($data['arrival_num']==$model->purchase_num){
 			$data['lack_num']=0;
 			$data['status']=2;
+			$this->	generateDarCode($id);
 		}
 		if($data['active']>0){
 			$data['active_status']=1;
@@ -142,14 +147,18 @@ class PurchaseListController extends Controller
      */
 	public function examinePurchaseItem()
 	{
-		$purchaseItemIds=explode(',',request()->get('purchase_ids'));
-		$arrayItems=$this->model->find($purchaseItemIds);
-		foreach($arrayItems as $vo)
-		{	
-			if($vo->active_status < 1 && $vo->costExamineStatus ==2){
-			$vo->update(['status'=>2,'arrival_num'=>$vo->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
-			$num=$this->model->where('purchase_order_id',$vo->purchase_order_id)->where('status','<>',2)->count();
-			$purchaseOrder=PurchaseOrderModel::find($vo->purchase_order_id);
+		$purcahse_active=explode(',',request()->get('purcahse_active'));
+		foreach($purcahse_active as $key=>$value){
+			$purcahse=explode('+',$value);
+			$arrayItems=$this->model->find($purcahse[0]);
+			if($purcahse[1]>0){
+				$arrayItems->update(['active_status'=>1,'active'=>$purcahse[1]]);	
+			}
+			if($purcahse[1]==0 && $arrayItems->costExamineStatus ==2){
+			$arrayItems->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
+			$this->	generateBarCode($arrayItems->id);
+			$num=$this->model->where('purchase_order_id',$arrayItems->purchase_order_id)->where('status','<',2)->count();
+			$purchaseOrder=PurchaseOrderModel::find($arrayItems->purchase_order_id);
 			if($num==0){
 				$purchaseOrder->update(['status'=>3]);
 			}
@@ -177,7 +186,7 @@ class PurchaseListController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-	public function generateDarCode($id){
+	public function generateBarCode($id){
 		$model=$this->model->find($id);
 		$res=InModel::where('relation_id',$id)->count();			
 		if($res>0){
@@ -196,9 +205,12 @@ class PurchaseListController extends Controller
 				$warehouseName=$position->name;
 				$sku=$model->sku;
 				$barCode=$sku.$warehouseId.$warehouseName;
-				echo $barCode;
 			}else{
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
+				$position_num=PositionModel::where('warehouse_id',$model->warehouse_id)->count();
+				if($position_num == 0){
+					return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
+					}
 					foreach($position as $key=>$v){
 						$WarehousePositionIds[$key]=$v->id;
 					}
@@ -217,10 +229,22 @@ class PurchaseListController extends Controller
 				$warehouseName=$position->name;
 				$sku=$model->sku;
 				$barCode=$sku.$warehouseId.$warehouseName;
-				echo $barCode;
 			}
 		}
 	}
+	/**
+     * 生成条码
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function printBarCode($id){
+		$response = [
+			'metas' => $this->metas(__FUNCTION__),
+			'model' => $this->model->find($id),
+        ];
+		 return view($this->viewPath . 'printBarCode', $response);
+		}
 	
 }
 

@@ -77,7 +77,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="country_id" class="form-control" multiple style="height:300px;width:400px;">
                 @foreach($countries as $country)
-                    <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
+                    <option class="form-control" value="{{ $country->abbreviation }}" {{ old('country_id') ? old('country_id') == $country->abbreviation ? 'selected' : '' : ''}} onclick="addCountry( this )">
                         {{ $country->name }}
                     </option>
                 @endforeach
@@ -140,7 +140,7 @@
     function getPostCountry(){
         var selectCountry = "";
         $(".thecountry").each(function(){
-            selectCountry += $.trim($(this).html()) + ",";
+            selectCountry += $.trim($(this).attr('value')) + ",";
         });
         selectCountry = selectCountry.substring(0,selectCountry.length - 1);
         $("#country_id").html(selectCountry);

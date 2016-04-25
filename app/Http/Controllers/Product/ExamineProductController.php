@@ -70,7 +70,7 @@ class ExamineProductController extends Controller
         $data = request()->input();
         $productModel->update($data);
         //ERP中如果该产品之前没有创建item,并且是审核,就创建item
-        if($data['examine']=='pass'&&empty($productModel->item->toArray())){
+        if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){
             $productModel->createItem();
         }
         return redirect($this->mainIndex);

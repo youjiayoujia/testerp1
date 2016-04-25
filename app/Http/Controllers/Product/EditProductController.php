@@ -94,14 +94,10 @@ class EditProductController extends Controller
 
         $editStatus = request()->input('edit');
         $data = request()->all();
-        //echo '<pre>';
-        //print_r($data);
-        
+        $product_data = $data;
+        $product_data['description'] = $product_data['product_description'];
         $productModel = $this->product->find($id);
-        //print_r($data);
-        $productModel->update($data);
-
-//exit;
+        $productModel->update($product_data);
         //更新英文信息
         $ProductEnglishValueModel = new ProductEnglishValueModel();
         $data['product_id'] = $productModel->id;
@@ -260,5 +256,4 @@ class EditProductController extends Controller
 
         return $result;
     }
-     
 }

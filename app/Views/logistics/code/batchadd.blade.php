@@ -12,7 +12,7 @@
         <br/>
         <br/>
         <div class="form-group col-lg-12">
-            <label for="url" class="control-label">Select File</label>
+            <label for="url" class="control-label">Select File (文件格式为.csv)</label>
             <input type="hidden" name="logistics_id" value="{{ $logistics->id }}">
             <input id="input-1" type="file" class="file" name="trackingnos">
         </div>

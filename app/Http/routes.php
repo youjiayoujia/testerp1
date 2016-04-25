@@ -101,8 +101,10 @@ Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition'
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
 Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
-Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+//采购需求
+Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
+Route::resource('require', 'Purchase\RequireController');
 //未结算订单
 Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 

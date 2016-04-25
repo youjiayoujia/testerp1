@@ -232,6 +232,14 @@ class PurchaseListController extends Controller
 		}
 	}
 	
+	public function printBarCode($id){
+		$response = [
+			'metas' => $this->metas(__FUNCTION__),
+			'model' => $this->model->find($id),
+        ];
+		 return view($this->viewPath . 'printBarCode', $response);
+		}
+	
 }
 
 

@@ -85,10 +85,10 @@
                 <a href="{{ route('purchaseList.show', ['id'=>$purchaseList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>       
-                @if($purchaseList->active_status>0)
-                <!--<a href="/purchaseList/activeChange/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
-                     处理异常
-                </a>-->
+                @if($purchaseList->status >1)
+           		<a href="/purchaseList/printBarCode/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
+                     打印条码
+                </a>
                 @endif
                  
                 <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">

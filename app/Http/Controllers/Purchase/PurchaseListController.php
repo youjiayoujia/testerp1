@@ -147,15 +147,18 @@ class PurchaseListController extends Controller
      */
 	public function examinePurchaseItem()
 	{
-		$purchaseItemIds=explode(',',request()->get('purchase_ids'));
-		$arrayItems=$this->model->find($purchaseItemIds);
-		foreach($arrayItems as $vo)
-		{	
-			if($vo->active_status < 1 && $vo->costExamineStatus ==2){
-			$vo->update(['status'=>2,'arrival_num'=>$vo->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
-			$this->	generateDarCode($vo->id);
-			$num=$this->model->where('purchase_order_id',$vo->purchase_order_id)->where('status','<>',2)->count();
-			$purchaseOrder=PurchaseOrderModel::find($vo->purchase_order_id);
+		$purcahse_active=explode(',',request()->get('purcahse_active'));
+		foreach($purcahse_active as $key=>$value){
+			$purcahse=explode('+',$value);
+			$arrayItems=$this->model->find($purcahse[0]);
+			if($purcahse[1]>0){
+				$arrayItems->update(['active_status'=>1,'active'=>$purcahse[1]]);	
+			}
+			if($purcahse[1]==0 && $arrayItems->costExamineStatus ==2){
+			$arrayItems->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
+			$this->	generateBarCode($arrayItems->id);
+			$num=$this->model->where('purchase_order_id',$arrayItems->purchase_order_id)->where('status','<',2)->count();
+			$purchaseOrder=PurchaseOrderModel::find($arrayItems->purchase_order_id);
 			if($num==0){
 				$purchaseOrder->update(['status'=>3]);
 			}
@@ -183,7 +186,7 @@ class PurchaseListController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-	public function generateDarCode($id){
+	public function generateBarCode($id){
 		$model=$this->model->find($id);
 		$res=InModel::where('relation_id',$id)->count();			
 		if($res>0){
@@ -202,7 +205,6 @@ class PurchaseListController extends Controller
 				$warehouseName=$position->name;
 				$sku=$model->sku;
 				$barCode=$sku.$warehouseId.$warehouseName;
-				echo $barCode;
 			}else{
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
 				$position_num=PositionModel::where('warehouse_id',$model->warehouse_id)->count();
@@ -227,11 +229,15 @@ class PurchaseListController extends Controller
 				$warehouseName=$position->name;
 				$sku=$model->sku;
 				$barCode=$sku.$warehouseId.$warehouseName;
-				echo $barCode;
 			}
 		}
 	}
-	
+	/**
+     * 生成条码
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
 	public function printBarCode($id){
 		$response = [
 			'metas' => $this->metas(__FUNCTION__),

@@ -107,6 +107,7 @@ class EditProductController extends Controller
         }
         //去除英文产品表和产品表重名字段以更新
         unset($data['description']);
+        $data['edit_user'] = request()->user()->id;
         $productModel->update($data);
         
         return redirect($this->mainIndex);
@@ -140,12 +141,15 @@ class EditProductController extends Controller
         $id = request()->input('id');
         request()->flash();
         $data = request()->all();
+        $ProductModel = $this->product->find($id);
         if($data['uploadType']=='image'){
-            $ProductModel = $this->product->find($id);
             $ProductModel->updateProductImage($data,request()->files);
         }else{
             $this->image->imageCreate(request()->all(), request()->files);
         }
+        $user = [];
+        $user['edit_image_user'] = request()->user()->id;
+        $ProductModel->update($user);
         
         return redirect($this->mainIndex);
     }

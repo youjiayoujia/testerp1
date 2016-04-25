@@ -270,7 +270,7 @@ class PickListController extends Controller
     {   
         if(request()->has('logistic')) {
             foreach(request()->input('logistic') as $logistic_id) {
-                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistic_id'=>$logistic_id, 'is_auto'=>'1'])->where(function($query){
+                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1'])->where(function($query){
                     if(request()->has('package')) {
                         foreach(request()->input('package') as $key => $package)
                             $query = ($key == 0 ? $query->where('type', $package) : $query->orwhere('type', $package));

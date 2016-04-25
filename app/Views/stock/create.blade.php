@@ -1,5 +1,4 @@
 @extends('common.form')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stock.store') }} @stop
 @section('formBody')
     <div class='row'>
@@ -32,6 +31,7 @@
         </div>
     </div>
 @stop
+@section('pageJs')
 <script type='text/javascript'>
     $(document).ready(function(){
         $('.sku').blur(function(){
@@ -73,3 +73,4 @@
         });
     });
 </script>
+@stop

@@ -1,5 +1,4 @@
 @extends('common.form')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('pickList.createPickStore') }} @stop
 @section('formBody')
     <table class='table table-bordered'>
@@ -73,6 +72,7 @@
 @section('formButton')
     <button type="submit" class="btn btn-success">生成拣货单</button>
 @stop
+@section('pageJs')
 <script type='text/javascript'>
 $(document).ready(function(){
     $('.mixed').click(function(){
@@ -111,3 +111,4 @@ $(document).ready(function(){
     });
 });
 </script>
+@stop

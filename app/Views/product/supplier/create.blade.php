@@ -1,6 +1,4 @@
 @extends('common.form')
-<script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('productSupplier.store') }} @stop
 @section('formAttributes') name='creator' @stop
 @section('formBody')
@@ -83,6 +81,8 @@
        </div>
    </div>
 @stop
+@section('pageJs')
+<script type='text/javascript' src="{{ asset('js/pro_city.js') }}"></script>
 <script type='text/javascript'>
     $(document).ready(function(){
         var buf = new Array();
@@ -100,5 +100,5 @@
             }
         });
     });
-
 </script>
+@stop

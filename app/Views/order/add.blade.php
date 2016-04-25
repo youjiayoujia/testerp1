@@ -2,13 +2,16 @@
     <div class="form-group col-sm-2">
         <input type='text' class="form-control sku" id="arr[sku][{{$current}}]" placeholder="sku" name='arr[sku][{{$current}}]' value="{{ old('arr[sku][$current]') }}">
     </div>
+    <div class="form-group col-sm-2">
+        <input type='text' class="form-control image" id="arr[image][{{$current}}]" placeholder="图片" name='arr[image][{{$current}}]' value="{{ old('arr[image][$current]') }}">
+    </div>
     <div class="form-group col-sm-1">
         <input type='text' class="form-control quantity" id="arr[quantity][{{$current}}]" placeholder="数量" name='arr[quantity][{{$current}}]' value="{{ old('arr[quantity][$current]') }}">
     </div>
     <div class="form-group col-sm-1">
-        <input type='text' class="form-control price" id="arr[price][{{$current}}]" placeholder="金额" name='arr[price][{{$current}}]' value="{{ old('arr[price][$current]') }}">
+        <input type='text' class="form-control price" id="arr[price][{{$current}}]" placeholder="单价" name='arr[price][{{$current}}]' value="{{ old('arr[price][$current]') }}">
     </div>
-    <div class="form-group col-sm-2">
+    <div class="form-group col-sm-1">
         <select class="form-control status" name="arr[status][{{$current}}]" id="arr[status][{{$current}}]">
             @foreach(config('order.product_status') as $product_status_key => $status)
                 <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
@@ -29,7 +32,7 @@
     <div class="form-group col-sm-2">
         <input type='text' class="form-control remark" id="arr[remark][{{$current}}]" placeholder="备注" name='arr[remark][{{$current}}]' value="{{ old('arr[remark][$current]') }}">
     </div>
-    <div class="form-group col-sm-2">
+    <div class="form-group col-sm-1">
         <select class="form-control ship_status" name="arr[ship_status][{{$current}}]" id="arr[ship_status][{{$current}}]">
             @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
                 <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$current]') == $ship_status_key ? 'selected' : '' }}>

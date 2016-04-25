@@ -24,12 +24,33 @@
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') }}">
         </div>
-            <div class="form-group col-md-3">
+        <div class="form-group col-md-3">
+            <label for="color">别名中文</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="alias_cname" placeholder="别名中文" name='alias_cname' value="{{ old('alias_cname') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">别名英文</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="alias_name" placeholder="别名英文" name='alias_name' value="{{ old('alias_name')  }}">
+        </div>
+    </div>
+
+    <div class='row'>
+        <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id="supplier_id" class="form-control" name="supplier_id">
                 <option value=""></option>
                 @foreach($suppliers as $supplier)
                     <option value="{{ $supplier->id}}" {{ $supplier->id == old('supplier_id') ? 'selected' : '' }} >{{$supplier->name}}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-md-3"><label for="color">辅供应商</label>
+            <select  class="form-control" name="second_supplier_id">
+                <option value="0"></option>
+                @foreach($suppliers as $supplier)
+                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
                 @endforeach
             </select>
         </div>
@@ -40,15 +61,6 @@
     </div>
 
     <div class='row'>
-        <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
-                @endforeach
-            </select>
-        </div>
-
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') }}">
@@ -65,7 +77,7 @@
             <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2">
             <label for="color">产品包装尺寸(m³)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长,xx 宽,xx 高,xx)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>

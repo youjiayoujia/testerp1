@@ -367,8 +367,6 @@ class ProductModel extends BaseModel
             $product_data = $this->toArray();
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
-            echo '<pre>';
-            print_r($product_data);exit;
             $this->item()->create($product_data);
         }
         $this->status = 1;

@@ -222,19 +222,19 @@ return [
             '采购管理' => [
                 [
                     'name' => '采购需求',
-                    'url' => 'purchaseItem.index',
+                    'url' => 'require.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '采购条目',
-                    'url' => 'purchaseItemList.index',
-                    'icon' => '',
-                ],
-                [
+				[
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '采购条目',
+                    'url' => 'purchaseItemList.index',	
+                    'icon' => '',
+                ],  
 				[
                     'name' => '打印采购单',
                     'url' => 'printPurchaseOrder.index',

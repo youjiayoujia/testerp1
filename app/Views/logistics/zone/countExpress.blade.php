@@ -55,7 +55,7 @@
             </div>
             <div class="form-group col-lg-12">
                 <label for="country_id" class="control-label">国家</label>
-                <textarea class="form-control" rows="3" id="country_id" placeholder="国家" name="country_id">{{ old('country_id') ? old('country_id') : $zone->country_id }}</textarea>
+                <textarea class="form-control" rows="3" id="country_id" placeholder="国家" name="country_id" readonly>{{ old('country_id') ? old('country_id') : $zone->country($zone->country_id) }}</textarea>
             </div>
         </div>
     </div>

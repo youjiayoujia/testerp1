@@ -11,6 +11,7 @@
 namespace App\Models\Logistics;
 
 use App\Base\BaseModel;
+use App\Models\CountryModel;
 
 class ZoneModel extends BaseModel
 {
@@ -52,6 +53,22 @@ class ZoneModel extends BaseModel
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+    }
+
+    /**
+     * 遍历国家
+     */
+    public function country($country)
+    {
+        $str = '';
+        foreach(explode(",", $country) as $value) {
+            $countries = CountryModel::where(['abbreviation' => $value])->get();
+            foreach($countries as $country) {
+                $val = $country['name'];
+                $str = $str.$val.',';
+            }
+        }
+        return substr($str, 0, -1);
     }
 
 }

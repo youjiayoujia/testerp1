@@ -46,7 +46,7 @@
                 <strong>最后折扣</strong>: {{ $model->discount }}
             </div>
             <div class="col-lg-12">
-                <strong>国家</strong>: {{ $model->country_id }}
+                <strong>国家</strong>: {{ $model->country($model->country_id) }}
             </div>
         </div>
     </div>

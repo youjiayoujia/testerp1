@@ -6,7 +6,10 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="row">
-      <div class="form-group col-lg-3">
+    <div class="form-group col-lg-4">
+       <strong>ID</strong>: {{ $model->id }}
+      </div>
+      <div class="form-group col-lg-4">
         <label for="type">采购类型：</label>
         @foreach(config('purchase.purchaseItem.type') as $k=>$type)
             	@if($model->type == $k)
@@ -16,28 +19,45 @@
     </div>
     
     
-     <div class="form-group col-lg-3">
+     <div class="form-group col-lg-4">
             <label for="warehouse">仓库:</label>
             {{$model->warehouse->name}}
     </div>
-    <div class="form-group col-lg-3">
+    </div>
+     <div class="row">
+    <div class="form-group col-lg-4">
         <label for="sku_id">sku:</label>
         {{$model->sku}}
     </div>
-  <div class="form-group col-lg-3">
+  <div class="form-group col-lg-4">
         <label >图片:</label>
         <img src="{{asset($model->item->product->image->src)}}" height='50px'/>
     </div>
-    </div> 
+    <div class="form-group col-lg-4">
+                <strong>采购状态</strong>:
+               @foreach(config('purchase.purchaseItem.status') as $k=>$val)
+            	@if($model->status == $k)
+            		{{$val}}
+                @endif
+            	@endforeach
+            </div> 
+     </div>
     <div class="row">
-    <div class="form-group col-lg-3">
+    <div class="form-group col-lg-4">
+        <strong>供应商信息</strong>:
+        名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
+    </div>
+    <div class="form-group col-lg-4">
             <label >参考价格:</label>
             {{$model->item->product->purchase_price}}
     </div>
-    <div class="form-group col-lg-3">
+    <div class="form-group col-lg-4">
             <label >成本价格:</label>
             {{$model->purchase_cost}}
     </div>
+    </div>
+    <div class="row">
+     @if($model->purchase_cost >0)
         <div class="form-group col-lg-4">
             <label >审核成本:</label>
             <select name='costExamineStatus'>
@@ -46,20 +66,13 @@
             @endforeach
             </select>
     </div>
+    @endif
+    @if($model->status < 2)
+     <div class="form-group col-lg-4" >
+        <label for="URL">采购数量：</label>
+        <input type="text" class="form-control"  name="purchase_num" value="{{$model->purchase_num}}"/>
     </div>
-    <div class="row">
-    <div class="form-group col-lg-3">
-            <label >异常:</label>
-           <select  class="form-control" name="active" id='type' onChange="reportwait(this.id)">
-            @foreach(config('purchase.purchaseItem.active') as $k=>$v)
-            	<option value="{{$k}}" @if($k==$model->active) selected @endif>{{ $v }}</option>   
-            @endforeach
-            </select>
-    </div>
-    <div class="form-group col-lg-3" >
-        <label for="URL">备注：</label>
-        <input type="text" class="form-control"  name="remark" value=""/>
-    </div>
+    @endif
     </div>
 @stop
  

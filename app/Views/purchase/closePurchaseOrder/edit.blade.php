@@ -22,7 +22,7 @@
             </div>
             <div class="form-group col-lg-4">
                 <strong>结算人</strong>:            
-            		{{$model->update_userid}}
+            		{{$model->assigner}}
             </div> 
              <div class="form-group col-lg-4">
                 <strong>采购单结算状态</strong>:
@@ -47,17 +47,23 @@
                 	线下采购
                 @endif
             </div>
-         <div class="form-group col-lg-4">
+        <div class="form-group col-lg-4">
             <strong>采购单运单号</strong>:
+                @if(!$model->post_coding)
+                暂无运单号
+                @else
                 {{$model->post_coding}}
+                @endif
             </div>
          <div class="form-group col-lg-4">
             <strong>采购单运费</strong>:
+             @if(!$model->post_coding)
+                暂无运费上报
+                @else
                 {{$model->total_postage}}
+                @endif  
             </div>  
-                    
-        </div>
-
+		</div>
      <div class="panel panel-default">
         <div class="panel-heading">单身</div>
         <div class="panel-body">

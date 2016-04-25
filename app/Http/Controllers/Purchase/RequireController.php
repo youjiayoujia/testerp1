@@ -57,6 +57,7 @@ class RequireController extends Controller
 		$all_quantity=StockModel::where('item_id',$v->item_id)->sum('all_quantity');
 		$purchasingNum=PurchaseItemModel::where('sku',$v->sku)->sum('purchase_num');
 		$order_need_num=$this->model->where('id',$v->id)->sum('quantity');
+		$data['type']=0;
 		$data['warehouse_id']=$v->warehouse_id;
 		$data['sku']=$v->sku;
 		$data['supplier_id']=$v->item->supplier_id;

@@ -9,7 +9,7 @@ class ProductEnglishValueModel extends BaseModel
             'product_id','unedit_reason','sale_usd_price','market_usd_price','cost_usd_price',
             'choies_set',
             'name',
-            'c_name',
+            'baoguan_name',
             'attribute_size',
             'store',
             'brief',

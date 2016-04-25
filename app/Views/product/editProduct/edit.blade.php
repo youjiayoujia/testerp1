@@ -9,18 +9,20 @@
     $cost_usd_price = '';
     $sale_usd_price = '';
     $name = '';
-    $c_name = '';
+    $baoguan_name = '';
+    $attribute_size = '';
     $store = '';
     $filter_attributes = '';
     $brief = '';
     $description = '';
     if(!empty($check)){
+        $attribute_size = $check->attribute_size;
         $unedit_reason = $check->unedit_reason;
         $market_usd_price = $check->market_usd_price;
         $cost_usd_price = $check->cost_usd_price;
         $sale_usd_price = $check->sale_usd_price; 
         $name = $check->name;
-        $c_name = $check->c_name;
+        $baoguan_name = $check->baoguan_name;
         $store = $check->store;
         $filter_attributes = $check->filter_attributes;
         $brief = $check->brief;
@@ -49,7 +51,7 @@
         </tr>
         <tr>
             <td><label>产品中文名: </label>{{$model->c_name}}</td>
-            <td><label>主表:中文名: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" style="width:300px;" id="c_name" value="{{ old('c_name') ?  old('c_name') : $c_name }}" name="c_name"></td>
+            <td><label>报关:中文名: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" style="width:300px;" id="baoguan_name" value="{{ old('baoguan_name') ?  old('baoguan_name') : $baoguan_name }}" name="baoguan_name"></td>
         </tr>
         <tr>
             <td><label>图片备注: </label></td>
@@ -85,9 +87,8 @@
                 <textarea class="vLargeTextField" cols="50" id="filter_attributes" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> name="filter_attributes" rows="3" >{{ old('filter_attributes') ?  old('filter_attributes') : $filter_attributes }}</textarea>
             </td>
         </tr>
-        
         <tr>
-            <td><label>尺码描述: </label>
+            <td><label>尺码: </label>
                 <?php 
                     $size = "";
                     foreach($model->variationValues->toArray() as $key=>$arr){
@@ -96,6 +97,17 @@
                     }
                     echo substr($size,0,strlen($size)-1);
                  ?>
+            </td>
+            <td>
+                <label>Attribute:Size: </label>
+                <br>
+                <input type="text" value="{{ old('attribute_size') ?  old('attribute_size') : $attribute_size }}" class="form-control form55" style="width:300px;" name="attribute_size"/>
+            </td>
+        </tr>
+       
+        <tr>
+            <td><label>尺码描述: </label>
+                {{$model->size_description}}
             </td>
             <td>
                 <label>主表:简短描述(brief): </label>
@@ -117,9 +129,7 @@
             <td></td>
         </tr>
         <tr>
-            <td><label>材质: </label>
-            <br>
-                <textarea class="vLargeTextField" cols="50" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="product_description" name="product_description" rows="3" >{{ old('product_description') ?  old('product_description') : $model->description }}</textarea>
+            <td>配件说明:{{$model->description}}
             </td>
             <td>
                 <label>主表:描述(description): </label>
@@ -187,13 +197,8 @@
             </td>
         </tr>
         <tr>
-            <td><label>是否透明: </label></td>
-            <td></td>
-        </tr>
-        <tr>
             <td><label>信息录入员: </label></td>
             <td>
-                <label>备注不编辑原因: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" id="unedit_reason" value="{{ old('unedit_reason') ?  old('unedit_reason') : $unedit_reason }}" name="unedit_reason">
             </td>
         </tr>
         <tr>

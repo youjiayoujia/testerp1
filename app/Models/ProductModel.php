@@ -20,11 +20,9 @@ class ProductModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'name' => 'required',
             'c_name' => 'required',
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
-           // 'purchase_url' => 'url',
             'supplier_id' => 'required',
             'product_size' => 'required',
             'weight' => 'required|numeric',
@@ -32,11 +30,9 @@ class ProductModel extends BaseModel
             'catalog_id' => 'required',
         ],
         'update' => [
-            'name' => 'required',
             'c_name' => 'required',
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
-            'purchase_url' => 'url',
             'product_size' => 'required',
             'weight' => 'required|numeric',
             'upload_user' => 'required',
@@ -67,6 +63,7 @@ class ProductModel extends BaseModel
         'product_size',
         'package_size',
         'weight',
+        'size_description',
         'description',
         'upload_user',
         'selector_id',
@@ -370,6 +367,8 @@ class ProductModel extends BaseModel
             $product_data = $this->toArray();
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
+            echo '<pre>';
+            print_r($product_data);exit;
             $this->item()->create($product_data);
         }
         $this->status = 1;

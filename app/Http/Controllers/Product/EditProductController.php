@@ -93,11 +93,8 @@ class EditProductController extends Controller
         request()->flash();
 
         $editStatus = request()->input('edit');
-        $data = request()->all();
-        $product_data = $data;
-        $product_data['description'] = $product_data['product_description'];
-        $productModel = $this->product->find($id);
-        $productModel->update($product_data);
+        $data = request()->all();  
+        $productModel = $this->product->find($id);    
         //更新英文信息
         $ProductEnglishValueModel = new ProductEnglishValueModel();
         $data['product_id'] = $productModel->id;
@@ -108,6 +105,9 @@ class EditProductController extends Controller
         }else{
             $english->update($data);
         }
+        //去除英文产品表和产品表重名字段以更新
+        unset($data['description']);
+        $productModel->update($data);
         
         return redirect($this->mainIndex);
     }

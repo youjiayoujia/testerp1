@@ -33,14 +33,14 @@
                 <td>邮递方式</td>
             </tr>
             <tr>
-                <td><input type='checkbox' class='logistic_all' checked='true'>全部</td>
+                <td><input type='checkbox' class='logistics_all' checked='true'>全部</td>
             </tr>
             <tr>
                 <td><input type='checkbox' class='mixed'>混合物流</td>
             </tr>
-            @foreach($logistics as $logistic)
+            @foreach($logisticses as $logistics)
             <tr>
-                <td><input type='checkbox' name='logistic[]' class='logistic' value="{{$logistic->id}}" checked='true'>{{$logistic->logistics_type}}</td>
+                <td><input type='checkbox' name='logistics[]' class='logistics' value="{{$logistics->id}}" checked='true'>{{$logistics->logistics_type}}</td>
             </tr>
             @endforeach
         </table>
@@ -77,15 +77,15 @@
 $(document).ready(function(){
     $('.mixed').click(function(){
         if($(this).prop('checked') == true) {
-            $('.logistic').prop('checked', false);
-            $('.logistic').prop('disabled', true);
-            $('.logistic_all').prop('checked', false);
-            $('.logistic_all').prop('disabled', true);
+            $('.logistics').prop('checked', false);
+            $('.logistics').prop('disabled', true);
+            $('.logistics_all').prop('checked', false);
+            $('.logistics_all').prop('disabled', true);
         } else {
-            $('.logistic').prop('checked', false);
-            $('.logistic').prop('disabled', false);
-            $('.logistic_all').prop('checked', false);
-            $('.logistic_all').prop('disabled', false);
+            $('.logistics').prop('checked', false);
+            $('.logistics').prop('disabled', false);
+            $('.logistics_all').prop('checked', false);
+            $('.logistics_all').prop('disabled', false);
         }
     });
 
@@ -103,11 +103,11 @@ $(document).ready(function(){
             $('.package').prop('checked', false);
     });
 
-    $('.logistic_all').click(function(){
+    $('.logistics_all').click(function(){
         if($(this).prop('checked') == true)
-            $('.logistic').prop('checked', true);
+            $('.logistics').prop('checked', true);
         else
-            $('.logistic').prop('checked', false);
+            $('.logistics').prop('checked', false);
     });
 });
 </script>

@@ -28,12 +28,6 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-//        $order = OrderModel::find(2);
-//        for ($i = 0; $i < 200; $i++) {
-//            foreach (OrderModel::all() as $order) {
-//                $order->createPackage();
-//            }
-//        }
         return view($this->viewPath . 'create', $response);
     }
 

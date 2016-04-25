@@ -207,7 +207,7 @@ class StockModel extends BaseModel
         $this->all_quantity -= $quantity;
         $this->available_quantity -= $quantity;
         if ($this->available_quantity < 0) {
-            throw new Exception('出库时数量有问题');
+            throw new Exception('Quantity ERROR.');
         }
         $this->save();
         $this->stockOut()->create([

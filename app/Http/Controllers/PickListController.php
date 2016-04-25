@@ -252,7 +252,7 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
-            'logistics' => LogisticsModel::all(),
+            'logisticses' => LogisticsModel::all(),
             'count' => PackageModel::where('status','PROCESSING')->count(),
         ];
 
@@ -268,8 +268,8 @@ class PickListController extends Controller
      */
     public function createPickStore()
     {   
-        if(request()->has('logistic')) {
-            foreach(request()->input('logistic') as $logistic_id) {
+        if(request()->has('logistics')) {
+            foreach(request()->input('logistics') as $logistic_id) {
                 $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1'])->where(function($query){
                     if(request()->has('package')) {
                         foreach(request()->input('package') as $key => $package)

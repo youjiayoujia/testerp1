@@ -64,16 +64,34 @@
             <div class="col-lg-3">
                 <strong>采购价</strong>: {{ $model->purchase_price }}
             </div>
-            <div class="col-lg-3">
-                <strong>采购物流费</strong>: {{ $model->purchase_carriage }}
-            </div>
         </div>
         <div class="panel-body">
+        <div class="col-lg-3">
+            <strong>采购物流费</strong>: {{ $model->purchase_carriage }}
+        </div>
         <div class="col-lg-3">
                 <strong>主供应商sku</strong>: {{ $model->supplier_sku }}
             </div>
             <div class="col-lg-3">
                 <strong>辅供应商</strong>: <?php if($model->second_supplier_id==0){echo "无辅供应商";}else{echo $model->supplier->where('id',$model->second_supplier_id)->get()->first()->name;} ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">通关报关信息:</div>
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>hscode</strong>: {{ $model->hs_code }}
+            </div>
+            <div class="col-lg-3">
+                <strong>unit</strong>: <a href="http://{{ $model->product_sale_url }}" target="_blank">{{ $model->unit }}</a>
+            </div>
+            <div class="col-lg-3">
+                <strong>规格型号</strong>: <a href="http://{{ $model->purchase_url }}" target="_blank">{{ $model->specification_model }}</a>
+            </div>
+            <div class="col-lg-3">
+                <strong>通关状态</strong>: <?php if($model->specification_model==0){echo "已通关";}else{echo "未通关";} ?>
             </div>
         </div>
     </div>

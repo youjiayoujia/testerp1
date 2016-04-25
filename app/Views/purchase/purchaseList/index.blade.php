@@ -46,8 +46,8 @@
            
             <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
-            <td>{{ $purchaseList->item->supplier_suk}}</td>
-            <td>{{ $purchaseList->weight}}</td>
+            <td>{{ $purchaseList->item->supplier_sku}}</td>
+            <td>{{ $purchaseList->item->weight}}</td>
             <td>{{ $purchaseList->warehouse->name}}</td>
             <td>{{ $purchaseList->purchase_num}}/{{ $purchaseList->arrival_num}}/{{ $purchaseList->lack_num}}</td>
              

@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
 use App\Models\ItemModel;
+use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\CountryModel;
 use App\Models\LogisticsModel;
@@ -98,10 +99,18 @@ class RuleController extends Controller
             }
             if(count(array_intersect(array($shippingCountry), explode(",", $rule['country']))) == 1 && count(array_intersect($packageLimits, explode(",", $limit))) == 0) {
                 $model = PackageModel::where(['id' => $packageId])->first();
-                $model->update(['logistics_id' => $logisticsId]);
+                $url = LogisticsModel::where(['id' => $logisticsId])->get(['url']);
+                $codeModel = CodeModel::where(['logistics_id' => $logisticsId, 'status' => 0])->first();
+                $model->update(['logistics_id' => $logisticsId, 'tracking_link' => $url, 'tracking_no' => $codeModel['code']]);
+                $codeModel->update(['status' => 1, 'package_id' => $packageId, 'used_at' => date('y-m-d', time())]);
                 break;
             }
         }
+    }
+
+    public function bhw()
+    {
+
     }
 
 }

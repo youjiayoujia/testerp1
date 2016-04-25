@@ -195,10 +195,13 @@
                     <div class="col-lg-2">
                         <strong>sku</strong> : {{ $orderItem->sku }}
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-1">
+                        <strong>图片</strong> : {{ $orderItem->image }}
+                    </div>
+                    <div class="col-lg-1">
                         <strong>数量</strong> : {{ $orderItem->quantity }}
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-1">
                         <strong>单价</strong> : {{ $orderItem->price }}
                     </div>
                     <div class="col-lg-2">
@@ -207,7 +210,7 @@
                     <div class="col-lg-2">
                         <strong>是否赠品</strong> : {{ $orderItem->is_gift_name }}
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-1">
                         <strong>备注</strong> : {{ $orderItem->remark }}
                     </div>
                     <div class="col-lg-2">

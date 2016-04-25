@@ -79,6 +79,16 @@ return [
                 'url' => 'order.index',
                 'icon' => '',
             ],
+            [
+                'name' => '订单利润率',
+                'url' => 'dashboard.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '黑名单',
+                'url' => 'dashboard.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航

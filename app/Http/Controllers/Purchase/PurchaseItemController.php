@@ -107,7 +107,7 @@ class PurchaseItemController extends Controller
 		$data['costExamineStatus']=$costExamineStatus;
 		$model->update($data);
 		if($costExamineStatus==2){
-			Item::where('sku',$model->sku)->update(['purchase_price'=>$model->purchase_cost]);
+			ItemModel::where('sku',$model->sku)->update(['purchase_price'=>$model->purchase_cost]);
 			}
 		$num=$this->model->where('purchase_order_id',$model->purchase_order_id)->where('costExamineStatus','<>',2)->count();
 		if($num==0){

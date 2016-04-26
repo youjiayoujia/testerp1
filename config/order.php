@@ -11,9 +11,9 @@ return [
     //订单状态
     'status' => [
         'new' => '未处理',
-        'confirmed' => '已确认',
-        'need' => '需补货',
-        'arrived' => '货物到齐',
+        'prepared' => '准备发货',
+        'needed' => '需补货',
+        'packed' => '打包完成',
         'shipped' => '发货完成',
         'completed' => '订单完成',
         'cancel' => '取消订单',
@@ -36,7 +36,24 @@ return [
     ],
 
     //币种
-    'currency' => ['USD', 'GBP', 'EUR', 'NOK', 'CAD', 'AUD', 'CHF', 'SEK', 'PLN', 'RUB', 'MXN', 'DKK', 'SAR', 'TWD', 'JPY', 'HKD'],
+    'currency' => [
+        'USD',
+        'GBP',
+        'EUR',
+        'NOK',
+        'CAD',
+        'AUD',
+        'CHF',
+        'SEK',
+        'PLN',
+        'RUB',
+        'MXN',
+        'DKK',
+        'SAR',
+        'TWD',
+        'JPY',
+        'HKD'
+    ],
 
     //种类
     'shipping' => [

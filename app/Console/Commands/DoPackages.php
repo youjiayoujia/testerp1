@@ -39,8 +39,8 @@ class DoPackages extends Command
     public function handle()
     {
         $t1 = microtime(true);
-//        $orders = OrderModel::limit(100)->get();
-        $orders = OrderModel::all();
+        $orders = OrderModel::limit(1)->get();
+//        $orders = OrderModel::all();
         foreach ($orders as $order) {
             $order->createPackage();
         }

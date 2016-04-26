@@ -21,6 +21,7 @@ class CreatePackages extends Migration
             $table->integer('logistics_id')->comment('物流方式ID');
             $table->integer('picklist_id')->comment('拣货单ID');
             $table->integer('assigner_id')->comment('负责人');
+            $table->integer('shipper_id')->comment('发货人');
             $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI',])->default('SINGLE')->comment('类型');
             $table->enum('status',
                 [
@@ -34,7 +35,9 @@ class CreatePackages extends Migration
                     'ERROR'
                 ])->default('NEW')->comment('状态');
             $table->decimal('cost', 10, 2)->comment('物流成本');
+            $table->decimal('cost1', 10, 2)->comment('物流成本1');
             $table->decimal('weight', 10, 2)->comment('重量');
+            $table->decimal('actual_weight', 10, 2)->comment('实际重量');
             $table->decimal('length', 10, 2)->comment('长');
             $table->decimal('width', 10, 2)->comment('宽');
             $table->decimal('height', 10, 2)->comment('高');

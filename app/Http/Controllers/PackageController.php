@@ -41,7 +41,7 @@ class PackageController extends Controller
             if ($order->createPackage()) {
                 return redirect($this->mainIndex)->with('alert', $this->alert('success', '包裹创建成功'));
             } else {
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败,库存不足. 已生成订单需求.'));
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '包裹创建失败.'));
             }
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));

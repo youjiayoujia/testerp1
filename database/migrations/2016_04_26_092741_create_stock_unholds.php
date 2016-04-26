@@ -18,7 +18,7 @@ class CreateStockUnholds extends Migration
             $table->string('type')->comment('类型')->default(NULL);
             $table->integer('relation_id')->comment('相关的id')->default(0);
             $table->integer('stock_id')->comment('stock_id')->default(0);
-            $table->text('remark')->comment('备注')->default(0);
+            $table->text('remark')->comment('备注')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

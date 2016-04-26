@@ -1,5 +1,6 @@
 @extends('common.table')
 @section('tableHeader')
+    <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class="sort" data-field="id">ID</th>
     <th>订单号</th>
     <th>仓库</th>
@@ -17,6 +18,7 @@
 @section('tableBody')
     @foreach($data as $package)
         <tr>
+            <td><input type='checkbox' name='single[]' class='single'></td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
@@ -56,6 +58,21 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="glyphicon glyphicon-filter"></i> 批量导入
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
+        <li><a href="javascript:" class='returnFee' data-status='2'>回传物流费</a></li>
+    </ul>
+</div>
+<div class="btn-group">
+    <a class="btn btn-success export" href="javascript:">
+        批量导出手工发货package信息
+    </a>
+</div>
 <div class="btn-group">
     <a class="btn btn-success" href="{{ route('package.shipping') }}">
         执行发货
@@ -71,6 +88,33 @@
 @section('childJs')
     <script type='text/javascript'>
         $(document).ready(function () {
+            $('.returnTrackno').click(function(){
+                location.href="{{ route('package.returnTrackno')}}";
+            });
+
+            $('.returnFee').click(function(){
+                location.href="{{ route('package.returnFee')}}";
+            })
+
+            $('.export').click(function(){
+                arr = new Array();
+                i = 0;
+                $.each($('.single:checked'), function(){
+                    tmp = $(this).parent().next().text();
+                    arr[i] = tmp;
+                    i++;
+                })
+                location.href="{{ route('package.exportManualPackage') }}?arr="+arr.join('|');
+            });
+
+            $('.select_all').click(function(){
+                if($(this).prop('checked') == true) {
+                    $('.single').prop('checked', true);
+                } else {
+                    $('.single').prop('checked', false);
+                }
+            });
+
             $('.send').click(function () {
                 id = $(this).data('id');
                 $.ajax({

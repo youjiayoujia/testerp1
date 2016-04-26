@@ -8,10 +8,12 @@
 
 namespace App\Http\Controllers;
 
+use Excel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
+use App\Models\Warehouse\PositionModel;
 
 class PackageController extends Controller
 {
@@ -122,6 +124,36 @@ class PackageController extends Controller
         return view($this->viewPath . 'shipping', $response);
     }
 
+    public function exportManualPackage()
+    {
+        $str = request()->input('arr');
+        $arr = explode('|', $str);
+        $rows = '';
+        foreach($arr as $id) {
+            $package = $this->model->find($id);
+            if($package->is_auto || $package->status == 'PROCESSING') {
+                continue;
+            }
+            $package->update(['status' => 'PACKED', 'shipper_id' => '2', 'shipped_at' => date('Y-m-d G:i:s', time())]);
+            foreach($package->items as $item) {
+                $rows[] = [
+                    'package  ID' => $id,
+                    'sku' => ItemModel::find($item->item_id)->sku,
+                    'warehouse_position' => PositionModel::find($item->warehouse_position_id)->name,
+                    'quantity' => $item->quantity,
+                    'created_at' => $item->created_at
+                ];
+            }
+        }
+        $name = 'ManualPackage';
+        Excel::create($name, function($excel) use ($rows){
+            $nameSheet='手工发货包裹';
+            $excel->sheet($nameSheet, function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     /**
      * 执行发货
      *
@@ -132,15 +164,16 @@ class PackageController extends Controller
     public function ajaxShippingExec()
     {
         $track_no = request()->input('trackno');
+        $weight = request()->input('weight');
         $logistic_id = request()->input('logistic_id');
         $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
         if (!$package) {
             return json_encode(false);
         }
-        if ($package->logistic_id != $logistic_id) {
+        if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time())]);
+        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
         return json_encode(true);
     }
 
@@ -159,5 +192,50 @@ class PackageController extends Controller
         $end_time = request()->input('end_time');
         $packages = PackageModel::whereBetween('shipped_at', [$start_time, $end_time])->get();
         $this->model->exportData($packages);
+    }
+
+    public function returnTrackno()
+    {
+
+    }
+
+    /**
+     * excel 导入数据
+     *
+     * @param
+     *
+     */
+    public function importByExcel()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'excel', $response);
+    }
+
+    /**
+     * excel 处理
+     *
+     * @param none
+     *
+     */
+    public function excelProcess()
+    {
+        if(request()->hasFile('excel'))
+        {
+           $file = request()->file('excel');
+           $errors = $this->model->excelProcess($file);
+           $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'errors' => $errors,
+            ];
+            return view($this->viewPath.'excelResult', $response);
+        }
+    }
+    
+    public function returnFee()
+    {
+
     }
 }

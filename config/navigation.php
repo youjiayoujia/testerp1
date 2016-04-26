@@ -164,6 +164,16 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => 'hold库存',
+                    'url' => 'stockHold.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'unhold库存',
+                    'url' => 'stockUnhold.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '库存调整',
                     'url' => 'stockAdjustment.index',
                     'icon' => '',
@@ -181,6 +191,11 @@ return [
                 [
                     'name' => '库存结转',
                     'url' => 'stockCarryOver.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '关帐',
+                    'url' => 'stockShut.index',
                     'icon' => '',
                 ],
             ],

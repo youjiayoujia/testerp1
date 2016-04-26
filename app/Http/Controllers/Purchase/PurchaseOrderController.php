@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
+use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
 
 class PurchaseOrderController extends Controller
@@ -93,7 +94,7 @@ class PurchaseOrderController extends Controller
 	public function update($id)
 	{
 		$model=$this->model->find($id);
-		if ($model->examineStatus !=2) {
+		if($model->examineStatus !=2){
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
 		$data=request()->all();		
@@ -111,6 +112,7 @@ class PurchaseOrderController extends Controller
 					}
 					if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
 						$item['costExamineStatus']=2;
+						ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]);	
 					}else{
 						$item['costExamineStatus']=0;	
 					}

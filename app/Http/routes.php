@@ -125,6 +125,8 @@ Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController
 Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
+Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
+Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
 //异常条目采购

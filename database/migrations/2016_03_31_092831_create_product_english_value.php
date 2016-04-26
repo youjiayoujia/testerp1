@@ -17,7 +17,7 @@ class CreateProductEnglishValue extends Migration
             $table->integer('product_id')->comment('产品ID')->nullable()->default(null);
             $table->string('choies_set')->comment('分类')->nullable()->default(null);
             $table->string('name')->comment('中文名')->nullable()->default(null);
-            $table->string('c_name')->comment('英文名')->nullable()->default(null);
+            $table->string('baoguan_name')->comment('报关名')->nullable()->default(null);
             $table->string('attribute_size')->comment('属性')->nullable()->default(null);
             $table->string('store')->comment('store')->nullable()->default(null);
             $table->string('brief')->comment('简述')->nullable()->default(null);

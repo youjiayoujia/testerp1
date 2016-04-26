@@ -20,6 +20,8 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items'];
 
+    private $canPackageStatus = ['prepared', 'needed'];
+
     public $searchFields = [
         'channel_id',
         'channel_account_id',
@@ -187,10 +189,10 @@ class OrderModel extends BaseModel
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
             $obj = ItemModel::where('sku', $item['sku'])->get();
-            if(!count($obj)) {
+            if (!count($obj)) {
                 $item['item_id'] = 0;
                 $order->update(['status' => 'error']);
-            }else {
+            } else {
                 $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
             $order->items()->create($item);
@@ -199,11 +201,33 @@ class OrderModel extends BaseModel
         return $order;
     }
 
+    public function getActiveItemsAttribute()
+    {
+        return $this->items->where('status', 1);
+    }
+
+    public function canPackage()
+    {
+        //判断订单ACTIVE状态
+        if ($this->active != 'normal') {
+            return false;
+        }
+        //判断订单状态
+        if (!in_array($this->status, $this->canPackageStatus)) {
+            return false;
+        }
+        //订单是否包含正常产品
+        if ($this->active_items->count() < 1) {
+            $this->status = 'error';
+            $this->save();
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @param array $items
      * @return bool
-     * todo:生成采购需求
-     * * todo:判断订单状态
      * todo:更新订单状态
      * todo:订单优先级
      * todo:判断订单是否需要拆单先发
@@ -211,56 +235,63 @@ class OrderModel extends BaseModel
      */
     public function createPackage()
     {
-        $items = $this->setPackageItems();
-        if ($items) {
-            DB::beginTransaction();
-            foreach ($items as $warehouseId => $packageItems) {
-                $package = [];
-                //channel
-                $package['channel_account_id'] = $this->channel_account_id;
-                //warehouse
-                $package['warehouse_id'] = $warehouseId;
-                //assigner
-                $package['assigner_id'] = 1;
-                //type
-                $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
-                $package['weight'] = collect($packageItems)->sum('weight');
-                $package['email'] = $this->email;
-                $package['shipping_firstname'] = $this->shipping_firstname;
-                $package['shipping_lastname'] = $this->shipping_lastname;
-                $package['shipping_address'] = $this->shipping_address;
-                $package['shipping_address1'] = $this->shipping_address1;
-                $package['shipping_city'] = $this->shipping_city;
-                $package['shipping_state'] = $this->shipping_state;
-                $package['shipping_country'] = $this->shipping_country;
-                $package['shipping_zipcode'] = $this->shipping_zipcode;
-                $package['shipping_phone'] = $this->shipping_phone;
-                $package = $this->packages()->create($package);
-                if ($package) {
-                    foreach ($packageItems as $packageItem) {
-                        $newPackageItem = $package->items()->create($packageItem);
-                        try {
-                            $newPackageItem->item->out(
-                                $packageItem['warehouse_position_id'],
-                                $packageItem['quantity'],
-                                'PACKAGE',
-                                $newPackageItem->id);
-                        } catch (Exception $e) {
-                            DB::rollBack();
+        if ($this->canPackage()) {
+            $items = $this->setPackageItems();
+            if ($items) {
+                DB::beginTransaction();
+                foreach ($items as $warehouseId => $packageItems) {
+                    $package = [];
+                    //channel
+                    $package['channel_id'] = $this->channel_id;
+                    $package['channel_account_id'] = $this->channel_account_id;
+                    //warehouse
+                    $package['warehouse_id'] = $warehouseId;
+                    //assigner
+                    $package['assigner_id'] = 1;
+                    //type
+                    $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
+                    $package['weight'] = collect($packageItems)->sum('weight');
+                    $package['email'] = $this->email;
+                    $package['shipping_firstname'] = $this->shipping_firstname;
+                    $package['shipping_lastname'] = $this->shipping_lastname;
+                    $package['shipping_address'] = $this->shipping_address;
+                    $package['shipping_address1'] = $this->shipping_address1;
+                    $package['shipping_city'] = $this->shipping_city;
+                    $package['shipping_state'] = $this->shipping_state;
+                    $package['shipping_country'] = $this->shipping_country;
+                    $package['shipping_zipcode'] = $this->shipping_zipcode;
+                    $package['shipping_phone'] = $this->shipping_phone;
+                    $package = $this->packages()->create($package);
+                    if ($package) {
+                        foreach ($packageItems as $packageItem) {
+                            $newPackageItem = $package->items()->create($packageItem);
+                            try {
+                                $newPackageItem->item->out(
+                                    $packageItem['warehouse_position_id'],
+                                    $packageItem['quantity'],
+                                    'PACKAGE',
+                                    $newPackageItem->id);
+                            } catch (Exception $e) {
+                                DB::rollBack();
+                            }
                         }
                     }
                 }
-            }
-            DB::commit();
-            return true;
-        } else { //生成订单需求
-            foreach ($this->items as $item) {
-                $require = [];
-                $require['item_id'] = $item->item_id;
-                $require['order_item_id'] = $item->id;
-                $require['sku'] = $item->sku;
-                $require['quantity'] = $item->quantity;
-                $this->requires()->create($require);
+                DB::commit();
+                $this->status = 'packed';
+                $this->save();
+                return true;
+            } else { //生成订单需求
+                foreach ($this->active_items as $item) {
+                    $require = [];
+                    $require['item_id'] = $item->item_id;
+                    $require['order_item_id'] = $item->id;
+                    $require['sku'] = $item->sku;
+                    $require['quantity'] = $item->quantity;
+                    $this->requires()->create($require);
+                }
+                $this->status = 'needed';
+                $this->save();
             }
         }
         return false;
@@ -269,11 +300,10 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return array|bool
-     * todo:订单产品状态判断
      */
     public function setPackageItems()
     {
-        if ($this->is_multi) { //多产品
+        if ($this->active_items->count() > 1) { //多产品
             $packageItem = $this->setMultiPackageItem();
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
@@ -285,7 +315,7 @@ class OrderModel extends BaseModel
     public function setSinglePackageItem()
     {
         $packageItem = [];
-        $orderItem = $this->items->first();
+        $orderItem = $this->active_items->first();
         $stocks = $orderItem->item->assignStock($orderItem->quantity);
         if ($stocks) {
             foreach ($stocks as $warehouseId => $stock) {
@@ -308,7 +338,7 @@ class OrderModel extends BaseModel
         $stocks = [];
         //根据仓库满足库存数量进行排序
         $warehouses = [];
-        foreach ($this->items as $orderItem) {
+        foreach ($this->active_items as $orderItem) {
             $itemStocks = $orderItem->item ? $orderItem->item->matchStock($orderItem->quantity) : false;
             if ($itemStocks) {
                 foreach ($itemStocks as $itemStock) {

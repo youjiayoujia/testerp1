@@ -49,10 +49,9 @@ class CarryOverController extends Controller
         return view($this->viewPath . 'show', $response);
     }
 
-
     public function createCarryOver(){
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, '月结'),
         ];
 
         return view($this->viewPath.'month', $response);
@@ -149,7 +148,7 @@ class CarryOverController extends Controller
     public function showStock()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, '查看库存'),
         ];
 
         return view($this->viewPath.'showStock', $response);

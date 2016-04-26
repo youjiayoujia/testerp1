@@ -394,15 +394,19 @@
                     <label for="sku" class='control-label'>sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
+                <div class="form-group col-sm-2">
+                    <label for="image" class='control-label'>图片</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
                 <div class="form-group col-sm-1">
                     <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="price" class='control-label'>金额</label>
+                    <label for="price" class='control-label'>单价</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-1">
                     <label for="status" class='control-label'>是否有效</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
@@ -413,7 +417,7 @@
                 <div class="form-group col-sm-2">
                     <label for="remark" class='control-label'>备注</label>
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-1">
                     <label for="ship_status" class='control-label'>发货状态</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
@@ -423,13 +427,16 @@
                     <div class="form-group col-sm-2">
                         <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}">
                     </div>
+                    <div class="form-group col-sm-2">
+                        <input type='text' class="form-control image" id="arr[image][{{$key}}]" placeholder="图片" name='arr[image][{{$key}}]' value="{{ old('arr[image][$key]') ? old('arr[image][$key]') : $orderItem->image }}">
+                    </div>
                     <div class="form-group col-sm-1">
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="金额" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
+                        <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="单价" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
                     </div>
-                    <div class="form-group col-sm-2">
+                    <div class="form-group col-sm-1">
                         <select class="form-control status" name="arr[status][{{$key}}]" id="arr[status][{{$key}}]">
                             @foreach(config('order.product_status') as $product_status_key => $status)
                                 <option value="{{ $product_status_key }}" {{ old('arr[status][$key]') ? (old('arr[status][$key]') == $product_status_key ? 'selected' : '') : ($orderItem->status == $product_status_key ? 'selected' : '') }}>
@@ -450,7 +457,7 @@
                     <div class="form-group col-sm-2">
                         <input type='text' class="form-control remark" id="arr[remark][{{$key}}]" placeholder="备注" name='arr[remark][{{$key}}]' value="{{ old('arr[remark][$key]') ? old('arr[remark][$key]') : $orderItem->remark }}">
                     </div>
-                    <div class="form-group col-sm-2">
+                    <div class="form-group col-sm-1">
                         <select class="form-control ship_status" name="arr[ship_status][{{$key}}]" id="arr[ship_status][{{$key}}]">
                             @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
                                 <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$key]') ? (old('arr[ship_status][$key]') == $ship_status_key ? 'selected' : '') : ($orderItem->ship_status == $ship_status_key ? 'selected' : '') }}>

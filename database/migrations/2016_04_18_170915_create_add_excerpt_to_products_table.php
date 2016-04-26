@@ -16,7 +16,7 @@ class CreateAddExcerptToProductsTable extends Migration
 			$table->string('hs_code')->nullable()->after('data_edit_not_pass_remark');
 			$table->string('unit')->nullable()->after('hs_code');
 			$table->string('specification_model')->nullable()->after('unit');
-			$table->integer('clearance_status')->nullable()->after('specification_model');
+			$table->tinyInteger('clearance_status')->default(0)->after('specification_model');
         });
     }
     /**

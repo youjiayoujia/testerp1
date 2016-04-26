@@ -101,6 +101,16 @@ return [
                 'url' => 'order.index',
                 'icon' => '',
             ],
+            [
+                'name' => '订单利润率',
+                'url' => 'dashboard.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '黑名单',
+                'url' => 'dashboard.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航
@@ -307,20 +317,13 @@ return [
         'name' => '客户',
         'icon' => 'user',
         'url' => 'dashboard.index',
-        'type' => 'group',
+        'type' => '',
         'subnavigations' => [
-            '用户' => [
-                [
-                    'name' => '用户列表',
-                    'url' => 'user.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '添加用户',
-                    'url' => 'user.create',
-                    'icon' => '',
-                ],
-            ]
+            [
+                'name' => 'CRM',
+                'url' => 'dashboard.index',
+                'icon' => '',
+            ],
         ],
 
     ],
@@ -331,6 +334,16 @@ return [
         'url' => '',
         'type' => '',
         'subnavigations' => [
+            [
+                'name' => '用户列表',
+                'url' => 'user.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加用户',
+                'url' => 'user.create',
+                'icon' => '',
+            ],
             [
                 'name' => '汇率',
                 'url' => 'currency.index',

@@ -1,7 +1,4 @@
 @extends('common.form')
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-<script src="{{ asset('js/pro_city.js') }}"></script>
 @section('formAction') {{ route('productRequire.store') }} @stop
 @section('formAttributes') name='creator' enctype="multipart/form-data" @stop
 @section('formBody')
@@ -103,6 +100,9 @@
         </div>
     </div>
 @stop
+@section('pageJs')
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
+<script src="{{ asset('js/pro_city.js') }}"></script>
 <script type='text/javascript'>
     $(document).ready(function(){
         var buf = new Array();
@@ -112,3 +112,4 @@
         $('#expected_date').cxCalendar();
     });
 </script>
+@stop

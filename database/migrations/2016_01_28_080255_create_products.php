@@ -33,8 +33,13 @@ class CreateProducts extends Migration
             $table->string('carriage_limit')->comment('运费限制')->nullable()->default(NULL);
             $table->string('package_limit')->comment('物流限制')->nullable()->default(NULL);
             $table->string('package_size')->comment('包装尺寸')->nullable()->default(NULL);
-            $table->integer('upload_user')->comment('上传人')->nullable()->default(0);
+            $table->integer('upload_user')->comment('选款上传人')->nullable()->default(0);
+            $table->integer('edit_user')->comment('资料编辑人')->nullable()->default(0);
+            $table->integer('edit_image_user')->comment('图片编辑人')->nullable()->default(0);
+            $table->integer('examine_user')->comment('审核人')->nullable()->default(0);
+            $table->integer('revocation_user')->comment('撤销审核人')->nullable()->default(0);
             $table->string('default_image')->comment('默认图片')->nullable()->default(0);
+            $table->string('size_description')->comment('尺码描述')->nullable()->default(NULL);
             $table->string('description')->comment('描述')->nullable()->default(NULL);
             $table->decimal('weight',5,2)->comment('重量')->nullable()->default(0);
             $table->string('status')->comment('上下架状态')->nullable()->default(0);

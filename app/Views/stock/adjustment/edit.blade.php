@@ -1,6 +1,5 @@
 @extends('common.form')
 <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockAdjustment.update', ['id' => $model->id] ) }} @stop
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'/>
@@ -79,6 +78,7 @@
         </div>
     </div>
 @stop
+@section('pageJs')
 <script type='text/javascript'>
     $(document).ready(function(){
         $(document).on('click', '.bt_right', function(){
@@ -222,3 +222,4 @@
         });
     });
 </script>
+@stop

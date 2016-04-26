@@ -156,7 +156,7 @@ class PurchaseListController extends Controller
 			}
 			if($purcahse[1]==0 && $arrayItems->costExamineStatus ==2){
 			$arrayItems->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
-			$this->	generateBarCode($arrayItems->id);
+			$this->generateBarCode($arrayItems->id);
 			$num=$this->model->where('purchase_order_id',$arrayItems->purchase_order_id)->where('status','<',2)->count();
 			$purchaseOrder=PurchaseOrderModel::find($arrayItems->purchase_order_id);
 			if($num==0){

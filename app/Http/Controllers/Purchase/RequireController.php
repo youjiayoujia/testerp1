@@ -44,7 +44,7 @@ class RequireController extends Controller
     }
 	
 	/**
-     * AJAX创建采购单生成条目
+     * AJAX创建采购单生成采购条目
      *
      * 
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -52,7 +52,11 @@ class RequireController extends Controller
 	public function addPurchaseOrder()
 	{	
 		$purchaseIds=explode(',',request()->get('purchase_ids'));
+		if(request()->get('purchase_ids')){
 		$needPurchases=$this->model->find($purchaseIds);
+		}else{
+			$needPurchases=$this->model->where('is_require',1)->groupby('item_id')->get();
+			}
 		foreach($needPurchases as $key=>$v){
 		$all_quantity=StockModel::where('item_id',$v->item_id)->sum('all_quantity');
 		$purchasingNum=PurchaseItemModel::where('sku',$v->sku)->sum('purchase_num');

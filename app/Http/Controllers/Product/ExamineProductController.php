@@ -68,6 +68,11 @@ class ExamineProductController extends Controller
         request()->flash();
         $productModel = $this->product->find($id);
         $data = request()->input();
+        if($data['examine_status']=='revocation'){
+            $data['revocation_user'] = empty(request()->user()) ? 0 : request()->user()->id;
+        }else{
+            $data['examine_user'] = empty(request()->user()) ? 0 : request()->user()->id;
+        }
         $productModel->update($data);
         //ERP中如果该产品之前没有创建item,并且是审核,就创建item
         if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){

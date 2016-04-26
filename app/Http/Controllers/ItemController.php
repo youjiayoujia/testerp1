@@ -13,15 +13,19 @@ use App\Models\ItemModel;
 use App\Models\ProductModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
+use App\Models\Logistics\LimitsModel;
+use App\Models\WrapLimitsModel;
 
 class ItemController extends Controller
 {
-    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse)
+    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel)
     {
         $this->model     = $item;
         $this->supplier  = $supplier;
         $this->product   = $product;
         $this->warehouse = $warehouse;
+        $this->logisticsLimit = $limitsModel;
+        $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('item.index');
         $this->mainTitle = '产品Item';
         $this->viewPath  = 'item.';
@@ -44,6 +48,8 @@ class ItemController extends Controller
             'model' => $model,
             'suppliers' => $this->supplier->all(),
             'warehouses' => $this->warehouse->where('type','local')->get(),
+            'wrapLimit' => $this->wrapLimit->all(),
+            'logisticsLimit' => $this->logisticsLimit->all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

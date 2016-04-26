@@ -245,7 +245,34 @@ class PurchaseListController extends Controller
         ];
 		 return view($this->viewPath . 'printBarCode', $response);
 		}
+	/**
+     * ajax回传修改产品重量
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function changeItemWeight(){
+		$itemWeight=request()->get('item_weight');
+		$purchase_id=request()->get('purchase_id');
+		$model=$this->model->find($purchase_id);
+		ItemModel::where('sku',$model->sku)->update(['weight'=>$itemWeight]);
+		return 1;
+		}
 	
+	/**
+     * ajax回传修改采购条目物流单号
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function changePurchaseItemPostcoding(){
+		$post_coding=request()->get('post_coding');
+		$purchase_id=request()->get('purchase_id');
+		$model=$this->model->find($purchase_id);
+		$model->update(['post_coding'=>$post_coding]);
+		return 1;
+		}	
+
 }
 
 

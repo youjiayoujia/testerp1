@@ -94,65 +94,7 @@ class PurchaseItemController extends Controller
         return redirect($this->mainIndex);
     }
 
-	/**
-     * ajax批量生成采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function addPurchaseOrder()
-	{
-		$purchaseIds=explode(',',request()->get('purchase_ids'));
-		 if(!empty(request()->get('purchase_ids'))){
-			$warehouse_supplier=$this->model->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->whereIn('id',$purchaseIds)->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
-			if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$data['warehouse_id']=$v['warehouse_id'];		 
-				$data['supplier_id']=$v['supplier_id'];
-				$supplier=SupplierModel::find($v['supplier_id']);
-				$data['assigner']=$supplier->purchase_id;
-				$purchaseOrder=PurchaseOrderModel::create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-					$this->model->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->whereIn('id',$purchaseIds)->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}				 
-			}
-			
-		}
-			 }else{ 
-		$warehouse_supplier=$this->model->select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$data['warehouse_id']=$v['warehouse_id'];		 
-				$data['supplier_id']=$v['supplier_id'];
-				$supplier=SupplierModel::find($v['supplier_id']);
-				$data['assigner']=$supplier->purchase_id;
-				$purchaseOrder=PurchaseOrderModel::create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-					$this->model->where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
-				}				 
-			}
-			
-		}
-		/*$warehouse_nosupplier=$this->model->select('id','warehouse_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id',0)->get()->toArray();
-		if(isset($warehouse_supplier)){
-			foreach($warehouse_supplier as $key=>$v){
-				$purchaseOrderModel =new PurchaseOrderModel;
-				$data['warehouse_id']=$v['warehouse_id'];	
-				$purchaseOrder=$purchaseOrderModel->create($data);
-				$purchaseOrderId=$purchaseOrder->id; 
-				if($purchaseOrderId >0){
-				$purchaseItem=$this->find($v['id']);
-				$purchaseItem->purchase_order_id=$v['purchase_order_id'];
-				$purchaseItem->save();
-				}				 
-			}
-			return 1;*/
-			}
-		return 1;
-		 		
-	}
+	
 	/**
      * 审核采购价格
      *
@@ -164,6 +106,9 @@ class PurchaseItemController extends Controller
 		$model=$this->model->find($id);
 		$data['costExamineStatus']=$costExamineStatus;
 		$model->update($data);
+		if($costExamineStatus==2){
+			Item::where('sku',$model->sku)->update(['purchase_price'=>$model->purchase_cost]);
+			}
 		$num=$this->model->where('purchase_order_id',$model->purchase_order_id)->where('costExamineStatus','<>',2)->count();
 		if($num==0){
 			PurchaseOrderModel::where('id',$model->purchase_order_id)->update(['costExamineStatus'=>2]);

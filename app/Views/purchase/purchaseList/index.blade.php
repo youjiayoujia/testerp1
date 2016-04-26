@@ -47,11 +47,15 @@
             <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
-            <td>{{ $purchaseList->item->weight}}</td>
+            <td>
+            <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}"/> 
+              <a href="javascript:" class="btn btn-info btn-xs changeWeight" data-id="{{ $purchaseList->id }}">更新</a>
+            </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
             <td>{{ $purchaseList->purchase_num}}/{{ $purchaseList->arrival_num}}/{{ $purchaseList->lack_num}}</td>
              
-            	<td>{{ $purchaseList->post_coding }}</td>
+            	<td><input type="text" name="weight" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}"/> 
+            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
                 
             @foreach(config('purchase.purchaseItem.status') as $k=>$status)
             	@if($purchaseList->status == $k)
@@ -82,6 +86,7 @@
         </tr>
     @endforeach
    <script type="text/javascript"> 
+   		
         //批量对单
         $('#batchexamine').click(function () {
             if (confirm("确认对单?")) {
@@ -110,33 +115,34 @@
                 })
             }
         });
-		
-		 //批量导出采购单
-       /* $('#orderExcelOut').click(function () {
-            if (confirm("确认导出这些采购单为一个excel?")) {
-                var checkbox = document.getElementsByName("purchaseList_id");
-                var purchase_ids = "";
-                for (var i = 0; i < checkbox.length; i++) {
-                    if(!checkbox[i].checked)continue;
-                    if(checkbox[i].getAttribute('isexamine')==1){
-                        alert("id为"+checkbox[i].value+"的采购单已经审核了");
-                        return;
-                    }
-                    purchase_ids += checkbox[i].value+",";
-                }
-                purchase_ids = purchase_ids.substr(0,(purchase_ids.length)-1);
-                $.ajax({
-                    url:'purchaseOrder/examinePurchaseOrder',
-                    data:{purchase_ids:purchase_ids},
+		//回传重量
+		$('.changeWeight').click(function(){
+			var purchase_id = $(this).data('id');
+			var item_weight = $("#"+purchase_id+"_weight").val();
+			$.ajax({
+                    url:'/changeItemWeight',
+                    data:{purchase_id:purchase_id,item_weight:item_weight},
                     dataType:'json',
                     type:'get',
                     success:function(result){
                         window.location.reload();
                     }                    
                 })
-            }
-        });*/
-
+			});
+			//回传物流单号
+			$('.change_post_coding').click(function(){
+			var purchase_id = $(this).data('id');
+			var post_coding = $("#"+purchase_id+"_post_coding").val();
+			$.ajax({
+                    url:'/changePurchaseItemPostcoding',
+                    data:{purchase_id:purchase_id,post_coding:post_coding},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        window.location.reload();
+                    }                    
+                })
+			});
         //全选
         function quanxuan()
         {

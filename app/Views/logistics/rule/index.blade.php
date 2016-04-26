@@ -22,7 +22,7 @@
             <td>{{ $rule->weight_to }}</td>
             <td>{{ $rule->order_amount }}</td>
             <td>{{ $rule->is_clearance == '1' ? '是' : '否' }}</td>
-            <td>{{ $rule->country }}</td>
+            <td>{{ $rule->country($rule->country) }}</td>
             <td>{{ $rule->updated_at }}</td>
             <td>{{ $rule->created_at }}</td>
             <td>

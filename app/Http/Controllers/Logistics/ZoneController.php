@@ -34,7 +34,7 @@ class ZoneController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses'=>LogisticsModel::all(),
-            'countries'=>CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'countries'=>CountryModel::orderBy('abbreviation', 'asc')->get(['name', 'abbreviation']),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -47,15 +47,15 @@ class ZoneController extends Controller
     public function edit($id)
     {
         $model = $this->model->find($id);
-        $selectedCountry = $model->country_id;
-        $selectedCountries = explode(",",$selectedCountry);
+        $selectedCountry = explode(",", $model->country_id);
+        $selectedCountries = CountryModel::whereIn('abbreviation', $selectedCountry)->get();
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name']),
+            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['name', 'abbreviation']),
             'selectedCountries' => $selectedCountries,
         ];
         return view($this->viewPath . 'edit', $response);
@@ -73,7 +73,7 @@ class ZoneController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'zone' => $zone,
             'logistics' => LogisticsModel::all(),
-            'country' => CountryModel::all(),
+            'country' => CountryModel::orderBy('abbreviation', 'asc')->get(['name', 'abbreviation']),
         ];
         return view('logistics.zone.countExpress', $response);
     }
@@ -90,7 +90,7 @@ class ZoneController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'zone' => $zone,
             'logistics' => LogisticsModel::all(),
-            'country' => CountryModel::all(),
+            'country' => CountryModel::orderBy('abbreviation', 'asc')->get(['name', 'abbreviation']),
         ];
         return view('logistics.zone.countPacket', $response);
     }

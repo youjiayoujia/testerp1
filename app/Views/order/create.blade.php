@@ -389,15 +389,19 @@
                     <label for="sku" class='control-label'>sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
+                <div class="form-group col-sm-2">
+                    <label for="image" class='control-label'>图片</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
                 <div class="form-group col-sm-1">
                     <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="price" class='control-label'>金额</label>
+                    <label for="price" class='control-label'>单价</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-1">
                     <label for="status" class='control-label'>是否有效</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
@@ -408,7 +412,7 @@
                 <div class="form-group col-sm-2">
                     <label for="remark" class='control-label'>备注</label>
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-1">
                     <label for="ship_status" class='control-label'>发货状态</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
@@ -417,13 +421,16 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control image" id="arr[image][0]" placeholder="图片" name='arr[image][0]' value="{{ old('arr[image][0]') }}">
+                </div>
                 <div class="form-group col-sm-1">
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input type='text' class="form-control price" id="arr[price][0]" placeholder="金额" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
+                    <input type='text' class="form-control price" id="arr[price][0]" placeholder="单价" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-1">
                     <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
                         @foreach(config('order.product_status') as $product_status_key => $status)
                             <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
@@ -444,7 +451,7 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control remark" id="arr[remark][0]" placeholder="备注" name='arr[remark][0]' value="{{ old('arr[remark][0]') }}">
                 </div>
-                <div class="form-group col-sm-2">
+                <div class="form-group col-sm-1">
                     <select class="form-control ship_status" name="arr[ship_status][0]" id="arr[ship_status][0]">
                         @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
                             <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][0]') == $ship_status_key ? 'selected' : '' }}>

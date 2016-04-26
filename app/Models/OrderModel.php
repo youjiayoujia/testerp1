@@ -187,10 +187,10 @@ class OrderModel extends BaseModel
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
             $obj = ItemModel::where('sku', $item['sku'])->get();
-            if(!count($obj)) {
+            if (!count($obj)) {
                 $item['item_id'] = 0;
                 $order->update(['status' => 'error']);
-            }else {
+            } else {
                 $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
             $order->items()->create($item);
@@ -203,7 +203,7 @@ class OrderModel extends BaseModel
      * @param array $items
      * @return bool
      * todo:生成采购需求
-     * * todo:判断订单状态
+     * todo:判断订单状态
      * todo:更新订单状态
      * todo:订单优先级
      * todo:判断订单是否需要拆单先发

@@ -93,10 +93,6 @@
     </div>
     <div class='row'>
         <div class="form-group col-md-3">
-            <label for="size">产品name</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="name" placeholder="产品name" name='name' value="{{ old('name') ?  old('name') : $product->name }}">
-        </div>
-        <div class="form-group col-md-3">
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $product->c_name }}">
         </div>
@@ -107,11 +103,7 @@
                     <option value="{{ $supplier->id}}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
                 @endforeach
             </select>
-        </div>   
-        <!--<div class="form-group col-md-3">
-            <label for="size">供应商信息</label>
-            <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $product->supplier_info }}">
-        </div>-->  
+        </div> 
     </div>
 
     <div class='row'>  
@@ -122,10 +114,6 @@
                     <option value="{{ $supplier->id}}" {{ $supplier->id == $product->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
                 @endforeach
             </select>
-        </div>
-        <div class="form-group col-md-3">
-            <label for="color">销售链接</label>
-            <input class="form-control" id="product_sale_url" placeholder="销售链接" name='product_sale_url' value="{{ old('product_sale_url') ?  old('product_sale_url') : $product->product_sale_url }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
@@ -157,7 +145,7 @@
         </div>
     </div>
     <div class='row'>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
@@ -165,7 +153,7 @@
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                     <label>
@@ -174,6 +162,10 @@
             @endforeach
         </div>
         
+        <div class="form-group col-md-3">
+            <label for="color">尺寸描述</label>
+            <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') ?  old('size_description') : $product->size_description }}">
+        </div>
         <div class="form-group col-md-3">
             <label for="color">描述</label>
             <input class="form-control" id="description" placeholder="备注" name='description' value="{{ old('description') ?  old('description') : $product->description }}">

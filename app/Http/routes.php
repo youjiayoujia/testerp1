@@ -122,6 +122,7 @@ Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
 Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
+Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
@@ -219,6 +220,7 @@ Route::get('scanAddTrCode/{logistic_id}',
     ['uses' => 'Logistics\CodeController@scanAddTrCode', 'as' => 'scanAddTrCode']);
 Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
 Route::resource('logisticsRule', 'Logistics\RuleController');
+Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
 
 //拣货单异常
 Route::get('errorList/ajaxProcess', ['uses'=>'Picklist\ErrorListController@ajaxProcess', 'as'=>'errorList.ajaxProcess']);

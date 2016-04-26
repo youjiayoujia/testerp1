@@ -51,21 +51,21 @@
         </div>
     </div>
     <div class="row">
-        <div class="form-group col-lg-2" style="clear:left;">
+        <div class="form-group col-lg-4" style="clear:left;">
             <label for="country" class="control-label">已有国家</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="country" class="form-control" multiple style="height:250px;width:180px;">
+            <select name="country" class="form-control" multiple style="height:300px;width:400px;">
                 @foreach($countries as $country)
-                    <option class="form-control" value="{{ $country->id }}" {{ old('country') ? old('country') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
-                        {{ $country->abbreviation }}
+                    <option class="form-control" value="{{ $country->abbreviation }}" {{ old('country') ? old('country') == $country->abbreviation ? 'selected' : '' : ''}} onclick="addCountry( this )">
+                        {{ $country->name }}
                     </option>
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-2" style="clear:right;">
+        <div class="form-group col-lg-4" style="clear:right;">
             <label for="country" class="control-label">已选国家</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" id="dselectCountry" multiple  style="height:250px;width:180px;">
+            <select class="form-control" id="dselectCountry" multiple  style="height:300px;width:400px;">
 
             </select>
         </div>
@@ -78,7 +78,7 @@
     function getPostCountry(){
         var selectCountry = "";
         $(".thecountry").each(function(){
-            selectCountry += $.trim($(this).html()) + ",";
+            selectCountry += $.trim($(this).attr('value')) + ",";
         });
         selectCountry = selectCountry.substring(0,selectCountry.length - 1);
         $("#country").html(selectCountry);

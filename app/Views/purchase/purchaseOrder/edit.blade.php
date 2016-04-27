@@ -63,6 +63,10 @@
                 </a>
                 @endif     
             </div> 
+             <div class="form-group col-lg-4">
+            	<strong>取消采购单</strong>:
+                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该采购</a>  
+            </div> 
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
                 <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
@@ -75,7 +79,8 @@
                 @else
                 已结算
                 @endif  
-            </div>        
+            </div>
+                   
         </div>
 
      <div class="panel panel-default">

@@ -20,7 +20,7 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items'];
 
-    private $canPackageStatus = ['prepared', 'needed'];
+    private $canPackageStatus = ['PREPARED', 'NEED'];
 
     public $searchFields = [
         'channel_id',
@@ -209,7 +209,7 @@ class OrderModel extends BaseModel
     public function canPackage()
     {
         //判断订单ACTIVE状态
-        if ($this->active != 'normal') {
+        if ($this->active != 'NORMAL') {
             return false;
         }
         //判断订单状态
@@ -218,7 +218,7 @@ class OrderModel extends BaseModel
         }
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
-            $this->status = 'error';
+            $this->status = 'ERROR';
             $this->save();
             return false;
         }
@@ -228,8 +228,6 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return bool
-     * todo:更新订单状态
-     * todo:订单优先级
      * todo:判断订单是否需要拆单先发
      * todo:判断订单是否要hold库存
      */
@@ -246,8 +244,6 @@ class OrderModel extends BaseModel
                     $package['channel_account_id'] = $this->channel_account_id;
                     //warehouse
                     $package['warehouse_id'] = $warehouseId;
-                    //assigner
-                    $package['assigner_id'] = 1;
                     //type
                     $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
                     $package['weight'] = collect($packageItems)->sum('weight');
@@ -271,6 +267,8 @@ class OrderModel extends BaseModel
                                     $packageItem['quantity'],
                                     'PACKAGE',
                                     $newPackageItem->id);
+                                $newPackageItem->orderItem->ship_status = 'PACKED';
+                                $newPackageItem->orderItem->save();
                             } catch (Exception $e) {
                                 DB::rollBack();
                             }
@@ -278,7 +276,8 @@ class OrderModel extends BaseModel
                     }
                 }
                 DB::commit();
-                $this->status = 'packed';
+                $this->package_times += 1;
+                $this->status = 'PACKED';
                 $this->save();
                 return true;
             } else { //生成订单需求
@@ -290,7 +289,8 @@ class OrderModel extends BaseModel
                     $require['quantity'] = $item->quantity;
                     $this->requires()->create($require);
                 }
-                $this->status = 'needed';
+                $this->package_times += 1;
+                $this->status = 'NEED';
                 $this->save();
             }
         }

@@ -25,9 +25,9 @@ class CreateProductEnglishValue extends Migration
             $table->string('filter_attributes')->nullable()->default(null);
             $table->float('weight')->comment('重量')->nullable()->default(0);
             $table->string('unedit_reason')->comment('图片不编辑原因')->nullable()->default(null);
-            $table->string('sale_usd_price')->comment('产品name')->nullable()->default(null);
-            $table->string('market_usd_price')->comment('产品中文name')->nullable()->default(null);
-            $table->integer('cost_usd_price')->comment('供应商')->nullable()->default(null);
+            $table->float('sale_usd_price')->comment('销售价美元')->nullable()->default(null);
+            $table->float('market_usd_price')->comment('市场价美元')->nullable()->default(null);
+            $table->float('cost_usd_price')->comment('成本价美元')->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();
         });

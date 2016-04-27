@@ -14,12 +14,14 @@ class CreatePackages extends Migration
     {
         Schema::create('packages', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('channel_id')->comment('渠道ID');
             $table->integer('channel_account_id')->comment('渠道账号ID');
             $table->integer('order_id')->comment('订单ID');
             $table->integer('warehouse_id')->comment('仓库ID');
             $table->integer('logistics_id')->comment('物流方式ID');
             $table->integer('picklist_id')->comment('拣货单ID');
             $table->integer('assigner_id')->comment('负责人');
+            $table->integer('shipper_id')->comment('发货人');
             $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI',])->default('SINGLE')->comment('类型');
             $table->enum('status',
                 [
@@ -33,7 +35,9 @@ class CreatePackages extends Migration
                     'ERROR'
                 ])->default('NEW')->comment('状态');
             $table->decimal('cost', 10, 2)->comment('物流成本');
+            $table->decimal('cost1', 10, 2)->comment('物流成本1');
             $table->decimal('weight', 10, 2)->comment('重量');
+            $table->decimal('actual_weight', 10, 2)->comment('实际重量');
             $table->decimal('length', 10, 2)->comment('长');
             $table->decimal('width', 10, 2)->comment('宽');
             $table->decimal('height', 10, 2)->comment('高');
@@ -49,7 +53,7 @@ class CreatePackages extends Migration
             $table->string('shipping_country')->comment('发货国家/地区');
             $table->string('shipping_zipcode')->comment('发货邮编');
             $table->string('shipping_phone')->comment('发货电话');
-            $table->enum('is_auto', [0, 1])->default(0)->comment('是否自动发货');
+            $table->enum('is_auto', [0, 1])->default(1)->comment('是否自动发货');
             $table->text('remark')->comment('备注');
             $table->timestamp('logistic_assigned_at')->comment('物流分配时间');
             $table->timestamp('printed_at')->comment('打印面单时间');

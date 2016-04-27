@@ -34,7 +34,6 @@ class StockModel extends BaseModel
         'all_quantity',
         'available_quantity',
         'hold_quantity',
-        'amount',
         'created_at'
     ];
 
@@ -120,8 +119,13 @@ class StockModel extends BaseModel
      */
     public function getUnitCostAttribute()
     {
-        $stocks = $this->where('item_id', $this->item_id)->get();
-        return round($stocks->sum('amount') / $stocks->sum('all_quantity'), 3);
+        $item = ItemModel::where('id', $this->item_id)->first();
+
+        if($item) {
+            return $item->cost;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -140,7 +144,6 @@ class StockModel extends BaseModel
     {
         $this->all_quantity += $quantity;
         $this->available_quantity += $quantity;
-        $this->amount += $amount;
         $this->save();
         $this->stockIn()->create([
             'quantity' => $quantity,
@@ -201,11 +204,13 @@ class StockModel extends BaseModel
     public function out($quantity, $type, $relation_id, $remark)
     {
         $price = $this->unit_cost;
+        if($this->unit_cost <= 0) {
+            throw new Exception('单价不是正数，出错');
+        }
         $this->all_quantity -= $quantity;
         $this->available_quantity -= $quantity;
-        $this->amount -= $quantity * $price;
-        if ($this->available_quantity < 0 || $this->amount < 0) {
-            throw new Exception('出库时数量和金额有问题');
+        if ($this->available_quantity < 0) {
+            throw new Exception('Quantity ERROR.');
         }
         $this->save();
         $this->stockOut()->create([
@@ -272,8 +277,15 @@ class StockModel extends BaseModel
                 $error[] = $key;
                 continue;
             }
+            DB::beginTransaction();
+            try {
             $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost'],
                 'MAKE_ACCOUNT');
+            } catch(Exception $e) {
+                DB::rollback();
+                $error[] = $key;
+            }
+            DB::commit();
         }
 
         return $error;

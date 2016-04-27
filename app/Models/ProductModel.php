@@ -20,11 +20,9 @@ class ProductModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'name' => 'required',
             'c_name' => 'required',
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
-           // 'purchase_url' => 'url',
             'supplier_id' => 'required',
             'product_size' => 'required',
             'weight' => 'required|numeric',
@@ -32,11 +30,9 @@ class ProductModel extends BaseModel
             'catalog_id' => 'required',
         ],
         'update' => [
-            'name' => 'required',
             'c_name' => 'required',
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
-            'purchase_url' => 'url',
             'product_size' => 'required',
             'weight' => 'required|numeric',
             'upload_user' => 'required',
@@ -67,9 +63,13 @@ class ProductModel extends BaseModel
         'product_size',
         'package_size',
         'weight',
+        'size_description',
         'description',
         'upload_user',
-        'assigner',
+        'edit_user',
+        'edit_image_user',
+        'examine_user',
+        'revocation_user',
         'default_image',
         'carriage_limit',
         'carriage_limit_1',
@@ -105,6 +105,11 @@ class ProductModel extends BaseModel
     public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'upload_user');
     }
 
     public function item()
@@ -156,6 +161,8 @@ class ProductModel extends BaseModel
     {
         return $this->hasMany('App\Models\Product\ImageModel', 'product_id');
     }
+
+
 
 
     /**

@@ -60,7 +60,8 @@ Route::resource('productSupplier', 'Product\SupplierController');
 Route::get('productRequire/ajaxQuantityProcess', ['uses'=>'Product\RequireController@ajaxQuantityProcess', 'as'=>'productRequire.ajaxQuantityProcess']);
 Route::get('productRequire/ajaxProcess', ['uses'=>'Product\RequireController@ajaxProcess', 'as'=>'productRequire.ajaxProcess']);
 Route::resource('productRequire', 'Product\RequireController');
-
+//通关报关
+Route::resource('customsClearance', 'CustomsClearance\CustomsClearanceController');
 //仓库
 Route::resource('warehouse', 'WarehouseController');
 
@@ -100,9 +101,12 @@ Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition'
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
 Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
-Route::any('/addPurchaseOrder', 'Purchase\PurchaseItemController@addPurchaseOrder');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
-
+//采购需求
+Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
+Route::resource('require', 'Purchase\RequireController');
+//未结算订单
+Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
 //采购单
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
@@ -111,12 +115,18 @@ Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@exce
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
 Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
-
+//打印采购单
+Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');
+Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
+Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
 Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
 Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
+Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
 Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
 Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
+Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
+Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
 Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
 Route::resource('purchaseList', 'Purchase\PurchaseListController');
 //异常条目采购
@@ -133,7 +143,7 @@ Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
 Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
 Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
-Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController'); 
 /**
  * stock controller route
  */
@@ -180,7 +190,8 @@ Route::resource('stockAllotment', 'Stock\AllotmentController');
 //库存结转
 Route::post('stockCarryOver/showStockView', ['uses'=>'Stock\CarryOverController@showStockView', 'as'=>'stockCarryOver.showStockView']);
 Route::get('stockCarryOver/showStock', ['uses'=>'Stock\CarryOverController@showStock', 'as'=>'stockCarryOver.showStock']);
-Route::get('stockCarryOver/ajaxCreateCarryOver', ['uses'=>'Stock\CarryOverController@ajaxCreateCarryOver', 'as'=>'stockCarryOver.ajaxCreateCarryOver']);
+Route::get('stockCarryOver/createCarryOver', ['uses'=>'Stock\CarryOverController@createCarryOver', 'as'=>'stockCarryOver.createCarryOver']);
+Route::post('stockCarryOver/createCarryOverResult', ['uses'=>'Stock\CarryOverController@createCarryOverResult', 'as'=>'stockCarryOver.createCarryOverResult']);
 Route::resource('stockCarryOver', 'Stock\CarryOverController');
 
 //库存盘点
@@ -275,3 +286,6 @@ Route::get('getMsg', ['uses' => 'OrderController@getMsg', 'as' => 'getMsg']);
 Route::get('getChoiesOrder', ['uses' => 'OrderController@getChoiesOrder', 'as' => 'getChoiesOrder']);
 Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
 Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
+
+//用户路由
+Route::resource('user', 'UserController');

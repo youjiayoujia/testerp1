@@ -35,6 +35,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\ItemModel', 'item_id');
     }
 
+    public function orderItem()
+    {
+        return $this->belongsTo('App\Models\Order\ItemModel', 'order_item_id');
+    }
+
     public function warehousePosition()
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id');

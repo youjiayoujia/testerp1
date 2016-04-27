@@ -2,6 +2,10 @@
 @section('formAction') {{ route('product.store') }} @stop
 @section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
+<?php 
+//echo '<pre>';
+  //          print_r($logisticsLimit);exit;
+?>
     <div class="form-group">
         <label for="catalog_id">分类</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select id="catalog_id" class="form-control" name="catalog_id">
@@ -17,35 +21,31 @@
 
     <div class='row'>
         <div class="form-group col-md-3">
-            <label for="size">产品name</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_name" placeholder="产品name" name='name' value="{{ old('name') }}">
-        </div>
-        <div class="form-group col-md-3">
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') }}">
         </div>
-            <div class="form-group col-md-3">
-            <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                <option value=""></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}" {{ $supplier->id == old('supplier_id') ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
-            </select>
+        <div class="form-group col-md-3">
+            <label for="color">别名中文</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="alias_cname" placeholder="别名中文" name='alias_cname' value="{{ old('alias_cname') }}">
         </div>
-        
-        <!--<div class="form-group col-md-2">
-            <label for="size">供应商信息</label>
-            <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') }}">
-        </div>-->
-
-        <div class="form-group col-md-1">
-            <label for="size">供应商货号</label>
-            <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
+        <div class="form-group col-md-3">
+            <label for="color">别名英文</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="alias_name" placeholder="别名英文" name='alias_name' value="{{ old('alias_name')  }}">
         </div>
     </div>
 
     <div class='row'>
+        <div class="form-group col-md-3">
+            <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id="supplier_id" class="form-control" name="supplier_id">
+                <option value=""></option>
+                @foreach($suppliers as $supplier)
+                    <option value="{{ $supplier->id}}" {{ $supplier->id == old('supplier_id') ? 'selected' : '' }} >{{$supplier->name}}</option>
+                @endforeach
+            </select>
+        </div>
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select  class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -54,7 +54,13 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-md-1">
+            <label for="size">供应商货号</label>
+            <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
+        </div>
+    </div>
 
+    <div class='row'>
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') }}">
@@ -71,7 +77,7 @@
             <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2">
             <label for="color">产品包装尺寸(m³)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长,xx 宽,xx 高,xx)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>
@@ -86,26 +92,30 @@
     </div>
 
     <div class='row'>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">物流限制</label>  
-                @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+                @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}'>{{$carriage_limit}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}'>{{$carriage_limit->name}}
                     </label>
                 @endforeach   
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">包装限制</label>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+            @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}'>{{$package_limit}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}'>{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>
-        
+
         <div class="form-group col-md-3">
-            <label for="color">描述</label>
-            <input class="form-control" id="description" placeholder="备注" name='description' value="{{ old('description') }}">
+            <label for="color">尺寸描述</label>
+            <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') }}">
+        </div>        
+        <div class="form-group col-md-3">
+            <label for="color">描述(配件说明)</label>
+            <input class="form-control" id="description" placeholder="描述(配件说明)" name='description' value="{{ old('description') }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">备注</label>

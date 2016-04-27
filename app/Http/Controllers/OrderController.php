@@ -265,8 +265,8 @@ class OrderController extends Controller
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['channel_ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['email'] = $channelOrder['email'];
-            $orders[$key]['status'] = 'new';
-            $orders[$key]['active'] = 'normal';
+            $orders[$key]['status'] = 'NEW';
+            $orders[$key]['active'] = 'NORMAL';
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
@@ -282,9 +282,9 @@ class OrderController extends Controller
             $orders[$key]['amount_coupon'] = $channelOrder['order_insurance'];
             $orders[$key]['amount_shipping'] = $channelOrder['amount_shipping'] + $orders[$key]['amount_coupon'];
             if(($orders[$key]['amount_shipping'] / $orders[$key]['rate']) < 10) {
-                $orders[$key]['shipping'] = 'packet';
+                $orders[$key]['shipping'] = 'PACKET';
             }else {
-                $orders[$key]['shipping'] = 'express';
+                $orders[$key]['shipping'] = 'EXPRESS';
             }
             $orders[$key]['shipping_firstname'] = $channelOrder['shipping_firstname'];
             $orders[$key]['shipping_lastname'] = $channelOrder['shipping_lastname'];

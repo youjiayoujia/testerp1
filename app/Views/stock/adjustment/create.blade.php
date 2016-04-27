@@ -1,6 +1,4 @@
 @extends('common.form')
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockAdjustment.store') }} @stop
 @section('formBody')
     <div class='row'>
@@ -79,6 +77,8 @@
         </div>
     </div>
 @stop
+@section('pageJs')
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
 <script type='text/javascript'>
     $(document).ready(function(){
         var current = 1;    
@@ -175,7 +175,7 @@
             block.find('.unit_cost').val('');
         });
 
-        $(document).on('blur', '.sku', function(){
+        $(document).on('change', '.sku', function(){
             var tmp = $(this);
             var block = $(this).parent().parent();
             var type = block.find('.type').val();
@@ -239,3 +239,4 @@
         $('#check_time').cxCalendar();
     });
 </script>
+@stop

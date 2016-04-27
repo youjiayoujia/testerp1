@@ -17,7 +17,7 @@
     <th>采购条目状态</th>
     <th>入库状态</th>
     <th>异常状态</th>
-    <th>操作</th>
+    <!--<th>操作</th>-->
 @stop
 @section('tableBody')
     @foreach($data as $purchaseList)
@@ -76,16 +76,12 @@
             @endforeach
             @endif
             </td>
-            <td>
+           <!-- <td>
                 <a href="{{ route('purchaseStockIn.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                      入库
                 </a>
-                @if(!$purchaseList->bar_code)
-                 <a href="/purchaseStockIn/generateDarCode/{{$purchaseList->id}}" class="btn btn-info btn-xs ">
-                     生成库位入库
-                </a>
-                @endif
-            </td>       
+                
+            </td>    -->   
         </tr>
     @endforeach
 @stop

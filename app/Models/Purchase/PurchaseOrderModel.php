@@ -30,7 +30,7 @@ class PurchaseOrderModel extends BaseModel
     public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
     
 	 
-    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid','start_buying_time','arrival_time'];
+    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid','start_buying_time','arrival_time','assigner'];
 	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');

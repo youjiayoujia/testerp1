@@ -156,6 +156,7 @@ class TakingController extends Controller
             $takingForm->delete();
         }
         $model->delete();
+        Cache::store('file')->forever('stockIOStatus', 1);
 
         return redirect($this->mainIndex);
     }

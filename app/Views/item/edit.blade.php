@@ -12,24 +12,24 @@
         <div class="form-group col-md-3">
             <label for="size">item名英文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="name" placeholder="产品name" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
+            <input class="form-control" id="name" placeholder="产品name" disabled="disabled" name='name' value="{{ old('name') ?  old('name') : $model->product->productEnglishValue->name }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">item名中文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+            <input class="form-control" id="c_name" placeholder="产品中文名" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">item别名中文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+            <input class="form-control" id="c_name" placeholder="产品中文名" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
         </div>
     </div>
     <div class="row">
         <div class="form-group col-md-3">
             <label for="color">item别名英文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+            <input class="form-control" id="c_name" placeholder="产品中文名" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
         </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label>
@@ -40,10 +40,6 @@
                 @endforeach
             </select>
         </div>
-        <!--<div class="form-group col-md-3">
-            <label for="size">供应商信息</label>
-            <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $model->supplier_info }}">
-        </div>-->
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -112,20 +108,20 @@
 
 
     <div class="row">
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">物流限制</label>
-            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
-                <label>
-                    <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}' {{ in_array($carriage_key, explode(',',$model->carriage_limit))? 'checked' : '' }} >{{$carriage_limit}}
-                </label>
+            @foreach($logisticsLimit as $carriage_limit)
+                    <label>
+                        <input type='checkbox' disabled="disabled" name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$model->product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
+                    </label>
             @endforeach
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">包装限制</label>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
-                <label>
-                    <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}' {{ in_array($package_key, explode(',',$model->package_limit))? 'checked' : '' }} >{{$package_limit}}
-                </label>
+            @foreach($wrapLimit as $wrap_limit)
+                    <label>
+                        <input type='checkbox' disabled="disabled" name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$model->product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
+                    </label>
             @endforeach
         </div>
         <div class="form-group col-md-3">
@@ -140,6 +136,13 @@
         <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">是否可售</label>
+            <select  class="form-control" name="is_sale">
+                <option value="1" >可售</option>
+                <option value="0" {{ $model->is_sale == 0 ? 'selected' : '' }}>不可售</option>
+            </select>
         </div>
     </div>
 @stop

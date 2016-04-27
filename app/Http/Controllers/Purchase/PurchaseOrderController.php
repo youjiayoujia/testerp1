@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
+use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
 
 class PurchaseOrderController extends Controller
@@ -91,9 +92,9 @@ class PurchaseOrderController extends Controller
      */
 	
 	public function update($id)
-	{//echo date('Y-m-d h:i:s',time());exit;
+	{
 		$model=$this->model->find($id);
-		if ($model->examineStatus !=2) {
+		if($model->examineStatus !=2){
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
 		$data=request()->all();		
@@ -111,12 +112,20 @@ class PurchaseOrderController extends Controller
 					}
 					if($item['purchase_cost'] >0.6*$itemPurchasePrice && $item['purchase_cost'] <1.3*$itemPurchasePrice ){
 						$item['costExamineStatus']=2;
+						ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]);	
 					}else{
 						$item['costExamineStatus']=0;	
 					}
+					if(!$item['post_coding'] && $item['status'] >0){
+						$item['post_coding']=$data['post_coding'];
+						}
+						if($item['postage']!= $purchaseItem->postage && $item['postage']>0){
+							$data['total_postage']+=$item['postage']-$purchaseItem->postage;
+							}
 					if($item['status']>0){
 						$data['status']=1;
 					}
+					
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;

@@ -50,10 +50,10 @@
             <td>{{ $product->model }}</td>
             <td>{{ $product->catalog->name }}</td>
             <td>@if($product->default_image>0)<a href="{{ asset($product->image->path) }}/{{$product->image->name}}"><img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" ></a>@else无图片@endif</td>
-            <td><?php if($product->edit_status=="")echo "New";if($product->edit_status=="picked")echo "Picked";if($product->edit_status=="canceled")echo "Cancel"; ?></td>
+            <td><?php if($product->edit_status=="")echo "新品上传";if($product->edit_status=="picked")echo "被选中";if($product->edit_status=="canceled")echo "取消"; ?></td>
             <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
             <td>{{ $product->c_name }}</td>
-            <td>{{ $product->fabric }}</td>
+            <td>{{ $product->description }}</td>
             <td>{{ $product->supplier->name }}</td>
             <td><a href="{{$product->purchase_url}}" >链接</td>
             <td>线下供货商</td>

@@ -65,6 +65,28 @@ return [
                     'icon' => '',
                 ],
             ],
+			 '通关报关' => [
+                [
+                    'name' => 'home',
+                    'url' => 'customsClearance.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '三宝产品',
+                    'url' => 'product.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '三宝package',
+                    'url' => 'SelectProduct.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '中邮运单号列表',
+                    'url' => 'EditProduct.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //订单导航
@@ -210,17 +232,27 @@ return [
             '采购管理' => [
                 [
                     'name' => '采购需求',
-                    'url' => 'purchaseItem.index',
+                    'url' => 'require.index',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '采购单',
+                    'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '采购条目',
-                    'url' => 'purchaseItemList.index',
+                    'url' => 'purchaseItemList.index',	
+                    'icon' => '',
+                ],  
+				[
+                    'name' => '打印采购单',
+                    'url' => 'printPurchaseOrder.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '采购单',
-                    'url' => 'purchaseOrder.index',
+				[
+                    'name' => '采购单结算',
+                    'url' => 'closePurchaseOrder.index',
                     'icon' => '',
                 ],
                 [
@@ -285,6 +317,15 @@ return [
         'name' => '客户',
         'icon' => 'user',
         'url' => 'dashboard.index',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => 'CRM',
+                'url' => 'dashboard.index',
+                'icon' => '',
+            ],
+        ],
+
     ],
     //系统导航
     [
@@ -293,6 +334,16 @@ return [
         'url' => '',
         'type' => '',
         'subnavigations' => [
+            [
+                'name' => '用户列表',
+                'url' => 'user.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加用户',
+                'url' => 'user.create',
+                'icon' => '',
+            ],
             [
                 'name' => '汇率',
                 'url' => 'currency.index',

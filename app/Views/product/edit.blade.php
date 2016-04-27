@@ -93,10 +93,6 @@
     </div>
     <div class='row'>
         <div class="form-group col-md-3">
-            <label for="size">产品name</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="name" placeholder="产品name" name='name' value="{{ old('name') ?  old('name') : $product->name }}">
-        </div>
-        <div class="form-group col-md-3">
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') ?  old('c_name') : $product->c_name }}">
         </div>
@@ -107,11 +103,7 @@
                     <option value="{{ $supplier->id}}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
                 @endforeach
             </select>
-        </div>   
-        <!--<div class="form-group col-md-3">
-            <label for="size">供应商信息</label>
-            <input class="form-control" id="supplier_info" placeholder="供应商信息" name='supplier_info' value="{{ old('supplier_info') ?  old('supplier_info') : $product->supplier_info }}">
-        </div>-->  
+        </div> 
     </div>
 
     <div class='row'>  
@@ -123,7 +115,6 @@
                 @endforeach
             </select>
         </div>
-
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $product->purchase_url }}">
@@ -154,23 +145,27 @@
         </div>
     </div>
     <div class='row'>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">物流限制</label>
-            @foreach(config('product.carriage_limit') as $carriage_key=>$carriage_limit)
+            @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_key}}' {{ in_array($carriage_key, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">包装限制</label>
-            @foreach(config('product.package_limit') as $package_key=>$package_limit)
+            @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$package_key}}' {{ in_array($package_key, explode(',',$product->package_limit))? 'checked' : '' }} >{{$package_limit}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>
         
+        <div class="form-group col-md-3">
+            <label for="color">尺寸描述</label>
+            <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') ?  old('size_description') : $product->size_description }}">
+        </div>
         <div class="form-group col-md-3">
             <label for="color">描述</label>
             <input class="form-control" id="description" placeholder="备注" name='description' value="{{ old('description') ?  old('description') : $product->description }}">

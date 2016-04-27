@@ -1,6 +1,4 @@
 @extends('common.form')
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockAllotment.update', ['id' => $allotment->id] ) }} @stop
 @section('formBody')
     <input type='hidden' name='_method' value='PUT'/>
@@ -78,7 +76,8 @@
         </div>
     </div>
 @stop
-
+@section('pageJs')
+<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
 <script type='text/javascript'>
     $(document).ready(function(){
         $(document).on('click', '.bt_right', function(){
@@ -193,7 +192,7 @@
                         str += "</select>";
                         block.find('.position_html').html(str);
                         block.find('.access_quantity').val(result[0][0]['available_quantity']);
-                        block.find('.unit_cost').val(result[1]);
+                        block.find('.unit_cost').val(result[2]);
                     }
                 }
             });
@@ -217,3 +216,4 @@
         });
     });
 </script>
+@stop

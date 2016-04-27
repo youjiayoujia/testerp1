@@ -1,5 +1,4 @@
 @extends('common.form')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockAllotment.store') }} @stop
 @section('formBody')
     <div class='row'>
@@ -78,6 +77,7 @@
         </div>
     </div> 
 @stop
+@section('pageJs')
 <script type='text/javascript'>
     $(document).ready(function(){
         current = 1;
@@ -202,7 +202,7 @@
                             str += "</select>";
                             block.find('.position_html').html(str);
                             block.find('.access_quantity').val(result[0][0]['available_quantity']);
-                            block.find('.unit_cost').val(result[1]);
+                            block.find('.unit_cost').val(result[2]);
                         }
                     }
                 });
@@ -227,3 +227,4 @@
         });
     });
 </script>
+@stop

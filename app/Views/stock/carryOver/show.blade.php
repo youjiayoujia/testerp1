@@ -1,35 +1,37 @@
 @extends('common.detail')
 @section('detailBody')
-    <div class="panel panel-default">
-        <div class="panel-heading">基础信息</div>
-        <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>ID</strong>: {{ $model->id }}
-            </div>
-            <div class="col-lg-2">
-                <strong>sku</strong>: {{ $model->stock ? $model->stock->items ? $model->stock->items->sku : '' : '' }}
-            </div>
-            <div class="col-lg-2">
-                <strong>仓库</strong>: {{ $model->stock ? $model->stock->warehouse ? $model->stock->warehouse->name : '' : '' }}
-            </div>
-            <div class="col-lg-2">
-                <strong>库位</strong>: {{ $model->stock ? $model->stock->position ? $model->stock->position->name : '' : '' }}
-            </div>
-            <div class="col-lg-2">
-                <strong>期初数量</strong>: {{ $model->begin_quantity }}
-            </div>
-            <div class="col-lg-2">
-                <strong>期初金额</strong>: {{ $model->begin_amount }}
-            </div>
-            <div class="col-lg-2">
-                <strong>期末数量</strong>: {{ $model->over_quantity }}
-            </div>
-            <div class="col-lg-2">
-                <strong>期末金额</strong>: {{ $model->over_amount }}
-            </div>
-            <div class="col-lg-2">
-                <strong>结转时间</strong>: {{ $model->carry_over_time }}
-            </div>
+    <div class='row'>
+        <div class='form-group col-lg-2'>
+            <label>月结时间</label>
+            <input type='text' class='form-control' value="{{ $model->date }}">
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>结转时间</label>
+            <input type='text' class='form-control' value="{{ $model->created_at }}">
         </div>
     </div>
+    <table class='table table-bordered'>
+        <thead>
+            <th>sku</th>
+            <th>仓库</th>
+            <th>库位</th>
+            <th>期初数量</th>
+            <th>期初金额</th>
+            <th>期末数量</th>
+            <th>期末金额</th>
+        </thead>
+        <tbody>
+            @foreach($forms as $form)
+            <tr>
+                <td>{{ $form->stock ? $form->stock->items ? $form->stock->items->sku : '' : '' }}</td>
+                <td>{{ $form->stock ? $form->stock->warehouse ? $form->stock->warehouse->name : '' : '' }}</td>
+                <td>{{ $form->stock ? $form->stock->position ? $form->stock->position->name : '' : ''}}</td>
+                <td>{{ $form->begin_quantity }}</td>
+                <td>{{ $form->begin_amount }}</td>
+                <td>{{ $form->over_quantity }}</td>
+                <td>{{ $form->over_amount }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
 @stop

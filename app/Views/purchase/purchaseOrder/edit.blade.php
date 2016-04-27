@@ -6,12 +6,21 @@
  <input type="hidden" name="total_purchase_cost" value="0"/>
         <div class="panel-heading">单头</div>
         <div class="panel-body">
-            <div class="form-group col-lg-4">
-                <strong>ID</strong>: {{ $model->id }}
+         <div class="form-group col-lg-4">
+                <strong>标题: choies公司向 {{$model->supplier->name}} 采购单</strong>
             </div>
+           
              <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
                 {{ $model->warehouse->name}}
+            </div>
+            <div class="form-group col-lg-4">
+                <strong>仓库地址</strong>:
+                {{ $model->warehouse->province}}{{ $model->warehouse->city}}{{ $model->warehouse->address}}
+            </div>
+            
+             <div class="form-group col-lg-4">
+                <strong>采购单ID</strong>: {{ $model->id }}
             </div>
              <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:
@@ -35,16 +44,7 @@
                 @endif
             	@endforeach
             </div> 
-             <div class="form-group col-lg-4">
-            	<strong>导出该订单</strong>:
-                @if($model->supplier->type==1)
-                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>
-                @else
-                <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
-                </a>
-                @endif     
-            </div>
+            
          <div class="form-group col-lg-4">
             <strong>采购单运单号</strong>:
                 <input class="form-control" type="text" name='post_coding' value='{{$model->post_coding}}'/>
@@ -53,7 +53,29 @@
             <strong>采购单运费</strong>:
                 <input class="form-control" type="text" name='total_postage' value='{{$model->total_postage}}'/>
             </div>  
-                    
+            <div class="form-group col-lg-4">
+            	<strong>导出该订单</strong>:
+                @if($model->supplier->type==1)
+                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
+                </a>
+                @else
+                <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
+                </a>
+                @endif     
+            </div> 
+            <div class="form-group col-lg-4">
+                <strong>采购人</strong>:
+                <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
+            </div>
+            <div class="form-group col-lg-4">
+            	<strong>采购单结算</strong>:
+                 @if($model->close_status ==0)
+                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算改采购单
+                </a>
+                @else
+                已结算
+                @endif  
+            </div>        
         </div>
 
      <div class="panel panel-default">
@@ -69,9 +91,10 @@
         <tr>
             <td>采购条目ID</td> 
             <td>采购类型</td> 
-            <td>SKU</td> 
+            <td>model</td>
+            <td>SKU*采购数量</td> 
+            <td>供货商sku</td> 
             <td>样图</td>
-            <td>采购数量</td>
             <td>状态</td>
             <td>物流单号+物流费</td>
             <td>采购价格</td>
@@ -93,7 +116,9 @@
                     @endif
                 @endforeach
             </td>
-            <td>{{$purchaseItem->sku}}</td>
+            <td>{{$purchaseItem->item->product->model}}</td>
+            <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
+            <td>{{$purchaseItem->item->supplier_sku}}</td>   
             <td>
             @if($purchaseItem->item->product->default_image>0) 
             <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
@@ -101,7 +126,7 @@
              暂无图片
              @endif
             </td>
-            <td>{{$purchaseItem->purchase_num}}</td>
+            
             <td>
            	<select name="arr[{{$k}}][status]" >
              @foreach(config('purchase.purchaseItem.status') as $key=>$v)

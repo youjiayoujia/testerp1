@@ -35,13 +35,16 @@ class ItemModel extends BaseModel
         'purchase_url',
         'purchase_price',
         'purchase_carriage',
+        'cost',
         'product_size',
         'package_size',
         'carriage_limit',
         'package_limit',
         'warehouse_id',
         'status',
-        'remark'
+        'is_sale',
+        'remark',
+        'cost',
     ];
 
     public function product()
@@ -75,6 +78,16 @@ class ItemModel extends BaseModel
     public function getImageAttribute()
     {
         return $this->product->image->path . $this->product->image->name;
+    }
+
+    public function getAllQuantityAttribute()
+    {
+        $data = 0;
+        foreach ($this->stocks as $stock) {
+            $data += $stock->all_quantity;
+        }
+
+        return $data;
     }
 
     /**
@@ -118,6 +131,13 @@ class ItemModel extends BaseModel
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
+            $cost = $amount / $quantity;
+            if ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3) {
+                throw new Exception('入库单价不在原单价0.6-1.3范围内');
+            }
+            $this->update([
+                'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
+            ]);
             return $stock->in($quantity, $amount, $type, $relation_id, $remark);
         }
         return false;

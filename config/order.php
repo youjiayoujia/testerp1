@@ -10,23 +10,23 @@
 return [
     //订单状态
     'status' => [
-        'new' => '未处理',
-        'confirmed' => '已确认',
-        'need' => '需补货',
-        'arrived' => '货物到齐',
-        'shipped' => '发货完成',
-        'completed' => '订单完成',
-        'cancel' => '取消订单',
-        'error' => '订单异常',
+        'NEW' => '未处理',
+        'PREPARED' => '准备发货',
+        'NEED' => '需补货',
+        'PACKED' => '打包完成',
+        'SHIPPED' => '发货完成',
+        'COMPLETE' => '订单完成',
+        'CANCEL' => '取消订单',
+        'ERROR' => '订单异常',
     ],
 
     //售后状态
     'active' => [
-        'normal' => '正常',
-        'accounting' => '验证中',
-        'chargeback' => '客户CB',
-        'suspend' => '暂停发货',
-        'recovery' => '恢复正常'
+        'NORMAL' => '正常',
+        'VERIFY' => '验证中',
+        'CHARGEBACK' => '客户CB',
+        'STOP' => '暂停发货',
+        'RESUME' => '恢复正常'
     ],
 
     //订单地址
@@ -36,12 +36,29 @@ return [
     ],
 
     //币种
-    'currency' => ['USD', 'GBP', 'EUR', 'NOK', 'CAD', 'AUD', 'CHF', 'SEK', 'PLN', 'RUB', 'MXN', 'DKK', 'SAR', 'TWD', 'JPY', 'HKD'],
+    'currency' => [
+        'USD',
+        'GBP',
+        'EUR',
+        'NOK',
+        'CAD',
+        'AUD',
+        'CHF',
+        'SEK',
+        'PLN',
+        'RUB',
+        'MXN',
+        'DKK',
+        'SAR',
+        'TWD',
+        'JPY',
+        'HKD'
+    ],
 
     //种类
     'shipping' => [
-        'express' => '快递',
-        'packet' => '小包'
+        'EXPRESS' => '快递',
+        'PACKET' => '小包'
     ],
 
     //支付方式
@@ -55,9 +72,9 @@ return [
 
     //发货状态
     'ship_status' => [
-        'not_shipped' => '未发货',
-        'ready_shipped' => '准备发货',
-        'already_shipped' => '已发货'
+        'NEW' => '未发货',
+        'PACKED' => '准备发货',
+        'SHIPPED' => '已发货'
     ],
 
     //是否有效

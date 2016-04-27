@@ -10,6 +10,8 @@ namespace App\Http\Controllers;
 use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Logistics\LimitsModel;
+use App\Models\WrapLimitsModel;
 use App\Models\ChannelModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
@@ -17,11 +19,13 @@ use App\Models\Product\ProductFeatureValueModel;
 class ProductController extends Controller
 {
 
-    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog)
+    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel)
     {
         $this->model = $product;
         $this->supplier = $supplier;
         $this->catalog = $catalog;
+        $this->logisticsLimit = $limitsModel;
+        $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
         $this->viewPath = 'product.';
@@ -33,6 +37,8 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
             'suppliers' => $this->supplier->all(),
+            'wrapLimit' => $this->wrapLimit->all(),
+            'logisticsLimit' => $this->logisticsLimit->all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -88,6 +94,8 @@ class ProductController extends Controller
             'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
+            'wrapLimit' => $this->wrapLimit->all(),
+            'logisticsLimit' => $this->logisticsLimit->all(),
         ];
 
         return view($this->viewPath . 'edit', $response);

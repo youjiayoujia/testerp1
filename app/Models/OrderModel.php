@@ -191,7 +191,7 @@ class OrderModel extends BaseModel
             $obj = ItemModel::where('sku', $item['sku'])->get();
             if (!count($obj)) {
                 $item['item_id'] = 0;
-                $order->update(['status' => 'error']);
+                $order->update(['status' => 'ERROR']);
             } else {
                 $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }

@@ -19,30 +19,46 @@ class CreateOrders extends Migration
             $table->string('ordernum')->comment('订单号');
             $table->string('channel_ordernum')->comment('渠道订单号');
             $table->string('email')->comment('邮箱');
-            $table->string('status')->comment('订单状态');
-            $table->string('active')->comment('售后状态');
+            $table->enum('status',
+                [
+                    'NEW',
+                    'PREPARED',
+                    'NEED',
+                    'PACKED',
+                    'SHIPPED',
+                    'COMPLETE',
+                    'CANCEL',
+                    'ERROR'
+                ])->default('NEW')->comment('订单状态');
+            $table->enum('active',
+                [
+                    'NORMAL',
+                    'VERIFY',
+                    'CHARGEBACK',
+                    'STOP',
+                    'RESUME'
+                ])->default('NORMAL')->comment('售后状态');
             $table->double('amount', 15, 2)->comment('总金额');
             $table->double('amount_product', 15, 2)->comment('产品金额');
             $table->double('amount_shipping', 15, 2)->comment('运费');
             $table->double('amount_coupon', 15, 2)->comment('折扣金额');
             $table->string('transaction_number')->comment('交易号');
-            $table->integer('is_partial')->comment('是否分批发货');
-            $table->enum('is_multi', ['0', '1'])->comment('是否复数')->default(NULL);
-            $table->integer('by_hand')->comment('是否手工');
-            $table->integer('is_affair')->comment('是否做账');
+            $table->enum('is_partial', [0, 1])->comment('是否分批发货')->default(0);
+            $table->enum('by_hand', [0, 1])->comment('是否手工');
+            $table->enum('is_affair', [0, 1])->comment('是否做账')->default(0);
             $table->string('affairer')->comment('做账人员')->nullable()->default(NULL);
             $table->string('customer_service')->comment('客服人员')->nullable()->default(NULL);
             $table->string('operator')->comment('运营人员')->nullable()->default(NULL);
-            $table->string('payment')->comment('支付方式');
+            $table->enum('payment', ['GC', 'IDEAL', 'OC', 'PP', 'SOFORT'])->default('GC')->comment('支付方式');
             $table->string('currency')->comment('币种');
             $table->double('rate', 15, 4)->comment('汇率');
             $table->string('ip')->comment('IP地址')->nullable()->default(NULL);
-            $table->integer('address_confirm')->comment('地址验证');
+            $table->enum('address_confirm', [0, 1])->comment('地址验证')->default(1);
             $table->string('comment')->comment('备用字段')->nullable()->default(NULL);
             $table->string('comment1')->comment('红人/choies用')->nullable()->default(NULL);
             $table->string('remark')->comment('订单备注')->nullable()->default(NULL);
             $table->string('import_remark')->comment('导单备注')->nullable()->default(NULL);
-            $table->string('shipping')->comment('种类');
+            $table->enum('shipping', ['EXPRESS', 'PACKET'])->comment('种类');
             $table->string('shipping_firstname')->comment('发货名字');
             $table->string('shipping_lastname')->comment('发货姓氏');
             $table->string('shipping_address')->comment('发货地址');
@@ -65,6 +81,8 @@ class CreateOrders extends Migration
             $table->string('refund_account')->comment('客户账户')->nullable()->default(NULL);
             $table->string('refund_amount')->comment('退款金额')->nullable()->default(NULL);
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
+            $table->integer('priority')->comment('优先级')->nullable()->default(0);
+            $table->integer('package_times')->comment('打包次数')->nullable()->default(0);
             $table->date('refund_time')->comment('退款时间')->nullable()->default(NULL);
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间')->nullable()->default(NULL);

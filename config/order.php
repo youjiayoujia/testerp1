@@ -57,8 +57,8 @@ return [
 
     //种类
     'shipping' => [
-        'express' => '快递',
-        'packet' => '小包'
+        'EXPRESS' => '快递',
+        'PACKET' => '小包'
     ],
 
     //支付方式
@@ -71,14 +71,14 @@ return [
     ],
 
     //发货状态
-    'ship_status' => [
+    'item_status' => [
         'NEW' => '未发货',
         'PACKED' => '准备发货',
         'SHIPPED' => '已发货'
     ],
 
     //是否有效
-    'product_status' => [
+    'is_active' => [
         '0' => '无效',
         '1' => '有效'
     ],

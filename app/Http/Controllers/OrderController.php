@@ -316,7 +316,7 @@ class OrderController extends Controller
                 $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];
                 $orders[$key]['items'][$itemKey]['price'] = $channelOrderItem['price'];
                 $orders[$key]['items'][$itemKey]['is_active'] = 1;
-                $orders[$key]['items'][$itemKey]['status'] = 'not_shipped';
+                $orders[$key]['items'][$itemKey]['status'] = 'NEW';
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
                 $arr = $channelOrder['orderitems'];
                 $len = count($arr);

@@ -158,7 +158,7 @@ class PurchaseOrderController extends Controller
 		$data['examineStatus']=$examineStatus;
 		$model->update($data);
 		if($examineStatus==1){
-			$this->model->cancelOrderItems($id);
+			$this->cancelOrder($id);
 		}
 		return redirect($this->mainIndex);
 	}
@@ -200,11 +200,11 @@ class PurchaseOrderController extends Controller
 		$purchaseOrders=$this->model->find($arrayIds);
 			foreach($purchaseOrders as $vo){
 				$vo->update(['examineStatus'=>2]);
-				}
+			}
 		return 1;
 		}
 	/**
-     * 批量审核采购单
+     * 导出3天未到货采购单
      *
      * 
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -217,6 +217,23 @@ class PurchaseOrderController extends Controller
 		}
 		$this->model->excelOrdersOut($purchaseOrderIds);
 			
+	}
+	
+	/**
+     * 取消采购单
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function cancelOrder($id)
+	{	
+		$num=purchaseItemModel::where('purchase_order_id',$id)->where('status','>',2)->count();
+		if($num>0){
+			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
+			}
+		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
+		$this->model->destroy($id);
+		return redirect($this->mainIndex);	
 	}
 }
 

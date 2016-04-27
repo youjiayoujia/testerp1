@@ -114,6 +114,7 @@ Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderControll
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
 Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
 Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
+Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
 Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 //打印采购单
 Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');

@@ -74,10 +74,7 @@ class PurchaseOrderAbnormalController extends Controller
 		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
 		$this->model->destroy($id);
 		return redirect($this->mainIndex);	
-	}
-	
-	
-	 
+	}	 
 		
 }
 

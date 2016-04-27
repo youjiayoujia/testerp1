@@ -169,11 +169,6 @@
                     </label>
                 </div>
             </div>
-            <div class="form-group col-lg-2" id="is_multi">
-                <label for="is_multi" class='control-label'>是否复数</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="is_multi" placeholder="是否复数" name='is_multi' value="{{ old('is_multi') ? old('is_multi') : $model->is_multi }}">
-            </div>
             <div class="form-group col-lg-2" id="hand">
                 <label for="by_hand" class='control-label'>是否手工</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -477,7 +472,6 @@
         $('#create_time, #payment_date, #affair_time, #refund_time').cxCalendar();
 
         document.getElementById('comment').style.display='none';
-        document.getElementById('is_multi').style.display='none';
         document.getElementById('hand').style.display='none';
 
         var payment = $('#payment').val();

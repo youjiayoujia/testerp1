@@ -64,11 +64,6 @@ class OrderController extends Controller
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
-                if(count($item) >= 2) {
-                    $data['is_multi'] = 1;
-                }else {
-                    $data['is_multi'] = 0;
-                }
             }
         }
         unset($data['arr']);
@@ -320,11 +315,6 @@ class OrderController extends Controller
                 $orders[$key]['items'][$itemKey]['is_active'] = 1;
                 $orders[$key]['items'][$itemKey]['status'] = 'not_shipped';
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
-                if(count($channelOrder['orderitems']) >= 2) {
-                    $orders[$key]['is_multi'] = 1;
-                }else {
-                    $orders[$key]['is_multi'] = 0;
-                }
                 $arr = $channelOrder['orderitems'];
                 $len = count($arr);
                 for($i=0; $i<$len; $i++) {

@@ -44,7 +44,6 @@ class CreateOrders extends Migration
             $table->double('amount_coupon', 15, 2)->comment('折扣金额');
             $table->string('transaction_number')->comment('交易号');
             $table->enum('is_partial', [0, 1])->comment('是否分批发货')->default(0);
-            $table->enum('is_multi', [0, 1])->comment('是否复数');
             $table->enum('by_hand', [0, 1])->comment('是否手工');
             $table->enum('is_affair', [0, 1])->comment('是否做账')->default(0);
             $table->string('affairer')->comment('做账人员')->nullable()->default(NULL);

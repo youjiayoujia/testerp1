@@ -20,9 +20,9 @@ class CreateOrderItems extends Migration
             $table->string('image')->comment('图片');
             $table->integer('quantity')->comment('数量');
             $table->float('price')->comment('金额');
-            $table->integer('is_active')->comment('是否有效');
-            $table->string('status')->comment('发货状态');
-            $table->integer('is_gift')->comment('是否赠品');
+            $table->enum('is_active', [0, 1])->comment('是否有效');
+            $table->enum('status', ['NEW', 'PACKED', 'SHIPPED'])->comment('发货状态');
+            $table->enum('is_gift', [0, 1])->comment('是否赠品');
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();

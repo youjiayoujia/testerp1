@@ -17,7 +17,7 @@ class CreateLogisticsCodes extends Migration
             $table->integer('logistics_id')->comment('物流方式')->default(NULL);
             $table->string('code')->comment('跟踪号')->default("");
             $table->integer('package_id')->comment('包裹ID')->nullable();
-            $table->string('status')->comment('状态')->default('N');
+            $table->enum('status', [0, 1])->comment('状态');
             $table->date('used_at')->nullable()->comment('使用时间')->default(NULL);
             $table->timestamps();
             $table->softDeletes();

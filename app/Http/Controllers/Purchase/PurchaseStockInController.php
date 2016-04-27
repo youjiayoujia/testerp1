@@ -19,6 +19,7 @@ use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\Stock\InModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Purchase\StorageLogModel;
 
 class PurchaseStockInController extends Controller
 {
@@ -36,7 +37,7 @@ class PurchaseStockInController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status',2)->orderby('storageStatus')),
+            'data' => $this->autoList($this->model->where('status',2)->orderBy('storageStatus', 'desc')),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -98,24 +99,33 @@ class PurchaseStockInController extends Controller
 					$storage['storageStatus']=2;
 					$data['storage_qty']=0;
 				}
+				$stoeagelog['storage_quantity']=1;
 			}else{
 				if(($data['storage_qty']+$vo->storage_qty) < $vo->purchase_num){
 					$storage['storage_qty']=$data['storage_qty']+$vo->storage_qty;
 					$storage['storageStatus']=1;
+					$stoeagelog['storage_quantity']=$data['storage_qty'];
 					$data['storage_qty']=0;					
 				}elseif(($data['storage_qty']+$vo->storage_qty) == $vo->purchase_num){
 					$storage['storage_qty']=$vo->purchase_num;
 					$storage['storageStatus']=2;
+					$stoeagelog['storage_quantity']=$data['storage_qty'];
 					$data['storage_qty']=0;
 				}else{
 					$storage['storage_qty']=$vo->purchase_num;
 					$storage['storageStatus']=2;
+					$stoeagelog['storage_quantity']=$vo->purchase_num - $vo->storage_qty;
 					$data['storage_qty']=$data['storage_qty']-$vo->purchase_num;				
 				}
 			}
 		}
 					
 				$this->model->find($vo->id)->update($storage);
+				$stoeagelog['user_id']=1;
+				$stoeagelog['purchaseItemId']=$vo->id;
+				if($stoeagelog['storage_quantity']>0){
+				StorageLogModel::create($stoeagelog);
+				}
 				if($data['storage_qty'] == 0){
 					break;
 					}

@@ -21,7 +21,7 @@
                 物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}
             </div>
             <div class="form-group col-lg-4">
-                <strong>结算人</strong>:            
+                <strong>采购人</strong>:            
             		{{$model->assigner}}
             </div> 
              <div class="form-group col-lg-4">
@@ -123,7 +123,7 @@
             @endforeach     
              </td>
             <td>
-            物流单号：
+            {{$purchaseItem->post_coding }}
             </td>       
             <td>
               {{$purchaseItem->storage_qty }}  

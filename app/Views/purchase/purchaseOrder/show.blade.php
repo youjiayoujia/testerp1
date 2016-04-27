@@ -42,7 +42,7 @@
             	@endforeach
             </div> 
             <div class="form-group col-lg-4">
-                <strong>结算人</strong>:
+                <strong>采购人</strong>:
                 {{$model->assigner}}
             </div>
          <div class="form-group col-lg-4">

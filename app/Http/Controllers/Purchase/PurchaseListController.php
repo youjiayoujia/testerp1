@@ -80,7 +80,7 @@ class PurchaseListController extends Controller
 		if($data['arrival_num']==$model->purchase_num){
 			$data['lack_num']=0;
 			$data['status']=2;
-			$this->	generateDarCode($id);
+			$this->	generateBarCode($id);
 		}
 		if($data['active']>0){
 			$data['active_status']=1;
@@ -156,7 +156,7 @@ class PurchaseListController extends Controller
 			}
 			if($purcahse[1]==0 && $arrayItems->costExamineStatus ==2){
 			$arrayItems->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
-			$this->	generateBarCode($arrayItems->id);
+			$this->generateBarCode($arrayItems->id);
 			$num=$this->model->where('purchase_order_id',$arrayItems->purchase_order_id)->where('status','<',2)->count();
 			$purchaseOrder=PurchaseOrderModel::find($arrayItems->purchase_order_id);
 			if($num==0){
@@ -204,7 +204,8 @@ class PurchaseListController extends Controller
 				$warehouseId=$position->warehouse_id;
 				$warehouseName=$position->name;
 				$sku=$model->sku;
-				$barCode=$sku.$warehouseId.$warehouseName;
+				$model->update(['bar_code'=>$sku]);
+				//$barCode=$sku.$warehouseId.$warehouseName;
 			}else{
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
 				$position_num=PositionModel::where('warehouse_id',$model->warehouse_id)->count();
@@ -228,7 +229,8 @@ class PurchaseListController extends Controller
 				$warehouseId=$position->warehouse_id;
 				$warehouseName=$position->name;
 				$sku=$model->sku;
-				$barCode=$sku.$warehouseId.$warehouseName;
+				$model->update(['bar_code'=>$sku]);
+				//$barCode=$sku.$warehouseId.$warehouseName;
 			}
 		}
 	}

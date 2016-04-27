@@ -50,25 +50,7 @@ class CreateOrders extends Migration
             $table->string('customer_service')->comment('客服人员')->nullable()->default(NULL);
             $table->string('operator')->comment('运营人员')->nullable()->default(NULL);
             $table->enum('payment', ['GC', 'IDEAL', 'OC', 'PP', 'SOFORT'])->default('GC')->comment('支付方式');
-            $table->enum('currency',
-                [
-                    'USD',
-                    'GBP',
-                    'EUR',
-                    'NOK',
-                    'CAD',
-                    'AUD',
-                    'CHF',
-                    'SEK',
-                    'PLN',
-                    'RUB',
-                    'MXN',
-                    'DKK',
-                    'SAR',
-                    'TWD',
-                    'JPY',
-                    'HKD'
-                ])->default('USD')->comment('币种');
+            $table->string('currency')->comment('币种');
             $table->double('rate', 15, 4)->comment('汇率');
             $table->string('ip')->comment('IP地址')->nullable()->default(NULL);
             $table->enum('address_confirm', [0, 1])->comment('地址验证')->default(1);

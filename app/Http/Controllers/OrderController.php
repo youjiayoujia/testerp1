@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
+use App\Models\CurrencyModel;
 use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
@@ -39,6 +40,7 @@ class OrderController extends Controller
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
+            'currencys' => CurrencyModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -90,6 +92,7 @@ class OrderController extends Controller
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
+            'currencys' => CurrencyModel::all(),
             'aliases' => $model->channel->channelAccount,
         ];
 

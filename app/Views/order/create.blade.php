@@ -198,9 +198,9 @@
                 <label for="currency" class='control-label'>币种</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="currency" id="currency">
-                    @foreach(config('order.currency') as $currency)
-                        <option value="{{ $currency }}" {{ old('currency') == $currency ? 'selected' : '' }}>
-                            {{ $currency }}
+                    @foreach($currencys as $currency)
+                        <option value="{{ $currency->code }}" {{ Tool::isSelected('currency', $currency->code) }}>
+                            {{ $currency->code }}
                         </option>
                     @endforeach
                 </select>
@@ -355,9 +355,9 @@
             <div class="form-group col-lg-2">
                 <label for="refund_currency" class='control-label'>退款币种</label>
                 <select class="form-control" name="refund_currency" id="refund_currency">
-                    @foreach(config('order.currency') as $refund_currency)
-                        <option value="{{ $refund_currency }}" {{ old('refund_currency') == $refund_currency ? 'selected' : '' }}>
-                            {{ $refund_currency }}
+                    @foreach($currencys as $refund_currency)
+                        <option value="{{ $refund_currency->code }}" {{ old('refund_currency') == $refund_currency->code ? 'selected' : '' }}>
+                            {{ $refund_currency->code }}
                         </option>
                     @endforeach
                 </select>
@@ -448,7 +448,7 @@
                 </div>
                 <div class="form-group col-sm-1">
                     <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
-                        @foreach(config('order.ship_status') as $ship_status_key => $status)
+                        @foreach(config('order.item_status') as $ship_status_key => $status)
                             <option value="{{ $ship_status_key }}" {{ old('arr[status][0]') == $ship_status_key ? 'selected' : '' }}>
                                 {{ $status }}
                             </option>

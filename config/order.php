@@ -71,7 +71,7 @@ return [
     ],
 
     //发货状态
-    'ship_status' => [
+    'item_status' => [
         'NEW' => '未发货',
         'PACKED' => '准备发货',
         'SHIPPED' => '已发货'

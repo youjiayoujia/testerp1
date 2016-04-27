@@ -33,7 +33,7 @@ class ItemModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('order.ship_status');
+        $arr = config('order.item_status');
         return $arr[$this->status];
     }
 

@@ -164,6 +164,16 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => 'hold库存',
+                    'url' => 'stockHold.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'unhold库存',
+                    'url' => 'stockUnhold.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '库存调整',
                     'url' => 'stockAdjustment.index',
                     'icon' => '',

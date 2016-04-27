@@ -8,10 +8,12 @@
 
 namespace App\Http\Controllers;
 
+use Excel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
+use App\Models\Warehouse\PositionModel;
 
 class PackageController extends Controller
 {
@@ -77,34 +79,6 @@ class PackageController extends Controller
         echo json_encode('success');
     }
 
-    public function manualLogistic($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'logistics' => LogisticsModel::all(),
-        ];
-
-        return view($this->viewPath . 'fee', $response);
-    }
-
-    public function feeStore()
-    {
-        $model = $this->model->find(request()->input('id'));
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $model->update(request()->all());
-        $model->status = 'SHIPPED';
-        $model->save();
-
-        return redirect($this->mainIndex);
-    }
-
     /**
      * 跳转发货页面
      *
@@ -123,6 +97,42 @@ class PackageController extends Controller
     }
 
     /**
+     * 导出手工发货包裹信息 
+     *
+     * @param none
+     * @return csv
+     *
+     */
+    public function exportManualPackage()
+    {
+        $str = request()->input('arr');
+        $arr = explode('|', $str);
+        $rows = '';
+        foreach($arr as $id) {
+            $package = $this->model->find($id);
+            if($package->is_auto || (!$package->is_auto && $package->status != 'PROCESSING')) {
+                continue;
+            }
+            $package->update(['status' => 'PACKED', 'shipper_id' => '2', 'shipped_at' => date('Y-m-d G:i:s', time())]);
+            foreach($package->items as $item) {
+                $rows[] = [
+                    'package  ID' => $id,
+                    'sku' => ItemModel::find($item->item_id)->sku,
+                    'warehouse_position' => PositionModel::find($item->warehouse_position_id)->name,
+                    'quantity' => $item->quantity,
+                ];
+            }
+        }
+        $name = 'ManualPackage';
+        Excel::create($name, function($excel) use ($rows){
+            $nameSheet='手工发货包裹';
+            $excel->sheet($nameSheet, function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    /**
      * 执行发货
      *
      * @param none
@@ -132,32 +142,123 @@ class PackageController extends Controller
     public function ajaxShippingExec()
     {
         $track_no = request()->input('trackno');
+        $weight = request()->input('weight');
         $logistic_id = request()->input('logistic_id');
         $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
         if (!$package) {
             return json_encode(false);
         }
-        if ($package->logistic_id != $logistic_id) {
+        if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time())]);
+        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
         return json_encode(true);
     }
 
+    /**
+     * 跳转发货统计页面 
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function shippingStatistics()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, '发货统计'),
         ];
 
         return view($this->viewPath . 'statistics', $response);
     }
 
+    /**
+     * 导出数据 according to start_time end_time
+     *
+     * @param none
+     * @return none
+     *
+     */
     public function exportData()
     {
         $start_time = request()->input('start_time');
         $end_time = request()->input('end_time');
         $packages = PackageModel::whereBetween('shipped_at', [$start_time, $end_time])->get();
         $this->model->exportData($packages);
+    }
+
+    /**
+     * 跳转excel页面 
+     *
+     * @param none
+     * @return view
+     *
+     */
+    public function returnTrackno()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '导入trackno'),
+            'action' => route('package.excelProcess'),
+        ];
+
+        return view($this->viewPath.'excel', $response);
+    }
+
+    /**
+     * excel 处理
+     *
+     * @param none
+     *
+     */
+    public function excelProcess()
+    {
+        if(request()->hasFile('excel'))
+        {
+           $file = request()->file('excel');
+           $errors = $this->model->excelProcess($file);
+           $response = [
+                'metas' => $this->metas(__FUNCTION__, '导入结果'),
+                'errors' => $errors,
+            ];
+
+            return view($this->viewPath.'excelResult', $response);
+        }
+    }
+    
+    /**
+     * 跳转excel页面 
+     *
+     * @param none
+     * @return view
+     *
+     */
+    public function returnFee()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '导入fee'),
+            'action' => route('package.excelProcessFee', ['type' => request('type')]),
+        ];
+
+        return view($this->viewPath.'excel', $response);
+    }
+
+    /**
+     * excel 处理
+     *
+     * @param none
+     *
+     */
+    public function excelProcessFee($type)
+    {
+        if(request()->hasFile('excel'))
+        {
+           $file = request()->file('excel');
+           $errors = $this->model->excelProcessFee($file, $type);
+           $response = [
+                'metas' => $this->metas(__FUNCTION__, '导入结果'),
+                'errors' => $errors,
+            ];
+
+            return view($this->viewPath.'excelFeeResult', $response);
+        }
     }
 }

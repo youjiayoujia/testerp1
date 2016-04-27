@@ -1,5 +1,6 @@
 @extends('common.table')
 @section('tableHeader')
+    <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class="sort" data-field="id">ID</th>
     <th>订单号</th>
     <th>仓库</th>
@@ -17,6 +18,7 @@
 @section('tableBody')
     @foreach($data as $package)
         <tr>
+            <td><input type='checkbox' name='single[]' class='single'></td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
@@ -41,11 +43,6 @@
                         <span class="glyphicon glyphicon-pencil"></span> 发货
                     </a>
                 @endif
-                @if(!$package->is_auto && $package->status != 'SHIPPED')
-                    <a href="{{ route('package.manualLogistic', ['id'=>$package->id])}}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 手工发货
-                    </a>
-                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $package->id }}"
                    data-url="{{ route('package.destroy', ['id' => $package->id]) }}">
@@ -56,6 +53,22 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="glyphicon glyphicon-filter"></i> 批量回传运费运单号
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
+        <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
+        <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
+    </ul>
+</div>
+<div class="btn-group">
+    <a class="btn btn-success export" href="javascript:">
+        批量导出手工发货package信息
+    </a>
+</div>
 <div class="btn-group">
     <a class="btn btn-success" href="{{ route('package.shipping') }}">
         执行发货
@@ -71,6 +84,38 @@
 @section('childJs')
     <script type='text/javascript'>
         $(document).ready(function () {
+            $('.returnTrackno').click(function(){
+                location.href="{{ route('package.returnTrackno')}}";
+            });
+
+            $('.returnFee').click(function(){
+                type = $(this).data('type');
+                location.href="{{ route('package.returnFee')}}?type="+type;
+            })
+
+            $('.export').click(function(){
+                arr = new Array();
+                i = 0;
+                $.each($('.single:checked'), function(){
+                    tmp = $(this).parent().next().text();
+                    arr[i] = tmp;
+                    i++;
+                })
+                if(arr.length) {
+                    location.href="{{ route('package.exportManualPackage') }}?arr="+arr.join('|');
+                } else {
+                    alert('未选择包裹信息');
+                }
+            });
+
+            $('.select_all').click(function(){
+                if($(this).prop('checked') == true) {
+                    $('.single').prop('checked', true);
+                } else {
+                    $('.single').prop('checked', false);
+                }
+            });
+
             $('.send').click(function () {
                 id = $(this).data('id');
                 $.ajax({

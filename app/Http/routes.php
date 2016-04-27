@@ -11,7 +11,6 @@
  */
 
 Route::get('test', 'TestController@test');
-Route::get('test1/{url}', ['uses' => 'TestController@test1', 'as' => 'test1']);
 Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
 //产品图片路由
@@ -38,6 +37,15 @@ Route::post('auth/register', 'Auth\AuthController@postRegister');
 
 //汇率
 Route::resource('currency', 'CurrencyController');
+
+//关帐s
+Route::resource('stockShut', 'Stock\ShutController');
+
+//入库
+Route::resource('stockHold', 'Stock\HoldController');
+
+//出库
+Route::resource('stockUnhold', 'Stock\UnholdController');
 
 //入库
 Route::resource('stockIn', 'Stock\InController');
@@ -270,13 +278,16 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::post('package/excelProcessFee/{type}', ['uses'=>'PackageController@excelProcessFee', 'as'=>'package.excelProcessFee']);
+Route::get('package/returnTrackno', ['uses'=>'PackageController@returnTrackno', 'as'=>'package.returnTrackno']);
+Route::post('package/excelProcess', ['uses'=>'PackageController@excelProcess', 'as'=>'package.excelProcess']);
+Route::get('package/returnFee', ['uses'=>'PackageController@returnFee', 'as'=>'package.returnFee']);
+Route::get('package/exportManualPackage/{str}', ['uses'=>'PackageController@exportManualPackage', 'as'=>'package.exportManualPackage']);
+Route::get('package/ajaxWeight', ['uses'=>'PackageController@ajaxWeight', 'as'=>'package.ajaxWeight']);
 Route::post('package/exportData', ['uses' => 'PackageController@exportData', 'as'=>'package.exportData']);
 Route::get('package/shippingStatistics', ['uses'=>'PackageController@shippingStatistics', 'as'=>'package.shippingStatistics']);
 Route::get('package/ajaxShippingExec', ['uses'=>'PackageController@ajaxShippingExec', 'as'=>'package.ajaxShippingExec']);
 Route::get('package/shipping', ['uses'=>'PackageController@shipping', 'as'=>'package.shipping']);
-Route::post('package/feeStore', ['uses' => 'PackageController@feeStore', 'as' => 'package.feeStore']);
-Route::get('package/manualLogistic/{id}',
-    ['uses' => 'PackageController@manualLogistic', 'as' => 'package.manualLogistic']);
 Route::get('package/ajaxPackageSend',
     ['uses' => 'PackageController@ajaxPackageSend', 'as' => 'package.ajaxPackageSend']);
 Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);

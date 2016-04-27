@@ -43,11 +43,6 @@
                         <span class="glyphicon glyphicon-pencil"></span> 发货
                     </a>
                 @endif
-                @if(!$package->is_auto && $package->status != 'SHIPPED')
-                    <a href="{{ route('package.manualLogistic', ['id'=>$package->id])}}" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 手工发货
-                    </a>
-                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $package->id }}"
                    data-url="{{ route('package.destroy', ['id' => $package->id]) }}">
@@ -60,12 +55,13 @@
 @section('tableToolButtons')
 <div class="btn-group" role="group">
     <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="glyphicon glyphicon-filter"></i> 批量导入
+        <i class="glyphicon glyphicon-filter"></i> 批量回传运费运单号
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
         <li><a href="javascript:" class='returnTrackno' data-status='1'>回传运单号</a></li>
-        <li><a href="javascript:" class='returnFee' data-status='2'>回传物流费</a></li>
+        <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
+        <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
     </ul>
 </div>
 <div class="btn-group">
@@ -93,7 +89,8 @@
             });
 
             $('.returnFee').click(function(){
-                location.href="{{ route('package.returnFee')}}";
+                type = $(this).data('type');
+                location.href="{{ route('package.returnFee')}}?type="+type;
             })
 
             $('.export').click(function(){
@@ -104,7 +101,11 @@
                     arr[i] = tmp;
                     i++;
                 })
-                location.href="{{ route('package.exportManualPackage') }}?arr="+arr.join('|');
+                if(arr.length) {
+                    location.href="{{ route('package.exportManualPackage') }}?arr="+arr.join('|');
+                } else {
+                    alert('未选择包裹信息');
+                }
             });
 
             $('.select_all').click(function(){

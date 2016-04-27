@@ -106,30 +106,91 @@ class PackageModel extends BaseModel
         }
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
-        foreach($arr as $key=> $position)
+        foreach($arr as $key=> $content)
         {
-            $position['warehouse'] = iconv('gb2312','utf-8',$position['warehouse']);
-            $position['remark'] = iconv('gb2312','utf-8',$position['remark']);
-            if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available'=>'1'])->count()) {
+            $content['package_id'] = iconv('gb2312','utf-8',trim($content['package_id']));
+            $content['logistics_id'] = iconv('gb2312','utf-8',trim($content['logistics_id']));
+            $content['tracking_no'] = iconv('gb2312','utf-8',trim($content['tracking_no']));
+            if(!LogisticsModel::where(['logistics_type' => $content['logistics_id']])->count()) {
                 $error[] = $key;
                 continue;
             }
-            $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available'=>'1'])->first();
-            $position['name']=iconv('gb2312','utf-8',$position['name']);
-            if(PositionModel::where(['name' => trim($position['name'])])->count()) {
-                $tmp_position = PositionModel::where(['name' => trim($position['name'])])->first();
-                $tmp_position->update($position);
-                $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
+            $tmp_logistics = LogisticsModel::where(['logistics_type' => $content['logistics_id']])->first();
+            $tmp_package = $this->where('id', $content['package_id'])->first();
+            if(!$tmp_package || $tmp_package->is_auto || $tmp_package->status != 'PROCESSING') {
+                $error[] = $key;
                 continue;
             }
-
-            $tmp_position = $this->create($position);
-            $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
+            $this->find($content['package_id'])->update(['logistics_id' => $tmp_logistics->id, 
+                                                         'tracking_no' => $content['tracking_no'],
+                                                         'status' => 'SHIPPED',
+                                                         'shipped_at' => date('Y-m-d G:i:s', time()),
+                                                         'shipper_id' => '2']);
         }
 
         return $error;
     }
 
+    /**
+     * 整体流程处理excel
+     *
+     * @param $file 文件指针 
+     *
+     */
+    public function excelProcessFee($file, $type)
+    {
+        $path = config('setting.excelPath');
+        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        return $this->excelDataProcessFee($path.'excelProcess.xls', $type);
+    }
+
+    /**
+     * 处理excel数据
+     *
+     * @param $path excel文件路径
+     *
+     */
+    public function excelDataProcessFee($path, $type)
+    {
+        $fd = fopen($path, 'r');
+        $arr = [];
+        while(!feof($fd))
+        {
+            $row = fgetcsv($fd);
+            $arr[] = $row;
+        }
+        fclose($fd);
+        if(!$arr[count($arr)-1]) {
+            unset($arr[count($arr)-1]);
+        }
+        $arr = $this->transfer_arr($arr);
+        $error[] = $arr;
+        foreach($arr as $key=> $content)
+        {
+            $content['package_id'] = iconv('gb2312','utf-8',trim($content['package_id']));
+            $content['cost'] = iconv('gb2312','utf-8',trim($content['cost']));
+            $tmp_package = $this->where('id', $content['package_id'])->first();
+            if(!$tmp_package || $tmp_package->status != 'SHIPPED') {
+                $error[] = $key;
+                continue;
+            }
+            if($type == 1)
+                $this->find($content['package_id'])->update(['cost' => $content['cost']]);
+            else
+                $this->find($content['package_id'])->update(['cost1' => $content['cost']]);
+        }
+
+        return $error;
+    }
+
+    /**
+     * 将arr转换成相应的格式 
+     *
+     * @param $arr type:array
+     * @return array
+     *
+     */
     public function transfer_arr($arr)
     {
         $buf = [];

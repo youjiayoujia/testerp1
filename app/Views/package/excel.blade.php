@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('package.excelProcess') }} @stop
+@section('formAction') {{ $action }} @stop
 @section('formBody')
 <div class='row'>
     <div class="form-group col-lg-4">

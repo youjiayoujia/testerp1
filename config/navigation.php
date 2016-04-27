@@ -193,11 +193,6 @@ return [
                     'url' => 'stockCarryOver.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '关帐',
-                    'url' => 'stockShut.index',
-                    'icon' => '',
-                ],
             ],
         ],
     ],

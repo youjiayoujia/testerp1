@@ -52,6 +52,8 @@ $(document).ready(function(){
                     if(result == true) {
                         $('.holder').text('发送成功');
                         $('.holder_weight').text('重量保存成功');
+                        $('.trackno').val('');
+                        $('.weight').val('');
                     }
                 }
             });

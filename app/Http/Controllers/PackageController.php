@@ -79,34 +79,6 @@ class PackageController extends Controller
         echo json_encode('success');
     }
 
-    public function manualLogistic($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'logistics' => LogisticsModel::all(),
-        ];
-
-        return view($this->viewPath . 'fee', $response);
-    }
-
-    public function feeStore()
-    {
-        $model = $this->model->find(request()->input('id'));
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $model->update(request()->all());
-        $model->status = 'SHIPPED';
-        $model->save();
-
-        return redirect($this->mainIndex);
-    }
-
     /**
      * 跳转发货页面
      *
@@ -124,6 +96,13 @@ class PackageController extends Controller
         return view($this->viewPath . 'shipping', $response);
     }
 
+    /**
+     * 导出手工发货包裹信息 
+     *
+     * @param none
+     * @return csv
+     *
+     */
     public function exportManualPackage()
     {
         $str = request()->input('arr');
@@ -131,7 +110,7 @@ class PackageController extends Controller
         $rows = '';
         foreach($arr as $id) {
             $package = $this->model->find($id);
-            if($package->is_auto || $package->status == 'PROCESSING') {
+            if($package->is_auto || (!$package->is_auto && $package->status != 'PROCESSING')) {
                 continue;
             }
             $package->update(['status' => 'PACKED', 'shipper_id' => '2', 'shipped_at' => date('Y-m-d G:i:s', time())]);
@@ -141,7 +120,6 @@ class PackageController extends Controller
                     'sku' => ItemModel::find($item->item_id)->sku,
                     'warehouse_position' => PositionModel::find($item->warehouse_position_id)->name,
                     'quantity' => $item->quantity,
-                    'created_at' => $item->created_at
                 ];
             }
         }
@@ -177,15 +155,29 @@ class PackageController extends Controller
         return json_encode(true);
     }
 
+    /**
+     * 跳转发货统计页面 
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function shippingStatistics()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, '发货统计'),
         ];
 
         return view($this->viewPath . 'statistics', $response);
     }
 
+    /**
+     * 导出数据 according to start_time end_time
+     *
+     * @param none
+     * @return none
+     *
+     */
     public function exportData()
     {
         $start_time = request()->input('start_time');
@@ -194,21 +186,18 @@ class PackageController extends Controller
         $this->model->exportData($packages);
     }
 
-    public function returnTrackno()
-    {
-
-    }
-
     /**
-     * excel 导入数据
+     * 跳转excel页面 
      *
-     * @param
+     * @param none
+     * @return view
      *
      */
-    public function importByExcel()
+    public function returnTrackno()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, '导入trackno'),
+            'action' => route('package.excelProcess'),
         ];
 
         return view($this->viewPath.'excel', $response);
@@ -227,15 +216,49 @@ class PackageController extends Controller
            $file = request()->file('excel');
            $errors = $this->model->excelProcess($file);
            $response = [
-                'metas' => $this->metas(__FUNCTION__),
+                'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
             ];
+
             return view($this->viewPath.'excelResult', $response);
         }
     }
     
+    /**
+     * 跳转excel页面 
+     *
+     * @param none
+     * @return view
+     *
+     */
     public function returnFee()
     {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '导入fee'),
+            'action' => route('package.excelProcessFee', ['type' => request('type')]),
+        ];
 
+        return view($this->viewPath.'excel', $response);
+    }
+
+    /**
+     * excel 处理
+     *
+     * @param none
+     *
+     */
+    public function excelProcessFee($type)
+    {
+        if(request()->hasFile('excel'))
+        {
+           $file = request()->file('excel');
+           $errors = $this->model->excelProcessFee($file, $type);
+           $response = [
+                'metas' => $this->metas(__FUNCTION__, '导入结果'),
+                'errors' => $errors,
+            ];
+
+            return view($this->viewPath.'excelFeeResult', $response);
+        }
     }
 }

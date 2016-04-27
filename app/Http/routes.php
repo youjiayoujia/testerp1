@@ -275,8 +275,9 @@ Route::resource('orderItem', 'Order\ItemController');
 Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
 //包裹管理路由
+Route::post('package/excelProcessFee/{type}', ['uses'=>'PackageController@excelProcessFee', 'as'=>'package.excelProcessFee']);
 Route::get('package/returnTrackno', ['uses'=>'PackageController@returnTrackno', 'as'=>'package.returnTrackno']);
-Route::get('package/excelProcess', ['uses'=>'PackageController@excelProcess', 'as'=>'package.excelProcess']);
+Route::post('package/excelProcess', ['uses'=>'PackageController@excelProcess', 'as'=>'package.excelProcess']);
 Route::get('package/returnFee', ['uses'=>'PackageController@returnFee', 'as'=>'package.returnFee']);
 Route::get('package/exportManualPackage/{str}', ['uses'=>'PackageController@exportManualPackage', 'as'=>'package.exportManualPackage']);
 Route::get('package/ajaxWeight', ['uses'=>'PackageController@ajaxWeight', 'as'=>'package.ajaxWeight']);
@@ -284,9 +285,6 @@ Route::post('package/exportData', ['uses' => 'PackageController@exportData', 'as
 Route::get('package/shippingStatistics', ['uses'=>'PackageController@shippingStatistics', 'as'=>'package.shippingStatistics']);
 Route::get('package/ajaxShippingExec', ['uses'=>'PackageController@ajaxShippingExec', 'as'=>'package.ajaxShippingExec']);
 Route::get('package/shipping', ['uses'=>'PackageController@shipping', 'as'=>'package.shipping']);
-Route::post('package/feeStore', ['uses' => 'PackageController@feeStore', 'as' => 'package.feeStore']);
-Route::get('package/manualLogistic/{id}',
-    ['uses' => 'PackageController@manualLogistic', 'as' => 'package.manualLogistic']);
 Route::get('package/ajaxPackageSend',
     ['uses' => 'PackageController@ajaxPackageSend', 'as' => 'package.ajaxPackageSend']);
 Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);

@@ -61,7 +61,7 @@ return [
     ],
 
     //是否有效
-    'product_status' => [
+    'is_active' => [
         '0' => '无效',
         '1' => '有效'
     ],

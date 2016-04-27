@@ -431,10 +431,10 @@
                     <input type='text' class="form-control price" id="arr[price][0]" placeholder="单价" name='arr[price][0]' value="{{ old('arr[price][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
-                        @foreach(config('order.product_status') as $product_status_key => $status)
-                            <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
-                                {{ $status }}
+                    <select class="form-control is_active" name="arr[is_active][0]" id="arr[is_active][0]">
+                        @foreach(config('order.is_active') as $is_active_key => $is_active)
+                            <option value="{{ $is_active_key }}" {{ $is_active_key == '1' ? 'selected' : '' }}>
+                                {{ $is_active }}
                             </option>
                         @endforeach
                     </select>
@@ -452,10 +452,10 @@
                     <input type='text' class="form-control remark" id="arr[remark][0]" placeholder="备注" name='arr[remark][0]' value="{{ old('arr[remark][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <select class="form-control ship_status" name="arr[ship_status][0]" id="arr[ship_status][0]">
-                        @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                            <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][0]') == $ship_status_key ? 'selected' : '' }}>
-                                {{ $ship_status }}
+                    <select class="form-control status" name="arr[status][0]" id="arr[status][0]">
+                        @foreach(config('order.ship_status') as $ship_status_key => $status)
+                            <option value="{{ $ship_status_key }}" {{ old('arr[status][0]') == $ship_status_key ? 'selected' : '' }}>
+                                {{ $status }}
                             </option>
                         @endforeach
                     </select>

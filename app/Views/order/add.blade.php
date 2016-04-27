@@ -12,10 +12,10 @@
         <input type='text' class="form-control price" id="arr[price][{{$current}}]" placeholder="单价" name='arr[price][{{$current}}]' value="{{ old('arr[price][$current]') }}">
     </div>
     <div class="form-group col-sm-1">
-        <select class="form-control status" name="arr[status][{{$current}}]" id="arr[status][{{$current}}]">
-            @foreach(config('order.product_status') as $product_status_key => $status)
-                <option value="{{ $product_status_key }}" {{ $product_status_key == '1' ? 'selected' : '' }}>
-                    {{ $status }}
+        <select class="form-control is_active" name="arr[is_active][{{$current}}]" id="arr[is_active][{{$current}}]">
+            @foreach(config('order.is_active') as $is_active_key => $is_active)
+                <option value="{{ $is_active_key }}" {{ $is_active_key == '1' ? 'selected' : '' }}>
+                    {{ $is_active }}
                 </option>
             @endforeach
         </select>
@@ -33,10 +33,10 @@
         <input type='text' class="form-control remark" id="arr[remark][{{$current}}]" placeholder="备注" name='arr[remark][{{$current}}]' value="{{ old('arr[remark][$current]') }}">
     </div>
     <div class="form-group col-sm-1">
-        <select class="form-control ship_status" name="arr[ship_status][{{$current}}]" id="arr[ship_status][{{$current}}]">
-            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$current]') == $ship_status_key ? 'selected' : '' }}>
-                    {{ $ship_status }}
+        <select class="form-control status" name="arr[status][{{$current}}]" id="arr[status][{{$current}}]">
+            @foreach(config('order.ship_status') as $ship_status_key => $status)
+                <option value="{{ $ship_status_key }}" {{ old('arr[status][$current]') == $ship_status_key ? 'selected' : '' }}>
+                    {{ $status }}
                 </option>
             @endforeach
         </select>

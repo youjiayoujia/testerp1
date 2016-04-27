@@ -72,6 +72,8 @@ class OrderController extends Controller
             }
         }
         unset($data['arr']);
+        $data['priority'] = 0;
+        $data['package_times'] = 0;
         $this->model->createOrder($data);
 
         return redirect($this->mainIndex);
@@ -309,12 +311,14 @@ class OrderController extends Controller
             $orders[$key]['refund_time'] = NULL;
             $orders[$key]['transaction_number'] = $channelOrder['trans_id'];
             $orders[$key]['cele_admin'] = $channelOrder['cele_admin'];
+            $orders[$key]['priority'] = 0;
+            $orders[$key]['package_times'] = 0;
             foreach ($channelOrder['orderitems'] as $itemKey => $channelOrderItem) {
                 $orders[$key]['items'][$itemKey]['item_id'] = 0;
                 $orders[$key]['items'][$itemKey]['quantity'] = $channelOrderItem['quantity'];
                 $orders[$key]['items'][$itemKey]['price'] = $channelOrderItem['price'];
-                $orders[$key]['items'][$itemKey]['status'] = 1;
-                $orders[$key]['items'][$itemKey]['ship_status'] = 'not_shipped';
+                $orders[$key]['items'][$itemKey]['is_active'] = 1;
+                $orders[$key]['items'][$itemKey]['status'] = 'not_shipped';
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
                 if(count($channelOrder['orderitems']) >= 2) {
                     $orders[$key]['is_multi'] = 1;

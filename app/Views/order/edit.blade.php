@@ -437,10 +437,10 @@
                         <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="单价" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <select class="form-control status" name="arr[status][{{$key}}]" id="arr[status][{{$key}}]">
-                            @foreach(config('order.product_status') as $product_status_key => $status)
-                                <option value="{{ $product_status_key }}" {{ old('arr[status][$key]') ? (old('arr[status][$key]') == $product_status_key ? 'selected' : '') : ($orderItem->status == $product_status_key ? 'selected' : '') }}>
-                                    {{ $status }}
+                        <select class="form-control is_active" name="arr[is_active][{{$key}}]" id="arr[is_active][{{$key}}]">
+                            @foreach(config('order.is_active') as $is_active_key => $is_active)
+                                <option value="{{ $is_active_key }}" {{ old('arr[is_active][$key]') ? (old('arr[is_active][$key]') == $is_active_key ? 'selected' : '') : ($orderItem->is_active == $is_active_key ? 'selected' : '') }}>
+                                    {{ $is_active }}
                                 </option>
                             @endforeach
                         </select>
@@ -458,10 +458,10 @@
                         <input type='text' class="form-control remark" id="arr[remark][{{$key}}]" placeholder="备注" name='arr[remark][{{$key}}]' value="{{ old('arr[remark][$key]') ? old('arr[remark][$key]') : $orderItem->remark }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <select class="form-control ship_status" name="arr[ship_status][{{$key}}]" id="arr[ship_status][{{$key}}]">
-                            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$key]') ? (old('arr[ship_status][$key]') == $ship_status_key ? 'selected' : '') : ($orderItem->ship_status == $ship_status_key ? 'selected' : '') }}>
-                                    {{ $ship_status }}
+                        <select class="form-control status" name="arr[status][{{$key}}]" id="arr[status][{{$key}}]">
+                            @foreach(config('order.ship_status') as $ship_status_key => $status)
+                                <option value="{{ $ship_status_key }}" {{ old('arr[status][$key]') ? (old('arr[status][$key]') == $ship_status_key ? 'selected' : '') : ($orderItem->status == $ship_status_key ? 'selected' : '') }}>
+                                    {{ $status }}
                                 </option>
                             @endforeach
                         </select>

@@ -64,7 +64,7 @@
                 @endif     
             </div> 
             <div class="form-group col-lg-4">
-                <strong>结算人</strong>:
+                <strong>采购人</strong>:
                 <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
             </div>
             <div class="form-group col-lg-4">

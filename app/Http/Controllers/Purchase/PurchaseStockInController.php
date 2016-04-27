@@ -19,7 +19,7 @@ use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\Stock\InModel;
 use App\Models\Warehouse\PositionModel;
-use App\Models\Purchase\StorageLogModel
+use App\Models\Purchase\StorageLogModel;
 
 class PurchaseStockInController extends Controller
 {
@@ -37,7 +37,7 @@ class PurchaseStockInController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status',2)->orderby('storageStatus')),
+            'data' => $this->autoList($this->model->where('status',2)->orderBy('storageStatus', 'desc')),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -123,7 +123,9 @@ class PurchaseStockInController extends Controller
 				$this->model->find($vo->id)->update($storage);
 				$stoeagelog['user_id']=1;
 				$stoeagelog['purchaseItemId']=$vo->id;
-				StorageLogModel::store($stoeagelog);
+				if($stoeagelog['storage_quantity']>0){
+				StorageLogModel::create($stoeagelog);
+				}
 				if($data['storage_qty'] == 0){
 					break;
 					}

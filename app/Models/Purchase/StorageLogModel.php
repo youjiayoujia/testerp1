@@ -26,7 +26,7 @@ class StorageLogModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = [];
+    protected $fillable = ['id','purchaseItemId','user_id','storage_quantity'];
 	public function purchaseItem()
     {
         return $this->belongsTo('App\Models\Purchase\PurchaseItemModel', 'purchaseItemId');

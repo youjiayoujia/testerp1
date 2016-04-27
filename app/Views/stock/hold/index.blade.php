@@ -6,8 +6,8 @@
     <th class='sort' data-field='amount'>数量</th>
     <th>仓库</th>
     <th>库位</th>
-    <th>入库类型</th>
-    <th>入库来源</th>
+    <th>hold类型</th>
+    <th>hold来源</th>
     <th>备注</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>

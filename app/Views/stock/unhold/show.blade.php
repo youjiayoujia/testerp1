@@ -19,10 +19,10 @@
                 <strong>库位</strong>: {{ $model->stock ? $model->stock->position ? $model->stock->position->name : '' : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>入库类型</strong>: {{ $model->type_name }}
+                <strong>hold类型</strong>: {{ $model->type_name }}
             </div>
             <div class="col-lg-2">
-                <strong>入库类型id</strong>: {{ $model->relation_name }}
+                <strong>hold来源</strong>: {{ $model->relation_name }}
             </div>
             <div class="col-lg-2">
                 <strong>remark</strong>: {{ $model->remark }}

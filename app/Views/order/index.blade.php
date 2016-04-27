@@ -66,7 +66,7 @@
             <td>{{ $order->comment1 }}</td>
             <td>{{ $order->remark }}</td>
             <td>{{ $order->import_remark }}</td>
-            <td>{{ $order->shipping == 'packet' ? '小包' : '快递' }}</td>
+            <td>{{ $order->shipping == 'PACKET' ? '小包' : '快递' }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->payment_date }}</td>
             <td>{{ $order->affair_time == '0000-00-00' ? '' : $order->affair_time }}</td>

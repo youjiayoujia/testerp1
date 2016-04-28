@@ -14,7 +14,8 @@ class CreateCatalogs extends Migration
     {
         Schema::create('catalogs', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('分类名')->nullable()->default(NULL);
+            $table->string('name')->comment('分类名中文')->nullable()->default(NULL);
+            $table->string('c_name')->comment('分类名英文')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

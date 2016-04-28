@@ -169,11 +169,6 @@
                     </label>
                 </div>
             </div>
-            <div class="form-group col-lg-2" id="is_multi">
-                <label for="is_multi" class='control-label'>是否复数</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="is_multi" placeholder="是否复数" name='is_multi' value="{{ old('is_multi') ? old('is_multi') : $model->is_multi }}">
-            </div>
             <div class="form-group col-lg-2" id="hand">
                 <label for="by_hand" class='control-label'>是否手工</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -208,9 +203,9 @@
                 <label for="currency" class='control-label'>币种</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="currency" id="currency">
-                    @foreach(config('order.currency') as $currency)
-                        <option value="{{ $currency }}" {{ old('currency') ? (old('currency') == $currency ? 'selected' : '') : ($model->currency == $currency ? 'selected' : '') }}>
-                            {{ $currency }}
+                    @foreach($currencys as $currency)
+                        <option value="{{ $currency->code }}" {{ old('currency') ? (old('currency') == $currency->code ? 'selected' : '') : ($model->currency == $currency->code ? 'selected' : '') }}>
+                            {{ $currency->code }}
                         </option>
                     @endforeach
                 </select>
@@ -365,9 +360,9 @@
             <div class="form-group col-lg-2">
                 <label for="refund_currency" class='control-label'>退款币种</label>
                 <select class="form-control" name="refund_currency" id="refund_currency">
-                    @foreach(config('order.currency') as $refund_currency)
-                        <option value="{{ $refund_currency }}" {{ old('refund_currency') ? (old('refund_currency') == $refund_currency ? 'selected' : '') : ($model->refund_currency == $refund_currency ? 'selected' : '') }}>
-                            {{ $refund_currency }}
+                    @foreach($currencys as $refund_currency)
+                        <option value="{{ $refund_currency->code }}" {{ old('refund_currency') ? (old('refund_currency') == $refund_currency->code ? 'selected' : '') : ($model->refund_currency == $refund_currency->code ? 'selected' : '') }}>
+                            {{ $refund_currency->code }}
                         </option>
                     @endforeach
                 </select>
@@ -437,10 +432,10 @@
                         <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="单价" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <select class="form-control status" name="arr[status][{{$key}}]" id="arr[status][{{$key}}]">
-                            @foreach(config('order.product_status') as $product_status_key => $status)
-                                <option value="{{ $product_status_key }}" {{ old('arr[status][$key]') ? (old('arr[status][$key]') == $product_status_key ? 'selected' : '') : ($orderItem->status == $product_status_key ? 'selected' : '') }}>
-                                    {{ $status }}
+                        <select class="form-control is_active" name="arr[is_active][{{$key}}]" id="arr[is_active][{{$key}}]">
+                            @foreach(config('order.is_active') as $is_active_key => $is_active)
+                                <option value="{{ $is_active_key }}" {{ old('arr[is_active][$key]') ? (old('arr[is_active][$key]') == $is_active_key ? 'selected' : '') : ($orderItem->is_active == $is_active_key ? 'selected' : '') }}>
+                                    {{ $is_active }}
                                 </option>
                             @endforeach
                         </select>
@@ -458,10 +453,10 @@
                         <input type='text' class="form-control remark" id="arr[remark][{{$key}}]" placeholder="备注" name='arr[remark][{{$key}}]' value="{{ old('arr[remark][$key]') ? old('arr[remark][$key]') : $orderItem->remark }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <select class="form-control ship_status" name="arr[ship_status][{{$key}}]" id="arr[ship_status][{{$key}}]">
-                            @foreach(config('order.ship_status') as $ship_status_key => $ship_status)
-                                <option value="{{ $ship_status_key }}" {{ old('arr[ship_status][$key]') ? (old('arr[ship_status][$key]') == $ship_status_key ? 'selected' : '') : ($orderItem->ship_status == $ship_status_key ? 'selected' : '') }}>
-                                    {{ $ship_status }}
+                        <select class="form-control status" name="arr[status][{{$key}}]" id="arr[status][{{$key}}]">
+                            @foreach(config('order.item_status') as $ship_status_key => $status)
+                                <option value="{{ $ship_status_key }}" {{ old('arr[status][$key]') ? (old('arr[status][$key]') == $ship_status_key ? 'selected' : '') : ($orderItem->status == $ship_status_key ? 'selected' : '') }}>
+                                    {{ $status }}
                                 </option>
                             @endforeach
                         </select>
@@ -477,7 +472,6 @@
         $('#create_time, #payment_date, #affair_time, #refund_time').cxCalendar();
 
         document.getElementById('comment').style.display='none';
-        document.getElementById('is_multi').style.display='none';
         document.getElementById('hand').style.display='none';
 
         var payment = $('#payment').val();

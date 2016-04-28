@@ -31,16 +31,16 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
 
-    public function getShipStatusNameAttribute()
-    {
-        $arr = config('order.ship_status');
-        return $arr[$this->ship_status];
-    }
-
     public function getStatusNameAttribute()
     {
-        $arr = config('order.product_status');
+        $arr = config('order.item_status');
         return $arr[$this->status];
+    }
+
+    public function getIsActiveNameAttribute()
+    {
+        $arr = config('order.is_active');
+        return $arr[$this->is_active];
     }
 
     public function getIsGiftNameAttribute()

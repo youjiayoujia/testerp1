@@ -65,7 +65,7 @@
             </div> 
              <div class="form-group col-lg-4">
             	<strong>取消采购单</strong>:
-                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该采购</a>  
+                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该采购单</a>  
             </div> 
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:

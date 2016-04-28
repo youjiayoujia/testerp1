@@ -64,6 +64,11 @@ return [
                     'url' => 'ExamineProduct.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '选款产品发布',
+                    'url' => 'dashboard.index',
+                    'icon' => '',
+                ],
             ],
 			 '通关报关' => [
                 [

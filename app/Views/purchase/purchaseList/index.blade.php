@@ -78,9 +78,9 @@
                 </a>
                 @endif
                  
-                <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
+               <!-- <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 去对单
-                </a>
+                </a>-->
             </td>
           
         </tr>
@@ -96,7 +96,7 @@
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     if(checkbox[i].getAttribute('isexamine')==1){
-                        alert("id为"+checkbox[i].value+"的采购单已经审核了");
+                        alert("id为"+checkbox[i].value+"的采购条目已经对单了");
                         return;
                     }
 					purcahse_active +=checkbox[i].value+"+"+$("#"+checkbox[i].value+"_active" ).val()+",";

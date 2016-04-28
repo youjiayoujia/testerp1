@@ -78,8 +78,8 @@ class ClosePurchaseOrderController extends Controller
 		$data=request()->all();
 		$items=PurchaseItemModel::where('purchase_order_id',$id)->get();
 		foreach($items as $key=>$v){
-		if($v->costExamineStatus !=2){
-			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '采购价格未审核通过.'));
+		if($v->status !>2){
+			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未对单采购条目不能结算.'));
 			}
 		}
 		$model->update($data);

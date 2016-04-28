@@ -1,8 +1,13 @@
 @extends('common.table')
 @section('tableToolButtons')
 	 <div class="btn-group">
+     <a class="btn btn-info" id="aKeyToGenerate">
+             一键生成采购单
+        </a>
+        </div>
+        <div class="btn-group">
         <a class="btn btn-info" id="checkPurchaseItem">
-            <i class="glyphicon glyphicon-ok-circle"></i> 批量生成采购单
+             批量生成采购单
         </a>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -13,7 +18,8 @@
     <th>产品图片</th>
     <th>供应商</th>
     <th>采购去向</th>
-    <th>采购需求/库存数量/正采购数目/仍需采购</th>
+    <th>订单需求/库存数量/正采购数目</th>
+    <th>仍需采购</th>
     <th>备注</th>
 @stop
 @section('tableBody')
@@ -30,7 +36,8 @@
             <td> <img src="{{ $requireItem->item->product->image->src}}" height="50px"/></td>
             <td>{{$requireItem->item->supplier->name}}</td>
             <td>{{ $requireItem->warehouse->name}}</td>
-            <td>{{ $requireItem->order_need_num}}/{{$requireItem->all_quantity}}/{{$requireItem->purchaseing_quantity}}/{{$requireItem->order_need_num - $requireItem->all_quantity -$requireItem->purchaseing_quantity}}</td>
+            <td>{{ $requireItem->order_need_num}}/{{$requireItem->all_quantity}}/{{$requireItem->purchaseing_quantity}}</td>
+            <td>{{$requireItem->order_need_num - $requireItem->all_quantity -$requireItem->purchaseing_quantity}}</td>
             <td>{{ $requireItem->remark}}</td> 
         </tr>
     @endforeach
@@ -48,17 +55,39 @@
                     purchase_ids += checkbox[i].value+",";
                 }
                 purchase_ids = purchase_ids.substr(0,(purchase_ids.length)-1);
+				if(purchase_ids){
                 $.ajax({
                     url:'addPurchaseOrder',
                     data:{purchase_ids:purchase_ids},
                     dataType:'json',
                     type:'get',
                     success:function(result){
+                        if(result==1){
+							alert("已经成功生成采购单及采购条目！");
                         window.location.reload();
+						}
                     }                    
                 })
+				}else{
+					alert("请选择需要生成采购单的采购需求！");
+					}
             }
-        });	 
+        });
+		$('#aKeyToGenerate').click(function(){
+			var purchase_ids='';
+			 $.ajax({
+                    url:'addPurchaseOrder',
+                    data:{purchase_ids:purchase_ids},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+						if(result==1){
+							alert("已经成功生成采购单及采购条目！");
+                        window.location.reload();
+						}
+                    }                    
+                })
+			});	 
 	//全选
         function quanxuan()
         {

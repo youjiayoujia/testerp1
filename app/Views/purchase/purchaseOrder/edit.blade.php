@@ -73,11 +73,15 @@
             </div>
             <div class="form-group col-lg-4">
             	<strong>采购单结算</strong>:
-                 @if($model->close_status ==0)
-                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算改采购单
+                 @if($model->close_status ==0 && $model->status >1)
+                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算该采购单
                 </a>
                 @else
+                @if($model->close_status ==1)
                 已结算
+                @else
+                未结算
+                @endif 
                 @endif  
             </div>
                    

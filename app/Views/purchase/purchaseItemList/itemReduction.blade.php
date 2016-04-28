@@ -5,9 +5,16 @@
     <input type="hidden" name="_method" value="PUT"/>
     <div class="row">
       <div class="form-group col-lg-3">
-        <label for="type">还原采购条目的ID：</label>
+        <label for="type">采购条目的ID：</label>
          <textarea name="purchaseItemIds" rows="4" cols="50" autofocus>
          </textarea>
+    </div>
+     <div class="form-group col-lg-3">
+       <strong>批量操作：</strong>
+         <select name="status">
+         	<option value="0">还原</option>
+            <option value="1">采购中</option>
+         </select>
     </div>
     </div>
 @stop

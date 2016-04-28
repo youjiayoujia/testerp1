@@ -277,7 +277,7 @@ return [
                 ],
                 [
                     'name' => '采购入库',
-                    'url' => 'purchaseStockIn.index',
+                    'url' => 'purchaseStockIn.create',
                     'icon' => '',
                 ],
                 [

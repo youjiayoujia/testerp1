@@ -103,13 +103,20 @@ class PurchaseItemListController extends Controller
 		$updateIds=explode('#',$data['purchaseItemIds']);
 		$items=$this->model->find($updateIds);
 		foreach($items as $key=>$item){
-			if($item->status == 1){
-				$item->update(['status'=>0]);
-			}
-			$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
-			if($orderItemNum ==0){
-				PurchaseOrderModel::where('id',$item->purchase_order_id)->update(['status'=>0]);	
+			if($data['status'] == 0){
+				if($item->status == 1){
+					$item->update(['status'=>0]);
 				}
+				$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
+				if($orderItemNum ==0){
+					PurchaseOrderModel::where('id',$item->purchase_order_id)->update(['status'=>0]);	
+				}
+			}elseif($data['status'] == 1){
+				if($item->status == 0){
+					$item->update(['status'=>1]);
+				}			
+				PurchaseOrderModel::where('id',$item->purchase_order_id)->where('examineStatus',2)->update(['status'=>1]);	
+			}
 		}
 		return redirect($this->mainIndex);
 	}

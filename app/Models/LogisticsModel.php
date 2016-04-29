@@ -115,35 +115,37 @@ class LogisticsModel extends BaseModel
      */
     public function assign($packageId)
     {
-        $weight = PackageModel::where(['id' => $packageId])->get(['weight']);
-        $shippingCountry = PackageModel::where(['id' => $packageId])->get(['shipping_country']);
-        $orderId = PackageModel::where(['id' => $packageId])->get(['order_id']);
-        $amount = OrderModel::where(['id' => $orderId])->get(['amount']);
-        $amountShipping = OrderModel::where(['id' => $orderId])->get(['amount_shipping']);
-        $celeAdmin = OrderModel::where(['id' => $orderId])->get(['cele_admin']);
+        $weight = PackageModel::where(['id' => $packageId])->first()->weight;
+        $shippingCountry = PackageModel::where(['id' => $packageId])->first()->shipping_country;
+        $orderId = PackageModel::where(['id' => $packageId])->first()->order_id;
+        $amount = OrderModel::where(['id' => $orderId])->first()->amount;
+        $amountShipping = OrderModel::where(['id' => $orderId])->first()->amount_shipping;
+        $celeAdmin = OrderModel::where(['id' => $orderId])->first()->cele_admin;
         if($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
             $isClearance = 1;
         }else{
             $isClearance = 0;
         }
-        $rules = RuleModel::where('weight_from', '<=', $weight)->where($weight, '<=', 'weight_to')->where($amount, '<=', 'order_amount')->where(['is_clearance' => $isClearance])->orderBy('priority', 'desc')->get();
+        $rules = RuleModel::where('weight_from', '<=', $weight)->where('weight_to', '>=', $weight)->where('order_amount', '>=', $amount)->where(['is_clearance' => $isClearance])->orderBy('priority', 'desc')->get();
         foreach($rules as $rule) {
             $logisticsId = $rule['type_id'];
-            $limit = LogisticsModel::where(['id' => $logisticsId])->get(['limit']);
+            $limit = LogisticsModel::where(['id' => $logisticsId])->first()->limit;
             $packageItems = packageItemModel::where(['package_id' => $packageId])->get();
             $packageLimits = [];
             foreach($packageItems as $packageItem) {
                 $itemId = $packageItem['item_id'];
-                $productId = ItemModel::where(['id' => $itemId])->get(['product_id']);
-                $packageLimit = ProductModel::where(['id' => $productId])->get(['package_limit']);
+                $productId = ItemModel::where(['id' => $itemId])->first()->product_id;
+                $packageLimit = ProductModel::where(['id' => $productId])->first()->package_limit;
                 $packageLimits = array_merge($packageLimits, explode(",", $packageLimit));
             }
             if(count(array_intersect(array($shippingCountry), explode(",", $rule['country']))) == 1 && count(array_intersect($packageLimits, explode(",", $limit))) == 0) {
                 $model = PackageModel::where(['id' => $packageId])->first();
-                $url = LogisticsModel::where(['id' => $logisticsId])->get(['url']);
+                $url = LogisticsModel::where(['id' => $logisticsId])->first()->url;
                 $codeModel = CodeModel::where(['logistics_id' => $logisticsId, 'status' => 0])->first();
-                $model->update(['logistics_id' => $logisticsId, 'tracking_link' => $url, 'tracking_no' => $codeModel['code']]);
-                $codeModel->update(['status' => 1, 'package_id' => $packageId, 'used_at' => date('y-m-d', time())]);
+                if(empty($model['logistics_id']) && empty($model['tracking_link']) && empty($model['tracking_no'])) {
+                    $model->update(['logistics_id' => $logisticsId, 'tracking_link' => $url, 'tracking_no' => $codeModel['code']]);
+                    $codeModel->update(['status' => 1, 'package_id' => $packageId, 'used_at' => date('y-m-d', time())]);
+                }
                 break;
             }
         }

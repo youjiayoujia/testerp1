@@ -223,7 +223,7 @@ class ItemModel extends BaseModel
             $warehouseStocks = $stocks->groupBy('warehouse_id');
             //默认仓库
             $defaultStocks = $warehouseStocks->get($this->warehouse_id);
-            if ($defaultStocks->sum('available_quantity') >= $quantity) {
+            if ($defaultStocks and $defaultStocks->sum('available_quantity') >= $quantity) {
                 $gotStocks = $defaultStocks;
             } else {
                 //其它仓库

@@ -25,6 +25,22 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function doPackage()
+    {
+        $begin = microtime(true);
+        $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+            ->orderBy('package_times', 'desc')
+            ->get();
+        $orders = $orders->sortByDesc('package_times');
+        foreach ($orders as $order) {
+            echo $order->id;
+            $order->createPackage();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
     public function create()
     {
         $response = [
@@ -97,7 +113,7 @@ class PackageController extends Controller
     }
 
     /**
-     * 导出手工发货包裹信息 
+     * 导出手工发货包裹信息
      *
      * @param none
      * @return csv
@@ -108,13 +124,13 @@ class PackageController extends Controller
         $str = request()->input('arr');
         $arr = explode('|', $str);
         $rows = '';
-        foreach($arr as $id) {
+        foreach ($arr as $id) {
             $package = $this->model->find($id);
-            if($package->is_auto || (!$package->is_auto && $package->status != 'PROCESSING')) {
+            if ($package->is_auto || (!$package->is_auto && $package->status != 'PROCESSING')) {
                 continue;
             }
             $package->update(['status' => 'PACKED', 'shipper_id' => '2', 'shipped_at' => date('Y-m-d G:i:s', time())]);
-            foreach($package->items as $item) {
+            foreach ($package->items as $item) {
                 $rows[] = [
                     'package  ID' => $id,
                     'sku' => ItemModel::find($item->item_id)->sku,
@@ -124,9 +140,9 @@ class PackageController extends Controller
             }
         }
         $name = 'ManualPackage';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='手工发货包裹';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
+        Excel::create($name, function ($excel) use ($rows) {
+            $nameSheet = '手工发货包裹';
+            $excel->sheet($nameSheet, function ($sheet) use ($rows) {
                 $sheet->fromArray($rows);
             });
         })->download('csv');
@@ -151,12 +167,17 @@ class PackageController extends Controller
         if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
+        $package->update([
+            'status' => 'SHIPPED',
+            'shipped_at' => date('Y-m-d h:i:s', time()),
+            'shipper_id' => '2',
+            'actual_weight' => $weight
+        ]);
         return json_encode(true);
     }
 
     /**
-     * 跳转发货统计页面 
+     * 跳转发货统计页面
      *
      * @param none
      * @return view
@@ -187,7 +208,7 @@ class PackageController extends Controller
     }
 
     /**
-     * 跳转excel页面 
+     * 跳转excel页面
      *
      * @param none
      * @return view
@@ -200,7 +221,7 @@ class PackageController extends Controller
             'action' => route('package.excelProcess'),
         ];
 
-        return view($this->viewPath.'excel', $response);
+        return view($this->viewPath . 'excel', $response);
     }
 
     /**
@@ -211,21 +232,20 @@ class PackageController extends Controller
      */
     public function excelProcess()
     {
-        if(request()->hasFile('excel'))
-        {
-           $file = request()->file('excel');
-           $errors = $this->model->excelProcess($file);
-           $response = [
+        if (request()->hasFile('excel')) {
+            $file = request()->file('excel');
+            $errors = $this->model->excelProcess($file);
+            $response = [
                 'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
             ];
 
-            return view($this->viewPath.'excelResult', $response);
+            return view($this->viewPath . 'excelResult', $response);
         }
     }
-    
+
     /**
-     * 跳转excel页面 
+     * 跳转excel页面
      *
      * @param none
      * @return view
@@ -238,7 +258,7 @@ class PackageController extends Controller
             'action' => route('package.excelProcessFee', ['type' => request('type')]),
         ];
 
-        return view($this->viewPath.'excel', $response);
+        return view($this->viewPath . 'excel', $response);
     }
 
     /**
@@ -249,16 +269,15 @@ class PackageController extends Controller
      */
     public function excelProcessFee($type)
     {
-        if(request()->hasFile('excel'))
-        {
-           $file = request()->file('excel');
-           $errors = $this->model->excelProcessFee($file, $type);
-           $response = [
+        if (request()->hasFile('excel')) {
+            $file = request()->file('excel');
+            $errors = $this->model->excelProcessFee($file, $type);
+            $response = [
                 'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
             ];
 
-            return view($this->viewPath.'excelFeeResult', $response);
+            return view($this->viewPath . 'excelFeeResult', $response);
         }
     }
 }

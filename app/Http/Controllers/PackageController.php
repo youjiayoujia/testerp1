@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use Tool;
 use Excel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
@@ -27,17 +28,22 @@ class PackageController extends Controller
 
     public function doPackage()
     {
-        $begin = microtime(true);
-        $orders = OrderModel::where('active', 'NORMAL')
-            ->whereIn('status', ['PREPARED', 'NEED'])
-            ->orderBy('package_times', 'desc')
-            ->get();
-        foreach ($orders as $order) {
-            echo $order->id . '<br>';
-            $order->createPackage();
-        }
-        $end = microtime(true);
-        echo '耗时' . round($end - $begin, 3) . '秒';
+        $logistics = new LogisticsModel;
+        $result = $logistics->assign(1);
+        Tool::show($result);
+
+
+//        $begin = microtime(true);
+//        $orders = OrderModel::where('active', 'NORMAL')
+//            ->whereIn('status', ['PREPARED', 'NEED'])
+//            ->orderBy('package_times', 'desc')
+//            ->get();
+//        foreach ($orders as $order) {
+//            echo $order->id . '<br>';
+//            $order->createPackage();
+//        }
+//        $end = microtime(true);
+//        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
     public function create()

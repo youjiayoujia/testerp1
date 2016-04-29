@@ -47,8 +47,8 @@ class DoPackages extends Command
         $orders = $orders->sortByDesc('package_times');
 //        $orders = OrderModel::all();
         foreach ($orders as $order) {
-            $this->info($order->id);
-//            $order->createPackage();
+//            $this->info($order->id);
+            $order->createPackage();
         }
         $end = microtime(true);
         $this->info('耗时' . round($end - $begin, 3) . '秒');

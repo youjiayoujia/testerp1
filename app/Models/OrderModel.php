@@ -203,7 +203,7 @@ class OrderModel extends BaseModel
 
     public function getActiveItemsAttribute()
     {
-        return $this->items->where('is_active', '=', '1');
+        return $this->items->where('is_active', '1');
     }
 
     public function canPackage()

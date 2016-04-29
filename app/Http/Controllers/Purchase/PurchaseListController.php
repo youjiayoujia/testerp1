@@ -50,6 +50,7 @@ class PurchaseListController extends Controller
 		foreach($purcahse_active as $key=>$value){
 			$purcahse=explode('+',$value);
 			$arrayItems=$this->model->find($purcahse[0]);
+			if($arrayItems->item->weight >0){	
 			if($purcahse[1]>0){
 				$arrayItems->update(['active_status'=>1,'active'=>$purcahse[1]]);	
 			}
@@ -62,6 +63,7 @@ class PurchaseListController extends Controller
 				$purchaseOrder->update(['status'=>3]);
 			}
 			}
+		}
 		}
 		return 1;
 		

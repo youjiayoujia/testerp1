@@ -113,7 +113,7 @@
             </td>      
 			<td>
             @if($purchaseItem->active ==1)
-            <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 去除该条目</a>  
+            <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 取消该条目</a>  
             @elseif($purchaseItem->active > 1)
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)
              	@if($key ==$purchaseItem->active)
@@ -122,7 +122,7 @@
              @endforeach
             
             @else
-           正常
+          	 正常
              @endif
             </td>
         </tr>

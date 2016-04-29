@@ -33,8 +33,8 @@ class PackageController extends Controller
             ->orderBy('package_times', 'desc')
             ->get();
         foreach ($orders as $order) {
-            echo $order->id;
-            var_dump($order->createPackage());exit;
+            echo $order->id . '<br>';
+            $order->createPackage();
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

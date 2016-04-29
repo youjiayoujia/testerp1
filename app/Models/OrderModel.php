@@ -203,7 +203,7 @@ class OrderModel extends BaseModel
 
     public function getActiveItemsAttribute()
     {
-        return $this->items->where('status', 1);
+        return $this->items->where('is_active', 1);
     }
 
     public function canPackage()
@@ -267,7 +267,7 @@ class OrderModel extends BaseModel
                                     $packageItem['quantity'],
                                     'PACKAGE',
                                     $newPackageItem->id);
-                                $newPackageItem->orderItem->ship_status = 'PACKED';
+                                $newPackageItem->orderItem->status = 'PACKED';
                                 $newPackageItem->orderItem->save();
                             } catch (Exception $e) {
                                 DB::rollBack();

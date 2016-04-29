@@ -34,7 +34,7 @@ class PackageController extends Controller
             ->get();
         foreach ($orders as $order) {
             echo $order->id;
-            $order->createPackage();
+            var_dump($order->createPackage());exit;
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

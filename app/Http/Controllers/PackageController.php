@@ -32,7 +32,6 @@ class PackageController extends Controller
             ->whereIn('status', ['PREPARED', 'NEED'])
             ->orderBy('package_times', 'desc')
             ->get();
-        $orders = $orders->sortByDesc('package_times');
         foreach ($orders as $order) {
             echo $order->id;
             $order->createPackage();

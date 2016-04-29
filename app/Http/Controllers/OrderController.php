@@ -13,7 +13,6 @@ namespace App\Http\Controllers;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CurrencyModel;
-use App\Models\Order\ItemModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
@@ -109,38 +108,40 @@ class OrderController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
-        $buf = request()->all();
-        if($buf['refund_account'] == null) {
-            $buf['refund'] = '';
-            $buf['refund_currency'] = '';
-            $buf['refund_account'] = '';
-            $buf['refund_amount'] = '';
-            $buf['refund_time'] = '';
+        $data = request()->all();
+        if($data['refund_account'] == null) {
+            $data['refund'] = '';
+            $data['refund_currency'] = '';
+            $data['refund_account'] = '';
+            $data['refund_amount'] = '';
+            $data['refund_time'] = '';
         }
-        $obj = $this->model->find($id)->orderItem;
-        $obj_len = count($obj);
-        $this->model->find($id)->update($buf);
-        for ($i = 0; $i < $len; $i++) {
-            unset($buf);
-            $arr = request()->input('arr');
-            foreach ($arr as $key => $val) {
-                $val = array_values($val);
-                $buf[$key] = $val[$i];
+        foreach ($data['arr'] as $key => $item) {
+            foreach ($item as $k => $v) {
+                $data['items'][$k][$key] = $v;
             }
-            $buf['order_id'] = $id;
-            if(count(productItem::where('sku', $buf['sku'])->get())) {
-                $buf['item_id'] = productItem::where('sku', $buf['sku'])->first()->id;
-            }else{
-                $buf['item_id'] = 0;
+        }
+        unset($data['arr']);
+        $this->model->find($id)->update($data);
+        foreach ($data['items'] as $item) {
+            $obj = productItem::where('sku', $item['sku'])->get();
+            if (!count($obj)) {
+                $item['item_id'] = 0;
+                $this->model->find($id)->update(['status' => 'ERROR']);
+            } else {
+                $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
             }
+            $orderItems = $this->model->find($id)->items;
+            foreach($orderItems as $orderItem) {
+                $orderItem->update($item);
+            }
+        }
 
-            $obj[$i]->update($buf);
-        }
-        while ($i != $obj_len) {
-            $obj[$i]->delete();
-            $i++;
-        }
+//        $orderItem[$i]->update($data);
+//        while ($i != $orderItem_len) {
+//            $orderItem[$i]->delete();
+//            $i++;
+//        }
 
         return redirect($this->mainIndex);
     }

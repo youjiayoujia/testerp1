@@ -216,8 +216,7 @@ class OrderModel extends BaseModel
         if (!in_array($this->status, $this->canPackageStatus)) {
             return false;
         }
-        echo $this->active_items->count();
-        exit;
+
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
             $this->status = 'ERROR';

@@ -78,7 +78,7 @@ class PurchaseOrderModel extends BaseModel
 			$rows[$key]['supplier_name']=iconv("UTF-8", "gb2312" ,"'".$vo->supplier->name."'");
 			$rows[$key]['supplier_link']='http://'.$vo->supplier->url;
 			$rows[$key]['purchas_address']=iconv("UTF-8", "gb2312" ,"'".$supplier_province.$supplier_city.$supplier_address."'");
-			$rows[$key]['assigner']=iconv("UTF-8", "gb2312" ,$vo->purchaseOrder->assigner);
+			$rows[$key]['user_id']=iconv("UTF-8", "gb2312" ,$vo->user_id);
 			$rows[$key]['supplier_telephone']=$vo->supplier->telephone;
 			$rows[$key]['tracking']=$vo->post_coding;
 			$rows[$key]['model']=$vo->item->product->model;
@@ -98,40 +98,41 @@ class PurchaseOrderModel extends BaseModel
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function excelOrdersOut($purchaseOrderIds)
+	public function excelOrdersOut()
 	{
 		$name='采购单';
-		$rows='';
-		foreach($purchaseOrderIds as $k=>$v){
-		$res=PurchaseItemModel::where('purchase_order_id',$v->purchase_order_id)->get();
+		$assigner=12;
+		$purchaseOrderIds=$this->select('id')->where('assigner',$assigner)->get()->toArray();
+		$res=PurchaseItemModel::whereIn('purchase_order_id',$purchaseOrderIds)->where('start_buying_time','<',date('Y-m-d H:i:s',time()-3600*24*3))->orderBy('supplier_id','desc')->get();
+		$rows ='';
 		foreach($res as $key=>$vo){
 			$supplier_province=$vo->supplier->province;
 			$supplier_city=$vo->supplier->city;
 			$supplier_address=$vo->supplier->address;
-			$rows[$k][$key]['id']=$vo->id;
-			$rows[$k][$key]['sku']=$vo->item->sku;
-			$rows[$k][$key]['采购单ID']=$vo->order_item_id;
-			$rows[$k][$key]['产品名']=$vo->item->product->c_name;
-			$rows[$k][$key]['供应商SKU']=$vo->item->supplier_id;
-			
-			$rows[$k][$key]['采购需求']=config('purchase.purchaseOrder.status.'.$vo->status);
-			$rows[$k][$key]['采购数量']=$vo->purchase_num;
-			$rows[$k][$key]['到货数量']=$vo->arrival_num;
-			$rows[$k][$key]['仍需采购数量']=$vo->lack_num;
-			$rows[$k][$key]['供应商链接']='http://'.$vo->supplier->url;
-			$rows[$k][$key]['供应商商名']=$vo->supplier->name;
-			$rows[$k][$key]['供应商电话']=$vo->supplier->telephone;
-			$rows[$k][$key]['供应商地址']=$supplier_province.$supplier_city.$supplier_address;
-			$rows[$k][$key]['审核单价']=$vo->cost;
-		
-		}
+			$rows[$key]['PurcahseOrderID']=$vo->purchase_order_id;
+			$rows[$key]['PurchaseItemID']=$vo->id;
+			$rows[$key]['status']=config("purchase.purchaseItem.status.".$vo->status);
+			$rows[$key]['sku']=$vo->sku;
+			$rows[$key]['purchase_qty']=$vo->purchase_num;
+			$rows[$key]['purchase_price']=$vo->purchase_cost;
+			$rows[$key]['item_name']=iconv("UTF-8", "gb2312" ,"'".$vo->item->product->c_name."'");
+			$rows[$key]['supplier_SKU']=$vo->item->supplier_sku;
+			$rows[$key]['remark']=$vo->remark;
+			$rows[$key]['supplier_name']=iconv("UTF-8", "gb2312" ,"'".$vo->supplier->name."'");
+			$rows[$key]['supplier_link']='http://'.$vo->supplier->url;
+			$rows[$key]['purchas_address']=iconv("UTF-8", "gb2312" ,"'".$supplier_province.$supplier_city.$supplier_address."'");
+			$rows[$key]['user_id']=iconv("UTF-8", "gb2312" ,$vo->user_id);
+			$rows[$key]['supplier_telephone']=$vo->supplier->telephone;
+			$rows[$key]['tracking']=$vo->post_coding;
+			$rows[$key]['model']=$vo->item->product->model;
+			$rows[$key]['assigner']=iconv("UTF-8", "gb2312" ,$vo->purchaseOrder->assigner);
+			$rows[$key]['create_time']=$vo->created_at;
 		}
 		Excel::create($name, function($excel) use ($rows) {
-			foreach($rows as $k=>$row){
-			$excel->sheet('采购单'.$k, function($sheet) use ($row) {
-				$sheet->fromArray($row);
+			$nameSheet='采购单';
+			$excel->sheet($nameSheet, function($sheet) use ($rows) {
+				$sheet->fromArray($rows);
 			});
-			}
-		})->download('csv');	
+		})->download('csv');
 		}
 }

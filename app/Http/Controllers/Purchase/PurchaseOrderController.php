@@ -188,16 +188,7 @@ class PurchaseOrderController extends Controller
 		return redirect($this->mainIndex);
 	}
 	
-	/**
-     * 导出采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function excelOut($id)
-	{
-		$this->model->purchaseOrderExcelOut($id);	
-	}
+	
 	
 	/**
      * 导出采购单
@@ -236,11 +227,16 @@ class PurchaseOrderController extends Controller
      */	
 	public function excelOrderOut($num){
 		if($num==0){
+			$this->model->allPurchaseExcelOut();	
+		}elseif($num==3){
+			
+			}
+		/*if($num==0){
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->distinct('purchase_order_id')->get();
 		}else{
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->where('start_buying_time','<',date('Y-m-d',(time()-3600*24*$num)))->distinct('purchase_order_id')->get();
 		}
-		$this->model->excelOrdersOut($purchaseOrderIds);
+		$this->model->excelOrdersOut($purchaseOrderIds);*/
 			
 	}
 	

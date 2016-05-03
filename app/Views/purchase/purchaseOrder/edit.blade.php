@@ -8,7 +8,17 @@
          <div class="form-group col-lg-4">
                 <strong>标题: choies公司向 {{$model->supplier->name}} 采购单</strong>
             </div>
+            <div class="form-group col-lg-4">
+                <strong>采购单ID</strong>: {{ $model->id }}
+            </div>
              <div class="form-group col-lg-4">
+                <strong>订单成本:
+                物流费{{$purchaseSumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{$purchaseSumPostage + $model->total_purchase_cost}}</strong>
+            </div>
+             
+            </div>
+           <div class="row">
+           <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
                 {{ $model->warehouse->name}}
             </div>
@@ -16,11 +26,7 @@
                 <strong>仓库地址</strong>:
                 {{ $model->warehouse->province}}{{ $model->warehouse->city}}{{ $model->warehouse->address}}
             </div>
-            </div>
-           <div class="row">
-             <div class="form-group col-lg-4">
-                <strong>采购单ID</strong>: {{ $model->id }}
-            </div>
+             
              <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:
                 名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
@@ -31,10 +37,7 @@
                 	线下采购
                 @endif
             </div>
-            <div class="form-group col-lg-4">
-                <strong>订单成本</strong>:
-                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}
-            </div>
+           
             </div>
            <div class="row">
             <div class="form-group col-lg-4">
@@ -66,6 +69,10 @@
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
                 <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
+            </div>
+             <div class="form-group col-lg-4">
+                <strong>批量输入采购单:(在此输入物流单号则本页面采购条目列表的物流号全部跟新为输入的物流号)</strong>
+                <input class="form-control" type="text" id="batch_post_coding" onChange="batchPostCoding()" value=''/>		
             </div>
             <div class="form-group col-lg-4">
             	<strong>采购单结算</strong>:
@@ -100,7 +107,7 @@
             <td>供货商sku</td> 
             <td>样图</td>
             <td>状态</td>
-            ><td>物流单号</td>
+            <td>物流单号</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>所属平台</td>
@@ -121,7 +128,7 @@
                 @endforeach
             </td>
             <td>{{$purchaseItem->item->product->model}}</td>
-            <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
+            <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
             <td>{{$purchaseItem->item->supplier_sku}}</td>   
             <td>
             @if($purchaseItem->item->product->default_image>0) 
@@ -141,7 +148,7 @@
             </select>  
              </td>
             <td>
-            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}"  name="arr[{{$k}}][post_coding]"/>
+            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" id="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
             </td>
             <td>
               <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
@@ -296,17 +303,23 @@
                     <label for="sku" class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
-            </div>
+            </div>       
             <div class='row'>
+             @foreach($purchasePostage as $key=>$post)
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku" id="post[0][post_coding]" name='post[0][post_coding]' value="{{ old('post[0][post_coding]') }}">
+                    <input type='text' class="form-control post_coding" id="post[{{$key}}][post_coding]" name='post[{{$key}}][post_coding]' value="{{$post->post_coding}}">
                 </div>
                
                 <div class="form-group col-sm-1">
-                    <input type='text' class="form-control quantity" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="{{ old('post[0][postage]') }}">
+                    <input type='text' class="form-control postage" id="post[{{$key}}][postage]" placeholder="物流费" name='post[{{$key}}][postage]' value="{{$post->postage}}">
                 </div>
-        		<input type="hidden" id="currrent" value="{{$key}}">
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+                 @endforeach
+                 	@if($current>0)
+                    <input type="hidden" id="currrent" value="{{$current}}">
+                    @else
+                    <input type="hidden" id="currrent" value="1">
+                    @endif
             </div>
         </div>
         <div class="panel-footer">
@@ -316,8 +329,14 @@
 @stop
 @section('pageJs')
     <script type='text/javascript'>
+	//批量输入采购单号
+	function batchPostCoding(){
+		 var batch_post_coding=$('#batch_post_coding').val();
+		 $("#itemPostCoding").val(batch_post_coding);
+		}
+		//新增物流号对应物流费
         $(document).ready(function () {
-            var current = 1;
+            var current = $('#currrent').val();
             $('#addItem').click(function () {
                 $.ajax({
                     url: "{{ route('postAdd') }}",

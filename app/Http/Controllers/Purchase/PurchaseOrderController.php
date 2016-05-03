@@ -61,6 +61,9 @@ class PurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
+			'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
+			'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
         ];
         return view($this->viewPath . 'edit', $response);	
 	}
@@ -99,7 +102,6 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
 		$data=request()->all();	
-		//print_r($data);exit;	
 		if(isset($data['arr'])){
 			if($data['post']){
 				$post="";
@@ -116,10 +118,13 @@ class PurchaseOrderController extends Controller
 					}
 					if(!empty($post)){
 						foreach($post as $num=>$val){
-							$num=PurchaseItemModel::where('purchase_item_id',$val['purchase_item_id'])->count();
+							$num=PurchasePostageModel::where('post_coding',$val['post_coding'])->count();
 							if($num==0){
 								PurchasePostageModel::create($val);
-							}
+							}else{
+								PurchasePostageModel::where('post_coding',$val['post_coding'])->update(['postage'=>$val['postage']]);
+								}
+							
 							}	
 						}
 				}
@@ -143,6 +148,9 @@ class PurchaseOrderController extends Controller
 					if($item['status']>0){
 						$data['status']=1;
 					}
+					if($item['purchase_num']>0){
+						$data['status']=$item['purchase_num'];
+						}
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
@@ -180,16 +188,7 @@ class PurchaseOrderController extends Controller
 		return redirect($this->mainIndex);
 	}
 	
-	/**
-     * 导出采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function excelOut($id)
-	{
-		$this->model->purchaseOrderExcelOut($id);	
-	}
+	
 	
 	/**
      * 导出采购单
@@ -228,11 +227,16 @@ class PurchaseOrderController extends Controller
      */	
 	public function excelOrderOut($num){
 		if($num==0){
+			$this->model->allPurchaseExcelOut();	
+		}elseif($num==3){
+			
+			}
+		/*if($num==0){
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->distinct('purchase_order_id')->get();
 		}else{
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->where('start_buying_time','<',date('Y-m-d',(time()-3600*24*$num)))->distinct('purchase_order_id')->get();
 		}
-		$this->model->excelOrdersOut($purchaseOrderIds);
+		$this->model->excelOrdersOut($purchaseOrderIds);*/
 			
 	}
 	

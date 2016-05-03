@@ -99,7 +99,7 @@ class LogisticsModel extends BaseModel
      * 物流商下单
      * todo:分方式下单
      */
-    public function getTracking($packageId)
+    public function placeOrder($packageId)
     {
         $code = $this->codes->where('status', '0')->first();
         if ($code) {

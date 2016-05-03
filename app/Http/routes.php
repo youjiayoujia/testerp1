@@ -20,7 +20,8 @@ Route::post('auth/register', 'Auth\AuthController@postRegister');
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('test', 'TestController@test');
-    Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
+    Route::any('/', ['as' => 'dashboard.index', 'uses' => 'PackageController@flow']);
+//    Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
     //产品图片路由
     Route::resource('productImage', 'Product\ImageController');
@@ -204,7 +205,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('allotment/checkform/{id}',
         ['uses' => 'Stock\AllotmentController@checkform', 'as' => 'allotment.checkform']);
     Route::get('allotment/pick/{id}', ['uses' => 'Stock\AllotmentController@allotmentpick', 'as' => 'allotment.pick']);
-    Route::get('allotment/check/{id}', ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotment.check']);
+    Route::get('allotment/check/{id}',
+        ['uses' => 'Stock\AllotmentController@allotmentCheck', 'as' => 'allotment.check']);
     Route::resource('stockAllotment', 'Stock\AllotmentController');
 
     //库存结转
@@ -262,7 +264,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('pickList/createPickStore',
         ['uses' => 'PickListController@createPickStore', 'as' => 'pickList.createPickStore']);
     Route::get('pickList/createPick', ['uses' => 'PickListController@createPick', 'as' => 'pickList.createPick']);
-    Route::get('pickList/inboxResult', ['uses' => 'PickListController@ajaxInboxResult', 'as' => 'pickList.inboxResult']);
+    Route::get('pickList/inboxResult',
+        ['uses' => 'PickListController@ajaxInboxResult', 'as' => 'pickList.inboxResult']);
     Route::get('pickList/inbox/{id}', ['uses' => 'PickListController@inbox', 'as' => 'pickList.inbox']);
     Route::get('pickList/packageItemUpdate',
         ['uses' => 'PickListController@ajaxPackageItemUpdate', 'as' => 'pickList.packageItemUpdate']);
@@ -294,7 +297,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('EditProduct', 'Product\EditProductController');
     Route::resource('SelectProduct', 'Product\SelectProductController');
     Route::get('cancelExamineAmazonProduct',
-        ['uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct', 'as' => 'cancelExamineAmazonProduct']);
+        [
+            'uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct',
+            'as' => 'cancelExamineAmazonProduct'
+        ]);
 
 
     //订单管理路由
@@ -324,6 +330,10 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'PackageController@doPackage', 'as' => 'package.doPackage']);
     Route::get('package/assignLogistics',
         ['uses' => 'PackageController@assignLogistics', 'as' => 'package.assignLogistics']);
+    Route::get('package/placeLogistics',
+        ['uses' => 'PackageController@placeLogistics', 'as' => 'package.placeLogistics']);
+    Route::get('package/flow',
+        ['uses' => 'PackageController@flow', 'as' => 'package.flow']);
     Route::resource('package', 'PackageController');
 
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);

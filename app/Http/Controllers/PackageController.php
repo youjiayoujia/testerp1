@@ -26,6 +26,19 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function flow()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'packageNum' => OrderModel::where('active', 'NORMAL')
+                ->whereIn('status', ['PREPARED', 'NEED'])->count(),
+            'assignNum' => $this->model->where('status', 'NEW')->count(),
+            'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
+            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
+        ];
+        return view($this->viewPath . 'workFlow', $response);
+    }
+
     public function doPackage()
     {
         $begin = microtime(true);
@@ -48,6 +61,18 @@ class PackageController extends Controller
         foreach ($packages as $package) {
             echo $package->id . '<br>';
             $package->assignLogistics();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+    public function placeLogistics()
+    {
+        $begin = microtime(true);
+        $packages = PackageModel::where('status', 'ASSIGNED')->where('is_auto', '1')->get();
+        foreach ($packages as $package) {
+            echo $package->id . '<br>';
+            $package->placeLogistics();
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

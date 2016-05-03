@@ -134,24 +134,52 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //物流商下单
-                $trackingNo = $rule->logistics->getTracking($this->id);
-                if ($trackingNo) {
-                    $trackingUrl = $rule->logistics->url;
-                    return $this->update([
-                        'status' => 'PROCESSING',
-                        'logistics_id' => $rule->logistics->id,
-                        'tracking_link' => $trackingUrl,
-                        'tracking_no' => $trackingNo,
-                        'logistic_assigned_at' => date('Y-m-d H:i:s')
-                    ]);
-                }
+                $trackingUrl = $rule->logistics->url;
+                return $this->update([
+                    'status' => 'ASSIGNED',
+                    'logistics_id' => $rule->logistics->id,
+                    'tracking_link' => $trackingUrl,
+                    'logistics_assigned_at' => date('Y-m-d H:i:s')
+                ]);
             }
             //匹配失败,改为手工发货
             $this->update([
                 'status' => 'PROCESSING',
                 'is_auto' => '0',
-                'logistic_assigned_at' => date('Y-m-d H:i:s')
+                'logistics_assigned_at' => date('Y-m-d H:i:s')
             ]);
+        }
+        return false;
+    }
+
+    /**
+     * 判断包裹是否能物流下单
+     */
+    public function canPlaceLogistics()
+    {
+        //判断订单状态
+        if ($this->status != 'ASSIGNED') {
+            return false;
+        }
+
+        //判断是否自动发货
+        if (!$this->is_auto) {
+            return false;
+        }
+        return true;
+    }
+
+    public function placeLogistics()
+    {
+        if ($this->canPlaceLogistics()) {
+            $trackingNo = $this->logistics->placeOrder($this->id);
+            if ($trackingNo) {
+                return $this->update([
+                    'status' => 'PROCESSING',
+                    'tracking_no' => $trackingNo,
+                    'logistics_order_at' => date('Y-m-d H:i:s')
+                ]);
+            }
         }
         return false;
     }

@@ -28,22 +28,25 @@ class PackageController extends Controller
 
     public function doPackage()
     {
-        $logistics = new LogisticsModel;
-        $result = $logistics->assign(1);
-        Tool::show($result);
+//        $a = collect(['1', '4', '3']);
+//        $b = $a->intersect(['3', '4'])->count();
+//        var_dump($b);
+//        exit;
+//        $result = $this->model->find(1)->assignLogistics();
+//        Tool::show($result);
 
 
-//        $begin = microtime(true);
-//        $orders = OrderModel::where('active', 'NORMAL')
-//            ->whereIn('status', ['PREPARED', 'NEED'])
-//            ->orderBy('package_times', 'desc')
-//            ->get();
-//        foreach ($orders as $order) {
-//            echo $order->id . '<br>';
-//            $order->createPackage();
-//        }
-//        $end = microtime(true);
-//        echo '耗时' . round($end - $begin, 3) . '秒';
+        $begin = microtime(true);
+        $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+            ->orderBy('package_times', 'desc')
+            ->get();
+        foreach ($orders as $order) {
+            echo $order->id . '<br>';
+            $order->createPackage();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
     public function create()

@@ -114,57 +114,53 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
 
     //采购条目
-    Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
-    Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
-    Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}',
-        'Purchase\PurchaseItemController@costExamineStatus');
-    Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
-    //采购需求
-    Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
-    Route::resource('require', 'Purchase\RequireController');
-    //未结算订单
-    Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
+Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
+Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
+Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
+Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+//采购需求
+Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
+Route::resource('require', 'Purchase\RequireController');
+//未结算订单
+Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
-    //采购单
-    Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}',
-        'Purchase\PurchaseOrderController@changeExamineStatus');
-    Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
-    Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
-    Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
-    Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
-    Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
-    Route::get('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
-    Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
-    //打印采购单
-    Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');
-    Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
-    Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
-    //采购列表
-    Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
-    Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
-    Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
-    Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
-    Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
-    Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
-    Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
-    Route::any('examinePurchaseItem',
-        ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
-    Route::resource('purchaseList', 'Purchase\PurchaseListController');
-    //异常条目采购
-    Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
-    //异常单采购
-    Route::any('purchaseOrderAbnormal/cancelOrder/{id}', 'Purchase\PurchaseOrderAbnormalController@cancelOrder');
-    Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
-    //采购入库
-    Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');
-    Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseStockIn');
-    Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
-    Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
-    //采购条目
-    Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
-    Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
-    Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
-    Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+//采购单
+Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
+Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
+Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
+Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
+Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
+Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
+Route::get('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
+Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
+//打印采购单
+Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');
+Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
+Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
+//采购列表
+Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
+Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
+Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
+Route::any('purchaseList/activeChange/{id}', 'Purchase\PurchaseListController@activeChange');
+Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
+Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
+Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
+Route::any('examinePurchaseItem', ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
+Route::resource('purchaseList', 'Purchase\PurchaseListController');
+//异常条目采购
+Route::resource('purchaseAbnormal', 'Purchase\PurchaseAbnormalController');
+//异常单采购
+Route::any('purchaseOrderAbnormal/cancelOrder/{id}', 'Purchase\PurchaseOrderAbnormalController@cancelOrder');
+Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
+//采购入库
+Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');
+Route::get('/manyStockIn', ['uses' => 'Purchase\PurchaseStockInController@manyStockIn', 'as' => 'manyStockIn']);
+Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
+//采购条目
+Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
+Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
+Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
+Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController'); 
     /**
      * stock controller route
      */

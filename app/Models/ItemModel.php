@@ -132,7 +132,7 @@ class ItemModel extends BaseModel
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
             $cost = $amount / $quantity;
-            if ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3) {
+            if ($this->cost && ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3)) {
                 throw new Exception('入库单价不在原单价0.6-1.3范围内');
             }
             $this->update([

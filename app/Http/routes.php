@@ -59,6 +59,12 @@ Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryControlle
 //供货商评级
 Route::resource('supplierLevel', 'Product\SupplierLevelController');
 
+//3宝package
+Route::resource('bao3Package', 'Bao3PackageController');
+
+//国家
+Route::resource('countries', 'CountriesController');
+
 //供货商
 Route::post('productSupplier/levelStore', ['uses'=>'Product\SupplierController@levelStore', 'as'=>'productSupplier.levelStore']);
 Route::get('productSupplier/createLevel', ['uses'=>'Product\SupplierController@createLevel', 'as'=>'productSupplier.createLevel']);
@@ -68,8 +74,34 @@ Route::resource('productSupplier', 'Product\SupplierController');
 Route::get('productRequire/ajaxQuantityProcess', ['uses'=>'Product\RequireController@ajaxQuantityProcess', 'as'=>'productRequire.ajaxQuantityProcess']);
 Route::get('productRequire/ajaxProcess', ['uses'=>'Product\RequireController@ajaxProcess', 'as'=>'productRequire.ajaxProcess']);
 Route::resource('productRequire', 'Product\RequireController');
+
 //通关报关
-Route::resource('customsClearance', 'CustomsClearance\CustomsClearanceController');
+Route::post('customsClearance/exportProduct', ['uses'=>'CustomsClearanceController@exportProduct', 'as'=>'customsClearance.exportProduct']);
+Route::get('customsClearance/exportFailModel', ['uses'=>'CustomsClearanceController@exportFailModel', 'as'=>'customsClearance.exportFailModel']);
+Route::get('customsClearance/exportFailItem', ['uses'=>'CustomsClearanceController@exportFailItem', 'as'=>'customsClearance.exportFailItem']);
+Route::post('customsClearance/exportNXB', ['uses'=>'CustomsClearanceController@exportNXB', 'as'=>'customsClearance.exportNXB']);
+Route::post('customsClearance/exportEUB', ['uses'=>'CustomsClearanceController@exportEUB', 'as'=>'customsClearance.exportEUB']);
+Route::post('customsClearance/exportEUBWeight', ['uses'=>'CustomsClearanceController@exportEUBWeight', 'as'=>'customsClearance.exportEUBWeight']);
+
+Route::post('customsClearance/exportProductZY', ['uses'=>'CustomsClearanceController@exportProductZY', 'as'=>'customsClearance.exportProductZY']);
+Route::post('customsClearance/exportProductEUB', ['uses'=>'CustomsClearanceController@exportProductEUB', 'as'=>'customsClearance.exportProductEUB']);
+Route::post('customsClearance/exportProductFed', ['uses'=>'CustomsClearanceController@exportProductFed', 'as'=>'customsClearance.exportProductFed']);
+
+Route::get('customsClearance/bao3packageindex', ['uses'=>'CustomsClearanceController@bao3packageindex', 'as'=>'customsClearance.bao3packageindex']);
+Route::get('customsClearance/downloadToNanjing', ['uses'=>'CustomsClearanceController@downloadToNanjing', 'as'=>'customsClearance.downloadToNanjing']);
+Route::get('customsClearance/downloadOver', ['uses'=>'CustomsClearanceController@downloadOver', 'as'=>'customsClearance.downloadOver']);
+Route::post('customsClearance/updateNanjing', ['uses'=>'CustomsClearanceController@updateNanjing', 'as'=>'customsClearance.updateNanjing']);
+Route::post('customsClearance/updateOver', ['uses'=>'CustomsClearanceController@updateOver', 'as'=>'customsClearance.updateOver']);
+
+Route::get('customsClearance/bao3index', ['uses'=>'CustomsClearanceController@bao3index', 'as'=>'customsClearance.bao3index']);
+Route::post('customsClearance/updateNumber', ['uses'=>'CustomsClearanceController@updateNumber', 'as'=>'customsClearance.updateNumber']);
+Route::get('customsClearance/downloadUpdateProduct', ['uses'=>'CustomsClearanceController@downloadUpdateProduct', 'as'=>'customsClearance.downloadUpdateProduct']);
+Route::get('customsClearance/downloadNumber', ['uses'=>'CustomsClearanceController@downloadNumber', 'as'=>'customsClearance.downloadNumber']);
+Route::get('customsClearance/downloadUploadProduct', ['uses'=>'CustomsClearanceController@downloadUploadProduct', 'as'=>'customsClearance.downloadUploadProduct']);
+Route::post('customsClearance/uploadProduct', ['uses'=>'CustomsClearanceController@uploadProduct', 'as'=>'customsClearance.uploadProduct']);
+Route::post('customsClearance/updateProduct', ['uses'=>'CustomsClearanceController@updateProduct', 'as'=>'customsClearance.updateProduct']);
+Route::resource('customsClearance', 'CustomsClearanceController');
+
 //仓库
 Route::resource('warehouse', 'WarehouseController');
 

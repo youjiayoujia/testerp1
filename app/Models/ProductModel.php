@@ -86,7 +86,6 @@ class ProductModel extends BaseModel
         'supplier_sku'
     ];
 
-
     public function image()
     {
         return $this->belongsTo('App\Models\Product\ImageModel', 'default_image');
@@ -120,6 +119,11 @@ class ProductModel extends BaseModel
     public function variationValues()
     {
         return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
+    }
+
+    public function clearance()
+    {
+        return $this->hasOne('App\Models\CustomsClearanceModel', 'product_id', 'id');
     }
 
     public function featureValues()

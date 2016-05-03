@@ -28,14 +28,6 @@ class PackageController extends Controller
 
     public function doPackage()
     {
-//        $a = collect(['1', '4', '3']);
-//        $b = $a->intersect(['3', '4'])->count();
-//        var_dump($b);
-//        exit;
-//        $result = $this->model->find(1)->assignLogistics();
-//        Tool::show($result);
-
-
         $begin = microtime(true);
         $orders = OrderModel::where('active', 'NORMAL')
             ->whereIn('status', ['PREPARED', 'NEED'])
@@ -44,6 +36,18 @@ class PackageController extends Controller
         foreach ($orders as $order) {
             echo $order->id . '<br>';
             $order->createPackage();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+    public function assignLogistics()
+    {
+        $begin = microtime(true);
+        $packages = PackageModel::where('status', 'NEW')->where('is_auto', '1')->get();
+        foreach ($packages as $package) {
+            echo $package->id . '<br>';
+            $package->assignLogistics();
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

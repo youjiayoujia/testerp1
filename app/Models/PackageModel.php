@@ -3,7 +3,8 @@ namespace App\Models;
 
 use Excel;
 use App\Base\BaseModel;
-use App\Models\LogisticsModel;
+use App\Models\Logistics\RuleModel;
+use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
 
 class PackageModel extends BaseModel
@@ -71,18 +72,102 @@ class PackageModel extends BaseModel
         return $arr[$this->status];
     }
 
+    public function getShippingLimitsAttribute()
+    {
+        $packageLimits = collect();
+        foreach ($this->items as $packageItem) {
+            $packageLimit = $packageItem->item->product->package_limit;
+            $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+        }
+        return $packageLimits->unique();
+    }
+
+    /**
+     * 判断包裹是否能分配物流
+     */
+    public function canAssignLogistics()
+    {
+        //判断订单状态
+        if ($this->status != 'NEW') {
+            return false;
+        }
+
+        //判断是否自动发货
+        if (!$this->is_auto) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 自动分配物流方式
+     */
+    public function assignLogistics()
+    {
+        if ($this->canAssignLogistics()) {
+            //匹配物流方式
+            $weight = $this->weight; //包裹重量
+            $amount = $this->order->amount; //订单金额
+            $amountShipping = $this->order->amount_shipping; //订单运费
+            $celeAdmin = $this->order->cele_admin;
+            //是否通关
+            if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
+                $isClearance = 1;
+            } else {
+                $isClearance = 0;
+            }
+            $rules = RuleModel::
+            where('weight_from', '<=', $weight)->where('weight_to', '>=', $weight)
+                ->where('order_amount', '>=', $amount)
+                ->where(['is_clearance' => $isClearance])
+                ->orderBy('priority', 'desc')
+                ->get();
+            foreach ($rules as $rule) {
+                //是否在物流方式国家中
+                $countries = explode(",", $rule->country);
+                if (!in_array($this->shipping_country, $countries)) {
+                    continue;
+                }
+                //是否有物流限制
+                $limits = explode(",", $rule->logistics->limit);
+                if ($this->shipping_limits->intersect($limits)->count() > 0) {
+                    continue;
+                }
+                //物流商下单
+                $trackingNo = $rule->logistics->getTracking($this->id);
+                if ($trackingNo) {
+                    $trackingUrl = $rule->logistics->url;
+                    return $this->update([
+                        'status' => 'PROCESSING',
+                        'logistics_id' => $rule->logistics->id,
+                        'tracking_link' => $trackingUrl,
+                        'tracking_no' => $trackingNo,
+                        'logistic_assigned_at' => date('Y-m-d H:i:s')
+                    ]);
+                }
+            }
+            //匹配失败,改为手工发货
+            $this->update([
+                'status' => 'PROCESSING',
+                'is_auto' => '0',
+                'logistic_assigned_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+        return false;
+    }
+
     /**
      * 整体流程处理excel
      *
-     * @param $file 文件指针 
+     * @param $file 文件指针
      *
      */
     public function excelProcess($file)
     {
         $path = config('setting.excelPath');
-        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        !file_exists($path . 'excelProcess.xls') or unlink($path . 'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
-        return $this->excelDataProcess($path.'excelProcess.xls');
+        return $this->excelDataProcess($path . 'excelProcess.xls');
     }
 
     /**
@@ -95,37 +180,37 @@ class PackageModel extends BaseModel
     {
         $fd = fopen($path, 'r');
         $arr = [];
-        while(!feof($fd))
-        {
+        while (!feof($fd)) {
             $row = fgetcsv($fd);
             $arr[] = $row;
         }
         fclose($fd);
-        if(!$arr[count($arr)-1]) {
-            unset($arr[count($arr)-1]);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
         }
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
-        foreach($arr as $key=> $content)
-        {
-            $content['package_id'] = iconv('gb2312','utf-8',trim($content['package_id']));
-            $content['logistics_id'] = iconv('gb2312','utf-8',trim($content['logistics_id']));
-            $content['tracking_no'] = iconv('gb2312','utf-8',trim($content['tracking_no']));
-            if(!LogisticsModel::where(['logistics_type' => $content['logistics_id']])->count()) {
+        foreach ($arr as $key => $content) {
+            $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+            $content['logistics_id'] = iconv('gb2312', 'utf-8', trim($content['logistics_id']));
+            $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
+            if (!LogisticsModel::where(['logistics_type' => $content['logistics_id']])->count()) {
                 $error[] = $key;
                 continue;
             }
             $tmp_logistics = LogisticsModel::where(['logistics_type' => $content['logistics_id']])->first();
             $tmp_package = $this->where('id', $content['package_id'])->first();
-            if(!$tmp_package || $tmp_package->is_auto || $tmp_package->status != 'PROCESSING') {
+            if (!$tmp_package || $tmp_package->is_auto || $tmp_package->status != 'PROCESSING') {
                 $error[] = $key;
                 continue;
             }
-            $this->find($content['package_id'])->update(['logistics_id' => $tmp_logistics->id, 
-                                                         'tracking_no' => $content['tracking_no'],
-                                                         'status' => 'SHIPPED',
-                                                         'shipped_at' => date('Y-m-d G:i:s', time()),
-                                                         'shipper_id' => '2']);
+            $this->find($content['package_id'])->update([
+                'logistics_id' => $tmp_logistics->id,
+                'tracking_no' => $content['tracking_no'],
+                'status' => 'SHIPPED',
+                'shipped_at' => date('Y-m-d G:i:s', time()),
+                'shipper_id' => '2'
+            ]);
         }
 
         return $error;
@@ -134,15 +219,15 @@ class PackageModel extends BaseModel
     /**
      * 整体流程处理excel
      *
-     * @param $file 文件指针 
+     * @param $file 文件指针
      *
      */
     public function excelProcessFee($file, $type)
     {
         $path = config('setting.excelPath');
-        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        !file_exists($path . 'excelProcess.xls') or unlink($path . 'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
-        return $this->excelDataProcessFee($path.'excelProcess.xls', $type);
+        return $this->excelDataProcessFee($path . 'excelProcess.xls', $type);
     }
 
     /**
@@ -155,37 +240,36 @@ class PackageModel extends BaseModel
     {
         $fd = fopen($path, 'r');
         $arr = [];
-        while(!feof($fd))
-        {
+        while (!feof($fd)) {
             $row = fgetcsv($fd);
             $arr[] = $row;
         }
         fclose($fd);
-        if(!$arr[count($arr)-1]) {
-            unset($arr[count($arr)-1]);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
         }
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
-        foreach($arr as $key=> $content)
-        {
-            $content['package_id'] = iconv('gb2312','utf-8',trim($content['package_id']));
-            $content['cost'] = iconv('gb2312','utf-8',trim($content['cost']));
+        foreach ($arr as $key => $content) {
+            $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+            $content['cost'] = iconv('gb2312', 'utf-8', trim($content['cost']));
             $tmp_package = $this->where('id', $content['package_id'])->first();
-            if(!$tmp_package || $tmp_package->status != 'SHIPPED') {
+            if (!$tmp_package || $tmp_package->status != 'SHIPPED') {
                 $error[] = $key;
                 continue;
             }
-            if($type == 1)
+            if ($type == 1) {
                 $this->find($content['package_id'])->update(['cost' => $content['cost']]);
-            else
+            } else {
                 $this->find($content['package_id'])->update(['cost1' => $content['cost']]);
+            }
         }
 
         return $error;
     }
 
     /**
-     * 将arr转换成相应的格式 
+     * 将arr转换成相应的格式
      *
      * @param $arr type:array
      * @return array
@@ -194,15 +278,13 @@ class PackageModel extends BaseModel
     public function transfer_arr($arr)
     {
         $buf = [];
-        foreach($arr as $key => $value)
-        {
+        foreach ($arr as $key => $value) {
             $tmp = [];
-            if($key != 0) {
-                foreach($value as $k => $v)
-                {
+            if ($key != 0) {
+                foreach ($value as $k => $v) {
                     $tmp[$arr[0][$k]] = $v;
                 }
-            $buf[] = $tmp;
+                $buf[] = $tmp;
             }
         }
 

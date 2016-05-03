@@ -322,6 +322,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);
     Route::get('package/doPackage',
         ['uses' => 'PackageController@doPackage', 'as' => 'package.doPackage']);
+    Route::get('package/assignLogistics',
+        ['uses' => 'PackageController@assignLogistics', 'as' => 'package.assignLogistics']);
     Route::resource('package', 'PackageController');
 
     Route::get('account', ['uses' => 'OrderController@account', 'as' => 'account']);

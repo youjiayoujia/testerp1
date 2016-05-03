@@ -15,6 +15,7 @@
     $filter_attributes = '';
     $brief = '';
     $description = '';
+    $weight = 0;
     if(!empty($check)){
         $attribute_size = $check->attribute_size;
         $unedit_reason = $check->unedit_reason;
@@ -27,6 +28,7 @@
         $filter_attributes = $check->filter_attributes;
         $brief = $check->brief;
         $description = $check->description;
+        $weight = $check->weight;
     } 
 ?>
 <input type='hidden' value='PUT' name="_method">
@@ -141,7 +143,7 @@
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
                 <label>主表:重量: </label>
-                <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="weight" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="weight">
+                <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="weight" name="weight" value="{{ old('weight') ?  old('weight') : $weight }}">
             </td>
         </tr>
         <tr>
@@ -159,7 +161,9 @@
             </td>
         </tr>
         <tr>
-            <td><label>拿货价(RMB): </label><span id="we_cost">{{$model->purchase_price}}</span></td>
+            <td><label>拿货价(RMB): </label><span id="we_cost">{{$model->purchase_price}}</span>
+                <input type="text" class="form-control" id="we_cost" value="{{$model->purchase_price}}" name="we_cost" onkeyup="ajax_price();ajax_cost();">
+            </td>
             <td style="width:927px">
                 <label>主表:销售价美元: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" name="sale_usd_price" id="sale_usd_price" value="{{ old('sale_usd_price') ?  old('sale_usd_price') : $sale_usd_price }}">
                 <a href="#" id="price_calculate">价格试算</a>

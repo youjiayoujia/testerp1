@@ -34,17 +34,23 @@ class DoPackages extends Command
     /**
      * Execute the console command.
      *
+     * todo:订单优先级
      * @return mixed
      */
     public function handle()
     {
-        $t1 = microtime(true);
-        $orders = OrderModel::limit(1)->get();
+        $begin = microtime(true);
+        $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+//            ->orderBy('package_times','desc')
+            ->get();
+        $orders = $orders->sortByDesc('package_times');
 //        $orders = OrderModel::all();
         foreach ($orders as $order) {
+//            $this->info($order->id);
             $order->createPackage();
         }
-        $t2 = microtime(true);
-        $this->info('耗时' . round($t2 - $t1, 3) . '秒');
+        $end = microtime(true);
+        $this->info('耗时' . round($end - $begin, 3) . '秒');
     }
 }

@@ -7,7 +7,7 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-3">
-                <strong>品类名称</strong>: {{ $model->name }}
+                <strong>品类名称</strong>: {{ $model->all_name }}
             </div>
             <div class="col-lg-3">
                 <strong>创建时间</strong>: {{ $model->created_at }}

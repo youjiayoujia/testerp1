@@ -151,11 +151,28 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function hold($warehousePosistionId, $quantity)
+    public function hold($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            return $stock->hold($quantity);
+            return $stock->hold($quantity, $type, $relation_id, $remark);
+        }
+        return false;
+    }
+
+    /**
+     * holdout api
+     * @param
+     * $warehousePositionId 库位id
+     * $quantity 数量
+     *
+     * @return
+     */
+    public function holdout($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
+    {
+        $stock = $this->getStock($warehousePosistionId);
+        if ($quantity) {
+            return $stock->holdout($quantity, $type, $relation_id, $remark);
         }
         return false;
     }
@@ -168,11 +185,11 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function unhold($warehousePosistionId, $quantity)
+    public function unhold($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
     {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
-            return $stock->unhold($quantity);
+            return $stock->unhold($quantity, $type, $relation_id, $remark);
         }
         return false;
     }
@@ -206,7 +223,7 @@ class ItemModel extends BaseModel
             $warehouseStocks = $stocks->groupBy('warehouse_id');
             //默认仓库
             $defaultStocks = $warehouseStocks->get($this->warehouse_id);
-            if ($defaultStocks->sum('available_quantity') >= $quantity) {
+            if ($defaultStocks and $defaultStocks->sum('available_quantity') >= $quantity) {
                 $gotStocks = $defaultStocks;
             } else {
                 //其它仓库

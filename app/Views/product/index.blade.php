@@ -36,7 +36,7 @@
             <td>{{ $product->id }}</td>
             <td>{{ $product->model }}</td>
             <td>@if($product->default_image>0)<img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" >@else无图片@endif</td>
-            <td>{{ $product->catalog->name }}</td>
+            <td>{{ $product->catalog->all_name }}</td>
             <td>{{ $product->name }}</td>
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->supplier->name }}</td>

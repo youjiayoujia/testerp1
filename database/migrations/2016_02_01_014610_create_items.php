@@ -31,11 +31,13 @@ class CreateItems extends Migration
             $table->string('purchase_url')->nullable();
             $table->decimal('purchase_price', 7, 2)->nullable();
             $table->decimal('purchase_carriage', 5, 2)->nullable();
+            $table->float('cost')->nullable()->default(NULL);
             $table->string('product_size')->nullable();
             $table->string('package_size')->nullable();
             $table->string('carriage_limit')->nullable();
             $table->string('package_limit')->nullable();
             $table->tinyInteger('status')->nullable();
+            $table->tinyInteger('is_sale')->comment('是否可售')->nullable()->default(1);
             $table->string('remark')->nullable();
             $table->timestamps();
             $table->softDeletes();

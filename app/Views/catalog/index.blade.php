@@ -12,7 +12,7 @@
     @foreach($data as $catalog)
         <tr>
             <td>{{ $catalog->id }}</td>
-            <td>{{ $catalog->name }}</td>
+            <td>{{ $catalog->all_name }}</td>
             <td>{{ $catalog->updated_at }}</td>
             <td>{{ $catalog->created_at }}</td>
             <td>

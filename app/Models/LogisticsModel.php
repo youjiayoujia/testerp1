@@ -69,7 +69,7 @@ class LogisticsModel extends BaseModel
     public function batchImport($file)
     {
         $filePath = '' . $file;
-        Excel::load($filePath, function($reader) {
+        Excel::load($filePath, function ($reader) {
             $data = $reader->all();
             dd($data);
         });
@@ -90,20 +90,43 @@ class LogisticsModel extends BaseModel
         return $this->belongsTo('App\Models\Logistics\LimitsModel', 'limit', 'id');
     }
 
+    public function codes()
+    {
+        return $this->hasMany('App\Models\Logistics\CodeModel', 'logistics_id');
+    }
+
+    /**
+     * 物流商下单
+     * todo:分方式下单
+     */
+    public function placeOrder($packageId)
+    {
+        $code = $this->codes->where('status', '0')->first();
+        if ($code) {
+            $code->update([
+                'status' => 1,
+                'package_id' => $packageId,
+                'used_at' => date('y-m-d', time())
+            ]);
+            return $code->code;
+        }
+        return false;
+
+    }
+
     /**
      * 遍历物流限制
      */
     public function limit($limit)
     {
         $str = '';
-        foreach(explode(",", $limit) as $value) {
+        foreach (explode(",", $limit) as $value) {
             $limits = LimitsModel::where(['id' => $value])->get();
-            foreach($limits as $limit) {
+            foreach ($limits as $limit) {
                 $val = $limit['name'];
-                $str = $str.$val.',';
+                $str = $str . $val . ',';
             }
         }
         return substr($str, 0, -1);
     }
-
 }

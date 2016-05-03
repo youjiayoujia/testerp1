@@ -11,6 +11,7 @@ use App\Models\Stock\OutModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\ItemModel;
 use App\Models\WarehouseModel;
+use App\Models\Product\ProductEnglishValueModel;
 
 class StockModel extends BaseModel
 {
@@ -89,6 +90,28 @@ class StockModel extends BaseModel
      * @return
      *
      */
+    public function stockHold()
+    {
+        return $this->hasMany('App\Models\Stock\HoldModel', 'stock_id', 'id');
+    }
+
+    /**
+     * get the relationship between the two model
+     *
+     * @return
+     *
+     */
+    public function stockUnhold()
+    {
+        return $this->hasMany('App\Models\Stock\UnholdModel', 'stock_id', 'id');
+    }
+
+    /**
+     * get the relationship between the two model
+     *
+     * @return
+     *
+     */
     public function stockOut()
     {
         return $this->hasMany('App\Models\Stock\OutModel', 'stock_id', 'id');
@@ -120,9 +143,16 @@ class StockModel extends BaseModel
     public function getUnitCostAttribute()
     {
         $item = ItemModel::where('id', $this->item_id)->first();
-
         if($item) {
-            return $item->cost;
+            if($item->cost) {
+                return $item->cost;
+            } else {
+                if(ProductEnglishValueModel::where('product_id', $item->product_id)->first()) {
+                    return ProductEnglishValueModel::where('product_id', $item->product_id)->first()->sale_usd_price;
+                } else {
+                    return false;
+                }
+            }
         } else {
             return false;
         }
@@ -162,7 +192,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function hold($quantity)
+    public function hold($quantity, $type, $relation_id, $remark)
     {
         $this->available_quantity -= $quantity;
         if ($this->available_quantity < 0) {
@@ -170,6 +200,12 @@ class StockModel extends BaseModel
         }
         $this->hold_quantity += $quantity;
         $this->save();
+        $this->stockHold()->create([
+                'quantity' => $quantity,
+                'type' => $type,
+                'relation_id' => $relation_id,
+                'remark' => $remark
+            ]);
     }
 
     /**
@@ -180,7 +216,36 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function unhold($quantity)
+    public function holdout($quantity, $type, $relation_id, $remark)
+    {
+        $this->hold_quantity -= $quantity;
+        if ($this->hold_quantity < 0) {
+            throw new Exception('unhold时，hold数量为负了');
+        }
+        $this->save();
+        $this->stockUnhold()->create([
+                'quantity' => $quantity,
+                'type' => $type,
+                'relation_id' => $relation_id,
+                'remark' => $remark
+            ]);
+        $this->stockOut()->create([
+            'quantity' => $quantity,
+            'type' => $type,
+            'relation_id' => $relation_id,
+            'remark' => $remark
+        ]);
+    }
+
+    /**
+     * unhold api
+     * @param
+     * $quantity 数量
+     *
+     * @return none
+     *
+     */
+    public function unhold($quantity, $type, $relation_id, $remark)
     {
         $this->hold_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
@@ -188,6 +253,12 @@ class StockModel extends BaseModel
         }
         $this->available_quantity += $quantity;
         $this->save();
+        $this->stockUnhold()->create([
+                'quantity' => $quantity,
+                'type' => $type,
+                'relation_id' => $relation_id,
+                'remark' => $remark
+            ]);
     }
 
     /**

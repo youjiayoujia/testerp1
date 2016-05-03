@@ -107,7 +107,7 @@
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
             <div class="col-lg-2">
-                <strong>种类</strong>: {{ $model->shipping == 'packet' ? '小包' : '快递' }}
+                <strong>种类</strong>: {{ $model->shipping == 'PACKET' ? '小包' : '快递' }}
             </div>
             <div class="col-lg-2">
                 <strong>发货名字</strong>: {{ $model->shipping_firstname }}
@@ -205,7 +205,7 @@
                         <strong>单价</strong> : {{ $orderItem->price }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>是否有效</strong> : {{ $orderItem->status_name }}
+                        <strong>是否有效</strong> : {{ $orderItem->is_active_name }}
                     </div>
                     <div class="col-lg-2">
                         <strong>是否赠品</strong> : {{ $orderItem->is_gift_name }}
@@ -214,7 +214,7 @@
                         <strong>备注</strong> : {{ $orderItem->remark }}
                     </div>
                     <div class="col-lg-2">
-                        <strong>发货状态</strong> : {{ $orderItem->ship_status_name }}
+                        <strong>发货状态</strong> : {{ $orderItem->status_name }}
                     </div>
                 </div>
             @endforeach

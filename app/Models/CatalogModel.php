@@ -14,18 +14,19 @@ class CatalogModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name','c_name'];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['name','c_name'];
 
     public $rules = [
         'create' => ['name' => 'required|unique:catalogs,name',
+                     'c_name' => 'required|unique:catalogs,name',
                      'sets.0.name' => 'required',
                      'sets.0.value.name.0.name' => 'required',
                      'variations.0.name' => 'required',
                      'variations.0.value.name.0.name' => 'required',
                     ],
-        'update' => ['name' => 'required|unique:catalogs,name,{id}']
+        'update' => ['name' => 'required|unique:catalogs,name,{id}','c_name' => 'required|unique:catalogs,c_name,{id}',]
     ];
 
     public function sets()
@@ -41,6 +42,13 @@ class CatalogModel extends BaseModel
     public function features()
     {
         return $this->hasMany('App\Models\Catalog\FeatureModel','catalog_id');
+    }
+
+    public function getAllNameAttribute()
+    {
+        $name = $this->c_name."(".$this->name.")";
+
+        return $name;
     }
 
     public function createCatalog($data,$extra=[])

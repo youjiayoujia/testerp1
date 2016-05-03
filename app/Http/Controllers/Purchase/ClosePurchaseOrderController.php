@@ -78,7 +78,7 @@ class ClosePurchaseOrderController extends Controller
 		$data=request()->all();
 		$items=PurchaseItemModel::where('purchase_order_id',$id)->get();
 		foreach($items as $key=>$v){
-		if($v->status !>2){
+		if($v->status !=2){
 			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未对单采购条目不能结算.'));
 			}
 		}

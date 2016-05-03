@@ -138,8 +138,7 @@ Route::any('purchaseOrderAbnormal/cancelOrder/{id}', 'Purchase\PurchaseOrderAbno
 Route::resource('purchaseOrderAbnormal', 'Purchase\PurchaseOrderAbnormalController');
 //采购入库
 Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController@updateStorage');
-Route::any('/purchaseStockIn/in', 'Purchase\PurchaseStockInController@purchaseStockIn');
-Route::any('purchaseStockIn/generateDarCode/{id}', 'Purchase\PurchaseStockInController@generateDarCode');
+Route::get('/manyStockIn', ['uses' => 'Purchase\PurchaseStockInController@manyStockIn', 'as' => 'manyStockIn']);
 Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 //采购条目
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');

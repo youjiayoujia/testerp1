@@ -53,11 +53,10 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'purchase_order_id');
     }
-	public function getStock($id){
-		$model=$this->find($id);
-		$sum=StockModel::where('item_id',$model->item->id)->sum('all_quantity');
-		return $sum;
-		}
+	 public function stock()
+    {
+        return $this->belongsTo('App\Models\StockModel', 'stock_id');
+    }
 	
 	
 	/*处理异常状态

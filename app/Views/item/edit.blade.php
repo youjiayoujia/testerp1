@@ -69,16 +69,16 @@
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $model->purchase_carriage }}">
         </div>
         <div class="form-group col-md-1">
-            <label for="size">item尺寸</label>
+            <label for="size">尺寸类型</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="产品尺寸" name='product_size' value="{{ old('product_size') ?  old('product_size') : $model->product_size }}">
+            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $model->product_size }}">
         </div>
         <div class="form-group col-md-1">
-            <label for="color">item包装尺寸</label>
+            <label for="color">item包装尺寸（cm）</label>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $model->package_size }}">
         </div>
         <div class="form-group col-md-1">
-            <label for="size">item重量</label>
+            <label for="size">item重量（kg）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
         </div>

@@ -86,4 +86,12 @@ class AccountController extends Controller
 
         return redirect($this->mainIndex);
     }
+
+
+    public function getAccountUser()
+    {
+        $channel_id = request()->input('channel_id');
+        $account = AccountModel::where('channel_id',$channel_id)->get()->toArray();
+        return $account;
+    }
 }

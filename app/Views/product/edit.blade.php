@@ -132,7 +132,7 @@
             <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $product->product_size }}">
         </div>
         <div class="form-group col-md-1">
-            <label for="color">产品包装尺寸(m³)</label>
+            <label for="color">产品包装尺寸(cm)</label>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $product->package_size }}">
         </div>
         <div class="form-group col-md-1">

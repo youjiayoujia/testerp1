@@ -88,11 +88,21 @@
     <div class='row'>
         <div class="form-group col-lg-4">
             <label for="needer_id">需求渠道</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="needer_id" placeholder="需求渠道" name='needer_id' value="{{ old('needer_id') }}">
+                <select  class="form-control" name="needer_id" id="needer_id">
+                    @foreach($channel as $_channel)
+                        <option value="{{ $_channel->id}}">{{$_channel->name}}</option>
+                    @endforeach
+                </select>
+           
         </div>
         <div class="form-group col-lg-4">
             <label for="needer_shop_id">需求帐号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="needer_shop_id" placeholder="需求帐号" name='needer_shop_id' value="{{ old('needer_shop_id') }}">
+                <select  class="form-control" name="needer_shop_id" id="needer_shop_id">
+                    @foreach($channel_account as $_channelAccount)
+                        <option value="{{ $_channelAccount->id}}">{{$_channelAccount->account}}</option>
+                    @endforeach
+                </select>
+            
         </div>
         <div class="form-group col-lg-4">
             <label for="created_by">创建人</label>
@@ -110,6 +120,24 @@
         buf[1] = "{{ old('city') }}";
         init(buf[0],buf[1]);
         $('#expected_date').cxCalendar();
+
+        $("#needer_id").change(function(){
+            var url = "{{route('getAccountUser')}}";
+            var channel_id = $(this).val();
+            $.ajax({
+                    url:url,
+                    data:{channel_id:channel_id},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        html="";
+                        for(i=0;i<result.length;i++){
+                            html+= "<option value="+result[i].id+">"+result[i].account+"</option>"
+                        }
+                        $("#needer_shop_id").html(html);
+                    }                  
+            })
+        })
     });
 </script>
 @stop

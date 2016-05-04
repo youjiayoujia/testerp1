@@ -147,6 +147,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('stock/getMessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'stock.getMessage']);
     Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
 
+
 //采购条目
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
@@ -217,6 +218,7 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::resource('channel', 'ChannelController');
 
   //渠道账号路由
+  Route::any('channelAccount/getAccountUser',['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
   Route::resource('channelAccount', 'Channel\AccountController');
 
 
@@ -374,5 +376,6 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
 
   //用户路由
   Route::resource('user', 'UserController');
+
 
 });

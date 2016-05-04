@@ -483,7 +483,7 @@ class CustomsClearanceModel extends BaseModel
             $clearance['model'] = iconv('gb2312','utf-8',$clearance['model']);
             $clearance['cn_name'] = iconv('gb2312','utf-8',$clearance['cn_name']);
             $clearance['hs_code'] = iconv('gb2312','utf-8',$clearance['hs_code']);
-            $clearance['unit'] = iconv('gb2312','utf-8',$clearance['unit']);
+            $clearance['unit'] = iconv('gb2312','utf-8',str_replace('^', '', $clearance['unit']));
             $clearance['f_model'] = iconv('gb2312','utf-8',$clearance['f_model']);
             $clearance['status'] = iconv('gb2312','utf-8',$clearance['status']);
             if(!ProductModel::where(['model' => $clearance['model']])->count()) {
@@ -529,7 +529,7 @@ class CustomsClearanceModel extends BaseModel
             $clearance['model'] = iconv('gb2312','utf-8',$clearance['model']);
             $clearance['cn_name'] = iconv('gb2312','utf-8',$clearance['cn_name']);
             $clearance['hs_code'] = iconv('gb2312','utf-8',$clearance['hs_code']);
-            $clearance['unit'] = iconv('gb2312','utf-8',$clearance['unit']);
+            $clearance['unit'] = iconv('gb2312','utf-8',str_replace('^', '', $clearance['unit']));
             $clearance['f_model'] = iconv('gb2312','utf-8',$clearance['f_model']);
             if(!ProductModel::where(['model' => $clearance['model']])->count()) {
                 $error[] = $key;

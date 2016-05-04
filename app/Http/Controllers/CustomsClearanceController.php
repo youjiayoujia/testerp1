@@ -233,12 +233,7 @@ class CustomsClearanceController extends Controller
                     ]
             ];
         $name = 'download_tonanjing';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='更新到南京状态';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');
+        $this->exportExcel($rows, '更新到南京状态');
     }
 
     public function downloadOver()
@@ -249,13 +244,7 @@ class CustomsClearanceController extends Controller
                      'is_over'=>'',
                     ]
             ];
-        $name = 'download_over';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='更新海关审结';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');
+        $this->exportExcel($rows, 'download_over');
     }
 
     public function downloadUploadProduct()
@@ -265,17 +254,12 @@ class CustomsClearanceController extends Controller
                      'model'=>'BLOU0302B791C',
                      'cn_name' => '123',
                      'hs_code'=>'6206400090',
-                     'unit'=>'011/035',
+                     'unit'=>'^011/^035',
                      'f_model'=>'织造方法:机织,种类:衬衫,类别:女式,成分含量:100%聚酯纤维,品牌:choies',
                     ]
             ];
         $name = 'upload_product';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='上传三宝产品';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');
+        $this->exportExcel($rows, '上传三宝产品');
     }
 
     public function downloadUpdateProduct()
@@ -285,18 +269,13 @@ class CustomsClearanceController extends Controller
                      'model'=>'BLOU0302B791C',
                      'cn_name' => '123',
                      'hs_code'=>'6206400090',
-                     'unit'=>'011/035',
+                     'unit'=>'^011/^035',
                      'f_model'=>'织造方法:机织,种类:衬衫,类别:女式,成分含量:100%聚酯纤维,品牌:choies',
                      'status' => '1',
                     ]
             ];
         $name = 'update_product';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='更新三宝产品';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');
+        $this->exportExcel($rows, '更新三宝产品');
     }
 
     public function downloadNumber()
@@ -308,11 +287,6 @@ class CustomsClearanceController extends Controller
                     ]
             ];
         $name = 'update_number';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='更新国家number';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
-                $sheet->fromArray($rows);
-            });
-        })->download('csv');
+        $this->exportExcel($rows, '更新国家number');
     }
 }

@@ -128,13 +128,13 @@
         <div class="panel-heading">物流信息 :</div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>item尺寸</strong>: {{ $model->product_size }}
+                <strong>尺寸类型</strong>: {{ $model->product_size }}
             </div>
             <div class="col-lg-3">
-                <strong>item包装尺寸</strong>: {{ $model->package_size }}
+                <strong>item包装尺寸（cm）</strong>: {{ $model->package_size }}
             </div>
             <div class="col-lg-3">
-                <strong>item重量</strong>: {{ $model->weight }}
+                <strong>item重量（kg）</strong>: {{ $model->weight }}
             </div>
             <div class="col-lg-3">
                 <strong>物流限制</strong>: 

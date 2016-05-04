@@ -147,6 +147,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('stock/getMessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'stock.getMessage']);
     Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
 
+
 //采购条目
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
 Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
@@ -191,6 +192,12 @@ Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController
 Route::get('/manyStockIn', ['uses' => 'Purchase\PurchaseStockInController@manyStockIn', 'as' => 'manyStockIn']);
 Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 //采购条目
+Route::any('/purchaseItemList/postExcelReduction', 'Purchase\PurchaseItemListController@postExcelReduction');
+Route::any('/purchaseItemList/excelReductionUpdatePost', 'Purchase\PurchaseItemListController@excelReductionUpdatePost');
+Route::any('/purchaseItemList/excelReductionUpdate', 'Purchase\PurchaseItemListController@excelReductionUpdate');
+Route::any('/purchaseItemList/purchaseItemPriceExcel', 'Purchase\PurchaseItemListController@purchaseItemPriceExcel');
+Route::any('/purchaseItemList/purchaseItemPostExcel', 'Purchase\PurchaseItemListController@purchaseItemPostExcel');
+Route::any('/purchaseItemList/excelReduction', 'Purchase\PurchaseItemListController@excelReduction');
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
 Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
 Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
@@ -217,6 +224,7 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::resource('channel', 'ChannelController');
 
   //渠道账号路由
+  Route::any('channelAccount/getAccountUser',['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
   Route::resource('channelAccount', 'Channel\AccountController');
 
 
@@ -374,5 +382,6 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
 
   //用户路由
   Route::resource('user', 'UserController');
+
 
 });

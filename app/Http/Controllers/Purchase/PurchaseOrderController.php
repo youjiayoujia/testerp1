@@ -103,7 +103,7 @@ class PurchaseOrderController extends Controller
         }
 		$data=request()->all();	
 		if(isset($data['arr'])){
-			if($data['post']){
+			if(isset($data['post'])){
 				$post="";
 				foreach($data['arr'] as $key=>$vo){
 					foreach($data['post'] as $k=>$value){

@@ -13,6 +13,7 @@ namespace App\Http\Controllers;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CurrencyModel;
+use App\Models\ItemModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
@@ -40,6 +41,7 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
+            'items' => ItemModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -158,6 +160,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'orderItems' => $model->orderItem,
+            'packages' => $model->package,
             'model' => $model,
         ];
 
@@ -190,13 +193,14 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $sku = request()->input('sku');
-            $obj = productItem::where(['sku' => $sku])->get();
-            if (count($obj)) {
-                return json_encode('sku');
+            $obj = productItem::where(['sku' => $sku])->first();
+            if (!$obj) {
+                return json_encode(false);
             }
+            $result = $obj->product->image->src;
+            return $result;
         }
-
-        return json_encode('false');
+        return json_encode(false);
     }
 
     /**

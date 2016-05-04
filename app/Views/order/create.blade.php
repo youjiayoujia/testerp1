@@ -541,11 +541,12 @@
                     dataType : 'json',
                     type : 'get',
                     success : function(result) {
-                        if(result != 'sku') {
+                        if(!result) {
                             alert('sku有误');
                             tmp.val('');
                             return;
                         }
+                        $('#image').html("<img src='"+result+"'>");
                     }
                 });
             });

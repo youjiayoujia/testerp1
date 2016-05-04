@@ -203,7 +203,7 @@ class OrderModel extends BaseModel
 
     public function getActiveItemsAttribute()
     {
-        return $this->items->where('status', 1);
+        return $this->items->where('is_active', '1');
     }
 
     public function canPackage()
@@ -216,6 +216,7 @@ class OrderModel extends BaseModel
         if (!in_array($this->status, $this->canPackageStatus)) {
             return false;
         }
+
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
             $this->status = 'ERROR';
@@ -267,7 +268,7 @@ class OrderModel extends BaseModel
                                     $packageItem['quantity'],
                                     'PACKAGE',
                                     $newPackageItem->id);
-                                $newPackageItem->orderItem->ship_status = 'PACKED';
+                                $newPackageItem->orderItem->status = 'PACKED';
                                 $newPackageItem->orderItem->save();
                             } catch (Exception $e) {
                                 DB::rollBack();

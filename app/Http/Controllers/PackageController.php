@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use Tool;
 use Excel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
@@ -23,6 +24,58 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+    }
+
+    public function flow()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'packageNum' => OrderModel::where('active', 'NORMAL')
+                ->whereIn('status', ['PREPARED', 'NEED'])->count(),
+            'assignNum' => $this->model->where('status', 'NEW')->count(),
+            'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
+            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
+        ];
+        return view($this->viewPath . 'workFlow', $response);
+    }
+
+    public function doPackage()
+    {
+        $begin = microtime(true);
+        $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+            ->orderBy('package_times', 'desc')
+            ->get();
+        foreach ($orders as $order) {
+            echo $order->id . '<br>';
+            $order->createPackage();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+    public function assignLogistics()
+    {
+        $begin = microtime(true);
+        $packages = PackageModel::where('status', 'NEW')->where('is_auto', '1')->get();
+        foreach ($packages as $package) {
+            echo $package->id . '<br>';
+            $package->assignLogistics();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+    public function placeLogistics()
+    {
+        $begin = microtime(true);
+        $packages = PackageModel::where('status', 'ASSIGNED')->where('is_auto', '1')->get();
+        foreach ($packages as $package) {
+            echo $package->id . '<br>';
+            $package->placeLogistics();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
     public function create()
@@ -97,7 +150,7 @@ class PackageController extends Controller
     }
 
     /**
-     * 导出手工发货包裹信息 
+     * 导出手工发货包裹信息
      *
      * @param none
      * @return csv
@@ -108,13 +161,13 @@ class PackageController extends Controller
         $str = request()->input('arr');
         $arr = explode('|', $str);
         $rows = '';
-        foreach($arr as $id) {
+        foreach ($arr as $id) {
             $package = $this->model->find($id);
-            if($package->is_auto || (!$package->is_auto && $package->status != 'PROCESSING')) {
+            if ($package->is_auto || (!$package->is_auto && $package->status != 'PROCESSING')) {
                 continue;
             }
             $package->update(['status' => 'PACKED', 'shipper_id' => '2', 'shipped_at' => date('Y-m-d G:i:s', time())]);
-            foreach($package->items as $item) {
+            foreach ($package->items as $item) {
                 $rows[] = [
                     'package  ID' => $id,
                     'sku' => ItemModel::find($item->item_id)->sku,
@@ -124,9 +177,9 @@ class PackageController extends Controller
             }
         }
         $name = 'ManualPackage';
-        Excel::create($name, function($excel) use ($rows){
-            $nameSheet='手工发货包裹';
-            $excel->sheet($nameSheet, function($sheet) use ($rows){
+        Excel::create($name, function ($excel) use ($rows) {
+            $nameSheet = '手工发货包裹';
+            $excel->sheet($nameSheet, function ($sheet) use ($rows) {
                 $sheet->fromArray($rows);
             });
         })->download('csv');
@@ -161,7 +214,7 @@ class PackageController extends Controller
     }
 
     /**
-     * 跳转发货统计页面 
+     * 跳转发货统计页面
      *
      * @param none
      * @return view
@@ -192,7 +245,7 @@ class PackageController extends Controller
     }
 
     /**
-     * 跳转excel页面 
+     * 跳转excel页面
      *
      * @param none
      * @return view
@@ -205,7 +258,7 @@ class PackageController extends Controller
             'action' => route('package.excelProcess'),
         ];
 
-        return view($this->viewPath.'excel', $response);
+        return view($this->viewPath . 'excel', $response);
     }
 
     /**
@@ -216,21 +269,20 @@ class PackageController extends Controller
      */
     public function excelProcess()
     {
-        if(request()->hasFile('excel'))
-        {
-           $file = request()->file('excel');
-           $errors = $this->model->excelProcess($file);
-           $response = [
+        if (request()->hasFile('excel')) {
+            $file = request()->file('excel');
+            $errors = $this->model->excelProcess($file);
+            $response = [
                 'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
             ];
 
-            return view($this->viewPath.'excelResult', $response);
+            return view($this->viewPath . 'excelResult', $response);
         }
     }
-    
+
     /**
-     * 跳转excel页面 
+     * 跳转excel页面
      *
      * @param none
      * @return view
@@ -243,7 +295,7 @@ class PackageController extends Controller
             'action' => route('package.excelProcessFee', ['type' => request('type')]),
         ];
 
-        return view($this->viewPath.'excel', $response);
+        return view($this->viewPath . 'excel', $response);
     }
 
     /**
@@ -254,16 +306,15 @@ class PackageController extends Controller
      */
     public function excelProcessFee($type)
     {
-        if(request()->hasFile('excel'))
-        {
-           $file = request()->file('excel');
-           $errors = $this->model->excelProcessFee($file, $type);
-           $response = [
+        if (request()->hasFile('excel')) {
+            $file = request()->file('excel');
+            $errors = $this->model->excelProcessFee($file, $type);
+            $response = [
                 'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
             ];
 
-            return view($this->viewPath.'excelFeeResult', $response);
+            return view($this->viewPath . 'excelFeeResult', $response);
         }
     }
 }

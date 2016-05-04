@@ -64,8 +64,13 @@ return [
                     'url' => 'ExamineProduct.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '选款产品发布',
+                    'url' => 'dashboard.index',
+                    'icon' => '',
+                ],
             ],
-			 '通关报关' => [
+            '通关报关' => [
                 [
                     'name' => 'home',
                     'url' => 'customsClearance.index',
@@ -79,11 +84,6 @@ return [
                 [
                     'name' => '三宝package',
                     'url' => 'bao3Package.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '中邮运单号列表',
-                    'url' => 'EditProduct.index',
                     'icon' => '',
                 ],
                 [
@@ -250,22 +250,22 @@ return [
                     'url' => 'require.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '采购条目',
-                    'url' => 'purchaseItemList.index',	
+                    'url' => 'purchaseItemList.index',
                     'icon' => '',
-                ],  
-				[
+                ],
+                [
                     'name' => '打印采购单',
                     'url' => 'printPurchaseOrder.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',
                     'icon' => '',
@@ -277,7 +277,7 @@ return [
                 ],
                 [
                     'name' => '采购入库',
-                    'url' => 'purchaseStockIn.index',
+                    'url' => 'purchaseStockIn.create',
                     'icon' => '',
                 ],
                 [

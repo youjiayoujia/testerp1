@@ -11,7 +11,7 @@
         <select id="catalog_id" class="form-control" name="catalog_id">
             <option value="">选择分类</option>
             @foreach($catalogs as $_catalogs)
-                <option value="{{ $_catalogs->id }}">{{ $_catalogs->name }}</option>
+                <option value="{{ $_catalogs->id }}">{{ $_catalogs->all_name }}</option>
             @endforeach
         </select>
     </div>

@@ -36,7 +36,7 @@ class PurchaseItemModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark'];
+    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id'];
 	public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku','sku');
@@ -53,11 +53,10 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'purchase_order_id');
     }
-	public function getStock($id){
-		$model=$this->find($id);
-		$sum=StockModel::where('item_id',$model->item->id)->sum('all_quantity');
-		return $sum;
-		}
+	 public function stock()
+    {
+        return $this->belongsTo('App\Models\StockModel', 'stock_id');
+    }
 	
 	
 	/*处理异常状态

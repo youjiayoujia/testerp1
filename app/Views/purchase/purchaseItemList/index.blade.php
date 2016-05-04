@@ -2,7 +2,7 @@
 @section('tableToolButtons')
  <div class="btn-group">
         <a href="/purchaseItemList/reduction" class="btn btn-info" id="batchexamine">
-             还原采购条目
+             批量处理采购条目
         </a>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -10,7 +10,7 @@
 	
     <th>ID</th>
     <th>Item_ID</th>
-    <th>采购类型</th>
+    <th>采购单ID</th>
     <th>成本审核</th>
     <th>产品图片</th>
     <th>供应商-采购链接</th>
@@ -29,12 +29,7 @@
         <tr>
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->sku}}</td>
-            <td>@foreach(config('purchase.purchaseItem.type') as $k=>$type)
-            	@if($purchaseList->type == $k)
-            	{{ $type }}
-                @endif
-            @endforeach
-           </td>
+            <td>{{ $purchaseList->purchase_order_id}}</td>
            <td>
            @foreach(config('purchase.purchaseItem.costExamineStatus') as $k=>$costExamineStatu)
             	@if($purchaseList->costExamineStatus == $k)
@@ -95,11 +90,6 @@
             <td>
                 <a href="{{ route('purchaseItemList.show', ['id'=>$purchaseList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
-                </a>       
-               
-                 
-                <a href="{{ route('purchaseItemList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 @if($purchaseList->status == 1)
                  <a href="/purchaseItemList/itemReductionUpdate/{{$purchaseList->id}}" class="btn btn-danger btn-xs">

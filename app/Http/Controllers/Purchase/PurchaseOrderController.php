@@ -16,6 +16,7 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Purchase\PurchasePostageModel;
 
 class PurchaseOrderController extends Controller
 {
@@ -60,6 +61,9 @@ class PurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
+			'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
+			'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
         ];
         return view($this->viewPath . 'edit', $response);	
 	}
@@ -97,8 +101,33 @@ class PurchaseOrderController extends Controller
 		if($model->examineStatus !=2){
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
-		$data=request()->all();		
+		$data=request()->all();	
 		if(isset($data['arr'])){
+			if($data['post']){
+				$post="";
+				foreach($data['arr'] as $key=>$vo){
+					foreach($data['post'] as $k=>$value){
+						if($value['post_coding'] == $vo['post_coding']){
+							$purchaseItem=PurchaseItemModel::find($vo['id']);
+							$post[$key]['purchase_item_id']=$vo['id'];
+							$post[$key]['purchase_order_id']=$purchaseItem->purchase_order_id;
+							$post[$key]['post_coding']=$value['post_coding'];
+							$post[$key]['postage']=$value['postage'];
+							}
+						}
+					}
+					if(!empty($post)){
+						foreach($post as $num=>$val){
+							$num=PurchasePostageModel::where('post_coding',$val['post_coding'])->count();
+							if($num==0){
+								PurchasePostageModel::create($val);
+							}else{
+								PurchasePostageModel::where('post_coding',$val['post_coding'])->update(['postage'=>$val['postage']]);
+								}
+							
+							}	
+						}
+				}
 			foreach($data['arr'] as $k=>$v){
 				if($v['id']){
 					$purchaseItem=PurchaseItemModel::find($v['id']);
@@ -116,16 +145,12 @@ class PurchaseOrderController extends Controller
 					}else{
 						$item['costExamineStatus']=0;	
 					}
-					if(!$item['post_coding'] && $item['status'] >0){
-						$item['post_coding']=$data['post_coding'];
-						}
-						if($item['postage']!= $purchaseItem->postage && $item['postage']>0){
-							$data['total_postage']+=$item['postage']-$purchaseItem->postage;
-							}
 					if($item['status']>0){
 						$data['status']=1;
 					}
-					
+					if($item['purchase_num']>0){
+						$data['status']=$item['purchase_num'];
+						}
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
@@ -163,16 +188,7 @@ class PurchaseOrderController extends Controller
 		return redirect($this->mainIndex);
 	}
 	
-	/**
-     * 导出采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function excelOut($id)
-	{
-		$this->model->purchaseOrderExcelOut($id);	
-	}
+	
 	
 	/**
      * 导出采购单
@@ -211,11 +227,16 @@ class PurchaseOrderController extends Controller
      */	
 	public function excelOrderOut($num){
 		if($num==0){
+			$this->model->allPurchaseExcelOut();	
+		}elseif($num==3){
+			
+			}
+		/*if($num==0){
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->distinct('purchase_order_id')->get();
 		}else{
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->where('start_buying_time','<',date('Y-m-d',(time()-3600*24*$num)))->distinct('purchase_order_id')->get();
 		}
-		$this->model->excelOrdersOut($purchaseOrderIds);
+		$this->model->excelOrdersOut($purchaseOrderIds);*/
 			
 	}
 	
@@ -235,6 +256,24 @@ class PurchaseOrderController extends Controller
 		$this->model->destroy($id);
 		return redirect($this->mainIndex);	
 	}
+	
+	/**
+     * 新增产品条目
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+     */
+    public function ajaxPostAdd()
+    {
+        if (request()->input('current')) {
+            $current = request()->input('current');
+            $response = [
+                'current' => $current,
+            ];
+
+            return view($this->viewPath . 'add', $response);
+        }
+        return null;
+    }
 }
 
 

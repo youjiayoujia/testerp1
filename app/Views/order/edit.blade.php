@@ -293,7 +293,7 @@
             <div class="form-group col-lg-2">
                 <label for="shipping_country" class='control-label'>发货国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') ? old('') : $model->shipping_country }}">
+                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') ? old('shipping_country') : $model->shipping_country }}">
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_zipcode" class='control-label'>发货邮编</label>

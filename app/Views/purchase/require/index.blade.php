@@ -33,7 +33,13 @@
                 @endif
             {{ $requireItem->id }}</td>
             <td>{{ $requireItem->sku}}</td>   
-            <td> <img src="{{ $requireItem->item->product->image->src}}" height="50px"/></td>
+            <td>
+             @if($requireItem->item->product->default_image>0)
+             <img src="{{$requireItem->item->product->image->src}}" height="50px"/>
+            @else
+           该图片不存在
+            @endif
+            </td>
             <td>{{$requireItem->item->supplier->name}}</td>
             <td>{{ $requireItem->warehouse->name}}</td>
             <td>{{ $requireItem->order_need_num}}/{{$requireItem->all_quantity}}/{{$requireItem->purchaseing_quantity}}</td>

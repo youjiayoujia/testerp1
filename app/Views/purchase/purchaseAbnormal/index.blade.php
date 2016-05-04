@@ -32,7 +32,13 @@
                 @endif
             @endforeach
             <td>{{ $purchaseItem->order_item_id}}</td>
-            <td> <img src="{{ $purchaseItem->item->product->image->src}}" height="50px"/></td>
+            <td> 
+             @if($purchaseItem->item->product->default_image>0)
+             <img src="{{$purchaseItem->item->product->image->src}}" height="50px"/>
+            @else
+           该图片不存在
+            @endif
+           </td>
             <td>{{ $purchaseItem->supplier->name}}</td>
             <td>{{ $purchaseItem->warehouse->name}}</td>
             <td>{{ $purchaseItem->purchase_num}}/{{ $purchaseItem->arrival_num}}/{{ $purchaseItem->lack_num}}</td>

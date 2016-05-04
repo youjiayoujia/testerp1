@@ -33,7 +33,8 @@
                 @endif
             {{ $requireItem->id }}</td>
             <td>{{ $requireItem->sku}}</td>   
-            <td> @if($requireItem->item->product->image->src)
+            <td>
+             @if($requireItem->item->product->default_image>0)
              <img src="{{$requireItem->item->product->image->src}}" height="50px"/>
             @else
            该图片不存在

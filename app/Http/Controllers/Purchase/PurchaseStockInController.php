@@ -37,42 +37,13 @@ class PurchaseStockInController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status',2)->orderBy('storageStatus', 'desc')),
+            'data' => $this->autoList($this->model->where('storageStatus','>',0)),
         ];
         return view($this->viewPath . 'index', $response);
     }
 	
-	/**
-     * 对单界面
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function edit($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-        ];
-        return view($this->viewPath . 'edit', $response);
-    }
-	/**
-     * 对单界面
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function purchaseStockIn()
-    {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-        return view($this->viewPath . 'stockIn', $response);
-    }
+	 
+	 
 	/**
      * 批量入库
      *
@@ -86,7 +57,14 @@ class PurchaseStockInController extends Controller
 			$data['storage_qty']=1;
 		}
 		$purchaseItemList=$this->model->where('sku',$data['sku'])->where('status','2')->orderby('storageStatus')->get();
-		
+		$storage_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('lack_num');
+		if($storage_num == 0){
+			if($data['storageInType']==1){
+			return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+			}else{
+				return redirect('manyStockIn')->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+			}
+		}
 		foreach($purchaseItemList as $key=>$vo){
 			if($vo->bar_code){
 			if($data['storageInType']==1){
@@ -119,113 +97,40 @@ class PurchaseStockInController extends Controller
 				}
 			}
 		}
-					
+				if($data['storage_qty'] == 0){
+					return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
+					}	
 				$this->model->find($vo->id)->update($storage);
 				$stoeagelog['user_id']=1;
 				$stoeagelog['purchaseItemId']=$vo->id;
 				if($stoeagelog['storage_quantity']>0){
 				StorageLogModel::create($stoeagelog);
-				}
-				if($data['storage_qty'] == 0){
-					break;
-					}
-				
+				$stock=StockModel::find($vo->stock_id);
+				ItemModel::find($vo->item->id)->in($stock->warehouse_position_id,$stoeagelog['storage_quantity'], $vo->purchase_cost*$stoeagelog['storage_quantity'], "PURCHASE",$vo->id, $remark = '订单采购入库！');
+				}			
 			}
 	
        $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-        return view($this->viewPath . 'stockIn', $response);
-    }
-	/**
-     * 单件入库
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function update($id)
-	{
-		$data=request()->all();
-		$model=$this->model->find($id);
 		if($data['storageInType']==1){
-			if((1+$model->storage_qty) < $model->purchase_num){
-				$storage['storage_qty']=$model->storage_qty+1;
-				$storage['storageStatus']=1;
-			}elseif((1+$model->storage_qty) == $model->purchase_num){
-				$storage['storage_qty']=$model->storage_qty+1;
-				$storage['storageStatus']=2;
-				}else{
-					return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '入库数量大于了所需数量.'));	
-					}
-			}else{
-				if(($data['storage_qty']+$model->storage_qty) < $model->purchase_num){
-					$storage['storage_qty']=$data['storage_qty']+$model->storage_qty;
-					$storage['storageStatus']=1;
-				}elseif(($data['storage_qty']+$model->storage_qty) == $model->purchase_num){
-					$storage['storage_qty']=$data['storage_qty']+$model->storage_qty;
-					$storage['storageStatus']=2;
-				}else{
-					return redirect($this->mainIndex)->with('alert', $this->alert('danger', '入库数量大于了所需数量.'));
-					}
-				}		
-		$model->update($storage);
-        return redirect($this->mainIndex);		
-	}
-
-	/**
-     * 生成条码
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	public function generateDarCode($id){
-		$model=$this->model->find($id);
-		$res=InModel::where('relation_id',$id)->count();			
-		if($res>0){
-			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '已生成条码.'));		
-		}else{
-			$stock_num=StockModel::where('warehouse_id',$model->warehouse_id)->where('item_id',$model->item->id)->count();
-			if($stock_num>0){
-				$res=StockModel::where('warehouse_id',$model->warehouse_id)->where('item_id',$model->item->id)->get();
-				foreach($res as $key=>$v){
-					$stockInIds[$key]=$v->id;
-				}
-				$randKey=array_rand($stockInIds,1);
-				$stock=StockModel::find($stockInIds[$randKey]);
-				ItemModel::find($model->item->id)->in($stock->warehouse_position_id,$model->arrival_num, $model->purchase_cost*$model->purchase_num, 0,$model->id, $remark = '订单采购！');
-				$sku=$model->sku;
-				$warehouse_position_id=$stock->warehouse_position_id;
-				$data['bar_code']=$sku.'#'.$warehouse_position_id;
-				$model->update($data);
-			}else{
-				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
-				if(count($position)==0){
-					return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此仓库暂时没有库位.'));	
-				}
-					foreach($position as $key=>$v){
-						$WarehousePositionIds[$key]=$v->id;
-					}
-				$randKey=array_rand($WarehousePositionIds,1);
-				$stockData['warehouse_id']=$model->warehouse_id;
-				$stockData['item_id']=$model->item->id;
-				$stockData['warehouse_position_id']=$WarehousePositionIds[$randKey];
-				$stockData['all_quantity']=$model->arrival_num;
-				$stockData['hold_quantity']=$model->arrival_num;
-				$stockData['amount']=$model->purchase_cost;
-				$stockCreate=StockModel::create($stockData);
-				$stockId=$stockCreate->id;
-				ItemModel::find($model->item->id)->in($stockData['warehouse_position_id'],$model->arrival_num, $model->purchase_cost*$model->purchase_num, 0,$model->id, $remark = '订单采购！');
-				$position=PositionModel::find($WarehousePositionIds[$randKey]);
-				$sku=$model->sku;
-				$warehouse_position_id=$stockData['warehouse_position_id'];
-				$data['bar_code']=$sku.'#'.$warehouse_position_id;
-				$model->update($data);
-			}
+        return view($this->viewPath . 'create', $response);
+   		}else{
+		return view($this->viewPath . 'stockIn', $response);
 		}
-		return redirect($this->mainIndex);
-	}
-	
+		}
+	/**
+     * 多件入库界面
+     *
+     * 
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+ 	public function manyStockIn(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		return view($this->viewPath . 'stockIn', $response);
+		}
 }
 
 

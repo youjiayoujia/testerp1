@@ -16,10 +16,10 @@ class CreateProducts extends Migration
             $table->increments('id');
             $table->string('model')->comment('model')->nullable()->default(NULL);
             $table->integer('spu_id')->comment('spu_id')->nullable()->default(0);
-            $table->string('name')->comment('中文名')->nullable()->default(NUll);
-            $table->string('c_name')->comment('英文名')->nullable()->default(NUll);
-            $table->string('alias')->comment('别名')->nullable()->default(NULL);
-            $table->string('alias_cname')->comment('别名英文')->nullable()->default(NUll);
+            $table->string('name')->comment('英文名')->nullable()->default(NUll);
+            $table->string('c_name')->comment('中文名')->nullable()->default(NUll);
+            $table->string('alias_name')->comment('别名英文')->nullable()->default(NULL);
+            $table->string('alias_cname')->comment('别名中文')->nullable()->default(NUll);
             $table->integer('catalog_id')->comment('分类id')->nullable()->default(0);
             $table->integer('supplier_id')->comment('供应商id')->nullable()->default(0);
             $table->string('supplier_sku')->comment('供应商sku')->nullable()->default(NUll);

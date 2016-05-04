@@ -64,8 +64,13 @@ return [
                     'url' => 'ExamineProduct.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '选款产品发布',
+                    'url' => 'dashboard.index',
+                    'icon' => '',
+                ],
             ],
-			 '通关报关' => [
+            '通关报关' => [
                 [
                     'name' => 'home',
                     'url' => 'customsClearance.index',
@@ -73,17 +78,17 @@ return [
                 ],
                 [
                     'name' => '三宝产品',
-                    'url' => 'product.index',
+                    'url' => 'customsClearance.bao3index',
                     'icon' => '',
                 ],
                 [
                     'name' => '三宝package',
-                    'url' => 'SelectProduct.index',
+                    'url' => 'bao3Package.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '中邮运单号列表',
-                    'url' => 'EditProduct.index',
+                    'name' => '国家Number信息',
+                    'url' => 'countries.index',
                     'icon' => '',
                 ],
             ],
@@ -164,6 +169,16 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => 'hold库存',
+                    'url' => 'stockHold.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'unhold库存',
+                    'url' => 'stockUnhold.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '库存调整',
                     'url' => 'stockAdjustment.index',
                     'icon' => '',
@@ -235,22 +250,22 @@ return [
                     'url' => 'require.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '采购条目',
-                    'url' => 'purchaseItemList.index',	
+                    'url' => 'purchaseItemList.index',
                     'icon' => '',
-                ],  
-				[
+                ],
+                [
                     'name' => '打印采购单',
                     'url' => 'printPurchaseOrder.index',
                     'icon' => '',
                 ],
-				[
+                [
                     'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',
                     'icon' => '',
@@ -262,7 +277,7 @@ return [
                 ],
                 [
                     'name' => '采购入库',
-                    'url' => 'purchaseStockIn.index',
+                    'url' => 'purchaseStockIn.create',
                     'icon' => '',
                 ],
                 [

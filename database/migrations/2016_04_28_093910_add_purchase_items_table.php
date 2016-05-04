@@ -3,20 +3,19 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddItemIsSale extends Migration
+class AddPurchaseItemsTable extends Migration
 {
-    /**
+   /**
      * Run the migrations.
      *
      * @return void
      */
     public function up()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->tinyInteger('is_sale')->comment('是否可售')->nullable()->default(1)->after('status');
+        Schema::table('purchase_items', function (Blueprint $table) {
+            $table->integer('stock_id')->nullable()->after('bar_code');
         });
     }
-
     /**
      * Reverse the migrations.
      *
@@ -24,8 +23,8 @@ class AddItemIsSale extends Migration
      */
     public function down()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->dropColumn(['is_sale']);
+        Schema::table('purchase_items', function (Blueprint $table) {
+            $table->dropColumn(['stock_id']);
         });
     }
 }

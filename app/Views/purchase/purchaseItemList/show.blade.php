@@ -39,10 +39,6 @@
             </div> 
             </div>
             <div class="row">
-             <div class="form-group col-lg-4">
-            <label >参考价格:</label>
-            {{$model->item->product->purchase_price}}
-            </div>
             <div class="form-group col-lg-4">
                     <label >成本价格:</label>
                     {{$model->purchase_cost}}
@@ -52,6 +48,10 @@
                 <strong>采购数量/已到数量/仍需采购数量</strong>:
               	{{$model->purchase_num}}/{{$model->arrival_num}}/{{$model->lack_num}}
             </div>
+           <div class="form-group col-lg-4">
+            <strong>入库数量</strong>
+            {{$model->storage_qty}}
+            </div>
             </div>
             <div class="row">
             <div class="form-group col-lg-4">
@@ -60,6 +60,32 @@
             </div>
             </div>
         </div>
+    </div>
+    
+    <div class="panel panel-default">
+    <div class="panel-heading">入库日志</div>
+    <div class="panel-body">
+    <table class="table table-bordered table-striped table-hover sortable">
+    <thead>
+        <tr>
+            <td>ID</td>
+            <td>入库数量</td> 
+            <td>入库人</td> 
+            <td>入库时间</td>          
+        </tr>
+    </thead>
+    <tbody>
+    @foreach($storageLogs as $k=>$storageLog)
+     <tr>
+        <td>{{$storageLog->id}}</td> 
+        <td>{{$storageLog->storage_quantity}}</td> 
+        <td>{{$storageLog->user_id}}</td> 
+        <td>{{$storageLog->created_at}}</td>          
+     </tr>
+     @endforeach
+    </tbody>
+    </table>
+    </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">日志信息</div>

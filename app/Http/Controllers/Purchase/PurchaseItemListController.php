@@ -19,6 +19,7 @@ use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\Stock\InModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Purchase\StorageLogModel;
 
 class PurchaseItemListController extends Controller
 {
@@ -45,7 +46,7 @@ class PurchaseItemListController extends Controller
     }
 	
 	/**
-     * 对单界面
+     * 产看界面
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -61,6 +62,26 @@ class PurchaseItemListController extends Controller
             'model' => $model,
         ];
         return view($this->viewPath . 'edit', $response);
+    }
+	
+	/**
+     * 编辑界面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+			'storageLogs'=>StorageLogModel::where('purchaseItemId',$id)->get(),
+        ];
+        return view($this->viewPath . 'show', $response);
     }
 	
 	/**
@@ -93,7 +114,7 @@ class PurchaseItemListController extends Controller
 		}
 		
 	/**
-     * 批量还原采购需求
+     * 批量更改采购需求状态
      *
      * 
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -103,13 +124,20 @@ class PurchaseItemListController extends Controller
 		$updateIds=explode('#',$data['purchaseItemIds']);
 		$items=$this->model->find($updateIds);
 		foreach($items as $key=>$item){
-			if($item->status == 1){
-				$item->update(['status'=>0]);
-			}
-			$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
-			if($orderItemNum ==0){
-				PurchaseOrderModel::where('id',$item->purchase_order_id)->update(['status'=>0]);	
+			if($data['status'] == 0){
+				if($item->status == 1){
+					$item->update(['status'=>0]);
 				}
+				$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
+				if($orderItemNum ==0){
+					PurchaseOrderModel::where('id',$item->purchase_order_id)->update(['status'=>0]);	
+				}
+			}elseif($data['status'] == 1){
+				if($item->status == 0){
+					$item->update(['status'=>1]);
+				}			
+				PurchaseOrderModel::where('id',$item->purchase_order_id)->where('examineStatus',2)->update(['status'=>1]);	
+			}
 		}
 		return redirect($this->mainIndex);
 	}

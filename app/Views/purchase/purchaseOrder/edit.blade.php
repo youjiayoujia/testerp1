@@ -4,13 +4,21 @@
  <input type="hidden" name="_method" value="PUT"/>
  <input type="hidden" name="update_userid" value="2"/>
  <input type="hidden" name="total_purchase_cost" value="0"/>
-        <div class="panel-heading">单头</div>
-        <div class="panel-body">
+        <div class="row">
          <div class="form-group col-lg-4">
                 <strong>标题: choies公司向 {{$model->supplier->name}} 采购单</strong>
             </div>
-           
+            <div class="form-group col-lg-4">
+                <strong>采购单ID</strong>: {{ $model->id }}
+            </div>
              <div class="form-group col-lg-4">
+                <strong>订单成本:
+                物流费{{$purchaseSumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{$purchaseSumPostage + $model->total_purchase_cost}}</strong>
+            </div>
+             
+            </div>
+           <div class="row">
+           <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
                 {{ $model->warehouse->name}}
             </div>
@@ -18,10 +26,7 @@
                 <strong>仓库地址</strong>:
                 {{ $model->warehouse->province}}{{ $model->warehouse->city}}{{ $model->warehouse->address}}
             </div>
-            
-             <div class="form-group col-lg-4">
-                <strong>采购单ID</strong>: {{ $model->id }}
-            </div>
+             
              <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:
                 名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
@@ -32,10 +37,9 @@
                 	线下采购
                 @endif
             </div>
-            <div class="form-group col-lg-4">
-                <strong>订单成本</strong>:
-                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}
+           
             </div>
+           <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购单状态</strong>:
                @foreach(config('purchase.purchaseOrder.status') as $k=>$val)
@@ -45,14 +49,7 @@
             	@endforeach
             </div> 
             
-         <div class="form-group col-lg-4">
-            <strong>采购单运单号</strong>:
-                <input class="form-control" type="text" name='post_coding' value='{{$model->post_coding}}'/>
-            </div>
-         <div class="form-group col-lg-4">
-            <strong>采购单运费</strong>:
-                <input class="form-control" type="text" name='total_postage' value='{{$model->total_postage}}'/>
-            </div>  
+        
             <div class="form-group col-lg-4">
             	<strong>导出该订单</strong>:
                 @if($model->supplier->type==1)
@@ -63,23 +60,37 @@
                 </a>
                 @endif     
             </div> 
+             <div class="form-group col-lg-4">
+            	<strong>取消采购单</strong>:
+                	<a href="/purchaseOrder/cancelOrder/{{$model->id}}" class="btn btn-info btn-xs"> 取消该采购单</a>  
+            </div>
+             </div>
+           <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
                 <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
             </div>
+             <div class="form-group col-lg-4">
+                <strong>批量输入采购单:(在此输入物流单号则本页面采购条目列表的物流号全部跟新为输入的物流号)</strong>
+                <input class="form-control" type="text" id="batch_post_coding" onChange="batchPostCoding()" value=''/>		
+            </div>
             <div class="form-group col-lg-4">
             	<strong>采购单结算</strong>:
-                 @if($model->close_status ==0)
-                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算改采购单
+                 @if($model->close_status ==0 && $model->status >1)
+                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算该采购单
                 </a>
                 @else
+                @if($model->close_status ==1)
                 已结算
+                @else
+                未结算
+                @endif 
                 @endif  
-            </div>        
-        </div>
+            </div>
+                   
+      </div>
 
      <div class="panel panel-default">
-        <div class="panel-heading">单身</div>
         <div class="panel-body">
         <div class="row">
          <div class="form-group col-lg-4">
@@ -96,7 +107,7 @@
             <td>供货商sku</td> 
             <td>样图</td>
             <td>状态</td>
-            <td>物流单号+物流费</td>
+            <td>物流单号</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>所属平台</td>
@@ -117,7 +128,7 @@
                 @endforeach
             </td>
             <td>{{$purchaseItem->item->product->model}}</td>
-            <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
+            <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
             <td>{{$purchaseItem->item->supplier_sku}}</td>   
             <td>
             @if($purchaseItem->item->product->default_image>0) 
@@ -137,8 +148,7 @@
             </select>  
              </td>
             <td>
-            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}"  name="arr[{{$k}}][post_coding]"/>
-            物流费：<input type="text" value="{{$purchaseItem->postage}}"  name="arr[{{$k}}][postage]" style="width:50px"/>
+            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" id="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
             </td>
             <td>
               <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
@@ -281,4 +291,72 @@
     </table>
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">产品信息</div>
+        <div class="panel-body" id="itemDiv">
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label'>物流号</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div> 
+                 <div class="form-group col-sm-2">
+                    <label for="sku" class='control-label'>物流费</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>             
+            </div>       
+            <div class='row'>
+             @foreach($purchasePostage as $key=>$post)
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control post_coding" id="post[{{$key}}][post_coding]" name='post[{{$key}}][post_coding]' value="{{$post->post_coding}}">
+                </div>
+               
+                <div class="form-group col-sm-1">
+                    <input type='text' class="form-control postage" id="post[{{$key}}][postage]" placeholder="物流费" name='post[{{$key}}][postage]' value="{{$post->postage}}">
+                </div>
+                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+                 @endforeach
+                 	@if($current>0)
+                    <input type="hidden" id="currrent" value="{{$current}}">
+                    @else
+                    <input type="hidden" id="currrent" value="1">
+                    @endif
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
+        </div>
+    </div> 
+@stop
+@section('pageJs')
+    <script type='text/javascript'>
+	//批量输入采购单号
+	function batchPostCoding(){
+		 var batch_post_coding=$('#batch_post_coding').val();
+		 $("#itemPostCoding").val(batch_post_coding);
+		}
+		//新增物流号对应物流费
+        $(document).ready(function () {
+            var current = $('#currrent').val();
+            $('#addItem').click(function () {
+                $.ajax({
+                    url: "{{ route('postAdd') }}",
+                    data: {current: current},
+                    dataType: 'html',
+                    type: 'get',
+                    success: function (result) {
+                        $('#itemDiv').append(result);
+                    }
+                });
+                current++;
+            });
+
+ 			$(document).on('click', '.bt_right', function () {
+				if(current >1) {
+                $(this).parent().remove();
+                current--; 
+                }
+            });
+           
+        });
+    </script>
 @stop

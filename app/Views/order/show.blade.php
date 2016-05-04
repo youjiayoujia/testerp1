@@ -200,10 +200,10 @@
                 <div class="col-lg-2"><strong>备注</strong></div>
                 <div class="col-lg-2"><strong>发货状态</strong></div>
             </div>
-            @foreach($orderItems as $orderItem)
+            @foreach($orderItems as $key => $orderItem)
                 <div class="row">
                     <div class="col-lg-2">{{ $orderItem->sku }}</div>
-                    <div class="col-lg-2">{{ $orderItem->image }}</div>
+                    <div class="col-lg-2"><img src="/{{ $arr[$key] }}" width="25px" height="25px"></div>
                     <div class="col-lg-1">{{ $orderItem->quantity }}</div>
                     <div class="col-lg-1">{{ $orderItem->price }}</div>
                     <div class="col-lg-1">{{ $orderItem->is_active_name }}</div>

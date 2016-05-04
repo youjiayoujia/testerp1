@@ -15,6 +15,7 @@ use App\Models\ChannelModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
 use App\Models\OrderModel;
+use App\Models\product\ImageModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
 
@@ -86,6 +87,18 @@ class OrderController extends Controller
     public function edit($id)
     {
         $model = $this->model->find($id);
+        $arr = [];
+        foreach($model->orderItem as $orderItem)
+        {
+            $arr[] = $orderItem->sku;
+        }
+        foreach($arr as $key => $value) {
+            $obj = productItem::where(['sku' => $value])->first();
+            if ($obj) {
+                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                $arr[$key] = $image;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -94,7 +107,9 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
+            'items' => ItemModel::all(),
             'aliases' => $model->channel->channelAccount,
+            'arr' => $arr,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -157,11 +172,24 @@ class OrderController extends Controller
     public function show($id)
     {
         $model = $this->model->find($id);
+        $arr = [];
+        foreach($model->orderItem as $orderItem)
+        {
+            $arr[] = $orderItem->sku;
+        }
+        foreach($arr as $key => $value) {
+            $obj = productItem::where(['sku' => $value])->first();
+            if ($obj) {
+                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                $arr[$key] = $image;
+            }
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'orderItems' => $model->orderItem,
             'packages' => $model->package,
             'model' => $model,
+            'arr' => $arr,
         ];
 
         return view($this->viewPath . 'show', $response);
@@ -194,11 +222,13 @@ class OrderController extends Controller
         if (request()->ajax()) {
             $sku = request()->input('sku');
             $obj = productItem::where(['sku' => $sku])->first();
-            if (!$obj) {
+            if ($obj) {
+                $result = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                return json_encode($result);
+            }else{
                 return json_encode(false);
             }
-            $result = $obj->product->image->src;
-            return $result;
+
         }
         return json_encode(false);
     }

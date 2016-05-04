@@ -127,7 +127,7 @@
 
         $(document).on('blur', '.warehouse_position_id', function(){
             tmp = $(this);
-            warehouse_id = $('#warehous_id').val();
+            warehouse_id = $('#warehouse_id').val();
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();

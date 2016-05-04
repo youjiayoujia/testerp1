@@ -112,6 +112,10 @@ class AdjustmentController extends Controller
             $buf['stock_adjustment_id'] = $obj->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
+            if($buf['type'] == 'OUT') {
+                $item = ItemModel::find($buf['item_id']);
+                $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ADJUSTMENT', $obj->id);
+            }
             AdjustFormModel::create($buf);
         }
 
@@ -252,8 +256,7 @@ class AdjustmentController extends Controller
     {
         $result = request('result');
         $obj = $this->model->find($id);
-        if($result) {       
-            
+        if($result) {
             $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']); 
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
@@ -268,7 +271,7 @@ class AdjustmentController extends Controller
                         $item->in($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['amount'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
                     } else {
                         $tmp['type'] = 'ADJUSTMENT';
-                        $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
+                        $item->holdout($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
                     }
                 }
             } catch (Exception $e) {

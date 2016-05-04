@@ -48,7 +48,6 @@ class PackageModel extends BaseModel
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id');
-
     }
 
     public function items()

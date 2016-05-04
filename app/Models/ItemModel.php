@@ -245,6 +245,7 @@ class ItemModel extends BaseModel
             }
             return $result;
         }
+
         return false;
     }
 

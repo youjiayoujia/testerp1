@@ -57,7 +57,7 @@ class OutModel extends BaseModel
                 return $this->stockTaking ? $this->stockTaking->taking_id : '';
                 break;
             case 'PACKAGE':
-                return $this->packageItem ? $this->packageItem->package->order->ordernum . ' : ' . $this->packageItem->package->id : '';
+                return $this->packageItem ? (($this->packageItem->package ? $this->packageItem->package->order ? $this->packageItem->package->order->ordernum : '' : ''). ' : ' . $this->packageItem->package ? $this->packageItem->package->id : '') : '';
                 break;
         }
     }

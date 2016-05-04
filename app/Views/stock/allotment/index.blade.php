@@ -52,7 +52,7 @@
                     审核调拨单
                 </a>
                 @endif
-                @if($allotment->check_status == '2' && $allotment->allotment_status == 'new')
+                @if($allotment->check_status == '2')
                 <a href="{{ route('allotment.pick', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>生成拣货单
                 </a>

@@ -105,7 +105,7 @@ class StockController extends Controller
             return json_encode($obj->available_quantity);
         }
         if(StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->count() < 2) {
-            return json_encode('0');
+            return json_encode(true);
         } else {
             return json_encode(false);
         }

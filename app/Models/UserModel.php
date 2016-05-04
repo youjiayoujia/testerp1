@@ -54,4 +54,17 @@ class UserModel extends BaseModel implements AuthenticatableContract,
     {
         return $this->belongsToMany('App\Models\UserModel', 'channel_account_user', 'channel_account_id', 'user_id');
     }
+
+    public function role()
+    {
+        return $this->belongsToMany('App\Models\RoleModel', 'user_roles', 'user_id', 'role_id');
+    }
+
+    public function hasRole() {
+        echo 85858;exit;
+      if(is_string($role)){
+          return $this->roles->contains('name', $role);
+      }
+      return !!$role->intersect($this->roles)->count();
+    }
 }

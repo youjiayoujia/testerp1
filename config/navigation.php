@@ -78,17 +78,17 @@ return [
                 ],
                 [
                     'name' => '三宝产品',
-                    'url' => 'product.index',
+                    'url' => 'customsClearance.bao3index',
                     'icon' => '',
                 ],
                 [
                     'name' => '三宝package',
-                    'url' => 'SelectProduct.index',
+                    'url' => 'bao3Package.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '中邮运单号列表',
-                    'url' => 'EditProduct.index',
+                    'name' => '国家Number信息',
+                    'url' => 'countries.index',
                     'icon' => '',
                 ],
             ],

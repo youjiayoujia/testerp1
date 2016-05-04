@@ -219,6 +219,7 @@ class StockModel extends BaseModel
     public function holdout($quantity, $type, $relation_id, $remark)
     {
         $this->hold_quantity -= $quantity;
+        $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
             throw new Exception('unhold时，hold数量为负了');
         }

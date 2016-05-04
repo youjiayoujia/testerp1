@@ -204,12 +204,12 @@ class PackageController extends Controller
         if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update([
-            'status' => 'SHIPPED',
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => '2',
-            'actual_weight' => $weight
-        ]);
+        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
+        foreach($package->items as $packageitem)
+        {
+            $packageitem->orderItem->update(['status' => 'SHIPPED']);
+        }
+
         return json_encode(true);
     }
 

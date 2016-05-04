@@ -140,7 +140,7 @@
                     type:'get',
                     success:function(result){
                         if(result == false) {
-                            alert('库位超过两个或库存不存在');
+                            alert('库位超过两个||库存或库位不存在');
                             tmp.val('');
                             return;
                         }
@@ -202,7 +202,7 @@
                             }
                         }
                         if(type == 'IN') {
-                            block.find('.position_html').html("<input type='text' name='"+position_name+"' class='form-control' placeholder='库位'>");
+                            block.find('.position_html').html("<input type='text' name='"+position_name+"' class='form-control warehouse_position_id' placeholder='库位'>");
                             block.find('.access_quantity').val('');
                             block.find('.quantity').val('');
                             block.find('.unit_cost').val('');

@@ -94,4 +94,14 @@ class RequireModel extends BaseModel
     {
         return $this->belongsTo('App\Models\CatalogModel', 'catalog_id', 'id');
     }
+
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'needer_id', 'id');
+    }
+
+    public function channelAccount()
+    {
+        return $this->belongsTo('App\Models\Channel\AccountModel', 'needer_shop_id', 'id');
+    }
 }

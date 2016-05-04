@@ -110,6 +110,9 @@ class PurchaseAbnormalController extends Controller
 				}
 		}
         $model->update($data);
+		if($model->active==1 && $data['active_status']==2){
+			$this->model->destroy($id);
+			}
         return redirect($this->mainIndex);
     }
 

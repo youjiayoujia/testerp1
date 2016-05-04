@@ -157,6 +157,12 @@ Route::any('/purchaseStockIn/updateStorage', 'Purchase\PurchaseStockInController
 Route::get('/manyStockIn', ['uses' => 'Purchase\PurchaseStockInController@manyStockIn', 'as' => 'manyStockIn']);
 Route::resource('purchaseStockIn', 'Purchase\PurchaseStockInController');
 //采购条目
+Route::any('/purchaseItemList/postExcelReduction', 'Purchase\PurchaseItemListController@postExcelReduction');
+Route::any('/purchaseItemList/excelReductionUpdatePost', 'Purchase\PurchaseItemListController@excelReductionUpdatePost');
+Route::any('/purchaseItemList/excelReductionUpdate', 'Purchase\PurchaseItemListController@excelReductionUpdate');
+Route::any('/purchaseItemList/purchaseItemPriceExcel', 'Purchase\PurchaseItemListController@purchaseItemPriceExcel');
+Route::any('/purchaseItemList/purchaseItemPostExcel', 'Purchase\PurchaseItemListController@purchaseItemPostExcel');
+Route::any('/purchaseItemList/excelReduction', 'Purchase\PurchaseItemListController@excelReduction');
 Route::any('/purchaseItemList/reduction', 'Purchase\PurchaseItemListController@purchaseItemReduction');
 Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
 Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');

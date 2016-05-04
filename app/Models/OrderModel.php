@@ -285,6 +285,7 @@ class OrderModel extends BaseModel
                 foreach ($this->active_items as $item) {
                     $require = [];
                     $require['item_id'] = $item->item_id;
+                    $require['warehouse_id'] = 1;
                     $require['order_item_id'] = $item->id;
                     $require['sku'] = $item->sku;
                     $require['quantity'] = $item->quantity;

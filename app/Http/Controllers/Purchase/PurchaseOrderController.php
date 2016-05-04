@@ -229,7 +229,7 @@ class PurchaseOrderController extends Controller
 		if($num==0){
 			$this->model->allPurchaseExcelOut();	
 		}elseif($num==3){
-			
+			$this->model->noArrivalOut();
 			}
 		/*if($num==0){
 			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->distinct('purchase_order_id')->get();

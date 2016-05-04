@@ -98,7 +98,7 @@ class PurchaseOrderModel extends BaseModel
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	
-	public function excelOrdersOut()
+	public function noArrivalOut()
 	{
 		$name='采购单';
 		$assigner=12;
@@ -111,23 +111,24 @@ class PurchaseOrderModel extends BaseModel
 			$supplier_address=$vo->supplier->address;
 			$rows[$key]['PurcahseOrderID']=$vo->purchase_order_id;
 			$rows[$key]['PurchaseItemID']=$vo->id;
-			$rows[$key]['status']=config("purchase.purchaseItem.status.".$vo->status);
-			$rows[$key]['sku']=$vo->sku;
+			$rows[$key]['status']=mb_convert_encoding(config("purchase.purchaseItem.status.".$vo->status), 'gb2312', 'utf-8');
+			$rows[$key]['sku']=mb_convert_encoding("大傻逼", 'gb2312', 'utf-8');
 			$rows[$key]['purchase_qty']=$vo->purchase_num;
 			$rows[$key]['purchase_price']=$vo->purchase_cost;
-			$rows[$key]['item_name']=iconv("UTF-8", "gb2312" ,"'".$vo->item->product->c_name."'");
+			$rows[$key]['item_name']=mb_convert_encoding($vo->item->product->c_name, 'gb2312', 'utf-8');
 			$rows[$key]['supplier_SKU']=$vo->item->supplier_sku;
 			$rows[$key]['remark']=$vo->remark;
-			$rows[$key]['supplier_name']=iconv("UTF-8", "gb2312" ,"'".$vo->supplier->name."'");
+			$rows[$key]['supplier_name']=mb_convert_encoding($vo->supplier->name, 'gb2312', 'utf-8');
 			$rows[$key]['supplier_link']='http://'.$vo->supplier->url;
-			$rows[$key]['purchas_address']=iconv("UTF-8", "gb2312" ,"'".$supplier_province.$supplier_city.$supplier_address."'");
-			$rows[$key]['user_id']=iconv("UTF-8", "gb2312" ,$vo->user_id);
+			//$rows[$key]['purchas_address']=iconv( "gb2312" ,"UTF-8",$supplier_province.$supplier_city.$supplier_address);
+			$rows[$key]['user_id']=$vo->user_id;
 			$rows[$key]['supplier_telephone']=$vo->supplier->telephone;
 			$rows[$key]['tracking']=$vo->post_coding;
 			$rows[$key]['model']=$vo->item->product->model;
-			$rows[$key]['assigner']=iconv("UTF-8", "gb2312" ,$vo->purchaseOrder->assigner);
+			$rows[$key]['assigner']=$vo->purchaseOrder->assigner;
 			$rows[$key]['create_time']=$vo->created_at;
 		}
+		//var_dump($rows);exit;
 		Excel::create($name, function($excel) use ($rows) {
 			$nameSheet='采购单';
 			$excel->sheet($nameSheet, function($sheet) use ($rows) {

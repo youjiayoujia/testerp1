@@ -30,6 +30,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\PackageModel', 'package_id');
     }
 
+    public function stockOut()
+    {
+        return $this->hasOne('App\Models\Stock\OutModel', 'relation_id', 'id');
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id');

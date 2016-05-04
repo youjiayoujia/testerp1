@@ -309,6 +309,7 @@ class OrderModel extends BaseModel
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
         }
+
         return $packageItem;
     }
 

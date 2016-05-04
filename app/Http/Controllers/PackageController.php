@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use Tool;
 use Excel;
+use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
@@ -24,6 +25,25 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+    }
+
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'edit', $response);
     }
 
     public function flow()
@@ -101,6 +121,27 @@ class PackageController extends Controller
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
         }
+    }
+
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        foreach($model->items as $packageItem) {
+            $stockout = $packageItem->stockout;
+            $stock = StockModel::find($stockout->stock_id);
+            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
+        }
+        $model->destroy($id);
+        return redirect($this->mainIndex);
     }
 
     public function ajaxGetOrder()

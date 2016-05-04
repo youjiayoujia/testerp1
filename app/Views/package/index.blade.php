@@ -25,7 +25,7 @@
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
-            <td>{{ $package->status }}</td>
+            <td>{{ $package->status_name }}</td>
             <td>{{ $package->type }}</td>
             <td>{{ $package->logistics ? $package->logistics->short_code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>

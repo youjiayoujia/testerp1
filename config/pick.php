@@ -11,6 +11,7 @@
             ],
 
         'package' => [
+            'NEW' => 'NEW',
             'PROCESSING' => '处理中',
             'PICKING' => '拣货中',
             'PICKED' => '已拣货',

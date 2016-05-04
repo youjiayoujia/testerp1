@@ -378,7 +378,9 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['allotment_status'=>'pick']);
+        if($model->allotment_status == 'new') {
+            $model->update(['allotment_status'=>'pick']);
+        }
         $allotmentforms = AllotmentFormModel::where('stock_allotment_id', $id)->orderBy('warehouse_position_id')->get();
         $response = [
             'metas' => $this->metas(__FUNCTION__),

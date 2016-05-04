@@ -26,24 +26,56 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    public function flow()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'packageNum' => OrderModel::where('active', 'NORMAL')
+                ->whereIn('status', ['PREPARED', 'NEED'])->count(),
+            'assignNum' => $this->model->where('status', 'NEW')->count(),
+            'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
+            'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
+        ];
+        return view($this->viewPath . 'workFlow', $response);
+    }
+
     public function doPackage()
     {
-        $logistics = new LogisticsModel;
-        $result = $logistics->assign(1);
-        Tool::show($result);
+        $begin = microtime(true);
+        $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+            ->orderBy('package_times', 'desc')
+            ->get();
+        foreach ($orders as $order) {
+            echo $order->id . '<br>';
+            $order->createPackage();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
 
+    public function assignLogistics()
+    {
+        $begin = microtime(true);
+        $packages = PackageModel::where('status', 'NEW')->where('is_auto', '1')->get();
+        foreach ($packages as $package) {
+            echo $package->id . '<br>';
+            $package->assignLogistics();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
 
-//        $begin = microtime(true);
-//        $orders = OrderModel::where('active', 'NORMAL')
-//            ->whereIn('status', ['PREPARED', 'NEED'])
-//            ->orderBy('package_times', 'desc')
-//            ->get();
-//        foreach ($orders as $order) {
-//            echo $order->id . '<br>';
-//            $order->createPackage();
-//        }
-//        $end = microtime(true);
-//        echo '耗时' . round($end - $begin, 3) . '秒';
+    public function placeLogistics()
+    {
+        $begin = microtime(true);
+        $packages = PackageModel::where('status', 'ASSIGNED')->where('is_auto', '1')->get();
+        foreach ($packages as $package) {
+            echo $package->id . '<br>';
+            $package->placeLogistics();
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
     public function create()
@@ -172,12 +204,12 @@ class PackageController extends Controller
         if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update([
-            'status' => 'SHIPPED',
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => '2',
-            'actual_weight' => $weight
-        ]);
+        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
+        foreach($package->items as $packageitem)
+        {
+            $packageitem->orderItem->update(['status' => 'SHIPPED']);
+        }
+
         return json_encode(true);
     }
 

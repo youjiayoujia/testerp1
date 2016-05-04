@@ -44,4 +44,10 @@ class ItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id');
     }
+
+    public function getModelNameAttribute()
+    {
+        $item = $this->item;
+        return $item->product ? $item->product->id : '';
+    }
 }

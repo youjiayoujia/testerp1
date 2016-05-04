@@ -21,11 +21,11 @@
         <tr>
        		
             <td>{{ $purchaseOrder->id }}</td> 
-            @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
+           <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
-            	<td>{{ $statu }}</td>
+            	{{ $statu }}
                 @endif
-            @endforeach 
+            @endforeach </td>
             @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
             	@if($purchaseOrder->examineStatus == $k)
             	<td>{{ $statu }}</td>
@@ -37,12 +37,12 @@
             @endif
             </td>
             <td>{{ $purchaseOrder->warehouse->name}}</td>
-             @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
+            <td> @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
             	@if($purchaseOrder->close_status == $k)
-            	<td>{{ $close_statu}}</td>
+            	{{ $close_statu}}
                 @endif
             @endforeach
-                    
+             </td>       
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">

@@ -37,29 +37,12 @@ class PurchaseStockInController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status',2)->orderBy('storageStatus', 'desc')),
+            'data' => $this->autoList($this->model->where('storageStatus','>',0)),
         ];
         return view($this->viewPath . 'index', $response);
     }
 	
-	/**
-     * 对单界面
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function edit($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-        ];
-        return view($this->viewPath . 'edit', $response);
-    }
+	 
 	 
 	/**
      * 批量入库
@@ -76,7 +59,11 @@ class PurchaseStockInController extends Controller
 		$purchaseItemList=$this->model->where('sku',$data['sku'])->where('status','2')->orderby('storageStatus')->get();
 		$storage_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('lack_num');
 		if($storage_num == 0){
+			if($data['storageInType']==1){
 			return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+			}else{
+				return redirect('manyStockIn')->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+			}
 		}
 		foreach($purchaseItemList as $key=>$vo){
 			if($vo->bar_code){
@@ -126,9 +113,24 @@ class PurchaseStockInController extends Controller
        $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-        return view($this->viewPath . 'stockIn', $response);
-    }
- 
+		if($data['storageInType']==1){
+        return view($this->viewPath . 'create', $response);
+   		}else{
+		return view($this->viewPath . 'stockIn', $response);
+		}
+		}
+	/**
+     * 多件入库界面
+     *
+     * 
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+ 	public function manyStockIn(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		return view($this->viewPath . 'stockIn', $response);
+		}
 }
 
 

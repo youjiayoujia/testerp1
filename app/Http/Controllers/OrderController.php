@@ -140,7 +140,7 @@ class OrderController extends Controller
         }
         unset($data['arr']);
         $this->model->find($id)->update($data);
-        foreach ($data['items'] as $item) {
+        foreach ($data['items'] as $key1 => $item) {
             $obj = productItem::where('sku', $item['sku'])->get();
             if (!count($obj)) {
                 $item['item_id'] = 0;
@@ -149,8 +149,10 @@ class OrderController extends Controller
                 $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
             }
             $orderItems = $this->model->find($id)->items;
-            foreach($orderItems as $orderItem) {
-                $orderItem->update($item);
+            foreach($orderItems as $key2 => $orderItem) {
+                if($key1 == $key2) {
+                    $orderItem->update($item);
+                }
             }
         }
 

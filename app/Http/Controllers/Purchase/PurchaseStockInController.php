@@ -57,7 +57,10 @@ class PurchaseStockInController extends Controller
 			$data['storage_qty']=1;
 		}
 		$purchaseItemList=$this->model->where('sku',$data['sku'])->where('status','2')->orderby('storageStatus')->get();
-		$storage_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('storage_qty');
+		$arrival_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('arrival_num');
+		$storage_qty=$this->model->where('sku',$data['sku'])->where('status','2')->sum('storage_qty');
+		$storage_num=$arrival_num-$storage_qty;
+		//echo $arrival_num;echo ','.$storage_num;exit;
 		if($storage_num == 0){
 			if($data['storageInType']==1){
 			return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
@@ -97,9 +100,6 @@ class PurchaseStockInController extends Controller
 				}
 			}
 		}
-				if($data['storage_qty'] == 0){
-					return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
-					}	
 				$this->model->find($vo->id)->update($storage);
 				$stoeagelog['user_id']=1;
 				$stoeagelog['purchaseItemId']=$vo->id;

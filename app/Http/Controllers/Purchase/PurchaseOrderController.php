@@ -312,7 +312,11 @@ class PurchaseOrderController extends Controller
 			];
 		return view($this->viewPath.'waitTime',$response);	
 	}
-	
+	/**
+	* 添加报等时间
+	*
+	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+	*/
 	public function updateItemWaitTime($id){
 		$data=request()->all();
 		$purchaseItem=purchaseItemModel::find($id);

@@ -23,7 +23,7 @@
             <td>{{ $account->account }}</td>
             <td>{{ $account->alias }}</td>
             <td>{{ $account->channel->name }}</td>
-            <td>{{ $account->country->name }}</td>
+            <td>{{ $account->country->cn_name }}</td>
             <td>{{ $account->domain }}</td>
             <td>{{ $account->service_email }}</td>
             <td>{{ $account->order_prefix }}</td>

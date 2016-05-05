@@ -26,7 +26,7 @@
             <td>{{ $package->order ? $package->order->ordernum : '' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->status_name }}</td>
-            <td>{{ $package->type }}</td>
+            <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->logistics ? $package->logistics->short_code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->logistics_assigned_at }}</td>

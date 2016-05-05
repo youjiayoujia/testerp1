@@ -115,7 +115,6 @@ Route::group(['middleware' => 'auth'], function () {
 
     //采购条目
 Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
-Route::any('/purchaseItem/activeCreate', 'Purchase\PurchaseItemController@activeCreate');
 Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}', 'Purchase\PurchaseItemController@costExamineStatus');
 Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
 //采购需求
@@ -124,7 +123,9 @@ Route::resource('require', 'Purchase\RequireController');
 //未结算订单
 Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
-//采购单
+//采购单e
+Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
+Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
 Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
 Route::any('/purchaseOrder/addItem/{id}', 'Purchase\PurchaseOrderController@addItem');
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');

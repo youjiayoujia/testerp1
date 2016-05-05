@@ -300,8 +300,25 @@ class PurchaseOrderController extends Controller
 		PurchaseItemModel::create($data);
 		return redirect( route('purchaseOrder.edit', $id));	
 		}
-
-
+	/**
+	* 添加报等时间页面
+	*
+	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+	*/
+	public function updateWaitTime($id){
+		$response = [
+				'metas' => $this->metas(__FUNCTION__),
+				'purchase_item_id'=>$id,
+			];
+		return view($this->viewPath.'waitTime',$response);	
+	}
+	
+	public function updateItemWaitTime($id){
+		$data=request()->all();
+		$purchaseItem=purchaseItemModel::find($id);
+		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time']]);
+		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
+		}
 }
 
 

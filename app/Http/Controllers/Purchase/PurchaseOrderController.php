@@ -148,9 +148,7 @@ class PurchaseOrderController extends Controller
 					if($item['status']>0){
 						$data['status']=1;
 					}
-					if($item['purchase_num']>0){
-						$data['status']=$item['purchase_num'];
-						}
+					
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;

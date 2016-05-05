@@ -30,7 +30,13 @@
                 @endif
             @endforeach 
             
-            	<td><img src="{{ $purchaseItem->item->product->image->src}}" height="50px"/></td>
+            	<td>
+                 @if($purchaseItem->item->product->default_image>0)
+             <img src="{{$purchaseItem->item->product->image->src}}" height="50px"/>
+            @else
+           该图片不存在
+            @endif
+                </td>
               <td>{{ $purchaseItem->purchase_order_id }}</td> 
               <td>{{ $purchaseItem->purchaseOrder->assigner}}</td>       
     		<td>

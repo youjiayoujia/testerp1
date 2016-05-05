@@ -57,7 +57,7 @@ class PurchaseStockInController extends Controller
 			$data['storage_qty']=1;
 		}
 		$purchaseItemList=$this->model->where('sku',$data['sku'])->where('status','2')->orderby('storageStatus')->get();
-		$storage_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('lack_num');
+		$storage_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('storage_qty');
 		if($storage_num == 0){
 			if($data['storageInType']==1){
 			return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));

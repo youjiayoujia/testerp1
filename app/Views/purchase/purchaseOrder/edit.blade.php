@@ -75,17 +75,10 @@
                 <input class="form-control" type="text" id="batch_post_coding" onChange="batchPostCoding()" value=''/>		
             </div>
             <div class="form-group col-lg-4">
-            	<strong>采购单结算</strong>:
-                 @if($model->close_status ==0 && $model->status >1)
-                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算该采购单
+            	<strong>为该采购单添加新采购条目</strong>:
+                	<a href="/purchaseOrder/addItem/{{$model->id}}" class="btn btn-info btn-xs"> 添加
                 </a>
-                @else
-                @if($model->close_status ==1)
-                已结算
-                @else
-                未结算
-                @endif 
-                @endif  
+               
             </div>
                    
       </div>
@@ -148,7 +141,7 @@
             </select>  
              </td>
             <td>
-            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" id="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
+            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
             </td>
             <td>
               <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
@@ -187,12 +180,8 @@
                 正常
                 @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
-            @elseif($purchaseItem->active > 1)
-             @foreach(config('purchase.purchaseItem.active') as $key=>$v)
-             	@if($key ==$purchaseItem->active)
-            	{{$v}}
-            	@endif
-             @endforeach
+            @elseif($purchaseItem->active == 2)
+             报等<a href="/purchaseItem/updateWaitTime">添加报等时间</a>
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @else
             <select name="arr[{{$k}}][active]}">
@@ -304,8 +293,9 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
             </div>       
-            <div class='row'>
+           
              @foreach($purchasePostage as $key=>$post)
+              <div class='row'>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control post_coding" id="post[{{$key}}][post_coding]" name='post[{{$key}}][post_coding]' value="{{$post->post_coding}}">
                 </div>
@@ -314,13 +304,14 @@
                     <input type='text' class="form-control postage" id="post[{{$key}}][postage]" placeholder="物流费" name='post[{{$key}}][postage]' value="{{$post->postage}}">
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-                 @endforeach
+                </div>
+                 @endforeach 
                  	@if($current>0)
                     <input type="hidden" id="currrent" value="{{$current}}">
                     @else
                     <input type="hidden" id="currrent" value="1">
                     @endif
-            </div>
+           
         </div>
         <div class="panel-footer">
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
@@ -332,7 +323,7 @@
 	//批量输入采购单号
 	function batchPostCoding(){
 		 var batch_post_coding=$('#batch_post_coding').val();
-		 $("#itemPostCoding").val(batch_post_coding);
+		 $(".itemPostCoding").val(batch_post_coding);
 		}
 		//新增物流号对应物流费
         $(document).ready(function () {

@@ -160,6 +160,8 @@ Route::resource('require', 'Purchase\RequireController');
 Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
 //采购单
+Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
+Route::any('/purchaseOrder/addItem/{id}', 'Purchase\PurchaseOrderController@addItem');
 Route::any('purchaseOrder/changeExamineStatus/{id}/{examinStatus}', 'Purchase\PurchaseOrderController@changeExamineStatus');
 Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
 Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');

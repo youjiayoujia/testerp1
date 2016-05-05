@@ -181,7 +181,12 @@
                 @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @elseif($purchaseItem->active == 2)
-             报等<a href="/purchaseItem/updateWaitTime">添加报等时间</a>
+             报等
+             @if($purchaseItem->wait_time)
+             {{$purchaseItem->wait_time}}
+            @else
+            <a href="/purchaseOrder/updateWaitTime/{{$purchaseItem->id}}">添加报等时间</a>
+            @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @else
             <select name="arr[{{$k}}][active]}">

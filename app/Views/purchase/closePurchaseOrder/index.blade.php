@@ -18,16 +18,16 @@
         <tr>
        		
             <td>{{ $purchaseOrder->id }}</td> 
-            @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
+            <td>@foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
-            	<td>{{ $statu }}</td>
+            	{{ $statu }}
                 @endif
-            @endforeach 
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
+            @endforeach </td>
+           <td> @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
             	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
+            	{{ $statu }}
                 @endif
-            @endforeach     
+            @endforeach   </td>  
     		<td>
             @if($purchaseOrder->supplier_id >0)
             	{{ $purchaseOrder->supplier->name}}

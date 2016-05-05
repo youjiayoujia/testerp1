@@ -123,6 +123,21 @@ class PackageController extends Controller
         }
     }
 
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $model->update(request()->all());
+        $arr = explode(' ', request('name'));
+        $model->update(['shipping_firstname' => array_key_exists('0', $arr) ? $arr['0'] : '', 'shipping_lastname'=>array_key_exists('1', $arr) ? $arr['1'] : '']);
+
+        return redirect($this->mainIndex);
+    }
+
     /**
      * 删除
      *
@@ -139,6 +154,7 @@ class PackageController extends Controller
             $stockout = $packageItem->stockout;
             $stock = StockModel::find($stockout->stock_id);
             $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
+            $packageItem->delete();
         }
         $model->destroy($id);
         return redirect($this->mainIndex);

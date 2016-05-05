@@ -20,15 +20,15 @@
                 </div>
                 <div class="col-lg-2">
                     <label>状态</label>
-                    <input type='text' class='form-control' name='status' value="{{ $model->status }}">
+                    <input type='text' class='form-control' value="{{ $model->status }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>类型</label>
-                    <input type='text' class='form-control' name='type' value="{{ $model->type }}">
+                    <input type='text' class='form-control' value="{{ $model->type }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>仓库</label>
-                    <input type='text' class='form-control' name='warehouse_id' value="{{ $model->warehouse->name }}">
+                    <input type='text' class='form-control' value="{{ $model->warehouse->name }}" readonly>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th>图片</th>
                     <th>SKU</th>
                     <th>库位</th>
                     <th>数量</th>
@@ -49,11 +49,11 @@
                 <tbody>
                 @foreach($model->items as $item)
                     <tr>
-                        <td></td>
-                        <td><input type='text' class='form-control' name='sku' value="{{ old('sku') ? old('sku') : $item->item->sku }}">{{ $item->item->sku }}</td>
-                        <td><input type='text' class='form-control' name='warehouse_position_id' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : $item->warehousePosition->name }}"></td>
-                        <td><input type='text' class='form-control' name='quantity' value="{{ old('quantity') ? old('quantity') : $item->quantity }}"></td>
-                        <td><input type='text' class='form-control' name='remark' value="{{ old('remark') ? old('remark') : $item->remark }}"></td>
+                        <td><img src="{{ asset($item->item->image) }}" width="100" readonly></td>
+                        <td><input type='text' class='form-control' value="{{ old('sku') ? old('sku') : $item->item->sku }}" readonly></td>
+                        <td><input type='text' class='form-control' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : $item->warehousePosition->name }}" readonly></td>
+                        <td><input type='text' class='form-control' value="{{ old('quantity') ? old('quantity') : $item->quantity }}" readonly></td>
+                        <td><input type='text' class='form-control' value="{{ old('remark') ? old('remark') : $item->remark }}" readonly></td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -76,15 +76,15 @@
             <div class="row">
                 <div class="col-lg-2">
                     <label>物流方式</label>
-                    <input type='text' class='form-control' name='logistics' value="{{ old('logistics') ? old('logistics') : $model->logistics ? $model->logistics->short_code : '' }}">
+                    <input type='text' class='form-control' value="{{ old('logistics') ? old('logistics') : $model->logistics ? $model->logistics->short_code : '' }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>物流单号</label>
-                    <input type='text' class='form-control' name='tracking_no' value="{{ old('tracking_no') ? old('tracking_no') : $model->tracking_no }}">
+                    <input type='text' class='form-control' value="{{ old('tracking_no') ? old('tracking_no') : $model->tracking_no }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>查询地址</label>
-                    <input type='text' class='form-control' name='tracking_link' value="{{ old('tracking_link') ? old('tracking_link') : $model->tracking_link }}">
+                    <input type='text' class='form-control' value="{{ old('tracking_link') ? old('tracking_link') : $model->tracking_link }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>物流成本</label>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="col-lg-2">
                     <label>体积</label>
-                    <input type='text' class='form-control' name='volumn' value="{{ old('volumn') ? old('volumn') : $model->length.'cm*'.$model->width.'cm*'.$model->height.'cm' }}">
+                    <input type='text' class='form-control' value="{{ old('volumn') ? old('volumn') : $model->length.'cm*'.$model->width.'cm*'.$model->height.'cm' }}" readonly>
                 </div>
             </div>
         </div>
@@ -107,7 +107,7 @@
             <div class="row">
                 <div class="col-lg-3">
                     <label>姓名</label>
-                    <input type='text' class='form-control' name='name' value="{{ old('name') ? old('name') : $model->shipping_lastname.$model->shipping_firstname }}">
+                    <input type='text' class='form-control' name='name' value="{{ old('name') ? old('name') : $model->shipping_firstname.' '.$model->shipping_lastname }}">
                 </div>
                 <div class="col-lg-3">
                     <label>地址</label>

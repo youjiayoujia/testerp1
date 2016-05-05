@@ -20,11 +20,11 @@
                 </div>
                 <div class="col-lg-2">
                     <label>状态</label>
-                    <input type='text' class='form-control' value="{{ $model->status }}" readonly>
+                    <input type='text' class='form-control' value="{{ $model->status_name }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>类型</label>
-                    <input type='text' class='form-control' value="{{ $model->type }}" readonly>
+                    <input type='text' class='form-control' value="{{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>仓库</label>
@@ -76,15 +76,19 @@
             <div class="row">
                 <div class="col-lg-2">
                     <label>物流方式</label>
-                    <input type='text' class='form-control' value="{{ old('logistics') ? old('logistics') : $model->logistics ? $model->logistics->short_code : '' }}" readonly>
+                    <select name='logistics_id' class='form-control'>
+                        @foreach($logisticses as $logistics)
+                            <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : ''}}>{{ $logistics->short_code }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-lg-2">
                     <label>物流单号</label>
-                    <input type='text' class='form-control' value="{{ old('tracking_no') ? old('tracking_no') : $model->tracking_no }}" readonly>
+                    <input type='text' class='form-control' name='tracking_no' value="{{ old('tracking_no') ? old('tracking_no') : $model->tracking_no }}">
                 </div>
                 <div class="col-lg-2">
                     <label>查询地址</label>
-                    <input type='text' class='form-control' value="{{ old('tracking_link') ? old('tracking_link') : $model->tracking_link }}" readonly>
+                    <input type='text' class='form-control' name='tracking_link' value="{{ old('tracking_link') ? old('tracking_link') : $model->tracking_link }}">
                 </div>
                 <div class="col-lg-2">
                     <label>物流成本</label>

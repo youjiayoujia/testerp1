@@ -42,6 +42,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'logisticses' => LogisticsModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -155,6 +156,7 @@ class PackageController extends Controller
             $stock = StockModel::find($stockout->stock_id);
             $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
             $packageItem->delete();
+            $stockout->delete();
         }
         $model->destroy($id);
         return redirect($this->mainIndex);

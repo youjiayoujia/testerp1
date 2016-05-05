@@ -220,13 +220,13 @@
             @foreach($packages as $package)
                 <div class="row">
                     <div class="col-lg-3">
-                        <strong>包裹ID</strong> : {{ $package->id }}
+                        <strong>包裹ID</strong> : <a href="http://erp.jinjidexiaoxuesheng.com/package/{{$package->id}}">{{ $package->id }}</a>
                     </div>
                     <div class="col-lg-3">
                         <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
                     </div>
                     <div class="col-lg-3">
-                        <strong>追踪号</strong> : {{ $package->tracking_no }}
+                        <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                     </div>
                     <div class="col-lg-3">
                         <strong>包裹状态</strong> : {{ $package->status }}
@@ -241,7 +241,7 @@
                         <strong>交付时间</strong> : {{ $package->delivered_at }}
                     </div>
                     <div class="col-lg-3">
-                        <strong>妥投时效</strong> : {{ $package->delivered_time }}
+                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
                     </div>
                     <div class="col-lg-3">
                         <strong>备注</strong> : {{ $package->remark }}

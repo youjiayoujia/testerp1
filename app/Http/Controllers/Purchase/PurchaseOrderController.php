@@ -131,7 +131,7 @@ class PurchaseOrderController extends Controller
 			foreach($data['arr'] as $k=>$v){
 				if($v['id']){
 					$purchaseItem=PurchaseItemModel::find($v['id']);
-					$itemPurchasePrice=$purchaseItem->item->product->purchase_price;
+					$itemPurchasePrice=$purchaseItem->item->purchase_price;
 					$purchase_num=$purchaseItem->purchase_num;
 					foreach($v as $key=>$vo){
 						$item[$key]=$vo;	
@@ -231,13 +231,6 @@ class PurchaseOrderController extends Controller
 		}elseif($num==3){
 			$this->model->noArrivalOut();
 			}
-		/*if($num==0){
-			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->distinct('purchase_order_id')->get();
-		}else{
-			$purchaseOrderIds=PurchaseItemModel::select('purchase_order_id')->where('status','>',0)->where('start_buying_time','<',date('Y-m-d',(time()-3600*24*$num)))->distinct('purchase_order_id')->get();
-		}
-		$this->model->excelOrdersOut($purchaseOrderIds);*/
-			
 	}
 	
 	/**
@@ -258,7 +251,7 @@ class PurchaseOrderController extends Controller
 	}
 	
 	/**
-     * 新增产品条目
+     * ajax	新增物流单号物流费
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
      */
@@ -274,6 +267,58 @@ class PurchaseOrderController extends Controller
         }
         return null;
     }
+	/**
+     * 新增产品条目
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+     */
+	
+	public function addItem($id)
+	{
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'purchase_order_id'=>$id,
+        ];
+		return view($this->viewPath.'addItem',$response);
+	}
+	/**
+     * 创建采购条目
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+     */
+	public function createItem($id){
+		$data=request()->all();
+		$model=$this->model->find($id);
+		$num=PurchaseItemModel::where('purchase_order_id',$id)->where('sku',$data['sku'])->count();
+		if($num==0){
+			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该sku不存在此订单中.'));
+		}
+		$data['lack_num']=$data['purchase_num'];
+		$data['warehouse_id']=$model->warehouse_id;
+		$data['supplier_id']=$model->supplier_id;
+		$data['purchase_order_id']=$id;
+		PurchaseItemModel::create($data);
+		return redirect( route('purchaseOrder.edit', $id));	
+		}
+	/**
+	* 添加报等时间页面
+	*
+	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+	*/
+	public function updateWaitTime($id){
+		$response = [
+				'metas' => $this->metas(__FUNCTION__),
+				'purchase_item_id'=>$id,
+			];
+		return view($this->viewPath.'waitTime',$response);	
+	}
+	
+	public function updateItemWaitTime($id){
+		$data=request()->all();
+		$purchaseItem=purchaseItemModel::find($id);
+		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time']]);
+		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
+		}
 }
 
 

@@ -11,7 +11,7 @@
 namespace App\Models\Logistics;
 
 use App\Base\BaseModel;
-use App\Models\CountryModel;
+use App\Models\CountriesModel;
 
 class RuleModel extends BaseModel
 {
@@ -62,7 +62,7 @@ class RuleModel extends BaseModel
     {
         $str = '';
         foreach(explode(",", $country) as $value) {
-            $countries = CountryModel::where(['abbreviation' => $value])->get();
+            $countries = CountriesModel::where(['abbreviation' => $value])->get();
             foreach($countries as $country) {
                 $val = $country['name'];
                 $str = $str.$val.',';

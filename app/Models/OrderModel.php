@@ -179,6 +179,11 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
 
+    public function package()
+    {
+        return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
+    }
+
     public function requires()
     {
         return $this->hasMany('App\Models\RequireModel', 'order_id');

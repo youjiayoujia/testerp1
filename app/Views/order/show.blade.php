@@ -214,7 +214,6 @@
             @endforeach
         </div>
     </div>
-
     <div class="panel panel-default">
         <div class="panel-heading">包裹信息</div>
         <div class="panel-body">
@@ -224,10 +223,25 @@
                         <strong>包裹ID</strong> : {{ $package->id }}
                     </div>
                     <div class="col-lg-3">
+                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
+                    </div>
+                    <div class="col-lg-3">
+                        <strong>追踪号</strong> : {{ $package->tracking_no }}
+                    </div>
+                    <div class="col-lg-3">
                         <strong>包裹状态</strong> : {{ $package->status }}
                     </div>
                     <div class="col-lg-3">
-                        <strong>物流方式</strong> : {{ $package->logistics->logistics_type }}
+                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
+                    </div>
+                    <div class="col-lg-3">
+                        <strong>发货时间</strong> : {{ $package->shipped_at }}
+                    </div>
+                    <div class="col-lg-3">
+                        <strong>交付时间</strong> : {{ $package->delivered_at }}
+                    </div>
+                    <div class="col-lg-3">
+                        <strong>妥投时效</strong> : {{ $package->delivered_time }}
                     </div>
                     <div class="col-lg-3">
                         <strong>备注</strong> : {{ $package->remark }}
@@ -236,7 +250,6 @@
             @endforeach
         </div>
     </div>
-
     <div class="panel panel-default">
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">

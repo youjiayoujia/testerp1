@@ -21,7 +21,7 @@ class ZoneController extends Controller
     {
         $this->model = $zoneModel;
         $this->mainIndex = route('logisticsZone.index');
-        $this->mainTitle = '物流';
+        $this->mainTitle = '物流分区';
         $this->viewPath = 'logistics.zone.';
     }
 

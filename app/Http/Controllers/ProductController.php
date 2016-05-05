@@ -29,14 +29,14 @@ class ProductController extends Controller
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
-        $this->viewPath = 'product.';echo '<pre>';
-        /*if (Gate::denies('default')) {
-            echo 111222;exit;
-        }*/
-
-        if (Gate::denies('product_admin','product|show')) {
+        $this->viewPath = 'product.';
+        if (Gate::denies('check','product_admin,product_staff|show')) {
             echo "没有权限";exit;
         }
+
+        /*if (Gate::denies('product_admin','product|show')) {
+            echo "没有权限";exit;
+        }*/
     }
 
     public function create()

@@ -35,8 +35,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         parent::registerPolicies($gate);
 
-        $user = new UserModel();
-        $user = $user->find(14);
+        //$user = new UserModel();
+        //$user = $user->find(14);
 
         /*$gate->define('default', function ($user){
             $this->users = $user;
@@ -44,7 +44,8 @@ class AuthServiceProvider extends ServiceProvider
         });*/
             
         //print_r($this->users);exit;
-        foreach($user->role as $role){
+        //循环权限
+        /*foreach($user->role as $role){
             $gate->define($role->role, function ($user, $post){
                 foreach($user->role as $role){
                     //print_r(explode('|',$post)[0]);exit;
@@ -59,25 +60,27 @@ class AuthServiceProvider extends ServiceProvider
                     }
                 }
             });   
-        }
-        /*$gate->define('default', function ($user, $post){
+        }*/
+        //去找权限
+        $gate->define('check', function ($user, $post){
+
+            $post_array = explode('|', $post);//print_r($post_array);
+            $role_array = explode(',', $post_array[0]);
+            //print_r($role_array);exit;  
             foreach($user->role as $role){
-                $gate->define($role->role, function ($user, $post){
-                    foreach($user->role as $role){
-                    //print_r(explode('|',$post)[0]);exit;
-                    if(explode('_',$role->role)[0]==explode('|',$post)[0]){
-                        //echo '<pre>';print_r($role->permission);exit;
-                        foreach($role->permission as $permission){
-                            //echo $permission->action;
-                            if($permission->action==explode('|',$post)[1]){
-                                return true;
-                            }
+                if(in_array($role->role, $role_array)){
+                    //echo '<pre>';
+                    //print_r($role);
+                    foreach($role->permission as $permission){echo $permission->action;
+                        if(in_array($permission->action, $post_array)){//echo 111;exit;
+                            return true;
                         }
                     }
-                    }
-                });  
-            }
-        });*/
+                }
+            }//exit;
+        });
+
+
     }
 }
 

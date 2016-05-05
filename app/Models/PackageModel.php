@@ -106,7 +106,7 @@ class PackageModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('pick.package');
+        $arr = config('package');
         return $arr[$this->status];
     }
 

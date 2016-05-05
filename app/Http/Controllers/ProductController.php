@@ -15,6 +15,7 @@ use App\Models\WrapLimitsModel;
 use App\Models\ChannelModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use Gate;
 
 class ProductController extends Controller
 {
@@ -28,11 +29,21 @@ class ProductController extends Controller
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
-        $this->viewPath = 'product.';
+        $this->viewPath = 'product.';echo '<pre>';
+        /*if (Gate::denies('default')) {
+            echo 111222;exit;
+        }*/
+
+        if (Gate::denies('product_admin','product|show')) {
+            echo "没有权限";exit;
+        }
     }
 
     public function create()
     {
+        if (Gate::denies('product_admin','product|add')) {
+            echo "没有权限";exit;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -52,6 +63,9 @@ class ProductController extends Controller
      */
     public function store()
     {
+        if (Gate::denies('product_admin','product|add')) {
+            echo "没有权限";exit;
+        }
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $this->model->createProduct(request()->all(),request()->files);
@@ -67,6 +81,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
+        if (Gate::denies('product_admin','product|edit')) {
+            echo "没有权限";exit;
+        }
         $variation_value_id_arr = [];
         $features_value_id_arr  = [];
         $features_input = [];
@@ -110,6 +127,9 @@ class ProductController extends Controller
      */
     public function update($id)
     {
+        if (Gate::denies('product_admin','product|edit')) {
+            echo "没有权限";exit;
+        }
         request()->flash();
         $this->validate(request(), $this->model->rules('update',$id));
         $productModel = $this->model->find($id);

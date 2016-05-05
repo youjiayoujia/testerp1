@@ -12,6 +12,9 @@ use App\Models\Product\SupplierModel;
 use App\Models\CurrencyModel;
 use App\Models\Product\ImageModel;
 use App\Http\Controllers\Controller;
+use Gate;
+use App\User;
+//use App\Post;
 
 class EditProductController extends Controller
 {
@@ -35,6 +38,9 @@ class EditProductController extends Controller
      */
     public function index()
     {
+        if (Gate::denies('product_admin','product|show')) {
+            echo "没有权限";exit;
+        }
         $response = [
             'metas' => $this->metas('index'),
             'data' => $this->autoList($this->product, $this->product->where('edit_status','!=','canceled')->where('edit_status','!=','')),

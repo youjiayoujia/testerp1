@@ -138,7 +138,11 @@ class PurchaseItemListController extends Controller
 					$item->update(['status'=>1]);
 				}			
 				PurchaseOrderModel::where('id',$item->purchase_order_id)->where('examineStatus',2)->update(['status'=>1]);	
-			}
+			}elseif($data['status'] == 3){
+				if($item->status < 2 ){
+					$item->destroy($item->id);
+				}
+				}
 		}
 		return redirect($this->mainIndex);
 	}

@@ -4,7 +4,7 @@
     <input type="hidden" name="user_id" value="1">
     <div class="row"> 
     <div class="form-group col-lg-4">
-        <label class='control-label'>批量输入SKU:</label>
+        <label class='control-label'>批量输入SKU:</label>（批量输入sku各之间用#隔开）
         <textarea name="sku" rows="4" cols="50" autofocus>
         </textarea>
          

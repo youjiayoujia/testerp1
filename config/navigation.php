@@ -113,7 +113,7 @@ return [
             ],
             [
                 'name' => '黑名单',
-                'url' => 'dashboard.index',
+                'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
         ],

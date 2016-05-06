@@ -337,6 +337,8 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::resource('order', 'OrderController');
   Route::resource('orderItem', 'Order\ItemController');
   Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
+  Route::resource('orderBlacklist', 'Order\BlacklistController');
+  Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
 
   //包裹管理路由
   Route::post('package/excelProcessFee/{type}',

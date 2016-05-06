@@ -13,12 +13,22 @@ class PermissionModel extends BaseModel
      */
     protected $table = 'permissions';
 
+    public $rules = [
+        'create' => [
+            'action' => 'required|unique:permissions,action',
+            'action_name' => 'required|unique:permissions,action_name',
+        ],
+        'update' => [
+            'action' => 'required|unique:permissions,action,{id}',
+            'action_name' => 'required|unique:permissions,action_name,{id}',
+        ]
+    ];
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['id', 'permission'];
+    protected $fillable = ['id', 'action_name','action'];
 
     public function role()
     {

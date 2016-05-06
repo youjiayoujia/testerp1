@@ -375,7 +375,9 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
   //用户路由
+  Route::any('user/role',['uses' => 'UserController@per', 'as' => 'role']);
   Route::resource('user', 'UserController');
-
+  Route::resource('role', 'RoleController');
+  Route::resource('permission', 'PermissionController');
 
 });

@@ -13,12 +13,23 @@ class RoleModel extends BaseModel
      */
     protected $table = 'roles';
 
+    public $rules = [
+        'create' => [
+            'role' => 'required|unique:roles,role',
+            'role_name' => 'required|unique:roles,role_name',
+        ],
+        'update' => [
+            'role' => 'required|unique:roles,role,{id}',
+            'role_name' => 'required|unique:roles,role_name,{id}',
+        ]
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['id', 'role'];
+    protected $fillable = ['id', 'role','role_name'];
 
     public function permission()
     {

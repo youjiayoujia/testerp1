@@ -9,12 +9,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserModel;
+use App\Models\RoleModel;
+use App\Models\PermissionModel;
 
 class UserController extends Controller
 {
-    public function __construct(UserModel $user)
+    public function __construct(UserModel $user,RoleModel $role,PermissionModel $permission)
     {
         $this->model = $user;
+        $this->role = $role;
+        $this->permission = $permission;
         $this->mainIndex = route('user.index');
         $this->mainTitle = '用户';
         $this->viewPath = 'user.';
@@ -78,5 +82,20 @@ class UserController extends Controller
         $model->update($data);
         return redirect($this->mainIndex);
     }
+
+    public function per()
+    {
+        $role = $this->role->find(1);
+        $permission = $this->permission->find(1);
+        $user = $this->model->find(14);
+        echo '<pre>';
+        print_r($user->role->toArray());exit;
+        print_r($permission->role->toArray());exit;
+
+        print_r($role->permission->toArray());exit;
+        
+    }
+
+    
 
 }

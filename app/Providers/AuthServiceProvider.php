@@ -71,7 +71,7 @@ class AuthServiceProvider extends ServiceProvider
                 if(in_array($role->role, $role_array)){
                     //echo '<pre>';
                     //print_r($role);
-                    foreach($role->permission as $permission){echo $permission->action;
+                    foreach($role->permission as $permission){//echo $permission->action;
                         if(in_array($permission->action, $post_array)){//echo 111;exit;
                             return true;
                         }

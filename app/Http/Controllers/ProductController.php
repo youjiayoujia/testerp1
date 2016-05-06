@@ -41,7 +41,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        if (Gate::denies('product_admin','product|add')) {
+        if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }
         $response = [
@@ -63,7 +63,7 @@ class ProductController extends Controller
      */
     public function store()
     {
-        if (Gate::denies('product_admin','product|add')) {
+        if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }
         request()->flash();
@@ -81,7 +81,7 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        if (Gate::denies('product_admin','product|edit')) {
+        if (Gate::denies('check','product_admin,product_staff|edit')) {
             echo "没有权限";exit;
         }
         $variation_value_id_arr = [];
@@ -127,7 +127,7 @@ class ProductController extends Controller
      */
     public function update($id)
     {
-        if (Gate::denies('product_admin','product|edit')) {
+        if (Gate::denies('check','product_admin,product_staff|edit')) {
             echo "没有权限";exit;
         }
         request()->flash();
@@ -146,6 +146,9 @@ class ProductController extends Controller
      */
     public function destroy($id) 
     {
+        if (Gate::denies('check','product_admin,product_staff|delete')) {
+            echo "没有权限";exit;
+        }
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));

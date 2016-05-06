@@ -1,10 +1,8 @@
 @extends('common.table')
 @section('tableHeader')
-    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
-    ID</th>
+    <th>ID</th>
     <th>sku</th>
-    <th>采购类型</th>
-    <th>订单itemId</th>
+    <th>采购单ID</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>采购去向</th>
@@ -19,19 +17,11 @@
     @foreach($data as $purchaseItem)
         <tr>
             <td>
-             @if($purchaseItem->purchase_order_id >0)
-                <input type="checkbox" name="purchaseItem_id"  value="{{$purchaseItem->id}}" isexamine="1" >
-                @else
-                <input type="checkbox" name="purchaseItem_id"  value="{{$purchaseItem->id}}" isexamine="0" >
-                @endif
+            
             {{ $purchaseItem->id }}</td>
             <td>{{ $purchaseItem->sku}}</td>
-            @foreach(config('purchase.purchaseItem.type') as $k=>$type)
-            	@if($purchaseItem->type == $k)
-            	<td>{{ $type }}</td>
-                @endif
-            @endforeach
-            <td>{{ $purchaseItem->order_item_id}}</td>
+           
+            <td>{{ $purchaseItem->purchase_order_id}}</td>
             <td> 
              @if($purchaseItem->item->product->default_image>0)
              <img src="{{$purchaseItem->item->product->image->src}}" height="50px"/>

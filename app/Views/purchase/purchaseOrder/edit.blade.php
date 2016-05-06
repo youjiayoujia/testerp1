@@ -52,13 +52,9 @@
         
             <div class="form-group col-lg-4">
             	<strong>导出该订单</strong>:
-                @if($model->supplier->type==1)
-                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>
-                @else
+               
                 <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
-                </a>
-                @endif     
+                </a>     
             </div> 
              <div class="form-group col-lg-4">
             	<strong>取消采购单</strong>:
@@ -184,6 +180,7 @@
              报等
              @if($purchaseItem->wait_time)
              {{$purchaseItem->wait_time}}
+             备注：{{$purchaseItem->wait_remark}}
             @else
             <a href="/purchaseOrder/updateWaitTime/{{$purchaseItem->id}}">添加报等时间</a>
             @endif

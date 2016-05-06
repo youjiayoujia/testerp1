@@ -13,7 +13,7 @@
             </div>
              <div class="form-group col-lg-4">
                 <strong>订单成本:
-                物流费{{$purchaseSumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{$purchaseSumPostage + $model->total_purchase_cost}}</strong>
+                物流费{{$purchaseSumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{$purchaseSumPostage + $purchaseSumPostage}}</strong>
             </div>
              
             </div>

@@ -18,7 +18,7 @@
             </div>
             <div class="form-group col-lg-4">
                 <strong>订单成本</strong>:
-                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}
+                物流费{{ $sumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $sumPostage + $model->total_purchase_cost}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:            

@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
+use App\Models\Purchase\PurchasePostageModel;
 
 class ClosePurchaseOrderController extends Controller
 {
@@ -32,6 +33,9 @@ class ClosePurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('status','>',0)),
         ];
+		foreach($response['data'] as $key=>$v ){
+			$response['data'][$key]['sumPostage']=PurchasePostageModel::where('purchase_order_id',$v->id)->sum('postage');
+			}
         return view($this->viewPath . 'index', $response);
     }
 	
@@ -57,6 +61,7 @@ class ClosePurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'sumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
         ];
         return view($this->viewPath . 'edit', $response);	
 	}

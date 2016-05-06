@@ -61,10 +61,10 @@ class UserModel extends BaseModel implements AuthenticatableContract,
     }
 
     public function hasRole() {
-        echo 85858;exit;
-      if(is_string($role)){
-          return $this->roles->contains('name', $role);
-      }
-      return !!$role->intersect($this->roles)->count();
+        if(is_string($role)){
+            return $this->roles->contains('name', $role);
+        }
+        return !!$role->intersect($this->roles)->count();
     }
 }
+

@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="type_id">物流方式</th>
+    <th>物流方式简码</th>
     <th class="sort" data-field="priority">优先级</th>
     <th class="sort" data-field="weight_from">重量从(kg)</th>
     <th class="sort" data-field="weight_to">重量至(kg)</th>
@@ -17,6 +18,7 @@
         <tr>
             <td>{{ $rule->id }}</td>
             <td>{{ $rule->logistics->type }}</td>
+            <td>{{ $rule->logistics->short_code }}</td>
             <td>{{ $rule->priority }}</td>
             <td>{{ $rule->weight_from }}</td>
             <td>{{ $rule->weight_to }}</td>

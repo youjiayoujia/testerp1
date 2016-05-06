@@ -82,7 +82,6 @@
             <td>采购数量</td>
             <td>总价</td>
             <td>成本审核状态</td>	
-            <td>状态</td>
             <td>物流单号</td>
             <td>实际入库数量</td>
             <td>供应商sku</td>       
@@ -117,11 +116,6 @@
             采购价格未审核
             @endif
             </td>
-            <td>     	
-            @foreach(config('purchase.purchaseItem.status') as $key=>$v)
-				@if($purchaseItem->status == $key) {{$v}} @endif
-            @endforeach     
-             </td>
             <td>
             {{$purchaseItem->post_coding }}
             </td>       

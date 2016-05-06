@@ -58,7 +58,7 @@ class PurchaseOrderModel extends BaseModel
 	public function allPurchaseExcelOut()
 	{
 		$name='采购单';
-		$assigner=12;
+		$assigner=request()->user()->id;
 		$purchaseOrderIds=$this->select('id')->where('assigner',$assigner)->get()->toArray();
 		$res=PurchaseItemModel::whereIn('purchase_order_id',$purchaseOrderIds)->orderBy('supplier_id','desc')->get();
 		$rows ='';
@@ -101,7 +101,7 @@ class PurchaseOrderModel extends BaseModel
 	public function noArrivalOut()
 	{
 		$name='采购单';
-		$assigner=12;
+		$assigner=request()->user()->id;
 		$purchaseOrderIds=$this->select('id')->where('assigner',$assigner)->get()->toArray();
 		$res=PurchaseItemModel::whereIn('purchase_order_id',$purchaseOrderIds)->where('start_buying_time','<',date('Y-m-d H:i:s',time()-3600*24*3))->orderBy('supplier_id','desc')->get();
 		$rows ='';

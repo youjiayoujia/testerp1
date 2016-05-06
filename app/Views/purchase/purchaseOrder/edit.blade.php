@@ -315,8 +315,7 @@
                     <input type="hidden" id="currrent" value="{{$current}}">
                     @else
                     <input type="hidden" id="currrent" value="1">
-                    @endif
-           
+                    @endif    
         </div>
         <div class="panel-footer">
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
@@ -327,8 +326,10 @@
     <script type='text/javascript'>
 	//批量输入采购单号
 	function batchPostCoding(){
-		 var batch_post_coding=$('#batch_post_coding').val();
-		 $(".itemPostCoding").val(batch_post_coding);
+		 var batch_post_coding=$('#batch_post_coding').val(); 
+		 var  items=$(".itemPostCoding").val();
+		 alert(items);
+			$(".itemPostCoding").val(batch_post_coding);
 		}
 		//新增物流号对应物流费
         $(document).ready(function () {

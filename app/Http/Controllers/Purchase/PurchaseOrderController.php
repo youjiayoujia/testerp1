@@ -148,9 +148,7 @@ class PurchaseOrderController extends Controller
 					if($item['status']>0){
 						$data['status']=1;
 					}
-					if($item['purchase_num']>0){
-						$data['status']=$item['purchase_num'];
-						}
+					
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
@@ -312,11 +310,15 @@ class PurchaseOrderController extends Controller
 			];
 		return view($this->viewPath.'waitTime',$response);	
 	}
-	
+	/**
+	* 添加报等时间
+	*
+	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+	*/
 	public function updateItemWaitTime($id){
 		$data=request()->all();
 		$purchaseItem=purchaseItemModel::find($id);
-		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time']]);
+		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time'],'wait_remark'=>$data['wait_remark']]);
 		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
 		}
 }

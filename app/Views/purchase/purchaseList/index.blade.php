@@ -21,6 +21,7 @@
     <th>国内物流号</th>
     <th>采购条目状态</th>
     <th>入库状态</th>
+    <th>采购价格审核状态</th>
     <th>采购人</th>
     <th>异常状态</th>
     <th>操作</th>
@@ -68,6 +69,18 @@
             	{{ $status }}
                 @endif
             @endforeach</td>
+                      <td> @if($purchaseList->costExamineStatus ==2)
+            	价格审核通过
+            @elseif($purchaseList->costExamineStatus ==1)
+            	价格审核不通过
+            @else
+             @if($purchaseList->purchase_cost>0)
+            	<a href="/purchaseItem/costExamineStatus/{{$purchaseList->id}}/1" class="btn btn-info btn-xs"> 审核不通过
+                </a> 
+                <a href="/purchaseItem/costExamineStatus/{{$purchaseList->id}}/2" class="btn btn-info btn-xs"> 审核通过
+                </a>
+              @endif
+            @endif</td>
                       
             <td>{{ $purchaseList->purchaseOrder->assigner }}</td>
             <td> 

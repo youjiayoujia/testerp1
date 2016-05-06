@@ -64,17 +64,18 @@
             	{{ $status }}
                 @endif
             @endforeach</td>
-             <td> @foreach(config('purchase.purchaseItem.storageStatus') as $k=>$status)
-            	@if($purchaseList->storageStatus == $k)
-            	{{ $status }}
+             <td> @foreach(config('purchase.purchaseItem.storageStatus') as $kt=>$va)
+            	@if($purchaseList->storageStatus == $kt)
+            	{{ $va}}
                 @endif
             @endforeach</td>
-                      <td> @if($purchaseList->costExamineStatus ==2)
+           <td>
+            @if($purchaseList->costExamineStatus ==2)
             	价格审核通过
             @elseif($purchaseList->costExamineStatus ==1)
             	价格审核不通过
             @else
-             @if($purchaseList->purchase_cost>0)
+             @if($purchaseList->purchase_cost > 0)
             	<a href="/purchaseItem/costExamineStatus/{{$purchaseList->id}}/1" class="btn btn-info btn-xs"> 审核不通过
                 </a> 
                 <a href="/purchaseItem/costExamineStatus/{{$purchaseList->id}}/2" class="btn btn-info btn-xs"> 审核通过

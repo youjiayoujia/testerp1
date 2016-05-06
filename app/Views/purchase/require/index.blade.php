@@ -21,6 +21,7 @@
     <th>订单需求/库存数量/正采购数目</th>
     <th>仍需采购</th>
     <th>备注</th>
+    <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $requireItem)
@@ -44,7 +45,10 @@
             <td>{{ $requireItem->warehouse->name}}</td>
             <td>{{ $requireItem->order_need_num}}/{{$requireItem->all_quantity}}/{{$requireItem->purchaseing_quantity}}</td>
             <td>{{$requireItem->order_need_num - $requireItem->all_quantity -$requireItem->purchaseing_quantity}}</td>
-            <td>{{ $requireItem->remark}}</td> 
+            <td>{{ $requireItem->remark}}</td>
+            <td><a href="{{ route('require.show', ['id'=>$requireItem->id]) }}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-eye-open"></span> 查看
+                </a></td> 
         </tr>
     @endforeach
  <script type="text/javascript">		 

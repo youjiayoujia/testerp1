@@ -43,6 +43,16 @@ class RequireController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 	
+	
+	
+	public function show($id){
+		$model=$this->model->find($id);
+		 $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'result' =>$this->model->where('sku',$model->sku)->get(),
+        ];
+        return view($this->viewPath . 'show', $response);
+		}
 	/**
      * AJAX创建采购单生成采购条目
      *

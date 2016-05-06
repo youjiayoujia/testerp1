@@ -51,6 +51,16 @@
          <input type="radio" name="supplier_id" value="{{$secondSupplier->id}}">名：{{$secondSupplier->name}}&nbsp;电话：{{$secondSupplier->telephone}}&nbsp;地址：{{$secondSupplier->province}}{{$secondSupplier->city}}{{$secondSupplier->address}}
     </div>
     @endif
+    @if($model->active == 2)
+     <div class="form-group col-lg-4">
+        <label for="sku_id">预计报等时间:</label>
+         {{$model->wait_time}}
+    </div>
+     <div class="form-group col-lg-4">
+        <label for="sku_id">报等备注:</label>
+         {{$model->wait_remark}}
+    </div>
+    @endif
     </div>
 @stop
  

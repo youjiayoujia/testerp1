@@ -184,6 +184,7 @@
              报等
              @if($purchaseItem->wait_time)
              {{$purchaseItem->wait_time}}
+             备注：{{$purchaseItem->wait_remark}}
             @else
             <a href="/purchaseOrder/updateWaitTime/{{$purchaseItem->id}}">添加报等时间</a>
             @endif

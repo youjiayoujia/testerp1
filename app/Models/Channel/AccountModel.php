@@ -75,7 +75,7 @@ class AccountModel extends BaseModel
 
     public function country()
     {
-        return $this->belongsTo('App\Models\CountryModel', 'country_id', 'id');
+        return $this->belongsTo('App\Models\CountriesModel', 'country_id', 'id');
     }
 
 

@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use Tool;
 use Excel;
+use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
@@ -24,6 +25,26 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+    }
+
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'logisticses' => LogisticsModel::all(),
+        ];
+        return view($this->viewPath . 'edit', $response);
     }
 
     public function flow()
@@ -101,6 +122,44 @@ class PackageController extends Controller
         } else {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '订单不存在'));
         }
+    }
+
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $model->update(request()->all());
+        $arr = explode(' ', request('name'));
+        $model->update(['shipping_firstname' => array_key_exists('0', $arr) ? $arr['0'] : '', 'shipping_lastname'=>array_key_exists('1', $arr) ? $arr['1'] : '']);
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        foreach($model->items as $packageItem) {
+            $stockout = $packageItem->stockout;
+            $stock = StockModel::find($stockout->stock_id);
+            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
+            $packageItem->delete();
+            $stockout->delete();
+        }
+        $model->destroy($id);
+        return redirect($this->mainIndex);
     }
 
     public function ajaxGetOrder()
@@ -204,12 +263,12 @@ class PackageController extends Controller
         if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update([
-            'status' => 'SHIPPED',
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => '2',
-            'actual_weight' => $weight
-        ]);
+        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
+        foreach($package->items as $packageitem)
+        {
+            $packageitem->orderItem->update(['status' => 'SHIPPED']);
+        }
+
         return json_encode(true);
     }
 

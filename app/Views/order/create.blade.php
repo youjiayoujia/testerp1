@@ -416,9 +416,7 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
                 </div>
-                <div class="form-group col-sm-2">
-                    <input type='text' class="form-control image" id="arr[image][0]" placeholder="图片" name='arr[image][0]' value="{{ old('arr[image][0]') }}">
-                </div>
+                <div class="form-group col-sm-2 image"></div>
                 <div class="form-group col-sm-1">
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
@@ -541,10 +539,11 @@
                     dataType : 'json',
                     type : 'get',
                     success : function(result) {
-                        if(result != 'sku') {
+                        if(result != false) {
+                            tmp.parent().parent().find('.image').html("<img src='/"+result+"' width='25px' height='25px'>");
+                        }else{
                             alert('sku有误');
                             tmp.val('');
-                            return;
                         }
                     }
                 });

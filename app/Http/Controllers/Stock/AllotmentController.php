@@ -100,7 +100,7 @@ class AllotmentController extends Controller
             $buf['item_id'] = ItemModel::where('sku', trim($buf['sku']))->first()->id;
             AllotmentFormModel::create($buf);
             $item = ItemModel::find($buf['item_id']);
-            $item->hold($buf['warehouse_position_id'], $buf['quantity']);
+            $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ALLOTMENT', $obj->id);
         }
 
         return redirect($this->mainIndex);
@@ -197,7 +197,7 @@ class AllotmentController extends Controller
         $obj = $this->model->find($id);
         foreach($obj->allotmentforms as $val) {
             $item = ItemModel::find($val->item_id);
-            $item->unhold($val->warehouse_position_id, $val->quantity);
+            $item->unhold($val->warehouse_position_id, $val->quantity, 'ALLOTMENT', $obj->id);
             $val->delete();
         }
         foreach($obj->logistics as $tmp)
@@ -273,8 +273,7 @@ class AllotmentController extends Controller
                 $tmp = array_merge($arr, $buf[$i]);
                 $tmp['type'] = 'ALLOTMENT';
                 $item = ItemModel::find($tmp['item_id']);
-                $item->unhold($tmp['warehouse_position_id'], $tmp['quantity']);
-                $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
+                $item->holdout($tmp['warehouse_position_id'], $tmp['quantity'], 'ALLOTMENT', $model->id);
             }
         } catch(Exception $e) {
             DB::rollback();
@@ -379,7 +378,9 @@ class AllotmentController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['allotment_status'=>'pick']);
+        if($model->allotment_status == 'new') {
+            $model->update(['allotment_status'=>'pick']);
+        }
         $allotmentforms = AllotmentFormModel::where('stock_allotment_id', $id)->orderBy('warehouse_position_id')->get();
         $response = [
             'metas' => $this->metas(__FUNCTION__),

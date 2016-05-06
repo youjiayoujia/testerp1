@@ -179,6 +179,11 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
 
+    public function package()
+    {
+        return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
+    }
+
     public function requires()
     {
         return $this->hasMany('App\Models\RequireModel', 'order_id');
@@ -285,6 +290,7 @@ class OrderModel extends BaseModel
                 foreach ($this->active_items as $item) {
                     $require = [];
                     $require['item_id'] = $item->item_id;
+                    $require['warehouse_id'] = 1;
                     $require['order_item_id'] = $item->id;
                     $require['sku'] = $item->sku;
                     $require['quantity'] = $item->quantity;
@@ -309,6 +315,7 @@ class OrderModel extends BaseModel
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
         }
+
         return $packageItem;
     }
 

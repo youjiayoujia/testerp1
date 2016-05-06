@@ -170,7 +170,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function in($quantity, $amount, $type, $relation_id, $remark)
+    public function in($quantity, $amount, $type = '', $relation_id = '', $remark = '')
     {
         $this->all_quantity += $quantity;
         $this->available_quantity += $quantity;
@@ -192,7 +192,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function hold($quantity, $type, $relation_id, $remark)
+    public function hold($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $this->available_quantity -= $quantity;
         if ($this->available_quantity < 0) {
@@ -216,9 +216,10 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function holdout($quantity, $type, $relation_id, $remark)
+    public function holdout($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $this->hold_quantity -= $quantity;
+        $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
             throw new Exception('unhold时，hold数量为负了');
         }
@@ -245,7 +246,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function unhold($quantity, $type, $relation_id, $remark)
+    public function unhold($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $this->hold_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
@@ -272,7 +273,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function out($quantity, $type, $relation_id, $remark)
+    public function out($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $price = $this->unit_cost;
         if($this->unit_cost <= 0) {

@@ -91,11 +91,11 @@ class StockController extends Controller
      */
     public function ajaxGetByPosition()
     {
-        $position = PositionModel::where(['name' => trim(request()->input('position')), 'is_available' => '1'])->first();
+        $warehouse_id = trim(request()->input('warehouse_id'));
+        $position = PositionModel::where(['name' => trim(request()->input('position')), 'warehouse_id'=>$warehouse_id, 'is_available' => '1'])->first();
         if(!$position) {
             return json_encode(false);
         }
-        $warehouse_id = request()->input('warehouse_id');
         $type = request()->input('type');
         $warehouse_position_id = $position->id;
         $sku = trim(request()->input('sku'));
@@ -105,7 +105,7 @@ class StockController extends Controller
             return json_encode($obj->available_quantity);
         }
         if(StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->count() < 2) {
-            return json_encode('0');
+            return json_encode(true);
         } else {
             return json_encode(false);
         }

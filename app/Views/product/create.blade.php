@@ -78,7 +78,7 @@
             <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') }}">
         </div>
         <div class="form-group col-md-2">
-            <label for="color">产品包装尺寸(m³)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长,xx 宽,xx 高,xx)
+            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长,xx 宽,xx 高,xx)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>
             <div class="form-group col-md-1">

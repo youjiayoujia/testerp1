@@ -27,7 +27,7 @@
 
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>产品尺寸</strong>: {{ $model->product_size }}
+                <strong>尺寸类型</strong>: {{ $model->product_size }}
             </div>
             <div class="col-lg-3">
                 <strong>产品包装尺寸</strong>: {{ $model->package_size }}

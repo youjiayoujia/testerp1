@@ -3,6 +3,7 @@
     <th class="sort" data-field="created_at">ID</th>
     <th>物流分区</th>
     <th>物流方式</th>
+    <th>物流方式简码</th>
     <th>国家</th>
     <th>种类</th>
     <th>首重(kg)</th>
@@ -23,7 +24,8 @@
         <tr>
             <td>{{ $zone->id }}</td>
             <td>{{ $zone->zone }}</td>
-            <td>{{ $zone->logistics->logistics_type}}</td>
+            <td>{{ $zone->logistics->logistics_type }}</td>
+            <td>{{ $zone->logistics->short_code }}</td>
             <td>{{ $zone->country($zone->country_id) }}</td>
             <td>{{ $zone->shipping_id == 'express' ? '快递' : '小包'}}</td>
             <td>{{ $zone->fixed_weight }}</td>

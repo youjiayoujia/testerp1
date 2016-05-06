@@ -18,7 +18,46 @@ class PackageModel extends BaseModel
         'update' => [],
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'channel_id',
+        'channel_account_id',
+        'order_id',
+        'warehouse_id',
+        'logistics_id',
+        'picklist_id',
+        'assigner_id',
+        'shipper_id',
+        'type',
+        'status',
+        'cost',
+        'cost1',
+        'weight',
+        'actual_weight',
+        'length',
+        'width',
+        'height',
+        'tracking_no',
+        'tracking_link',
+        'email',
+        'shipping_firstname',
+        'shipping_lastname',
+        'shipping_address',
+        'shipping_address1',
+        'shipping_city',
+        'shipping_state',
+        'shipping_country',
+        'shipping_zipcode',
+        'shipping_phone',
+        'is_auto',
+        'remark',
+        'logistic_assigned_at',
+        'printed_at',
+        'shipped_at',
+        'delivered_at',
+        'created_at',
+        'is_tonanjing',
+        'is_over',
+    ];
 
     public function assigner()
     {
@@ -48,7 +87,6 @@ class PackageModel extends BaseModel
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id');
-
     }
 
     public function items()
@@ -68,7 +106,7 @@ class PackageModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('pick.package');
+        $arr = config('package');
         return $arr[$this->status];
     }
 
@@ -232,13 +270,15 @@ class PackageModel extends BaseModel
                 $error[] = $key;
                 continue;
             }
-            $this->find($content['package_id'])->update([
-                'logistics_id' => $tmp_logistics->id,
-                'tracking_no' => $content['tracking_no'],
-                'status' => 'SHIPPED',
-                'shipped_at' => date('Y-m-d G:i:s', time()),
-                'shipper_id' => '2'
-            ]);
+            $this->find($content['package_id'])->update(['logistics_id' => $tmp_logistics->id, 
+                                                         'tracking_no' => $content['tracking_no'],
+                                                         'status' => 'SHIPPED',
+                                                         'shipped_at' => date('Y-m-d G:i:s', time()),
+                                                         'shipper_id' => '2']);
+            foreach($this->find($content['package_id'])->items as $packageitem)
+            {
+                $packageitem->orderItem->update(['status' => 'SHIPPED']);
+            }
         }
 
         return $error;

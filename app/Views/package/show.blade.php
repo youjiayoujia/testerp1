@@ -14,10 +14,10 @@
                     <strong>订单号</strong>: {{ $model->order->ordernum }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>状态</strong>: {{ $model->status }}
+                    <strong>状态</strong>: {{ $model->status_name }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>类型</strong>: {{ $model->type }}
+                    <strong>类型</strong>: {{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}
                 </div>
                 <div class="col-lg-2">
                     <strong>仓库</strong>: {{ $model->warehouse->name }}
@@ -31,7 +31,7 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th></th>
+                    <th>图片</th>
                     <th>SKU</th>
                     <th>库位</th>
                     <th>数量</th>
@@ -40,6 +40,7 @@
                 </thead>
                 <tbody>
                 @foreach($model->items as $item)
+
                     <tr>
                         <td><img src="{{ asset($item->item->image) }}" width="100"></td>
                         <td>{{ $item->item->sku }}</td>

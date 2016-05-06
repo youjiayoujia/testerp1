@@ -1,7 +1,7 @@
 <?php
 /**
- * 仓库控制器
- * 处理仓库相关的Request与Response
+ * 汇率控制器
+ * 处理汇率相关的Request与Response
  *
  * @author: MC<178069409@qq.com>
  * Date: 15/12/18

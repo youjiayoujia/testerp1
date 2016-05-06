@@ -294,7 +294,7 @@ class PickListModel extends BaseModel
      */
     public function getStatusNameAttribute()
     {
-        $arr = config('pick.pick');
+        $arr = config('pick');
         return $arr[$this->status];
     }
 }

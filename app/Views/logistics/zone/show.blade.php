@@ -16,6 +16,9 @@
                 <strong>物流方式</strong>: {{ $model->logistics->logistics_type }}
             </div>
             <div class="col-lg-2">
+                <strong>物流方式简码</strong>: {{ $model->logistics->short_code }}
+            </div>
+            <div class="col-lg-2">
                 <strong>种类</strong>: {{ $model->shipping_id == 'express' ? '快递' : '小包' }}
             </div>
             <div class="col-lg-2" id="express">

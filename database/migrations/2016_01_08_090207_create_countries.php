@@ -14,8 +14,10 @@ class CreateCountries extends Migration
     {
         Schema::create('countries', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('国家');
-            $table->string('abbreviation')->comment('缩写');
+            $table->string('name')->comment('国家')->default(NULL);
+            $table->string('cn_name')->comment('中文名称')->default(NULL);
+            $table->string('code')->comment('缩写')->default(NULL);
+            $table->integer('number')->comment('number')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

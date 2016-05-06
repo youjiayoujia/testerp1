@@ -350,6 +350,10 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
 
   //包裹管理路由
+  Route::get('package/allocateLogistics/{id}',
+      ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);
+  Route::post('package/storeAllocateLogistics/{id}',
+      ['uses' => 'PackageController@storeAllocateLogistics', 'as' => 'package.storeAllocateLogistics']);
   Route::post('package/excelProcessFee/{type}',
       ['uses' => 'PackageController@excelProcessFee', 'as' => 'package.excelProcessFee']);
   Route::get('package/returnTrackno', ['uses' => 'PackageController@returnTrackno', 'as' => 'package.returnTrackno']);

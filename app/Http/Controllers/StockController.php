@@ -60,7 +60,7 @@ class StockController extends Controller
         $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
         $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
         ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_cost'), 'MAKE_ACCOUNT');
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
     /**
@@ -79,7 +79,7 @@ class StockController extends Controller
             $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
         }
 
-        return redirect(route('stockTaking.index'));
+        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
     }
     /**
      * 获取库存对象，通过库位

@@ -119,7 +119,7 @@ class AdjustmentController extends Controller
             AdjustFormModel::create($buf);
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
     /**
@@ -194,7 +194,7 @@ class AdjustmentController extends Controller
             $i++;
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**
@@ -281,6 +281,6 @@ class AdjustmentController extends Controller
         } else {
             $obj->update(['status'=>'1', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']);
         }
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
 }

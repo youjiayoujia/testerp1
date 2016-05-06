@@ -20,7 +20,11 @@
                 </div>
                 <div class="col-lg-2">
                     <label>状态</label>
-                    <input type='text' class='form-control' value="{{ $model->status_name }}" readonly>
+                    <select name='status' class='form-control'>
+                    @foreach($status as $key => $value)
+                    <option value="{{ $key }}" {{ $model->status == $key ? 'selected' : '' }}>{{ $value }}</option>
+                    @endforeach
+                    </select>
                 </div>
                 <div class="col-lg-2">
                     <label>类型</label>

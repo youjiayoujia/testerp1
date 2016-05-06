@@ -27,6 +27,7 @@ class CreatePackages extends Migration
                 [
                     'NEW',
                     'ASSIGNED',
+                    'ASSIGNFAILED',
                     'PROCESSING',
                     'PICKING',
                     'PICKED',

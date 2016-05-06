@@ -142,7 +142,6 @@ class PurchaseItemListController extends Controller
 				if($item->status < 2 ){
 					$item->destroy($item->id);
 				}
-				$orderItemNum=$this->model->where('purchase_order_id',$item->purchase_order_id)->where('status','>',0)->count();
 				}
 		}
 		return redirect($this->mainIndex);

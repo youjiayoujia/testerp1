@@ -135,7 +135,7 @@ class TakingController extends Controller
             }
         }
         $flag ? $this->model->find($id)->update(['create_taking_adjustment' => '1']) : $this->model->find($id)->update(['create_taking_adjustment' => '0']);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**
@@ -242,6 +242,6 @@ class TakingController extends Controller
         }
         
         Cache::store('file')->forever('stockIOStatus', '1');
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核'));
     }
 }

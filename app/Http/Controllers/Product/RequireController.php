@@ -68,7 +68,7 @@ class RequireController extends Controller
         }
         $buf->update($data);
 
-        return redirect(route('productRequire.index'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
     /**
@@ -121,7 +121,7 @@ class RequireController extends Controller
         }
         $model->update($data);
 
-        return redirect(route('productRequire.index'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**

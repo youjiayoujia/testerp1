@@ -103,7 +103,7 @@ class AllotmentController extends Controller
             $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ALLOTMENT', $obj->id);
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
     /**
@@ -182,7 +182,7 @@ class AllotmentController extends Controller
             $i++;
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**
@@ -226,7 +226,7 @@ class AllotmentController extends Controller
         $time = date('Y-m-d',time());       
         $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
 
     /**
@@ -293,7 +293,7 @@ class AllotmentController extends Controller
     {
         $this->model->find($id)->update(['allotment_status'=>'over']);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '强制结束调拨单 成功'));
     }
 
     /**
@@ -481,6 +481,6 @@ class AllotmentController extends Controller
         }
         DB::commit();
       
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '对单成功'));
     }
 }

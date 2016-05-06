@@ -89,7 +89,7 @@ class WarehouseController extends Controller
             }
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**

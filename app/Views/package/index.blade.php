@@ -44,6 +44,11 @@
                 <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                @if($package->status == 'ASSIGNFAILED')
+                <a href="{{ route('package.allocateLogistics', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
+                    分配物流方式
+                </a>
+                @endif
                 @if($package->status == 'PACKED')
                     <a href="javascript:" class="btn btn-warning btn-xs send" data-id="{{ $package->id }}">
                         <span class="glyphicon glyphicon-pencil"></span> 发货

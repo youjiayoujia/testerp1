@@ -326,7 +326,9 @@
     <script type='text/javascript'>
 	//批量输入采购单号
 	function batchPostCoding(){
-		 var batch_post_coding=$('#batch_post_coding').val();  
+		 var batch_post_coding=$('#batch_post_coding').val(); 
+		 var  items=$(".itemPostCoding").val();
+		 alert(items);
 			$(".itemPostCoding").val(batch_post_coding);
 		}
 		//新增物流号对应物流费

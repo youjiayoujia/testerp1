@@ -318,7 +318,7 @@ class PurchaseOrderController extends Controller
 	public function updateItemWaitTime($id){
 		$data=request()->all();
 		$purchaseItem=purchaseItemModel::find($id);
-		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time']]);
+		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time'],'wait_remark'=>$data['wait_remark']]);
 		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
 		}
 }

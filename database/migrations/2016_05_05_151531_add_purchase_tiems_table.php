@@ -14,6 +14,7 @@ class AddPurchaseTiemsTable extends Migration
     {
         Schema::table('purchase_items', function (Blueprint $table) {
             $table->date('wait_time')->nullable()->after('start_buying_time');
+			$table->string('wait_remark')->nullable()->after('wait_time');
         });
     }
     /**
@@ -25,6 +26,7 @@ class AddPurchaseTiemsTable extends Migration
     {
         Schema::table('purchase_items', function (Blueprint $table) {
             $table->dropColumn(['wait_time']);
+			$table->dropColumn(['wait_remark']);
         });
     }
 }

@@ -266,11 +266,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '采购单结算',
-                    'url' => 'closePurchaseOrder.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '采购对单',
                     'url' => 'purchaseList.index',
                     'icon' => '',
@@ -278,6 +273,11 @@ return [
                 [
                     'name' => '采购入库',
                     'url' => 'purchaseStockIn.create',
+                    'icon' => '',
+                ],
+				[
+                    'name' => '采购单结算',
+                    'url' => 'closePurchaseOrder.index',
                     'icon' => '',
                 ],
                 [

@@ -33,6 +33,6 @@ class RoleModel extends BaseModel
 
     public function permission()
     {
-        return $this->belongsToMany('App\Models\PermissionModel','role_permissions','role_id','permission_id');
+        return $this->belongsToMany('App\Models\PermissionModel','role_permissions','role_id','permission_id')->withTimestamps();
     }
 }

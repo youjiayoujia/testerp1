@@ -5,11 +5,13 @@
             <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
         </a>-->
     </div>
+    @can('check','product_admin,product_staff|add')
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
             <i class="glyphicon glyphicon-plus"></i> 新增
         </a>
     </div>
+    @endcan
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
@@ -45,9 +47,11 @@
                 <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                @can('check','product_admin,product_staff|edit')
                 <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                @endcan
                 <!--@if(!$product->status)
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"
                        data-id="{{ $product->id }}"
@@ -59,11 +63,13 @@
                         <span class="glyphicon glyphicon-check"></span> <span>已审核</span>
                     </a>
                 @endif-->
+                @can('check','product_admin,product_staff|delete')
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                @endcan
             </td>
         </tr>
     @endforeach

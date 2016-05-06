@@ -57,7 +57,7 @@ class UserModel extends BaseModel implements AuthenticatableContract,
 
     public function role()
     {
-        return $this->belongsToMany('App\Models\RoleModel', 'user_roles', 'user_id', 'role_id');
+        return $this->belongsToMany('App\Models\RoleModel', 'user_roles', 'user_id', 'role_id')->withTimestamps();
     }
 
     public function hasRole() {

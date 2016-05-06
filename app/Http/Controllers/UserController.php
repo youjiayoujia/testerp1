@@ -25,6 +25,16 @@ class UserController extends Controller
         
     }
 
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'roles' => RoleModel::all(),
+        ];
+
+        return view($this->viewPath . 'create', $response);
+    }
+
     /**
      * 存储
      *
@@ -36,7 +46,10 @@ class UserController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
         $data['password'] = bcrypt($data['password']);
-        $this->model->create($data);
+
+        $userModel = $this->model->create($data);
+        //多对多插入
+        $userModel->role()->attach($data['user_role']);
         return redirect($this->mainIndex);
     }
 
@@ -52,9 +65,17 @@ class UserController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        //echo '<pre>';
+        //print_r($model->role->toArray());exit;
+        $select_role = [];
+        foreach($model->role as $role){
+            $select_role[] = $role->pivot->role_id;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'roles' => RoleModel::all(),
+            'select_role' => $select_role,
         ];
         return view($this->viewPath . 'edit', $response);
     }

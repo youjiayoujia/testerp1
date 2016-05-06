@@ -371,12 +371,12 @@ return [
             ],
             [
                 'name' => '权限列表',
-                'url' => 'user.index',
+                'url' => 'permission.index',
                 'icon' => '',
             ],
             [
                 'name' => '添加权限',
-                'url' => 'user.create',
+                'url' => 'permission.create',
                 'icon' => '',
             ],
             [

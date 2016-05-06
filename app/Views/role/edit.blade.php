@@ -14,4 +14,20 @@
             <input type='text' class="form-control" id="role" placeholder="role" name='role' value="{{ $model->role }}">
         </div>
     </div>
+
+    <div class="row">
+        <div class="form-group col-lg-12">
+            <label for="permission_name" class='control-label'>选择角色对应的权限</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-lg-12">
+            @foreach($permissions as $permission)
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="permission" value="{{$permission->id}}" name="role_permission[]" {{ in_array($permission->id, $select_permission)? 'checked' : '' }}> {{$permission->action_name}}
+                </label>
+            @endforeach
+        </div>
+    </div>
 @stop

@@ -180,12 +180,6 @@ class PackageModel extends BaseModel
                     'logistics_assigned_at' => date('Y-m-d H:i:s')
                 ]);
             }
-            //匹配失败,改为手工发货
-            $this->update([
-                'status' => 'PROCESSING',
-                'is_auto' => '0',
-                'logistics_assigned_at' => date('Y-m-d H:i:s')
-            ]);
         }
         return false;
     }

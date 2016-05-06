@@ -59,25 +59,24 @@
             if (confirm("确认")) {
                 var url = "{{route('listAll')}}";
                 var checkbox = document.getElementsByName("tribute_id");
-                var product_ids = "";
-                var examine_status = $(this).data('status');
+                var blacklist_ids = "";
+                var blacklist_status = $(this).data('status');
 
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
-                    product_ids += checkbox[i].value+",";
+                    blacklist_ids += checkbox[i].value+",";
                 }
-                product_ids = product_ids.substr(0,(product_ids.length)-1);
+                blacklist_ids = blacklist_ids.substr(0,(blacklist_ids.length)-1);
                 $.ajax({
-                    url:url,
-                    data:{product_ids:product_ids,examine_status:examine_status},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){alert(11);
+                    url : url,
+                    data : {blacklist_ids:blacklist_ids,blacklist_status:blacklist_status},
+                    dataType : 'json',
+                    type : 'get',
+                    success:function(result){
                         window.location.reload();
                     }
                 })
             }
-
         });
 
         //全选

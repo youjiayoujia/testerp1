@@ -30,13 +30,12 @@ class BlacklistController extends Controller
      */
     public function listAll()
     {
-        $examine_status = request()->input('examine_status');
-        $product_ids = request()->input('product_ids');
-        $product_id_arr = explode(',', $product_ids);
-        var_dump($product_id_arr);exit;
-        foreach ($product_id_arr as $id) {
+        $blacklist_status = request()->input('blacklist_status');
+        $blacklist_ids = request()->input('blacklist_ids');
+        $blacklist_id_arr = explode(',', $blacklist_ids);
+        foreach($blacklist_id_arr as $id) {
             $model = $this->model->find($id);
-            $data['whitelist'] = $examine_status;
+            $data['whitelist'] = $blacklist_status;
             $model->update($data);
         }
         return 1;

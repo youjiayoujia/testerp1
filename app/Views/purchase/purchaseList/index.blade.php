@@ -82,10 +82,6 @@
                      打印条码
                 </a>
                 @endif
-                 
-               <!-- <a href="{{ route('purchaseList.edit', ['id'=>$purchaseList->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 去对单
-                </a>-->
             </td>
           
         </tr>

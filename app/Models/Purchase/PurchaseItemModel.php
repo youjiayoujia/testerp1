@@ -21,11 +21,7 @@ class PurchaseItemModel extends BaseModel
     protected $table = 'purchase_items';
     public $rules = [
         'create' => [
-            'type' => 'required',
-            'purchase_num' => 'required',
-            'warehouse_id' => 'required',
-            'user_id' => 'required',
-			'sku' => 'required',
+            
         ],
         'update' => [
  			'purchase_num' => 'required',
@@ -38,7 +34,7 @@ class PurchaseItemModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id'];
+    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id','wait_remark','wait_time'];
 	public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku','sku');

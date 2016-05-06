@@ -20,6 +20,7 @@
     <th>采购需求/采购数目/仍需采购</th>
     <th>国内物流号</th>
     <th>采购条目状态</th>
+    <th>入库状态</th>
     <th>采购人</th>
     <th>异常状态</th>
     <th>操作</th>
@@ -57,11 +58,16 @@
             	<td><input type="text" name="weight" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}"/> 
             	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
                 
-            @foreach(config('purchase.purchaseItem.status') as $k=>$status)
+           <td> @foreach(config('purchase.purchaseItem.status') as $k=>$status)
             	@if($purchaseList->status == $k)
-            	<td>{{ $status }}</td>
+            	{{ $status }}
                 @endif
-            @endforeach
+            @endforeach</td>
+             <td> @foreach(config('purchase.purchaseItem.storageStatus') as $k=>$status)
+            	@if($purchaseList->storageStatus == $k)
+            	{{ $status }}
+                @endif
+            @endforeach</td>
                       
             <td>{{ $purchaseList->purchaseOrder->assigner }}</td>
             <td> 

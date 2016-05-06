@@ -60,7 +60,7 @@ class PurchaseOrderModel extends BaseModel
 		$name='采购单';
 		$assigner=request()->user()->id;
 		$purchaseOrderIds=$this->select('id')->where('assigner',$assigner)->get()->toArray();
-		$res=PurchaseItemModel::whereIn('purchase_order_ids',$purchaseOrderIds)->orderBy('supplier_id','desc')->get();
+		$res=PurchaseItemModel::whereIn('purchase_order_id',$purchaseOrderIds)->orderBy('supplier_id','desc')->get();
 		$rows ='';
 		foreach($res as $key=>$vo){
 			$supplier_province=$vo->supplier->province;

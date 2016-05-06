@@ -14,6 +14,7 @@
          <select name="status">
          	<option value="0">还原</option>
             <option value="1">采购中</option>
+            <option value="3">取消</option>
          </select>
     </div>
     </div>

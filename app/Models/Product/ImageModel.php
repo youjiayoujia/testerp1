@@ -32,7 +32,7 @@ class ImageModel extends BaseModel
     protected $searchFields = ['type'];
     public $rules = [
         'create' => [
-            'product_id' => 'required',
+            'model' => 'required',
             'type' => 'required',
         ],
         'update' => [],
@@ -41,6 +41,11 @@ class ImageModel extends BaseModel
     public function getSrcAttribute()
     {
         return $this->path . $this->name;
+    }
+
+    public function product()
+    {
+        return $this->belongsTo('App\Models\productModel', 'product_id','id');
     }
 
     /**

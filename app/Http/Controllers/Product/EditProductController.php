@@ -90,6 +90,10 @@ class EditProductController extends Controller
      */
     public function update($id)
     {   
+        $model = $this->product->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         request()->flash();
 
         $editStatus = request()->input('edit');

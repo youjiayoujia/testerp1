@@ -328,20 +328,20 @@ return [
         'url' => 'dashboard.index',
     ],
     //客户导航
-    [
-        'name' => '客户',
-        'icon' => 'user',
-        'url' => 'dashboard.index',
-        'type' => '',
-        'subnavigations' => [
-            [
-                'name' => 'CRM',
-                'url' => 'dashboard.index',
-                'icon' => '',
-            ],
-        ],
-
-    ],
+//    [
+//        'name' => '客户',
+//        'icon' => 'user',
+//        'url' => 'dashboard.index',
+//        'type' => '',
+//        'subnavigations' => [
+//            [
+//                'name' => 'CRM',
+//                'url' => 'dashboard.index',
+//                'icon' => '',
+//            ],
+//        ],
+//
+//    ],
     //系统导航
     [
         'name' => '系统',

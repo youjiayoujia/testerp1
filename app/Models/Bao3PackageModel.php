@@ -12,7 +12,6 @@ class Bao3PackageModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'Packages';
 
     /**
      * The attributes that are mass assignable.

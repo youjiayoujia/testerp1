@@ -2,11 +2,11 @@
 @section('formAction') {{ route('catalog.store') }} @stop
 @section('formBody')
     <div class="form-group">
-        <label for="c_name">分类名称中文</label>(品类英文名（主要）和品类中文名 例如裙子(dress))
+        <label for="c_name">分类名称中文</label>
         <input class="form-control" id="c_name" placeholder="名称" name='c_name' value="{{old('c_name')}}">
     </div>
     <div class="form-group">
-        <label for="name">分类名称英文</label>(品类英文名（主要）和品类中文名 例如裙子(dress))
+        <label for="name">分类名称英文</label>
         <input class="form-control" id="name" placeholder="名称" name='name' value="{{old('name')}}">
     </div>
     <div class="panel panel-info">

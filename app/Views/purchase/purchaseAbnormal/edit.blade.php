@@ -6,7 +6,6 @@
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="warehouse">仓库:</label>
-{{--            {{$model->warehouse->name}}--}}
         </div>
         <div class="form-group col-lg-4">
             <label for="sku_id">sku:</label>

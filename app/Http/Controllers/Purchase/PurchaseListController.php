@@ -35,6 +35,9 @@ class PurchaseListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','desc')),
         ];
+		foreach($response['data'] as $key=>$vo){
+			$response['data'][$key]['position_num']=PositionModel::where('warehouse_id',$vo->warehouse_id)->count();			
+			}
         return view($this->viewPath . 'index', $response);
     }
 

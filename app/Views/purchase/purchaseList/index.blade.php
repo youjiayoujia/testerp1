@@ -36,6 +36,8 @@
                 @else
                 <input type="checkbox" name="purchaseList_id"  value="{{$purchaseList->id}}" isexamine="0" >
                 @endif
+                <input type="hidden" id="{{ $purchaseList->id }}_position_num"  value="{{$purchaseList['position_num']}}"  >
+                
             </td>
         
             <td>{{ $purchaseList->id }}</td>
@@ -113,6 +115,7 @@
 				var purcahse_active="";
 				var item_weight='';
 				var costExamineStatus='';
+				var position_num='';
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     if(checkbox[i].getAttribute('isexamine')==1){
@@ -129,7 +132,11 @@
                         alert("id为"+checkbox[i].value+"的采购条目价格审核未通过");
                         return;
                     }
-					
+					position_num=$("#"+checkbox[i].value+"_position_num" ).val();
+					if(position_num == 0){
+                        alert("id为"+checkbox[i].value+"的采购条目没有库位");
+                        return;
+                    }
 					purcahse_active +=checkbox[i].value+"+"+$("#"+checkbox[i].value+"_active" ).val()+",";
                     purchase_ids += checkbox[i].value+",";
                 }

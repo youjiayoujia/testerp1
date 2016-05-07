@@ -78,7 +78,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="country_id" class="form-control" multiple style="height:300px;width:400px;">
                 @foreach($countries as $country)
-                    <option class="form-control" value="{{ $country->abbreviation }}" {{ old('country_id') ? old('country_id') == $country->abbreviation ? 'selected' : '' : ''}} onclick="addCountry( this )">
+                    <option class="form-control" value="{{ $country->code }}" {{ old('country_id') ? old('country_id') == $country->code ? 'selected' : '' : ''}} onclick="addCountry( this )">
                         {{ $country->name }}
                     </option>
                 @endforeach
@@ -89,7 +89,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" id="dselectCountry" multiple style="height:300px;width:400px;">
                 @foreach($selectedCountries as $selectedCountry)
-                    <option class="form-control thecountry" value="{{ $selectedCountry->abbreviation }}" onclick="deleteCountry( this )">
+                    <option class="form-control thecountry" value="{{ $selectedCountry->code }}" onclick="deleteCountry( this )">
                         {{ $selectedCountry->name }}
                     </option>
                 @endforeach

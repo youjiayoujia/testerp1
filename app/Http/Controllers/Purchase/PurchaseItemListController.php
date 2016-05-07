@@ -80,7 +80,7 @@ class PurchaseItemListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'storageLogs'=>StorageLogModel::where('purchaseItemId',$id)->get(),
+			'storageLogs'=>InModel::where('relation_id',$id)->get(),
         ];
         return view($this->viewPath . 'show', $response);
     }

@@ -51,13 +51,13 @@
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
             <td>
-            <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}"/> 
+            <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}" style="width:50px"/> 
               <a href="javascript:" class="btn btn-info btn-xs changeWeight" data-id="{{ $purchaseList->id }}">更新</a>
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
             <td>{{ $purchaseList->purchase_num}}/{{ $purchaseList->arrival_num}}/{{ $purchaseList->lack_num}}</td>
              
-            	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}"/> 
+            	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
             	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
                 
            <td> @foreach(config('purchase.purchaseItem.status') as $k=>$status)

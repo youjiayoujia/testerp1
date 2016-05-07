@@ -51,7 +51,7 @@
         <div class='form-group col-lg-2'>
             <select class='form-control' name='new_logistic'>
             @foreach($logistics as $logistic)
-                <option value="{{ $logistic->id }}">{{ $logistic->logistics_type }}</option>
+                <option value="{{ $logistic->id }}">{{ $logistic->short_code }}</option>
             @endforeach
             </select>
         </div>

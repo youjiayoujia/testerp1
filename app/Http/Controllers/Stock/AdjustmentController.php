@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Stock;
 
 use DB;
 use Exception;
+use App\Models\UserModel;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
@@ -81,6 +82,7 @@ class AdjustmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -153,6 +155,7 @@ class AdjustmentController extends Controller
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
             'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
             'access_quantity' => $access_quantity,
+            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -278,9 +281,10 @@ class AdjustmentController extends Controller
                 DB::rollback();
             }
             DB::commit();
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
         } else {
             $obj->update(['status'=>'1', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']);
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核未通过...'));
         }
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
 }

@@ -64,13 +64,17 @@
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="purchase_id">采购员</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="purchase_id" placeholder="采购员id" name='purchase_id' value="{{ old('purchase_id') ?  old('purchase_id') : $model->purchase_id }}">
+            <select name='purchase_id' class='form-control'>
+            @foreach($users as $user)
+            <option value="{{ $user->id }}" {{ $user->id == $model->purchase_id ? 'selected' : ''}}>{{ $user->name }}</option>
+            @endforeach
+            </select>
         </div> 
         <div class="form-group col-lg-4">
             <label for="level">供货商等级</label>
             <select id='level' name='level_id' class='form-control' >
             @foreach($levels as $level)
-                <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
+                <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $model->level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
             @endforeach
             </select>
         </div>

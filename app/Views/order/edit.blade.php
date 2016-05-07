@@ -383,7 +383,7 @@
     </div>
     <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
-        <div class="panel-body">
+        <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label for="sku" class='control-label'>sku</label>
@@ -465,88 +465,107 @@
                 </div>
             @endforeach
         </div>
+        <div class="panel-footer">
+            <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增产品</strong></div>
+        </div>
     </div>
 @stop
-<script type='text/javascript'>
-    $(document).ready(function(){
-        $('#create_time, #payment_date, #affair_time, #refund_time').cxCalendar();
+@section('pageJs')
+    <script type='text/javascript'>
+        $(document).ready(function(){
+            $('#create_time, #payment_date, #affair_time, #refund_time').cxCalendar();
 
-        document.getElementById('comment').style.display='none';
-        document.getElementById('hand').style.display='none';
+            document.getElementById('comment').style.display='none';
+            document.getElementById('hand').style.display='none';
 
-        var payment = $('#payment').val();
-        $('#refund').val(payment);
-        var currency = $('#currency').val();
-        $('#refund_currency').val(currency);
+            var payment = $('#payment').val();
+            $('#refund').val(payment);
+            var currency = $('#currency').val();
+            $('#refund_currency').val(currency);
 
-        var refund_time = $('#refund_time').val();
-        if(refund_time == '0000-00-00') {
-            $('#refund').val(null);
-            $('#refund_currency').val(null);
-            $('#refund_account').val(null);
-            $('#refund_amount').val(null);
-            $('#refund_time').val(null);
-        }
+            var refund_time = $('#refund_time').val();
+            if(refund_time == '0000-00-00') {
+                $('#refund').val(null);
+                $('#refund_currency').val(null);
+                $('#refund_account').val(null);
+                $('#refund_amount').val(null);
+                $('#refund_time').val(null);
+            }
 
-        var affair_time = $('#affair_time').val();
-        if(affair_time == '0000-00-00') {
-            $('#affair_time').val('');
-        }
+            var affair_time = $('#affair_time').val();
+            if(affair_time == '0000-00-00') {
+                $('#affair_time').val('');
+            }
 
-        var current = 1;
-        $('#create_form').click(function(){
-            $.ajax({
-                url:"{{ route('orderAdd') }}",
-                data:{current:current},
-                dataType:'html',
-                type:'get',
-                success:function(result) {
-                    $('.addpanel').before(result);
-                }
-            });
-            current++;
-        });
-
-        $('#channel_id').click(function(){
-            var channel_id = $("#channel_id").val();
-            $.ajax({
-                url : "{{ route('account') }}",
-                data : { id : channel_id },
-                dataType : 'json',
-                type : 'get',
-                success : function(result) {
-                    $('.channel_account_id').html();
-                    str = '';
-                    for(var i=0; i<result.length; i++)
-                        str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
-                    $('.channel_account_id').html(str);
-                }
-            });
-        });
-
-        $(document).on('blur', '.sku', function(){
-            var tmp = $(this);
-            var sku = $(this).val();
-            $.ajax({
-                url : "{{ route('getMsg') }}",
-                data : {sku : sku},
-                dataType : 'json',
-                type : 'get',
-                success : function(result) {
-                    if(result != false) {
-                        tmp.parent().parent().find('.image').html("<img src='/"+result+"' width='25px' height='25px'>");
-                    }else{
-                        alert('sku有误');
-                        tmp.val('');
+            var current = 1;
+            $('#create_form').click(function(){
+                $.ajax({
+                    url:"{{ route('orderAdd') }}",
+                    data:{current:current},
+                    dataType:'html',
+                    type:'get',
+                    success:function(result) {
+                        $('.addpanel').before(result);
                     }
+                });
+                current++;
+            });
+
+            $('#addItem').click(function () {
+                $.ajax({
+                    url: "{{ route('orderAdd') }}",
+                    data: {current: current},
+                    dataType: 'html',
+                    type: 'get',
+                    success: function (result) {
+                        $('#itemDiv').append(result);
+                    }
+                });
+                current++;
+                if(current >= 1) {
+                    $('.sub').prop('disabled', false);
                 }
+            });
+
+            $('#channel_id').click(function(){
+                var channel_id = $("#channel_id").val();
+                $.ajax({
+                    url : "{{ route('account') }}",
+                    data : { id : channel_id },
+                    dataType : 'json',
+                    type : 'get',
+                    success : function(result) {
+                        $('.channel_account_id').html();
+                        str = '';
+                        for(var i=0; i<result.length; i++)
+                            str += "<option value='"+result[i]['id']+"'>"+result[i]['alias']+"</option>";
+                        $('.channel_account_id').html(str);
+                    }
+                });
+            });
+
+            $(document).on('blur', '.sku', function(){
+                var tmp = $(this);
+                var sku = $(this).val();
+                $.ajax({
+                    url : "{{ route('getMsg') }}",
+                    data : {sku : sku},
+                    dataType : 'json',
+                    type : 'get',
+                    success : function(result) {
+                        if(result != false) {
+                            tmp.parent().parent().find('.image').html("<img src='/"+result+"' width='25px' height='25px'>");
+                        }else{
+                            alert('sku有误');
+                            tmp.val('');
+                        }
+                    }
+                });
             });
         });
 
-    });
-
-    $(document).on('click', '.bt_right', function(){
-        $(this).parent().remove();
-    });
-
-</script>
+        $(document).on('click', '.bt_right', function(){
+            $(this).parent().remove();
+        });
+    </script>
+@stop

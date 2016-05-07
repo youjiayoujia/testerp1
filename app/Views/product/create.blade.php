@@ -36,6 +36,10 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-md-3">
+            <label for="size">主供应商货号</label>
+            <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
+        </div>
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select  class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -45,9 +49,10 @@
             </select>
         </div>
         <div class="form-group col-md-3">
-            <label for="size">供应商货号</label>
-            <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
+            <label for="size">辅供应商货号</label>
+            <input class="form-control" id="second_supplier_sku" placeholder="辅供应商货号" name='second_supplier_sku' value="{{ old('second_supplier_sku') }}">
         </div>
+        
     </div>
 
     <div class='row'>
@@ -62,6 +67,10 @@
         <div class="form-group col-md-3">
             <label for="color">采购物流费(RMB)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">采购天数</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="purchase_day" placeholder="采购天数" name='purchase_day' value="{{ old('purchase_day') }}">
         </div>
     </div>
     <div class="row">

@@ -95,11 +95,14 @@
                 $tuhuobuyi = "false";
                 $canci = "false";
                 $purchaseArray = $model->purchase->toArray();
+                //$purchase_day = 0;
                 foreach ($purchaseArray as $arr) {
                     if($arr['active']==1&&$arr['active_status']>0)$baoque="true";
                     if($arr['active']==2&&$arr['active_status']>0)$baodeng="true";
                     if($arr['active']==3&&$arr['active_status']>0)$canci="true";
                     if($arr['active']==4&&$arr['active_status']>0)$tuhuobuyi="true";
+
+                    //$purchase_day = (strtotime($arr['arrival_time']) - strtotime($arr['start_buying_time']))/86400;
                 }
             ?>
             <div class="col-lg-2">
@@ -108,7 +111,9 @@
             <div class="col-lg-2">
                 <strong>库存金额</strong>: {{ $amount }}
             </div>
-
+            <div class="col-lg-2">
+                <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天
+            </div>
             <div class="col-lg-2">
                 <strong>报缺状态</strong>: {{$baoque}}
             </div>

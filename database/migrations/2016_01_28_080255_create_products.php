@@ -24,8 +24,10 @@ class CreateProducts extends Migration
             $table->integer('supplier_id')->comment('供应商id')->nullable()->default(0);
             $table->string('supplier_sku')->comment('供应商sku')->nullable()->default(NUll);
             $table->string('second_supplier_id')->comment('辅助供应商')->nullable()->default(0);
+            $table->string('second_supplier_sku')->comment('辅供应商sku')->nullable()->default(NUll);
             $table->string('supplier_info')->comment('供应商信息')->nullable()->default(NULL);
             $table->string('purchase_url')->comment('采购链接')->nullable()->default(NUll);
+            $table->integer('purchase_day')->comment('采购天数')->nullable()->default(0);
             $table->string('product_sale_url')->comment('产品销售链接')->nullable()->default(NUll);
             $table->decimal('purchase_price',8,2)->comment('采购价')->nullable()->default(0);
             $table->decimal('purchase_carriage',6,2)->comment('运费')->nullable()->default(0);

@@ -107,7 +107,7 @@ class PurchaseStockInController extends Controller
 				StorageLogModel::create($stoeagelog);
 				$stock=StockModel::find($vo->stock_id);
 				$stockmodel=new StockModel;
-				$stockmodel->in($stock->warehouse_position_id,$stoeagelog['storage_quantity'], $vo->purchase_cost*$stoeagelog['storage_quantity'], "PURCHASE",$vo->id, $remark = '订单采购入库！');
+				$stockmodel->in($stoeagelog['storage_quantity'], $vo->purchase_cost*$stoeagelog['storage_quantity'], "PURCHASE",$vo->id, $remark = '订单采购入库！');
 				}			
 			}
 	

@@ -3,11 +3,11 @@
 @section('formBody')
     <div class="form-group">
         <label for="c_name">分类中文名称</label>
-        <input class="form-control" id="c_name" placeholder="名称" name='c_name' value="{{old('c_name')}}">
+        <input class="form-control" id="c_name" placeholder="中文名称" name='c_name' value="{{old('c_name')}}">
     </div>
     <div class="form-group">
         <label for="name">分类英文名称</label>
-        <input class="form-control" id="name" placeholder="名称" name='name' value="{{old('name')}}">
+        <input class="form-control" id="name" placeholder="English Name" name='name' value="{{old('name')}}">
     </div>
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>

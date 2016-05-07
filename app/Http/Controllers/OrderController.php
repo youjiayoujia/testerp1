@@ -110,6 +110,7 @@ class OrderController extends Controller
             'items' => ItemModel::all(),
             'aliases' => $model->channel->channelAccount,
             'arr' => $arr,
+            'rows' => $model->items()->count(),
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -149,18 +150,21 @@ class OrderController extends Controller
                 $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
             }
             $orderItems = $this->model->find($id)->items;
-            foreach($orderItems as $key2 => $orderItem) {
-                if($key1 == $key2) {
-                    $orderItem->update($item);
+            if(count($data['items']) == count($orderItems)) {
+                foreach($orderItems as $key2 => $orderItem) {
+                    if($key1 == $key2) {
+                        $orderItem->update($item);
+                    }
+                }
+            }else{
+                foreach($orderItems as $key2 => $orderItem) {
+                    $orderItem->delete($item);
+                }
+                foreach($data['items'] as $value) {
+                    $this->model->find($id)->items()->create($value);
                 }
             }
         }
-
-//        $orderItem[$i]->update($data);
-//        while ($i != $orderItem_len) {
-//            $orderItem[$i]->delete();
-//            $i++;
-//        }
 
         return redirect($this->mainIndex);
     }

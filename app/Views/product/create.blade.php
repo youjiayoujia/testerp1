@@ -77,10 +77,14 @@
     <div class="row">
         <div class="form-group col-md-2">
             <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') }}">
+            <select  class="form-control" name="product_size">
+                <option value="大">大</option>
+                <option value="中">中</option>
+                <option value="小">小</option>
+            </select>
         </div>
         <div class="form-group col-md-3">
-            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长,xx 宽,xx 高,xx)
+            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>
             <div class="form-group col-md-2">

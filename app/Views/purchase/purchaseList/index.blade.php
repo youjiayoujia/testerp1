@@ -20,6 +20,8 @@
     <th>采购需求/采购数目/仍需采购</th>
     <th>国内物流号</th>
     <th>采购条目状态</th>
+    <th>采购价格</th>
+    <th>采购价格审核</th>
     <th>入库状态</th>
     <th>采购人</th>
     <th>异常状态</th>
@@ -49,20 +51,35 @@
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
             <td>
-            <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}"/> 
+            <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}" style="width:50px"/> 
               <a href="javascript:" class="btn btn-info btn-xs changeWeight" data-id="{{ $purchaseList->id }}">更新</a>
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
             <td>{{ $purchaseList->purchase_num}}/{{ $purchaseList->arrival_num}}/{{ $purchaseList->lack_num}}</td>
              
-            	<td><input type="text" name="weight" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}"/> 
+            	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
             	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
                 
            <td> @foreach(config('purchase.purchaseItem.status') as $k=>$status)
             	@if($purchaseList->status == $k)
             	{{ $status }}
                 @endif
-            @endforeach</td>
+            @endforeach</td>                  
+            <td>{{ $purchaseList->purchase_cost }}</td>
+            <td>
+            <input  type="hidden" name="costExamineStatus" id="{{ $purchaseList->id }}_costExamineStatus" value="{{ $purchaseList->costExamineStatus }}"/>
+            @if($purchaseList->costExamineStatus ==2)
+            	价格审核通过
+            @elseif($purchaseList->costExamineStatus ==1)
+            	价格审核不通过
+            @else
+             @if($purchaseList->purchase_cost>0)
+            	<a href="/purchaseItem/costExamineStatus/{{$purchaseList->id}}/1" class="btn btn-info btn-xs"> 审核不通过
+                </a> 
+                <a href="/purchaseItem/costExamineStatus/{{$purchaseList->id}}/2" class="btn btn-info btn-xs"> 审核通过
+                </a>
+              @endif
+            @endif</td>
              <td> @foreach(config('purchase.purchaseItem.storageStatus') as $kt=>$va)
             	@if($purchaseList->storageStatus == $kt)
             	{{ $va}}
@@ -94,12 +111,25 @@
                 var checkbox = document.getElementsByName("purchaseList_id");
                 var purchase_ids = "";
 				var purcahse_active="";
+				var item_weight='';
+				var costExamineStatus='';
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     if(checkbox[i].getAttribute('isexamine')==1){
                         alert("id为"+checkbox[i].value+"的采购条目已经对单了");
                         return;
                     }
+					item_weight=$("#"+checkbox[i].value+"_weight" ).val();
+					if(item_weight ==0){
+                        alert("id为"+checkbox[i].value+"的采购条目没有重量");
+                        return;
+                    }
+					costExamineStatus=$("#"+checkbox[i].value+"_costExamineStatus" ).val();
+					if(costExamineStatus < 2){
+                        alert("id为"+checkbox[i].value+"的采购条目价格审核未通过");
+                        return;
+                    }
+					
 					purcahse_active +=checkbox[i].value+"+"+$("#"+checkbox[i].value+"_active" ).val()+",";
                     purchase_ids += checkbox[i].value+",";
                 }

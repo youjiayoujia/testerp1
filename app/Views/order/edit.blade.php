@@ -497,7 +497,7 @@
                 $('#affair_time').val('');
             }
 
-            var current = 1;
+            var current = "{{ $rows }}";
             $('#create_form').click(function(){
                 $.ajax({
                     url:"{{ route('orderAdd') }}",

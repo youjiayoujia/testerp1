@@ -161,6 +161,7 @@ class OrderController extends Controller
                     $orderItem->delete($item);
                 }
                 foreach($data['items'] as $value) {
+                    $value['item_id'] = productItem::where('sku', $value['sku'])->first()->id;
                     $this->model->find($id)->items()->create($value);
                 }
             }

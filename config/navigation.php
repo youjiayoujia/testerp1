@@ -66,7 +66,7 @@ return [
                 ],
                 [
                     'name' => '选款产品发布',
-                    'url' => 'dashboard.index',
+                    'url' => 'PublishProduct.index',
                     'icon' => '',
                 ],
             ],

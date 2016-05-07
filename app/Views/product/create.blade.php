@@ -24,16 +24,6 @@
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') }}">
         </div>
-        <div class="form-group col-md-3">
-            <label for="color">别名中文</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="alias_cname" placeholder="别名中文" name='alias_cname' value="{{ old('alias_cname') }}">
-        </div>
-        <div class="form-group col-md-3">
-            <label for="color">别名英文</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="alias_name" placeholder="别名英文" name='alias_name' value="{{ old('alias_name')  }}">
-        </div>
     </div>
 
     <div class='row'>

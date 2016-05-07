@@ -11,6 +11,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Bao3PackageModel;
 
 class Bao3PackageController extends Controller
 {

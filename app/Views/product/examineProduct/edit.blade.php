@@ -42,7 +42,7 @@
         <tr>
         <td>备注:{{$model->remark}}</td>
          <td>
-            <label style="width:80px">主表:英文名: </label>
+            <label style="width:80px">产品英文名: </label>
             <textarea class="form-control form55" disabled="disabled" style="width:300px;" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
             <br><label style="width:80px"></label>
             <span class="msg">0 characters</span>

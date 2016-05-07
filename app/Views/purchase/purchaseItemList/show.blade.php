@@ -70,7 +70,7 @@
         <tr>
             <td>ID</td>
             <td>入库数量</td> 
-            <td>入库人</td> 
+            <td>入库备注</td> 
             <td>入库时间</td>          
         </tr>
     </thead>
@@ -78,8 +78,8 @@
     @foreach($storageLogs as $k=>$storageLog)
      <tr>
         <td>{{$storageLog->id}}</td> 
-        <td>{{$storageLog->storage_quantity}}</td> 
-        <td>{{$storageLog->user_id}}</td> 
+        <td>{{$storageLog->quantity}}</td> 
+        <td>{{$storageLog->remark}}</td> 
         <td>{{$storageLog->created_at}}</td>          
      </tr>
      @endforeach

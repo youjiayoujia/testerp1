@@ -62,7 +62,7 @@ class RuleModel extends BaseModel
     {
         $str = '';
         foreach(explode(",", $country) as $value) {
-            $countries = CountriesModel::where(['abbreviation' => $value])->get();
+            $countries = CountriesModel::where(['code' => $value])->get();
             foreach($countries as $country) {
                 $val = $country['name'];
                 $str = $str.$val.',';

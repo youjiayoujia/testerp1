@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th>ID</th>
     <th>图片</th>
+    <th>MODEL</th>
     <th>SPU ID</th>
     <th>产品ID</th>
     <th>图片类型</th>
@@ -13,6 +14,7 @@
         <tr>
             <td>{{ $image->id }}</td>
             <td><img src="{{ asset($image->src) }}" height="50px"></td>
+            <td>{{ $image->product->model}}</td>
             <td>{{ $image->spu_id}}</td>
             <td>{{ $image->product_id}}</td>
             <td>{{ $image->type }}</td>

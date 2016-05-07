@@ -81,6 +81,7 @@ class PurchaseAbnormalController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+		
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,

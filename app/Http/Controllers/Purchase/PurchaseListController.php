@@ -45,7 +45,7 @@ class PurchaseListController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	public function examinePurchaseItem()
-	{
+	{ 
 		$purcahse_active=explode(',',request()->get('purcahse_active'));
 		foreach($purcahse_active as $key=>$value){
 			$purcahse=explode('+',$value);
@@ -55,8 +55,8 @@ class PurchaseListController extends Controller
 				$arrayItems->update(['active_status'=>1,'active'=>$purcahse[1]]);	
 			}
 			if($purcahse[1]==0 && $arrayItems->costExamineStatus ==2){
-			$arrayItems->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
 			$this->generateBarCode($arrayItems->id);
+			$this->model->where('id',$purcahse[0])->where('stock_id','>',0)->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
 			$num=$this->model->where('purchase_order_id',$arrayItems->purchase_order_id)->where('status','<',2)->count();
 			$purchaseOrder=PurchaseOrderModel::find($arrayItems->purchase_order_id);
 			if($num==0){
@@ -90,7 +90,7 @@ class PurchaseListController extends Controller
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
 				$position_num=PositionModel::where('warehouse_id',$model->warehouse_id)->count();
 				if($position_num == 0){
-					return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
+					continue;
 					}
 					foreach($position as $key=>$v){
 						$WarehousePositionIds[$key]=$v->id;

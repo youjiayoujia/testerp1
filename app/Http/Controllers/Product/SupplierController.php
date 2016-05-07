@@ -12,6 +12,7 @@
 namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Product\SupplierLevelModel;
 use App\Models\Product\SupplierChangeHistoryModel;
@@ -36,6 +37,7 @@ class SupplierController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'levels' => SupplierLevelModel::all(),
+            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -75,6 +77,7 @@ class SupplierController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'levels' => SupplierLevelModel::all(),
+            'users' => UserModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

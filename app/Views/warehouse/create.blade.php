@@ -25,7 +25,11 @@
         </div>
         <div class='form-group col-lg-3'> 
             <label for='city'>联系人</label> 
-            <input type='text' class="form-control" name="contact_by" placeholder="联系人" value="{{ old('contact_by') }}">
+            <select name='contact_by' class='form-control'>
+            @foreach($users as $user)
+            <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+            </select>
         </div>
         <div class='form-group col-lg-3'> 
             <label for='city'>联系电话</label> 

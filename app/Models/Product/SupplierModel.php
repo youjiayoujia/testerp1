@@ -18,7 +18,7 @@ class SupplierModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'url', 'company', 'official_url', 'contact_name', 'email', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level_id'];
+    protected $fillable = ['name', 'url', 'company', 'official_url', 'contact_name', 'email', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level_id', 'created_by'];
 
     //查询
     public $searchFields = ['name','telephone']; 

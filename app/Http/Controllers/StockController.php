@@ -11,6 +11,7 @@
 namespace App\Http\Controllers;
 
 use Cache;
+use App\Models\UserModel;
 use Maatwebsite\Excel\Facades\Excel; 
 use App\Models\StockModel;
 use App\Models\WarehouseModel;
@@ -43,6 +44,7 @@ class StockController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::where('is_available','1')->get(),
+            'uses' => UserModel::all(),
         ];
 
         return view($this->viewPath.'create', $response);

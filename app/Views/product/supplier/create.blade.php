@@ -63,7 +63,11 @@
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="purchase_id">采购员</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="purchase_id" placeholder="采购者id" name='purchase_id' value="{{ old('purchase_id') }}">
+            <select name='purchase_id' class='form-control'>
+            @foreach($users as $user)
+            <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+            </select>
         </div>
         <div class="form-group col-lg-4">
             <label for="level">供货商等级</label>
@@ -77,7 +81,7 @@
             <label name='created_by' class='control-group'>
                 创建人
             </label>
-            <input class='form-control' type='text' value='1' name='created_by' id = 'created_by' readonly/>
+            <input class='form-control' type='text' value='1' name='created_by' readonly/>
        </div>
    </div>
 @stop

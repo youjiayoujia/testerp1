@@ -221,7 +221,7 @@ class AllotmentController extends Controller
         $time = date('Y-m-d',time());       
         if($arr['result'] == 0) {
             $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
-            return redirect($this->mainIndex);
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核已拒绝...'));
         }
         $time = date('Y-m-d',time());       
         $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 

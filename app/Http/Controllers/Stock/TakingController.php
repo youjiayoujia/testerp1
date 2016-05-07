@@ -237,11 +237,12 @@ class TakingController extends Controller
                 }
             }
             $model->update(['check_by'=>4, 'check_status'=>'2', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            Cache::store('file')->forever('stockIOStatus', '1');
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '审核已通过'));
         } else {
             $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            Cache::store('file')->forever('stockIOStatus', '1');
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核未通过'));
         }
-        
-        Cache::store('file')->forever('stockIOStatus', '1');
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核'));
     }
 }

@@ -3,7 +3,7 @@
     <div class='row'>
         <div class='form-group col-sm-4'>
             <label for='adjust_form_id'>调整单号</label>
-            <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : $model->adjust_form_id }}" readonly>
+            <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : $model->adjust_form_id }}">
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -16,7 +16,7 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="adjust_by">调整人</label>
-            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ old('adjust_by') ? old('adjust_by') : $model->adjust_by }}" readonly>
+            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ $model->adjustByName->name }}">
         </div>
     </div>
     <div class='form-group'>
@@ -61,13 +61,13 @@
                         <input type='text' name='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][$key]') ? old('arr[warehouse_position_id][$key]') : $adjustment->position->name }}">
                     </div>
                     <div class="form-group col-sm-1">
-                        <input type='text' class="form-control access_quantity" id="arr[access_quantity][{{$key}}]" placeholder="可用数量" name='arr[access_quantity][{{$key}}]' value="{{ $access_quantity[$key] }}" readonly>
+                        <input type='text' class="form-control access_quantity" id="arr[access_quantity][{{$key}}]" placeholder="可用数量" name='arr[access_quantity][{{$key}}]' value="{{ $access_quantity[$key] }}">
                     </div>
                     <div class="form-group col-sm-2">
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
                     </div>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$key}}]" placeholder="单价" name='arr[unit_cost][{{$key}}]' value="{{ old('arr[unit_cost][$key]') ? old('arr[unit_cost][$key]') : round($adjustment->amount/$adjustment->quantity, 3) }}" {{ $adjustment->type == 'OUT' ? 'readonly' : ''}}>
+                        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$key}}]" placeholder="单价" name='arr[unit_cost][{{$key}}]' value="{{ old('arr[unit_cost][$key]') ? old('arr[unit_cost][$key]') : round($adjustment->amount/$adjustment->quantity, 3) }}" {{ $adjustment->type == 'OUT' ? : ''}}>
                     </div>
                 </div>
             @endforeach

@@ -81,7 +81,6 @@ class PurchaseAbnormalController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        var_dump(SupplierModel::find($model->item->product->second_supplier_id));exit;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,

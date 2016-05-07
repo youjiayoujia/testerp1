@@ -66,7 +66,7 @@
                     @endif
                 @endforeach
                 <li>
-                    <a href="http://crm.jinjidexiaoxuesheng.com">
+                    <a href="http://crm.com">
                         <span class="glyphicon glyphicon-user"></span>
                         CRM
                     </a>

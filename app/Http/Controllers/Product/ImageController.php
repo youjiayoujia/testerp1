@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product\ImageModel;
+use App\Models\ProductModel;
 
 class ImageController extends Controller
 {
@@ -44,7 +45,12 @@ class ImageController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $this->model->imageCreate(request()->all(), request()->files);
+        $data = request()->all();
+        $productModel = ProductModel::where("model",$data['model'])->first();
+        $data['product_id'] = $productModel->id;
+        $data['spu_id'] = $productModel->spu->id;
+    
+        $this->model->imageCreate($data, request()->files);
 
         return redirect($this->mainIndex);
     }

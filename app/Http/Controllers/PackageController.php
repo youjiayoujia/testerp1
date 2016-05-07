@@ -43,6 +43,7 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'logisticses' => LogisticsModel::all(),
+            'status' => config('package'),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -58,6 +59,28 @@ class PackageController extends Controller
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
         ];
         return view($this->viewPath . 'workFlow', $response);
+    }
+
+    public function allocateLogistics($id)
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '分配物流方式'),
+            'logisticses' => LogisticsModel::all(),
+            'id' => $id,
+        ];
+
+        return view($this->viewPath.'allocateLogistics', $response);
+    }
+
+    public function storeAllocateLogistics($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
+
+        return redirect($this->mainIndex);
     }
 
     public function doPackage()
@@ -81,7 +104,10 @@ class PackageController extends Controller
         $packages = PackageModel::where('status', 'NEW')->where('is_auto', '1')->get();
         foreach ($packages as $package) {
             echo $package->id . '<br>';
-            $package->assignLogistics();
+            $status = $package->assignLogistics();
+            if(!$status) {
+                $package->update(['status' => 'ASSIGNFAILED']);
+            }
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

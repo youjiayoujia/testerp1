@@ -41,7 +41,7 @@
         <tr>
         <td>备注:{{$model->remark}}</td>
          <td>
-            <label style="width:80px">主表:英文名: </label>
+            <label style="width:80px">产品英文名: </label>
             <textarea class="form-control form55" style="width:300px;" disabled="disabled" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
             <br><label style="width:80px"></label>
             <span class="msg">0 characters</span>
@@ -189,7 +189,6 @@
         <tr>
             <td><label>信息录入员: </label></td>
             <td>
-                <label>备注不编辑原因: </label><input type="text" disabled="disabled" class="form-control form55" id="unedit_reason" value="{{ old('unedit_reason') ?  old('unedit_reason') : $unedit_reason }}" name="unedit_reason">
             </td>
         </tr>
         <tr>
@@ -207,7 +206,7 @@
 
         <?php if($model->image_edit_not_pass_remark!=''){ ?>
             <tr>
-                <td><label>图片审核不通过原因: </label></td>
+                <td><label>图片不编辑原因: </label></td>
                 <td>
                     <label>{{$model->image_edit_not_pass_remark}} </label>
                 </td>

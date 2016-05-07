@@ -34,7 +34,7 @@ class RuleController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses' => LogisticsModel::all(),
-            'countries' => CountriesModel::orderBy('abbreviation', 'asc')->get(['name', 'abbreviation']),
+            'countries' => CountriesModel::orderBy('code', 'asc')->get(['name', 'code']),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -48,7 +48,7 @@ class RuleController extends Controller
     {
         $model = $this->model->find($id);
         $selectedCountry = explode(",",$model->country);
-        $selectedCountries = CountriesModel::whereIn('abbreviation', $selectedCountry)->get();
+        $selectedCountries = CountriesModel::whereIn('code', $selectedCountry)->get();
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -56,7 +56,7 @@ class RuleController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'logisticses' => LogisticsModel::all(),
-            'countries' => CountriesModel::orderBy('abbreviation', 'asc')->get(['name', 'abbreviation']),
+            'countries' => CountriesModel::orderBy('code', 'asc')->get(['name', 'code']),
             'selectedCountries' => $selectedCountries,
         ];
         return view($this->viewPath . 'edit', $response);

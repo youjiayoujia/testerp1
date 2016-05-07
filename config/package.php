@@ -2,6 +2,7 @@
 return  [
     'NEW' => '未处理',
     'ASSIGNED' => '已分配',
+    'ASSIGNFAILED' => '分配失败',
     'PROCESSING' => '处理中',
     'PICKING' => '拣货中',
     'PICKED' => '已拣货',

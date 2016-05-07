@@ -129,7 +129,12 @@
         </div>
         <div class="form-group col-md-1">
             <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $product->product_size }}">
+
+            <select id="supplier_id" class="form-control" name="product_size">     
+                <option value="大" {{ $product->product_size == '大' ? 'selected' : '' }}>大</option>
+                <option value="中" {{ $product->product_size == '中' ? 'selected' : '' }}>中</option>
+                <option value="小" {{ $product->product_size == '小' ? 'selected' : '' }}>小</option>
+            </select>
         </div>
         <div class="form-group col-md-1">
             <label for="color">产品包装尺寸(cm)</label>

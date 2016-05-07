@@ -84,7 +84,7 @@ class PurchaseAbnormalController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'secondSupplier'=>SupplierModel::find($model->item->product->second_supplier_id),
+			'secondSupplier'=>SupplierModel::find($model->item->second_supplier_id),
         ];
         return view($this->viewPath . 'edit', $response);
     }

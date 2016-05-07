@@ -104,6 +104,10 @@
                 @endforeach
             </select>
         </div> 
+        <div class="form-group col-md-3">
+            <label for="color">主供应商货号</label>
+            <input class="form-control" id="supplier_sku" placeholder="主供应商货号" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $product->supplier_sku }}">
+        </div>
     </div>
 
     <div class='row'>  
@@ -116,6 +120,10 @@
             </select>
         </div>
         <div class="form-group col-md-3">
+            <label for="color">辅供应商货号</label>
+            <input class="form-control" id="second_supplier_sku" placeholder="主供应商货号" name='second_supplier_sku' value="{{ old('second_supplier_sku') ?  old('second_supplier_sku') : $product->second_supplier_sku }}">
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $product->purchase_url }}">
         </div>
@@ -126,6 +134,10 @@
         <div class="form-group col-md-1">
             <label for="color">采购物流费(RMB)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $product->purchase_carriage }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">采购天数</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="purchase_day" placeholder="采购天数" name='purchase_day' value="{{ old('purchase_day') ?  old('purchase_day') : $product->purchase_day }}">
         </div>
         <div class="form-group col-md-1">
             <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>

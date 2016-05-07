@@ -83,7 +83,9 @@ class ProductModel extends BaseModel
         'data_edit_not_pass_remark',
         'spu_id',
         'second_supplier_id',
-        'supplier_sku'
+        'supplier_sku',
+        'second_supplier_sku',
+        'purchase_day'
     ];
 
     public function image()

@@ -70,6 +70,9 @@
             <strong>采购物流费</strong>: {{ $model->purchase_carriage }}
         </div>
         <div class="col-lg-3">
+            <strong>采购天数</strong>: {{ $model->purchase_day }} 天
+        </div>
+        <div class="col-lg-3">
                 <strong>主供应商sku</strong>: {{ $model->supplier_sku }}
             </div>
             <div class="col-lg-3">

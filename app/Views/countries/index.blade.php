@@ -21,6 +21,9 @@
                 <a href="{{ route('countries.show', ['id'=>$country->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                <a href="{{ route('countries.edit', ['id'=>$country->id]) }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $country->id }}"
                    data-url="{{ route('countries.destroy', ['id' => $country->id]) }}">

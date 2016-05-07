@@ -287,18 +287,20 @@ class OrderModel extends BaseModel
                 $this->save();
                 return true;
             } else { //生成订单需求
-                foreach ($this->active_items as $item) {
-                    $require = [];
-                    $require['item_id'] = $item->item_id;
-                    $require['warehouse_id'] = 1;
-                    $require['order_item_id'] = $item->id;
-                    $require['sku'] = $item->sku;
-                    $require['quantity'] = $item->quantity;
-                    $this->requires()->create($require);
+                if($this->status == 'PREPARED') {
+                    foreach ($this->active_items as $item) {
+                        $require = [];
+                        $require['item_id'] = $item->item_id;
+                        $require['warehouse_id'] = 1;
+                        $require['order_item_id'] = $item->id;
+                        $require['sku'] = $item->sku;
+                        $require['quantity'] = $item->quantity;
+                        $this->requires()->create($require);
+                    }
+                    $this->package_times += 1;
+                    $this->status = 'NEED';
+                    $this->save();
                 }
-                $this->package_times += 1;
-                $this->status = 'NEED';
-                $this->save();
             }
         }
         return false;

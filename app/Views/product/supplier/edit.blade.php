@@ -74,7 +74,7 @@
             <label for="level">供货商等级</label>
             <select id='level' name='level_id' class='form-control' >
             @foreach($levels as $level)
-                <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
+                <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $model->level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
             @endforeach
             </select>
         </div>

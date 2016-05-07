@@ -66,10 +66,7 @@
                 <strong>采购人</strong>:
                 <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
             </div>
-             <div class="form-group col-lg-4">
-                <strong>批量输入采购单:(在此输入物流单号则本页面采购条目列表的物流号全部跟新为输入的物流号)</strong>
-                <input class="form-control" type="text" id="batch_post_coding" onChange="batchPostCoding()" value=''/>		
-            </div>
+            
             <div class="form-group col-lg-4">
             	<strong>为该采购单添加新采购条目</strong>:
                 	<a href="/purchaseOrder/addItem/{{$model->id}}" class="btn btn-info btn-xs"> 添加
@@ -96,7 +93,7 @@
             <td>供货商sku</td> 
             <td>样图</td>
             <td>状态</td>
-            <td>物流单号</td>
+            <td>物流单号: <input  type="text" id="batch_post_coding" onChange="batchPostCoding()" value='' /></td>
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>所属平台</td>
@@ -324,8 +321,6 @@
 	//批量输入采购单号
 	function batchPostCoding(){
 		 var batch_post_coding=$('#batch_post_coding').val(); 
-		 var  items=$(".itemPostCoding").val();
-		 alert(items);
 			$(".itemPostCoding").val(batch_post_coding);
 		}
 		//新增物流号对应物流费

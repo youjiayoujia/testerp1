@@ -171,7 +171,8 @@ class PackageModel extends BaseModel
                 if ($this->shipping_limits->intersect($limits)->count() > 0) {
                     continue;
                 }
-                //物流商下单
+                echo 'here'.$rule->id;
+                //物流查询链接
                 $trackingUrl = $rule->logistics->url;
                 return $this->update([
                     'status' => 'ASSIGNED',

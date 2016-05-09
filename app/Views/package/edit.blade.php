@@ -21,9 +21,9 @@
                 <div class="col-lg-2">
                     <label>状态</label>
                     <select name='status' class='form-control'>
-                    @foreach($status as $key => $value)
-                    <option value="{{ $key }}" {{ $model->status == $key ? 'selected' : '' }}>{{ $value }}</option>
-                    @endforeach
+                        @foreach($status as $key => $value)
+                            <option value="{{ $key }}" {{ $model->status == $key ? 'selected' : '' }}>{{ $value }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-lg-2">
@@ -54,10 +54,18 @@
                 @foreach($model->items as $item)
                     <tr>
                         <td><img src="{{ asset($item->item->image) }}" width="100" readonly></td>
-                        <td><input type='text' class='form-control' value="{{ old('sku') ? old('sku') : $item->item->sku }}" readonly></td>
-                        <td><input type='text' class='form-control' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : $item->warehousePosition->name }}" readonly></td>
-                        <td><input type='text' class='form-control' value="{{ old('quantity') ? old('quantity') : $item->quantity }}" readonly></td>
-                        <td><input type='text' class='form-control' value="{{ old('remark') ? old('remark') : $item->remark }}" readonly></td>
+                        <td>
+                            <input type='text' class='form-control' value="{{ old('sku') ? old('sku') : $item->item->sku }}" readonly>
+                        </td>
+                        <td>
+                            <input type='text' class='form-control' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : $item->warehousePosition->name }}" readonly>
+                        </td>
+                        <td>
+                            <input type='text' class='form-control' value="{{ old('quantity') ? old('quantity') : $item->quantity }}" readonly>
+                        </td>
+                        <td>
+                            <input type='text' class='form-control' value="{{ old('remark') ? old('remark') : $item->remark }}" readonly>
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -99,7 +107,9 @@
                     <input type='text' class='form-control' name='cost' value="{{ old('cost') ? old('cost') : $model->cost }}">
                 </div>
                 <div class="col-lg-2">
-                    <label>重量</label>
+                    <label>重量
+                        <small>Kg</small>
+                    </label>
                     <input type='text' class='form-control' name='weight' value="{{ old('weight') ? old('weight') : $model->weight }}">
                 </div>
                 <div class="col-lg-2">

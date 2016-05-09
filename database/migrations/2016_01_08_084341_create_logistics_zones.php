@@ -16,7 +16,7 @@ class CreateLogisticsZones extends Migration
             $table->increments('id');
             $table->string('zone')->comment('物流分区报价');
             $table->integer('logistics_id')->comment('物流方式');
-            $table->string('country_id')->comment('国家');
+            $table->text('country_id')->comment('国家');
             $table->string('shipping_id')->comment('种类')->default(NULL);
             $table->float('fixed_weight')->comment('首重')->nullable()->default(NULL);
             $table->float('fixed_price')->comment('首重价格')->nullable()->default(NULL);

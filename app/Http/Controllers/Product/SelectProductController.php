@@ -90,7 +90,7 @@ class SelectProductController extends Controller
         $data['edit_status'] = 'canceled';
         $model->update($data);
         $model->destroy($id);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
 
     /**

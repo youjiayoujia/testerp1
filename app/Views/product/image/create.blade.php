@@ -8,7 +8,7 @@
     </div>-->
     <div class="form-group col-lg-12">
         <label class='control-label'>产品MODEL</label>
-        <input class="form-control" type="text" name='model' value='1'/>
+        <input class="form-control" type="text" name='model' value='' placeholder="MODEL"/>
     </div>
     <div class="form-group col-lg-12">
         <label for="color">图片类型：</label>

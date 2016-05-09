@@ -239,7 +239,7 @@ class PurchaseOrderController extends Controller
      */	
 	public function cancelOrder($id)
 	{	
-		$num=purchaseItemModel::where('purchase_order_id',$id)->where('status','>',2)->count();
+		$num=purchaseItemModel::where('purchase_order_id',$id)->where('status','>',1)->count();
 		if($num>0){
 			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
 			}

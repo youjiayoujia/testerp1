@@ -16,7 +16,7 @@ class CreateLogisticsRules extends Migration
             $table->increments('id');
             $table->integer('type_id')->comment('物流方式');
             $table->integer('priority')->comment('优先级');
-            $table->string('country')->comment('国家');
+            $table->text('country')->comment('国家');
             $table->double('weight_from', 15, 2)->comment('重量从');
             $table->double('weight_to', 15, 2)->comment('重量至');
             $table->double('order_amount', 15, 2)->comment('订单金额');

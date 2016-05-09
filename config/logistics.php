@@ -7,7 +7,12 @@
  */
 return [
     //对接方式
-    'docking' => ['手工发货', '内单号api', '物流api', '号码池'],
+    'docking' => [
+        'MANUAL' => '手工发货',
+        'SELFAPI' => '内单号api',
+        'API' => '物流api',
+        'CODE' => '号码池',
+    ],
 
     //面单模版
     'template' => [],

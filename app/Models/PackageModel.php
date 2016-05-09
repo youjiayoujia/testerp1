@@ -162,15 +162,18 @@ class PackageModel extends BaseModel
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中
+                echo '1';
                 $countries = explode(",", $rule->country);
                 if (!in_array($this->shipping_country, $countries)) {
                     continue;
                 }
+                echo '2';
                 //是否有物流限制
                 $limits = explode(",", $rule->logistics->limit);
                 if ($this->shipping_limits->intersect($limits)->count() > 0) {
                     continue;
                 }
+                echo '3';
                 //物流查询链接
                 $trackingUrl = $rule->logistics->url;
                 return $this->update([

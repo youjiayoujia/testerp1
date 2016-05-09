@@ -52,6 +52,7 @@ class PurchaseStockInController extends Controller
     public function updateStorage()
     {
         $data = request()->all();
+		$storageNum=$data['storage_qty'];
         if ($data['storageInType'] == 1) {
             $data['storage_qty'] = 1;
         }
@@ -110,9 +111,9 @@ class PurchaseStockInController extends Controller
             }
         } 
         if ($data['storageInType'] == 1) {
-			return redirect(route('purchaseStockIn.create'))->with('alert',$this->alert('success', $this->mainTitle . '入库成功.'));
+			return redirect(route('purchaseStockIn.create'))->with('alert',$this->alert('success', $this->mainTitle .$data['sku'].'入库成功1件！'));
         } else {
-			return redirect('manyStockIn')->with('alert', $this->alert('success', $this->mainTitle . '入库成功.'));
+			return redirect('manyStockIn')->with('alert', $this->alert('success', $this->mainTitle . $data['sku'].'入库成功'.$storageNum.'件！'));
         }
     }
 

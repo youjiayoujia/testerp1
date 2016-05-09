@@ -24,7 +24,7 @@ class PurchaseAbnormalController extends Controller
     {
         $this->model = $purchaseItem;
         $this->mainIndex = route('purchaseAbnormal.index');
-        $this->mainTitle = '异常采购需求';
+        $this->mainTitle = '异常采购条目';
 		$this->viewPath = 'purchase.purchaseAbnormal.';
     }
     

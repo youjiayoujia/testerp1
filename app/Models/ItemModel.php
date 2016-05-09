@@ -31,6 +31,7 @@ class ItemModel extends BaseModel
         'supplier_id',
         'supplier_sku',
         'second_supplier_id',
+        'second_supplier_sku',
         'supplier_info',
         'purchase_url',
         'purchase_price',

@@ -45,7 +45,7 @@ class ImageModel extends BaseModel
 
     public function product()
     {
-        return $this->belongsTo('App\Models\productModel', 'product_id','id');
+        return $this->belongsTo('App\Models\ProductModel', 'product_id','id');
     }
 
     /**

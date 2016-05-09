@@ -115,7 +115,9 @@ class PackageModel extends BaseModel
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
             $packageLimit = $packageItem->item->product->package_limit;
-            $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            if ($packageLimit) {
+                $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            }
         }
         return $packageLimits->unique();
     }
@@ -155,7 +157,8 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where('weight_from', '<=', $weight)->where('weight_to', '>=', $weight)
+            where('weight_from', '<=', $weight)
+                ->where('weight_to', '>=', $weight)
                 ->where('order_amount', '>=', $amount)
                 ->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
@@ -167,11 +170,13 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //是否有物流限制
-                $limits = explode(",", $rule->logistics->limit);
-                if ($this->shipping_limits->intersect($limits)->count() > 0) {
-                    continue;
+                if ($this->shipping_limits) {
+                    $limits = explode(",", $rule->logistics->limit);
+                    if ($this->shipping_limits->intersect($limits)->count() > 0) {
+                        continue;
+                    }
                 }
-                //物流商下单
+                //物流查询链接
                 $trackingUrl = $rule->logistics->url;
                 $this->update([
                     'status' => 'ASSIGNED',
@@ -185,6 +190,10 @@ class PackageModel extends BaseModel
                 }
                 return true;
             }
+            return $this->update([
+                'status' => 'ASSIGNFAILED',
+                'logistics_assigned_at' => date('Y-m-d H:i:s')
+            ]);
         }
         return false;
     }
@@ -269,13 +278,14 @@ class PackageModel extends BaseModel
                 $error[] = $key;
                 continue;
             }
-            $this->find($content['package_id'])->update(['logistics_id' => $tmp_logistics->id, 
-                                                         'tracking_no' => $content['tracking_no'],
-                                                         'status' => 'SHIPPED',
-                                                         'shipped_at' => date('Y-m-d G:i:s', time()),
-                                                         'shipper_id' => '2']);
-            foreach($this->find($content['package_id'])->items as $packageitem)
-            {
+            $this->find($content['package_id'])->update([
+                'logistics_id' => $tmp_logistics->id,
+                'tracking_no' => $content['tracking_no'],
+                'status' => 'SHIPPED',
+                'shipped_at' => date('Y-m-d G:i:s', time()),
+                'shipper_id' => '2'
+            ]);
+            foreach ($this->find($content['package_id'])->items as $packageitem) {
                 $packageitem->orderItem->update(['status' => 'SHIPPED']);
             }
         }

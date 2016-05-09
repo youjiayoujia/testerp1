@@ -14,6 +14,7 @@
     $filter_attributes = '';
     $brief = '';
     $description = '';
+    $baoguan_name = '';
     if(!empty($check)){
         $unedit_reason = $check->unedit_reason;
         $market_usd_price = $check->market_usd_price;
@@ -25,6 +26,7 @@
         $filter_attributes = $check->filter_attributes;
         $brief = $check->brief;
         $description = $check->description;
+        $baoguan_name = $check->baoguan_name;
     } 
 
 ?>
@@ -50,7 +52,7 @@
         </tr>
         <tr>
             <td><label>产品中文名: </label>{{$model->c_name}}</td>
-            <td><label>主表:中文名: </label><input type="text" disabled="disabled" class="form-control form55" style="width:300px;" id="c_name" value="{{ old('c_name') ?  old('c_name') : $c_name }}" name="c_name"></td>
+            <td><label>报关:中文名: </label><input type="text" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> class="form-control form55" style="width:300px;" id="baoguan_name" value="{{ old('baoguan_name') ?  old('baoguan_name') : $baoguan_name }}" name="baoguan_name"></td>
         </tr>
         <tr>
             <td><label>图片备注: </label></td>

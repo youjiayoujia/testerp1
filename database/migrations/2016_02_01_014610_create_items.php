@@ -27,6 +27,7 @@ class CreateItems extends Migration
             $table->integer('supplier_id')->nullable();
             $table->string('supplier_sku')->nullable();
             $table->string('second_supplier_id')->nullable();
+            $table->string('second_supplier_sku')->nullable();
             $table->string('supplier_info')->nullable();
             $table->string('purchase_url')->nullable();
             $table->decimal('purchase_price', 7, 2)->nullable();

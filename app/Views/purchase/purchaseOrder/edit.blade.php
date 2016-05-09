@@ -96,7 +96,6 @@
             <td>物流单号: <input  type="text" id="batch_post_coding" onChange="batchPostCoding()" value='' /></td>
             <td>采购价格</td>
             <td>采购价格审核</td>
-            <td>所属平台</td>
             <td>购买链接</td> 
             <td>操作</td>           
         </tr>
@@ -153,13 +152,7 @@
               @endif
             @endif
             </td>    
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
+           
              <td>
             	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
             </td>  
@@ -214,7 +207,6 @@
             <td>物流单号+物流费</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
-            <td>所属平台</td>
             <td>购买链接</td>           
         </tr>
     </thead>
@@ -261,13 +253,7 @@
             	价格审核不通过
             @endif
             </td>    
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
+            
              <td>
             	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
             </td>  

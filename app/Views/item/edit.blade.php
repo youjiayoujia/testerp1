@@ -10,27 +10,22 @@
         </div>
 
         <div class="form-group col-md-3">
-            <label for="size">item名英文</label>
+            <label for="size">item英文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="name" placeholder="产品name" disabled="disabled" name='name' value="{{ old('name') ?  old('name') : $model->product->productEnglishValue->name }}">
+            <input class="form-control" id="name" placeholder="item英文" disabled="disabled" name='name' value="{{ old('name') ?  old('name') : $model->product->productEnglishValue->name }}">
         </div>
         <div class="form-group col-md-3">
-            <label for="color">item名中文</label>
+            <label for="color">item中文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="产品中文名" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+            <input class="form-control" id="c_name" placeholder="item中文" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
         </div>
         <div class="form-group col-md-3">
-            <label for="color">item别名中文</label>
+            <label for="color">item报关中文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="产品中文名" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
+            <input class="form-control" id="c_name" placeholder="item报关中文" disabled="disabled" name='c_name' value="{{ $model->product->productEnglishValue->baoguan_name }}">
         </div>
     </div>
     <div class="row">
-        <div class="form-group col-md-3">
-            <label for="color">item别名英文</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="产品中文名" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
-        </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -40,6 +35,10 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-md-3">
+            <label for="color">主供应商sku</label>
+            <input class="form-control" id="supplier_sku" placeholder="主供应商sku" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $model->supplier_sku }}">
+        </div>
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -48,40 +47,48 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-md-3">
+            <label for="color">辅供应商sku</label>
+            <input class="form-control" id="second_supplier_sku" placeholder="辅供应商sku" name='second_supplier_sku' value="{{ old('second_supplier_sku') ?  old('second_supplier_sku') : $model->second_supplier_sku }}">
+        </div>
     </div>
     <div class="row">
-        <div class="form-group col-md-3">
-            <label for="color">供应商sku</label>
-            <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
-        </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-4">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2">
             <label for="size">采购价</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_price" placeholder="采购价" name='purchase_price' value="{{ old('purchase_price') ?  old('purchase_price') : $model->purchase_price }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2">
             <label for="color">采购物流费</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $model->purchase_carriage }}">
         </div>
-        <div class="form-group col-md-1">
+        
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
             <label for="size">尺寸类型</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $model->product_size }}">
+            <select id="product_size" class="form-control" name="product_size">     
+                <option value="大" {{ $model->product_size == '大' ? 'selected' : '' }}>大</option>
+                <option value="中" {{ $model->product_size == '中' ? 'selected' : '' }}>中</option>
+                <option value="小" {{ $model->product_size == '小' ? 'selected' : '' }}>小</option>
+            </select>
         </div>
-        <div class="form-group col-md-1">
-            <label for="color">item包装尺寸（cm）</label>
+        <div class="form-group col-md-3">
+            <label for="color">item包装尺寸（cm）(长*宽*高)</label>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $model->package_size }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-3">
             <label for="size">item重量（kg）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
-        </div>
+        </div>        
     </div>
 
 

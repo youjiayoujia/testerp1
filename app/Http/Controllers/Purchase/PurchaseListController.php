@@ -33,7 +33,7 @@ class PurchaseListController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','desc')),
+            'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','asc')),
         ];
 		foreach($response['data'] as $key=>$vo){
 			$response['data'][$key]['position_num']=PositionModel::where('warehouse_id',$vo->warehouse_id)->count();			

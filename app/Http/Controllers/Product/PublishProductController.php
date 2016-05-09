@@ -25,7 +25,7 @@ class PublishProductController extends Controller
         $this->currency = $currencyModel;
         $this->supplier = $supplier;
         $this->mainTitle = '选款发布';
-        $this->viewPath = 'product.PublishProduct.';
+        $this->viewPath = 'product.publishProduct.';
     }
 
     /**

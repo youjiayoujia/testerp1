@@ -50,7 +50,7 @@ class PackageModel extends BaseModel
         'shipping_phone',
         'is_auto',
         'remark',
-        'logistic_assigned_at',
+        'logistics_assigned_at',
         'printed_at',
         'shipped_at',
         'delivered_at',
@@ -173,12 +173,17 @@ class PackageModel extends BaseModel
                 }
                 //物流商下单
                 $trackingUrl = $rule->logistics->url;
-                return $this->update([
+                $this->update([
                     'status' => 'ASSIGNED',
                     'logistics_id' => $rule->logistics->id,
                     'tracking_link' => $trackingUrl,
                     'logistics_assigned_at' => date('Y-m-d H:i:s')
                 ]);
+                $logistics = LogisticsModel::find($rule->logistics->id);
+                if($logistics->docking == '手工发货') {
+                    $this->update(['is_auto' => '0']);
+                }
+                return true;
             }
         }
         return false;

@@ -75,6 +75,60 @@ class PickListController extends Controller
         return view($this->viewPath.'print', $response);
     }
 
+    public function indexPrintPickList($content)
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'content' => $content,
+        ];
+
+        return view($this->viewPath.'choosePickList', $response);
+    }
+
+    public function processBase()
+    {
+        $flag = request('flag');
+        $picknum = request('picknum');
+        switch($flag) {
+            case 'print':
+                $model = $this->model->where('picknum', $picknum)->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->printPickList($model->id);
+                break;
+            case 'single':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE', 'status' => 'PICKED', 'status' => 'PACKAGEING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->pickListPackage($model->id);
+                break;
+            case 'singleMulti':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI', 'status' => 'PICKED', 'status' => 'PACKAGEING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->pickListPackage($model->id);
+                break;
+            case 'inbox':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI', 'status' => 'PICKED'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->inbox($model->id);
+                break;
+            case 'multi':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI', 'status' => 'INBOXED', 'status' => 'PACKAGEING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->pickListPackage($model->id);
+                break;
+        }
+        
+    }
+
     /**
      * 打包页面
      *
@@ -99,6 +153,25 @@ class PickListController extends Controller
         ];
     
         return view($this->viewPath.'package', $response);
+    }
+
+    public function oldPrint()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'oldPrint', $response);
+    }
+
+    public function updatePrint()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath.'updatePrint', $response);
     }
 
     /**

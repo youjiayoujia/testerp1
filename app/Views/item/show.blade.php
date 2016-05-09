@@ -108,10 +108,10 @@
                 }
             ?>
             <div class="col-lg-1">
-                <strong>库存</strong>: {{ $inventory }}
+                <strong>库存</strong>: {{ $model->all_quantity }}
             </div>
             <div class="col-lg-1">
-                <strong>库存金额</strong>: {{ $amount }}
+                <strong>库存金额</strong>: {{ ($model->all_quantity)*($model->cost) }}
             </div>
             <div class="col-lg-1">
                 <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天

@@ -171,6 +171,7 @@ class PackageModel extends BaseModel
                 echo '2';
                 //是否有物流限制
                 $limits = explode(",", $rule->logistics->limit);
+                var_dump($limits);
                 if ($limits and $this->shipping_limits->intersect($limits)->count() > 0) {
                     continue;
                 }

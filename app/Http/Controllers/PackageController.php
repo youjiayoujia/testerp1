@@ -51,7 +51,7 @@ class PackageController extends Controller
     public function flow()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => OrderModel::where('active', 'NORMAL')
                 ->whereIn('status', ['PREPARED', 'NEED'])->count(),
             'assignNum' => $this->model->where('status', 'NEW')->count(),

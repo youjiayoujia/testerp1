@@ -34,6 +34,7 @@ class ImageModel extends BaseModel
         'create' => [
             'model' => 'required',
             'type' => 'required',
+            'image0' => 'required',
         ],
         'update' => [],
     ];

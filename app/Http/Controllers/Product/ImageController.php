@@ -46,7 +46,13 @@ class ImageController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
+        if (!array_key_exists('image0', $data)) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '请添加图片.'));
+        }
         $productModel = ProductModel::where("model",$data['model'])->first();
+        if (!$productModel) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
+        }
         $data['product_id'] = $productModel->id;
         $data['spu_id'] = $productModel->spu->id;
     

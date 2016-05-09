@@ -27,7 +27,7 @@
             <td>{{ $logistics->supplier->name }}</td>
             <td>{{ $logistics->type }}</td>
             <td>{{ $logistics->url }}</td>
-            <td>{{ $logistics->docking }}</td>
+            <td>{{ $logistics->docking_name }}</td>
             <td>{{ $logistics->pool_quantity }}</td>
             <td>{{ $logistics->limit($logistics->limit) }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>

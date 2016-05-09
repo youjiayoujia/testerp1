@@ -52,8 +52,8 @@
             <label for="docking" class="control-label">对接方式</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="docking" id="docking">
-                @foreach(config('logistics.docking') as $docking)
-                    <option value="{{ $docking }}" {{ old('docking') == $docking ? 'selected' : '' }}>
+                @foreach(config('logistics.docking') as $docking_key => $docking)
+                    <option value="{{ $docking_key }}" {{ old('docking') == $docking_key ? 'selected' : '' }}>
                         {{ $docking }}
                     </option>
                 @endforeach

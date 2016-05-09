@@ -95,6 +95,12 @@ class LogisticsModel extends BaseModel
         return $this->hasMany('App\Models\Logistics\CodeModel', 'logistics_id');
     }
 
+    public function getDockingNameAttribute()
+    {
+        $arr = config('logistics.docking');
+        return $arr[$this->docking];
+    }
+
     /**
      * 物流商下单
      * todo:分方式下单

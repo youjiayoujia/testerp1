@@ -7,6 +7,10 @@
         {{$model->product_id}}
     </div>
     <div class="form-group col-lg-12">
+        <label for="product_id">产品MODEL:</label>
+        {{$model->product->model}}
+    </div>
+    <div class="form-group col-lg-12">
         <label for="type">图片类型：</label>
         {{ $model->type }}
     </div>

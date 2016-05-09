@@ -148,8 +148,8 @@
                 <option value="小" {{ $product->product_size == '小' ? 'selected' : '' }}>小</option>
             </select>
         </div>
-        <div class="form-group col-md-1">
-            <label for="color">产品包装尺寸(cm)</label>
+        <div class="form-group col-md-2">
+            <label for="color">产品包装尺寸(cm)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长*宽*高)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $product->package_size }}">
         </div>
         <div class="form-group col-md-1">

@@ -45,7 +45,7 @@
                    data-url="{{ route('logistics.destroy', ['id' => $logistics->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
-                @if($logistics->docking == '号码池')
+                @if($logistics->docking == 'CODE')
                     <a href="/batchAddTrCode/{{ $logistics->id }}" class="btn btn-success btn-xs">
                         <span class="glyphicon glyphicon-plus"></span> 导入-号码池
                     </a>

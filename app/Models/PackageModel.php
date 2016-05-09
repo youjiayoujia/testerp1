@@ -165,13 +165,10 @@ class PackageModel extends BaseModel
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中
-                echo '1';
                 $countries = explode(",", $rule->country);
                 if (!in_array($this->shipping_country, $countries)) {
                     continue;
                 }
-                echo '2';
-                var_dump($this->shipping_limits);
                 //是否有物流限制
                 if ($this->shipping_limits) {
                     $limits = explode(",", $rule->logistics->limit);
@@ -179,7 +176,6 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
-                echo '3';
                 //物流查询链接
                 $trackingUrl = $rule->logistics->url;
                 return $this->update([
@@ -189,10 +185,10 @@ class PackageModel extends BaseModel
                     'logistics_assigned_at' => date('Y-m-d H:i:s')
                 ]);
             }
-//            return $this->update([
-//                'status' => 'ASSIGNFAILED',
-//                'logistics_assigned_at' => date('Y-m-d H:i:s')
-//            ]);
+            return $this->update([
+                'status' => 'ASSIGNFAILED',
+                'logistics_assigned_at' => date('Y-m-d H:i:s')
+            ]);
         }
         return false;
     }

@@ -58,7 +58,7 @@ class PackageController extends Controller
             'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
         ];
-        return view($this->viewPath . 'workFlow', $response);
+        return view($this->viewPath . 'flow', $response);
     }
 
     public function allocateLogistics($id)
@@ -69,7 +69,7 @@ class PackageController extends Controller
             'id' => $id,
         ];
 
-        return view($this->viewPath.'allocateLogistics', $response);
+        return view($this->viewPath . 'allocateLogistics', $response);
     }
 
     public function storeAllocateLogistics($id)
@@ -105,7 +105,7 @@ class PackageController extends Controller
         foreach ($packages as $package) {
             echo $package->id . '<br>';
             $status = $package->assignLogistics();
-            if(!$status) {
+            if (!$status) {
                 $package->update(['status' => 'ASSIGNFAILED']);
             }
         }
@@ -160,7 +160,10 @@ class PackageController extends Controller
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
         $arr = explode(' ', request('name'));
-        $model->update(['shipping_firstname' => array_key_exists('0', $arr) ? $arr['0'] : '', 'shipping_lastname'=>array_key_exists('1', $arr) ? $arr['1'] : '']);
+        $model->update([
+            'shipping_firstname' => array_key_exists('0', $arr) ? $arr['0'] : '',
+            'shipping_lastname' => array_key_exists('1', $arr) ? $arr['1'] : ''
+        ]);
 
         return redirect($this->mainIndex);
     }
@@ -177,7 +180,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        foreach($model->items as $packageItem) {
+        foreach ($model->items as $packageItem) {
             $stockout = $packageItem->stockout;
             $stock = StockModel::find($stockout->stock_id);
             $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
@@ -289,9 +292,13 @@ class PackageController extends Controller
         if ($package->logistics_id != $logistic_id) {
             return json_encode('logistic_error');
         }
-        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
-        foreach($package->items as $packageitem)
-        {
+        $package->update([
+            'status' => 'SHIPPED',
+            'shipped_at' => date('Y-m-d h:i:s', time()),
+            'shipper_id' => '2',
+            'actual_weight' => $weight
+        ]);
+        foreach ($package->items as $packageitem) {
             $packageitem->orderItem->update(['status' => 'SHIPPED']);
         }
 

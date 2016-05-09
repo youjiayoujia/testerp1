@@ -20,7 +20,7 @@
                 </a>
             </div>
             <div class="col-lg-2 text-left">
-                <a type="button" class="btn btn-default" href="{{ route('pickList.createPick') }}">
+                <a type="button" class="btn btn-default" href="{{ route('package.manualLogistics') }}">
                     手动分配物流 <span class="badge">{{ $pickNum }}</span>
                 </a>
             </div>
@@ -37,7 +37,7 @@
                 </a>
             </div>
             <div class="col-lg-2 text-left">
-                <a type="button" class="btn btn-default" href="{{ route('pickList.createPick') }}">
+                <a type="button" class="btn btn-default" href="{{ route('package.manualShipping') }}">
                     手工发货 <span class="badge">{{ $pickNum }}</span>
                 </a>
             </div>

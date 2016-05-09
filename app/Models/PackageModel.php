@@ -69,6 +69,11 @@ class PackageModel extends BaseModel
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id');
     }
 
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
+    }
+
     public function order()
     {
         return $this->belongsTo('App\Models\OrderModel', 'order_id');
@@ -178,17 +183,14 @@ class PackageModel extends BaseModel
                 }
                 //物流查询链接
                 $trackingUrl = $rule->logistics->url;
-                $this->update([
+                $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
+                return $this->update([
                     'status' => 'ASSIGNED',
                     'logistics_id' => $rule->logistics->id,
                     'tracking_link' => $trackingUrl,
-                    'logistics_assigned_at' => date('Y-m-d H:i:s')
+                    'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                    'is_auto' => $is_auto,
                 ]);
-                $logistics = LogisticsModel::find($rule->logistics->id);
-                if($logistics->docking == '手工发货') {
-                    $this->update(['is_auto' => '0']);
-                }
-                return true;
             }
             return $this->update([
                 'status' => 'ASSIGNFAILED',

@@ -220,10 +220,35 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses' => LogisticsModel::all(),
-            'model' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->get(),
+            'packages' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->get(),
         ];
 
         return view($this->viewPath.'manualShipping', $response);
+    }
+
+    public function manualLogistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logisticses' => LogisticsModel::all(),
+            'packages' => $this->model->where(['status' => 'ASSIGNFAILED', 'is_auto' => '1'])->get(),
+        ];
+
+        return view($this->viewPath.'manualLogistics', $response);
+    }
+
+    public function setManualLogistics()
+    {
+        $id = request('id');
+        $logistics_id = request('logistics');
+        $model = $this->model->find($id);
+        if(!$model) {
+            return json_encode(false);
+        }
+        $logistics = LogisticsModel::find($logistics_id);
+        $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
+        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
+        return json_encode(true);
     }
 
     public function ajaxPackageSend()

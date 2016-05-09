@@ -1,14 +1,14 @@
 @extends('common.detail')
 @section('detailBody')
     <div class="panel panel-default">
-        <div class="panel-heading">采购需求信息 :</div>
+        <div class="panel-heading">需求明细 :</div>
         
      <table class="table table-bordered table-striped table-hover sortable">
     <thead>
         <tr>
             <td>ID</td>
             <td>SKU</td>
-            <td>订单ID</td>
+            <td>订单号</td>
             <td>订单itemID</td>
             <td>数量</td>
             <td>创建时间</td>           

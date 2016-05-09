@@ -123,6 +123,18 @@ class PackageController extends Controller
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
+    public function ajaxQuantityProcess()
+    {
+        $buf = request()->input('buf');
+        foreach($buf as $v)
+        {
+            $model = $this->model->find($v);
+            $model->update(['status'=>'SHIPPED']);
+        }
+
+        return json_encode(true);
+    }
+
     public function placeLogistics()
     {
         $begin = microtime(true);

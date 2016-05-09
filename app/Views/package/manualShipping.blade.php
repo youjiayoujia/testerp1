@@ -29,10 +29,8 @@
 </div>
 @stop
 @section('formButton')
-<button type="submit" class="btn btn-success">打印发货单</button>
-<button type="reset" class="btn btn-default">取消</button>
+<button href="javascript:" class="btn btn-success quantity_process">发货</button>
 @stop
-
 @section('pageJs')
 <script type='text/javascript'>
 $(document).ready(function(){
@@ -46,6 +44,26 @@ $(document).ready(function(){
                 $(this).prop('checked', false);
             })
         }
+    });
+
+    $('.quantity_process').click(function(){
+        buf = new Array();
+        i = 0;
+        $.each($('.select_single:checked'), function(){
+            buf[i] = $(this).parent().next().text();
+            i++;
+        });
+        $.ajax({
+            url:"{{ route('package.ajaxQuantityProcess')}}",
+            data:{buf:buf},
+            dataType:'json',
+            type:'get',
+            success:function(result) {
+                if(result) {
+                    location.reload();
+                }
+            }
+        })
     });
 });
 </script>

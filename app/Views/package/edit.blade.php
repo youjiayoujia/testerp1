@@ -89,6 +89,7 @@
                 <div class="col-lg-2">
                     <label>物流方式</label>
                     <select name='logistics_id' class='form-control'>
+                        <option value=""></option>
                         @foreach($logisticses as $logistics)
                             <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : ''}}>{{ $logistics->short_code }}</option>
                         @endforeach

@@ -16,6 +16,7 @@ use App\Models\OrderModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\PickListModel;
 
 class PackageController extends Controller
 {
@@ -57,6 +58,14 @@ class PackageController extends Controller
             'assignNum' => $this->model->where('status', 'NEW')->count(),
             'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
+            'printNum' => PickListModel::where('status', 'NONE')->count(),
+            'singlePack' => PickListModel::where(['type' => 'SINGLE', 'status' => 'PICKED'])->count(),
+            'singleMultiPack' => PickListModel::where(['type' => 'SINGLEMULTI', 'status' => 'PICKED'])->count(),
+            'multiInbox' => PickListModel::where(['type' => 'MULTI', 'status' => 'PICKED'])->count(),
+            'multiPack' => PickListModel::where(['type' => 'MULTI', 'status' => 'INBOXED'])->count(),
+            'packageShipping' => $this->model->where('status', 'PACKED')->count(),
+            'packageException' => $this->model->where('status', 'ERROR')->count(),
+            'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
         return view($this->viewPath . 'flow', $response);
     }
@@ -77,6 +86,10 @@ class PackageController extends Controller
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $logistics = LogisticsModel::find(request('logistics_id'));
+        if($logistics->docking == '手工发货') {
+            $model->update(['is_auto' => '0']);
         }
         $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
 
@@ -200,6 +213,42 @@ class PackageController extends Controller
             }
         }
         return 'error';
+    }
+
+    public function manualShipping()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logisticses' => LogisticsModel::all(),
+            'packages' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->get(),
+        ];
+
+        return view($this->viewPath.'manualShipping', $response);
+    }
+
+    public function manualLogistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logisticses' => LogisticsModel::all(),
+            'packages' => $this->model->where(['status' => 'ASSIGNFAILED', 'is_auto' => '1'])->get(),
+        ];
+
+        return view($this->viewPath.'manualLogistics', $response);
+    }
+
+    public function setManualLogistics()
+    {
+        $id = request('id');
+        $logistics_id = request('logistics');
+        $model = $this->model->find($id);
+        if(!$model) {
+            return json_encode(false);
+        }
+        $logistics = LogisticsModel::find($logistics_id);
+        $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
+        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
+        return json_encode(true);
     }
 
     public function ajaxPackageSend()

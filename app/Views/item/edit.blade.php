@@ -53,34 +53,42 @@
         </div>
     </div>
     <div class="row">
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-4">
             <label for="color">采购链接</label>
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2">
             <label for="size">采购价</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_price" placeholder="采购价" name='purchase_price' value="{{ old('purchase_price') ?  old('purchase_price') : $model->purchase_price }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-2">
             <label for="color">采购物流费</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $model->purchase_carriage }}">
         </div>
-        <div class="form-group col-md-1">
+        
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
             <label for="size">尺寸类型</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $model->product_size }}">
+            <select id="product_size" class="form-control" name="product_size">     
+                <option value="大" {{ $model->product_size == '大' ? 'selected' : '' }}>大</option>
+                <option value="中" {{ $model->product_size == '中' ? 'selected' : '' }}>中</option>
+                <option value="小" {{ $model->product_size == '小' ? 'selected' : '' }}>小</option>
+            </select>
         </div>
-        <div class="form-group col-md-1">
-            <label for="color">item包装尺寸（cm）</label>
+        <div class="form-group col-md-3">
+            <label for="color">item包装尺寸（cm）(长*宽*高)</label>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $model->package_size }}">
         </div>
-        <div class="form-group col-md-1">
+        <div class="form-group col-md-3">
             <label for="size">item重量（kg）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') ?  old('weight') : $model->weight }}">
-        </div>
+        </div>        
     </div>
 
 

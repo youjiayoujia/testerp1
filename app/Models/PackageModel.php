@@ -115,7 +115,9 @@ class PackageModel extends BaseModel
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
             $packageLimit = $packageItem->item->product->package_limit;
-            $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            if ($packageLimit) {
+                $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            }
         }
         return $packageLimits->unique();
     }
@@ -169,8 +171,8 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 echo '2';
-                //是否有物流限制
                 var_dump($this->shipping_limits);
+                //是否有物流限制
                 if ($this->shipping_limits) {
                     $limits = explode(",", $rule->logistics->limit);
                     if ($this->shipping_limits->intersect($limits)->count() > 0) {

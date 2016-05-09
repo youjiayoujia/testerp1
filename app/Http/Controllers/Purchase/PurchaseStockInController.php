@@ -52,10 +52,10 @@ class PurchaseStockInController extends Controller
     public function updateStorage()
     {
         $data = request()->all();
-		$storageNum=$data['storage_qty'];
         if ($data['storageInType'] == 1) {
             $data['storage_qty'] = 1;
         }
+		$storageNum=$data['storage_qty'];
         $purchaseItemList = $this->model->where('sku', $data['sku'])->where('status',
             '2')->orderby('storageStatus')->get();
         $arrival_num = $this->model->where('sku', $data['sku'])->where('status', '2')->sum('arrival_num');

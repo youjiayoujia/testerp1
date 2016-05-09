@@ -170,10 +170,12 @@ class PackageModel extends BaseModel
                 }
                 echo '2';
                 //是否有物流限制
-                $limits = explode(",", $rule->logistics->limit);
-                var_dump($limits);
-                if ($limits and $this->shipping_limits->intersect($limits)->count() > 0) {
-                    continue;
+                var_dump($this->shipping_limits);
+                if ($this->shipping_limits) {
+                    $limits = explode(",", $rule->logistics->limit);
+                    if ($this->shipping_limits->intersect($limits)->count() > 0) {
+                        continue;
+                    }
                 }
                 echo '3';
                 //物流查询链接

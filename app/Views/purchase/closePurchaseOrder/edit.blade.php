@@ -89,7 +89,6 @@
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)
-         @if($purchaseItem->storageStatus == 0)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
             <td>
@@ -124,7 +123,6 @@
             </td>
             <td>{{$purchaseItem->item->supplier_sku}}</td>
         </tr>
-        @endif
         @endforeach
     </tbody>
     </table>

@@ -3,10 +3,6 @@
 <div class="panel panel-default">
         <div class="panel-heading">单头</div>
         <div class="panel-body">
-         <div class="form-group col-lg-4">
-                <strong>标题: choies公司向 {{$model->supplier->name}} 采购单</strong>
-            </div>
-           
              <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
                 {{ $model->warehouse->name}}
@@ -116,7 +112,6 @@
             <td>物流单号+物流费</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
-            <td>所属平台</td>
             <td>购买链接</td> 
             <td>操作</td>           
         </tr>
@@ -164,13 +159,7 @@
              	成本价格未审核
             @endif
             </td>    
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
+          
              <td>
             	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
             </td>  

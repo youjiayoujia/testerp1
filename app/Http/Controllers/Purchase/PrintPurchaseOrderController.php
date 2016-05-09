@@ -24,7 +24,7 @@ class PrintPurchaseOrderController extends Controller
     {
         $this->model = $purchaseOrder;
 		$this->purchaseItem=$purchaseItem;
-        $this->mainIndex = route('printPurchaseOrder.index');
+        $this->mainIndex = route('printPurchaseOrder.create');
         $this->mainTitle = '采购单';
 		$this->viewPath = 'purchase.printPurchaseOrder.';
     }

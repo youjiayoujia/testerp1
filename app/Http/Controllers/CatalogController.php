@@ -36,7 +36,7 @@ class CatalogController extends Controller
         $extra['features'] = request()->input('features');
         //创建品类
         $this->model->createCatalog($data,$extra);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
     /**
@@ -61,7 +61,7 @@ class CatalogController extends Controller
         $extra['features'] = request()->input('features');
         //更新品类信息
         $catalogModel->updateCatalog($data,$extra);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -74,7 +74,7 @@ class CatalogController extends Controller
     {
         $catalogModel = $this->model->find($id);
         $catalogModel->destoryCatalog();
-        return redirect(route('catalog.index'));
+        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '删除成功.'));
     }
 
     /**

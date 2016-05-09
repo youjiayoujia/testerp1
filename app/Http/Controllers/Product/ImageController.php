@@ -52,7 +52,7 @@ class ImageController extends Controller
     
         $this->model->imageCreate($data, request()->files);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
 
@@ -66,7 +66,7 @@ class ImageController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update'));
         $this->model->updateImage($id, request()->file('image'));
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ImageController extends Controller
     public function destroy($id)
     {
         $this->model->imageDestroy($id);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
 
 }

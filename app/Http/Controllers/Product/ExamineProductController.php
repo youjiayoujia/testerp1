@@ -78,7 +78,7 @@ class ExamineProductController extends Controller
         if($data['examine_status']=='pass'&&empty($productModel->item->toArray())){
             $productModel->createItem();
         }
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '审核状态已更新.'));
         
         
     }

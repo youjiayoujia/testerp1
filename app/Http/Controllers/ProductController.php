@@ -56,7 +56,7 @@ class ProductController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $this->model->createProduct(request()->all(),request()->files);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
     /**
@@ -115,7 +115,7 @@ class ProductController extends Controller
         $productModel = $this->model->find($id);
         $productModel->updateProduct(request()->all(),request()->files);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -132,7 +132,7 @@ class ProductController extends Controller
         }
         $model->destoryProduct();
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
 
     /**

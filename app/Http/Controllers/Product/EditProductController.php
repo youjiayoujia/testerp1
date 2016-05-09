@@ -114,7 +114,7 @@ class EditProductController extends Controller
         $data['edit_user'] = empty(request()->user()) ? 0 : request()->user()->id;
         $productModel->update($data);
         
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '资料编辑成功.'));
     }
 
     /**
@@ -155,7 +155,7 @@ class EditProductController extends Controller
         $user['edit_image_user'] = empty(request()->user()) ? 0 : request()->user()->id;
         $ProductModel->update($user);
         
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '图片编辑成功.'));
     }
 
     /**

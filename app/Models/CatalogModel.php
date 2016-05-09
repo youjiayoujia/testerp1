@@ -88,6 +88,7 @@ class CatalogModel extends BaseModel
         if($extra){
             try {
                     foreach ($extra as $model=>$property) {
+                        if($property=='')continue;
                         foreach($property as $valueModel){
                             if(array_key_exists("id",$valueModel)){
                                 //更新属性名属性值

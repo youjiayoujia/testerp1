@@ -1,5 +1,17 @@
 @extends('common.table')
 @section('tableToolButtons') 
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="glyphicon glyphicon-filter"></i> 发布状态查询
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="">待发布</a></li>
+        <li><a href="">发布中</a></li>
+        <li><a href="">发布成功</a></li>
+        <li><a href="">发布失败</a></li>
+    </ul>
+</div> 
 <div class="btn-group">
     <a class="btn btn-primary" href="">
         暂不发布

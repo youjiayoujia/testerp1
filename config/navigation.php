@@ -262,7 +262,7 @@ return [
                 ],
                 [
                     'name' => '打印采购单',
-                    'url' => 'printPurchaseOrder.index',
+                    'url' => 'printPurchaseOrder.create',
                     'icon' => '',
                 ],
                 [

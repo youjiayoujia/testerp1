@@ -9,6 +9,7 @@
             <div class="form-group col-lg-4">
                 <strong>仓库</strong>:
                 <select id="checkWarehouse" name="checkWarehouse" onChange="checkWarehouse(this.id)">
+                <option value="0" selected>请选择仓库</option>
                 	@foreach($warehouses as $key=>$v)
                     	<option value="{{$v->warehouse_id}}">{{$v->warehouse->name}}</option>
                     @endforeach

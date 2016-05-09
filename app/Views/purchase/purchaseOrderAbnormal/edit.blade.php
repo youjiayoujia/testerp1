@@ -48,8 +48,7 @@
             <td>采购类型</td> 
             <td>SKU*采购数量</td> 
             <td>样图</td>         
-            <td>状态</td>   
-            <td>所属平台</td>
+            <td>状态</td> 
             <td>操作</td>           
         </tr>
     </thead>
@@ -104,13 +103,7 @@
                 @endforeach  
             @endif      
              </td>
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>      
+              
 			<td>
             @if($purchaseItem->active ==1)
             <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 取消该条目</a>  

@@ -10,19 +10,17 @@
 	<th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th>ID</th>
     <th>采购单ID</th>
-    <th>sku</th>
+    <th>sku*采购数量</th>
     <th>采购类型</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>供应商sku</th>
     <th>重量</th>
     <th>采购去向</th>
-    <th>采购需求/采购数目/仍需采购</th>
     <th>国内物流号</th>
     <th>采购条目状态</th>
     <th>采购价格</th>
     <th>采购价格审核</th>
-    <th>入库状态</th>
     <th>采购人</th>
     <th>异常状态</th>
     <th>操作</th>
@@ -36,17 +34,19 @@
                 @else
                 <input type="checkbox" name="purchaseList_id"  value="{{$purchaseList->id}}" isexamine="0" >
                 @endif
+                <input type="hidden" id="{{ $purchaseList->id }}_position_num"  value="{{$purchaseList['position_num']}}"  >
+                
             </td>
         
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->purchase_order_id }}</td>
-            <td>{{ $purchaseList->sku}}</td>
-            @foreach(config('purchase.purchaseItem.type') as $k=>$type)
+            <td>{{ $purchaseList->sku}}*{{$purchaseList->purchase_num}}</td>
+            <td>@foreach(config('purchase.purchaseItem.type') as $k=>$type)
             	@if($purchaseList->type == $k)
-            	<td>{{ $type }}</td>
+            	{{ $type }}
                 @endif
             @endforeach
-           
+           </td>
             <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
@@ -55,8 +55,6 @@
               <a href="javascript:" class="btn btn-info btn-xs changeWeight" data-id="{{ $purchaseList->id }}">更新</a>
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
-            <td>{{ $purchaseList->purchase_num}}/{{ $purchaseList->arrival_num}}/{{ $purchaseList->lack_num}}</td>
-             
             	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
             	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
                 
@@ -80,11 +78,11 @@
                 </a>
               @endif
             @endif</td>
-             <td> @foreach(config('purchase.purchaseItem.storageStatus') as $kt=>$va)
+             <!--<td> @foreach(config('purchase.purchaseItem.storageStatus') as $kt=>$va)
             	@if($purchaseList->storageStatus == $kt)
             	{{ $va}}
                 @endif
-            @endforeach</td>                    
+            @endforeach</td> -->                   
             <td>{{ $purchaseList->purchaseOrder->assigner }}</td>
             <td> 
             <select id="{{$purchaseList->id}}_active" name="active">
@@ -113,6 +111,7 @@
 				var purcahse_active="";
 				var item_weight='';
 				var costExamineStatus='';
+				var position_num='';
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     if(checkbox[i].getAttribute('isexamine')==1){
@@ -129,7 +128,11 @@
                         alert("id为"+checkbox[i].value+"的采购条目价格审核未通过");
                         return;
                     }
-					
+					position_num=$("#"+checkbox[i].value+"_position_num" ).val();
+					if(position_num == 0){
+                        alert("id为"+checkbox[i].value+"的采购条目没有库位");
+                        return;
+                    }
 					purcahse_active +=checkbox[i].value+"+"+$("#"+checkbox[i].value+"_active" ).val()+",";
                     purchase_ids += checkbox[i].value+",";
                 }

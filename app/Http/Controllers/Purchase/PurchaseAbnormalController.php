@@ -24,7 +24,7 @@ class PurchaseAbnormalController extends Controller
     {
         $this->model = $purchaseItem;
         $this->mainIndex = route('purchaseAbnormal.index');
-        $this->mainTitle = '异常采购需求';
+        $this->mainTitle = '异常采购条目';
 		$this->viewPath = 'purchase.purchaseAbnormal.';
     }
     
@@ -81,6 +81,7 @@ class PurchaseAbnormalController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+		
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,

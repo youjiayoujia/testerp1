@@ -24,16 +24,6 @@
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') }}">
         </div>
-        <div class="form-group col-md-3">
-            <label for="color">别名中文</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="alias_cname" placeholder="别名中文" name='alias_cname' value="{{ old('alias_cname') }}">
-        </div>
-        <div class="form-group col-md-3">
-            <label for="color">别名英文</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="alias_name" placeholder="别名英文" name='alias_name' value="{{ old('alias_name')  }}">
-        </div>
     </div>
 
     <div class='row'>
@@ -46,6 +36,10 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-md-3">
+            <label for="size">主供应商货号</label>
+            <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
+        </div>
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
             <select  class="form-control" name="second_supplier_id">
                 <option value="0"></option>
@@ -55,9 +49,10 @@
             </select>
         </div>
         <div class="form-group col-md-3">
-            <label for="size">供应商货号</label>
-            <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
+            <label for="size">辅供应商货号</label>
+            <input class="form-control" id="second_supplier_sku" placeholder="辅供应商货号" name='second_supplier_sku' value="{{ old('second_supplier_sku') }}">
         </div>
+        
     </div>
 
     <div class='row'>
@@ -73,6 +68,10 @@
             <label for="color">采购物流费(RMB)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') }}">
         </div>
+        <div class="form-group col-md-3">
+            <label for="color">采购天数</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="purchase_day" placeholder="采购天数" name='purchase_day' value="{{ old('purchase_day') }}">
+        </div>
     </div>
     <div class="row">
         <div class="form-group col-md-2">
@@ -84,7 +83,7 @@
             </select>
         </div>
         <div class="form-group col-md-3">
-            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长*宽*高)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>
             <div class="form-group col-md-2">

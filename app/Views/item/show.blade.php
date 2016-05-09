@@ -62,12 +62,14 @@
     <div class="panel panel-default">
         <div class="panel-heading">采购信息 :</div>
         <div class="panel-body">
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <strong>销售链接</strong>: {{ $model->product->product_sale_url }}
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-6">
                 <strong>采购链接</strong>: {{ $model->purchase_url }}
             </div>
+        </div>
+        <div class="panel-body">
             <div class="col-lg-3">
                 <strong>供应商sku</strong>: {{ $model->supplier_sku }}
             </div>
@@ -81,7 +83,7 @@
     </div>
 
     <div class="panel panel-default">
-        <div class="panel-heading"> :</div>
+        <div class="panel-heading"> 库存信息:</div>
         <div class="panel-body">
             <?php 
                 $inventory = 0;
@@ -95,30 +97,35 @@
                 $tuhuobuyi = "false";
                 $canci = "false";
                 $purchaseArray = $model->purchase->toArray();
+                //$purchase_day = 0;
                 foreach ($purchaseArray as $arr) {
                     if($arr['active']==1&&$arr['active_status']>0)$baoque="true";
                     if($arr['active']==2&&$arr['active_status']>0)$baodeng="true";
                     if($arr['active']==3&&$arr['active_status']>0)$canci="true";
                     if($arr['active']==4&&$arr['active_status']>0)$tuhuobuyi="true";
+
+                    //$purchase_day = (strtotime($arr['arrival_time']) - strtotime($arr['start_buying_time']))/86400;
                 }
             ?>
-            <div class="col-lg-2">
-                <strong>库存</strong>: {{ $inventory }}
+            <div class="col-lg-1">
+                <strong>库存</strong>: {{ $model->all_quantity }}
             </div>
-            <div class="col-lg-2">
-                <strong>库存金额</strong>: {{ $amount }}
+            <div class="col-lg-1">
+                <strong>库存金额</strong>: {{ ($model->all_quantity)*($model->cost) }}
             </div>
-
-            <div class="col-lg-2">
+            <div class="col-lg-1">
+                <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天
+            </div>
+            <div class="col-lg-1">
                 <strong>报缺状态</strong>: {{$baoque}}
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 <strong>报等状态</strong>: {{$baodeng}}
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 <strong>残次品</strong>: {{$canci}}
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 <strong>图货不一</strong>: {{$tuhuobuyi}}
             </div>
         </div>
@@ -171,10 +178,11 @@
             <div class="col-lg-3">
                 <strong>退款率</strong>: 
             </div>
-            <div class="col-lg-3">
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-6">
                 <strong>备注</strong>: {{ $model->remark }}
             </div>
-            
         </div>
     </div>
 @stop

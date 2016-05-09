@@ -337,6 +337,7 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::any('product/price', ['uses' => 'Product\EditProductController@price', 'as' => 'productPrice']);
   Route::resource('EditProduct', 'Product\EditProductController');
   Route::resource('SelectProduct', 'Product\SelectProductController');
+  Route::resource('PublishProduct', 'Product\PublishProductController');
   Route::get('cancelExamineAmazonProduct',
       [
           'uses' => 'Product\Channel\AmazonController@cancelExamineAmazonProduct',

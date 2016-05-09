@@ -1,12 +1,11 @@
 @extends('common.table')
 @section('tableHeader')
     <th>ID</th>
-    <th>sku</th>
+    <th>sku*采购数量</th>
     <th>采购单ID</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>采购去向</th>
-    <th>采购需求/采购数目/仍需采购</th>
     <th>shop</th>
     <th>异常状态</th>
     <th>是否生成采购单</th>
@@ -19,7 +18,7 @@
             <td>
             
             {{ $purchaseItem->id }}</td>
-            <td>{{ $purchaseItem->sku}}</td>
+            <td>{{ $purchaseItem->sku}}*{{ $purchaseItem->purchase_num}}</td>
            
             <td>{{ $purchaseItem->purchase_order_id}}</td>
             <td> 
@@ -31,12 +30,13 @@
            </td>
             <td>{{ $purchaseItem->supplier->name}}</td>
             <td>{{ $purchaseItem->warehouse->name}}</td>
-            <td>{{ $purchaseItem->purchase_num}}/{{ $purchaseItem->arrival_num}}/{{ $purchaseItem->lack_num}}</td>
-             @foreach(config('purchase.purchaseItem.channels') as $k=>$channel)
+        
+             <td>@foreach(config('purchase.purchaseItem.channels') as $k=>$channel)
             	@if($purchaseItem->platform_id == $k)
-            	<td>{{ $channel }}</td>
+            	{{ $channel }}
                 @endif
             @endforeach
+            </td>
             <td>
             @foreach(config('purchase.purchaseItem.active') as $k=>$status)
             	@if($purchaseItem->active == $k)

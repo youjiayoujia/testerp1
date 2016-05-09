@@ -52,6 +52,7 @@ class PurchaseStockInController extends Controller
     public function updateStorage()
     {
         $data = request()->all();
+		$storageNum=$data['storage_qty'];
         if ($data['storageInType'] == 1) {
             $data['storage_qty'] = 1;
         }
@@ -63,8 +64,7 @@ class PurchaseStockInController extends Controller
         //echo $arrival_num;echo ','.$storage_num;exit;
         if ($storage_num == 0) {
             if ($data['storageInType'] == 1) {
-                return redirect(route('purchaseStockIn.create'))->with('alert',
-                    $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+                return redirect(route('purchaseStockIn.create'))->with('alert',$this->alert('danger', $this->mainTitle . '没有可入库条目.'));
             } else {
                 return redirect('manyStockIn')->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
             }
@@ -109,15 +109,11 @@ class PurchaseStockInController extends Controller
                 $stock = StockModel::find($vo->stock_id);
                 ItemModel::find($stock->item_id)->in($stock->warehouse_position_id,$stoeagelog['storage_quantity'], $vo->purchase_cost * $stoeagelog['storage_quantity'],"PURCHASE", $vo->id, $remark = '订单采购入库！',0);
             }
-        }
-
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
+        } 
         if ($data['storageInType'] == 1) {
-            return view($this->viewPath . 'create', $response);
+			return redirect(route('purchaseStockIn.create'))->with('alert',$this->alert('success', $this->mainTitle .$data['sku'].'入库成功1件！'));
         } else {
-            return view($this->viewPath . 'stockIn', $response);
+			return redirect('manyStockIn')->with('alert', $this->alert('success', $this->mainTitle . $data['sku'].'入库成功'.$storageNum.'件！'));
         }
     }
 

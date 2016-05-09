@@ -83,7 +83,7 @@
             </select>
         </div>
         <div class="form-group col-md-3">
-            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="color">产品包装尺寸(cm)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长*宽*高)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>
             <div class="form-group col-md-2">

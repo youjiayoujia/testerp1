@@ -155,7 +155,8 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where('weight_from', '<=', $weight)->where('weight_to', '>=', $weight)
+            where('weight_from', '<=', $weight)
+                ->where('weight_to', '>=', $weight)
                 ->where('order_amount', '>=', $amount)
                 ->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
@@ -170,6 +171,7 @@ class PackageModel extends BaseModel
                 echo '2';
                 //是否有物流限制
                 $limits = explode(",", $rule->logistics->limit);
+                echo $this->shipping_limits->intersect($limits)->count();
                 if ($this->shipping_limits->intersect($limits)->count() > 0) {
                     continue;
                 }
@@ -183,10 +185,10 @@ class PackageModel extends BaseModel
                     'logistics_assigned_at' => date('Y-m-d H:i:s')
                 ]);
             }
-            return $this->update([
-                'status' => 'ASSIGNFAILED',
-                'logistics_assigned_at' => date('Y-m-d H:i:s')
-            ]);
+//            return $this->update([
+//                'status' => 'ASSIGNFAILED',
+//                'logistics_assigned_at' => date('Y-m-d H:i:s')
+//            ]);
         }
         return false;
     }

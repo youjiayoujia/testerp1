@@ -104,10 +104,7 @@ class PackageController extends Controller
         $packages = PackageModel::where('status', 'NEW')->where('is_auto', '1')->get();
         foreach ($packages as $package) {
             echo $package->id . '<br>';
-            $status = $package->assignLogistics();
-            if (!$status) {
-                $package->update(['status' => 'ASSIGNFAILED']);
-            }
+            $package->assignLogistics();
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

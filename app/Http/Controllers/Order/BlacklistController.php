@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Order;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order\BlacklistModel;
+use App\Models\OrderModel;
 
 class BlacklistController extends Controller
 {
@@ -21,6 +22,36 @@ class BlacklistController extends Controller
         $this->mainIndex = route('orderBlacklist.index');
         $this->mainTitle = '黑名单';
         $this->viewPath = 'order.blacklist.';
+    }
+
+    /**
+     * 更新黑名单
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $emails = OrderModel::distinct()->get(['email'])->toArray();
+        foreach($emails as $email) {
+            $orders = OrderModel::where(['email' => $email, 'status' => 'CANCEL'])->get();
+            if($orders->count() >= 5) {
+                foreach($orders as $order) {
+                    $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
+                    $data['email'] = $email['email'];
+                    $data['zipcode'] = $order['shipping_zipcode'];
+                    $data['whitelist'] = '0';
+                    $count = BlacklistModel::where(['name' => $data['name']])->count();
+                    if($count == 0) {
+                        $this->model->create($data);
+                    }
+                }
+            }
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     /**

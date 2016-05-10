@@ -109,7 +109,7 @@
             status = $(this).data('status');
             buf = new Array();
             i = 0;
-            $.each($('.select_single'), function(){
+            $.each($('.select_single:checked'), function(){
                 buf[i] = $(this).parent().next().text();
                 i++;
             });

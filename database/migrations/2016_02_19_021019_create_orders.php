@@ -83,6 +83,7 @@ class CreateOrders extends Migration
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->integer('priority')->comment('优先级')->nullable()->default(0);
             $table->integer('package_times')->comment('打包次数')->nullable()->default(0);
+            $table->enum('blacklist', ['0', '1'])->comment('黑名单订单')->nullable()->default('1');
             $table->date('refund_time')->comment('退款时间')->nullable()->default(NULL);
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间')->nullable()->default(NULL);

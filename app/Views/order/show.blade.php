@@ -69,6 +69,9 @@
             <div class="col-lg-2">
                 <strong>是否手工</strong>: {{ $model->by_hand_name }}
             </div>
+            <div class="col-lg-2">
+                <strong>黑名单订单</strong>: {{ $model->blacklist == '1' ? '否' : '是' }}
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

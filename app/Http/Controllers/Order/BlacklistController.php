@@ -41,6 +41,9 @@ class BlacklistController extends Controller
                     $data['zipcode'] = $order['shipping_zipcode'];
                     $data['whitelist'] = '0';
                     $count = BlacklistModel::where(['name' => $data['name']])->count();
+                    $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
+                    $order->update(['blacklist' => '0', 'status' => 'NEW',
+                        'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
                     if($count == 0) {
                         $this->model->create($data);
                     }

@@ -80,3 +80,7 @@ th:hover:not([data-sort=false]) {
     opacity: .8;
     cursor: pointer;
 }
+
+.table.table-bordered td {
+    vertical-align:middle;
+}

@@ -48,7 +48,7 @@
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span>
                      @if($purchaseOrder->examineStatus ==0)
-                     	去审核
+                     	审核
                      @else
                      	查看
                      @endif
@@ -56,7 +56,7 @@
                 </a>
                 @if($purchaseOrder->examineStatus == 2)
                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span>去采购
+                    <span class="glyphicon glyphicon-pencil"></span>采购
                 </a>
                 @endif       
                 

@@ -98,28 +98,28 @@ class PickListController extends Controller
                 return $this->printPickList($model->id);
                 break;
             case 'single':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE', 'status' => 'PICKED', 'status' => 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKED', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'singleMulti':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI', 'status' => 'PICKED', 'status' => 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKED', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'inbox':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI', 'status' => 'PICKED'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI'])->whereIn('status', ['PICKED', 'PICKING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->inbox($model->id);
                 break;
             case 'multi':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI', 'status' => 'INBOXED', 'status' => 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI'])->whereIn('status', ['INBOXED', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }

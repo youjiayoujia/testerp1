@@ -35,7 +35,7 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <td style="font-size:10   px;color:#FF78fd">MODEL:{{$model->model}}</td>
+            <td style="font-size:14px;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif">MODEL:{{$model->model}}</td>
             <td></td>
         </tr>
         <tr>
@@ -119,7 +119,7 @@
         </tr>
         
         <tr>
-            <td>
+            <td colspan="2">
                 @foreach($model->featureTextValues as $featureModel)
                     <div class="col-lg-3">
                         <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
@@ -127,8 +127,6 @@
                     <br>
                 @endforeach
             </td>
-
-            <td></td>
         </tr>
         <tr>
             <td>配件说明:{{$model->description}}

@@ -112,7 +112,7 @@
         <tr>
             <td>
                 @foreach($model->featureTextValues as $featureModel)
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" colspan="2">
                         <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
                     </div>
                     <br>

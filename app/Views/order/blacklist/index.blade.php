@@ -41,6 +41,16 @@
 @stop
 @section('tableToolButtons')
     <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 查询黑白名单
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ DataList::filtersEncode(['whitelist', '=', '0']) }}">黑名单</a></li>
+            <li><a href="{{ DataList::filtersEncode(['whitelist', '=', '1']) }}">白名单</a></li>
+        </ul>
+    </div>
+    <div class="btn-group" role="group">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             批量审核
             <span class="caret"></span>

@@ -89,3 +89,35 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 查询订单状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEW']) }}">未处理</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PREPARED']) }}">准备发货</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEED']) }}">需补货</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PACKED']) }}">打包完成</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'SHIPPED']) }}">发货完成</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'COMPLETE']) }}">订单完成</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'CANCEL']) }}">取消订单</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'ERROR']) }}">订单异常</a></li>
+        </ul>
+    </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 查询售后状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ DataList::filtersEncode(['active', '=', 'NORMAL']) }}">正常</a></li>
+            <li><a href="{{ DataList::filtersEncode(['active', '=', 'VERIFY']) }}">验证中</a></li>
+            <li><a href="{{ DataList::filtersEncode(['active', '=', 'CHARGEBACK']) }}">客户CB</a></li>
+            <li><a href="{{ DataList::filtersEncode(['active', '=', 'STOP']) }}">暂停发货</a></li>
+            <li><a href="{{ DataList::filtersEncode(['active', '=', 'RESUME']) }}">恢复正常</a></li>
+        </ul>
+    </div>
+    @parent
+@stop

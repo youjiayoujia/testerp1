@@ -58,12 +58,12 @@
             <input class="form-control" id="purchase_url" placeholder="采购链接" name='purchase_url' value="{{ old('purchase_url') ?  old('purchase_url') : $model->purchase_url }}">
         </div>
         <div class="form-group col-md-2">
-            <label for="size">采购价</label>
+            <label for="size">采购价（RMB）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_price" placeholder="采购价" name='purchase_price' value="{{ old('purchase_price') ?  old('purchase_price') : $model->purchase_price }}">
         </div>
         <div class="form-group col-md-2">
-            <label for="color">采购物流费</label>
+            <label for="color">采购物流费（RMB）</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $model->purchase_carriage }}">
         </div>

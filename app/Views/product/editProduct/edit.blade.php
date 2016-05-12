@@ -35,7 +35,7 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <td>MODEL:{{$model->model}}</td>
+            <td style="font-size:10   px;color:#FF78fd">MODEL:{{$model->model}}</td>
             <td></td>
         </tr>
         <tr>
@@ -142,7 +142,7 @@
         <tr>
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
-                <label>主表:重量: </label>
+                <label>主表:重量（kg）: </label>
                 <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="weight" name="weight" value="{{ old('weight') ?  old('weight') : $weight }}">
             </td>
         </tr>

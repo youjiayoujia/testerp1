@@ -33,6 +33,22 @@ class StockController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'warehouses' => WarehouseModel::where(['is_available' => '1'])->get(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 跳转创建页
      *
      * @param none

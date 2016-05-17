@@ -24,11 +24,8 @@
             <button type='button' class='btn btn-info search'>确认</button>
         </div>
     </div>
-    <div class='row'>
     <div class='form-group result'>
     
-    </div>
-    <img class='img' src=''>
     </div>
     <table class='table table-bordered'>
         <thead>
@@ -67,6 +64,7 @@ $(document).ready(function(){
     $('.search').click(function(){
         val = $('.searchsku').val();
         if(val) {
+            $('.result').html('');
             outflag = 0;
             $.each($('.sku'), function(){
                 if($(this).text() == val) {
@@ -75,8 +73,18 @@ $(document).ready(function(){
                     if(parseInt(row.find('.quantity').text()) > parseInt(row.find('.picked_quantity').text())) {
                         outflag = 1;
                         row.find('.picked_quantity').text(parseInt(row.find('.picked_quantity').text())+1);
-                        img = '';
-                        $.get("{{route('item.getImage')}}",{sku:block.find('.sku').text()},function(result){if(result) {$('.result').html(block.find('.package_id').attr('name') + '    ' + block.find('.img').attr('src', result));
+                        img = 0;
+                        $.get("{{route('item.getImage')}}",
+                              {sku:block.find('.sku').text()},
+                              function(result){
+                                if(result) {
+                                    $('.result').html(block.find('.package_id').attr('name') + '                                                           ' + "<img src="+result+">");
+                                    img = 1;
+                                }
+                            });
+                        if(img == 0) {
+                            $('.result').html(block.find('.package_id').attr('name'));
+                        }
                         if(parseInt(row.find('.quantity').text()) == parseInt(row.find('.picked_quantity').text())) {
                             flag = '1';
                             $.each(block.find('.picked_quantity'), function(){

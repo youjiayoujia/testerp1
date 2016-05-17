@@ -305,7 +305,7 @@ class OrderController extends Controller
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['channel_ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['email'] = $channelOrder['email'];
-            $orders[$key]['status'] = 'NEW';
+            $orders[$key]['status'] = 'PAID';
             $orders[$key]['active'] = 'NORMAL';
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;

@@ -12,6 +12,7 @@ namespace App\Models;
 
 use Tool;
 use App\Base\BaseModel;
+use App\Models\Order\ItemModel;
 use Illuminate\Support\Facades\DB;
 
 class OrderModel extends BaseModel
@@ -172,6 +173,16 @@ class OrderModel extends BaseModel
     {
         $arr = config('order.address');
         return $arr[$this->address_confirm];
+    }
+
+    public function getSkuNameAttribute()
+    {
+        $items= ItemModel::where('order_id', $this->id)->get()->toArray();
+        $sku = '';
+        foreach($items as $item) {
+            $sku = $item['sku'] . $sku;
+        }
+        return $sku;
     }
 
     public function items()

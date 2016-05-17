@@ -21,7 +21,8 @@ class CreateOrders extends Migration
             $table->string('email')->comment('邮箱');
             $table->enum('status',
                 [
-                    'NEW',
+                    'UNPAID',
+                    'PAID',
                     'PREPARED',
                     'NEED',
                     'PACKED',
@@ -29,7 +30,7 @@ class CreateOrders extends Migration
                     'COMPLETE',
                     'CANCEL',
                     'ERROR'
-                ])->default('NEW')->comment('订单状态');
+                ])->default('PAID')->comment('订单状态');
             $table->enum('active',
                 [
                     'NORMAL',

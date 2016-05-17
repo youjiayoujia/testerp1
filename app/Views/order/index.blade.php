@@ -6,6 +6,7 @@
     <th class="sort" data-field="ordernum">订单号</th>
     <th class="sort" data-field="channel_ordernum">渠道订单号</th>
     <th>邮箱</th>
+    <th>sku</th>
     <th>订单状态</th>
     <th>售后状态</th>
     <th class="sort" data-field="amount">总金额</th>
@@ -45,6 +46,7 @@
             <td>{{ $order->ordernum }}</td>
             <td>{{ $order->channel_ordernum }}</td>
             <td>{{ $order->email }}</td>
+            <td>{{ $order->sku_name}}</td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->active_name }}</td>
             <td>{{ $order->amount }}</td>
@@ -96,7 +98,8 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEW']) }}">未处理</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'UNPAID']) }}">未付款</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PAID']) }}">已付款</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'PREPARED']) }}">准备发货</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEED']) }}">需补货</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'PACKED']) }}">打包完成</a></li>

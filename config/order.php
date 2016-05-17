@@ -10,7 +10,8 @@
 return [
     //订单状态
     'status' => [
-        'NEW' => '未处理',
+        'UNPAID' => '未付款',
+        'PAID' => '已付款',
         'PREPARED' => '准备发货',
         'NEED' => '需补货',
         'PACKED' => '打包完成',

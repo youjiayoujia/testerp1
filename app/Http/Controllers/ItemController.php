@@ -72,4 +72,16 @@ class ItemController extends Controller
         return redirect($this->mainIndex);
     }
 
+    public function getImage()
+    {
+        $item = $this->model->where('sku',trim(request('sku')))->first();
+        if(!$item) {
+            return json_encode(false);
+        }
+        $image = $item->product->image->path;
+        if($image)
+            return json_encode($image);
+        else 
+            return json_encode(false)
+    }
 }

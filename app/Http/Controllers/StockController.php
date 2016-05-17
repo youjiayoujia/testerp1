@@ -75,9 +75,10 @@ class StockController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
+        $item = ItemModel::where('sku', trim(request()->input('sku')))->first();
+        $item_id = $item->id;
         $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_cost'), 'MAKE_ACCOUNT');
+        $item->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * $item->purchase_price, 'MAKE_ACCOUNT');
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
@@ -307,9 +308,6 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
-                     'available_quantity'=>'',
-                     'hold_quantity'=>'',
-                     'unit_cost'=>'',
                     ]
             ];
         $name = 'stock';

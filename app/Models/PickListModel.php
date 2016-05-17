@@ -120,14 +120,14 @@ class PickListModel extends BaseModel
         foreach($package->items as $packageitem)
         {
             $name = PositionModel::find($packageitem->warehouse_position_id)->name;
-            $tmp = substr($name,1,1);
-            $buf[] = $tmp;
+            $tmp = substr($name,4,2);
+            $buf[] = (int)$tmp;
         }
         $buf = array_unique($buf);
         $num = 0;
         foreach($buf as $value)
         {
-            $num += pow(2,abs(ord($value)-ord('A')));
+            $num += pow(2,floor($value/2));
         }
         
         return $num;

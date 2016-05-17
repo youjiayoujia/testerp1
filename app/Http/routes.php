@@ -21,6 +21,9 @@ Route::post('auth/register', 'Auth\AuthController@postRegister');
 //国家
 Route::resource('countries', 'CountriesController');
 
+//国家分类
+Route::resource('countriesSort', 'CountriesSortController');
+
 //采购条目
 Route::group(['middleware' => 'auth'], function () {
     Route::get('test', 'TestController@test');
@@ -251,6 +254,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('catalog', 'CatalogController');
 
     //item路由
+    Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as'=>'item.getImage']);
     Route::resource('item', 'ItemController');
 
     //渠道路由

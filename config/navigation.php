@@ -86,11 +86,6 @@ return [
                     'url' => 'bao3Package.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '国家Number信息',
-                    'url' => 'countries.index',
-                    'icon' => '',
-                ],
             ],
         ],
     ],
@@ -372,6 +367,16 @@ return [
             [
                 'name' => '包装限制',
                 'url' => 'wrapLimits.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家Number信息',
+                'url' => 'countries.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家地区信息',
+                'url' => 'countriesSort.index',
                 'icon' => '',
             ],
         ],

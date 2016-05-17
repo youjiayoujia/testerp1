@@ -24,8 +24,11 @@
             <button type='button' class='btn btn-info search'>确认</button>
         </div>
     </div>
+    <div class='row'>
     <div class='form-group result'>
     
+    </div>
+    <img class='img' src=''>
     </div>
     <table class='table table-bordered'>
         <thead>
@@ -36,12 +39,12 @@
             <td class='col-lg-2'>状态</td>
         </thead>
         <tbody>
-        @foreach($packages as $package)
+        @foreach($packages as $k => $package)
             <table class='table table-bordered table-condensed'>
             @foreach($package->items as $key => $packageitem)
                 <tr>
                     @if($key == '0')
-                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
+                    <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2' name="{{ $k+1 }}">{{ $package->id }}</td>
                     @endif
                     <td class='sku col-lg-6'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                     <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
@@ -72,7 +75,8 @@ $(document).ready(function(){
                     if(parseInt(row.find('.quantity').text()) > parseInt(row.find('.picked_quantity').text())) {
                         outflag = 1;
                         row.find('.picked_quantity').text(parseInt(row.find('.picked_quantity').text())+1);
-                        $('.result').html(block.find('.package_id').text() - {{$packages->first()->id}} + 1);
+                        img = '';
+                        $.get("{{route('item.getImage')}}",{sku:block.find('.sku').text()},function(result){if(result) {$('.result').html(block.find('.package_id').attr('name') + '    ' + block.find('.img').attr('src', result));
                         if(parseInt(row.find('.quantity').text()) == parseInt(row.find('.picked_quantity').text())) {
                             flag = '1';
                             $.each(block.find('.picked_quantity'), function(){
@@ -84,7 +88,7 @@ $(document).ready(function(){
                                 block.find('.status').text('拣货完成');
                             }
                         }
-                    exit;
+                    return 2;
                     }
                 }
             });

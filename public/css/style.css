@@ -80,3 +80,14 @@ th:hover:not([data-sort=false]) {
     opacity: .8;
     cursor: pointer;
 }
+
+.table.table-bordered td {
+    vertical-align:middle;
+    font-size:14px;
+    font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.table.table-bordered td .col-lg-3 {
+    padding-left:0px
+}
+

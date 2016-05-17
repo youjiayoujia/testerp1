@@ -68,10 +68,10 @@
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>采购价</strong>: {{ $model->purchase_price }}
+                <strong>采购价（RMB）</strong>: {{ $model->purchase_price }}
             </div>
             <div class="col-lg-3">
-                <strong>采购物流费</strong>: {{ $model->purchase_carriage }}
+                <strong>采购物流费（RMB）</strong>: {{ $model->purchase_carriage }}
             </div>
         </div>
     </div>
@@ -105,7 +105,7 @@
                 <strong>库存</strong>: {{ $model->all_quantity }}
             </div>
             <div class="col-lg-1">
-                <strong>库存金额</strong>: {{ ($model->all_quantity)*($model->cost) }}
+                <strong>库存金额（RMB）</strong>: {{ ($model->all_quantity)*($model->cost) }}
             </div>
             <div class="col-lg-1">
                 <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天
@@ -132,7 +132,7 @@
                 <strong>尺寸类型</strong>: {{ $model->product_size }}
             </div>
             <div class="col-lg-3">
-                <strong>item包装尺寸（cm）</strong>: {{ $model->package_size }}
+                <strong>item包装尺寸（cm）(长*宽*高)</strong>: {{ $model->package_size }}
             </div>
             <div class="col-lg-3">
                 <strong>item重量（kg）</strong>: {{ $model->weight }}

@@ -107,7 +107,7 @@
         <tr>
             <td>
                 @foreach($model->featureTextValues as $featureModel)
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" colspan="2">
                         <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
                     </div>
                     <br>
@@ -127,7 +127,7 @@
         <tr>
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
-                <label>主表:重量: </label>
+                <label>主表:重量（kg）: </label>
                 <input type="text" class="form-control form55" disabled="disabled" id="weight" value="{{ old('cost_usd_price') ?  old('cost_usd_price') : $cost_usd_price }}" name="weight">
             </td>
         </tr>

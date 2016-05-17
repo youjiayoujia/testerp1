@@ -21,10 +21,10 @@ class CatalogModel extends BaseModel
     public $rules = [
         'create' => ['name' => 'required|unique:catalogs,name',
                      'c_name' => 'required|unique:catalogs,name',
-                     'sets.0.name' => 'required',
-                     'sets.0.value.name.0.name' => 'required',
-                     'variations.0.name' => 'required',
-                     'variations.0.value.name.0.name' => 'required',
+                     ////'sets.0.name' => 'required',
+                     //'sets.0.value.name.0.name' => 'required',
+                     //'variations.0.name' => 'required',
+                     //'variations.0.value.name.0.name' => 'required',
                     ],
         'update' => ['name' => 'required|unique:catalogs,name,{id}','c_name' => 'required|unique:catalogs,c_name,{id}',]
     ];
@@ -58,7 +58,12 @@ class CatalogModel extends BaseModel
         //属性名属性值添加
         if ($extra) {
             foreach ($extra as $model => $property) {
-                if(count($property)==0)continue;
+                if(count($property)==0){
+                    if($model=='features')continue;
+                    $property = [];
+                    $property[$model]['name'] = "Default";
+                    $property[$model]['value']['name'][0]['name'] = "Default";
+                }
                 try {
                     foreach ($property as $modelData) {
                         $modelObj = $catalog->$model()->create($modelData);

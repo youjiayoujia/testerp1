@@ -30,10 +30,10 @@
                 <strong>尺寸类型</strong>: {{ $model->product_size }}
             </div>
             <div class="col-lg-3">
-                <strong>产品包装尺寸</strong>: {{ $model->package_size }}
+                <strong>产品包装尺寸（cm）(长*宽*高)</strong>: {{ $model->package_size }}
             </div>
             <div class="col-lg-3">
-                <strong>产品重量</strong>: {{ $model->weight }}
+                <strong>产品重量（kg）</strong>: {{ $model->weight }}
             </div>
         </div>       
     </div>
@@ -62,12 +62,12 @@
                 <strong>采购链接</strong>: <a href="http://{{ $model->purchase_url }}" target="_blank">{{ $model->purchase_url }}</a>
             </div>
             <div class="col-lg-3">
-                <strong>采购价</strong>: {{ $model->purchase_price }}
+                <strong>采购价（RMB）</strong>: {{ $model->purchase_price }}
             </div>
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>采购物流费</strong>: {{ $model->purchase_carriage }}
+                <strong>采购物流费（RMB）</strong>: {{ $model->purchase_carriage }}
             </div>
             <div class="col-lg-3">
                 <strong>采购天数</strong>: {{ $model->purchase_day }} 天

@@ -29,7 +29,7 @@ class CreateOrders extends Migration
                     'SHIPPED',
                     'COMPLETE',
                     'CANCEL',
-                    'ERROR'
+                    'REVIEW'
                 ])->default('PAID')->comment('订单状态');
             $table->enum('active',
                 [

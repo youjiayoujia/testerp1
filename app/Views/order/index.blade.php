@@ -85,8 +85,13 @@
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $order->id }}"
                    data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                    <span class="glyphicon glyphicon-pencil"></span> 删除
                 </a>
+                @if($order->status == 'REVIEW')
+                    <a href="{{ route('updateStatus', ['id'=>$order->id]) }}" class="btn btn-success btn-xs review">
+                        <span class="glyphicon glyphicon-pencil"></span> 审核
+                    </a>
+                @endif
             </td>
         </tr>
     @endforeach
@@ -101,12 +106,12 @@
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'UNPAID']) }}">未付款</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'PAID']) }}">已付款</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'PREPARED']) }}">准备发货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEED']) }}">需补货</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEED']) }}">缺货</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'PACKED']) }}">打包完成</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'SHIPPED']) }}">发货完成</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'COMPLETE']) }}">订单完成</a></li>
             <li><a href="{{ DataList::filtersEncode(['status', '=', 'CANCEL']) }}">取消订单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'ERROR']) }}">订单异常</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status', '=', 'REVIEW']) }}">需审核</a></li>
         </ul>
     </div>
     <div class="btn-group" role="group">
@@ -123,4 +128,15 @@
         </ul>
     </div>
     @parent
+@stop
+@section('childJs')
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.review').click(function () {
+                if(confirm('确认审核?')) {
+
+                }
+            });
+        });
+    </script>
 @stop

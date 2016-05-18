@@ -134,6 +134,7 @@ class OrderController extends Controller
             $data['refund_amount'] = '';
             $data['refund_time'] = '';
         }
+        $data['status'] = 'REVIEW';
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
@@ -270,6 +271,13 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
+    public function updateStatus($id)
+    {
+        $this->model->find($id)->update(['status' => 'PREPARED']);
+
+        return redirect($this->mainIndex);
+    }
+
     /**
      * 获取choies订单数据
      *
@@ -310,6 +318,9 @@ class OrderController extends Controller
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
+            if($orders[$key]['remark'] != NULL && $orders[$key]['remark'] != '') {
+                $orders[$key]['status'] = 'REVIEW';
+            }
             $orders[$key]['affair_time'] = NULL;
             $orders[$key]['create_time'] = $channelOrder['date_purchased'];
             $orders[$key]['is_partial'] = 0;

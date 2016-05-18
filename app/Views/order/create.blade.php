@@ -45,11 +45,7 @@
                 <label for="status" class='control-label'>订单状态</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="status" id="status">
-                    @foreach(config('order.status') as $status_key => $status)
-                        <option value="{{ $status_key }}" {{ old('status') == $status_key ? 'selected' : '' }}>
-                            {{ $status }}
-                        </option>
-                    @endforeach
+                    <option value="REVIEW" {{ old('status') == 'REVIEW' ? 'selected' : '' }}>需审核</option>
                 </select>
             </div>
             <div class="form-group col-lg-2">

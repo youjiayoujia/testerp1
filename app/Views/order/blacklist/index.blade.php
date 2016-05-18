@@ -2,9 +2,14 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()">全选</th>
     <th class="sort" data-field="id">ID</th>
+    <th>平台</th>
+    <th>内单号</th>
     <th>收货人姓名</th>
     <th>邮箱</th>
     <th>收货人邮编</th>
+    <th>退款订单数</th>
+    <th>客户总订单数</th>
+    <th>备注</th>
     <th class="sort" data-field="whitelist">纳入白名单</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -17,9 +22,14 @@
                 <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
             </td>
             <td>{{ $blacklist->id }}</td>
+            <td>{{ $blacklist->channel_id }}</td>
+            <td>{{ $blacklist->ordernum }}</td>
             <td>{{ $blacklist->name }}</td>
             <td>{{ $blacklist->email }}</td>
             <td>{{ $blacklist->zipcode }}</td>
+            <td>{{ $blacklist->refund_number }}</td>
+            <td>{{ $blacklist->total_order }}</td>
+            <td>{{ $blacklist->remark }}</td>
             <td>{{ $blacklist->whitelist == '1' ? '是' : '否' }}</td>
             <td>{{ $blacklist->updated_at }}</td>
             <td>{{ $blacklist->created_at }}</td>

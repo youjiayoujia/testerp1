@@ -13,12 +13,12 @@ return [
         'UNPAID' => '未付款',
         'PAID' => '已付款',
         'PREPARED' => '准备发货',
-        'NEED' => '需补货',
+        'NEED' => '缺货',
         'PACKED' => '打包完成',
         'SHIPPED' => '发货完成',
         'COMPLETE' => '订单完成',
         'CANCEL' => '取消订单',
-        'ERROR' => '订单异常',
+        'REVIEW' => '需审核',
     ],
 
     //售后状态

@@ -31,25 +31,70 @@ class BlacklistController extends Controller
     public function index()
     {
         request()->flash();
-        $emails = OrderModel::distinct()->get(['email'])->toArray();
-        foreach($emails as $email) {
-            $orders = OrderModel::where(['email' => $email, 'status' => 'CANCEL'])->get();
-            if($orders->count() >= 5) {
-                foreach($orders as $order) {
-                    $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
-                    $data['email'] = $email['email'];
-                    $data['zipcode'] = $order['shipping_zipcode'];
-                    $data['whitelist'] = '0';
-                    $count = BlacklistModel::where(['name' => $data['name']])->count();
+        $orders = OrderModel::where(['status' => 'CANCEL'])->get()->toArray();
+        foreach($orders as $order) {
+            $count = OrderModel::where(['email' => $order['email'], 'status' => 'CANCEL'])->count();
+            if($count >= 5) {
+                $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
+                $data['email'] = $order['email'];
+                $data['zipcode'] = $order['shipping_zipcode'];
+                $data['whitelist'] = '0';
+                $count1 = BlacklistModel::where(['name' => $data['name']])->count();
+                if($count1 == 0) {
+                    $this->model->create($data);
                     $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
                     $order->update(['blacklist' => '0', 'status' => 'NEW',
                         'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
-                    if($count == 0) {
-                        $this->model->create($data);
-                    }
                 }
             }
         }
+
+//        $emails = OrderModel::distinct()->get(['email'])->toArray();
+//        foreach($emails as $email) {
+//            $orders = OrderModel::where(['email' => $email, 'status' => 'CANCEL'])->get();
+//            if($orders->count() >= 5) {
+//                foreach($orders as $order) {
+//                    $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
+//                    $data['email'] = $email['email'];
+//                    $data['zipcode'] = $order['shipping_zipcode'];
+//                    $data['whitelist'] = '0';
+//                    $count = BlacklistModel::where(['name' => $data['name']])->count();
+//                    $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
+//                    $order->update(['blacklist' => '0', 'status' => 'NEW',
+//                        'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
+//                    if($count == 0) {
+//                        $this->model->create($data);
+//                    }
+//                }
+//            }
+//        }
+//        $zipcodes = OrderModel::distinct()->get(['shipping_zipcode'])->toArray();
+//        foreach($zipcodes as $zipcode) {
+//            $firstnames = OrderModel::distinct()->get(['shipping_firstname'])->toArray();
+//            foreach($firstnames as $firstname) {
+//                $lastnames = OrderModel::distinct()->get(['shipping_lastname'])->toArray();
+//                foreach($lastnames as $lastname) {
+//                    $orders = OrderModel::where(['shipping_zipcode' => $zipcode,
+//                        'shipping_firstname' => $firstname, 'shipping_lastname' => $lastname,
+//                        'status' => 'CANCEL'])->get();
+//                    if($orders->count() >= 5) {
+//                        foreach($orders as $order) {
+//                            $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
+//                            $data['email'] = $order['email'];
+//                            $data['zipcode'] = $order['shipping_zipcode'];
+//                            $data['whitelist'] = '0';
+//                            $count = BlacklistModel::where(['name' => $data['name']])->count();
+//                            if($count == 0) {
+//                                $this->model->create($data);
+//                                $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
+//                                $order->update(['blacklist' => '0', 'status' => 'NEW',
+//                                    'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),

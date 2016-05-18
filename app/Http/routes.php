@@ -336,7 +336,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('pickList/updatePrint', ['uses' => 'PickListController@updatePrint', 'as' => 'pickList.updatePrint']);
 
     Route::post('pickList/processBase', ['uses' => 'PickListController@processBase', 'as' => 'pickList.processBase']);
-    Route::get('pickList/indexPrintPickList/{content}', ['uses' => 'PickListController@indexPrintPickList', 'as' => 'pickList.indexPrintPickList']);
+    Route::get('pickList/indexPrintPickList/{content}',
+        ['uses' => 'PickListController@indexPrintPickList', 'as' => 'pickList.indexPrintPickList']);
     Route::post('pickList/inboxStore/{id}', ['uses' => 'PickListController@inboxStore', 'as' => 'pickList.inboxStore']);
     Route::post('pickList/createPickStore',
         ['uses' => 'PickListController@createPickStore', 'as' => 'pickList.createPickStore']);
@@ -389,10 +390,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
 
     //包裹管理路由
-    Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
-    Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
-    Route::get('package/setManualLogistics', ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
-    Route::get('package/ajaxQuantityProcess', ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
+    Route::get('package/manualLogistics',
+        ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
+    Route::get('package/manualShipping',
+        ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
+    Route::get('package/setManualLogistics',
+        ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
+    Route::get('package/ajaxQuantityProcess',
+        ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
 
     Route::get('package/allocateLogistics/{id}',
         ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);
@@ -436,3 +441,5 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
+
+Route::any('test', ['uses' => 'TestController@index']);

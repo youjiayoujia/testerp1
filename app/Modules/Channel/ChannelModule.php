@@ -23,8 +23,29 @@ Class ChannelModule
         }
     }
 
+    /**
+     * 亚马逊接口驱动
+     *
+     * @param $config
+     * @return AmazonAdapter
+     */
     public function createAmazonDriver($config)
     {
         return new AmazonAdapter($config);
+    }
+
+    public function createEbayDriver($config)
+    {
+
+    }
+
+    public function createWishDriver($config)
+    {
+
+    }
+
+    public function createSMTDriver($config)
+    {
+
     }
 }

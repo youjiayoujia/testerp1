@@ -12,31 +12,40 @@ use Tool;
 
 Class AmazonAdapter implements AdapterInterface
 {
-    private $serviceUrl = 'https://mws.amazonservices.com';
+    private $serviceUrl;
     private $signatureVersion = '2';
     private $signatureMethod = 'HmacSHA256';
     private $version = '2013-09-01';
-    private $request = [];
+    private $config = [];
 
     public function __construct($config)
     {
-        $this->request = array_merge($config);
-        $this->request['SignatureVersion'] = $this->signatureVersion;
-        $this->request['SignatureMethod'] = $this->signatureMethod;
-        $this->request['Version'] = $this->version;
+        $this->serviceUrl = $config['serviceUrl'];
+        unset($config['serviceUrl']);
+        $this->config = array_merge($config);
+        $this->config['SignatureVersion'] = $this->signatureVersion;
+        $this->config['SignatureMethod'] = $this->signatureMethod;
+        $this->config['Version'] = $this->version;
     }
 
     public function getOrder($orderID)
     {
-        $this->request['Action'] = 'GetOrder';
-        $this->request['AmazonOrderId.Id.1'] = $orderID;
-        return $this->setRequest('Orders');
+        $request['Action'] = 'GetOrder';
+        $request['AmazonOrderId.Id.1'] = $orderID;
+        return $this->setRequest('Orders', $request);
     }
 
-    public function listOrders()
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
     {
-        // TODO: Implement listOrders() method.
-        echo "get Amazon Orders.";
+        $request['Action'] = 'ListOrders';
+        foreach ($status as $key => $value) {
+            $i = $key + 1;
+            $request['OrderStatus.Status.' . $i] = $value;
+        }
+        $request['MaxResultsPerPage'] = $perPage;
+        $request['CreatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
+        $request['CreatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
+        return $this->setRequest('Orders', $request);
     }
 
     public function returnTrack()
@@ -45,24 +54,25 @@ Class AmazonAdapter implements AdapterInterface
         echo "return Amazon Tracking Informations";
     }
 
-    public function setRequest($type)
+    public function setRequest($type, $request)
     {
-        $this->request['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
-        $requestUrl = $this->setRequestUrl($type);
+        $request['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+        $requestUrl = $this->setRequestUrl($type, $request);
         return simplexml_load_string(Tool::curl($requestUrl));
     }
 
-    public function setRequestUrl($type)
+    public function setRequestUrl($type, $request)
     {
         $baseUrl = $this->serviceUrl . '/' . $type . '/' . $this->version;
-        $request = [];
-        foreach ($this->request as $key => $value) {
+        $requests = array_merge($this->config, $request);
+        $requestParams = [];
+        foreach ($requests as $key => $value) {
             $key = str_replace("%7E", "~", rawurlencode($key));
             $value = str_replace("%7E", "~", rawurlencode($value));
-            $request[] = "{$key}={$value}";
+            $requestParams[] = "{$key}={$value}";
         }
-        sort($request);
-        $paramUrl = implode('&', $request);
+        sort($requestParams);
+        $paramUrl = implode('&', $requestParams);
         $signature = $this->getSignature($baseUrl, $paramUrl);
         return $baseUrl . '?' . $paramUrl . '&Signature=' . $signature;
     }
@@ -74,7 +84,7 @@ Class AmazonAdapter implements AdapterInterface
         $signatureString .= $signatureArray['host'] . "\n";
         $signatureString .= $signatureArray['path'] . "\n";
         $signatureString .= $paramUrl;
-        $signature = hash_hmac("sha256", $signatureString, $this->request['AWS_SECRET_ACCESS_KEY'], true);
+        $signature = hash_hmac("sha256", $signatureString, $this->config['AWS_SECRET_ACCESS_KEY'], true);
         $signature = urlencode(base64_encode($signature));
         return $signature;
     }

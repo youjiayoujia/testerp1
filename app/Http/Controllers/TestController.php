@@ -17,16 +17,19 @@ use App\Models\PickListModel;
 use App\Models\UserModel;
 use App\Models\StockModel;
 use App\Models\Stock\AdjustmentModel;
+use App\Models\OrderModel;
+use App\Models\ItemModel;
 
 class TestController extends Controller
 {
     public function test()
     {
-        $adjustment = AdjustmentModel::find(2);
-        $items = $adjustment->adjustments;
-        foreach($items as $item) 
-        {
-            $item->test();
-        }
+        $order = OrderModel::find(4);
+        $orderItems = $order->items;
+        $arr = $order->orderNeedArray();
+        echo "<pre>";
+        var_dump($order->orderStockDiff($arr));
+        print_r($order->explodeOrder());
+        echo "</pre>";
     }
 }

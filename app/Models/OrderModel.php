@@ -174,6 +174,20 @@ class OrderModel extends BaseModel
         return $arr[$this->address_confirm];
     }
 
+    public function getPartialOverAttribute()
+    {
+        $orderItems = $this->orderItem;
+        $flag = 1;
+        foreach($orderItems as $orderItem)
+        {
+            if($orderItem->split_quantity != $orderItem->quantity) {
+                $flag = 0;
+            }
+        }
+
+        return $flag ? true : false;
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
@@ -242,56 +256,13 @@ class OrderModel extends BaseModel
         if ($this->canPackage()) {
             $items = $this->setPackageItems();
             if ($items) {
-                DB::beginTransaction();
-                foreach ($items as $warehouseId => $packageItems) {
-                    $package = [];
-                    //channel
-                    $package['channel_id'] = $this->channel_id;
-                    $package['channel_account_id'] = $this->channel_account_id;
-                    //warehouse
-                    $package['warehouse_id'] = $warehouseId;
-                    //type
-                    $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
-                    $package['weight'] = collect($packageItems)->sum('weight');
-                    $package['email'] = $this->email;
-                    $package['shipping_firstname'] = $this->shipping_firstname;
-                    $package['shipping_lastname'] = $this->shipping_lastname;
-                    $package['shipping_address'] = $this->shipping_address;
-                    $package['shipping_address1'] = $this->shipping_address1;
-                    $package['shipping_city'] = $this->shipping_city;
-                    $package['shipping_state'] = $this->shipping_state;
-                    $package['shipping_country'] = $this->shipping_country;
-                    $package['shipping_zipcode'] = $this->shipping_zipcode;
-                    $package['shipping_phone'] = $this->shipping_phone;
-                    $package = $this->packages()->create($package);
-                    if ($package) {
-                        foreach ($packageItems as $packageItem) {
-                            $newPackageItem = $package->items()->create($packageItem);
-                            try {
-                                $newPackageItem->item->out(
-                                    $packageItem['warehouse_position_id'],
-                                    $packageItem['quantity'],
-                                    'PACKAGE',
-                                    $newPackageItem->id);
-                                $newPackageItem->orderItem->status = 'PACKED';
-                                $newPackageItem->orderItem->save();
-                            } catch (Exception $e) {
-                                DB::rollBack();
-                            }
-                        }
-                    }
-                }
-                DB::commit();
-                $this->package_times += 1;
-                $this->status = 'PACKED';
-                $this->save();
-                return true;
+                return $this->createPackageDetail($items);
             } else { //生成订单需求
                 if($this->status == 'PREPARED') {
                     foreach ($this->active_items as $item) {
                         $require = [];
                         $require['item_id'] = $item->item_id;
-                        $require['warehouse_id'] = 1;
+                        $require['warehouse_id'] = $item->item->warehouse_id;
                         $require['order_item_id'] = $item->id;
                         $require['sku'] = $item->sku;
                         $require['quantity'] = $item->quantity;
@@ -300,10 +271,190 @@ class OrderModel extends BaseModel
                     $this->package_times += 1;
                     $this->status = 'NEED';
                     $this->save();
+                } elseif ($this->status == 'NEED') {
+                    $this->package_times += 1;
+                    $this->save();
+                    if(strtotime($this->created_at) < strtotime('-3 days')) {
+                        $arr = $this->explodeOrder();
+                        if($arr) {
+                            $this->is_partial = 1;
+                            $this->save();
+                            $this->createPackageDetail($arr, 0);
+                            $this->package_times += 1;
+                            $this->split_times += 1;
+                            $this->save();
+                            if($this->partial_over) {
+                                $orderItems = $this->orderItem;
+                                foreach($orderItems as $orderItem) {
+                                    $orderItem->status = 'PACKED';
+                                    $orderItem->save();
+                                }
+                                $this->status = 'PACKED';
+                                $this->save();
+                            }
+                        }
+                    }
                 }
             }
         }
         return false;
+    }
+
+    public function createPackageDetail($items, $flag = 1)
+    {
+        DB::beginTransaction();
+        foreach ($items as $warehouseId => $packageItems) {
+            $package = [];
+            //channel
+            $package['channel_id'] = $this->channel_id;
+            $package['channel_account_id'] = $this->channel_account_id;
+            //warehouse
+            $package['warehouse_id'] = $warehouseId;
+            //type
+            $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
+            $package['weight'] = collect($packageItems)->sum('weight');
+            $package['email'] = $this->email;
+            $package['shipping_firstname'] = $this->shipping_firstname;
+            $package['shipping_lastname'] = $this->shipping_lastname;
+            $package['shipping_address'] = $this->shipping_address;
+            $package['shipping_address1'] = $this->shipping_address1;
+            $package['shipping_city'] = $this->shipping_city;
+            $package['shipping_state'] = $this->shipping_state;
+            $package['shipping_country'] = $this->shipping_country;
+            $package['shipping_zipcode'] = $this->shipping_zipcode;
+            $package['shipping_phone'] = $this->shipping_phone;
+            $package = $this->packages()->create($package);
+            if ($package) {
+                foreach ($packageItems as $packageItem) {
+                    $newPackageItem = $package->items()->create($packageItem);
+                    try {
+                        $newPackageItem->item->out(
+                            $packageItem['warehouse_position_id'],
+                            $packageItem['quantity'],
+                            'PACKAGE',
+                            $newPackageItem->id);
+                        if($flag == 1) {
+                            $newPackageItem->orderItem->status = 'PACKED';
+                        }
+                        $newPackageItem->orderItem->save();
+                    } catch (Exception $e) {
+                        DB::rollBack();
+                    }
+                }
+            }
+        }
+        DB::commit();
+        $this->package_times += 1;
+        if($flag == 1) {
+            $this->status = 'PACKED';
+        }
+        $this->save();
+        return true;
+    }
+
+    public function explodeOrder()
+    {
+        $arr = $this->orderStockDiff($this->orderNeedArray());
+        $sum = $this->atLeastTimes($arr);
+        if($this->split_times > (4 - $sum)) {
+            return false;
+        }
+        $stocks = [];
+        foreach($arr as $key => $value)
+        {
+            if(!($arr[$key]['allocateSum'] >= 5 && $arr[$key]['allocateSum']/$arr[$key]['sum'] >= 0.5 || $arr[$key]['allocateSum'] < 5 && $arr[$key]['allocateSum'] == $arr[$key]['sum'])) {
+                continue;
+            }
+            foreach($value as $k => $v)
+            {
+                if(!is_array($v)) {
+                    continue;
+                }
+                if($v['allocateQuantity']) {
+                    $defaultStocks = ItemModel::find($k)->assignDefaultStock($v['allocateQuantity']);
+                    if(array_key_exists($key, $stocks)) {
+                        $stocks[$key] = $stocks[$key] + $defaultStocks[$key];
+                    } else {
+                        $stocks += $defaultStocks;
+                    }
+                }
+            }
+        }
+
+        return $stocks;
+    }
+
+    public function atLeastTimes($arr)
+    {
+        $sum = 0;
+        foreach($arr as $key => $value)
+        {
+            if($value['sum'] == $value['allocateSum'] || $value['allocateSum'] == 0) {
+                $sum += 1;
+            } else {
+                $sum += 2;
+            }
+        }
+
+        return $sum;
+    }
+
+    public function orderNeedArray()
+    {
+        $orderItems = $this->orderItem;
+        $arr = [];
+        foreach($orderItems as $orderItem)
+        {
+            $item = $orderItem->item;
+            $needQuantity = $orderItem->quantity - $orderItem->split_quantity;
+            if(!array_key_exists($item->warehouse_id, $arr)) {
+                $arr[$item->warehouse_id] = [];
+                $arr[$item->warehouse_id]['sum'] = 0;
+                if(!array_key_exists($orderItem->item_id, $arr[$item->warehouse_id])) {
+                    $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] = $needQuantity;
+                    $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                } else {
+                    $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] += $needQuantity;
+                    $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                }
+            } else {
+                if(!array_key_exists($orderItem->item_id, $arr[$item->warehouse_id])) {
+                    $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] = $needQuantity;
+                    $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                } else {
+                    $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] += $needQuantity;
+                    $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    public function orderStockDiff($arr)
+    {
+        foreach($arr as $warehouseId => $singleWarehouseInfo)
+        {
+            $arr[$warehouseId]['allocateSum'] = 0;
+            foreach($singleWarehouseInfo as $key => $value) 
+            {
+                if($key == 0) {
+                    continue;
+                }
+                foreach($value as $k => $v)
+                {
+                    $stock = StockModel::where(['warehouse_id' => $warehouseId, 'item_id' => $key])->get();
+                    if(!count($stock)) {
+                        $arr[$warehouseId][$key]['allocateQuantity'] = 0;
+                    } else {
+                        $arr[$warehouseId][$key]['allocateQuantity'] = ($stock->sum('available_quantity') <= $arr[$warehouseId][$key]['quantity']) ? $stock->sum('available_quantity') : $arr[$warehouseId][$key]['quantity'];
+                        $arr[$warehouseId]['allocateSum'] += $arr[$warehouseId][$key]['allocateQuantity'];
+                    }
+                }
+            }
+        }
+
+        return $arr;
     }
 
     /**

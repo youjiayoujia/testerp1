@@ -250,6 +250,27 @@ class ItemModel extends BaseModel
         return false;
     }
 
+    //分配库存
+    public function assignDefaultStock($quantity)
+    {
+        $stocks = $this->stocks->groupBy('warehouse_id')->get($this->warehouse_id);
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            $stocks = $stocks->sortByDesc('available_quantity');
+            foreach ($stocks as $stock) {
+                if ($stock->available_quantity < $quantity) {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                    $quantity -= $stock->available_quantity;
+                } else {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    break;
+                }
+            }
+            return $result;
+        }
+
+        return false;
+    }
+
     //匹配库存
     public function matchStock($quantity)
     {

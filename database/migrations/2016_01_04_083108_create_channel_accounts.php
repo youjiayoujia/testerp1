@@ -23,7 +23,6 @@ class CreateChannelAccounts extends Migration
             $table->string('domain')->comment('账号对应域名');
             $table->string('image_domain')->comment('产品图片域名');
             $table->string('service_email')->comment('客服邮箱地址');
-            $table->string('tracking_config')->comment('上传追踪号配置');
             $table->string('amazon_api_url')->comment('AWS Service Url');
             $table->string('amazon_marketplace_id')->comment('AWS MarketplaceId');
             $table->string('amazon_seller_id')->comment('AWS SellerId');

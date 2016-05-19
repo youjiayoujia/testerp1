@@ -37,15 +37,98 @@ Class AmazonAdapter implements AdapterInterface
 
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
     {
-        $request['Action'] = 'ListOrders';
-        foreach ($status as $key => $value) {
-            $i = $key + 1;
-            $request['OrderStatus.Status.' . $i] = $value;
-        }
-        $request['MaxResultsPerPage'] = $perPage;
-        $request['CreatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
-        $request['CreatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
-        return $this->setRequest('Orders', $request);
+        $orders = [];
+        $nextToken = null;
+        do {
+            $request = [];
+            if ($nextToken) {
+                $request['Action'] = 'ListOrdersByNextToken';
+                $request['NextToken'] = $nextToken;
+            } else {
+                $request['Action'] = 'ListOrders';
+                foreach ($status as $key => $value) {
+                    $request['OrderStatus.Status.' . ($key + 1)] = $value;
+                }
+                $request['MaxResultsPerPage'] = $perPage;
+                $request['CreatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
+                $request['CreatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
+            }
+            $response = $this->setRequest('Orders', $request);
+            if (isset($response->Error)) {
+                break;
+            }
+            $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
+            foreach ($responseOrders->Orders->Order as $order) {
+                $orderItems = $this->getOrderItems($order->AmazonOrderId);
+                $orders[] = $this->parseOrder($order, $orderItems);
+            }
+            $nextToken = $responseOrders->NextToken;
+        } while ($nextToken);
+        return $orders;
+    }
+
+    public function getOrderItems($orderId)
+    {
+        $items = [];
+        $nextToken = null;
+        do {
+            if ($nextToken) {
+                $request['Action'] = 'ListOrderItemsByNextToken';
+                $request['NextToken'] = $nextToken;
+            } else {
+                $request['Action'] = 'ListOrderItems';
+                $request['AmazonOrderId'] = $orderId;
+            }
+            $response = $this->setRequest('Orders', $request);
+            if (isset($response->Error)) {
+                break;
+            }
+            $responseOrderItems = $nextToken ? $response->ListOrderItemsByNextTokenResult : $response->ListOrderItemsResult;
+            foreach ($responseOrderItems->OrderItems->OrderItem as $orderItem) {
+                $items[] = $this->parseOrderItem($orderItem);
+            }
+            $nextToken = $responseOrderItems->NextToken;
+        } while ($nextToken);
+        return $items;
+    }
+
+    public function parseOrder($order, $orderItems)
+    {
+        $shippingName = explode(' ', $order->ShippingAddress->Name);
+        $result = [
+            'channel_ordernum' => $order->AmazonOrderId,
+            'email' => $order->BuyerEmail,
+            'amount' => $order->OrderTotal->Amount,
+            'currency' => $order->OrderTotal->CurrencyCode,
+            'payment' => $order->PaymentMethod,
+            'shipping' => $order->ShipmentServiceLevelCategory,
+            'shipping_firstname' => isset($shippingName[0]) ? $shippingName[0] : '',
+            'shipping_lastname' => isset($shippingName[1]) ? $shippingName[1] : '',
+            'shipping_address' => $order->ShippingAddress->AddressLine1,
+            'shipping_address1' => $order->ShippingAddress->AddressLine2,
+            'shipping_city' => $order->ShippingAddress->City,
+            'shipping_state' => $order->ShippingAddress->StateOrRegion,
+            'shipping_country' => $order->ShippingAddress->CountryCode,
+            'shipping_zipcode' => $order->ShippingAddress->PostalCode,
+            'shipping_phone' => $order->ShippingAddress->Phone,
+            'payment_date' => $order->PurchaseDate,
+            'create_time' => $order->PurchaseDate,
+            'fulfill_by' => $order->FulfillmentChannel,
+            'items' => $orderItems
+        ];
+        return $result;
+    }
+
+    public function parseOrderItem($orderItem)
+    {
+        $result = [
+            'sku' => '',
+            'channel_sku' => $orderItem->SellerSKU,
+            'quantity' => $orderItem->QuantityOrdered,
+            'price' => $orderItem->ItemPrice->Amount,
+            'currency' => $orderItem->ItemPrice->CurrencyCode,
+        ];
+        return $result;
     }
 
     public function returnTrack()

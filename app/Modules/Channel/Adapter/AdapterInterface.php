@@ -34,6 +34,7 @@ interface AdapterInterface
      *          'amount' => '',
      *          'currency' => '',
      *          'payment' => '',
+     *          'shipping_method' => '',
      *          'shipping_firstname' => '',
      *          'shipping_lastname' => '',
      *          'shipping_address' => '',
@@ -48,13 +49,17 @@ interface AdapterInterface
      *          'items' => [
      *              [
      *                  'sku' => '',
+     *                  'channel_sku' => '',
      *                  'quantity' => '',
      *                  'price' => '',
+     *                  'currency' => '',
      *              ],
      *              [
      *                  'sku' => '',
+     *                  'channel_sku' => '',
      *                  'quantity' => '',
      *                  'price' => '',
+     *                  'currency' => '',
      *              ],
      *          ]
      *      ],

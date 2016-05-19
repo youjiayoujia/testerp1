@@ -259,6 +259,8 @@ Route::group(['middleware' => 'auth'], function () {
     //渠道账号路由
     Route::any('channelAccount/getAccountUser',
         ['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
+    Route::post('channelAccount/updateApi/{id}',
+        ['uses' => 'Channel\AccountController@updateApi', 'as' => 'channelAccount.updateApi']);
     Route::resource('channelAccount', 'Channel\AccountController');
 
 

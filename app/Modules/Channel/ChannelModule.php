@@ -12,7 +12,6 @@ use App\Modules\Channel\Adapter\AmazonAdapter;
 
 Class ChannelModule
 {
-
     public function driver($adapter, $config)
     {
         $driverMethod = 'create' . ucfirst(strtolower($adapter)) . 'Driver';

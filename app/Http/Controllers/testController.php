@@ -8,33 +8,35 @@
 
 namespace App\Http\Controllers;
 
+use Tool;
 use Channel;
+use App\Models\Channel\AccountModel;
+use App\Models\OrderModel;
 
 class TestController extends Controller
 {
+    public function __construct(OrderModel $orderModel)
+    {
+        $this->orderModel = $orderModel;
+    }
+
     public function index()
     {
-        $config = [
-            'serviceUrl' => 'https://mws.amazonservices.com',
-            'AWS_SECRET_ACCESS_KEY' => 'GSIczWEj5HXOwX0itVw62MU/sABECvu24XaFYFhH',
-            'AWSAccessKeyId' => 'AKIAIVJDQNXZFUIZWIXQ',
-            'MarketplaceId.Id.1' => 'ATVPDKIKX0DER',
-            'SellerId' => 'ARAZZBXXIK68F',
-        ];
-
-
-        $startDate = '2016-05-01 00:00:00';
+        $account = AccountModel::findOrFail(1);
+        $startDate = '2016-05-18 00:00:00';
         $endDate = date('Y-m-d 00:00:00', time());
-        $status = ['Unshipped', 'PartiallyShipped'];
-        $orderList = Channel::driver('Amazon', $config)->listOrders($startDate, $endDate, $status);
-        echo "<pre>";
-        var_dump($orderList);
-        echo "<hr>";
-        $orderID = '112-8698241-2648200';
-        $orderDetail = Channel::driver('Amazon', $config)->getOrder($orderID);
-        echo "<pre>";
-        var_dump($orderDetail);
-
-
+        $status = $account->api_status;
+        $channel = Channel::driver($account->channel->drive, $account->api_config);
+        $orderList = $channel->listOrders($startDate, $endDate, $status, 20);
+        foreach ($orderList as $order) {
+            $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
+            $order['channel_id'] = $account->channel->id;
+            $order['channel_account_id'] = $account->id;
+            if ($thisOrder) {
+                $thisOrder->updateOrder($order);
+            } else {
+                $this->orderModel->createOrder($order);
+            }
+        }
     }
 }

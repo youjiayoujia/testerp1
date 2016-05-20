@@ -5,7 +5,9 @@ use App\Base\BaseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
-use Maatwebsite\Excel\Facades\Excel; 
+use App\Models\UserModel;
+use Maatwebsite\Excel\Facades\Excel;
+ 
 
 class PurchaseOrderModel extends BaseModel
 {
@@ -39,6 +41,10 @@ class PurchaseOrderModel extends BaseModel
 	public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+	public function getAssignerNameAttribute()
+    {
+        return UserModel::find($this->assigner)->name;
     }
 	
 	public function updatePurchaseOrder($id,$data){

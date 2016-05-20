@@ -200,7 +200,7 @@ class OrderModel extends BaseModel
             $obj = ItemModel::where('sku', $item['sku'])->get();
             if (!count($obj)) {
                 $item['item_id'] = 0;
-                $order->update(['status' => 'ERROR']);
+                $order->update(['status' => 'REVIEW', 'remark' => '渠道SKU找不到对应产品']);
             } else {
                 $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
@@ -236,7 +236,7 @@ class OrderModel extends BaseModel
 
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
-            $this->status = 'ERROR';
+            $this->status = 'REVIEW';
             $this->save();
             return false;
         }

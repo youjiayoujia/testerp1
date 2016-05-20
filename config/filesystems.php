@@ -50,7 +50,7 @@ return [
 
         'product' => [
             'driver' => 'local',
-            'root' => public_path('uploads/product'),
+            'root' => public_path(),
         ],
 
         'ftp' => [

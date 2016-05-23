@@ -50,9 +50,9 @@ class SupplierController extends Controller
      */
     public function store()
     {
-        request()->flash();
+        $data=request()->all();
         $this->validate(request(), $this->model->rules('create'));
-        $model = $this->model->create(request()->all());
+        $model = $this->model->supplierCreate($data, request()->file('qualifications'));
         SupplierChangeHistoryModel::create([              
             'supplier_id' => $model->id,
             'to' =>request()->input('purchase_id'),

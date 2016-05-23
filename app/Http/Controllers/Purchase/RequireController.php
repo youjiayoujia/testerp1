@@ -16,6 +16,8 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Product\SupplierModel;
 use App\Models\StockModel;
+use App\Models\PackageModel;
+use App\Models\Package\ItemModel;
 
 class RequireController extends Controller
 {
@@ -35,9 +37,15 @@ class RequireController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('is_require',1)->groupby('item_id')),
         ];
+		$seven_time=date('Y-m-d H:i:s',strtotime('-7 day'));
+		$fourteen_time=date('Y-m-d H:i:s',strtotime('-14 day'));
+		$thirty_time=date('Y-m-d H:i:s',strtotime('-30 day'));
 		foreach($response['data'] as $key=>$vo){
 			$response['data'][$key]['order_need_num']=$this->model->where('item_id',$vo->item_id)->sum('quantity');
 			$response['data'][$key]['all_quantity']=StockModel::where('item_id',$vo->item_id)->sum('all_quantity');
+			$response['data'][$key]['seven_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$seven_time)->sum('package_items.quantity');
+			$response['data'][$key]['fourteen_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$fourteen_time)->sum('package_items.quantity');
+			$response['data'][$key]['thirty_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$thirty_time)->sum('package_items.quantity');
 			$response['data'][$key]['purchaseing_quantity']=PurchaseItemModel::where('sku',$vo->sku)->sum('purchase_num');
 			}
         return view($this->viewPath . 'index', $response);

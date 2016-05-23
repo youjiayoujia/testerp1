@@ -35,7 +35,7 @@
             <td>
                 @if($purchaseOrder->examineStatus == 2)
                 <a href="{{ route('purchaseOrderAbnormal.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span>去处理
+                    <span class="glyphicon glyphicon-pencil"></span>处理
                 </a>
                 @endif       
                

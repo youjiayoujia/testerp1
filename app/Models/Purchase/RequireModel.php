@@ -20,7 +20,7 @@ class RequireModel extends BaseModel
  			 
         ]
     ];
-    public $searchFields = ['id','sku','supplier_id','warehouse_id','user_id'];
+    public $searchFields = ['id','sku'];
     /**
      * The attributes that are mass assignable.
      *
@@ -36,6 +36,5 @@ class RequireModel extends BaseModel
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
     }
-	
 	
 }

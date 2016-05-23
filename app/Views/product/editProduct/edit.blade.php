@@ -35,7 +35,7 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <td>MODEL:{{$model->model}}</td>
+            <td style="font-size:14px;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif">MODEL:{{$model->model}}</td>
             <td></td>
         </tr>
         <tr>
@@ -119,7 +119,7 @@
         </tr>
         
         <tr>
-            <td>
+            <td colspan="2">
                 @foreach($model->featureTextValues as $featureModel)
                     <div class="col-lg-3">
                         <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
@@ -127,8 +127,6 @@
                     <br>
                 @endforeach
             </td>
-
-            <td></td>
         </tr>
         <tr>
             <td>配件说明:{{$model->description}}
@@ -142,7 +140,7 @@
         <tr>
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
-                <label>主表:重量: </label>
+                <label>主表:重量（kg）: </label>
                 <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="weight" name="weight" value="{{ old('weight') ?  old('weight') : $weight }}">
             </td>
         </tr>

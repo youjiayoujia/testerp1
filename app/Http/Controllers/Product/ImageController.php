@@ -46,13 +46,19 @@ class ImageController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
+        if (!array_key_exists('image0', $data)) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '请添加图片.'));
+        }
         $productModel = ProductModel::where("model",$data['model'])->first();
+        if (!$productModel) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
+        }
         $data['product_id'] = $productModel->id;
         $data['spu_id'] = $productModel->spu->id;
     
         $this->model->imageCreate($data, request()->files);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
 
@@ -66,7 +72,7 @@ class ImageController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update'));
         $this->model->updateImage($id, request()->file('image'));
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -78,7 +84,7 @@ class ImageController extends Controller
     public function destroy($id)
     {
         $this->model->imageDestroy($id);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
 
 }

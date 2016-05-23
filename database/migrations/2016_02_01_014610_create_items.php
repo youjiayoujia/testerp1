@@ -19,7 +19,7 @@ class CreateItems extends Migration
             $table->string('sku')->comment('sku')->nullable()->default(0);
             $table->string('name')->nullable();
             $table->string('c_name')->nullable();
-            $table->string('weight')->comment('重量')->nullable()->default(0);
+            $table->decimal('weight',7,4)->comment('重量')->nullable()->default(0);
             $table->string('inventory')->comment('库存')->nullable()->default(NULL);
             $table->integer('warehouse_id')->comment('仓库')->default(0);
             $table->string('alias_name')->nullable();
@@ -27,6 +27,7 @@ class CreateItems extends Migration
             $table->integer('supplier_id')->nullable();
             $table->string('supplier_sku')->nullable();
             $table->string('second_supplier_id')->nullable();
+            $table->string('second_supplier_sku')->nullable();
             $table->string('supplier_info')->nullable();
             $table->string('purchase_url')->nullable();
             $table->decimal('purchase_price', 7, 2)->nullable();

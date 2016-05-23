@@ -90,7 +90,17 @@ class AccountController extends Controller
     public function getAccountUser()
     {
         $channel_id = request()->input('channel_id');
-        $account = AccountModel::where('channel_id',$channel_id)->get()->toArray();
+        $account = AccountModel::where('channel_id', $channel_id)->get()->toArray();
         return $account;
+    }
+
+    public function updateApi($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->update(request()->all());
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $model->alias . ' 设置API成功.'));
     }
 }

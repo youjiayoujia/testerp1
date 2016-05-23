@@ -50,7 +50,7 @@ class PackageModel extends BaseModel
         'shipping_phone',
         'is_auto',
         'remark',
-        'logistic_assigned_at',
+        'logistics_assigned_at',
         'printed_at',
         'shipped_at',
         'delivered_at',
@@ -67,6 +67,11 @@ class PackageModel extends BaseModel
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id');
+    }
+
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
     }
 
     public function order()
@@ -115,7 +120,9 @@ class PackageModel extends BaseModel
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
             $packageLimit = $packageItem->item->product->package_limit;
-            $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            if ($packageLimit) {
+                $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            }
         }
         return $packageLimits->unique();
     }
@@ -155,7 +162,8 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where('weight_from', '<=', $weight)->where('weight_to', '>=', $weight)
+            where('weight_from', '<=', $weight)
+                ->where('weight_to', '>=', $weight)
                 ->where('order_amount', '>=', $amount)
                 ->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
@@ -167,19 +175,27 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //是否有物流限制
-                $limits = explode(",", $rule->logistics->limit);
-                if ($this->shipping_limits->intersect($limits)->count() > 0) {
-                    continue;
+                if ($this->shipping_limits) {
+                    $limits = explode(",", $rule->logistics->limit);
+                    if ($this->shipping_limits->intersect($limits)->count() > 0) {
+                        continue;
+                    }
                 }
-                //物流商下单
+                //物流查询链接
                 $trackingUrl = $rule->logistics->url;
+                $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
                 return $this->update([
                     'status' => 'ASSIGNED',
                     'logistics_id' => $rule->logistics->id,
                     'tracking_link' => $trackingUrl,
-                    'logistics_assigned_at' => date('Y-m-d H:i:s')
+                    'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                    'is_auto' => $is_auto,
                 ]);
             }
+            return $this->update([
+                'status' => 'ASSIGNFAILED',
+                'logistics_assigned_at' => date('Y-m-d H:i:s')
+            ]);
         }
         return false;
     }
@@ -264,13 +280,14 @@ class PackageModel extends BaseModel
                 $error[] = $key;
                 continue;
             }
-            $this->find($content['package_id'])->update(['logistics_id' => $tmp_logistics->id, 
-                                                         'tracking_no' => $content['tracking_no'],
-                                                         'status' => 'SHIPPED',
-                                                         'shipped_at' => date('Y-m-d G:i:s', time()),
-                                                         'shipper_id' => '2']);
-            foreach($this->find($content['package_id'])->items as $packageitem)
-            {
+            $this->find($content['package_id'])->update([
+                'logistics_id' => $tmp_logistics->id,
+                'tracking_no' => $content['tracking_no'],
+                'status' => 'SHIPPED',
+                'shipped_at' => date('Y-m-d G:i:s', time()),
+                'shipper_id' => '2'
+            ]);
+            foreach ($this->find($content['package_id'])->items as $packageitem) {
                 $packageitem->orderItem->update(['status' => 'SHIPPED']);
             }
         }

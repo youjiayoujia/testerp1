@@ -33,7 +33,7 @@ class UserController extends Controller
         $data = request()->all();
         $data['password'] = bcrypt($data['password']);
         $this->model->create($data);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
     /**
@@ -76,7 +76,7 @@ class UserController extends Controller
             $data['password'] = bcrypt($data['password']);
         }
         $model->update($data);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
 }

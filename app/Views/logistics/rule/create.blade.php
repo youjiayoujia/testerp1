@@ -54,6 +54,7 @@
         <div class="form-group col-lg-4" style="clear:left;">
             <label for="country" class="control-label">已有国家</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <button type="button" class="btn btn-success btn-xs" onclick="quanxuan()">全选</button>
             <select name="country" class="form-control" multiple style="height:300px;width:400px;">
                 @foreach($countries as $country)
                     <option class="form-control" value="{{ $country->code }}" {{ old('country') ? old('country') == $country->code ? 'selected' : '' : ''}} onclick="addCountry( this )">
@@ -109,6 +110,16 @@
 
     function deleteCountry(that){
         $(that).remove();
+        getPostCountry();
+    }
+
+    //全选
+    function quanxuan(that)
+    {
+        var checkCountries = '@foreach($countries as $country)' +
+                '<option class="form-control thecountry" value="{{ $country->code }}" onclick="deleteCountry(this)">' +
+                '{{ $country->name }}' + '</option>' + '@endforeach';
+        $("#dselectCountry").append(checkCountries);
         getPostCountry();
     }
 

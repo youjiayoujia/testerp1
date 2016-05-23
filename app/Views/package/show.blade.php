@@ -80,7 +80,7 @@
                     <strong>物流成本</strong>: {{ $model->cost }} 元
                 </div>
                 <div class="col-lg-2">
-                    <strong>重量</strong>: {{ $model->weight }} 克
+                    <strong>重量</strong>: {{ $model->weight }} Kg
                 </div>
                 <div class="col-lg-2">
                     <strong>体积</strong>: {{ $model->length }} cm * {{ $model->width }} cm * {{ $model->height }} cm

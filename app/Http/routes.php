@@ -259,6 +259,8 @@ Route::group(['middleware' => 'auth'], function () {
     //渠道账号路由
     Route::any('channelAccount/getAccountUser',
         ['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
+    Route::post('channelAccount/updateApi/{id}',
+        ['uses' => 'Channel\AccountController@updateApi', 'as' => 'channelAccount.updateApi']);
     Route::resource('channelAccount', 'Channel\AccountController');
 
 
@@ -332,6 +334,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('errorList', 'Picklist\ErrorListController');
 
     //拣货路由
+    Route::get('pickList/oldPrint', ['uses' => 'PickListController@oldPrint', 'as' => 'pickList.oldPrint']);
+    Route::get('pickList/updatePrint', ['uses' => 'PickListController@updatePrint', 'as' => 'pickList.updatePrint']);
+
+    Route::post('pickList/processBase', ['uses' => 'PickListController@processBase', 'as' => 'pickList.processBase']);
+    Route::get('pickList/indexPrintPickList/{content}',
+        ['uses' => 'PickListController@indexPrintPickList', 'as' => 'pickList.indexPrintPickList']);
     Route::post('pickList/inboxStore/{id}', ['uses' => 'PickListController@inboxStore', 'as' => 'pickList.inboxStore']);
     Route::post('pickList/createPickStore',
         ['uses' => 'PickListController@createPickStore', 'as' => 'pickList.createPickStore']);
@@ -385,6 +393,15 @@ Route::group(['middleware' => 'auth'], function () {
 	//订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
+    Route::get('package/manualLogistics',
+        ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
+    Route::get('package/manualShipping',
+        ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
+    Route::get('package/setManualLogistics',
+        ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
+    Route::get('package/ajaxQuantityProcess',
+        ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
+
     Route::get('package/allocateLogistics/{id}',
         ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);
     Route::post('package/storeAllocateLogistics/{id}',
@@ -427,3 +444,5 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
+
+Route::any('test', ['uses' => 'TestController@index']);

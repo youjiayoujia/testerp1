@@ -279,6 +279,28 @@ class PackageController extends Controller
     }
 
     /**
+     * 撤销包装的单个package 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function ctrlZ()
+    {
+        $packageId = request('packageId');
+        $package = $this->model->find($packageId);
+        $package->status = 'PICKING';
+        $package->save();
+        $items = $package->items;
+        foreach($items as $item)
+        {
+            $item->picked_quantity = 0;
+            $item->save();
+        }
+        return json_encode(true);
+    }
+
+    /**
      * 跳转发货页面
      *
      * @param none
@@ -347,7 +369,7 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
-        if ($package->logistics_id != $logistic_id) {
+        if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');
         }
         $package->update([

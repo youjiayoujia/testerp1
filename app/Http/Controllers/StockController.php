@@ -82,6 +82,48 @@ class StockController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
+    public function showStockInfo()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '库存信息查询'),
+        ];
+
+        return view($this->viewPath.'showStockInfo', $response);
+    }
+
+    public function getSingleSku()
+    {
+        $sku = request('sku');
+        $item = ItemModel::where('sku', $sku)->first();
+        if(!$item) {
+            return json_encode(false);
+        }
+        $item_id = $item->id;
+        $stocks = $this->model->where('item_id', $item_id)->get();
+        $str = '';
+        foreach($stocks as $stock)
+        {
+            $str .= "<p>仓库--".($stock->warehouse ? $stock->warehouse->name : '').'      '.'库位--'.($stock->position ? $stock->position->name : '').'       '.'总数量--'.($stock->all_quantity).'       '.'可用数量--'.$stock->available_quantity."</p>";
+        }
+        return $str;
+    }
+
+    public function getSinglePosition()
+    {
+        $position = request('position');
+        $position = PositionModel::where('name', $position)->first();
+        if(!$position) {
+            return json_encode(false);
+        }
+        $warehouse_position_id = $position->id;
+        $stocks = $this->model->where('warehouse_position_id', $warehouse_position_id)->get();
+        $str = '';
+        foreach($stocks as $stock)
+        {
+            $str .= "<p>仓库--".($stock->warehouse ? $stock->warehouse->name : '').'      '.'库位--'.($stock->position ? $stock->position->name : '').'       '.'总数量--'.($stock->all_quantity).'       '.'可用数量--'.$stock->available_quantity."</p>";
+        }
+        return $str;
+    }
     /**
      * 盘点更新
      *

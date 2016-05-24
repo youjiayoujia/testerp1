@@ -22,10 +22,16 @@
         </div>
         <div class='form-group'>
             <button type='button' class='btn btn-info search'>确认</button>
+            <button type='button' class='btn btn-warning printException'>打印异常</button>
         </div>
     </div>
-    <div class='form-group result'>
-    
+    <div class='row'>
+        <div class='form-group result col-lg-6 inboxNum'>
+            
+        </div>
+        <div class='col-lg-6 inboxImage image'>
+            
+        </div>
     </div>
     <table class='table table-bordered'>
         <thead>
@@ -47,7 +53,7 @@
                     <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
                     <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
                     @if($key == '0')
-                    <td class='status col-lg-2' rowspan="{{$package->items()->count()}}">{{ $package->status ? $package->status_name : '' }}</td>
+                    <td class='status col-lg-2' rowspan="{{$package->items()->count()}}"><font color='red'>{{ $package->status ? $package->status_name : '' }}</font></td>
                     @endif
                 </tr>
             @endforeach
@@ -55,12 +61,35 @@
         @endforeach
         </tbody>
     </table>
+    <div class='already'>
+    <label>已扫描</label>
+    </div><hr/>
+    <div class='old'>
+    <label>未扫描</label>
+    </div>
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success">拣货完成</button>
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){
+    $('.printException').click(function(){
+        $.each($('.sku'), function(){
+            tmp = $(this).parent();
+            sku = $(this).text();
+            picked_quantity = parseInt(tmp.find('.picked_quantity').text());
+            quantity = parseInt(tmp.find('.quantity').text());
+            if(picked_quantity) {
+                str1 = "<p>" + sku + '    ' + picked_quantity + "</p>";
+                $('.already').append(str1); 
+            }
+            if(quantity > picked_quantity) {
+                str2 = "<p>" + sku + '    ' + (quantity - picked_quantity) + "</p>";
+                $('.old').append(str2);
+            }
+        });
+    });
+
     $('.search').click(function(){
         val = $('.searchsku').val();
         if(val) {
@@ -78,7 +107,9 @@ $(document).ready(function(){
                               {sku:block.find('.sku').text()},
                               function(result){
                                 if(result) {
-                                    $('.result').html(block.find('.package_id').attr('name') + '                                                           ' + "<img src="+result+">");
+                                    str = "<h1>"+block.find('.package_id').attr('name')+"</h1>";
+                                    str += "<h2>sku:"+block.find('.sku').text()+"</h2>";
+                                    $('.image').html("<img class='inboxImage' src="+result+">");
                                     img = 1;
                                 }
                             });

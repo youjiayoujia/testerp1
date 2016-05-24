@@ -132,6 +132,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '效能统计',
+                    'url' => 'pickList.performanceStatistics',
+                    'icon' => '',
+                ],
+                [
                     'name' => '拣货单异常',
                     'url' => 'errorList.index',
                     'icon' => '',
@@ -151,6 +156,11 @@ return [
                 [
                     'name' => '库存',
                     'url' => 'stock.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存查询',
+                    'url' => 'stock.showStockInfo',
                     'icon' => '',
                 ],
                 [

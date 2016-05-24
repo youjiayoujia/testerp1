@@ -18,6 +18,18 @@
     margin-bottom: 5px;
 }
 
+.inboxNum {
+    width: 500px;
+    height: 500px;
+    background: #ddd;
+    left : 15px;
+}
+
+.inboxImage {
+    width: 500px;
+    height: 500px;
+}
+
 span.sign {
     display: block;
     position: absolute;

@@ -161,6 +161,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('warehousePosition', 'Warehouse\PositionController');
 
     //库存
+    Route::get('stock/getSinglePosition', ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
+    Route::get('stock/getSingleSku', ['uses' => 'StockController@getSingleSku', 'as' => 'stock.getSingleSku']);
+    Route::get('stock/showStockInfo', ['uses' => 'StockController@showStockInfo', 'as' => 'stock.showStockInfo']);
     Route::get('stock/getExcel', ['uses' => 'StockController@getExcel', 'as' => 'stock.getExcel']);
     Route::post('stock/excelProcess', ['uses' => 'StockController@excelProcess', 'as' => 'stock.excelProcess']);
     Route::get('stock/importByExcel', ['uses' => 'StockController@importByExcel', 'as' => 'stock.importByExcel']);
@@ -336,6 +339,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('errorList', 'Picklist\ErrorListController');
 
     //拣货路由
+    Route::post('pickList/statisticsProcess', ['uses' => 'PickListController@statisticsProcess', 'as' => 'pickList.statisticsProcess']);
+    Route::get('pickList/performanceStatistics', ['uses' => 'PickListController@performanceStatistics', 'as' => 'pickList.performanceStatistics']);
     Route::get('pickList/oldPrint', ['uses' => 'PickListController@oldPrint', 'as' => 'pickList.oldPrint']);
     Route::get('pickList/updatePrint', ['uses' => 'PickListController@updatePrint', 'as' => 'pickList.updatePrint']);
 
@@ -393,6 +398,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
 
     //包裹管理路由
+    Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
     Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
     Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
     Route::get('package/setManualLogistics', ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);

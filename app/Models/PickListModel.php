@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'pick_at', 'inbox_by', 'inbox_at', 'pack_by', 'pack_by', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -62,6 +62,31 @@ class PickListModel extends BaseModel
     public function pickByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'pick_by', 'id');
+    }
+
+    public function inboxByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'inbox_by', 'id');
+    }
+
+    public function packByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'pack_by', 'id');
+    }
+
+    public function getPackageNumAttribute()
+    {
+        return $this->package->count();
+    }
+
+    public function getSkuNumAttribute()
+    {
+        return $this->pickListItem->count();
+    }
+
+    public function getGoodsQuantityAttribute()
+    {
+        return $this->pickListItem->sum('quantity');
     }
 
     /**

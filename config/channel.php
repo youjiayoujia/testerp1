@@ -11,6 +11,6 @@ return [
     //渠道币种
     'currencies' => ['ALL', 'USD', 'GBP', 'EUR'],
     //Drive
-    'drives' => ['amazon', 'wish'],
+    'drives' => ['amazon', 'wish','aliexpress'],
 ];
 

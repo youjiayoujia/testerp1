@@ -46,6 +46,13 @@ class AccountModel extends BaseModel
         'amazon_seller_id',
         'amazon_accesskey_id',
         'amazon_accesskey_secret',
+        'aliexpress_member_id',
+        'aliexpress_appkey',
+        'aliexpress_appsecret',
+        'aliexpress_returnurl',
+        'aliexpress_refresh_token',
+        'aliexpress_access_token',
+        'aliexpress_access_token_date',
     ];
 
     public $searchFields = ['account', 'alias'];

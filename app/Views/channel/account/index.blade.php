@@ -54,5 +54,8 @@
         @if($account->channel->name == 'Amazon')
             @include('channel.account.api.amazon')
         @endif
+        @if($account->channel->name == 'Aliexpress')
+            @include('channel.account.api.aliexpress')
+        @endif
     @endforeach
 @stop

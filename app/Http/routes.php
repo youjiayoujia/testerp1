@@ -21,6 +21,9 @@ Route::post('auth/register', 'Auth\AuthController@postRegister');
 //国家
 Route::resource('countries', 'CountriesController');
 
+//国家分类
+Route::resource('countriesSort', 'CountriesSortController');
+
 //采购条目
 Route::group(['middleware' => 'auth'], function () {
     Route::get('test', 'TestController@test');
@@ -158,6 +161,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('warehousePosition', 'Warehouse\PositionController');
 
     //库存
+    Route::get('stock/getSinglePosition', ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
+    Route::get('stock/getSingleSku', ['uses' => 'StockController@getSingleSku', 'as' => 'stock.getSingleSku']);
+    Route::get('stock/showStockInfo', ['uses' => 'StockController@showStockInfo', 'as' => 'stock.showStockInfo']);
     Route::get('stock/getExcel', ['uses' => 'StockController@getExcel', 'as' => 'stock.getExcel']);
     Route::post('stock/excelProcess', ['uses' => 'StockController@excelProcess', 'as' => 'stock.excelProcess']);
     Route::get('stock/importByExcel', ['uses' => 'StockController@importByExcel', 'as' => 'stock.importByExcel']);
@@ -251,6 +257,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('catalog', 'CatalogController');
 
     //item路由
+    Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as'=>'item.getImage']);
     Route::resource('item', 'ItemController');
 
     //渠道路由
@@ -334,6 +341,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('errorList', 'Picklist\ErrorListController');
 
     //拣货路由
+    Route::post('pickList/statisticsProcess', ['uses' => 'PickListController@statisticsProcess', 'as' => 'pickList.statisticsProcess']);
+    Route::get('pickList/performanceStatistics', ['uses' => 'PickListController@performanceStatistics', 'as' => 'pickList.performanceStatistics']);
     Route::get('pickList/oldPrint', ['uses' => 'PickListController@oldPrint', 'as' => 'pickList.oldPrint']);
     Route::get('pickList/updatePrint', ['uses' => 'PickListController@updatePrint', 'as' => 'pickList.updatePrint']);
 
@@ -393,14 +402,13 @@ Route::group(['middleware' => 'auth'], function () {
 	//订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
-    Route::get('package/manualLogistics',
-        ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
-    Route::get('package/manualShipping',
-        ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
-    Route::get('package/setManualLogistics',
-        ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
-    Route::get('package/ajaxQuantityProcess',
-        ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
+
+    Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
+    Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
+    Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
+    Route::get('package/setManualLogistics', ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
+    Route::get('package/ajaxQuantityProcess', ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
+
 
     Route::get('package/allocateLogistics/{id}',
         ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);

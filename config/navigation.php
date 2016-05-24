@@ -86,11 +86,6 @@ return [
                     'url' => 'bao3Package.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '国家Number信息',
-                    'url' => 'countries.index',
-                    'icon' => '',
-                ],
             ],
         ],
     ],
@@ -142,6 +137,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '效能统计',
+                    'url' => 'pickList.performanceStatistics',
+                    'icon' => '',
+                ],
+                [
                     'name' => '拣货单异常',
                     'url' => 'errorList.index',
                     'icon' => '',
@@ -161,6 +161,11 @@ return [
                 [
                     'name' => '库存',
                     'url' => 'stock.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存查询',
+                    'url' => 'stock.showStockInfo',
                     'icon' => '',
                 ],
                 [
@@ -372,6 +377,16 @@ return [
             [
                 'name' => '包装限制',
                 'url' => 'wrapLimits.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家Number信息',
+                'url' => 'countries.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家地区信息',
+                'url' => 'countriesSort.index',
                 'icon' => '',
             ],
         ],

@@ -3,12 +3,14 @@
 @section('detailBody')
 <div class='row'>
     <div class='form-group col-lg-3'>
-        <select class='form-control logistic_id'>
+        <select class='form-control logistic_id' multiple="multiple">
         @foreach($logistics as $logistic)
-            <option value={{ $logistic->id }}>{{ $logistic->logistics_type }}</option>
+            <option value="{{ $logistic->id }}">{{ $logistic->logistics_type }}</option>
         @endforeach
         </select>
     </div>
+</div>
+<div class='row'>
     <div class='form-group col-lg-3'>
         <input type='text' name='trackno' class='form-control trackno' placeholder="trackno">
     </div>

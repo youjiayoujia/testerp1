@@ -33,7 +33,6 @@ class WarehouseController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'count' => $this->model->where(['is_available'=>'1', 'is_default'=>'1'])->count(),
             'users' => UserModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
@@ -54,7 +53,6 @@ class WarehouseController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'count' => $this->model->where(['is_available'=>'1', 'is_default'=>'1'])->count(),
             'users' => UserModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);

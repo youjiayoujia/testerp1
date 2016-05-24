@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 
-class CountriesModel extends BaseModel
+class CountriesSortModel extends BaseModel
 {
 
     /**
@@ -12,14 +12,14 @@ class CountriesModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'countries';
+    protected $table = 'countries_sorts';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'cn_name', 'code', 'number', 'parent_id', 'created_at'];
+    protected $fillable = ['name', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -30,10 +30,10 @@ class CountriesModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name', 'cn_name'];
+    public $searchFields=['name'];
 
-    public function countriesSort()
+    public function countries()
     {
-        return $this->belongsTo('App\Models\CountriesSortModel', 'parent_id', 'id');
+        return $this->hasMany('App\Models\CountriesModel', 'parent_id', 'id');
     }
 }

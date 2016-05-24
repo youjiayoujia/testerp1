@@ -39,6 +39,17 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+<div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 仓库查询
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach($warehouses as $warehouse)
+            <li><a href="{{ DataList::filtersEncode(['warehouse_id','=', $warehouse->id]) }}">{{ $warehouse->name }}</a></li>
+            @endforeach
+        </ul>
+</div>
 @parent
 <div class="btn-group">
     <a class="btn btn-info" href="{{ route('stock.getExcel') }}">

@@ -33,6 +33,22 @@ class StockController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'warehouses' => WarehouseModel::where(['is_available' => '1'])->get(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 跳转创建页
      *
      * @param none
@@ -59,12 +75,55 @@ class StockController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $item_id = ItemModel::where('sku', trim(request()->input('sku')))->first()->id;
+        $item = ItemModel::where('sku', trim(request()->input('sku')))->first();
+        $item_id = $item->id;
         $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        ItemModel::find($item_id)->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * request()->input('unit_cost'), 'MAKE_ACCOUNT');
+        $item->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * $item->purchase_price, 'MAKE_ACCOUNT');
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
+    public function showStockInfo()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '库存信息查询'),
+        ];
+
+        return view($this->viewPath.'showStockInfo', $response);
+    }
+
+    public function getSingleSku()
+    {
+        $sku = request('sku');
+        $item = ItemModel::where('sku', $sku)->first();
+        if(!$item) {
+            return json_encode(false);
+        }
+        $item_id = $item->id;
+        $stocks = $this->model->where('item_id', $item_id)->get();
+        $str = '';
+        foreach($stocks as $stock)
+        {
+            $str .= "<p>仓库--".($stock->warehouse ? $stock->warehouse->name : '').'      '.'库位--'.($stock->position ? $stock->position->name : '').'       '.'总数量--'.($stock->all_quantity).'       '.'可用数量--'.$stock->available_quantity."</p>";
+        }
+        return $str;
+    }
+
+    public function getSinglePosition()
+    {
+        $position = request('position');
+        $position = PositionModel::where('name', $position)->first();
+        if(!$position) {
+            return json_encode(false);
+        }
+        $warehouse_position_id = $position->id;
+        $stocks = $this->model->where('warehouse_position_id', $warehouse_position_id)->get();
+        $str = '';
+        foreach($stocks as $stock)
+        {
+            $str .= "<p>仓库--".($stock->warehouse ? $stock->warehouse->name : '').'      '.'库位--'.($stock->position ? $stock->position->name : '').'       '.'总数量--'.($stock->all_quantity).'       '.'可用数量--'.$stock->available_quantity."</p>";
+        }
+        return $str;
+    }
     /**
      * 盘点更新
      *
@@ -291,9 +350,6 @@ class StockController extends Controller
                      'sku'=>'',
                      'position'=>'',
                      'all_quantity'=>'',
-                     'available_quantity'=>'',
-                     'hold_quantity'=>'',
-                     'unit_cost'=>'',
                     ]
             ];
         $name = 'stock';

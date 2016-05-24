@@ -15,10 +15,10 @@
         <input type='text' class='form-control access_quantity' id='arr[access_quantity][{{$current}}]' placeholder='可用数量' name='arr[access_quantity][{{$current}}]' value='{{ old('arr[access_quantity][$current]') }}' readonly>
     </div>
     <div class='form-group col-sm-2'>
-        <input type='text' class='form-control quantity' id='arr[quantity][{{$current}}]' placeholder='数量' name='arr[quantity][{{$current}}]' value='{{ old('arr[quantity][$current]') }}'>
+        <input type='text' class='form-control quantity' id='arr[quantity][{{$current}}]' placeholder='数量' name='arr[quantity][{{$current}}]' value="{{ old('arr[quantity][$current]') }}">
     </div>
     <div class="form-group col-sm-2">
-        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$current}}]" placeholder="单价" name='arr[unit_cost][{{$current}}]' value="{{ old('arr[unit_cost][$current]') }}">
+        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$current}}]" placeholder="单价" name='arr[unit_cost][{{$current}}]' value="{{ old('arr[unit_cost][$current]') }}" readonly>
     </div>
     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
 </div>

@@ -17,7 +17,7 @@ class AlterPicklists extends Migration
             $table->integer('inbox_by')->comment('分拣人');
             $table->timestamp('inbox_at')->comment('分拣时间');
             $table->integer('pack_by')->comment('包装人');
-            $table->integer('pack_at')->comment('包装时间');
+            $table->timestamp('pack_at')->comment('包装时间');
         });
     }
 

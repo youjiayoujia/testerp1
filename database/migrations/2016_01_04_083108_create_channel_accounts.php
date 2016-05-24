@@ -23,10 +23,13 @@ class CreateChannelAccounts extends Migration
             $table->string('domain')->comment('账号对应域名');
             $table->string('image_domain')->comment('产品图片域名');
             $table->string('service_email')->comment('客服邮箱地址');
-            $table->string('tracking_config')->comment('上传追踪号配置');
+            $table->string('amazon_api_url')->comment('AWS Service Url');
+            $table->string('amazon_marketplace_id')->comment('AWS MarketplaceId');
+            $table->string('amazon_seller_id')->comment('AWS SellerId');
+            $table->string('amazon_accesskey_id')->comment('AWS AWSAccessKeyId');
+            $table->string('amazon_accesskey_secret')->comment('AWS AWS_SECRET_ACCESS_KEY');
             $table->integer('operator_id')->comment('默认运营人员');
             $table->integer('customer_service_id')->comment('默认客服人员');
-            $table->integer('warehouse_id')->comment('默认发货仓库');
             $table->enum('is_merge_package', ['0', '1'])->comment('合并相同地址订单包裹')->default('0');
             $table->enum('is_thanks', ['0', '1'])->comment('是否打印感谢信')->default('0');
             $table->enum('is_picking_list', ['0', '1'])->comment('是否打印拣货单')->default('0');

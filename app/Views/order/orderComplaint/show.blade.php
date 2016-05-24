@@ -3,17 +3,27 @@
     <div class="panel panel-default">
         <div class="panel-heading">基础信息</div>
         <div class="panel-body">
-            <div class="col-lg-2">
+            <div class="col-lg-4">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>名称</strong>: {{ $model->name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>API类型</strong>: {{ $model->drive }}
+                <strong>订单itemID</strong>: {{ $model->order_item_id }}
             </div>
             <div class="col-lg-4">
-                <strong>描述</strong>: {{ $model->brief }}
+                <strong>投诉Email</strong>: {{ $model->complaint_email }}
+            </div>
+          <div class="col-lg-4">
+                <strong>投诉类型</strong>: {{ $model->complaint_type }}
+            </div>
+          <div class="col-lg-4">
+                <strong>投诉国家</strong>: {{ $model->complaint_country }}
+            </div>
+            <div class="col-lg-4">
+                <strong>投诉创建人</strong>: {{ $model->create_user_id }}
+            </div>
+            
+            <div class="col-lg-4">
+                <strong>投诉备注</strong>: {{ $model->question }}
             </div>
         </div>
     </div>

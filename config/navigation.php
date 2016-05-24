@@ -111,6 +111,11 @@ return [
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
+			[
+                'name' => '订单投诉',
+                'url' => 'orderComplaint.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航
@@ -260,7 +265,7 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '采购条目',
                     'url' => 'purchaseItemList.index',
                     'icon' => '',
@@ -269,15 +274,10 @@ return [
                     'name' => '打印采购单',
                     'url' => 'printPurchaseOrder.create',
                     'icon' => '',
-                ],
+                ],*/
                 [
                     'name' => '采购对单',
                     'url' => 'purchaseList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '采购入库',
-                    'url' => 'purchaseStockIn.create',
                     'icon' => '',
                 ],
 				[

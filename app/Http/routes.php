@@ -266,6 +266,8 @@ Route::group(['middleware' => 'auth'], function () {
     //渠道账号路由
     Route::any('channelAccount/getAccountUser',
         ['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
+    Route::post('channelAccount/updateApi/{id}',
+        ['uses' => 'Channel\AccountController@updateApi', 'as' => 'channelAccount.updateApi']);
     Route::resource('channelAccount', 'Channel\AccountController');
 
 
@@ -345,7 +347,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('pickList/updatePrint', ['uses' => 'PickListController@updatePrint', 'as' => 'pickList.updatePrint']);
 
     Route::post('pickList/processBase', ['uses' => 'PickListController@processBase', 'as' => 'pickList.processBase']);
-    Route::get('pickList/indexPrintPickList/{content}', ['uses' => 'PickListController@indexPrintPickList', 'as' => 'pickList.indexPrintPickList']);
+    Route::get('pickList/indexPrintPickList/{content}',
+        ['uses' => 'PickListController@indexPrintPickList', 'as' => 'pickList.indexPrintPickList']);
     Route::post('pickList/inboxStore/{id}', ['uses' => 'PickListController@inboxStore', 'as' => 'pickList.inboxStore']);
     Route::post('pickList/createPickStore',
         ['uses' => 'PickListController@createPickStore', 'as' => 'pickList.createPickStore']);
@@ -389,20 +392,23 @@ Route::group(['middleware' => 'auth'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
 
-
+	
     //订单管理路由
     Route::resource('order', 'OrderController');
     Route::resource('orderItem', 'Order\ItemController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
-
+	//订单投诉
+    Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
+
     Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
     Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
     Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
     Route::get('package/setManualLogistics', ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
     Route::get('package/ajaxQuantityProcess', ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
+
 
     Route::get('package/allocateLogistics/{id}',
         ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);
@@ -446,3 +452,5 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
+
+Route::any('test', ['uses' => 'TestController@index']);

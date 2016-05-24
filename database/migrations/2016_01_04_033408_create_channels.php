@@ -15,6 +15,7 @@ class CreateChannels extends Migration
         Schema::create('channels', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->comment('渠道名称')->default("");
+            $table->string('drive')->comment('API DRIVE')->default("");
             $table->text('brief')->comment('渠道简介')->default("");
             $table->timestamps();
             $table->softDeletes();

@@ -206,18 +206,30 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
+        //todo: Ordernum Format
+        $last = $this->all()->last();
+        $data['ordernum'] = $last ? $last->id + 1 : 1;
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
+            //todo: Search item by channel sku
             $obj = ItemModel::where('sku', $item['sku'])->get();
             if (!count($obj)) {
                 $item['item_id'] = 0;
-                $order->update(['status' => 'ERROR']);
+                $order->update(['status' => 'REVIEW', 'remark' => '渠道SKU找不到对应产品']);
             } else {
                 $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
             $order->items()->create($item);
         }
 
+        return $order;
+    }
+
+    //todo: Update order
+    public function updateOrder($data)
+    {
+        unset($data['items']);
+        $order = $this->update($data);
         return $order;
     }
 
@@ -239,7 +251,7 @@ class OrderModel extends BaseModel
 
         //订单是否包含正常产品
         if ($this->active_items->count() < 1) {
-            $this->status = 'ERROR';
+            $this->status = 'REVIEW';
             $this->save();
             return false;
         }
@@ -259,7 +271,7 @@ class OrderModel extends BaseModel
             if ($items) {
                 return $this->createPackageDetail($items);
             } else { //生成订单需求
-                if($this->status == 'PREPARED') {
+                if ($this->status == 'PREPARED') {
                     foreach ($this->active_items as $item) {
                         $require = [];
                         $require['item_id'] = $item->item_id;

@@ -30,4 +30,9 @@ return [
 	'residualReport'=>[ 
 		'status'=>[0=>'正常',1=>'产品残次'],
 	],
+	
+	//供应商支付类型
+	'product_supplier'=>[
+		'pay_type'=>['ONLINE'=>'网上付款','BANK_PAY'=>'银行付款','CASH_PAY'=>'现金付款','OTHER_PAY'=>'其他方式'],
+	],
 ];

@@ -3,8 +3,9 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSoftDeleteToUser extends Migration
+class AddPurchaseItemsTable extends Migration
 {
+   
     /**
      * Run the migrations.
      *
@@ -12,11 +13,10 @@ class AddSoftDeleteToUser extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->softDeletes();
+        Schema::table('purchase_items', function (Blueprint $table) {
+            $table->integer('active_num')->nullable()->default(0)->after('active');		
         });
     }
-
     /**
      * Reverse the migrations.
      *
@@ -24,8 +24,8 @@ class AddSoftDeleteToUser extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['delete_at']);
+        Schema::table('purchase_items', function (Blueprint $table) {
+            $table->dropColumn(['active_num']);
         });
     }
 }

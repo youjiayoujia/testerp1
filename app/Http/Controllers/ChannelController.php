@@ -19,4 +19,27 @@ class ChannelController extends Controller
         $this->mainTitle = '渠道';
         $this->viewPath = 'channel.';
     }
+
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'drives' => config('channel.drives'),
+        ];
+        return view($this->viewPath . 'create', $response);
+    }
+
+    public function edit($id)
+    {
+        $account = $this->model->find($id);
+        if (!$account) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $account,
+            'drives' => config('channel.drives'),
+        ];
+        return view($this->viewPath . 'edit', $response);
+    }
 }

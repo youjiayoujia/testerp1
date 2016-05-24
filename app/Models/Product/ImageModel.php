@@ -8,6 +8,7 @@
 
 namespace App\Models\product;
 
+use Storage;
 use App\Base\BaseModel;
 use Tool;
 use Zipper;
@@ -68,7 +69,7 @@ class ImageModel extends BaseModel
         }
         if ($this->valid($file->getClientOriginalName())) {
             $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
-            $file->move($data['path'], $data['name']);
+            Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
             $imageModel = $this->create($data);
             return $imageModel->id;
         }
@@ -95,12 +96,13 @@ class ImageModel extends BaseModel
         } else {
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
         }
+        $disk = Storage::disk('product');
         switch ($data['uploadType']) {
             case 'image':
                 foreach ($files as $key => $file) {
                     if ($this->valid($file->getClientOriginalName())) {
                         $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
-                        $file->move($data['path'], $data['name']);
+                        Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
                         $this->create($data);
                     }
                 }
@@ -137,8 +139,7 @@ class ImageModel extends BaseModel
         if (is_file($image->src)) {
             unlink($image->src);
         }
-
-        return $file->move($image->path, $image->name);
+        return Storage::disk('product')->put($image->path.$image->name,file_get_contents($file->getRealPath()));
     }
 
     /**

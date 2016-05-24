@@ -9,26 +9,8 @@
     <th>订单状态</th>
     <th>售后状态</th>
     <th class="sort" data-field="amount">总金额</th>
-    {{--<th class="sort" data-field="amount_product">产品金额</th>--}}
-    {{--<th class="sort" data-field="amount_shipping">运费</th>--}}
-    {{--<th class="sort" data-field="amount_coupon">折扣金额</th>--}}
-    {{--<th>是否分批发货</th>--}}
-    {{--<th>是否手工</th>--}}
-    {{--<th>是否做账</th>--}}
-    {{--<th>做账人员</th>--}}
-    {{--<th>客服人员</th>--}}
-    {{--<th>运营人员</th>--}}
-    {{--<th>支付方式</th>--}}
     <th>币种</th>
-    {{--<th class="sort" data-field="rate">汇率</th>--}}
-    {{--<th>IP地址</th>--}}
     <th>地址验证</th>
-    {{--<th>备用字段</th>--}}
-    {{--<th>红人/choies用</th>--}}
-    {{--<th>订单备注</th>--}}
-    {{--<th>导单备注</th>--}}
-    {{--<th>种类</th>--}}
-    {{--<th>发货国家/地区</th>--}}
     <th class="sort" data-field="payment_date">支付时间</th>
     <th class="sort" data-field="affair_time">做账时间</th>
     <th class="sort" data-field="create_time">渠道创建时间</th>
@@ -48,26 +30,8 @@
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->active_name }}</td>
             <td>{{ $order->amount }}</td>
-            {{--<td>{{ $order->amount_product }}</td>--}}
-            {{--<td>{{ $order->amount_shipping }}</td>--}}
-            {{--<td>{{ $order->amount_coupon }}</td>--}}
-            {{--<td>{{ $order->is_partial_name }}</td>--}}
-            {{--<td>{{ $order->by_hand_name }}</td>--}}
-            {{--<td>{{ $order->is_affair_name }}</td>--}}
-{{--            <td>{{ $order->userAffairer ? $order->userAffairer->name : '' }}</td>--}}
-            {{--<td>{{ $order->userService->name }}</td>--}}
-{{--            <td>{{ $order->userOperator->name }}</td>--}}
-            {{--<td>{{ $order->payment }}</td>--}}
             <td>{{ $order->currency }}</td>
-            {{--<td>{{ $order->rate }}</td>--}}
-            {{--<td>{{ $order->ip }}</td>--}}
             <td>{{ $order->address_confirm_name }}</td>
-            {{--<td>{{ $order->comment }}</td>--}}
-            {{--<td>{{ $order->comment1 }}</td>--}}
-            {{--<td>{{ $order->remark }}</td>--}}
-            {{--<td>{{ $order->import_remark }}</td>--}}
-{{--            <td>{{ $order->shipping == 'PACKET' ? '小包' : '快递' }}</td>--}}
-            {{--<td>{{ $order->shipping_country }}</td>--}}
             <td>{{ $order->payment_date }}</td>
             <td>{{ $order->affair_time == '0000-00-00' ? '' : $order->affair_time }}</td>
             <td>{{ $order->create_time }}</td>

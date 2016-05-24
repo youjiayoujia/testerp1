@@ -144,6 +144,9 @@ class AccountModel extends BaseModel
             case 'amazon':
                 $status = ['Unshipped', 'PartiallyShipped'];
                 break;
+            case 'aliexpress':
+                $status =['WAIT_SELLER_SEND_GOODS'];
+                break;
         }
         return $status;
     }
@@ -159,6 +162,16 @@ class AccountModel extends BaseModel
                     'SellerId' => $this->amazon_seller_id,
                     'AWSAccessKeyId' => $this->amazon_accesskey_id,
                     'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
+                ];
+                break;
+            case 'aliexpress':
+                $config=[
+                    'appkey' => $this->aliexpress_appkey,
+                    'appsecret' =>$this->aliexpress_appsecret,
+                    'returnurl' =>$this->aliexpress_returnurl,
+                    'access_token_date' =>$this->aliexpress_access_token_date,
+                    'refresh_token' =>$this->aliexpress_refresh_token,
+                    'access_token' =>$this->aliexpress_access_token,
                 ];
                 break;
         }

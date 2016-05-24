@@ -13,6 +13,7 @@ use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 
+
 class TestController extends Controller
 {
     public function __construct(OrderModel $orderModel)
@@ -22,7 +23,7 @@ class TestController extends Controller
 
     public function index()
     {
-        $account = AccountModel::findOrFail(1);
+        $account = AccountModel::findOrFail(2);
         $startDate = '2016-05-18 00:00:00';
         $endDate = date('Y-m-d 00:00:00', time());
         $status = $account->api_status;
@@ -39,4 +40,7 @@ class TestController extends Controller
             }
         }
     }
+
+
+  
 }

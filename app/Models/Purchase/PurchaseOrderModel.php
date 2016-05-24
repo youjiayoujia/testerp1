@@ -46,6 +46,10 @@ class PurchaseOrderModel extends BaseModel
     {
         return UserModel::find($this->assigner)->name;
     }
+	public function getUsersAttribute()
+    {
+        return UserModel::all();
+    }
 	
 	public function updatePurchaseOrder($id,$data){
 		 $PurchaseOrder=$this->find($id);

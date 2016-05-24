@@ -70,9 +70,6 @@ class PurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-		if ($model->examineStatus !=2) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
-        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -114,10 +111,7 @@ class PurchaseOrderController extends Controller
 	public function update($id)
 	{
 		$model=$this->model->find($id);
-		if($model->examineStatus !=2){
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
-        }
-		$data=request()->all();	
+		$data=request()->all();
 		if(isset($data['arr'])){
 			if(isset($data['post'])){
 				$post="";
@@ -164,7 +158,9 @@ class PurchaseOrderController extends Controller
 					if($item['status']>0){
 						$data['status']=1;
 					}
-					
+					if($item['purchase_num'] != $purchaseItem->purchase_num){
+						$data['examineStatus']=2;
+					}
 					$item['start_buying_time']=date('Y-m-d h:i:s',time());
 					$purchaseItem->update($item);
 					$data['total_purchase_cost'] +=$v['purchase_cost']*$purchase_num;
@@ -182,29 +178,6 @@ class PurchaseOrderController extends Controller
 	}
 	
 	/**
-     * 审核采购单
-     *
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-	
-	public function changeExamineStatus($id,$examineStatus)
-	{
-		$model=$this->model->find($id);
-		if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-		$data['examineStatus']=$examineStatus;
-		$model->update($data);
-		if($examineStatus==1){
-			$this->cancelOrder($id);
-		}
-		return redirect($this->mainIndex);
-	}
-	
-	
-	
-	/**
      * 导出采购单
      *
      * @param $id
@@ -218,21 +191,23 @@ class PurchaseOrderController extends Controller
 		return view($this->viewPath.'excelOut',$response);	
 	}
 
-	/**
-     * 批量审核采购单
+	 /**
+     * 审核采购单
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */	
-	public function examinePurchaseOrder(){
-		$purchaseOrderIds=request()->get('purchase_ids');
-		$arrayIds=explode(',',$purchaseOrderIds);
-		$purchaseOrders=$this->model->find($arrayIds);
-			foreach($purchaseOrders as $vo){
-				$vo->update(['examineStatus'=>2]);
-			}
-		return 1;
-		}
+     */
+    
+    public function changeExamineStatus($id,$examineStatus)
+    {
+        $model=$this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $data['examineStatus']=$examineStatus;
+        $model->update($data);
+        return redirect( route('purchaseOrder.edit', $id));
+    }
 	/**
      * 导出3天未到货采购单
      *
@@ -259,8 +234,8 @@ class PurchaseOrderController extends Controller
 		if($num>0){
 			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
 			}
-		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['active'=>0,'active_status'=>0,'remark'=>'','arrival_time'=>'','purchase_order_id'=>0]);
-		$this->model->destroy($id);
+		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['status'=>5]);
+		$this->model->update(['status'=>5,'examineStatus'=>3]);
 		return redirect($this->mainIndex);	
 	}
 	
@@ -303,15 +278,17 @@ class PurchaseOrderController extends Controller
 	public function createItem($id){
 		$data=request()->all();
 		$model=$this->model->find($id);
-		$num=PurchaseItemModel::where('purchase_order_id',$id)->where('sku',$data['sku'])->count();
-		if($num==0){
-			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该sku不存在此订单中.'));
+		$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
+		$Inum=ItemModel::where('sku',$data['sku'])->where('is_sale','<>',1)->count();
+		if($num > 0 || $Inum > 0){
+			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
 		}
 		$data['lack_num']=$data['purchase_num'];
 		$data['warehouse_id']=$model->warehouse_id;
 		$data['supplier_id']=$model->supplier_id;
 		$data['purchase_order_id']=$id;
 		PurchaseItemModel::create($data);
+		$model->update(['examineStatus'=>2]);
 		return redirect( route('purchaseOrder.edit', $id));	
 		}
 	/**

@@ -24,7 +24,7 @@ class ChannelController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'drives' => config('channel.drives'),
+            'drivers' => config('channel.drivers'),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -38,7 +38,7 @@ class ChannelController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $account,
-            'drives' => config('channel.drives'),
+            'drivers' => config('channel.drivers'),
         ];
         return view($this->viewPath . 'edit', $response);
     }

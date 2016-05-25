@@ -27,7 +27,7 @@ class TestController extends Controller
         $startDate = '2016-05-18 00:00:00';
         $endDate = date('Y-m-d 00:00:00', time());
         $status = $account->api_status;
-        $channel = Channel::driver($account->channel->drive, $account->api_config);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
         $orderList = $channel->listOrders($startDate, $endDate, $status, 20);
         foreach ($orderList as $order) {
             $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
@@ -69,7 +69,8 @@ class TestController extends Controller
                         if (isset($orderDetail['orderStatus'])) {
                             $order = $channel->parseOrder($list, $orderDetail);
                             if ($order) {
-                                $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
+                                $thisOrder = $this->orderModel->where('channel_ordernum',
+                                    $order['channel_ordernum'])->first();
                                 $order['channel_id'] = $account->channel->id;
                                 $order['channel_account_id'] = $account->id;
                                 if ($thisOrder) {

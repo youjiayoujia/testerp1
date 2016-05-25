@@ -172,6 +172,7 @@ class AccountModel extends BaseModel
                     'access_token_date' =>$this->aliexpress_access_token_date,
                     'refresh_token' =>$this->aliexpress_refresh_token,
                     'access_token' =>$this->aliexpress_access_token,
+                    'aliexpress_member_id' =>$this->aliexpress_member_id,
                 ];
                 break;
         }

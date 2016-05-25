@@ -9,7 +9,11 @@
 namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
+use App\Models\CurrencyModel;
+use Illuminate\Support\Facades\DB;
+
 set_time_limit(1800);
+
 Class AliexpressAdapter implements AdapterInterface
 {
     const GWURL = 'gw.api.alibaba.com';
@@ -20,6 +24,7 @@ Class AliexpressAdapter implements AdapterInterface
     private $_appsecret;            //应用密匙
     private $_returnurl;            //回传地址
     private $_version = 1;
+    private $_aliexpress_member_id;
 
     public function __construct($config)
     {
@@ -28,64 +33,78 @@ Class AliexpressAdapter implements AdapterInterface
         $this->_returnurl = $config["returnurl"];
         $this->_access_token_date = $config["access_token_date"];
         $this->_refresh_token = $config["refresh_token"];
+        $this->_aliexpress_member_id = $config['aliexpress_member_id'];
         $access_token = $this->isResetAccesstoken();   //是否过期的accesstoken
         $this->_access_token = $access_token == false ? $config["access_token"] : $access_token;
+
     }
 
 
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
     {
-        $orders =[];
-        foreach($status as $orderStatus){
-            $pageTotalNum=1;
+        $orders = [];
+        foreach ($status as $orderStatus) {
+            $pageTotalNum = 1;
             for ($i = 1; $i <= $pageTotalNum; $i++) {
-                $param = "page=".$i."&pageSize=".$perPage."&orderStatus=$orderStatus";
-                $orderjson = $this->getJsonData('api.findOrderListQuery',$param);
-                $orderList = json_decode($orderjson,true);
+                $startDate= empty($startDate) ? date ("m/d/Y H:i:s", strtotime('-30 day') ) : date ("m/d/Y H:i:s", strtotime($startDate) );
+                $endDate=  empty($endDate) ? date ("m/d/Y H:i:s", strtotime('-12 hours')) : date ("m/d/Y H:i:s", strtotime($endDate));
+                $param = "page=" . $i . "&pageSize=" . $perPage . "&orderStatus=".$orderStatus."&createDateStart=".rawurlencode($startDate)."&createDateEnd=".rawurlencode($endDate);
+                $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
+                $orderList = json_decode($orderjson, true);
                 unset($orderjson);
-                if(isset($orderList['orderList'])){
+                if (isset($orderList['orderList'])) {
                     if ($i == 1) {
                         $pageTotalNum = ceil($orderList['totalItem'] / $perPage); //重新生成总页数
                     }
-
-                    foreach($orderList['orderList'] as $list){
-
-                        $obj = OrderModel::where(['ordernum' => $list['orderId']])->get();  //获取详情之前 进行判断是否存在 存在就没必要调API了
-
-                        if (count($obj)) {
+                    foreach ($orderList['orderList'] as $list) {
+                        $thisOrder = orderModel::where('channel_ordernum', $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
+                        if ($thisOrder) {
                             continue;
                         }
-
                         $param = "orderId=" . $list['orderId'];
-                        $orderjson = $this->getJsonData('api.findOrderById',$param);
-                        $orderDetail = json_decode($orderjson,true);
-                        if($orderDetail){
-
-                            $orders[] = $this->parseOrder($list,$orderDetail);
-
-
-                        }else{
+                        $orderjson = $this->getJsonData('api.findOrderById', $param);
+                        $orderDetail = json_decode($orderjson, true);
+                        if ($orderDetail) {
+                            $order = $this->parseOrder($list, $orderDetail);
+                            if ($order) {
+                                $orders[] = $order;
+                            }
+                        } else {
                             continue;
                         }
                     }
 
-                }else{
+                } else {
                     break;
                 }
             }
 
-           // if ($createDateStart && $createDateEnd) $param .= "&createDateStart=" . rawurlencode($createDateStart) . "&createDateEnd=" . rawurlencode($createDateEnd);
-
+            // if ($createDateStart && $createDateEnd) $param .= "&createDateStart=" . rawurlencode($createDateStart) . "&createDateEnd=" . rawurlencode($createDateEnd);
 
         }
 
         return $orders;
     }
 
-    public function getOrder($orderID)
+    public function listOrdersOther($startDate, $endDate, $status, $page=1,$perPage = 10)
     {
 
-        echo 'getOrder';
+        $startDate= empty($startDate) ? date ("m/d/Y H:i:s", strtotime('-30 day') ) : date ("m/d/Y H:i:s", strtotime($startDate) );
+        $endDate=  empty($endDate) ? date ("m/d/Y H:i:s", strtotime('-12 hours')) : date ("m/d/Y H:i:s", strtotime($endDate));
+        $param = "page=" . $page . "&pageSize=" . $perPage . "&orderStatus=".$status."&createDateStart=".rawurlencode($startDate)."&createDateEnd=".rawurlencode($endDate);
+
+        echo $param.'<br/>';
+        $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
+        return  json_decode($orderjson,true);
+    }
+
+
+
+    public function getOrder($orderID)
+    {
+        $param = "orderId=" . $orderID;
+        $orderjson = $this->getJsonData('api.findOrderById', $param);
+        return json_decode($orderjson,true);
     }
 
     public function returnTrack()
@@ -94,16 +113,9 @@ Class AliexpressAdapter implements AdapterInterface
     }
 
 
+    public function parseOrder($list, $orderDetail)
+    {
 
-
-
-
-
-    public function parseOrder($list, $orderDetail){
-
-     /*   var_dump($list);
-        echo '--------------------------------------------<br/>';
-        var_dump($orderDetail);exit;*/
 
         $orderInfo = array();
         $productInfo = array();
@@ -112,7 +124,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderProductArr = $list ["productList"] [0];
         $order_remark = array();
         foreach ($list ["productList"] as $p) {
-            if (isset($p['memo'])&&!empty($p['memo'])) {
+            if (isset($p['memo']) && !empty($p['memo'])) {
                 $order_remark[$p['childId']] = $p['memo']; //带ID进去吧
             }
             if (trim($p['logisticsServiceName']) != "Seller's Shipping Method") {
@@ -122,29 +134,37 @@ Class AliexpressAdapter implements AdapterInterface
         }
 
         $orderInfo['channel_ordernum'] = $list['orderId'];
-        $orderInfo["email"] = isset($list["buyerInfo"]["email"])?$list["buyerInfo"]["email"]:'';
+        $orderInfo["email"] = isset($list["buyerInfo"]["email"]) ? $list["buyerInfo"]["email"] : '';
         $orderInfo['amount'] = $list ["payAmount"] ["amount"];;
         $orderInfo['currency'] = $list["payAmount"] ["currencyCode"];
+
+        $rate = CurrencyModel::where(['code' => $orderInfo['currency']])->first();
+        if (!isset($rate['rate']) && (empty($rate))) {
+            echo "未找到该币种汇率";
+            return false;
+        }
+        $orderInfo['rate'] = $rate['rate'];
         $orderInfo['payment'] = $list['paymentType'];
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
         $orderInfo['shipping_firstname'] = $orderDetail['buyerInfo']['firstName'];
-        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];;
+        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];
         $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
         $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"] ["city"];
         $orderInfo['shipping_state'] = $orderDetail ["receiptAddress"] ["province"];
         $orderInfo['shipping_country'] = $orderDetail ["receiptAddress"] ["country"];
         $orderInfo['shipping_zipcode'] = $orderDetail ["receiptAddress"] ["zip"];
-        $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"])?$orderDetail ["receiptAddress"] ["mobileNo"]:'';
-        $phoneCountry=isset($orderDetail ["receiptAddress"] ["phoneCountry"])?$orderDetail ["receiptAddress"] ["phoneCountry"]:'';
-        $phoneArea =isset($orderDetail ["receiptAddress"] ["phoneArea"])?$orderDetail ["receiptAddress"] ["phoneArea"]:'';
-        $phoneNumber=isset($orderDetail ["receiptAddress"] ["phoneNumber"])?$orderDetail ["receiptAddress"] ["phoneNumber"]:'';
-        $phoneNumber = $phoneCountry."-".$phoneArea. "-" .$phoneNumber;
+
+        $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"]) ? $orderDetail ["receiptAddress"] ["mobileNo"] : '';
+        $phoneCountry = isset($orderDetail ["receiptAddress"] ["phoneCountry"]) ? $orderDetail ["receiptAddress"] ["phoneCountry"] : '';
+        $phoneArea = isset($orderDetail ["receiptAddress"] ["phoneArea"]) ? $orderDetail ["receiptAddress"] ["phoneArea"] : '';
+        $phoneNumber = isset($orderDetail ["receiptAddress"] ["phoneNumber"]) ? $orderDetail ["receiptAddress"] ["phoneNumber"] : '';
+        $phoneNumber = $phoneCountry . "-" . $phoneArea . "-" . $phoneNumber;
         $orderInfo['shipping_phone'] = $mobileNo != "" ? $mobileNo : $phoneNumber;
         $orderInfo['payment_date'] = $this->getPayTime($list['gmtPayTime']);
-
+        $orderInfo['aliexpress_loginId'] = $orderDetail['buyerInfo']['loginId'];
 
 
         $childProductArr = $orderDetail['childOrderList'];
@@ -164,13 +184,14 @@ Class AliexpressAdapter implements AdapterInterface
                 $sku_new = trim($matches[1][0]);
                 $qty = trim($matches[2][0]) ? trim($matches[2][0]) : 1;
             }
-            $productInfo[$sku_new]['channel_sku'] =trim($childProArr ["skuCode"]);
+            $productInfo[$sku_new]['channel_sku'] = trim($childProArr ["skuCode"]);
             $productInfo[$sku_new]["sku"] = $sku_new;
             $productInfo[$sku_new]["price"] = $qty ? $childProArr["productPrice"]["amount"] / $qty : $childProArr["productPrice"]["amount"];
 
             $productInfo[$sku_new]["quantity"] = isset($productInfo[$sku_new]["quantity"]) ? $productInfo[$sku_new]["quantity"] : 0;
             $productInfo[$sku_new]["quantity"] += $qty ? $childProArr["productCount"] * $qty : $childProArr["productCount"];
             $productInfo[$sku_new]['currency'] = $childProArr['initOrderAmt']['currencyCode'];
+            $productInfo[$sku_new]['orders_item_number'] = $childProArr['productId'];
 
             if (!empty($order_remark) && !empty($order_remark[$childProArr['id']])) { // --各SKU相应的备注信息
                 $productInfo[$sku_new]["remark"] = isset($productInfo[$sku_new]["remark"]) ? $productInfo[$sku_new]["remark"] . ' ' . $order_remark[$childProArr['id']] : $order_remark[$childProArr['id']]; //备注信息
@@ -188,51 +209,10 @@ Class AliexpressAdapter implements AdapterInterface
      * @param $paytime
      * @return bool|string
      */
-    public function getPayTime($paytime) {
-        $str = mb_substr ( $paytime, 0, 14 );
-        return date ( 'Y-m-d H:i:s', strtotime ( $str ) );
-    }
-
-    /**
-     * @param $page 页码
-     * @param $createDateStart  订单创建开始时间
-     * @param $createDateEnd    订单创建结束时间
-     * 时间参数一般不传入，
-     */
-
-    public function aliexpressListOrders($page, $pageSize, $createDateStart, $createDateEnd)
+    public function getPayTime($paytime)
     {
-        $api = 'api.findOrderListQuery';
-        $status = 'WAIT_SELLER_SEND_GOODS';
-        $param = "page=" . $page . "&pageSize=" . $pageSize;
-        $param .= "&orderStatus=$status";
-
-        if ($createDateStart && $createDateEnd) $param .= "&createDateStart=" . rawurlencode($createDateStart) . "&createDateEnd=" . rawurlencode($createDateEnd);
-        $orderjson = $this->getJsonData($api, $param);
-
-        $jsonResult = json_decode($orderjson, true);
-        if (isset($jsonResult['error_code']) && $jsonResult['error_code'] != "") {
-            return false;
-        } else {
-            return $jsonResult;
-        }
-    }
-
-    /**
-     * @param $orderId   aliexpress 订单号
-     * @return bool|mixed
-     */
-    public function aliexpressListOrder($orderId)
-    {
-        $api = 'api.findOrderById';
-        $param = "orderId=" . $orderId;
-        $orderjson = $this->getJsonData($api, $param);
-        $jsonResult = json_decode($orderjson, true);
-        if (isset($jsonResult['error_code']) && $jsonResult['error_code'] != "") {
-            return false;
-        } else {
-            return $jsonResult;
-        }
+        $str = mb_substr($paytime, 0, 14);
+        return date('Y-m-d H:i:s', strtotime($str));
     }
 
 
@@ -347,7 +327,7 @@ Class AliexpressAdapter implements AdapterInterface
         if ($hours > 9.5) { //大于10小时(提前半小时)
             $json = $this->resetAccessToken(); //获取最新的access_token
             $data = json_decode($json, true);
-            // $this->_CI->db->query("update smt_user_tokens set access_token = '".$data["access_token"]."', access_token_date = NOW() where token_id = ".$this->_token_id);
+            DB::table('channel_accounts')->where('aliexpress_member_id', $this->_aliexpress_member_id)->update(['aliexpress_access_token' => $data["access_token"], 'aliexpress_access_token_date' => date('Y-m-d H:i:s')]);
             return $data["access_token"];
         } else {
             return false;

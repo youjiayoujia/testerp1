@@ -33,9 +33,9 @@ class ImageModel extends BaseModel
     protected $searchFields = ['type'];
     public $rules = [
         'create' => [
-            'model' => 'required',
-            'type' => 'required',
-            'image0' => 'required',
+            //'model' => 'required',
+            //'type' => 'required',
+            //'image0' => 'required',
         ],
         'update' => [],
     ];
@@ -48,6 +48,11 @@ class ImageModel extends BaseModel
     public function product()
     {
         return $this->belongsTo('App\Models\ProductModel', 'product_id','id');
+    }
+
+    public function labels()
+    {
+        return $this->belongsToMany('App\Models\LabelModel','image_labels','image_id','label_id')->withTimestamps();
     }
 
     /**
@@ -103,7 +108,8 @@ class ImageModel extends BaseModel
                     if ($this->valid($file->getClientOriginalName())) {
                         $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
                         Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
-                        $this->create($data);
+                        $imageModel = $this->create($data);
+                        $imageModel->labels()->attach($data['is_link']);
                     }
                 }
                 break;
@@ -122,6 +128,8 @@ class ImageModel extends BaseModel
                 }
                 break;
         }
+
+        return $this;
     }
 
     /**

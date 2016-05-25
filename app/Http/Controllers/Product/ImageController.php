@@ -35,6 +35,20 @@ class ImageController extends Controller
         ];
         return view($this->viewPath . 'index', $response);
     }
+
+    /**
+     * 新建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'createone', $response);
+    }
+
     /**
      * 图片上传
      *
@@ -42,23 +56,34 @@ class ImageController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function store()
-    {
+    {   //echo '<pre>';
+        //echo $_REQUEST['ids'];exit;
+        //print_r(request()->files);
+        //exit;
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
-        if (!array_key_exists('image0', $data)) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '请添加图片.'));
-        }
+        //echo '<pre>';
+        //print_r($data);exit;
+        //if (!array_key_exists('image0', $data)) {
+        //    return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '请添加图片.'));
+        //}
         $productModel = ProductModel::where("model",$data['model'])->first();
-        if (!$productModel) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
-        }
+        //if (!$productModel) {
+        //    return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
+        //}
         $data['product_id'] = $productModel->id;
         $data['spu_id'] = $productModel->spu->id;
-    
-        $this->model->imageCreate($data, request()->files);
+        $data['type'] = 'public';
+        $data['uploadType'] = 'image';
+        $data['is_link'] = 4;
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
+        $this->model->imageCreate($data, request()->files);
+        //echo $this->model->id;exit;
+        //print_r($imageModel);exit;
+        
+        echo json_encode(1);
+        //return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
 
@@ -86,6 +111,17 @@ class ImageController extends Controller
         $this->model->imageDestroy($id);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
+
+    public function createImage()
+    {
+        $model = request()->input('model');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model'=> $model,
+        ];
+        return view($this->viewPath . 'create', $response);
+    }
+
 
 }
 

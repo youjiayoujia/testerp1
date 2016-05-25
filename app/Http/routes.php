@@ -33,6 +33,7 @@ Route::group(['middleware' => 'auth'], function () {
 //    Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
     //产品图片路由
+    Route::any('productImage/createImage', ['uses' => 'Product\ImageController@createImage', 'as' => 'createImage']);
     Route::resource('productImage', 'Product\ImageController');
 
     //reported smissing  reportedMissingCreate

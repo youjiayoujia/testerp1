@@ -47,7 +47,6 @@ class StockModel extends BaseModel
             'warehouse_id' => 'required|integer',
             'warehouse_position_id' => 'required',
             'all_quantity' => 'required|integer',
-            'unit_cost' => 'required|numeric',
         ]
     ];
 
@@ -218,6 +217,10 @@ class StockModel extends BaseModel
      */
     public function holdout($quantity, $type = '', $relation_id = '', $remark = '')
     {
+        $price = $this->unit_cost;
+        if($this->unit_cost <= 0) {
+            throw new Exception('单价不是正数，出错');
+        }
         $this->hold_quantity -= $quantity;
         $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
@@ -232,6 +235,7 @@ class StockModel extends BaseModel
             ]);
         $this->stockOut()->create([
             'quantity' => $quantity,
+            'amount' => $quantity * $price,
             'type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
@@ -351,7 +355,7 @@ class StockModel extends BaseModel
             }
             DB::beginTransaction();
             try {
-            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost'],
+            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->purchase_price,
                 'MAKE_ACCOUNT');
             } catch(Exception $e) {
                 DB::rollback();

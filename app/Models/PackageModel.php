@@ -127,6 +127,17 @@ class PackageModel extends BaseModel
         return $packageLimits->unique();
     }
 
+    public function getHasPickAttribute()
+    {
+        $items = $this->items;
+        foreach($items as $item) {
+            if($item->picked_quantity) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 判断包裹是否能分配物流
      */

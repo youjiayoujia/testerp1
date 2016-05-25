@@ -33,9 +33,6 @@
             <div class="col-lg-2">
                 <strong>是否启用</strong>: {{ $model->is_available == '1' ? '是' : '否' }}
             </div>
-            <div class="col-lg-2">
-                <strong>是否是默认仓</strong>: {{ $model->is_default == '1' ? '是' : '否' }}
-            </div>
         </div>
     </div>
     <div class="panel panel-default">

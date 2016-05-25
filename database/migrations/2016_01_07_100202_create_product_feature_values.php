@@ -1,8 +1,6 @@
 <?php
-
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-
 class CreateProductFeatureValues extends Migration
 {
     /**
@@ -22,7 +20,6 @@ class CreateProductFeatureValues extends Migration
             $table->softDeletes();
         });
     }
-
     /**
      * Reverse the migrations.
      *

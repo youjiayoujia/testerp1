@@ -59,3 +59,4 @@
     })
 </script>
 @stop
+@section('tableToolButtons')@stop

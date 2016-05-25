@@ -98,19 +98,24 @@ class ItemModel extends BaseModel
      * @return 库存对象
      *
      */
-    public function getStock($warehousePosistionId)
+    public function getStock($warehousePosistionId, $stock_id = 0)
     {
-        $stock = $this->stocks()->where('warehouse_position_id', $warehousePosistionId)->first();
-        if (!$stock) {
-            $warehouse = PositionModel::where(['id' => $warehousePosistionId])->first()->warehouse_id;
-            $len = StockModel::where(['item_id' => $this->id, 'warehouse_id' => $warehouse])->count();
-            if ($len >= 2) {
-                throw new Exception('该sku对应的库位已经是2，且并没找到库位');
+        $stock = '';
+        if(!$stock_id) {
+            $stock = $this->stocks()->where('warehouse_position_id', $warehousePosistionId)->first();
+            if (!$stock) {
+                $warehouse = PositionModel::where(['id' => $warehousePosistionId])->first()->warehouse_id;
+                $len = StockModel::where(['item_id' => $this->id, 'warehouse_id' => $warehouse])->count();
+                if ($len >= 2) {
+                    throw new Exception('该sku对应的库位已经是2，且并没找到库位');
+                }
+                $stock = $this->stocks()->create([
+                    'warehouse_position_id' => $warehousePosistionId,
+                    'warehouse_id' => $warehouse
+                ]);
             }
-            $stock = $this->stocks()->create([
-                'warehouse_position_id' => $warehousePosistionId,
-                'warehouse_id' => $warehouse
-            ]);
+        } else {
+            $stock = StockModel::find($stock_id);
         }
 
         return $stock;
@@ -207,9 +212,9 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '', $remark = '')
+    public function out($warehousePosistionId, $quantity, $type = '', $relation_id = '', $stock_id = 0, $remark = '')
     {
-        $stock = $this->getStock($warehousePosistionId);
+        $stock = $this->getStock($warehousePosistionId, $stock_id);
         if ($quantity) {
             return $stock->out($quantity, $type, $relation_id, $remark);
         }
@@ -241,6 +246,29 @@ class ItemModel extends BaseModel
                     $quantity -= $stock->available_quantity;
                 } else {
                     $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    break;
+                }
+            }
+            return $result;
+        }
+
+        return false;
+    }
+
+    //分配库存
+    public function assignDefaultStock($quantity, $order_item_id)
+    {
+        $stocks = $this->stocks->groupBy('warehouse_id')->get($this->warehouse_id);
+        if ($stocks->sum('available_quantity') >= $quantity) {
+            $stocks = $stocks->sortByDesc('available_quantity');
+            foreach ($stocks as $stock) {
+                if ($stock->available_quantity < $quantity) {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock);
+                    $result[$stock->warehouse_id][$stock->id]['order_item_id'] = $order_item_id;
+                    $quantity -= $stock->available_quantity;
+                } else {
+                    $result[$stock->warehouse_id][$stock->id] = $this->setStockData($stock, $quantity);
+                    $result[$stock->warehouse_id][$stock->id]['order_item_id'] = $order_item_id;
                     break;
                 }
             }

@@ -21,8 +21,10 @@
     <th>采购条目状态</th>
     <th>采购价格</th>
     <th>采购价格审核</th>
+    <th>入库数量</th>
+    <th>入库状态</th>
     <th>采购人</th>
-    <th>异常状态</th>
+   <!-- <th>异常状态</th>-->
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -51,8 +53,12 @@
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
             <td>
+            @if($purchaseList->item->weight == 0)
             <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}" style="width:50px"/> 
               <a href="javascript:" class="btn btn-info btn-xs changeWeight" data-id="{{ $purchaseList->id }}">更新</a>
+              @else
+              {{$purchaseList->item->weight}}
+              @endif
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
             	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
@@ -82,15 +88,32 @@
             	@if($purchaseList->storageStatus == $kt)
             	{{ $va}}
                 @endif
-            @endforeach</td> -->                   
+            @endforeach</td> --> 
+            <td>@if($purchaseList->storageStatus == 0)
+            	<input type="text" name="storage_qty" id="{{ $purchaseList->id }}_storage_qty" value="{{ $purchaseList->storage_qty }}" style="width:150px"/> 
+            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新
+                @elseif($purchaseList->storageStatus == 1)
+                <input type="text" name="storage_qty" id="{{ $purchaseList->id }}_storage_qty" value="{{ $purchaseList->storage_qty }}" style="width:150px"/> 
+            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新
+                @else
+                {{ $purchaseList->storage_qty }}
+                @endif</td>
+            <td>@if($purchaseList->storageStatus == 0)
+            	未入库
+                @elseif($purchaseList->storageStatus == 1)
+                部分入库
+                @else
+                全部入库
+                @endif
+            </td>                  
             <td>{{ $purchaseList->purchaseOrder->assigner }}</td>
-            <td> 
+           <!-- <td> 
             <select id="{{$purchaseList->id}}_active" name="active">
           	@foreach(config('purchase.purchaseItem.active') as $k=>$vo)
             	<option value="{{$k}}" @if($purchaseList->active == $k && $purchaseList->active_status ==1) selected="selected" @endif>{{$vo}}</option>
             @endforeach
             </select>
-            </td>
+            </td>-->
             <td>     
                 @if($purchaseList->status >1)
            		<a href="/purchaseList/printBarCode/{{$purchaseList->id}}" class="btn btn-warning btn-xs">

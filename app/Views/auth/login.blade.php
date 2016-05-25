@@ -54,7 +54,7 @@
                 </div>
                 <div class="mastfoot">
                     <div class="inner">
-                        <p><a href="javascript:">南京快悦客户管理系统</a> by <a href="javascript:">@霸王小龙龙</a>.</p>
+                        <p><a href="javascript:">南京快悦ERP系统</a> by <a href="javascript:">@霸王小龙龙</a>.</p>
                     </div>
                 </div>
             </div>

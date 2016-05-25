@@ -43,7 +43,7 @@
             <td>{{ $purchaseOrder->total_purchase_cost}}+{{ $purchaseOrder->sumPostage}}</td>
             <td>
                 <a href="{{ route('closePurchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil">@if($purchaseOrder->close_status == 0) 去结算 @else 去查看 @endif
+                    <span class="glyphicon glyphicon-pencil">@if($purchaseOrder->close_status == 0) 结算 @else 查看 @endif
                 </a>
             </td>
         </tr>

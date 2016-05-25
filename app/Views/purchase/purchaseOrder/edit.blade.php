@@ -64,7 +64,11 @@
            <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
-                <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
+                <select name="assigner">
+                @foreach($model->users as $k=>$user)
+                <option value="{{$user->id}}" {{$model->assigner == $k ? 'selected' : ''}}>{{$user->name}}</option>
+                @endforeach
+                </select>		
             </div>
             
             <div class="form-group col-lg-4">
@@ -73,7 +77,24 @@
                 </a>
                
             </div>
-                   
+            
+            <div class="form-group col-lg-4">
+            	<strong>审核该采购单</strong>:
+                @if($model->examineStatus == 0 || $model->examineStatus == 2)
+                {{$model->examineStatus == 0 ? '未审核':'二次审核'}}
+                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核通过
+                </a> 
+                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/3" class="btn btn-info btn-xs"> 审核不通过
+                </a>
+                @endif
+                @if($model->examineStatus == 1)
+                审核通过
+                @endif
+                @if($model->examineStatus == 3)
+                审核不通过
+                @endif
+            </div>
+           
       </div>
 
      <div class="panel panel-default">
@@ -87,7 +108,7 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>采购类型</td> 
+            <td></td> 
             <td>model</td>
             <td>SKU*采购数量</td> 
             <td>供货商sku</td> 
@@ -106,11 +127,7 @@
         <tr> 
             <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
             <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
+               
             </td>
             <td>{{$purchaseItem->item->product->model}}</td>
             <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
@@ -124,13 +141,20 @@
             </td>
             
             <td>
+            @if($purchaseItem->status ==0)
            	<select name="arr[{{$k}}][status]" >
              @foreach(config('purchase.purchaseItem.status') as $key=>$v)
              	@if($key < 2)
-            	<option value="{{$key}}"  @if($purchaseItem->status == $key) selected = "selected" @endif>{{$v}}</option>
+            	<option value="{{$key}}"  @if(1 == $key) selected = "selected" @endif>{{$v}}</option>
                 @endif
              @endforeach
-            </select>  
+            </select> 
+            @else
+            @foreach(config('purchase.purchaseItem.status') as $key=>$v)
+            	@if($purchaseItem->status == $key) {{$v}} @endif
+             @endforeach
+             <input type="hidden" name="arr[{{$k}}][status]" value="{{$purchaseItem->status}}"/>
+            @endif 
              </td>
             <td>
             物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>

@@ -93,7 +93,7 @@ Class AliexpressAdapter implements AdapterInterface
         $endDate=  empty($endDate) ? date ("m/d/Y H:i:s", strtotime('-12 hours')) : date ("m/d/Y H:i:s", strtotime($endDate));
         $param = "page=" . $page . "&pageSize=" . $perPage . "&orderStatus=".$status."&createDateStart=".rawurlencode($startDate)."&createDateEnd=".rawurlencode($endDate);
 
-        echo $param.'<br/>';
+        //echo $param.'<br/>';
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
         return  json_decode($orderjson,true);
     }
@@ -137,7 +137,6 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo["email"] = isset($list["buyerInfo"]["email"]) ? $list["buyerInfo"]["email"] : '';
         $orderInfo['amount'] = $list ["payAmount"] ["amount"];;
         $orderInfo['currency'] = $list["payAmount"] ["currencyCode"];
-        $orderInfo['rate'] = $rate['rate'];
         $orderInfo['payment'] = $list['paymentType'];
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];

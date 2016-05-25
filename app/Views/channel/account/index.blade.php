@@ -51,8 +51,6 @@
                 </a>
             </td>
         </tr>
-        @if($account->channel->name == 'Amazon')
-            @include('channel.account.api.amazon')
-        @endif
+        @include('channel.account.api.'.$account->channel->driver)
     @endforeach
 @stop

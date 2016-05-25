@@ -455,3 +455,4 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 Route::any('test', ['uses' => 'TestController@index']);
+Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);

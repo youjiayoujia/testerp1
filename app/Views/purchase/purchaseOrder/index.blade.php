@@ -121,7 +121,7 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="核销" class="btn btn-success btn-xs">
                      <span class="glyphicon glyphicon-yen"></span>
                 </a>
-                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="退回" class="btn btn-danger btn-xs">
+                 <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
 				<a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" title="打印" class="btn btn-primary btn-xs">

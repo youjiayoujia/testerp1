@@ -45,7 +45,6 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>采购类型</td> 
             <td>SKU*采购数量</td> 
             <td>样图</td>         
             <td>状态</td> 
@@ -56,13 +55,7 @@
         @foreach($purchaseItems as $k=>$purchaseItem)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
-            <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
-            </td>
+           
             <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
             <td>
             @if($purchaseItem->item->product->default_image>0) 

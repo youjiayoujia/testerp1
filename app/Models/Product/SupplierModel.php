@@ -78,8 +78,23 @@ class SupplierModel extends BaseModel
             $path = 'uploadSupplier/';
 			if ($file->getClientOriginalName()) {
 				$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
-				$file->move($path, $data['name']);
+				$file->move($path, $data['qualifications']);
 				return $this->create($data);
+			}         
+    }
+	
+	/**
+     * 创建新供应商
+     *
+     *
+     */
+    public function updateSupplier($id,$data, $file= null)
+    {
+            $path = 'uploadSupplier/';
+			if ($file->getClientOriginalName()) {
+				$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
+				$file->move($path, $data['qualifications']);
+				return $this->find($id)->update($data);
 			}         
     }
 }

@@ -7,14 +7,7 @@
             <div class="form-group col-lg-4">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
-             <div class="form-group col-lg-4">
-                <strong>采购类型</strong>:
-               @foreach(config('purchase.purchaseItem.type') as $k=>$v)
-            	@if($model->type == $k)
-            		{{$v}}
-                @endif
-            	@endforeach
-            </div>
+            
             <div class="form-group col-lg-4">
                 <strong>仓库</strong>:
               {{$model->warehouse->name}}

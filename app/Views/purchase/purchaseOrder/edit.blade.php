@@ -239,13 +239,7 @@
          @if($purchaseItem->storageStatus > 0)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
-            <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
-            </td>
+           
             <td>{{$purchaseItem->sku}}</td>
             <td>
             @if($purchaseItem->item->product->default_image>0) 

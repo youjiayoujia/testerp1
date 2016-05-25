@@ -217,6 +217,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
     Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
     Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
+	Route::any('/changePurchaseItemStorageQty', 'Purchase\PurchaseListController@changePurchaseItemStorageQty');
     Route::any('examinePurchaseItem',
         ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
     Route::resource('purchaseList', 'Purchase\PurchaseListController');

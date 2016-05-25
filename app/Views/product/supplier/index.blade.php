@@ -13,7 +13,11 @@
         <li><a href="javascript:" class="examine" data-channel="3" data-name="审核不通过">审核不通过</a></li>
     </ul>
 </div>
-
+<div class="btn-group">
+        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+            <i class="glyphicon glyphicon-plus"></i> 新增
+        </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
 	<th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选 </th>

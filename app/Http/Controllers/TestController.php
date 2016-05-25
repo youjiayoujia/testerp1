@@ -23,8 +23,9 @@ class TestController extends Controller
 
     public function index()
     {
+        $accountID = request()->get('id');
         $begin = microtime(true);
-        $account = AccountModel::findOrFail(1);
+        $account = AccountModel::findOrFail($accountID);
         $startDate = date("Y-m-d H:i:s", strtotime('-30 day'));
         $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
         $status = $account->api_status;

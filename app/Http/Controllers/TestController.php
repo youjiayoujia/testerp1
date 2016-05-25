@@ -27,14 +27,17 @@ class TestController extends Controller
         $endDate = date('Y-m-d 00:00:00', time());
         $status = $account->api_status;
         $channel = Channel::driver($account->channel->drive, $account->api_config);
+        $orderId = '104-9055646-5459426';
+        $order = $channel->getOrder($orderId);
+        Tool::show($order);
         $orderList = $channel->listOrders($startDate, $endDate, $status, 20);
         foreach ($orderList as $order) {
             $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
-            $order['channel_id'] = $account->channel->id;
-            $order['channel_account_id'] = $account->id;
             if ($thisOrder) {
                 $thisOrder->updateOrder($order);
             } else {
+                $order['channel_id'] = $account->channel->id;
+                $order['channel_account_id'] = $account->id;
                 $this->orderModel->createOrder($order);
             }
         }

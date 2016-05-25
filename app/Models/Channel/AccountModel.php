@@ -140,12 +140,12 @@ class AccountModel extends BaseModel
     public function getApiStatusAttribute()
     {
         $status = [];
-        switch ($this->channel->drive) {
+        switch ($this->channel->driver) {
             case 'amazon':
                 $status = ['Unshipped', 'PartiallyShipped'];
                 break;
             case 'aliexpress':
-                $status =['WAIT_SELLER_SEND_GOODS'];
+                $status = ['WAIT_SELLER_SEND_GOODS'];
                 break;
         }
         return $status;
@@ -154,7 +154,7 @@ class AccountModel extends BaseModel
     public function getApiConfigAttribute()
     {
         $config = [];
-        switch ($this->channel->drive) {
+        switch ($this->channel->driver) {
             case 'amazon':
                 $config = [
                     'serviceUrl' => $this->amazon_api_url,
@@ -165,14 +165,14 @@ class AccountModel extends BaseModel
                 ];
                 break;
             case 'aliexpress':
-                $config=[
+                $config = [
                     'appkey' => $this->aliexpress_appkey,
-                    'appsecret' =>$this->aliexpress_appsecret,
-                    'returnurl' =>$this->aliexpress_returnurl,
-                    'access_token_date' =>$this->aliexpress_access_token_date,
-                    'refresh_token' =>$this->aliexpress_refresh_token,
-                    'access_token' =>$this->aliexpress_access_token,
-                    'aliexpress_member_id' =>$this->aliexpress_member_id,
+                    'appsecret' => $this->aliexpress_appsecret,
+                    'returnurl' => $this->aliexpress_returnurl,
+                    'access_token_date' => $this->aliexpress_access_token_date,
+                    'refresh_token' => $this->aliexpress_refresh_token,
+                    'access_token' => $this->aliexpress_access_token,
+                    'aliexpress_member_id' => $this->aliexpress_member_id,
                 ];
                 break;
         }

@@ -50,9 +50,9 @@ class SupplierController extends Controller
      */
     public function store()
     {
-        request()->flash();
+        $data=request()->all();
         $this->validate(request(), $this->model->rules('create'));
-        $model = $this->model->create(request()->all());
+        $model = $this->model->supplierCreate($data, request()->file('qualifications'));
         SupplierChangeHistoryModel::create([              
             'supplier_id' => $model->id,
             'to' =>request()->input('purchase_id'),
@@ -137,4 +137,18 @@ class SupplierController extends Controller
 
         return redirect($this->mainIndex);
     }
+	
+	public function beExamine(){
+		$channel_id = request()->input('channel_id');
+        $product_id_str = request()->input('product_ids');
+        $product_id_arr = explode(',',$product_id_str);
+		$suppliers=$this->model->find($product_id_arr);
+		foreach($suppliers as $key=>$vo){
+			if($vo->examine_status <2){
+				$vo->update(['examine_status'=>$channel_id]);
+			}
+			}
+		return 1;	
+	}
+	
 }

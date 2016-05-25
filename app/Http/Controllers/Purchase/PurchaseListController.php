@@ -21,7 +21,7 @@ class PurchaseListController extends Controller
 {
 
     public function __construct(PurchaseItemModel $purchaseList)
-    {
+    {	
         $this->model = $purchaseList;
         $this->mainIndex = route('purchaseList.index');
         $this->mainTitle = '采购对单';

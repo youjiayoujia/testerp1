@@ -86,11 +86,6 @@ return [
                     'url' => 'bao3Package.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '国家Number信息',
-                    'url' => 'countries.index',
-                    'icon' => '',
-                ],
             ],
         ],
     ],
@@ -116,6 +111,11 @@ return [
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
+			[
+                'name' => '订单投诉',
+                'url' => 'orderComplaint.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航
@@ -134,6 +134,11 @@ return [
                 [
                     'name' => '拣货',
                     'url' => 'pickList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '效能统计',
+                    'url' => 'pickList.performanceStatistics',
                     'icon' => '',
                 ],
                 [
@@ -156,6 +161,11 @@ return [
                 [
                     'name' => '库存',
                     'url' => 'stock.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存查询',
+                    'url' => 'stock.showStockInfo',
                     'icon' => '',
                 ],
                 [
@@ -255,7 +265,7 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '采购条目',
                     'url' => 'purchaseItemList.index',
                     'icon' => '',
@@ -264,15 +274,10 @@ return [
                     'name' => '打印采购单',
                     'url' => 'printPurchaseOrder.create',
                     'icon' => '',
-                ],
+                ],*/
                 [
                     'name' => '采购对单',
                     'url' => 'purchaseList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '采购入库',
-                    'url' => 'purchaseStockIn.create',
                     'icon' => '',
                 ],
 				[
@@ -372,6 +377,16 @@ return [
             [
                 'name' => '包装限制',
                 'url' => 'wrapLimits.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家Number信息',
+                'url' => 'countries.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家地区信息',
+                'url' => 'countriesSort.index',
                 'icon' => '',
             ],
         ],

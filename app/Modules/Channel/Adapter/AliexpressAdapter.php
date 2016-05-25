@@ -46,9 +46,11 @@ Class AliexpressAdapter implements AdapterInterface
         foreach ($status as $orderStatus) {
             $pageTotalNum = 1;
             for ($i = 1; $i <= $pageTotalNum; $i++) {
-                $startDate= empty($startDate) ? date ("m/d/Y H:i:s", strtotime('-30 day') ) : date ("m/d/Y H:i:s", strtotime($startDate) );
-                $endDate=  empty($endDate) ? date ("m/d/Y H:i:s", strtotime('-12 hours')) : date ("m/d/Y H:i:s", strtotime($endDate));
-                $param = "page=" . $i . "&pageSize=" . $perPage . "&orderStatus=".$orderStatus."&createDateStart=".rawurlencode($startDate)."&createDateEnd=".rawurlencode($endDate);
+                $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
+                    strtotime($startDate));
+                $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
+                    strtotime($endDate));
+                $param = "page=" . $i . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
                 $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
                 $orderList = json_decode($orderjson, true);
                 unset($orderjson);
@@ -57,7 +59,8 @@ Class AliexpressAdapter implements AdapterInterface
                         $pageTotalNum = ceil($orderList['totalItem'] / $perPage); //重新生成总页数
                     }
                     foreach ($orderList['orderList'] as $list) {
-                        $thisOrder = orderModel::where('channel_ordernum', $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
+                        $thisOrder = orderModel::where('channel_ordernum',
+                            $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
                         if ($thisOrder) {
                             continue;
                         }
@@ -86,25 +89,26 @@ Class AliexpressAdapter implements AdapterInterface
         return $orders;
     }
 
-    public function listOrdersOther($startDate, $endDate, $status, $page=1,$perPage = 10)
+    public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
     {
 
-        $startDate= empty($startDate) ? date ("m/d/Y H:i:s", strtotime('-30 day') ) : date ("m/d/Y H:i:s", strtotime($startDate) );
-        $endDate=  empty($endDate) ? date ("m/d/Y H:i:s", strtotime('-12 hours')) : date ("m/d/Y H:i:s", strtotime($endDate));
-        $param = "page=" . $page . "&pageSize=" . $perPage . "&orderStatus=".$status."&createDateStart=".rawurlencode($startDate)."&createDateEnd=".rawurlencode($endDate);
+        $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
+            strtotime($startDate));
+        $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
+            strtotime($endDate));
+        $param = "page=" . $page . "&pageSize=" . $perPage . "&orderStatus=" . $status . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
 
         //echo $param.'<br/>';
         $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
-        return  json_decode($orderjson,true);
+        return json_decode($orderjson, true);
     }
-
 
 
     public function getOrder($orderID)
     {
         $param = "orderId=" . $orderID;
         $orderjson = $this->getJsonData('api.findOrderById', $param);
-        return json_decode($orderjson,true);
+        return json_decode($orderjson, true);
     }
 
     public function returnTrack()
@@ -121,7 +125,7 @@ Class AliexpressAdapter implements AdapterInterface
         $productInfo = array();
 
         $ship_price = 0;
-        $orderProductArr = $list ["productList"] [0];
+        $orderProductArr = $list ["productList"][0];
         $order_remark = array();
         foreach ($list ["productList"] as $p) {
             if (isset($p['memo']) && !empty($p['memo'])) {
@@ -320,7 +324,10 @@ Class AliexpressAdapter implements AdapterInterface
         if ($hours > 9.5) { //大于10小时(提前半小时)
             $json = $this->resetAccessToken(); //获取最新的access_token
             $data = json_decode($json, true);
-            DB::table('channel_accounts')->where('aliexpress_member_id', $this->_aliexpress_member_id)->update(['aliexpress_access_token' => $data["access_token"], 'aliexpress_access_token_date' => date('Y-m-d H:i:s')]);
+            DB::table('channel_accounts')->where('aliexpress_member_id', $this->_aliexpress_member_id)->update([
+                'aliexpress_access_token' => $data["access_token"],
+                'aliexpress_access_token_date' => date('Y-m-d H:i:s')
+            ]);
             return $data["access_token"];
         } else {
             return false;

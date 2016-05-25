@@ -119,6 +119,11 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
     }
 
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
@@ -180,7 +185,7 @@ class OrderModel extends BaseModel
         $items= ItemModel::where('order_id', $this->id)->get()->toArray();
         $sku = '';
         foreach($items as $item) {
-            $sku = $item['sku'] . $sku;
+            $sku = $item['sku'] . ' ' . $sku;
         }
         return $sku;
     }
@@ -188,6 +193,16 @@ class OrderModel extends BaseModel
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
+    }
+
+    public function remarks()
+    {
+        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany('App\Models\Order\RefundModel', 'order_id', 'id');
     }
 
     public function package()

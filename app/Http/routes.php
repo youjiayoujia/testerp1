@@ -340,6 +340,12 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::resource('orderBlacklist', 'Order\BlacklistController');
   Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
   Route::get('updateStatus/{id}', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
+  Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
+  Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
+  Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
+  Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
+  Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);
+  Route::post('refundUpdate/{id}', ['uses' => 'OrderController@refundUpdate', 'as' => 'refundUpdate']);
 
   //包裹管理路由
   Route::post('package/excelProcessFee/{type}',

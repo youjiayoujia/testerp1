@@ -171,26 +171,6 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">退款信息</div>
-        <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>退款方式</strong>: {{ $model->refund }}
-            </div>
-            <div class="col-lg-2">
-                <strong>退款币种</strong>: {{ $model->refund_currency }}
-            </div>
-            <div class="col-lg-2">
-                <strong>客户账户</strong>: {{ $model->refund_account }}
-            </div>
-            <div class="col-lg-2">
-                <strong>退款金额</strong>: {{ $model->refund_amount }}
-            </div>
-            <div class="col-lg-2">
-                <strong>退款时间</strong>: {{ $model->refund_time == '0000-00-00' ? '' : $model->refund_time }}
-            </div>
-        </div>
-    </div>
-    <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
             <div class="row">

@@ -1,5 +1,6 @@
 @extends('common.form')
 @section('formAction') {{ route('order.store') }} @stop
+@section('formAttributes') name='creator'@stop
 @section('formBody')
     <div class="panel panel-default">
         <div class="panel-heading">基础信息</div>
@@ -335,43 +336,6 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">退款信息</div>
-        <div class="panel-body">
-            <div class="form-group col-lg-2">
-                <label for="refund" class='control-label'>退款方式</label>
-                <select class="form-control" name="refund" id="refund">
-                    @foreach(config('order.payment') as $refund)
-                        <option value="{{ $refund }}" {{ old('refund') == $refund ? 'selected' : '' }}>
-                            {{ $refund }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_currency" class='control-label'>退款币种</label>
-                <select class="form-control" name="refund_currency" id="refund_currency">
-                    @foreach($currencys as $refund_currency)
-                        <option value="{{ $refund_currency->code }}" {{ old('refund_currency') == $refund_currency->code ? 'selected' : '' }}>
-                            {{ $refund_currency->code }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_account" class='control-label'>客户账户</label>
-                <input class="form-control" id="refund_account" placeholder="客户账户" name='refund_account' value="{{ old('refund_account') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_amount" class='control-label'>退款金额</label>
-                <input class="form-control" id="refund_amount" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_time" class='control-label'>退款时间</label>
-                <input class="form-control" id="refund_time" placeholder="退款时间" name='refund_time' value="{{ old('refund_time') }}" readonly>
-            </div>
-        </div>
-    </div>
     <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body" id="itemDiv">
@@ -457,6 +421,10 @@
         </div>
     </div>
 @stop
+@section('formButton')
+    <button type="submit" class="btn btn-success sub" id="tj">提交</button>
+    <button type="reset" class="btn btn-default" id="qx">取消</button>
+@show
 @section('pageJs')
     <script type='text/javascript'>
         $(document).ready(function () {
@@ -465,6 +433,8 @@
             //隐藏
             document.getElementById('hand').style.display='none';
             document.getElementById('comment').style.display='none';
+            document.getElementById('tj').style.display='none';
+            document.getElementById('qx').style.display='none';
 
             $('#payment').click(function() {
                 var payment = $('#payment').val();
@@ -556,7 +526,3 @@
         });
     </script>
 @stop
-@section('formButton')
-    <button type="submit" class="btn btn-success sub">提交</button>
-    <button type="reset" class="btn btn-default">取消</button>
-@show

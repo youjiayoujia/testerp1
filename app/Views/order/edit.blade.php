@@ -344,43 +344,6 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">退款信息</div>
-        <div class="panel-body">
-            <div class="form-group col-lg-2">
-                <label for="refund" class='control-label'>退款方式</label>
-                <select class="form-control" name="refund" id="refund">
-                    @foreach(config('order.payment') as $refund)
-                        <option value="{{ $refund }}" {{ old('refund') ? (old('refund') == $refund ? 'selected' : '') : ($model->refund == $refund ? 'selected' : '') }}>
-                            {{ $refund }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_currency" class='control-label'>退款币种</label>
-                <select class="form-control" name="refund_currency" id="refund_currency">
-                    @foreach($currencys as $refund_currency)
-                        <option value="{{ $refund_currency->code }}" {{ old('refund_currency') ? (old('refund_currency') == $refund_currency->code ? 'selected' : '') : ($model->refund_currency == $refund_currency->code ? 'selected' : '') }}>
-                            {{ $refund_currency->code }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_account" class='control-label'>客户账户</label>
-                <input class="form-control" id="refund_account" placeholder="客户账户" name='refund_account' value="{{ old('refund_account') ? old('refund_account') : $model->refund_account }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_amount" class='control-label'>退款金额</label>
-                <input class="form-control" id="refund_amount" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') ? old('refund_amount') : $model->refund_amount }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_time" class='control-label'>退款时间</label>
-                <input class="form-control" id="refund_time" placeholder="退款时间" name='refund_time' value="{{ old('refund_time') ? old('refund_time') : $model->refund_time }}" readonly>
-            </div>
-        </div>
-    </div>
     <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body" id="itemDiv">

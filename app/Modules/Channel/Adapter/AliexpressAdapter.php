@@ -137,12 +137,6 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo["email"] = isset($list["buyerInfo"]["email"]) ? $list["buyerInfo"]["email"] : '';
         $orderInfo['amount'] = $list ["payAmount"] ["amount"];;
         $orderInfo['currency'] = $list["payAmount"] ["currencyCode"];
-
-        $rate = CurrencyModel::where(['code' => $orderInfo['currency']])->first();
-        if (!isset($rate['rate']) && (empty($rate))) {
-            echo "未找到该币种汇率";
-            return false;
-        }
         $orderInfo['rate'] = $rate['rate'];
         $orderInfo['payment'] = $list['paymentType'];
         $orderInfo['amount_shipping'] = $ship_price;

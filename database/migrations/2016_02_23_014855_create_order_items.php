@@ -25,7 +25,6 @@ class CreateOrderItems extends Migration
             $table->enum('status', ['NEW', 'PACKED', 'SHIPPED'])->comment('发货状态')->nullable()->default('NEW');
             $table->enum('is_gift', [0, 1])->comment('是否赠品')->nullable()->default(0);
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
-            $table->string('orders_item_number')->comment('产品的广告ID')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

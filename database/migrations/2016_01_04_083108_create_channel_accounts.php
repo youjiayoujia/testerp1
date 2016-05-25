@@ -27,13 +27,6 @@ class CreateChannelAccounts extends Migration
             $table->string('amazon_marketplace_id')->comment('AWS MarketplaceId');
             $table->string('amazon_seller_id')->comment('AWS SellerId');
             $table->string('amazon_accesskey_id')->comment('AWS AWSAccessKeyId');
-            $table->string('aliexpress_member_id')->comment(' 速卖通开发者账号');
-            $table->string('aliexpress_appkey')->comment('速卖通appkey');
-            $table->string('aliexpress_appsecret')->comment('速卖通appsecret');
-            $table->string('aliexpress_returnurl')->comment('速卖通回调地址');
-            $table->string('aliexpress_refresh_token')->comment('速卖通refresh_token(半年有效期)');
-            $table->string('aliexpress_access_token')->comment('速卖通access_token(10小时有效期)');
-            $table->dateTime('aliexpress_access_token_date')->comment('速卖通access_token(10小时有效期)');
             $table->integer('operator_id')->comment('默认运营人员');
             $table->integer('customer_service_id')->comment('默认客服人员');
             $table->enum('is_merge_package', ['0', '1'])->comment('合并相同地址订单包裹')->default('0');

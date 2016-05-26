@@ -100,11 +100,13 @@ class StockController extends Controller
         }
         $item_id = $item->id;
         $stocks = $this->model->where('item_id', $item_id)->get();
-        $str = '';
+        $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
         foreach($stocks as $stock)
         {
-            $str .= "<p>仓库--".($stock->warehouse ? $stock->warehouse->name : '').'      '.'库位--'.($stock->position ? $stock->position->name : '').'       '.'总数量--'.($stock->all_quantity).'       '.'可用数量--'.$stock->available_quantity."</p>";
+            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->items ? $stock->items->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
         }
+        $str .= "</tbody>";
+
         return $str;
     }
 
@@ -117,11 +119,13 @@ class StockController extends Controller
         }
         $warehouse_position_id = $position->id;
         $stocks = $this->model->where('warehouse_position_id', $warehouse_position_id)->get();
-        $str = '';
+        $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
         foreach($stocks as $stock)
         {
-            $str .= "<p>仓库--".($stock->warehouse ? $stock->warehouse->name : '').'      '.'库位--'.($stock->position ? $stock->position->name : '').'       '.'总数量--'.($stock->all_quantity).'       '.'可用数量--'.$stock->available_quantity."</p>";
+            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->items ? $stock->items->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
         }
+        $str .= "</tbody>";
+
         return $str;
     }
     /**

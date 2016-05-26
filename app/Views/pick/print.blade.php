@@ -20,7 +20,7 @@
         </div>
         <div class='form-group col-lg-3'>
             <label>单号:</label>
-            <input type='text' class='form-control' value={{ $model->status_name }}>
+            <input type='text' class='form-control' value={{ $model->picknum }}>
         </div>
     </div>
     <div class='row'>

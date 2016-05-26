@@ -256,8 +256,7 @@ class PickListController extends Controller
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
-        $obj->status = 'INBOXED';
-        $obj->save();
+        $obj->update(['status' => 'INBOXED', 'inbox_by' => '1', 'inbox_at' => date('Y-m-d H:i:s', time())]);
         foreach($obj->package as $package)
         {
             $package->status = 'PICKED';
@@ -280,8 +279,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->status = 'PACKAGED';
-        $model->save();
+        $model->update(['status' => 'PACKAGED', 'pack_by' => '3', 'pack_at' => date('Y-m-d H:i:s', time())]);
 
         foreach($model->package as $package)
         {

@@ -106,4 +106,15 @@ class LogisticsController extends Controller
         return json_encode($buf);
     }
 
+    public function getLogistics()
+    {
+        $logistics_id = request('logistics');
+        $logistics = $this->model->find($logistics_id);
+        if(!$logistics) {
+            return json_encode(false);
+        }
+        $str = "<option class='logis' value='".$logistics->id."'>".$logistics->logistics_type."</option>";
+        return $str;
+    }
+
 }

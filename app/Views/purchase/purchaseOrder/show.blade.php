@@ -94,7 +94,7 @@
             <td>供货商sku</td> 
             <td>样图</td>
             <td>状态</td>
-            <td>物流单号+物流费</td>
+            <td>物流单号</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>购买链接</td> 
@@ -122,8 +122,7 @@
              @endforeach
              </td>
             <td>
-            物流单号：{{$purchaseItem->post_coding}}
-            物流费：{{$purchaseItem->postage}}
+            {{$purchaseItem->post_coding}}
             </td>
             <td>
               {{$purchaseItem->purchase_cost}}

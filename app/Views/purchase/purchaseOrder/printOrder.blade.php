@@ -92,7 +92,7 @@
             <td>SKU*采购数量</td> 
             <td>供货商sku</td> 
             <td>状态</td>
-            <td>物流单号+物流费</td>
+            <td>物流单号</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>操作</td>           
@@ -113,8 +113,7 @@
              @endforeach
              </td>
             <td>
-            物流单号：{{$purchaseItem->post_coding}}
-            物流费：{{$purchaseItem->postage}}
+            {{$purchaseItem->post_coding}}
             </td>
             <td>
               {{$purchaseItem->purchase_cost}}
@@ -156,6 +155,11 @@
             <div class="form-group col-lg-4">
                 <strong>采购日期</strong>:
                   {{$model->start_buying_time}}
+            </div>
+            <div class="form-group col-lg-4">
+                <strong>采购时间</strong>:
+                {{$model->supplier->purchase_time}}天
+                  
             </div>
             <div class="form-group col-lg-4">
                 <strong>打印日期</strong>:

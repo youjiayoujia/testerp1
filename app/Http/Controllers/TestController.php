@@ -48,11 +48,12 @@ class TestController extends Controller
 
     public function aliexpressOrdersList()
     {
+        $begin = microtime(true);
         $account = AccountModel::findOrFail(2);
-        $startDate = '2016-05-24 00:00:00';
-        $endDate = date('Y-m-d 00:00:00', time());
+        $startDate = date("Y-m-d H:i:s", strtotime('-30 day'));
+        $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
         $status = $account->api_status;
-        $channel = Channel::driver($account->channel->drive, $account->api_config);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
         foreach ($status as $orderStatus) {
             $pageTotalNum = 1;
             $pageSize = 50;
@@ -94,6 +95,8 @@ class TestController extends Controller
 
             }
         }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
 
     }
 }

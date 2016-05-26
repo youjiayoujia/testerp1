@@ -56,10 +56,7 @@ class ImageController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function store()
-    {   //echo '<pre>';
-        //echo $_REQUEST['ids'];exit;
-        //print_r(request()->files);
-        //exit;
+    {   
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
@@ -74,16 +71,40 @@ class ImageController extends Controller
         //}
         $data['product_id'] = $productModel->id;
         $data['spu_id'] = $productModel->spu->id;
-        $data['type'] = 'public';
+        $data['is_link'] = $data['is_link'];
+        $data['tag'] = $data['image_type'];
         $data['uploadType'] = 'image';
-        $data['is_link'] = 4;
-
-        $this->model->imageCreate($data, request()->files);
+        $path = $this->model->imageCreate($data, request()->files);
         //echo $this->model->id;exit;
         //print_r($imageModel);exit;
         
-        echo json_encode(1);
+        echo json_encode($path);
         //return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
+    }
+
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $label_arr = [];
+        foreach($model->labels as $imageLabel){
+            $label_arr[] = $imageLabel->pivot->label_id;
+        }
+        
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'label_arr' =>$label_arr,
+        ];
+        return view($this->viewPath . 'edit', $response);
     }
 
 
@@ -96,7 +117,7 @@ class ImageController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('update'));
-        $this->model->updateImage($id, request()->file('image'));
+        $this->model->updateImage($id, request()->file('image'),request()->all());
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
@@ -115,6 +136,10 @@ class ImageController extends Controller
     public function createImage()
     {
         $model = request()->input('model');
+        $productModel = ProductModel::where("model",$model)->first();
+        if (!$productModel) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model'=> $model,

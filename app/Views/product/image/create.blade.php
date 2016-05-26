@@ -1,7 +1,5 @@
-@extends('common.form')
-@section('formAction') {{ route('productImage.store') }} @stop
-@section('formBody')
-    
+@extends('common.detail')
+    @section('detailBody')
   <div class="container">
    <form enctype="multipart/form-data" method="POST" action="upload-handler" class="form">
     <div class="alert alert-info">
@@ -32,12 +30,12 @@
        </div>
       </div>
       <ul class="dowebok">
-        <li><input type="radio" name="is_link" data-labelauty="实拍图" value="1"></li>
+        <li><input type="radio" name="is_link" data-labelauty="实拍图" value="1" checked="checked"></li>
         <li><input type="radio" name="is_link" data-labelauty="链接图" value="2"></li>
       </ul>
       <ul class="dowebok">
         <li><input type="radio" name="image_type" data-labelauty="普通图" value="3"></li>
-        <li><input type="radio" name="image_type" data-labelauty="色卡" value="4"></li>
+        <li><input type="radio" name="image_type" data-labelauty="色卡" value="4" checked="checked"></li>
         <li><input type="radio" name="image_type" data-labelauty="Logo" value="5"></li>
         <li><input type="radio" name="image_type" data-labelauty="Size" value="6"></li>
       </ul>
@@ -66,8 +64,7 @@
         </button>
     </div>
 
-    @section('formButton')
-    @stop
+    
 @stop
 
 @section('pageJs')
@@ -77,15 +74,16 @@
     <script src="{{ asset('js/jquery-labelauty.js') }}"></script>
     <script type="text/javascript">
 
-        $("#file-1").fileinput({
+        $("#file-1").fileinput({   
+            //uploadAsync: false,   
             uploadUrl: "{{route('productImage.store')}}",
             uploadExtraData: function() {
-            return {
-                is_link:$('input[name="is_link"]:checked').val(),
-                image_type: $('input[name="image_type"]:checked').val(),
-                model:$("#model").val(),
-            };
-        }
+              return {
+                  is_link:$('input[name="is_link"]:checked').val(),
+                  image_type: $('input[name="image_type"]:checked').val(),
+                  model:$("#model").val(),
+              };
+            }
             //key: 100,
             //data:{"id":"12234"},
             //uploadExtraData:{id:'kv-1'},
@@ -98,14 +96,17 @@
       
         $(':input').labelauty();
         
-
+        $("#file-1").on("fileuploaded", function(event, data, previewId, index) {
+            //alert(data.files);
+            console.log(data);
+        });
     </script>
 @stop
  
 <style>
-ul { list-style-type: none;}
-li { display: inline-block;}
-li { margin: 10px 0;}
+.dowebok ul { list-style-type: none;}
+.dowebok li { display: inline-block;}
+.dowebok li { margin: 10px 0;}
 input.labelauty + label { font: 12px "Microsoft Yahei";}
 </style>
 

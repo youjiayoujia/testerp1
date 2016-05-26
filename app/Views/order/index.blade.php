@@ -32,16 +32,26 @@
             <td>{{ $order->created_at }}</td>
             <td>{{ $order->sku_name}}</td>
             <td>
-                <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href=".collapseExample{{$order->id}}" aria-expanded="false" aria-controls="collapseExample">
+                <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href=".collapseExample{{$order->id}}" aria-expanded="true" aria-controls="collapseExample">
                     <span class="glyphicon glyphicon-eye-open"></span> 展开
                 </a>
             </td>
         </tr>
-        <tr class="collapse collapseExample{{$order->id}}">
+        <tr class="collapse in collapseExample{{$order->id}}">
             <td colspan="5" style="padding: 10px; margin: 10px">
                 <div>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</div>
                 <div>{{ $order->shipping_address . ' ' . $order->shipping_city . ' ' . $order->shipping_state }}</div>
                 <div>{{ $order->shipping_country . ' ' . $order->country->name . ' ' . $order->country->cn_name }}</div>
+                @if(count($order->refunds) > 0)
+                    @foreach($order->refunds as $refund)
+                        <div style="color: red">
+                            <label>退款ID:</label>{{ $refund->id }}
+                            <label>退款金额:</label>{{ $refund->refund_amount }}
+                            <label>原因:</label>{{ $refund->reason }}
+                            <label>申请时间:</label>{{ $refund->created_at }}
+                        </div>
+                    @endforeach
+                @endif
             </td>
             <td colspan="25" style="padding: 10px; margin: 10px">
                 @foreach($order->orderItem as $orderItem)
@@ -50,7 +60,13 @@
                         <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
                         <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
                         <div class="col-lg-2">{{ 'X' . ' ' . $orderItem->quantity }}</div>
-                        <div class="col-lg-2" style="color: #2aabd2">消</div>
+                        <div class="col-lg-2" style="color: #2aabd2">
+                            <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                               data-id="{{ $orderItem->id }}"
+                               data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">
+                                <span class="glyphicon glyphicon-trash"></span> 删除
+                            </a>
+                        </div>
                     </div>
                 @endforeach
                 <div class="row col-lg-12" style="color: black; text-align: center;">
@@ -58,16 +74,12 @@
                     总运费: @foreach($order->package as $package)
                         {{ $package->cost }}RMB,
                     @endforeach
-                    包裹重: @foreach($order->package as $package)
-                        {{ $package->weight }}Kg,
-                    @endforeach
-                    物品数量: @foreach($order->orderItem as $orderItem)
-                        {{ $orderItem->quantity }}
-                    @endforeach
+                    包裹重: {{ $order->package->sum('weight') }}Kg,
+                    物品数量: {{ $order->orderItem->sum('quantity') }}
                 </div>
             </td>
         </tr>
-        <tr class="collapse collapseExample{{$order->id}}">
+        <tr class="collapse in collapseExample{{$order->id}}">
             <td colspan="30" style="padding: 10px; margin: 10px">
                 <div>
                     <strong>邮箱</strong> : {{ $order->email }}
@@ -78,7 +90,7 @@
                 </div>
                 <div style="text-align: center;">
                     @if($order->status == 'REVIEW')
-                        <a href="{{ route('updateStatus', ['id'=>$order->id]) }}" class="btn btn-success btn-xs review">
+                        <a href="javascript:" class="btn btn-success btn-xs review" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 审核
                         </a>
                     @endif
@@ -146,8 +158,17 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('.review').click(function () {
-                if(confirm('确认审核?')) {
-
+                if (confirm("确认审核?")) {
+                    var order_id = $(this).data('id');
+                    $.ajax({
+                        url : "{{ route('updateStatus') }}",
+                        data : { order_id : order_id },
+                        dataType : 'json',
+                        type : 'get',
+                        success : function(result) {
+                            window.location.reload();
+                        }
+                    });
                 }
             });
         });

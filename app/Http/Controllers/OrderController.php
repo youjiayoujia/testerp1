@@ -157,6 +157,7 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->refunds()->create($data);
+        //refundCreate($data, request()->files);
         return redirect($this->mainIndex);
     }
 
@@ -334,11 +335,12 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
-    public function updateStatus($id)
+    public function updateStatus()
     {
-        $this->model->find($id)->update(['status' => 'PREPARED']);
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['status' => 'PREPARED']);
 
-        return redirect($this->mainIndex);
+        return 1;
     }
 
     public function withdrawUpdate($id)

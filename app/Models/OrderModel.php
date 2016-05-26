@@ -215,6 +215,22 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\RequireModel', 'order_id');
     }
 
+    public function refundCreate($data, $files = null)
+    {
+        $data['path'] = 'uploads/refund' . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
+        switch ($data['uploadType']) {
+            case 'image':
+                foreach ($files as $key => $file) {
+                    if ($this->valid($file->getClientOriginalName())) {
+                        $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
+                        $file->move($data['path'], $data['name']);
+                        $this->create($data);
+                    }
+                }
+                break;
+        }
+    }
+
     public function createOrder($data)
     {
         $order = $this->create($data);

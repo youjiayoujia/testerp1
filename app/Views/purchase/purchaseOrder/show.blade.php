@@ -71,14 +71,13 @@
             <div class="form-group col-lg-4">
                 <strong>采购单审核状态</strong>:     
             	@if($model->examineStatus == 0)
-                    <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核不通过
-                </a> 
-                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/2" class="btn btn-info btn-xs"> 审核通过
-                </a>
+                    未审核
                  @elseif($model->examineStatus == 1)
-                 审核不通过
-                 @else
                  审核通过
+                 @elseif($model->examineStatus == 2)
+                 待复审
+                 @else
+                 审核不通过
                 @endif
             </div>   
             <div class="form-group col-lg-4">
@@ -103,7 +102,6 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>采购类型</td> 
             <td>model</td>
             <td>SKU*采购数量</td> 
             <td>供货商sku</td> 
@@ -120,14 +118,7 @@
         @foreach($purchaseItems as $k=>$purchaseItem)  
         <tr> 
             <td>{{$purchaseItem->id}}</td>
-            <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
-            </td>
+            
             <td>{{$purchaseItem->item->product->model}}</td>
             <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
             <td>{{$purchaseItem->item->supplier_sku}}</td>   

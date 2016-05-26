@@ -9,6 +9,7 @@ namespace App\Modules\Channel;
  */
 use Exception;
 use App\Modules\Channel\Adapter\AmazonAdapter;
+use App\Modules\Channel\Adapter\AliexpressAdapter;
 
 Class ChannelModule
 {
@@ -43,8 +44,8 @@ Class ChannelModule
 
     }
 
-    public function createSMTDriver($config)
+    public function createAliexpressDriver($config)
     {
-
+        return new AliexpressAdapter($config);
     }
 }

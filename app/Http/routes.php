@@ -184,6 +184,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}',
         'Purchase\PurchaseItemController@costExamineStatus');
     Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
+	Route::any('beExamine', ['uses' => 'Product\SupplierController@beExamine', 'as' => 'beExamine']);
 //采购需求
     Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
     Route::resource('require', 'Purchase\RequireController');
@@ -216,6 +217,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
     Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
     Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
+	Route::any('/changePurchaseItemStorageQty', 'Purchase\PurchaseListController@changePurchaseItemStorageQty');
     Route::any('examinePurchaseItem',
         ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
     Route::resource('purchaseList', 'Purchase\PurchaseListController');
@@ -455,3 +457,4 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 Route::any('test', ['uses' => 'TestController@index']);
+Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);

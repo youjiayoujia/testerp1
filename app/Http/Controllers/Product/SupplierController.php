@@ -94,7 +94,7 @@ class SupplierController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        request()->flash();
+        $data=request()->all();
         $this->validate(request(), $this->model->rules('update', $id));
         if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
@@ -104,7 +104,7 @@ class SupplierController extends Controller
                 'adjust_by' => '3',
             ]);
         }
-        $model->update(request()->all());
+        $this->model->updateSupplier($id,$data,request()->file('qualifications'));
         return redirect($this->mainIndex);
     }
 
@@ -137,4 +137,18 @@ class SupplierController extends Controller
 
         return redirect($this->mainIndex);
     }
+	
+	public function beExamine(){
+		$channel_id = request()->input('channel_id');
+        $product_id_str = request()->input('product_ids');
+        $product_id_arr = explode(',',$product_id_str);
+		$suppliers=$this->model->find($product_id_arr);
+		foreach($suppliers as $key=>$vo){
+			if($vo->examine_status <2){
+				$vo->update(['examine_status'=>$channel_id]);
+			}
+			}
+		return 1;	
+	}
+	
 }

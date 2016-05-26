@@ -150,7 +150,30 @@ class PurchaseListController extends Controller
 		$model->update(['post_coding'=>$post_coding]);
 		return 1;
 		}	
-
+/**
+     * ajax采购入库
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function changePurchaseItemStorageQty(){
+		$storage_qty=request()->get('storage_qty');
+		$purchase_id=request()->get('purchase_id');
+		$model=$this->model->find($purchase_id);
+		$model->update(['storage_qty'=>$storage_qty]);
+		if($storage_qty>0){
+			$model->update(['status'=>3]);
+			PurchaseOrder::find($model->purchase_order_id)->update(['status',3]);
+		}
+		if($model->purchase_num ==$storage_qty){
+			$model->update(['status'=>4]);
+			}
+			$num=$this->model->where('purchase_order_id',$model->purchase_order_id)->where('status','<>',4)->count();
+			if($num ==0){
+			PurchaseOrder::find($model->purchase_order_id)->update(['status',4]);
+			}
+		return 1;
+		}
 }
 
 

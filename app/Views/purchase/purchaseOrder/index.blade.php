@@ -112,7 +112,7 @@
             	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
                      <span class="glyphicon glyphicon-ok-sign"></span>
                 </a>
-                <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  class="btn btn-info btn-xs">
+                <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
                      <span class="glyphicon glyphicon-eye-open"></span>  
                 </a>
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
@@ -121,7 +121,7 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="核销" class="btn btn-success btn-xs">
                      <span class="glyphicon glyphicon-yen"></span>
                 </a>
-                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="退回" class="btn btn-danger btn-xs">
+                 <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
 				<a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" title="打印" class="btn btn-primary btn-xs">

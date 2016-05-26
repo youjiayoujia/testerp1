@@ -46,6 +46,13 @@ class AccountModel extends BaseModel
         'amazon_seller_id',
         'amazon_accesskey_id',
         'amazon_accesskey_secret',
+        'aliexpress_member_id',
+        'aliexpress_appkey',
+        'aliexpress_appsecret',
+        'aliexpress_returnurl',
+        'aliexpress_refresh_token',
+        'aliexpress_access_token',
+        'aliexpress_access_token_date',
     ];
 
     public $searchFields = ['account', 'alias'];
@@ -133,9 +140,12 @@ class AccountModel extends BaseModel
     public function getApiStatusAttribute()
     {
         $status = [];
-        switch ($this->channel->drive) {
+        switch ($this->channel->driver) {
             case 'amazon':
                 $status = ['Unshipped', 'PartiallyShipped'];
+                break;
+            case 'aliexpress':
+                $status = ['WAIT_SELLER_SEND_GOODS'];
                 break;
         }
         return $status;
@@ -144,7 +154,7 @@ class AccountModel extends BaseModel
     public function getApiConfigAttribute()
     {
         $config = [];
-        switch ($this->channel->drive) {
+        switch ($this->channel->driver) {
             case 'amazon':
                 $config = [
                     'serviceUrl' => $this->amazon_api_url,
@@ -152,6 +162,17 @@ class AccountModel extends BaseModel
                     'SellerId' => $this->amazon_seller_id,
                     'AWSAccessKeyId' => $this->amazon_accesskey_id,
                     'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
+                ];
+                break;
+            case 'aliexpress':
+                $config = [
+                    'appkey' => $this->aliexpress_appkey,
+                    'appsecret' => $this->aliexpress_appsecret,
+                    'returnurl' => $this->aliexpress_returnurl,
+                    'access_token_date' => $this->aliexpress_access_token_date,
+                    'refresh_token' => $this->aliexpress_refresh_token,
+                    'access_token' => $this->aliexpress_access_token,
+                    'aliexpress_member_id' => $this->aliexpress_member_id,
                 ];
                 break;
         }

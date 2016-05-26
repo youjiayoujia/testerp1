@@ -46,6 +46,10 @@ class PurchaseOrderModel extends BaseModel
     {
         return UserModel::find($this->assigner)->name;
     }
+	public function getUsersAttribute()
+    {
+        return UserModel::all();
+    }
 	
 	public function updatePurchaseOrder($id,$data){
 		 $PurchaseOrder=$this->find($id);
@@ -118,7 +122,7 @@ class PurchaseOrderModel extends BaseModel
 			$rows[$key]['PurcahseOrderID']=$vo->purchase_order_id;
 			$rows[$key]['PurchaseItemID']=$vo->id;
 			$rows[$key]['status']=mb_convert_encoding(config("purchase.purchaseItem.status.".$vo->status), 'gb2312', 'utf-8');
-			$rows[$key]['sku']=mb_convert_encoding("大傻逼", 'gb2312', 'utf-8');
+			$rows[$key]['sku']=mb_convert_encoding($vo->sku, 'gb2312', 'utf-8');
 			$rows[$key]['purchase_qty']=$vo->purchase_num;
 			$rows[$key]['purchase_price']=$vo->purchase_cost;
 			$rows[$key]['item_name']=mb_convert_encoding($vo->item->product->c_name, 'gb2312', 'utf-8');

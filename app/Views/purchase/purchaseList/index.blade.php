@@ -2,7 +2,7 @@
 @section('tableToolButtons')
  <div class="btn-group">
         <a class="btn btn-info" id="batchexamine">
-            <i class="glyphicon glyphicon-ok-circle"></i> 确认对单
+            <i class="glyphicon glyphicon-ok-circle"></i> 确认到货
         </a>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -11,7 +11,6 @@
     <th>ID</th>
     <th>采购单ID</th>
     <th>sku*采购数量</th>
-    <th>采购类型</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>供应商sku</th>
@@ -43,12 +42,7 @@
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->purchase_order_id }}</td>
             <td>{{ $purchaseList->sku}}*{{$purchaseList->purchase_num}}</td>
-            <td>@foreach(config('purchase.purchaseItem.type') as $k=>$type)
-            	@if($purchaseList->type == $k)
-            	{{ $type }}
-                @endif
-            @endforeach
-           </td>
+           
             <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
@@ -61,8 +55,9 @@
               @endif
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
-            	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
-            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
+            	<td>{{ $purchaseList->post_coding }}
+                <!--<input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
+            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a>--></td>
                 
            <td> @foreach(config('purchase.purchaseItem.status') as $k=>$status)
             	@if($purchaseList->status == $k)
@@ -84,20 +79,17 @@
                 </a>
               @endif
             @endif</td>
-             <!--<td> @foreach(config('purchase.purchaseItem.storageStatus') as $kt=>$va)
-            	@if($purchaseList->storageStatus == $kt)
-            	{{ $va}}
-                @endif
-            @endforeach</td> --> 
-            <td>@if($purchaseList->storageStatus == 0)
+            
+            <td>
+           	
+            @if($purchaseList->status == 2 || $purchaseList->status == 3)
             	<input type="text" name="storage_qty" id="{{ $purchaseList->id }}_storage_qty" value="{{ $purchaseList->storage_qty }}" style="width:150px"/> 
-            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新
-                @elseif($purchaseList->storageStatus == 1)
-                <input type="text" name="storage_qty" id="{{ $purchaseList->id }}_storage_qty" value="{{ $purchaseList->storage_qty }}" style="width:150px"/> 
-            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新
+            	<a href="javascript:" class="btn btn-info btn-xs change_storage_qty" data-id="{{ $purchaseList->id }}">更新
                 @else
                 {{ $purchaseList->storage_qty }}
-                @endif</td>
+                @endif
+                
+                </td>
             <td>@if($purchaseList->storageStatus == 0)
             	未入库
                 @elseif($purchaseList->storageStatus == 1)
@@ -193,6 +185,21 @@
 			$.ajax({
                     url:'/changePurchaseItemPostcoding',
                     data:{purchase_id:purchase_id,post_coding:post_coding},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        window.location.reload();
+                    }                    
+                })
+			});
+			
+			//采购入库
+			$('.change_storage_qty').click(function(){
+			var purchase_id = $(this).data('id');
+			var storage_qty = $("#"+purchase_id+"_storage_qty").val();
+			$.ajax({
+                    url:'/changePurchaseItemStorageQty',
+                    data:{purchase_id:purchase_id,storage_qty:storage_qty},
                     dataType:'json',
                     type:'get',
                     success:function(result){

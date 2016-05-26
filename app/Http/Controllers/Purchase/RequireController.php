@@ -46,7 +46,14 @@ class RequireController extends Controller
 			$response['data'][$key]['seven_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$seven_time)->sum('package_items.quantity');
 			$response['data'][$key]['fourteen_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$fourteen_time)->sum('package_items.quantity');
 			$response['data'][$key]['thirty_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$thirty_time)->sum('package_items.quantity');
-			$response['data'][$key]['purchaseing_quantity']=PurchaseItemModel::where('sku',$vo->sku)->sum('purchase_num');
+			$response['data'][$key]['purchaseing_quantity']=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$vo->sku)->where('purchase_items.status','<',4)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
+			$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$v->item->sku)->count();
+		$Inum=ItemModel::where('sku',$v->item->sku)->where('is_sale','<>',1)->count();
+		if($num >0 || $Inum>0){
+			$response['data'][$key]['active_status']='不可采购';
+			}else{
+			$response['data'][$key]['active_status']='可采购';
+				}
 			}
         return view($this->viewPath . 'index', $response);
     }
@@ -77,7 +84,12 @@ class RequireController extends Controller
 		}
 		foreach($needPurchases as $key=>$v){
 		$all_quantity=StockModel::where('item_id',$v->item_id)->sum('all_quantity');
-		$purchasingNum=PurchaseItemModel::where('sku',$v->sku)->sum('purchase_num');
+		$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$v->item->sku)->count();
+		$Inum=ItemModel::where('sku',$v->item->sku)->where('is_sale','<>',1)->count();
+		if($num >0 || $Inum>0){
+			continue;
+			}
+		$purchasingNum=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$vo->sku)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
 		$order_need_num=$this->model->where('sku',$v->sku)->sum('quantity');
 		$data['type']=0;
 		$data['warehouse_id']=$v->warehouse_id;

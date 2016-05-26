@@ -9,6 +9,9 @@
         <label for="name">分类英文名称</label>
         <input class="form-control" id="name" placeholder="English Name" name='name' value="{{old('name')}}">
     </div>
+
+   
+
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>
         <div class="panel-body setfirst">
@@ -39,6 +42,19 @@
     <input type='hidden' value='0' id='setnum' name="setnum">
     <input type='hidden' value='0' id='attrnum' name="attrnum">
     <input type='hidden' value='0' id='featurenum' name="featurenum">
+    @foreach($channels as $channel)
+        <div class="form-group">
+            <div class="col-md-6">
+                <label for="size">渠道</label>
+                <input class="form-control" placeholder="渠道"  value="{{$channel->name}}">
+            </div>
+
+            <div class="col-md-6">
+                <label for="size">费率</label>
+                <input class="form-control" placeholder="费率" name='channel[name][{{$channel->id}}]' value="">
+            </div>
+        </div>
+    @endforeach
 @stop
 
 @section('pageJs')

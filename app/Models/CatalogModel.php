@@ -51,10 +51,19 @@ class CatalogModel extends BaseModel
         return $name;
     }
 
+    public function channels()
+    {
+        return $this->belongsToMany('App\Models\ChannelModel','catalog_channels','catalog_id','channel_id')->withTimestamps();
+    }
+
     public function createCatalog($data,$extra=[])
     {
         DB::beginTransaction();
         $catalog = $this->create($data);
+        foreach($data['channel']['name'] as $channel_id=>$rate){
+            $arr['channel_id'] = $channel_id;
+            $catalog->channels()->attach($arr,['rate'=>$rate]);
+        }
         //属性名属性值添加
         if ($extra) {
             foreach ($extra as $model => $property) {

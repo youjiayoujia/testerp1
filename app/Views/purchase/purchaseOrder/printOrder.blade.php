@@ -1,7 +1,6 @@
-@extends('common.detail')
-@section('detailBody')
+
 <div class="panel panel-default">
-        <div class="panel-heading">单头</div>
+        
         <div class="panel-body">
              <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
@@ -92,12 +91,10 @@
             <td>model</td>
             <td>SKU*采购数量</td> 
             <td>供货商sku</td> 
-            <td>样图</td>
             <td>状态</td>
             <td>物流单号</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
-            <td>购买链接</td> 
             <td>操作</td>           
         </tr>
     </thead>
@@ -109,13 +106,7 @@
             <td>{{$purchaseItem->item->product->model}}</td>
             <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
             <td>{{$purchaseItem->item->supplier_sku}}</td>   
-            <td>
-            @if($purchaseItem->item->product->default_image>0) 
-            <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
-             @else
-             暂无图片
-             @endif
-            </td>
+            
             <td>       	
              @foreach(config('purchase.purchaseItem.status') as $key=>$v)     	
             	 @if($purchaseItem->status == $key) {{$v}} @endif
@@ -137,9 +128,7 @@
             @endif
             </td>    
           
-             <td>
-            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
-            </td>  
+             
 			<td>
             @if($purchaseItem->active ==1 )
                 @if($purchaseItem->active_status ==1 )
@@ -165,16 +154,20 @@
         <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购日期</strong>:
-                 <input type="button" value="打印" onclick="window.print();"/> 
+                  {{$model->start_buying_time}}
+            </div>
+            <div class="form-group col-lg-4">
+                <strong>采购时间</strong>:
+                {{$model->supplier->purchase_time}}天
+                  
             </div>
             <div class="form-group col-lg-4">
                 <strong>打印日期</strong>:
-                <?php echo date('Y-m-d h:i:s',time());?>
+                <?php echo date('Y-m-d',time());?>
             </div>
              <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
                 {{$model->assigner}}
             </div>
          </div>   
-    </div>
-@stop
+    </div><input type="button" value="打印" onclick="window.print();"/>

@@ -329,6 +329,24 @@ class PurchaseOrderController extends Controller
 		purchaseItemModel::where('id',$id)->update(['wait_time'=>$data['wait_time'],'wait_remark'=>$data['wait_remark']]);
 		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
 		}
+	/**
+	* 添加报等时间
+	*
+	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+	*/
+	public function printOrder($id){
+		$model=$this->model->find($id);
+		if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+        ];
+        return view($this->viewPath . 'printOrder', $response);
+		}
+
 }
 
 

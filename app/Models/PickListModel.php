@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'pick_at', 'inbox_by', 'inbox_at', 'pack_by', 'pack_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'created_at'];
 
     // 规则验证
     public $rules = [

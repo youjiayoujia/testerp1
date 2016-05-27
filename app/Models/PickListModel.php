@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -62,6 +62,31 @@ class PickListModel extends BaseModel
     public function pickByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'pick_by', 'id');
+    }
+
+    public function inboxByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'inbox_by', 'id');
+    }
+
+    public function packByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'pack_by', 'id');
+    }
+
+    public function getPackageNumAttribute()
+    {
+        return $this->package->count();
+    }
+
+    public function getSkuNumAttribute()
+    {
+        return $this->pickListItem->count();
+    }
+
+    public function getGoodsQuantityAttribute()
+    {
+        return $this->pickListItem->sum('quantity');
     }
 
     /**
@@ -120,14 +145,14 @@ class PickListModel extends BaseModel
         foreach($package->items as $packageitem)
         {
             $name = PositionModel::find($packageitem->warehouse_position_id)->name;
-            $tmp = substr($name,1,1);
-            $buf[] = $tmp;
+            $tmp = substr($name,4,2);
+            $buf[] = (int)$tmp;
         }
         $buf = array_unique($buf);
         $num = 0;
         foreach($buf as $value)
         {
-            $num += pow(2,abs(ord($value)-ord('A')));
+            $num += pow(2,floor($value/2));
         }
         
         return $num;

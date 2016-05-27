@@ -127,6 +127,17 @@ class PackageModel extends BaseModel
         return $packageLimits->unique();
     }
 
+    public function getHasPickAttribute()
+    {
+        $items = $this->items;
+        foreach($items as $item) {
+            if($item->picked_quantity) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * 判断包裹是否能分配物流
      */
@@ -142,6 +153,62 @@ class PackageModel extends BaseModel
             return false;
         }
         return true;
+    }
+
+    public function calculateProfit()
+    {
+        $orderIds = $this->where('status', 'ASSIGNED')->get()->groupBy('order_id');
+        foreach($orderIds as $orderId => $value) {
+            $order = OrderModel::find($orderId);
+            $orderAmount = $this->calculateOrderAmount($order);
+            $orderCosting = $this->calculateOrderCosting($order);
+            if($orderAmount > $orderCosting) {
+                //利润率为负撤销
+                $this->OrderCancle($order);
+            }
+        }
+    }
+
+    public function OrderCancle($order)
+    {
+        $order->update(['status' => 'CANCLE']);
+        $orderItems = $order->orderItems;
+        foreach($orderItems as $orderItem) {
+            $orderItem->update(['is_active' => '1']);
+        }
+        $packages = $order->packages;
+        foreach($packages as $package) {
+            $package->update(['status' => 'CANCLE']);
+            foreach($package->items as $packageItem) {
+                $packageItem->update(['status' => 'CANCLE']);
+                $item = ItemModel::find($packageItem->item_id);
+                $item->in($packageItem->warehouse_position_id, $packageItem->quantity, $packageItem->quantity*$item->cost, 'PACKAGE_CANCLE', $order->ordernum.':'.$packageItem->id);
+            }
+        }
+    }
+
+    public function calculateOrderAmount($order)
+    {
+        $orderItems = $order->orderItems;
+        $sum = 0;
+        foreach($orderItems as $orderItem) {
+            $sum += $orderItem->amount;
+        }
+
+        return $sum;
+    }
+
+    public function calculateOrderCosting($order)
+    {
+        $orderItems = $order->orderItems;
+        $sum = 0;
+        foreach($orderItems as $orderItem)
+        {
+            $item = $orderItem->item;
+            $sum += round($item->cost * $orderItem->quantity, 3);
+        }
+
+        return $sum;
     }
 
     /**

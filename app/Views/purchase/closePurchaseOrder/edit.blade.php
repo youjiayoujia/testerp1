@@ -24,6 +24,19 @@
                 <strong>采购人</strong>:            
             		{{$model->assigner}}
             </div> 
+            <div class="form-group col-lg-4">
+                <strong>采购单结算方式</strong>:
+          		@if($model->close_status ==0)
+                <select name="close_status">
+               		@foreach(config('product.product_supplier.pay_type') as $k=>$v)           	
+            			<option value="{{$k}}" {{ $model->pay_type == $k ? 'selected' : '' }}>{{$v}}</option>
+ 					@endforeach
+                    </select>
+                @else
+                <input name="close_status" type="hidden" value="1"/>
+                已结算
+                @endif
+            </div> 
              <div class="form-group col-lg-4">
                 <strong>采购单结算状态</strong>:
           		@if($model->close_status ==0)

@@ -5,7 +5,9 @@ use App\Base\BaseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
-use Maatwebsite\Excel\Facades\Excel; 
+use App\Models\UserModel;
+use Maatwebsite\Excel\Facades\Excel;
+ 
 
 class PurchaseOrderModel extends BaseModel
 {
@@ -31,7 +33,7 @@ class PurchaseOrderModel extends BaseModel
     public $searchFields = ['id', 'supplier_id','warehouse_id','user_id'];
     
 	 
-    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid','start_buying_time','arrival_time','assigner'];
+    protected $fillable = ['type','status','supplier_id','user_id','update_userid','warehouse_id','costExamineStatus','examineStatus','post_coding','total_postage','total_purchase_cost','close_status','purchase_userid','start_buying_time','arrival_time','assigner','pay_type','write_off','print_num','print_status'];
 	public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
@@ -39,6 +41,14 @@ class PurchaseOrderModel extends BaseModel
 	public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+	public function getAssignerNameAttribute()
+    {
+        return UserModel::find($this->assigner)->name;
+    }
+	public function getUsersAttribute()
+    {
+        return UserModel::all();
     }
 	
 	public function updatePurchaseOrder($id,$data){
@@ -112,7 +122,7 @@ class PurchaseOrderModel extends BaseModel
 			$rows[$key]['PurcahseOrderID']=$vo->purchase_order_id;
 			$rows[$key]['PurchaseItemID']=$vo->id;
 			$rows[$key]['status']=mb_convert_encoding(config("purchase.purchaseItem.status.".$vo->status), 'gb2312', 'utf-8');
-			$rows[$key]['sku']=mb_convert_encoding("大傻逼", 'gb2312', 'utf-8');
+			$rows[$key]['sku']=mb_convert_encoding($vo->sku, 'gb2312', 'utf-8');
 			$rows[$key]['purchase_qty']=$vo->purchase_num;
 			$rows[$key]['purchase_price']=$vo->purchase_cost;
 			$rows[$key]['item_name']=mb_convert_encoding($vo->item->product->c_name, 'gb2312', 'utf-8');

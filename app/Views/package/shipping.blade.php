@@ -3,12 +3,20 @@
 @section('detailBody')
 <div class='row'>
     <div class='form-group col-lg-3'>
-        <select class='form-control logistic_id'>
+        <input type='text' class='form-control search'>
+    </div>
+    <div class='form-group col-lg-3'>
+        <select class='form-control logistics_id' multiple="multiple">
         @foreach($logistics as $logistic)
-            <option value={{ $logistic->id }}>{{ $logistic->logistics_type }}</option>
+            <option class='logis' value="{{ $logistic->id }}">{{ $logistic->logistics_type }}</option>
         @endforeach
         </select>
     </div>
+    <div class='form-group col-lg-6'>
+        <div class='buf'></div>
+    </div>
+</div>
+<div class='row'>
     <div class='form-group col-lg-3'>
         <input type='text' name='trackno' class='form-control trackno' placeholder="trackno">
     </div>
@@ -28,10 +36,41 @@
 @stop
 <script type='text/javascript'>
 $(document).ready(function(){
+    $('.search').change(function(){
+        val = $(this).val();
+        if(val) {
+            $.get(
+                "{{ route('logistics.getLogistics')}}",
+                {logistics:val},
+                function(result){
+                    $('.logistics_id').html('');
+                    if(result != 'false') {
+                        $('.logistics_id').html(result);
+                    }
+                }
+            );
+        }
+    });
+
+    $(document).on('click', '.logis', function(){
+        log_value = $(this).prop('value');
+        log_text = $(this).text();
+        str = "<font size='3px' color='green' data-value='"+log_value+"'>"+log_text+" || </font>";
+        $('.buf').append(str);
+    });
+
+    $(document).on('click', 'font', function(){
+        $(this).remove();
+    });
+
     $('.shipping').click(function(){
         trackno = $('.trackno').val();
         weight = $('.weight').val();
-        logistic_id = $('.logistic_id').val();
+        logistic_id = new Array();
+        i=0;
+        $('font').each(function(){
+            logistic_id[i++] = $(this).data('value');
+        });
         if(weight && trackno) {
             $.ajax({
                 url:"{{ route('package.ajaxShippingExec') }}",

@@ -2,7 +2,7 @@
 @section('tableToolButtons')
  <div class="btn-group">
         <a class="btn btn-info" id="batchexamine">
-            <i class="glyphicon glyphicon-ok-circle"></i> 确认对单
+            <i class="glyphicon glyphicon-ok-circle"></i> 确认到货
         </a>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -11,7 +11,6 @@
     <th>ID</th>
     <th>采购单ID</th>
     <th>sku*采购数量</th>
-    <th>采购类型</th>
     <th>产品图片</th>
     <th>供应商</th>
     <th>供应商sku</th>
@@ -21,8 +20,10 @@
     <th>采购条目状态</th>
     <th>采购价格</th>
     <th>采购价格审核</th>
+    <th>入库数量</th>
+    <th>入库状态</th>
     <th>采购人</th>
-    <th>异常状态</th>
+   <!-- <th>异常状态</th>-->
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -41,22 +42,22 @@
             <td>{{ $purchaseList->id }}</td>
             <td>{{ $purchaseList->purchase_order_id }}</td>
             <td>{{ $purchaseList->sku}}*{{$purchaseList->purchase_num}}</td>
-            <td>@foreach(config('purchase.purchaseItem.type') as $k=>$type)
-            	@if($purchaseList->type == $k)
-            	{{ $type }}
-                @endif
-            @endforeach
-           </td>
+           
             <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
             <td>
+            @if($purchaseList->item->weight == 0)
             <input type="text" name="weight" id="{{ $purchaseList->id }}_weight" value="{{$purchaseList->item->weight}}" style="width:50px"/> 
               <a href="javascript:" class="btn btn-info btn-xs changeWeight" data-id="{{ $purchaseList->id }}">更新</a>
+              @else
+              {{$purchaseList->item->weight}}
+              @endif
             </td>
             <td>{{ $purchaseList->warehouse->name}}</td>
-            	<td><input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
-            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a></td>
+            	<td>{{ $purchaseList->post_coding }}
+                <!--<input type="text" name="post_coding" id="{{ $purchaseList->id }}_post_coding" value="{{ $purchaseList->post_coding }}" style="width:150px"/> 
+            	<a href="javascript:" class="btn btn-info btn-xs change_post_coding" data-id="{{ $purchaseList->id }}">更新</a>--></td>
                 
            <td> @foreach(config('purchase.purchaseItem.status') as $k=>$status)
             	@if($purchaseList->status == $k)
@@ -78,19 +79,33 @@
                 </a>
               @endif
             @endif</td>
-             <!--<td> @foreach(config('purchase.purchaseItem.storageStatus') as $kt=>$va)
-            	@if($purchaseList->storageStatus == $kt)
-            	{{ $va}}
+            
+            <td>
+           	
+            @if($purchaseList->status == 2 || $purchaseList->status == 3)
+            	<input type="text" name="storage_qty" id="{{ $purchaseList->id }}_storage_qty" value="{{ $purchaseList->storage_qty }}" style="width:150px"/> 
+            	<a href="javascript:" class="btn btn-info btn-xs change_storage_qty" data-id="{{ $purchaseList->id }}">更新
+                @else
+                {{ $purchaseList->storage_qty }}
                 @endif
-            @endforeach</td> -->                   
+                
+                </td>
+            <td>@if($purchaseList->storageStatus == 0)
+            	未入库
+                @elseif($purchaseList->storageStatus == 1)
+                部分入库
+                @else
+                全部入库
+                @endif
+            </td>                  
             <td>{{ $purchaseList->purchaseOrder->assigner }}</td>
-            <td> 
+           <!-- <td> 
             <select id="{{$purchaseList->id}}_active" name="active">
           	@foreach(config('purchase.purchaseItem.active') as $k=>$vo)
             	<option value="{{$k}}" @if($purchaseList->active == $k && $purchaseList->active_status ==1) selected="selected" @endif>{{$vo}}</option>
             @endforeach
             </select>
-            </td>
+            </td>-->
             <td>     
                 @if($purchaseList->status >1)
            		<a href="/purchaseList/printBarCode/{{$purchaseList->id}}" class="btn btn-warning btn-xs">
@@ -170,6 +185,21 @@
 			$.ajax({
                     url:'/changePurchaseItemPostcoding',
                     data:{purchase_id:purchase_id,post_coding:post_coding},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        window.location.reload();
+                    }                    
+                })
+			});
+			
+			//采购入库
+			$('.change_storage_qty').click(function(){
+			var purchase_id = $(this).data('id');
+			var storage_qty = $("#"+purchase_id+"_storage_qty").val();
+			$.ajax({
+                    url:'/changePurchaseItemStorageQty',
+                    data:{purchase_id:purchase_id,storage_qty:storage_qty},
                     dataType:'json',
                     type:'get',
                     success:function(result){

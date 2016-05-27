@@ -55,8 +55,8 @@
                     <label for="refund" class='control-label'>退款方式</label>
                     <select class="form-control" name="refund" id="refund">
                         <option value="NULL">==退款方式==</option>
-                        @foreach(config('order.refund') as $refund)
-                            <option value="{{ $refund }}" {{ old('refund') ? (old('refund') == $refund ? 'selected' : '') : ($model->refund == $refund ? 'selected' : '') }}>
+                        @foreach(config('order.refund') as $refund_key => $refund)
+                            <option value="{{ $refund_key }}" {{ old('refund') ? (old('refund') == $refund_key ? 'selected' : '') : ($model->refund == $refund_key ? 'selected' : '') }}>
                                 {{ $refund }}
                             </option>
                         @endforeach
@@ -66,8 +66,8 @@
                     <label for="reason" class='control-label'>退款原因</label>
                     <select class="form-control" name="reason" id="reason">
                         <option value="NULL">==退款原因==</option>
-                        @foreach(config('order.reason') as $reason)
-                            <option value="{{ $reason }}" {{ old('reason') ? (old('reason') == $reason ? 'selected' : '') : ($model->reason == $reason ? 'selected' : '') }}>
+                        @foreach(config('order.reason') as $reason_key => $reason)
+                            <option value="{{ $reason_key }}" {{ old('reason') ? (old('reason') == $reason_key ? 'selected' : '') : ($model->reason == $reason_key ? 'selected' : '') }}>
                                 {{ $reason }}
                             </option>
                         @endforeach
@@ -77,8 +77,8 @@
                     <label for="type" class='control-label'>退款类型</label>
                     <select class="form-control" name="type" id="type">
                         <option value="NULL">==退款类型==</option>
-                        @foreach(config('order.type') as $type)
-                            <option value="{{ $type }}" {{ old('type') ? (old('type') == $type ? 'selected' : '') : ($model->type == $type ? 'selected' : '') }}>
+                        @foreach(config('order.type') as $type_key => $type)
+                            <option value="{{ $type_key }}" {{ old('type') ? (old('type') == $type_key ? 'selected' : '') : ($model->type == $type_key ? 'selected' : '') }}>
                                 {{ $type }}
                             </option>
                         @endforeach

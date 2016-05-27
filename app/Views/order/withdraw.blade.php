@@ -11,8 +11,8 @@
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="withdraw" id="withdraw">
                     <option value="NULL">==选择原因==</option>
-                    @foreach(config('order.withdraw') as $withdraw)
-                        <option value="{{ $withdraw }}" {{ old('withdraw') == $withdraw ? 'selected' : '' }}>
+                    @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
+                        <option value="{{ $withdraw_key }}" {{ old('withdraw') == $withdraw_key ? 'selected' : '' }}>
                             {{ $withdraw }}
                         </option>
                     @endforeach

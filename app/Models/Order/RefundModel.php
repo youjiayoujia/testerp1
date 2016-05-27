@@ -40,4 +40,22 @@ class RefundModel extends BaseModel
         ],
     ];
 
+    public function getReasonNameAttribute()
+    {
+        $arr = config('order.reason');
+        return $arr[$this->reason];
+    }
+
+    public function getTypeNameAttribute()
+    {
+        $arr = config('order.type');
+        return $arr[$this->type];
+    }
+
+    public function getRefundNameAttribute()
+    {
+        $arr = config('order.refund');
+        return $arr[$this->refund];
+    }
+
 }

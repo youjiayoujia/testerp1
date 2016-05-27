@@ -180,6 +180,12 @@ class OrderModel extends BaseModel
         return $arr[$this->address_confirm];
     }
 
+    public function getWithdrawNameAttribute()
+    {
+        $arr = config('order.withdraw');
+        return $arr[$this->withdraw];
+    }
+
     public function getSkuNameAttribute()
     {
         $items= ItemModel::where('order_id', $this->id)->get()->toArray();

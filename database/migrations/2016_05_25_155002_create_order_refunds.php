@@ -20,31 +20,18 @@ class CreateOrderRefunds extends Migration
             $table->string('refund_currency')->comment('退款币种');
             $table->enum('refund',
                 [
-                    'Paypal',
-                    '销售平台'
+                    '1',
+                    '2'
                 ])->comment('退款方式');
             $table->enum('type',
                 [
-                    '全部退款',
-                    '部分退款'
+                    'FULL',
+                    'PARTIAL'
                 ])->comment('退款类型');
             $table->enum('reason',
                 [
-                    '[没发货] 客户取消',
-                    '[没发货] 缺货中国仓',
-                    '[没发货] 亏本+物品被删',
-                    '[没发货] 付款审查/资金冻结',
-                    '[中国发] 物流问题',
-                    '[中国发] 没出国退回',
-                    '[中国发] 关税',
-                    '[海外仓] 缺货海外仓',
-                    '[海外仓] 物流问题',
-                    '质量问题(尺码色差不能用不满意)',
-                    '运输损坏',
-                    '发错货(中国仓)',
-                    '发错货(海外仓)',
-                    '广告错/SKU错/客户错',
-                    '漏配件'
+                    '1', '2', '3', '4', '5', '6', '7', '8',
+                    '9', '10', '11', '12', '13', '14', '15'
                 ])->comment('退款原因');
             $table->text('memo')->comment('memo')->nullable()->default(NULL);
             $table->text('detail_reason')->comment('详细原因')->nullable()->default(NULL);

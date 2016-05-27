@@ -77,7 +77,10 @@ class CreateOrders extends Migration
             $table->string('billing_country')->comment('账单国家/地区')->nullable()->default(NULL);
             $table->string('billing_zipcode')->comment('账单邮编')->nullable()->default(NULL);
             $table->string('billing_phone')->comment('账单电话')->nullable()->default(NULL);
-            $table->text('withdraw')->comment('撤单原因')->nullable()->default(NULL);
+            $table->enum('withdraw',
+                [
+                    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
+                ])->comment('撤单原因')->nullable()->default(NULL);
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->integer('priority')->comment('优先级')->nullable()->default(0);
             $table->integer('package_times')->comment('打包次数')->nullable()->default(0);

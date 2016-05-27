@@ -48,7 +48,10 @@ class WarehouseModel extends BaseModel
     {
         return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouse_id' ,'id');
     }
-
+	//获取仓库地址
+	public function getWarehouseAddressAttribute(){
+		return $this->province.$this->city.$this->address;
+	}
     /**
      * get the relationship
      * 

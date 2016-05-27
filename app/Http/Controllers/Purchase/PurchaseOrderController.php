@@ -343,6 +343,9 @@ class PurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'purchase_num_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
+			'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
+			'postage_sum'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
         ];
         return view($this->viewPath . 'printOrder', $response);
 		}

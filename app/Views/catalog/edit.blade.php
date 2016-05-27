@@ -97,6 +97,19 @@
             <div class="create" id="featureadd"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>
+    @foreach($model->channels as $channel)
+        <div class="form-group">
+            <div class="col-md-6">
+                <label for="size">渠道</label>
+                <input class="form-control" placeholder="渠道" disabled="disabled"  value="{{$channel->name}}">
+            </div>
+
+            <div class="col-md-6">
+                <label for="size">费率</label>
+                <input class="form-control" placeholder="费率" name='channel[name][{{$channel->pivot->channel_id}}]' value="{{$channel->pivot->rate}}">
+            </div>
+        </div>
+    @endforeach
     <input type='hidden' value='{{count($model->sets)-1}}' id='setnum' name="setnum" >
     <input type='hidden' value='{{count($model->variations)-1}}' id='attrnum' name="attrnum" >
     <input type='hidden' value='{{count($model->features)-1}}' id='featurenum' name="featurenum" >

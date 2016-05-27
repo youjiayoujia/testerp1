@@ -46,7 +46,7 @@
         <div class="form-group">
             <div class="col-md-6">
                 <label for="size">渠道</label>
-                <input class="form-control" placeholder="渠道"  value="{{$channel->name}}">
+                <input class="form-control" disabled="disabled" placeholder="渠道"  value="{{$channel->name}}">
             </div>
 
             <div class="col-md-6">

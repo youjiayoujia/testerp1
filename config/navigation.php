@@ -28,7 +28,7 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '产品Item',
+                    'name' => '产品SKU',
                     'url' => 'item.index',
                     'icon' => '',
                 ],

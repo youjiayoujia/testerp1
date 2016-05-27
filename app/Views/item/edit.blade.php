@@ -141,14 +141,22 @@
             </select>
         </div>
         <div class="form-group col-md-3">
+            <label for="color">库位</label>
+            <input class="form-control" id="warehouse_position" placeholder="备注" name='warehouse_position' value="{{ old('warehouse_position') ?  old('warehouse_position') : $model->warehouse_position }}">
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $model->remark }}">
         </div>
         <div class="form-group col-md-3">
-            <label for="color">是否可售</label>
+            <label for="color">在售状态</label>
             <select  class="form-control" name="is_sale">
-                <option value="1" >可售</option>
-                <option value="0" {{ $model->is_sale == 0 ? 'selected' : '' }}>不可售</option>
+                <option value="1" {{ $model->is_sale == 1 ? 'selected' : '' }}>在售</option>
+                <option value="0" {{ $model->is_sale == 0 ? 'selected' : '' }}>待售</option>
+                <option value="2" {{ $model->is_sale == 2 ? 'selected' : '' }}>卖完下架</option>
+                <option value="3" {{ $model->is_sale == 3 ? 'selected' : '' }}>停产</option>
+                <option value="4" {{ $model->is_sale == 4 ? 'selected' : '' }}>试销</option>
+                <option value="5" {{ $model->is_sale == 5 ? 'selected' : '' }}>货源待定</option>
             </select>
         </div>
     </div>

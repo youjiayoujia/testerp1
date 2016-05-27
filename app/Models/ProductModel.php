@@ -78,6 +78,7 @@ class ProductModel extends BaseModel
         'status',
         'edit_status',
         'examine_status',
+        'quality_standard',
         'remark',
         'image_edit_not_pass_remark',
         'data_edit_not_pass_remark',

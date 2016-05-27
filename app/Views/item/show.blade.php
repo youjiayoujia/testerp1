@@ -101,6 +101,12 @@
                     //$purchase_day = (strtotime($arr['arrival_time']) - strtotime($arr['start_buying_time']))/86400;
                 }
             ?>
+            <div class="col-lg-2">
+                <strong>仓库</strong>: {{ $warehouse->name }}
+            </div>
+            <div class="col-lg-1">
+                <strong>库位</strong>: {{ $model->warehouse_position }}
+            </div>
             <div class="col-lg-1">
                 <strong>库存</strong>: {{ $model->all_quantity }}
             </div>
@@ -164,7 +170,29 @@
                 ?>
             </div>
             <div class="col-lg-3">
-                <strong>状态</strong>: <?php if($model->is_sale==1){echo "可售";}else{echo "不可售";} ?>
+                <strong>状态</strong>: 
+                <?php 
+                    switch ($model->is_sale) {
+                        case '0':
+                            echo "待售";
+                            break;
+                        case '1':
+                            echo "在售";
+                            break;
+                        case '2':
+                            echo "卖完下架";
+                            break;
+                        case '3':
+                            echo "停产";
+                            break;
+                        case '4':
+                            echo "试销";
+                            break;
+                        case '5':
+                            echo "货源待定";
+                            break;
+                    }
+                ?>
             </div>
             <div class="col-lg-3">
                 <strong>投诉比例</strong>: 

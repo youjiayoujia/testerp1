@@ -49,7 +49,7 @@
             </div>
             <div class="form-group col-lg-4">
                 <strong>预计到货日期:
-                {{$model->start_buying_time > 0 ? $model->start_buying_time : '暂无联系人'}}</strong>
+                {{$model->arrival_day}}</strong>
             </div>
              </div>
          
@@ -98,7 +98,7 @@
         <td>{{$storage_qty_sum}}</td>
         <td>{{$purchase_num_sum - $storage_qty_sum}}</td>
         <td></td>
-        <td>{{$model->total_purchase_cost}} + YF{{$postage_sum}} = 总{{$model->total_purchase_cost + $postage_sum}}</td>
+        <td>{{$purchaseAccount}} + YF{{$postage_sum}} = 总{{$purchaseAccount + $postage_sum}}</td>
         
         </tr> 
     </tbody>

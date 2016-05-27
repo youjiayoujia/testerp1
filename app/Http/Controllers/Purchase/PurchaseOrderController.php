@@ -347,6 +347,11 @@ class PurchaseOrderController extends Controller
 			'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
 			'postage_sum'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
         ];
+		$purchaseAccount='';
+		foreach($response['purchaseItems'] as $key=>$v){
+			$purchaseAccount +=$v->purchase_num * $v->purchase_cost;
+			}
+			$response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
 		}
 

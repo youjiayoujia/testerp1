@@ -18,6 +18,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\Package\ItemModel;
+use App\Models\ItemModel as ProductItemModel;
 
 class RequireController extends Controller
 {
@@ -47,8 +48,8 @@ class RequireController extends Controller
 			$response['data'][$key]['fourteen_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$fourteen_time)->sum('package_items.quantity');
 			$response['data'][$key]['thirty_time']=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$vo->item_id)->where('packages.shipped_at','>',$thirty_time)->sum('package_items.quantity');
 			$response['data'][$key]['purchaseing_quantity']=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$vo->sku)->where('purchase_items.status','<',4)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
-			$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$v->item->sku)->count();
-		$Inum=ItemModel::where('sku',$v->item->sku)->where('is_sale','<>',1)->count();
+			$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$vo->item->sku)->count();
+		$Inum=ProductItemModel::where('sku',$vo->item->sku)->where('is_sale','<>',1)->count();
 		if($num >0 || $Inum>0){
 			$response['data'][$key]['active_status']='不可采购';
 			}else{
@@ -85,7 +86,7 @@ class RequireController extends Controller
 		foreach($needPurchases as $key=>$v){
 		$all_quantity=StockModel::where('item_id',$v->item_id)->sum('all_quantity');
 		$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$v->item->sku)->count();
-		$Inum=ItemModel::where('sku',$v->item->sku)->where('is_sale','<>',1)->count();
+		$Inum=ProductItemModel::where('sku',$v->item->sku)->where('is_sale','<>',1)->count();
 		if($num >0 || $Inum>0){
 			continue;
 			}

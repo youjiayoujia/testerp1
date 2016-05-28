@@ -9,6 +9,10 @@
         <label for="name">分类英文名称</label>
         <input class="form-control" id="name" placeholder="English Name" name='name' value="{{old('name')}}">
     </div>
+    <div class="form-group">
+        <label for="name">前缀</label>
+        <input class="form-control" id="code" placeholder="前缀" name='code' value="{{old('code')}}">
+    </div>
 
    
 

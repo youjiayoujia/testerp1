@@ -10,6 +10,10 @@
         <label for="name">分类名称英文</label>
         <input class="form-control" id="name" placeholder="名称" name='name' value="{{$model->name}}">
     </div>
+    <div class="form-group">
+        <label for="name">前缀</label>
+        <input class="form-control" id="code" placeholder="前缀" name='code' value="{{$model->code}}">
+    </div>
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>
         <div class="panel-body setfirst">

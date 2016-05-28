@@ -243,18 +243,16 @@ class OrderModel extends BaseModel
 
     public function refundCreate($data, $files = null)
     {
-        $data['path'] = 'uploads/refund' . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
-        switch ($data['uploadType']) {
-            case 'image':
-                foreach ($files as $key => $file) {
-                    if ($this->valid($file->getClientOriginalName())) {
-                        $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
-                        $file->move($data['path'], $data['name']);
-                        $this->create($data);
-                    }
-                }
-                break;
+        $data['path'] = 'uploads/refund' . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['is_link'] . '/' . $data['tag'] . '/';
+        $disk = Storage::disk('product');
+        foreach ($files as $key => $file) {
+            if ($this->valid($file->getClientOriginalName())) {
+                $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
+                Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
+                $imageModel = $this->create($data);
+            }
         }
+        return $imageModel;
     }
 
     public function createOrder($data)

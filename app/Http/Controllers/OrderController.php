@@ -156,8 +156,8 @@ class OrderController extends Controller
     {
         request()->flash();
         $data = request()->all();
-        $this->model->find($id)->refunds()->create($data);
-        //refundCreate($data, request()->files);
+        $data['order_id'] = $id;
+        $this->model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
     }
 

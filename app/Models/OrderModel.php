@@ -15,6 +15,7 @@ use App\Base\BaseModel;
 use App\Models\Order\ItemModel;
 use App\Models\ItemModel as productItem;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order\RefundModel;
 
 class OrderModel extends BaseModel
 {
@@ -241,18 +242,15 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\RequireModel', 'order_id');
     }
 
-    public function refundCreate($data, $files = null)
+    public function refundCreate($data, $file = null)
     {
-        $data['path'] = 'uploads/refund' . '/' . $data['order_id'] . '/';
-        $disk = Storage::disk('refund');
-        foreach ($files as $key => $file) {
-            if ($this->valid($file->getClientOriginalName())) {
-                $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
-                Storage::disk('refund')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
-                $refundModel = $this->create($data);
-            }
+        $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
+        if ($file->getClientOriginalName()) {
+            $data['image'] = $path.time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, time() . '.' . $file->getClientOriginalExtension());
+            return RefundModel::create($data);
         }
-        return $refundModel;
+        return 1;
     }
 
     public function createOrder($data)

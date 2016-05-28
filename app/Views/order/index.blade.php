@@ -12,7 +12,6 @@
     <th>订单状态</th>
     <th>客服人员</th>
     <th class="sort" data-field="created_at">创建时间</th>
-    <th>sku</th>
     <th>详情</th>
 @stop
 @section('tableBody')
@@ -25,12 +24,22 @@
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
             <td>{{ $order->currency . ' ' . $order->amount }}<strong style="color: red">({{ $order->amount_shipping }})</strong></td>
-            <td>{{ $order->gross_margin }}</td>
+            <td>
+                @if($order->gross_margin != null)
+                    <div>{{ $order->gross_margin }}</div>
+                    <div>产品成本: {{ $order->item_cost_name }}RMB</div>
+                    <div>运费成本: {{ $order->package->sum('cost') }}RMB</div>
+                    <div>平台费: {{ '' }}USD</div>
+                    <div>毛利润: {{ '' }}USD</div>
+                @endif
+                @if($order->gross_margin == null)
+                    {{ '' }}
+                @endif
+            </td>
             <td>{{ $order->channelAccount->alias }}</td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService->name }}</td>
             <td>{{ $order->created_at }}</td>
-            <td>{{ $order->sku_name}}</td>
             <td>
                 <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href=".collapseExample{{$order->id}}" aria-expanded="true" aria-controls="collapseExample">
                     <span class="glyphicon glyphicon-eye-open"></span> 展开
@@ -71,9 +80,7 @@
                 @endforeach
                 <div class="row col-lg-12" style="color: black; text-align: center;">
                     平台费: ${{ '' }},
-                    总运费: @foreach($order->package as $package)
-                        {{ $package->cost }}RMB,
-                    @endforeach
+                    总运费: {{ $order->package->sum('cost') }}RMB,
                     包裹重: {{ $order->package->sum('weight') }}Kg,
                     物品数量: {{ $order->orderItem->sum('quantity') }}
                 </div>

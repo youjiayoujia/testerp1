@@ -40,6 +40,7 @@ class CreateOrders extends Migration
                     'RESUME'
                 ])->default('NORMAL')->comment('售后状态');
             $table->double('amount', 15, 2)->comment('总金额');
+            $table->string('gross_margin')->comment('预测毛利率')->nullable()->defalut(NULL);
             $table->double('amount_product', 15, 2)->comment('产品金额');
             $table->double('amount_shipping', 15, 2)->comment('运费');
             $table->double('amount_coupon', 15, 2)->comment('折扣金额');

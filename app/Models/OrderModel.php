@@ -13,6 +13,7 @@ namespace App\Models;
 use Tool;
 use App\Base\BaseModel;
 use App\Models\Order\ItemModel;
+use App\Models\ItemModel as productItem;
 use Illuminate\Support\Facades\DB;
 
 class OrderModel extends BaseModel
@@ -186,14 +187,33 @@ class OrderModel extends BaseModel
         return $arr[$this->withdraw];
     }
 
+    /**
+     * 订单sku获取器
+     * @return string
+     */
     public function getSkuNameAttribute()
     {
-        $items= ItemModel::where('order_id', $this->id)->get()->toArray();
+        $items = ItemModel::where('order_id', $this->id)->get()->toArray();
         $sku = '';
         foreach($items as $item) {
             $sku = $item['sku'] . ' ' . $sku;
         }
         return $sku;
+    }
+
+    /**
+     * 订单成本获取器
+     * @return int
+     */
+    public function getItemCostNameAttribute()
+    {
+        $orderItems = ItemModel::where('order_id', $this->id)->get()->toArray();
+        $all = 0;
+        foreach($orderItems as $orderItem) {
+            $cost = productItem::where('id', $orderItem['item_id'])->first()->cost;
+            $all = $cost * $orderItem['quantity'] + $all;
+        }
+        return $all;
     }
 
     public function items()

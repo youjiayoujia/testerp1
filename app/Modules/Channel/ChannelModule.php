@@ -10,6 +10,7 @@ namespace App\Modules\Channel;
 use Exception;
 use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
+use App\Modules\Channel\Adapter\WishAdapter;
 
 Class ChannelModule
 {
@@ -41,7 +42,7 @@ Class ChannelModule
 
     public function createWishDriver($config)
     {
-
+        return new WishAdapter($config);
     }
 
     public function createAliexpressDriver($config)

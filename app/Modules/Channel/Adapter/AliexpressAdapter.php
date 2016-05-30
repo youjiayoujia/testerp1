@@ -9,7 +9,6 @@
 namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
-use App\Models\CurrencyModel;
 use Illuminate\Support\Facades\DB;
 
 set_time_limit(1800);

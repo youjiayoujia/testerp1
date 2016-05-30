@@ -53,6 +53,15 @@ class AccountModel extends BaseModel
         'aliexpress_refresh_token',
         'aliexpress_access_token',
         'aliexpress_access_token_date',
+        'wish_publish_code',
+        'wish_client_id',
+        'wish_client_secret',
+        'wish_redirect_uri',
+        'wish_refresh_token',
+        'wish_access_token',
+        'wish_expiry_time',
+        'wish_proxy_address',
+        'wish_sku_resolve',
     ];
 
     public $searchFields = ['account', 'alias'];
@@ -147,6 +156,9 @@ class AccountModel extends BaseModel
             case 'aliexpress':
                 $status = ['WAIT_SELLER_SEND_GOODS'];
                 break;
+            case 'wish':
+                $status =[];
+                break;
         }
         return $status;
     }
@@ -173,6 +185,19 @@ class AccountModel extends BaseModel
                     'refresh_token' => $this->aliexpress_refresh_token,
                     'access_token' => $this->aliexpress_access_token,
                     'aliexpress_member_id' => $this->aliexpress_member_id,
+                ];
+                break;
+            case 'wish':
+                $config=[
+                    'publish_code'=>$this->wish_publish_code,
+                    'client_id'=>$this->wish_client_id,
+                    'client_secret'=>$this->wish_client_secret,
+                    'redirect_uri'=>$this->wish_redirect_uri,
+                    'refresh_token'=>$this->wish_refresh_token,
+                    'access_token'=>$this->wish_access_token,
+                    'expiry_time'=>$this->wish_expiry_time,
+                    'proxy_address'=>$this->wish_proxy_address,
+                    'sku_resolve' =>$this->wish_sku_resolve,
                 ];
                 break;
         }

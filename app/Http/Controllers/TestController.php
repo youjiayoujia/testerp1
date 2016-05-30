@@ -99,4 +99,29 @@ class TestController extends Controller
         echo '耗时' . round($end - $begin, 3) . '秒';
 
     }
+
+    public function lazadaOrdersList(){
+        $begin = microtime(true);
+        $account = AccountModel::findOrFail(4);
+        $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
+        $endDate = date("Y-m-d H:i:s");
+        $status = $account->api_status;
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+        $orderList = $channel->listOrders($startDate, $endDate, $status, 10);
+
+        foreach ($orderList as $order) {
+            $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
+            $order['channel_id'] = $account->channel->id;
+            $order['channel_account_id'] = $account->id;
+            if ($thisOrder) {
+                //$thisOrder->updateOrder($order);
+            } else {
+                $this->orderModel->createOrder($order);
+            }
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+
+    }
 }

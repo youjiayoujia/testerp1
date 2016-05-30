@@ -14,13 +14,13 @@ class ModifyChannelAccountsForLazadaCol extends Migration
     {
         Schema::table('channel_accounts', function (Blueprint $table) {
             //
-            $table->string('lazada_account')->after('wish_proxy_address');
-            $table->string('lazada_access_key')->after('wish_proxy_address');
-            $table->string('lazada_user_id')->after('wish_proxy_address');
-            $table->string('lazada_site')->after('wish_proxy_address');
-            $table->string('lazada_currency_type')->after('wish_proxy_address');
-            $table->string('lazada_currency_type_cn')->after('wish_proxy_address');
-            $table->string('lazada_api_host')->after('wish_proxy_address');
+            $table->string('lazada_account')->after('amazon_accesskey_secret');
+            $table->string('lazada_access_key')->after('lazada_account');
+            $table->string('lazada_user_id')->after('lazada_access_key');
+            $table->string('lazada_site')->after('lazada_user_id');
+            $table->string('lazada_currency_type')->after('lazada_site');
+            $table->string('lazada_currency_type_cn')->after('lazada_currency_type');
+            $table->string('lazada_api_host')->after('lazada_currency_type_cn');
         });
     }
 

@@ -74,7 +74,7 @@ Class AmazonAdapter implements AdapterInterface
             }
             $response = $this->setRequest('Orders', $request);
             if (isset($response->Error)) {
-                break;
+                continue;
             }
             $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
             foreach ($responseOrders->Orders->Order as $order) {

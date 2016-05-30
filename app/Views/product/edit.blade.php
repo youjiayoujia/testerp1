@@ -180,6 +180,10 @@
         </div>
         
         <div class="form-group col-md-3">
+            <label for="color">质检标准</label>
+            <input class="form-control" id="quality_standard" placeholder="质检标准" name='quality_standard' value="{{ old('quality_standard') ?  old('quality_standard') : $product->quality_standard }}">
+        </div>
+        <div class="form-group col-md-3">
             <label for="color">尺寸描述</label>
             <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') ?  old('size_description') : $product->size_description }}">
         </div>

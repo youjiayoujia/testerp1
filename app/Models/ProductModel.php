@@ -78,6 +78,7 @@ class ProductModel extends BaseModel
         'status',
         'edit_status',
         'examine_status',
+        'quality_standard',
         'remark',
         'image_edit_not_pass_remark',
         'data_edit_not_pass_remark',
@@ -180,14 +181,18 @@ class ProductModel extends BaseModel
     {   
         DB::beginTransaction();
         try {
-            //创建spu，,并插入数据
-            $spuobj = SpuModel::create(['spu'=>Tool::createSku()]);
-            $data['spu_id'] = $spuobj->id;
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
+            $code_num = SpuModel::where("spu","like",$catalog->code."%")->get()->count();
+            //创建spu，,并插入数据
+            $spuobj = SpuModel::create(['spu'=>Tool::createSku($catalog->code,$code_num)]);
+            $data['spu_id'] = $spuobj->id;
+            $az=array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+            $aznum = 0;
             foreach ($data['modelSet'] as $model) {
                 //拼接model号
-                $data['model'] = $spuobj->spu . "-" . $model['model'];
+                //$data['model'] = $spuobj->spu . "-" . $model['model'];
+                $data['model'] = $spuobj->spu . $az[$aznum];
                 $data['carriage_limit'] = empty($data['carriage_limit_arr'])?'':implode(',', $data['carriage_limit_arr']);
                 $data['package_limit'] = empty($data['package_limit_arr'])?'':implode(',', $data['package_limit_arr']);
                 $product = $this->create($data);
@@ -245,6 +250,7 @@ class ProductModel extends BaseModel
                         }
                     }
                 }
+                $aznum++;
             }
             
         } catch (Exception $e) {
@@ -354,19 +360,30 @@ class ProductModel extends BaseModel
     {
         //获得variation属性集合
         $variations = $this->variationValues->toArray();
-        $brr = [];
-        
-        foreach ($variations as $variation) {
+        //$brr = [];
+        //echo '<pre>';
+
+        /*foreach ($variations as $variation) {
             if($variation['pivot']['created_at']==$variation['pivot']['updated_at']){
                 $brr[$variation['variation_id']][] = $variation['name'];
             }  
-        }
+        }*/
         //按照指定格式的数组去笛卡尔及创建item
-        $brr = array_values($brr);
-        $result = Tool::createDikaer($brr);
+        //$brr = array_values($brr);
+        //$result = Tool::createDikaer($brr);
         //产品model号赋值
         $model = $this->model;
-        foreach ($result as $_result) {
+        //print_r($variations);exit;
+
+        foreach ($variations as $key => $value) {
+            $item = $model.($key+1);
+            $product_data = $this->toArray();
+            $product_data['sku'] = $item;
+            $product_data['product_id'] = $this->id;
+            $this->item()->create($product_data);
+        }
+        
+        /*foreach ($result as $_result) {
             $item = $model;
             //循环拼接创建item
             foreach ($_result as $__result) {
@@ -376,7 +393,7 @@ class ProductModel extends BaseModel
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
             $this->item()->create($product_data);
-        }
+        }*/
         $this->status = 1;
         $this->save();
     }

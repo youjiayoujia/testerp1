@@ -62,7 +62,6 @@ class AccountModel extends BaseModel
         'wish_expiry_time',
         'wish_proxy_address',
         'wish_sku_resolve',
-
         'lazada_access_key',
         'lazada_user_id',
         'lazada_site',
@@ -124,6 +123,11 @@ class AccountModel extends BaseModel
 
     }
 
+    public function orders()
+    {
+        return $this->hasMany('App\Models\OrderModel', 'channel_account_id');
+    }
+
     public function getMergePackageAttribute()
     {
         return $this->is_merge_package ? '是' : '否';
@@ -168,7 +172,7 @@ class AccountModel extends BaseModel
                 $status = ['pending'];
                 break;
             case 'wish':
-                $status =[];
+                $status = [];
                 break;
         }
         return $status;
@@ -210,17 +214,17 @@ class AccountModel extends BaseModel
                 ];
                 break;
             case 'wish':
-                $config=[
-                    'publish_code'=>$this->wish_publish_code,
-                    'client_id'=>$this->wish_client_id,
-                    'client_secret'=>$this->wish_client_secret,
-                    'redirect_uri'=>$this->wish_redirect_uri,
-                    'refresh_token'=>$this->wish_refresh_token,
-                    'access_token'=>$this->wish_access_token,
-                    'expiry_time'=>$this->wish_expiry_time,
-                    'proxy_address'=>$this->wish_proxy_address,
-                    'sku_resolve' =>$this->wish_sku_resolve,
-                 ];
+                $config = [
+                    'publish_code' => $this->wish_publish_code,
+                    'client_id' => $this->wish_client_id,
+                    'client_secret' => $this->wish_client_secret,
+                    'redirect_uri' => $this->wish_redirect_uri,
+                    'refresh_token' => $this->wish_refresh_token,
+                    'access_token' => $this->wish_access_token,
+                    'expiry_time' => $this->wish_expiry_time,
+                    'proxy_address' => $this->wish_proxy_address,
+                    'sku_resolve' => $this->wish_sku_resolve,
+                ];
                 break;
         }
         return $config;

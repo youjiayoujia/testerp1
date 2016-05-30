@@ -47,7 +47,10 @@ class SupplierModel extends BaseModel
     {
         return $this->belongsTo('App\Models\UserModel', 'purchase_id', 'id');
     }
-
+	//获取供应商地址
+	public function getSupplierAddressAttribute(){
+		return $this->province.$this->city.$this->address;
+		}
     /**
      * return the relation between the two module 
      *

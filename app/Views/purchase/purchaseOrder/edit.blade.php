@@ -160,7 +160,12 @@
             物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
             </td>
             <td>
+            @if($model->close_status ==0)
               <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+              @else
+              {{$purchaseItem->purchase_cost}}
+              <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+              @endif
  			</td>
             <td>
             @if($purchaseItem->costExamineStatus ==2)

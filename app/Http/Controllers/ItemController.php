@@ -27,7 +27,7 @@ class ItemController extends Controller
         $this->logisticsLimit = $limitsModel;
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('item.index');
-        $this->mainTitle = '产品Item';
+        $this->mainTitle = '产品SKU';
         $this->viewPath  = 'item.';
     }
 
@@ -71,6 +71,27 @@ class ItemController extends Controller
         $model->updateItem(request()->all());
         return redirect($this->mainIndex);
     }
+
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'warehouse' => $this->warehouse->find($model->warehouse_id),
+        ];
+        return view($this->viewPath . 'show', $response);
+    }
+
 
     public function getImage()
     {

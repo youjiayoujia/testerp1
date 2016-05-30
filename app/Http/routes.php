@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
 //    Route::any('/', ['as' => 'dashboard.index', 'uses' => 'DashboardController@index']);
 
     //产品图片路由
+    Route::any('productImage/createImage', ['uses' => 'Product\ImageController@createImage', 'as' => 'createImage']);
     Route::resource('productImage', 'Product\ImageController');
 
     //reported smissing  reportedMissingCreate
@@ -204,6 +205,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
+	 Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
     Route::get('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
     Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 //打印采购单

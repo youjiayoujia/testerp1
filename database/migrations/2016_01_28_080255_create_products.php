@@ -32,6 +32,7 @@ class CreateProducts extends Migration
             $table->decimal('purchase_price',8,2)->comment('采购价')->nullable()->default(0);
             $table->decimal('purchase_carriage',6,2)->comment('运费')->nullable()->default(0);
             $table->string('product_size')->comment('产品尺寸')->nullable()->default(NUll);
+            $table->string('quality_standard')->comment('质检标准')->nullable()->default(NUll);
             $table->string('carriage_limit')->comment('运费限制')->nullable()->default(NULL);
             $table->string('package_limit')->comment('物流限制')->nullable()->default(NULL);
             $table->string('package_size')->comment('包装尺寸')->nullable()->default(NULL);

@@ -13,6 +13,9 @@
             <strong>中文名</strong>: {{ $model->cn_name }}
         </div>
         <div class="col-lg-2">
+            <strong>地区</strong>: {{ $model->countriesSort ? $model->countriesSort->name : '' }}
+        </div>
+        <div class="col-lg-2">
             <strong>简码</strong>: {{ $model->code }}
         </div>
         <div class="col-lg-2">

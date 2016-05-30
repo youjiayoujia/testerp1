@@ -1,13 +1,27 @@
 /*
  * Main content
  */
+body,
+.btn,
+.form-control,
+.dropdown-menu {
+    font-size: 10px;
+}
+
+.form-control {
+    height: 31px;
+}
+
+.breadcrumb {
+    margin-bottom: 10px;
+}
 
 .main {
-    padding: 70px 10px 10px;
+    padding: 60px 10px 10px;
 }
 
 .tr_bgcolor {
-    background: red ;
+    background: red;
 }
 
 .pagination {
@@ -16,6 +30,18 @@
 
 .toolbar {
     margin-bottom: 5px;
+}
+
+.inboxNum {
+    width: 500px;
+    height: 500px;
+    background: #ddd;
+    left : 15px;
+}
+
+.inboxImage {
+    width: 500px;
+    height: 500px;
 }
 
 span.sign {
@@ -80,3 +106,14 @@ th:hover:not([data-sort=false]) {
     opacity: .8;
     cursor: pointer;
 }
+
+.table.table-bordered td {
+    vertical-align: middle;
+    font-size: 14px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.table.table-bordered td .col-lg-3 {
+    padding-left: 0px
+}
+

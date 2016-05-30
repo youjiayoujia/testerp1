@@ -21,15 +21,16 @@ class CreateOrders extends Migration
             $table->string('email')->comment('邮箱');
             $table->enum('status',
                 [
-                    'NEW',
+                    'UNPAID',
+                    'PAID',
                     'PREPARED',
                     'NEED',
                     'PACKED',
                     'SHIPPED',
                     'COMPLETE',
                     'CANCEL',
-                    'ERROR'
-                ])->default('NEW')->comment('订单状态');
+                    'REVIEW'
+                ])->default('PAID')->comment('订单状态');
             $table->enum('active',
                 [
                     'NORMAL',
@@ -49,7 +50,7 @@ class CreateOrders extends Migration
             $table->string('affairer')->comment('做账人员')->nullable()->default(NULL);
             $table->string('customer_service')->comment('客服人员')->nullable()->default(NULL);
             $table->string('operator')->comment('运营人员')->nullable()->default(NULL);
-            $table->enum('payment', ['GC', 'IDEAL', 'OC', 'PP', 'SOFORT'])->default('GC')->comment('支付方式');
+            $table->string('payment')->comment('支付方式')->default(NULL);
             $table->string('currency')->comment('币种');
             $table->double('rate', 15, 4)->comment('汇率');
             $table->string('ip')->comment('IP地址')->nullable()->default(NULL);
@@ -58,7 +59,7 @@ class CreateOrders extends Migration
             $table->string('comment1')->comment('红人/choies用')->nullable()->default(NULL);
             $table->string('remark')->comment('订单备注')->nullable()->default(NULL);
             $table->string('import_remark')->comment('导单备注')->nullable()->default(NULL);
-            $table->enum('shipping', ['EXPRESS', 'PACKET'])->comment('种类');
+            $table->string('shipping')->comment('物流方式')->nullable()->default(NULL);
             $table->string('shipping_firstname')->comment('发货名字');
             $table->string('shipping_lastname')->comment('发货姓氏');
             $table->string('shipping_address')->comment('发货地址');
@@ -83,6 +84,10 @@ class CreateOrders extends Migration
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->integer('priority')->comment('优先级')->nullable()->default(0);
             $table->integer('package_times')->comment('打包次数')->nullable()->default(0);
+            $table->integer('split_times')->comment('拆分次数')->nullable()->default(0);
+            $table->integer('split_quantity')->comment('被拆分数量')->nullable()->default(0);
+            $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);
+            $table->enum('blacklist', ['0', '1'])->comment('黑名单订单')->nullable()->default('1');
             $table->date('refund_time')->comment('退款时间')->nullable()->default(NULL);
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间')->nullable()->default(NULL);

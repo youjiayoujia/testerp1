@@ -23,13 +23,13 @@ class ChannelModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'brief'];
+    protected $fillable = ['name', 'driver', 'brief'];
 
     protected $searchFields = ['name'];
 
     protected $rules = [
-        'create' => ['name' => 'required|unique:channels,name'],
-        'update' => ['name' => 'required|unique:channels,name,{id}']
+        'create' => ['name' => 'required|unique:channels,name', 'driver' => 'required'],
+        'update' => ['name' => 'required|unique:channels,name,{id}', 'driver' => 'required']
     ];
 
     public function channelAccount()

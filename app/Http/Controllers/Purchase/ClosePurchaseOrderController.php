@@ -77,14 +77,14 @@ class ClosePurchaseOrderController extends Controller
 	public function update($id)
 	{
 		$model=$this->model->find($id);
-		if ($model->examineStatus !=2) {
+		if ($model->examineStatus !=1 ) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
 		$data=request()->all();
 		$items=PurchaseItemModel::where('purchase_order_id',$id)->get();
 		foreach($items as $key=>$v){
-		if($v->status !=2){
-			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未对单采购条目不能结算.'));
+		if($v->status ==0 || $v->status ==5){
+			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未开始的或已取消的采购单不能结算.'));
 			}
 		}
 		$model->update($data);

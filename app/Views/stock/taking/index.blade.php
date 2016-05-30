@@ -54,11 +54,22 @@
     @endforeach
 @stop
 @section('tableToolButtons')
-    <div class="btn-group">
-        <a class="btn btn-success" href="{{ route('stock.createTaking') }}">
-            生成盘点表
-        </a>
-    </div>
+<div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 查询状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ DataList::filtersEncode(['check_status','=','0']) }}">未审核</a></li>
+            <li><a href="{{ DataList::filtersEncode(['check_status','=','1']) }}">未通过</a></li>
+            <li><a href="{{ DataList::filtersEncode(['check_status','=','2']) }}">已通过</a></li>
+        </ul>
+</div>
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('stock.createTaking') }}">
+        生成盘点表
+    </a>
+</div>
 @stop
 @section('childJs')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}

@@ -43,7 +43,33 @@
             </div>
         </div>
     </div>
-    <div class="row"> 
+       <div class="row">
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>采购周期</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="purchase_time" placeholder="采购周期" name='purchase_time' value="{{ old('purchase_time') ? old('purchase_time') : $model->purchase_time }}">
+        </div>
+       <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>开户行</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="bank_account" placeholder="开户行" name='bank_account' value="{{ old('bank_account') ? old('bank_account') : $model->bank_account }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>银行卡号</label>
+            <input type='text' class="form-control" id="bank_code" placeholder="银行卡号" name='bank_code' value="{{ old('bank_code')? old('bank_code') : $model->bank_code }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>支付方式</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+           <select name='pay_type' class='form-control'>
+            @foreach(config('product.product_supplier.pay_type') as $key=>$pay_type)
+                <option value="{{$key}}" {{ $key == $model->pay_type ? 'selected' : ''}}> {{$pay_type}} </option>
+            @endforeach
+            </select>
+        </div>
+    </div>　
+    <div class="row">
+   		<div class="form-group col-lg-3" id="update_examine" > 
+            <label for="url">上传审核资料</label>
+            <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications' value="">
+        </div>
         <div class="form-group col-lg-3">
             <label for="url">供货商网址</label>
             <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $model->url }}" {{ old('type') ? old('type') != '1' ? 'readonly' : '' :$model->type != '1' ? 'readonly' : ''}}>
@@ -99,9 +125,15 @@
             if($(this).find(':radio:checked').val() != '1') {
                 $(this).parent().parent().next().find('.url').val('');
                 $(this).parent().parent().next().find('.url').attr('readonly', true);
+				if($(this).find(':radio:checked').val() == 0){
+					$('#update_examine').show();
+				}else{
+					$('#update_examine').hide();
+					}
             }
             else {
                 $(this).parent().parent().next().find('.url').attr('readonly', false);
+				$('#update_examine').hide();
             }
         });
     });

@@ -156,6 +156,9 @@ class AccountModel extends BaseModel
             case 'aliexpress':
                 $status = ['WAIT_SELLER_SEND_GOODS'];
                 break;
+            case 'lazada':
+                $status = ['pending'];
+                break;
             case 'wish':
                 $status =[];
                 break;
@@ -187,6 +190,17 @@ class AccountModel extends BaseModel
                     'aliexpress_member_id' => $this->aliexpress_member_id,
                 ];
                 break;
+            case 'lazada':
+                $config = [
+                    'lazada_account' => $this->lazada_account,
+                    'lazada_access_key' => $this->lazada_access_key,
+                    'lazada_user_id' => $this->lazada_user_id,
+                    'lazada_site' => $this->lazada_site,
+                    'lazada_currency_type' => $this->lazada_currency_type,
+                    'lazada_currency_type_cn' => $this->lazada_currency_type_cn,
+                    'lazada_api_host' => $this->lazada_api_host,
+                ];
+                break;
             case 'wish':
                 $config=[
                     'publish_code'=>$this->wish_publish_code,
@@ -198,7 +212,7 @@ class AccountModel extends BaseModel
                     'expiry_time'=>$this->wish_expiry_time,
                     'proxy_address'=>$this->wish_proxy_address,
                     'sku_resolve' =>$this->wish_sku_resolve,
-                ];
+                 ];
                 break;
         }
         return $config;

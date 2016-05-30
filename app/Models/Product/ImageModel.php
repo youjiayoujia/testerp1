@@ -33,9 +33,9 @@ class ImageModel extends BaseModel
     protected $searchFields = ['type'];
     public $rules = [
         'create' => [
-            'model' => 'required',
-            'type' => 'required',
-            'image0' => 'required',
+            //'model' => 'required',
+            //'type' => 'required',
+            //'image0' => 'required',
         ],
         'update' => [],
     ];
@@ -48,6 +48,11 @@ class ImageModel extends BaseModel
     public function product()
     {
         return $this->belongsTo('App\Models\ProductModel', 'product_id','id');
+    }
+
+    public function labels()
+    {
+        return $this->belongsToMany('App\Models\LabelModel','image_labels','image_id','label_id')->withTimestamps();
     }
 
     /**
@@ -91,11 +96,12 @@ class ImageModel extends BaseModel
      */
     public function imageCreate($data, $files = null)
     {
-        if ($data['type'] != 'public') {
+        /*if ($data['type'] != 'public') {
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['type'] . '/';
         } else {
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
-        }
+        }*/
+        $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['is_link'] . '/' . $data['tag'] . '/';
         $disk = Storage::disk('product');
         switch ($data['uploadType']) {
             case 'image':
@@ -103,7 +109,8 @@ class ImageModel extends BaseModel
                     if ($this->valid($file->getClientOriginalName())) {
                         $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
                         Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
-                        $this->create($data);
+                        $imageModel = $this->create($data);
+                        $imageModel->labels()->attach($data['is_link']);
                     }
                 }
                 break;
@@ -122,6 +129,8 @@ class ImageModel extends BaseModel
                 }
                 break;
         }
+
+        return $imageModel;
     }
 
     /**
@@ -133,13 +142,36 @@ class ImageModel extends BaseModel
      * @return mixed
      * @throws FileException
      */
-    public function updateImage($id, $file)
+    public function updateImage($id, $file,$data)
     {
         $image = $this->findOrFail($id);
-        if (is_file($image->src)) {
-            unlink($image->src);
+        //if (is_file($image->src)) {
+        //    unlink($image->src);
+        //}
+        //foreach($data['image_type'] as $type){
+         //   $imageModel->labels()->attach($data['image']);
+        //}
+        //echo '<pre>';
+        //$tag_arr = [];
+        //$active['is_active']
+        //foreach($image->labels as $labels){
+        //    $tag_arr[] = $labels->pivot->label_id;
+        //    $labels->update()
+        //}
+        
+        //print_r($tag_arr);exit;
+        //print_r($image->labels->toArray());exit;
+        
+        //$arr['is_link'] = $data['is_link'];
+        //$arr['active'] = 1;
+        //$image->labels()->attach($arr['is_link'],['is_active'=>1]);
+        $arr[] = $data['is_link'];
+        foreach($data['image_type'] as $data){
+            $arr[] = $data;
         }
-        return Storage::disk('product')->put($image->path.$image->name,file_get_contents($file->getRealPath()));
+        
+        $image->labels()->sync($arr);
+        return;
     }
 
     /**

@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CatalogModel;
+use App\Models\ChannelModel;
 
 class CatalogController extends Controller
 {
@@ -18,6 +19,21 @@ class CatalogController extends Controller
         $this->mainIndex = route('catalog.index');
         $this->mainTitle = '品类Category';
         $this->viewPath = 'catalog.';
+    }
+
+    /**
+     * 新建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $channels = ChannelModel::all();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'channels' =>$channels,
+        ];
+        return view($this->viewPath . 'create', $response);
     }
 
     /**
@@ -38,6 +54,8 @@ class CatalogController extends Controller
         $this->model->createCatalog($data,$extra);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
+
+
 
     /**
      * 更新品类

@@ -58,16 +58,7 @@
                 @endif
                 
             </div>  
-           <!-- <div class="form-group col-lg-4">
-            	<strong>导出该订单</strong>:
-                @if($model->supplier->type==1)
-                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>
-                @else
-                <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
-                </a>
-                @endif     
-            </div> -->
+          
             <div class="form-group col-lg-4">
                 <strong>采购单审核状态</strong>:     
             	@if($model->examineStatus == 0)
@@ -93,11 +84,7 @@
      <div class="panel panel-default">
         <div class="panel-heading">单身</div>
         <div class="panel-body">
-        <div class="row">
-         <div class="form-group col-lg-4">
-                <strong>未入库条目</strong>:
-            </div>
-            </div>
+        
     <table class="table table-bordered table-striped table-hover sortable">
     <thead>
         <tr>
@@ -107,7 +94,7 @@
             <td>供货商sku</td> 
             <td>样图</td>
             <td>状态</td>
-            <td>物流单号+物流费</td>
+            <td>物流单号</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>购买链接</td> 
@@ -135,8 +122,7 @@
              @endforeach
              </td>
             <td>
-            物流单号：{{$purchaseItem->post_coding}}
-            物流费：{{$purchaseItem->postage}}
+            {{$purchaseItem->post_coding}}
             </td>
             <td>
               {{$purchaseItem->purchase_cost}}
@@ -179,7 +165,7 @@
         <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购日期</strong>:
-                
+                 <input type="button" value="打印" onclick="window.print();"/> 
             </div>
             <div class="form-group col-lg-4">
                 <strong>打印日期</strong>:

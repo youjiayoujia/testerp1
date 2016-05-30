@@ -49,6 +49,7 @@
             @endif
             </td>
             <td>
+            @if($purchaseOrder->status <4)
                 <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
@@ -104,6 +105,7 @@
                 </tr>
                 </tbody>
                 </table>
+                @endif
             </td>
             <td>{{ $purchaseOrder->warehouse->name}}</td>
                   
@@ -124,7 +126,7 @@
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
-				<a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}" title="打印" class="btn btn-primary btn-xs">
+				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
                 </a>                       
                 

@@ -18,6 +18,8 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
+Route::get('test', 'TestController@test');
+
 //国家
 Route::resource('countries', 'CountriesController');
 
@@ -26,7 +28,6 @@ Route::resource('countriesSort', 'CountriesSortController');
 
 //采购条目
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('test', 'TestController@test');
     Route::resource('countries', 'CountriesController');
 
     //3宝package
@@ -455,6 +456,3 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
-
-Route::any('test', ['uses' => 'TestController@index']);
-Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);

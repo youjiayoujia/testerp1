@@ -98,14 +98,25 @@ class PackageController extends Controller
 
     public function doPackage()
     {
-        $begin = microtime(true);
+        set_time_limit(0);
+        $len = 1000;
+        $start = 0;
         $orders = OrderModel::where('active', 'NORMAL')
             ->whereIn('status', ['PREPARED', 'NEED'])
-            ->orderBy('package_times', 'desc')
+            ->orderBy('package_times', 'desc')->skip($start)->take($len)
             ->get();
-        foreach ($orders as $order) {
-            echo $order->id . '<br>';
-            $order->createPackage();
+        $begin = microtime(true);
+        while(count($orders)) {
+            foreach ($orders as $order) {
+                echo $order->id . '<br>';
+                $order->createPackage();
+            }
+            $start += $len;
+            $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+            ->orderBy('package_times', 'desc')->skip($start)->take($len)
+            ->get();
+            break;
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

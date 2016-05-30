@@ -50,6 +50,14 @@ class PurchaseOrderModel extends BaseModel
     {
         return UserModel::all();
     }
+	//到货时间
+	public function getArrivalDayAttribute()
+    {
+		$startTime=strtotime($this->start_buying_time);
+		$needTime=$this->supplier->purchase_time;
+		$arrivalTime=$startTime + $needTime*24*3600;
+        return date('Y-m-d',$arrivalTime);
+    }
 	
 	public function updatePurchaseOrder($id,$data){
 		 $PurchaseOrder=$this->find($id);
@@ -62,7 +70,7 @@ class PurchaseOrderModel extends BaseModel
      * 导出单张采购单为单张excel
      *
      * 
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector0
      */
 	
 	public function allPurchaseExcelOut()

@@ -61,13 +61,14 @@ class OrdersGet extends Command
             $end = microtime(true);
             $lasting = round($end - $begin, 3);
             $this->info($account->alias . ' 耗时' . $lasting . '秒');
+            CommandModel::create([
+                'account_id' => $account->id,
+                'signature' => $this->signature,
+                'description' => $this->description,
+                'lasting' => $lasting,
+                'result' => 'success.',
+                'remark' => 'success.',
+            ]);
         }
-        CommandModel::create([
-            'signature' => $this->signature,
-            'description' => $this->description,
-            'lasting' => $lasting,
-            'result' => 'success.',
-            'remark' => 'success.',
-        ]);
     }
 }

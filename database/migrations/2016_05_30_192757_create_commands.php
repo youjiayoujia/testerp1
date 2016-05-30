@@ -14,6 +14,7 @@ class CreateCommands extends Migration
     {
         Schema::create('commands', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('account_id')->comment('帐号ID');
             $table->string('signature')->comment('命令');
             $table->string('description')->comment('描述');
             $table->string('lasting')->comment('执行时间');

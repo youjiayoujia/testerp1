@@ -62,6 +62,14 @@ class AccountModel extends BaseModel
         'wish_expiry_time',
         'wish_proxy_address',
         'wish_sku_resolve',
+
+        'lazada_access_key',
+        'lazada_user_id',
+        'lazada_site',
+        'lazada_currency_type',
+        'lazada_currency_type_cn',
+        'lazada_api_host',
+
     ];
 
     public $searchFields = ['account', 'alias'];

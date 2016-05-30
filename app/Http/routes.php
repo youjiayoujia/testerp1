@@ -399,6 +399,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 	
     //订单管理路由
+    Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
+    Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
     Route::resource('order', 'OrderController');
     Route::resource('orderItem', 'Order\ItemController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);

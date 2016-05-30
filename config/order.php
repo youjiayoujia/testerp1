@@ -81,6 +81,13 @@ return [
         '2' => '销售平台'
     ],
 
+    //黑名单类型
+    'blacklist_type' => [
+        'CONFIRMED' => '确认黑名单',
+        'SUSPECTED' => '疑似黑名单',
+        'WHITE' => '白名单'
+    ],
+
     //币种
     'currency' => [
         'USD',

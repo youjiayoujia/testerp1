@@ -11,6 +11,6 @@ return [
     //渠道币种
     'currencies' => ['ALL', 'USD', 'GBP', 'EUR'],
     //Driver
-    'drivers' => ['amazon', 'wish', 'aliexpress'],
+    'drivers' => ['amazon', 'wish', 'aliexpress','lazada'],
 ];
 

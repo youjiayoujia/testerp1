@@ -3,8 +3,9 @@
 namespace App\Console\Commands;
 
 use Channel;
-use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+use App\Models\CommandModel;
+use App\Models\Channel\AccountModel;
 use Illuminate\Console\Command;
 
 class OrdersGet extends Command
@@ -58,7 +59,15 @@ class OrdersGet extends Command
                 }
             }
             $end = microtime(true);
-            $this->info($account->alias . ' 耗时' . round($end - $begin, 3) . '秒');
+            $lasting = round($end - $begin, 3);
+            $this->info($account->alias . ' 耗时' . $lasting . '秒');
         }
+        CommandModel::create([
+            'signature' => $this->signature,
+            'description' => $this->description,
+            'lasting' => $lasting,
+            'result' => 'success.',
+            'remark' => 'success.',
+        ]);
     }
 }

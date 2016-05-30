@@ -102,7 +102,13 @@ class TestController extends Controller
 
     public function lazadaOrdersList(){
         $begin = microtime(true);
-        $account = AccountModel::findOrFail(4);
+        error_reporting(E_ALL);
+        $accountID = request()->get('id');
+        if(empty($accountID)){
+            die('empty account id');
+        }
+
+        $account = AccountModel::findOrFail($accountID);
         $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
         $endDate = date("Y-m-d H:i:s");
         $status = $account->api_status;

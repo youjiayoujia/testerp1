@@ -12,4 +12,17 @@
             </div>
         </div>
     </div>
+    @if(count($remarks) > 0)
+        <div class="panel panel-default">
+            <div class="panel-heading">历史备注</div>
+            <div class="panel-body">
+                @foreach($remarks as $remark)
+                    <div>
+                        <div class="col-lg-2">{{ $remark->created_at }}</div>
+                        <div class="col-lg-10">{{ $remark->remark }}</div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 @stop

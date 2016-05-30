@@ -14,6 +14,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
 use App\Models\UserModel;
@@ -171,6 +172,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'remarks' => $model->remarks,
         ];
 
         return view($this->viewPath . 'remark', $response);

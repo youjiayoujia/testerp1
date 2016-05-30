@@ -30,7 +30,7 @@ class TestController extends Controller
         $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
         $status = $account->api_status;
         $channel = Channel::driver($account->channel->driver, $account->api_config);
-        $orderList = $channel->listOrders($startDate, $endDate, $status, 20);
+        $orderList = $channel->listOrders($startDate, $endDate, $status, 500);
         foreach ($orderList as $order) {
             $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
             $order['channel_id'] = $account->channel->id;

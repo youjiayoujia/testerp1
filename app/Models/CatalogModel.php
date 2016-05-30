@@ -14,7 +14,7 @@ class CatalogModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name','c_name'];
+    protected $fillable = ['name','c_name','code'];
 
     public $searchFields = ['name','c_name'];
 
@@ -51,10 +51,19 @@ class CatalogModel extends BaseModel
         return $name;
     }
 
+    public function channels()
+    {
+        return $this->belongsToMany('App\Models\ChannelModel','catalog_channels','catalog_id','channel_id')->withPivot('rate')->withTimestamps();
+    }
+
     public function createCatalog($data,$extra=[])
     {
         DB::beginTransaction();
         $catalog = $this->create($data);
+        foreach($data['channel']['name'] as $channel_id=>$rate){
+            $arr['channel_id'] = $channel_id;
+            $catalog->channels()->attach($arr,['rate'=>$rate]);
+        }
         //属性名属性值添加
         if ($extra) {
             foreach ($extra as $model => $property) {
@@ -88,7 +97,14 @@ class CatalogModel extends BaseModel
     {
         DB::beginTransaction();
         //更新分类信息
-        $this->update($data);
+        $catalog = $this->update($data);
+        $arr=[];
+        foreach($data['channel']['name'] as $channel_id=>$rate){
+            $brr['rate'] = $rate;
+            $arr[$channel_id] = $brr;
+            
+        }
+        $this->channels()->sync($arr);
         //更新分类属性
         if($extra){
             try {

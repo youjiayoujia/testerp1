@@ -46,7 +46,7 @@ class OrdersGet extends Command
             $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
             $status = $account->api_status;
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $orderList = $channel->listOrders($startDate, $endDate, $status, 50);
+            $orderList = $channel->listOrders($startDate, $endDate, $status, 100);
             foreach ($orderList as $order) {
                 $thisOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
                 if ($thisOrder) {

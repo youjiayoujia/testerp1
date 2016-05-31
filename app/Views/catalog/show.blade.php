@@ -53,4 +53,15 @@
             @endforeach
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">平台费率 :</div>
+        <div class="panel-body">
+            @foreach($model->channels as $channel)
+                <div class="col-lg-12">
+                    <div class="col-lg-1"><strong>{{ $channel->name }}</strong>：</div>
+                    <div class="col-lg-1"><strong>{{ $channel->pivot->rate }}</strong></div>
+                </div>
+            @endforeach
+        </div>
+    </div>
 @stop

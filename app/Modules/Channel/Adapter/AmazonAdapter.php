@@ -28,13 +28,32 @@ Class AmazonAdapter implements AdapterInterface
         $this->config['Version'] = $this->version;
     }
 
+    /**
+     * 获取单个订单内容
+     * @param $orderID
+     * @return array|bool
+     */
     public function getOrder($orderID)
     {
         $request['Action'] = 'GetOrder';
         $request['AmazonOrderId.Id.1'] = $orderID;
-        return $this->setRequest('Orders', $request);
+        $response = $this->setRequest('Orders', $request);
+        $order = $response->GetOrderResult->Orders->Order;
+        if ($order) {
+            $orderItems = $this->getOrderItems($order->AmazonOrderId);
+            return $this->parseOrder($order, $orderItems);
+        }
+        return false;
     }
 
+    /**
+     * 获取订单列表
+     * @param $startDate
+     * @param $endDate
+     * @param array $status
+     * @param int $perPage
+     * @return array
+     */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
     {
         $orders = [];
@@ -50,12 +69,14 @@ Class AmazonAdapter implements AdapterInterface
                     $request['OrderStatus.Status.' . ($key + 1)] = $value;
                 }
                 $request['MaxResultsPerPage'] = $perPage;
-                $request['CreatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
-                $request['CreatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
+                $request['LastUpdatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
+                if ($endDate) {
+                    $request['LastUpdatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
+                }
             }
             $response = $this->setRequest('Orders', $request);
             if (isset($response->Error)) {
-                break;
+                continue;
             }
             $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
             foreach ($responseOrders->Orders->Order as $order) {
@@ -67,6 +88,11 @@ Class AmazonAdapter implements AdapterInterface
         return $orders;
     }
 
+    /**
+     * 获取订单行数据
+     * @param $orderId
+     * @return array
+     */
     public function getOrderItems($orderId)
     {
         $items = [];
@@ -92,6 +118,12 @@ Class AmazonAdapter implements AdapterInterface
         return $items;
     }
 
+    /**
+     * 解析返回订单
+     * @param $order
+     * @param $orderItems
+     * @return array
+     */
     public function parseOrder($order, $orderItems)
     {
         $shippingName = explode(' ', $order->ShippingAddress->Name);
@@ -119,6 +151,11 @@ Class AmazonAdapter implements AdapterInterface
         return $result;
     }
 
+    /**
+     * 解析返回订单行
+     * @param $orderItem
+     * @return array
+     */
     public function parseOrderItem($orderItem)
     {
         $result = [
@@ -137,6 +174,12 @@ Class AmazonAdapter implements AdapterInterface
         echo "return Amazon Tracking Informations";
     }
 
+    /**
+     * 发送请求
+     * @param $type
+     * @param $request
+     * @return \SimpleXMLElement
+     */
     public function setRequest($type, $request)
     {
         $request['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
@@ -144,6 +187,12 @@ Class AmazonAdapter implements AdapterInterface
         return simplexml_load_string(Tool::curl($requestUrl));
     }
 
+    /**
+     * 获取请求URL
+     * @param $type
+     * @param $request
+     * @return string
+     */
     public function setRequestUrl($type, $request)
     {
         $baseUrl = $this->serviceUrl . '/' . $type . '/' . $this->version;
@@ -160,6 +209,12 @@ Class AmazonAdapter implements AdapterInterface
         return $baseUrl . '?' . $paramUrl . '&Signature=' . $signature;
     }
 
+    /**
+     * 获取签名
+     * @param $baseUrl
+     * @param $paramUrl
+     * @return string
+     */
     public function getSignature($baseUrl, $paramUrl)
     {
         $signatureArray = parse_url($baseUrl);

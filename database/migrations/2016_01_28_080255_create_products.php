@@ -32,10 +32,13 @@ class CreateProducts extends Migration
             $table->decimal('purchase_price',8,2)->comment('采购价')->nullable()->default(0);
             $table->decimal('purchase_carriage',6,2)->comment('运费')->nullable()->default(0);
             $table->string('product_size')->comment('产品尺寸')->nullable()->default(NUll);
+            $table->integer('warehouse_id')->comment('仓库')->default(0);
+            $table->string('quality_standard')->comment('质检标准')->nullable()->default(NUll);
             $table->string('carriage_limit')->comment('运费限制')->nullable()->default(NULL);
             $table->string('package_limit')->comment('物流限制')->nullable()->default(NULL);
             $table->string('package_size')->comment('包装尺寸')->nullable()->default(NULL);
             $table->integer('upload_user')->comment('选款上传人')->nullable()->default(0);
+            $table->integer('purchase_adminer')->comment('采购负责人')->nullable()->default(0);
             $table->integer('edit_user')->comment('资料编辑人')->nullable()->default(0);
             $table->integer('edit_image_user')->comment('图片编辑人')->nullable()->default(0);
             $table->integer('examine_user')->comment('审核人')->nullable()->default(0);
@@ -44,6 +47,9 @@ class CreateProducts extends Migration
             $table->string('size_description')->comment('尺码描述')->nullable()->default(NULL);
             $table->string('description')->comment('描述')->nullable()->default(NULL);
             $table->decimal('weight',5,2)->comment('重量')->nullable()->default(0);
+            $table->string('url1')->comment('url1')->default(NULL);
+            $table->string('url2')->comment('url2')->default(NULL);
+            $table->string('url3')->comment('url3')->default(NULL);
             $table->string('status')->comment('上下架状态')->nullable()->default(0);
             $table->string('edit_status')->comment('编辑状态')->nullable()->default(NULL);
             $table->string('examine_status')->comment('审核状态')->nullable()->default(NULL);

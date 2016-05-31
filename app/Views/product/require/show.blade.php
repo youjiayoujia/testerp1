@@ -34,6 +34,15 @@
             </div>
         @endif
         <div class="col-lg-2">
+            <strong>URL1</strong>: {{ $model->url1 }}
+        </div>
+        <div class="col-lg-2">
+            <strong>URL2</strong>: {{ $model->url2 }}
+        </div>
+        <div class="col-lg-2">
+            <strong>URL3</strong>: {{ $model->url3 }}
+        </div>
+        <div class="col-lg-2">
             <strong>ID</strong>: {{ $model->id }}
         </div>
         <div class="col-lg-2">
@@ -90,7 +99,7 @@
             <strong>创建时间</strong>: {{ $model->created_at }}
         </div>
         <div class="col-lg-2">
-            <strong>状态</strong>: {{ $model->status }}
+            <strong>状态</strong>: {{ $model->status ? ($model->status == '1' ? '未找到' : '已找到') : '新需求' }}
         </div>
         <div class="col-lg-2">
             <strong>处理者</strong>: {{ $model->userName ? $model->userName->name : '' }}

@@ -10,7 +10,7 @@ return [
     'countries' => ['GLOBAL', 'US', 'UK', 'CN', 'DE', 'FR', 'JP'],
     //渠道币种
     'currencies' => ['ALL', 'USD', 'GBP', 'EUR'],
-    //Drive
-    'drives' => ['amazon', 'wish'],
+    //Driver
+    'drivers' => ['amazon', 'wish', 'aliexpress','lazada'],
 ];
 

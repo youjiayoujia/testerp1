@@ -65,15 +65,11 @@ class Tool
      * 2015-12-18 10:43:21 YJ
      * @return str
      */
-    public function createSku()
+    public function createSku($code,$code_num)
     {
-        $str = null;
-        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        $max = strlen($strPol) - 1;
-        for ($i = 0; $i < 5; $i++) {
-            $str .= $strPol[rand(0, $max)];
-        }
-        return $str;
+        $spu = $code.sprintf("%05d", $code_num+1);
+        
+        return $spu;
 
     }
 

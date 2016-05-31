@@ -10,9 +10,9 @@
         <div class="form-group col-lg-6">
             <label for="name" class='control-label'>API类型</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" name="drive">
-                @foreach($drives as $drive)
-                    <option value="{{ $drive }}" {{ Tool::isSelected('drive', $drive) }}>{{ $drive }}</option>
+            <select class="form-control" name="driver">
+                @foreach($drivers as $driver)
+                    <option value="{{ $driver }}" {{ Tool::isSelected('driver', $driver) }}>{{ $driver }}</option>
                 @endforeach
             </select>
         </div>

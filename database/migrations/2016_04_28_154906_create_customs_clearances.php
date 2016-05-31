@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CraeteCustomsClearances extends Migration
+class CreateCustomsClearances extends Migration
 {
     /**
      * Run the migrations.

@@ -16,12 +16,12 @@
         <div class="row">
             <div class="col-lg-4">
                 <a type="button" class="btn btn-warning" href="{{ route('package.assignLogistics') }}">
-                    自动分配物流 <span class="badge">{{ $assignFailed }}</span>
+                    自动分配物流 <span class="badge">{{ $assignNum }}</span>
                 </a>
             </div>
             <div class="col-lg-2 text-left">
                 <a type="button" class="btn btn-default" href="{{ route('package.manualLogistics') }}">
-                    手动分配物流 <span class="badge">{{ $pickNum }}</span>
+                    手动分配物流 <span class="badge">{{ $assignFailed }}</span>
                 </a>
             </div>
         </div>

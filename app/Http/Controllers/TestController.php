@@ -12,6 +12,7 @@ use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+use DB;
 
 
 class TestController extends Controller
@@ -123,5 +124,45 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
 
+    }
+
+    public function test(){
+        $datas = DB::table('test')->get();
+
+        foreach ($datas as $data)
+        {
+            $spu_id = DB::table('spus')->insertGetId(
+                 array('spu' => $data->sku, 'status' =>  0,'created_at'=>'2015-10-16 16:33:00','updated_at'=>'2015-10-16 16:33:00')
+            );
+            
+            $product_id = DB::table('products')->insertGetId(
+                 array('spu_id' => $spu_id, 
+                    'name' =>  $data->title,
+                    'c_name'=>$data->c_name,
+                    'model'=>$data->sku,
+                    'weight'=>$data->weight,
+                    'catalog_id'=>1,
+                    'supplier_id'=>1,
+                    'warehouse_id'=>1,
+                    'default_image'=>0,
+                    'status'=>1)
+            );
+
+            $sku_id = DB::table('items')->insertGetId(
+                 array('product_id' => $product_id, 
+                    'name' =>  $data->title,
+                    'c_name'=>$data->c_name,
+                    'sku'=>$data->sku,
+                    'weight'=>$data->weight,
+                    'purchase_price'=>$data->value,
+                    'warehouse_position'=>$data->location,
+                    'warehouse_id'=>1,
+                    'catalog_id'=>1,
+                    'supplier_id'=>1,
+                    'status'=>1)
+            );
+
+
+        }
     }
 }

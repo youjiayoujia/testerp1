@@ -30,14 +30,19 @@
        </div>
       </div>
       <ul class="dowebok">
-        <li><input type="radio" name="is_link" data-labelauty="实拍图" value="1" checked="checked"></li>
-        <li><input type="radio" name="is_link" data-labelauty="链接图" value="2"></li>
+        @foreach($labels as $label)
+          @if($label->group_id==1)
+            <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
+          @endif  
+        @endforeach
       </ul>
       <ul class="dowebok">
-        <li><input type="radio" name="image_type" data-labelauty="普通图" value="3"></li>
-        <li><input type="radio" name="image_type" data-labelauty="色卡" value="4" checked="checked"></li>
-        <li><input type="radio" name="image_type" data-labelauty="Logo" value="5"></li>
-        <li><input type="radio" name="image_type" data-labelauty="Size" value="6"></li>
+        @foreach($labels as $label)
+            @if($label->group_id==2)
+                <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
+            @endif
+              
+        @endforeach
       </ul>
       <div class="form-group">
         <input id="file-1" class="file" type="file" multiple data-preview-file-type="any" data-sku="ssdf" input-name="dlo">

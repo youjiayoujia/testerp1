@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product\ImageModel;
 use App\Models\ProductModel;
+use App\Models\LabelModel;
 
 class ImageController extends Controller
 {
@@ -103,6 +104,7 @@ class ImageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'label_arr' =>$label_arr,
+            'labels'=> LabelModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -143,6 +145,7 @@ class ImageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model'=> $model,
+            'labels'=> LabelModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }

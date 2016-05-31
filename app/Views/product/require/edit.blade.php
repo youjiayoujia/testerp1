@@ -128,6 +128,20 @@
             <input type='text' class='form-control' id='created_by' placeholder='创建人' name='created_by' value="{{ old('created_by') ? old('craeted_by') : $model->created_by }}" readonly>
         </div>
     </div>
+    <div class='row'>
+        <div class="form-group col-lg-4">
+            <label for="url1" class='control-label'>URL1</label>
+            <input type='text' class="form-control" id="url1" placeholder="URL" name='url1' value="{{ old('url1') ? old('url1') : $model->url1}}">
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="url2" class='control-label'>URL2</label>
+            <input type='text' class="form-control" id="url2" placeholder="URL" name='url2' value="{{ old('url2') ? old('url2') : $model->url2 }}">
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="url3" class='control-label'>URL3</label>
+            <input type='text' class="form-control" id="url3" placeholder="URL" name='url3' value="{{ old('url3') ? old('url3') : $model->url3 }}">
+        </div>
+    </div>
 @stop
 <script type='text/javascript'>
     window.onload = function(){

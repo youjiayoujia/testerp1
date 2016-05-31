@@ -74,6 +74,14 @@
         </div>
     </div>
     <div class="row">
+        <div class="form-group col-md-3">
+            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select  class="form-control" name="warehouse_id">
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}">{{$warehouse->name}}</option>
+                @endforeach
+            </select>
+        </div>
         <div class="form-group col-md-2">
             <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select  class="form-control" name="product_size">
@@ -93,6 +101,25 @@
         <div class="form-group col-md-2">
             <label for="color">选款人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="upload_user" placeholder="上传人" name='upload_user' value="{{ old('upload_user') }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="color">采购负责人</label>
+            <input class="form-control" id="purchase_adminer" placeholder="采购负责人" name='purchase_adminer' value="{{ old('purchase_adminer') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">url1</label>
+            <input class="form-control" id="url1" placeholder="url" name='url1' value="{{ old('url1') }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="size">url2</label>
+            <input class="form-control" id="url2" placeholder="url" name='url2' value="{{ old('url2') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">url3</label>
+            <input class="form-control" id="url3" placeholder="url" name='url3' value="{{ old('url3') }}">
         </div>
     </div>
 

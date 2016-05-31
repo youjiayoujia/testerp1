@@ -18,11 +18,14 @@
     <th>产品图片</th>
     <th>供应商</th>
     <th>采购去向</th>
-    <th>订单需求/库存数量/采购中</th>
+    <th>订单需求</th>
+    <th>库存数量</th>
+    <th>采购中</th>
     <th>近30天销量</th>
     <th>近14天销量</th>
     <th>近7天销量</th>
-    <th>需要采购数量</th>
+    <th>建议采购数量</th>
+    <th>趋势系数</th>
     <th>备注</th>
     <th>操作</th>
 @stop
@@ -46,11 +49,23 @@
             </td>
             <td>{{$requireItem->item->supplier->name}}</td>
             <td>{{ $requireItem->warehouse->name}}</td>
-            <td>{{ $requireItem->order_need_num}}/{{$requireItem->all_quantity}}/{{$requireItem->purchaseing_quantity}}</td>
+            <td>{{ $requireItem->order_need_num}}</td>
+            <td>{{$requireItem->all_quantity}}</td>
+            <td>{{$requireItem->purchaseing_quantity}}</td>
             <td>{{$requireItem->thirty_time}}</td>
             <td>{{$requireItem->fourteen_time}}</td>
             <td>{{$requireItem->seven_time}}</td>
-            <td>{{$requireItem->order_need_num - $requireItem->all_quantity -$requireItem->purchaseing_quantity}}</td>
+            <td>{{$requireItem->ProposedpurchaseQuantity}}</td>
+            <td>@if($requireItem->sell_status == 1)
+            	上涨
+            @elseif($requireItem->sell_status == 2)
+            	下跌
+            @elseif($requireItem->sell_status == 3)
+            	持平
+            @elseif($requireItem->sell_status == 4)
+            	无销量
+            @endif
+            </td>
             <td>{{ $requireItem->remark}}</td>
             <td><a href="{{ route('require.show', ['id'=>$requireItem->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看

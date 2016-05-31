@@ -285,16 +285,18 @@ class OrderModel extends BaseModel
                     $this->status = 'NEED';
                     $this->save();
                 } elseif ($this->status == 'NEED') {
-                    $this->package_times += 1;
-                    $this->save();
                     if(strtotime($this->created_at) < strtotime('-3 days')) {
                         $arr = $this->explodeOrder();
                         if($arr) {
                             $this->is_partial = 1;
+                            $this->package_times += 1;
                             $this->save();
                             $this->createPackageDetail($arr, 0);
+                            return true;
                         }
                     }
+                    $this->package_times += 1;
+                    $this->save();
                 }
             }
         }
@@ -306,10 +308,6 @@ class OrderModel extends BaseModel
     {
         DB::beginTransaction();
         foreach ($items as $warehouseId => $packageItems) {
-            if($flag == 0) {
-                $this->split_times += 1;
-            }
-            $this->save();
             $package = [];
             //channel
             $package['channel_id'] = $this->channel_id;
@@ -354,8 +352,10 @@ class OrderModel extends BaseModel
         DB::commit();
         if($flag == 1) {
             $this->status = 'PACKED';
-            $this->save();
+        } else {
+            $this->split_times += 1;
         }
+        $this->save();
     }
 
     public function explodeOrder()
@@ -453,7 +453,7 @@ class OrderModel extends BaseModel
                 }
                 foreach($value as $k => $v)
                 {
-                    $stocks = StockModel::where(['warehouse_id' => $warehouseId, 'item_id' => $key])->get();
+                    $stocks = StockModel::where(['item_id' => $key, 'warehouse_id' => $warehouseId])->get();
                     if(!count($stocks)) {
                         $arr[$warehouseId][$key]['allocateQuantity'] = 0;
                     } else {

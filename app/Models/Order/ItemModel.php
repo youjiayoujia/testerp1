@@ -18,6 +18,8 @@ class ItemModel extends BaseModel
 
     protected $guarded = [];
 
+    protected $fillable = ['order_id', 'item_id', 'sku', 'quantity', 'amount', 'is_active', 'status', 'is_gift'];
+
     public $searchFields = [
         'order_id',
         'item_id',

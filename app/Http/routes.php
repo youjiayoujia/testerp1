@@ -456,6 +456,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     //用户路由
     Route::resource('user', 'UserController');
+    //图片标签
+    Route::resource('label', 'LabelController');
 
 
 });

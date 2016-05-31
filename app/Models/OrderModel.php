@@ -21,8 +21,6 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items'];
 
-    protected $fillable = ['ordernum', 'status'];
-
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
     public $searchFields = [

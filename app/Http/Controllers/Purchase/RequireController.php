@@ -169,7 +169,7 @@ class RequireController extends Controller
 				if($itemModel->is_sale == 4){
 					$available_quantity=StockModel::where('item_id',$item_id)->sum('available_quantity');
 						$purchasingNum=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$itemModel->sku)->where('purchase_items.status','<',4)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
-						$needNum=$this->model->where('item_id',$vo->item_id)->sum('quantity');
+						$needNum=$this->model->where('item_id',$item_id)->sum('quantity');
 						$trend['ProposedpurchaseQuantity']=$needNum-$purchasingNum-$available_quantity;
 				}else{
 				$trend['ProposedpurchaseQuantity']=0;

@@ -185,6 +185,7 @@ class OrderController extends Controller
     {
         request()->flash();
         $data = request()->all();
+        $data['user_id'] = request()->user()->id;
         $this->model->find($id)->remarks()->create($data);
         return redirect($this->mainIndex);
     }

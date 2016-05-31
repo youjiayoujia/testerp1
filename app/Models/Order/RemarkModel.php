@@ -20,6 +20,7 @@ class RemarkModel extends BaseModel
 
     protected $fillable = [
         'order_id',
+        'user_id',
         'remark',
     ];
 
@@ -31,5 +32,10 @@ class RemarkModel extends BaseModel
             'remark' => 'required',
         ],
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id', 'id');
+    }
 
 }

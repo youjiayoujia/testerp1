@@ -18,8 +18,9 @@
             <div class="panel-body">
                 @foreach($remarks as $remark)
                     <div>
+                        <div class="col-lg-2">{{ $remark->user->name }}</div>
                         <div class="col-lg-2">{{ $remark->created_at }}</div>
-                        <div class="col-lg-10">{{ $remark->remark }}</div>
+                        <div class="col-lg-8">{{ $remark->remark }}</div>
                     </div>
                 @endforeach
             </div>

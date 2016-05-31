@@ -112,16 +112,16 @@ class RequireController extends Controller
 	public function getNeedPurchaseNum($item_id){
 			$itemModel=ProductItemModel::find($item_id);
 			$trend='';
-			if($itemModel->is_sale ==1){
+			if($itemModel->is_sale ==1 ||$itemModel->is_sale ==4){
 			$seven_time=date('Y-m-d H:i:s',strtotime('-7 day'));
 			$fourteen_time=date('Y-m-d H:i:s',strtotime('-14 day'));
 			$thirty_time=date('Y-m-d H:i:s',strtotime('-30 day'));
 			$sevenDaySellNum=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$item_id)->where('packages.shipped_at','>',$seven_time)->where('package_items.quantity','<',5)->sum('package_items.quantity');
 			$fourteenDaySellNum=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$item_id)->where('packages.shipped_at','>',$fourteen_time)->where('package_items.quantity','<',5)->sum('package_items.quantity');
 			$thirtyDaySellNum=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$item_id)->where('package_items.quantity','<',5)->where('packages.shipped_at','>',$thirty_time)->sum('package_items.quantity');
-			$trend['sevenDaySellNum']=$sevenDaySellNum;
-			$trend['fourteenDaySellNum']=$fourteenDaySellNum;
-			$trend['thirtyDaySellNum']=$thirtyDaySellNum;
+			$trend['sevenDaySellNum']=$sevenDaySellNum ? $sevenDaySellNum : 0;
+			$trend['fourteenDaySellNum']=$fourteenDaySellNum ? $fourteenDaySellNum : 0;
+			$trend['thirtyDaySellNum']=$thirtyDaySellNum ? $thirtyDaySellNum : 0;
 			
 			
 			//开始计算趋势系数

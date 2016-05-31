@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ModifyChannelAccountsForLazadaCol extends Migration
+class ReAddFieldsForLazadaChannelAccount extends Migration
 {
     /**
      * Run the migrations.
@@ -12,6 +12,8 @@ class ModifyChannelAccountsForLazadaCol extends Migration
      */
     public function up()
     {
+        $this->down();
+
         Schema::table('channel_accounts', function (Blueprint $table) {
             //
             $table->string('lazada_access_key')->nullable()->default(NULL)->after('amazon_accesskey_secret');
@@ -32,13 +34,15 @@ class ModifyChannelAccountsForLazadaCol extends Migration
     {
         Schema::table('channel_accounts', function (Blueprint $table) {
             //
-            $table->dropColumn(['lazada_access_key']);
-            $table->dropColumn(['lazada_user_id']);
-            $table->dropColumn(['lazada_site']);
-            $table->dropColumn(['lazada_currency_type']);
-            $table->dropColumn(['lazada_currency_type_cn']);
-            $table->dropColumn(['lazada_api_host']);
 
+            $table->dropColumn('lazada_account');
+
+            $table->dropColumn('lazada_access_key');
+            $table->dropColumn('lazada_user_id');
+            $table->dropColumn('lazada_site');
+            $table->dropColumn('lazada_currency_type');
+            $table->dropColumn('lazada_currency_type_cn');
+            $table->dropColumn('lazada_api_host');
 
         });
     }

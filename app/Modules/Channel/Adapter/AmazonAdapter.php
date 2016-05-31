@@ -69,12 +69,14 @@ Class AmazonAdapter implements AdapterInterface
                     $request['OrderStatus.Status.' . ($key + 1)] = $value;
                 }
                 $request['MaxResultsPerPage'] = $perPage;
-                $request['CreatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
-                $request['CreatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
+                $request['LastUpdatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
+                if ($endDate) {
+                    $request['LastUpdatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
+                }
             }
             $response = $this->setRequest('Orders', $request);
             if (isset($response->Error)) {
-                break;
+                continue;
             }
             $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
             foreach ($responseOrders->Orders->Order as $order) {

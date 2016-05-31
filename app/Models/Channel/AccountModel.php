@@ -53,6 +53,22 @@ class AccountModel extends BaseModel
         'aliexpress_refresh_token',
         'aliexpress_access_token',
         'aliexpress_access_token_date',
+        'wish_publish_code',
+        'wish_client_id',
+        'wish_client_secret',
+        'wish_redirect_uri',
+        'wish_refresh_token',
+        'wish_access_token',
+        'wish_expiry_time',
+        'wish_proxy_address',
+        'wish_sku_resolve',
+        'lazada_access_key',
+        'lazada_user_id',
+        'lazada_site',
+        'lazada_currency_type',
+        'lazada_currency_type_cn',
+        'lazada_api_host',
+
     ];
 
     public $searchFields = ['account', 'alias'];
@@ -107,6 +123,11 @@ class AccountModel extends BaseModel
 
     }
 
+    public function orders()
+    {
+        return $this->hasMany('App\Models\OrderModel', 'channel_account_id');
+    }
+
     public function getMergePackageAttribute()
     {
         return $this->is_merge_package ? '是' : '否';
@@ -150,6 +171,9 @@ class AccountModel extends BaseModel
             case 'lazada':
                 $status = ['pending'];
                 break;
+            case 'wish':
+                $status = [];
+                break;
         }
         return $status;
     }
@@ -187,6 +211,19 @@ class AccountModel extends BaseModel
                     'lazada_currency_type' => $this->lazada_currency_type,
                     'lazada_currency_type_cn' => $this->lazada_currency_type_cn,
                     'lazada_api_host' => $this->lazada_api_host,
+                ];
+                break;
+            case 'wish':
+                $config = [
+                    'publish_code' => $this->wish_publish_code,
+                    'client_id' => $this->wish_client_id,
+                    'client_secret' => $this->wish_client_secret,
+                    'redirect_uri' => $this->wish_redirect_uri,
+                    'refresh_token' => $this->wish_refresh_token,
+                    'access_token' => $this->wish_access_token,
+                    'expiry_time' => $this->wish_expiry_time,
+                    'proxy_address' => $this->wish_proxy_address,
+                    'sku_resolve' => $this->wish_sku_resolve,
                 ];
                 break;
         }

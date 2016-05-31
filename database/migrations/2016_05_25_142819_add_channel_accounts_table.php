@@ -14,7 +14,7 @@ class AddChannelAccountsTable extends Migration
     {
         Schema::table('channel_accounts', function (Blueprint $table) {
 
-            $table->string('aliexpress_member_id')->comment(' 速卖通开发者账号')->after('amazon_accesskey_id');
+            $table->string('aliexpress_member_id')->comment(' 速卖通开发者账号')->after('amazon_accesskey_secret');
             $table->string('aliexpress_appkey')->comment('速卖通appkey')->after('aliexpress_member_id');
             $table->string('aliexpress_appsecret')->comment('速卖通appsecret')->after('aliexpress_appkey');
             $table->string('aliexpress_returnurl')->comment('速卖通回调地址')->after('aliexpress_appsecret');

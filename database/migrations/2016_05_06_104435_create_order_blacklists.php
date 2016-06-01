@@ -23,7 +23,7 @@ class CreateOrderBlacklists extends Migration
                 [
                     'CONFIRMED', 'SUSPECTED', 'WHITE'
                 ])->comment('类型')->default('SUSPECTED');
-            $table->text('remark')->comment('备注');
+            $table->text('remark')->comment('备注')->nullable()->default(NULL);
             $table->integer('total_order')->comment('订单总数');
             $table->integer('refund_order')->comment('退款订单数');
             $table->string('refund_rate')->comment('退款率');

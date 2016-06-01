@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Order;
 use App\Http\Controllers\Controller;
 use App\Models\ChannelModel;
 use App\Models\Order\BlacklistModel;
+use App\Models\Order\RefundModel;
 use App\Models\OrderModel;
 
 class BlacklistController extends Controller
@@ -58,9 +59,96 @@ class BlacklistController extends Controller
     }
 
     /**
-     * 更新黑名单
+     * 首页
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'channels' => ChannelModel::all(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    public function getBlacklist()
+    {
+        $orders = OrderModel::all()->groupBy('shipping_zipcode');
+        foreach($orders as $key1 => $order) {
+            $lastnames = $order->groupBy('shipping_lastname');
+            foreach($lastnames as $key2 => $lastname) {
+                $firstnames = $lastname->groupBy('shipping_firstname');
+                foreach($firstnames as $key3 => $firstname) {
+                    if(count($firstname) >= 5) {
+                        $count2 = 0;
+                        foreach($firstname as $value) {
+                            $refunds = RefundModel::where('order_id', $value['id'])->get();
+                            if($refunds) {
+                                $count2++;
+                            }
+                        }
+                        if($count2 >= 5) {
+                            $obj = OrderModel::where('shipping_zipcode', $firstname->first()->shipping_zipcode)->first();
+                            $data['channel_id'] = $obj->channel_id;
+                            $data['ordernum'] = $obj->ordernum;
+                            $data['name'] = $obj->shipping_lastname . $obj->shipping_firstname;
+                            $data['email'] = $obj->email;
+                            $data['zipcode'] = $obj->shipping_zipcode;
+                            $data['type'] = 'SUSPECTED';
+                            $data['remark'] = NULL;
+                            $data['total_order'] = count($firstname);
+                            $data['refund_order'] = $count2;
+                            $data['refund_rate'] = ($count2 / count($firstname)) * 100 . '%';
+                            $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])->where('name', $data['name'])->count();
+                            if($blacklist <= 0) {
+                                $this->model->create($data);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $emails = OrderModel::distinct()
+            ->where('create_time', '<=', date('Y-m-d'))
+            ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
+            ->get(['email'])->toArray();
+        foreach($emails as $email) {
+            $orders = OrderModel::where('create_time', '<=', date('Y-m-d'))
+                ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
+                ->where('email', $email)
+                ->get();
+            if(count($orders) >= 5) {
+                $count = 0;
+                foreach($orders as $order) {
+                    $refunds = RefundModel::where('order_id', $order['id'])->get();
+                    if($refunds) {
+                        $count++;
+                    }
+                }
+                if($count >= 5) {
+                    $obj = OrderModel::where('email', $email)->first();
+                    $data['channel_id'] = $obj->channel_id;
+                    $data['ordernum'] = $obj->ordernum;
+                    $data['name'] = $obj->shipping_lastname . $obj->shipping_firstname;
+                    $data['email'] = $obj->email;
+                    $data['zipcode'] = $obj->shipping_zipcode;
+                    $data['type'] = 'SUSPECTED';
+                    $data['remark'] = NULL;
+                    $data['total_order'] = count($orders);
+                    $data['refund_order'] = $count;
+                    $data['refund_rate'] = ($count / count($orders)) * 100 . '%';
+                    $blacklist = BlacklistModel::where(['email' => $data['email']])->count();
+                    if($blacklist <= 0) {
+                        $this->model->create($data);
+                    }
+                }
+            }
+        }
+    }
+    
 //    public function index()
 //    {
 //        request()->flash();

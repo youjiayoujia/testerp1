@@ -89,6 +89,7 @@ class CreateOrders extends Migration
             $table->integer('split_quantity')->comment('被拆分数量')->nullable()->default(0);
             $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);
             $table->enum('blacklist', ['0', '1'])->comment('黑名单订单')->nullable()->default('1');
+            $table->double('platform', 15, 2)->comment('平台费')->nullable()->default(0);
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间')->nullable()->default(NULL);
             $table->date('create_time')->comment('渠道创建时间');

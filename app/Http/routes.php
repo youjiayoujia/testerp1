@@ -346,6 +346,7 @@ Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
   Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
   Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);
   Route::post('refundUpdate/{id}', ['uses' => 'OrderController@refundUpdate', 'as' => 'refundUpdate']);
+  Route::get('getBlacklist', ['uses' => 'Order\BlacklistController@getBlacklist', 'as' => 'getBlacklist']);
 
   //包裹管理路由
   Route::post('package/excelProcessFee/{type}',

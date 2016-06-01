@@ -39,7 +39,7 @@
       <ul class="dowebok">
         @foreach($labels as $label)
             @if($label->group_id==2)
-                <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
+                <li><input type="checkbox" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
             @endif
               
         @endforeach

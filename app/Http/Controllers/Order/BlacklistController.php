@@ -91,6 +91,9 @@ class BlacklistController extends Controller
                             }
                         }
                         if($count2 >= 5) {
+                            foreach($firstname as $value) {
+                                $value->update(['blacklist' => '0']);
+                            }
                             $obj = OrderModel::where('shipping_zipcode', $firstname->first()->shipping_zipcode)->first();
                             $data['channel_id'] = $obj->channel_id;
                             $data['ordernum'] = $obj->ordernum;
@@ -129,6 +132,9 @@ class BlacklistController extends Controller
                     }
                 }
                 if($count >= 5) {
+                    foreach($orders as $order) {
+                        $order->update(['blacklist' => '0']);
+                    }
                     $obj = OrderModel::where('email', $email)->first();
                     $data['channel_id'] = $obj->channel_id;
                     $data['ordernum'] = $obj->ordernum;
@@ -148,7 +154,7 @@ class BlacklistController extends Controller
             }
         }
     }
-    
+
 //    public function index()
 //    {
 //        request()->flash();

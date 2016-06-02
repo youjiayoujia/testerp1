@@ -42,7 +42,7 @@
                 @foreach($packages as $package)
                     @if($package->has_pick)
                         @foreach($package->items as $key => $packageitem)
-                            <tr data-id="{{ $package->id}}">
+                            <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                                 @if($key == '0')
                                 <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
                                 @endif
@@ -84,7 +84,7 @@
                 @foreach($packages as $package)
                     @if(!$package->has_pick)
                         @foreach($package->items as $key => $packageitem)
-                            <tr data-id="{{ $package->id}}">
+                            <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                                 @if($key == '0')
                                 <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
                                 @endif
@@ -167,7 +167,7 @@ $(document).ready(function(){
                             }
                         });
                         tmp.find('.picked_quantity').text(picked_quantity + 1);
-                        if(tmp.find('.picked_quantity').text() == quantity) {
+                        if(parseInt(tmp.find('.picked_quantity').text()) == quantity) {
                             needId = tmp.data('id');
                             flag = 1;
                             $.each($('.new tr'), function(){
@@ -179,12 +179,12 @@ $(document).ready(function(){
                                 }
                             });
                             if(flag) {
-                                tmp.find('.status').text('已包装');
+                                id = tmp.data('id');
+                                $("."+id).find('.status').text('已包装');
                             }
                         }
                     exit;
                     }
-
                 }
             });
             $.each($('.old tr'), function(){
@@ -232,9 +232,9 @@ $(document).ready(function(){
                     len = arr.length;
                     for(j=0;j<len;j++) {
                         if(j == 0) {
-                            str = "<tr data-id='" + tmp.data('id') + "'>" + arr[j] + "<td class='col-lg-1' rowspan='" + len + "'><button type='button' class='cz btn btn-info'>撤销</button></td></tr>";
+                            str = "<tr data-id='" + tmp.data('id') + "' class='"+ tmp.data('id') +"'>" + arr[j] + "<td class='col-lg-1' rowspan='" + len + "'><button type='button' class='cz btn btn-info'>撤销</button></td></tr>";
                         } else {
-                            str += "<tr data-id='" + tmp.data('id') + "'>" + arr[j] + "</tr>";
+                            str += "<tr data-id='" + tmp.data('id') + "' class='"+ tmp.data('id') + "'>" + arr[j] + "</tr>";
                         }
                     }
                     $('.new').append(str);

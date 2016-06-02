@@ -10,7 +10,29 @@
             <input type='text' class='form-control' value={{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}>
         </div>
         <div class='form-group col-lg-2'>
-            <label>状态</label>
+            <label>拣货人</label>
+            <input type='text' class='form-control' value={{ $model->pickByName ? $model->pickByName->name : '' }}>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>拣货时间</label>
+            <input type='text' class='form-control' value={{ $model->pick_at }}>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>分拣人</label>
+            <input type='text' class='form-control' value={{ $model->inboxByName ? $model->inboxByName->name : '' }}>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>分拣时间</label>
+            <input type='text' class='form-control' value={{ $model->inbox_at }}>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='form-group col-lg-2'>
+            <label>包装人</label>
+            <input type='text' class='form-control' value={{ $model->packByName ? $model->packByName->name : '' }}>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label>包装时间</label>
             <input type='text' class='form-control' value={{ $model->status_name }}>
         </div>
     </div>

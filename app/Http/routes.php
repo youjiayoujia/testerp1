@@ -18,6 +18,8 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
+Route::get('test', 'TestController@test');
+
 //国家
 Route::resource('countries', 'CountriesController');
 
@@ -26,7 +28,6 @@ Route::resource('countriesSort', 'CountriesSortController');
 
 //采购条目
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('test', 'TestController@test');
     Route::resource('countries', 'CountriesController');
 
     //3宝package
@@ -399,12 +400,23 @@ Route::group(['middleware' => 'auth'], function () {
 
 	
     //订单管理路由
+    Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
+    Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
     Route::resource('order', 'OrderController');
     Route::resource('orderItem', 'Order\ItemController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
-	//订单投诉
+    Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
+    Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
+    Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
+    Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
+    Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
+    Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);
+    Route::post('refundUpdate/{id}', ['uses' => 'OrderController@refundUpdate', 'as' => 'refundUpdate']);
+    Route::get('getBlacklist', ['uses' => 'Order\BlacklistController@getBlacklist', 'as' => 'getBlacklist']);
+
+    //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
 
@@ -454,12 +466,16 @@ Route::group(['middleware' => 'auth'], function () {
 
     //用户路由
     Route::resource('user', 'UserController');
+    //图片标签
+    Route::resource('label', 'LabelController');
 
     Route::resource('paypal', 'PaypalController');
 
 
 });
 
+Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);
 Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
+

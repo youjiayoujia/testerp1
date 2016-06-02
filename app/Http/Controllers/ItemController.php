@@ -92,6 +92,43 @@ class ItemController extends Controller
         return view($this->viewPath . 'show', $response);
     }
 
+    /**
+     * 批量更新界面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function batchEdit()
+    {
+        $item_ids = request()->input("item_ids");
+        $arr = explode(',', $item_ids);
+        $skus = $this->model->whereIn("id",$arr)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'skus' => $skus,
+            'item_ids'=>$item_ids,
+        ];
+        return view($this->viewPath . 'batchEdit', $response);
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function batchUpdate()
+    {
+        $item_ids = request()->input("item_ids");
+        $arr = explode(',', $item_ids);
+        $skus = $this->model->whereIn("id",$arr)->get();
+        $data = request()->all();
+        foreach($skus as $itemModel){
+            $itemModel->update($data);
+        }       
+        return redirect($this->mainIndex);
+    }
+
 
     public function getImage()
     {

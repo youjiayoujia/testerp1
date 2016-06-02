@@ -83,6 +83,9 @@
             <div class="col-lg-3">
                 <strong>辅供应商sku</strong>:{{ $model->second_supplier_sku }}
             </div>
+            <div class="col-lg-3">
+                <strong>仓库</strong>: {{ $warehouse->name }}
+            </div>
         </div>
     </div>
 
@@ -134,10 +137,24 @@
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
+                <strong>采购负责人</strong>: {{ $model->purchase_adminer }}
+            </div>
+            <div class="col-lg-3">
                 <strong>上传人</strong>: {{ $model->upload_user }}
             </div>
             <div class="col-lg-3">
                 <strong>备注</strong>: {{ $model->remark }}
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>url1</strong>: {{ $model->url1 }}
+            </div>
+            <div class="col-lg-3">
+                <strong>url2</strong>: {{ $model->url2 }}
+            </div>
+            <div class="col-lg-3">
+                <strong>url3</strong>: {{ $model->url3 }}
             </div>
         </div>
     </div>

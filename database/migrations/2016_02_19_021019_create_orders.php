@@ -40,6 +40,7 @@ class CreateOrders extends Migration
                     'RESUME'
                 ])->default('NORMAL')->comment('售后状态');
             $table->double('amount', 15, 2)->comment('总金额');
+            $table->string('gross_margin')->comment('预测毛利率')->nullable()->defalut(NULL);
             $table->double('amount_product', 15, 2)->comment('产品金额');
             $table->double('amount_shipping', 15, 2)->comment('运费');
             $table->double('amount_coupon', 15, 2)->comment('折扣金额');
@@ -77,10 +78,10 @@ class CreateOrders extends Migration
             $table->string('billing_country')->comment('账单国家/地区')->nullable()->default(NULL);
             $table->string('billing_zipcode')->comment('账单邮编')->nullable()->default(NULL);
             $table->string('billing_phone')->comment('账单电话')->nullable()->default(NULL);
-            $table->string('refund')->comment('退款方式')->nullable()->default(NULL);
-            $table->string('refund_currency')->comment('退款币种')->nullable()->default(NULL);
-            $table->string('refund_account')->comment('客户账户')->nullable()->default(NULL);
-            $table->string('refund_amount')->comment('退款金额')->nullable()->default(NULL);
+            $table->enum('withdraw',
+                [
+                    '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
+                ])->comment('撤单原因')->nullable()->default(NULL);
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->integer('priority')->comment('优先级')->nullable()->default(0);
             $table->integer('package_times')->comment('打包次数')->nullable()->default(0);
@@ -88,7 +89,7 @@ class CreateOrders extends Migration
             $table->integer('split_quantity')->comment('被拆分数量')->nullable()->default(0);
             $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);
             $table->enum('blacklist', ['0', '1'])->comment('黑名单订单')->nullable()->default('1');
-            $table->date('refund_time')->comment('退款时间')->nullable()->default(NULL);
+            $table->double('platform', 15, 2)->comment('平台费')->nullable()->default(0);
             $table->date('payment_date')->comment('支付时间');
             $table->date('affair_time')->comment('做账时间')->nullable()->default(NULL);
             $table->date('create_time')->comment('渠道创建时间');

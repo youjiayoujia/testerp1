@@ -109,6 +109,21 @@
             <input class="form-control" id="created_by" placeholder="创建人" name='created_by' value="{{ old('created_by') }}" readonly>
         </div>
     </div>
+
+    <div class='row'>
+        <div class="form-group col-lg-4">
+            <label for="url1">URL1</label>
+            <input class="form-control" id="url1" placeholder="URL" name='url1' value="{{ old('url1') }}">
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="url2">URL2</label>
+            <input class="form-control" id="url2" placeholder="URL" name='url2' value="{{ old('url2') }}">
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="url3">URL3</label>
+            <input class="form-control" id="url3" placeholder="URL" name='url3' value="{{ old('url3') }}">
+        </div>
+    </div>
 @stop
 @section('pageJs')
 <link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">

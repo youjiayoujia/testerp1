@@ -15,7 +15,7 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
     ID</th>
     <th>sku</th>
-    <th>产品图片</th>
+    <th>中文名</th>
     <th>供应商</th>
     <th>采购去向</th>
     <th>订单需求</th>
@@ -41,11 +41,7 @@
             {{ $requireItem->id }}</td>
             <td>{{ $requireItem->sku}}</td>   
             <td>
-             @if($requireItem->item->product->default_image>0)
-             <img src="{{$requireItem->item->product->image->src}}" height="50px"/>
-            @else
-           该图片不存在
-            @endif
+            {{$requireItem->item->c_name}}
             </td>
             <td>{{$requireItem->item->supplier->name}}</td>
             <td>{{ $requireItem->warehouse->name}}</td>

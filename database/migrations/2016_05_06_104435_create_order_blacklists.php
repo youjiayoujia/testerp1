@@ -14,10 +14,19 @@ class CreateOrderBlacklists extends Migration
     {
         Schema::create('order_blacklists', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('channel_id')->comment('平台');
+            $table->string('ordernum')->comment('订单号');
             $table->string('name')->comment('收货人姓名');
             $table->string('email')->comment('邮箱');
             $table->string('zipcode')->comment('收货人邮编');
-            $table->enum('whitelist', ['0', '1'])->comment('纳入白名单');
+            $table->enum('type',
+                [
+                    'CONFIRMED', 'SUSPECTED', 'WHITE'
+                ])->comment('类型')->default('SUSPECTED');
+            $table->text('remark')->comment('备注')->nullable()->default(NULL);
+            $table->integer('total_order')->comment('订单总数');
+            $table->integer('refund_order')->comment('退款订单数');
+            $table->string('refund_rate')->comment('退款率');
             $table->timestamps();
             $table->softDeletes();
         });

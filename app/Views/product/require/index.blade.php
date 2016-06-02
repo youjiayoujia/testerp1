@@ -65,6 +65,17 @@
 @stop
 @section('tableToolButtons')
 <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 查询处理状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ DataList::filtersEncode(['status','=','0']) }}">未处理</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status','=','1']) }}">未找到</a></li>
+            <li><a href="{{ DataList::filtersEncode(['status','=','2']) }}">已找到</a></li>
+        </ul>
+</div>  
+<div class="btn-group" role="group">
     <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="glyphicon glyphicon-filter"></i> 批量处理
         <span class="caret"></span>
@@ -109,7 +120,7 @@
             status = $(this).data('status');
             buf = new Array();
             i = 0;
-            $.each($('.select_single'), function(){
+            $.each($('.select_single:checked'), function(){
                 buf[i] = $(this).parent().next().text();
                 i++;
             });

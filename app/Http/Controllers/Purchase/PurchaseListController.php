@@ -21,7 +21,7 @@ class PurchaseListController extends Controller
 {
 
     public function __construct(PurchaseItemModel $purchaseList)
-    {
+    {	
         $this->model = $purchaseList;
         $this->mainIndex = route('purchaseList.index');
         $this->mainTitle = '采购对单';
@@ -33,8 +33,11 @@ class PurchaseListController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','desc')),
+            'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','asc')),
         ];
+		foreach($response['data'] as $key=>$vo){
+			$response['data'][$key]['position_num']=PositionModel::where('warehouse_id',$vo->warehouse_id)->count();			
+			}
         return view($this->viewPath . 'index', $response);
     }
 
@@ -45,7 +48,7 @@ class PurchaseListController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	public function examinePurchaseItem()
-	{
+	{ 
 		$purcahse_active=explode(',',request()->get('purcahse_active'));
 		foreach($purcahse_active as $key=>$value){
 			$purcahse=explode('+',$value);
@@ -55,8 +58,8 @@ class PurchaseListController extends Controller
 				$arrayItems->update(['active_status'=>1,'active'=>$purcahse[1]]);	
 			}
 			if($purcahse[1]==0 && $arrayItems->costExamineStatus ==2){
-			$arrayItems->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
 			$this->generateBarCode($arrayItems->id);
+			$this->model->where('id',$purcahse[0])->where('stock_id','>',0)->update(['status'=>2,'arrival_num'=>$arrayItems->purchase_num,'lack_num'=>0,'arrival_time'=>date('Y-m-d h:i:s',time())]);
 			$num=$this->model->where('purchase_order_id',$arrayItems->purchase_order_id)->where('status','<',2)->count();
 			$purchaseOrder=PurchaseOrderModel::find($arrayItems->purchase_order_id);
 			if($num==0){
@@ -90,7 +93,7 @@ class PurchaseListController extends Controller
 				$position=PositionModel::where('warehouse_id',$model->warehouse_id)->get();
 				$position_num=PositionModel::where('warehouse_id',$model->warehouse_id)->count();
 				if($position_num == 0){
-					return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
+					continue;
 					}
 					foreach($position as $key=>$v){
 						$WarehousePositionIds[$key]=$v->id;
@@ -147,7 +150,30 @@ class PurchaseListController extends Controller
 		$model->update(['post_coding'=>$post_coding]);
 		return 1;
 		}	
-
+/**
+     * ajax采购入库
+     *
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */	
+	public function changePurchaseItemStorageQty(){
+		$storage_qty=request()->get('storage_qty');
+		$purchase_id=request()->get('purchase_id');
+		$model=$this->model->find($purchase_id);
+		$model->update(['storage_qty'=>$storage_qty]);
+		if($storage_qty>0){
+			$model->update(['status'=>3]);
+			PurchaseOrder::find($model->purchase_order_id)->update(['status',3]);
+		}
+		if($model->purchase_num ==$storage_qty){
+			$model->update(['status'=>4]);
+			}
+			$num=$this->model->where('purchase_order_id',$model->purchase_order_id)->where('status','<>',4)->count();
+			if($num ==0){
+			PurchaseOrder::find($model->purchase_order_id)->update(['status',4]);
+			}
+		return 1;
+		}
 }
 
 

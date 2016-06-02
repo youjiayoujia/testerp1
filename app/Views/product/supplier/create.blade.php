@@ -40,9 +40,35 @@
                     <input type='radio' name='type' value='2' {{ old('type') ? (old('type') == '2' ? 'checked' : '') : '' }}>做货
                 </label>
             </div>
-        </div>
+        </div>	
     </div>
     <div class="row">
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>采购周期</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="purchase_time" placeholder="采购周期" name='purchase_time' value="{{ old('purchase_time') }}">
+        </div>
+       <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>开户行</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input type='text' class="form-control" id="bank_account" placeholder="开户行" name='bank_account' value="{{ old('bank_account') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>银行卡号</label> 
+            <input type='text' class="form-control" id="bank_code" placeholder="银行卡号" name='bank_code' value="{{ old('bank_code') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="name" class='control-label'>支付方式</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+           <select name='pay_type' class='form-control'>
+            @foreach(config('product.product_supplier.pay_type') as $key=>$pay_type)
+                <option value="{{$key}}" > {{$pay_type}} </option>
+            @endforeach
+            </select>
+        </div>
+    </div>　
+    <div class="row">
+   		<div class="form-group col-lg-3" id="update_examine" > 
+            <label for="url">上传审核资料</label>
+            <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications' >
+        </div>
         <div class="form-group col-lg-3">
             <label for="url">供货商网址</label>
             <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') }}" {{ old('type') ? old('type') != '1' ? 'readonly' : '' : 'readonly' }}>
@@ -63,7 +89,11 @@
     <div class="row">
         <div class="form-group col-lg-4">
             <label for="purchase_id">采购员</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="purchase_id" placeholder="采购者id" name='purchase_id' value="{{ old('purchase_id') }}">
+            <select name='purchase_id' class='form-control'>
+            @foreach($users as $user)
+            <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+            </select>
         </div>
         <div class="form-group col-lg-4">
             <label for="level">供货商等级</label>
@@ -77,7 +107,7 @@
             <label name='created_by' class='control-group'>
                 创建人
             </label>
-            <input class='form-control' type='text' value='1' name='created_by' id = 'created_by' readonly/>
+            <input class='form-control' type='text' value='1' name='created_by' readonly/>
        </div>
    </div>
 @stop
@@ -94,9 +124,15 @@
             if($(this).find(':radio:checked').val() != '1') {
                 $(this).parent().parent().next().find('.url').val('');
                 $(this).parent().parent().next().find('.url').attr('readonly', true);
+				if($(this).find(':radio:checked').val() == 0){
+					$('#update_examine').show();
+				}else{
+					$('#update_examine').hide();
+					}
             }
             else {
                 $(this).parent().parent().next().find('.url').attr('readonly', false);
+				$('#update_examine').hide();
             }
         });
     });

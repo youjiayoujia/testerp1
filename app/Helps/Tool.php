@@ -65,15 +65,11 @@ class Tool
      * 2015-12-18 10:43:21 YJ
      * @return str
      */
-    public function createSku()
+    public function createSku($code,$code_num)
     {
-        $str = null;
-        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        $max = strlen($strPol) - 1;
-        for ($i = 0; $i < 5; $i++) {
-            $str .= $strPol[rand(0, $max)];
-        }
-        return $str;
+        $spu = $code.sprintf("%05d", $code_num+1);
+        
+        return $spu;
 
     }
 
@@ -110,5 +106,17 @@ class Tool
         if ($type == true) {
             exit;
         }
+    }
+
+    public function curl($url)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return $response;
     }
 }

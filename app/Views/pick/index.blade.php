@@ -6,6 +6,9 @@
     <th>物流</th>
     <th>状态</th>
     <th>拣货人</th>
+    <th>拣货时间</th>
+    <th>包装人</th>
+    <th>包装时间</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
 @stop
@@ -18,6 +21,9 @@
             <td>{{ $pickList->logistic ? $pickList->logistic->logistics_type : '混合物流'}}</td>
             <td>{{ $pickList->status_name }}</td>
             <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
+            <td>{{ $pickList->pick_at }}</td>
+            <td>{{ $pickList->packByName ? $pickList->packByName->name : ''}}</td>
+            <td>{{ $pickList->pack_at }}</td>
             <td>{{ $pickList->created_at }}</td>
             <td>
                 <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs">

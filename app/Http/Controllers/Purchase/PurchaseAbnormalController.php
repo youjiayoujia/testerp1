@@ -24,7 +24,7 @@ class PurchaseAbnormalController extends Controller
     {
         $this->model = $purchaseItem;
         $this->mainIndex = route('purchaseAbnormal.index');
-        $this->mainTitle = '异常采购需求';
+        $this->mainTitle = '异常采购条目';
 		$this->viewPath = 'purchase.purchaseAbnormal.';
     }
     
@@ -81,10 +81,11 @@ class PurchaseAbnormalController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+		
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'secondSupplier'=>SupplierModel::find($model->item->product->second_supplier_id),
+			'secondSupplier'=>SupplierModel::find($model->item->second_supplier_id),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -110,6 +111,9 @@ class PurchaseAbnormalController extends Controller
 				}
 		}
         $model->update($data);
+		if($model->active==1 && $data['active_status']==2){
+			$this->model->destroy($id);
+			}
         return redirect($this->mainIndex);
     }
 

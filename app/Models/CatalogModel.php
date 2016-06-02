@@ -14,17 +14,17 @@ class CatalogModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name','c_name'];
+    protected $fillable = ['name','c_name','code'];
 
     public $searchFields = ['name','c_name'];
 
     public $rules = [
         'create' => ['name' => 'required|unique:catalogs,name',
                      'c_name' => 'required|unique:catalogs,name',
-                     'sets.0.name' => 'required',
-                     'sets.0.value.name.0.name' => 'required',
-                     'variations.0.name' => 'required',
-                     'variations.0.value.name.0.name' => 'required',
+                     ////'sets.0.name' => 'required',
+                     //'sets.0.value.name.0.name' => 'required',
+                     //'variations.0.name' => 'required',
+                     //'variations.0.value.name.0.name' => 'required',
                     ],
         'update' => ['name' => 'required|unique:catalogs,name,{id}','c_name' => 'required|unique:catalogs,c_name,{id}',]
     ];
@@ -51,14 +51,28 @@ class CatalogModel extends BaseModel
         return $name;
     }
 
+    public function channels()
+    {
+        return $this->belongsToMany('App\Models\ChannelModel','catalog_channels','catalog_id','channel_id')->withPivot('rate','flat_rate')->withTimestamps();
+    }
+
     public function createCatalog($data,$extra=[])
     {
         DB::beginTransaction();
         $catalog = $this->create($data);
+        foreach($data['channel']['name'] as $channel_id=>$rate){
+            $arr['channel_id'] = $channel_id;
+            $catalog->channels()->attach($arr,['rate'=>$rate,'flat_rate'=>$data['channel']['flat'][$channel_id]]);
+        }
         //属性名属性值添加
         if ($extra) {
             foreach ($extra as $model => $property) {
-                if(count($property)==0)continue;
+                if(count($property)==0){
+                    if($model=='features')continue;
+                    $property = [];
+                    $property[$model]['name'] = "Default";
+                    $property[$model]['value']['name'][0]['name'] = "Default";
+                }
                 try {
                     foreach ($property as $modelData) {
                         $modelObj = $catalog->$model()->create($modelData);
@@ -83,11 +97,19 @@ class CatalogModel extends BaseModel
     {
         DB::beginTransaction();
         //更新分类信息
-        $this->update($data);
+        $catalog = $this->update($data);
+        $arr=[];
+        foreach($data['channel']['name'] as $channel_id=>$rate){
+            $brr['rate'] = $rate;
+            $brr['flat_rate'] = $data['channel']['flat'][$channel_id];
+            $arr[$channel_id] = $brr;         
+        }
+        $this->channels()->sync($arr);
         //更新分类属性
         if($extra){
             try {
                     foreach ($extra as $model=>$property) {
+                        if($property=='')continue;
                         foreach($property as $valueModel){
                             if(array_key_exists("id",$valueModel)){
                                 //更新属性名属性值

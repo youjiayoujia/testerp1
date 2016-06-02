@@ -109,15 +109,37 @@
     <div class='row'>
         <div class="form-group col-lg-4">
             <label for="needer_id">需求渠道</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="needer_id" placeholder="需求渠道" name='needer_id' value="{{ old('needer_id') ? old('needer_id') : $model->needer_id }}">
+            <select  class="form-control" name="needer_id" id="needer_id">
+                @foreach($channel as $_channel)
+                    <option value="{{ $_channel->id}}" {{ $_channel->id == $model->needer_id ? 'selected' : '' }} >{{$_channel->name}}</option>
+                @endforeach
+            </select>
         </div>
         <div class="form-group col-lg-4">
             <label for="needer_shop_id">需求帐号</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="needer_shop_id" placeholder="需求帐号" name='needer_shop_id' value="{{ old('needer_shop_id') ? old('needer_shop_id') : $model->needer_shop_id}}">
+            <select  class="form-control" name="needer_shop_id" id="needer_shop_id">
+                @foreach($channel_account as $_channelAccount)
+                    <option value="{{ $_channelAccount->id}}" {{ $_channelAccount->id == $model->needer_shop_id ? 'selected' : '' }} >{{$_channelAccount->account}}</option>
+                @endforeach
+            </select>
         </div>
         <div class='form-group col-lg-4'>
             <label for='created_by'>创建人</label>
             <input type='text' class='form-control' id='created_by' placeholder='创建人' name='created_by' value="{{ old('created_by') ? old('craeted_by') : $model->created_by }}" readonly>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-lg-4">
+            <label for="url1" class='control-label'>URL1</label>
+            <input type='text' class="form-control" id="url1" placeholder="URL" name='url1' value="{{ old('url1') ? old('url1') : $model->url1}}">
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="url2" class='control-label'>URL2</label>
+            <input type='text' class="form-control" id="url2" placeholder="URL" name='url2' value="{{ old('url2') ? old('url2') : $model->url2 }}">
+        </div>
+        <div class="form-group col-lg-4">
+            <label for="url3" class='control-label'>URL3</label>
+            <input type='text' class="form-control" id="url3" placeholder="URL" name='url3' value="{{ old('url3') ? old('url3') : $model->url3 }}">
         </div>
     </div>
 @stop
@@ -128,5 +150,23 @@
         buf[1] = "{{ old('city') ? old('city') : $model->city }}";
         init(buf[0],buf[1]);
         $('#expected_date').cxCalendar();
+
+        $("#needer_id").change(function(){
+            var url = "{{route('getAccountUser')}}";
+            var channel_id = $(this).val();
+            $.ajax({
+                    url:url,
+                    data:{channel_id:channel_id},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        html="";
+                        for(i=0;i<result.length;i++){
+                            html+= "<option value="+result[i].id+">"+result[i].account+"</option>"
+                        }
+                        $("#needer_shop_id").html(html);
+                    }                  
+            })
+        })
     };
 </script>

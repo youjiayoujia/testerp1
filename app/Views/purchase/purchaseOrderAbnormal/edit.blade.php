@@ -45,11 +45,9 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>采购类型</td> 
-            <td>SKU</td> 
+            <td>SKU*采购数量</td> 
             <td>样图</td>         
-            <td>状态</td>   
-            <td>所属平台</td>
+            <td>状态</td> 
             <td>操作</td>           
         </tr>
     </thead>
@@ -57,14 +55,8 @@
         @foreach($purchaseItems as $k=>$purchaseItem)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
-            <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
-            </td>
-            <td>{{$purchaseItem->sku}}</td>
+           
+            <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
             <td>
             @if($purchaseItem->item->product->default_image>0) 
             <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
@@ -104,17 +96,13 @@
                 @endforeach  
             @endif      
              </td>
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>      
+              
 			<td>
             @if($purchaseItem->active ==1)
             <a href="/purchaseItem/cancelThisItem/{{$purchaseItem->id}}" class="btn btn-info btn-xs"> 取消该条目</a>  
-            @elseif($purchaseItem->active > 1)
+            @elseif($purchaseItem->active == 2)
+            报等时间：{{$purchaseItem->wait_time}}&nbsp;报等备注：{{$purchaseItem->remark}}
+            @elseif($purchaseItem->active >2)
              @foreach(config('purchase.purchaseItem.active') as $key=>$v)
              	@if($key ==$purchaseItem->active)
             	{{$v}}

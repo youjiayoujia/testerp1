@@ -18,16 +18,16 @@
         <tr>
        		
             <td>{{ $purchaseOrder->id }}</td> 
-            @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
+            <td>@foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
-            	<td>{{ $statu }}</td>
+            	{{ $statu }}
                 @endif
-            @endforeach 
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
+            @endforeach </td>
+           <td> @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
             	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
+            	{{ $statu }}
                 @endif
-            @endforeach     
+            @endforeach   </td>  
     		<td>
             @if($purchaseOrder->supplier_id >0)
             	{{ $purchaseOrder->supplier->name}}
@@ -40,10 +40,10 @@
                 @endif
             @endforeach
                     
-            <td>{{ $purchaseOrder->total_purchase_cost}}+{{ $purchaseOrder->total_postage}}</td>
+            <td>{{ $purchaseOrder->total_purchase_cost}}+{{ $purchaseOrder->sumPostage}}</td>
             <td>
                 <a href="{{ route('closePurchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil"> 去结算
+                    <span class="glyphicon glyphicon-pencil">@if($purchaseOrder->close_status == 0) 结算 @else 查看 @endif
                 </a>
             </td>
         </tr>

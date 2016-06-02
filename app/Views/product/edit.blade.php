@@ -104,6 +104,10 @@
                 @endforeach
             </select>
         </div> 
+        <div class="form-group col-md-3">
+            <label for="color">主供应商货号</label>
+            <input class="form-control" id="supplier_sku" placeholder="主供应商货号" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $product->supplier_sku }}">
+        </div>
     </div>
 
     <div class='row'>  
@@ -114,6 +118,10 @@
                     <option value="{{ $supplier->id}}" {{ $supplier->id == $product->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
                 @endforeach
             </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">辅供应商货号</label>
+            <input class="form-control" id="second_supplier_sku" placeholder="主供应商货号" name='second_supplier_sku' value="{{ old('second_supplier_sku') ?  old('second_supplier_sku') : $product->second_supplier_sku }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
@@ -127,12 +135,31 @@
             <label for="color">采购物流费(RMB)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $product->purchase_carriage }}">
         </div>
-        <div class="form-group col-md-1">
-            <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $product->product_size }}">
+        <div class="form-group col-md-3">
+            <label for="color">采购天数</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="purchase_day" placeholder="采购天数" name='purchase_day' value="{{ old('purchase_day') ?  old('purchase_day') : $product->purchase_day }}">
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-md-3">
+            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select  class="form-control" name="warehouse_id">
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ $product->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
+                @endforeach
+            </select>
         </div>
         <div class="form-group col-md-1">
-            <label for="color">产品包装尺寸(m³)</label>
+            <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+
+            <select id="supplier_id" class="form-control" name="product_size">     
+                <option value="大" {{ $product->product_size == '大' ? 'selected' : '' }}>大</option>
+                <option value="中" {{ $product->product_size == '中' ? 'selected' : '' }}>中</option>
+                <option value="小" {{ $product->product_size == '小' ? 'selected' : '' }}>小</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="color">产品包装尺寸（cm）(长*宽*高)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长*宽*高)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $product->package_size }}">
         </div>
         <div class="form-group col-md-1">
@@ -142,6 +169,24 @@
         <div class="form-group col-md-1">
             <label for="color">更新人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="upload_user" placeholder="上传人" name='upload_user' value="{{ old('upload_user') ?  old('upload_user') : $product->upload_user }}">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="color">采购负责人</label>
+            <input class="form-control" id="purchase_adminer" placeholder="采购负责人" name='purchase_adminer' value="{{ old('purchase_adminer') ?  old('purchase_adminer') : $product->purchase_adminer }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">url1</label>
+            <input class="form-control" id="url1" placeholder="url" name='url1' value="{{ old('url1') ?  old('url1') : $product->url1 }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="size">url2</label>
+            <input class="form-control" id="url2" placeholder="url" name='url2' value="{{old('url2') ?  old('url2') : $product->url2 }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">url3</label>
+            <input class="form-control" id="url3" placeholder="url" name='url3' value="{{ old('url3') ?  old('url3') : $product->url3 }}">
         </div>
     </div>
     <div class='row'>
@@ -162,6 +207,10 @@
             @endforeach
         </div>
         
+        <div class="form-group col-md-3">
+            <label for="color">质检标准</label>
+            <input class="form-control" id="quality_standard" placeholder="质检标准" name='quality_standard' value="{{ old('quality_standard') ?  old('quality_standard') : $product->quality_standard }}">
+        </div>
         <div class="form-group col-md-3">
             <label for="color">尺寸描述</label>
             <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') ?  old('size_description') : $product->size_description }}">

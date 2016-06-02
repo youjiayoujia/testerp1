@@ -7,14 +7,7 @@
             <div class="form-group col-lg-4">
                 <strong>ID</strong>: {{ $model->id }}
             </div>
-             <div class="form-group col-lg-4">
-                <strong>采购类型</strong>:
-               @foreach(config('purchase.purchaseItem.type') as $k=>$v)
-            	@if($model->type == $k)
-            		{{$v}}
-                @endif
-            	@endforeach
-            </div>
+            
             <div class="form-group col-lg-4">
                 <strong>仓库</strong>:
               {{$model->warehouse->name}}
@@ -70,7 +63,7 @@
         <tr>
             <td>ID</td>
             <td>入库数量</td> 
-            <td>入库人</td> 
+            <td>入库备注</td> 
             <td>入库时间</td>          
         </tr>
     </thead>
@@ -78,8 +71,8 @@
     @foreach($storageLogs as $k=>$storageLog)
      <tr>
         <td>{{$storageLog->id}}</td> 
-        <td>{{$storageLog->storage_quantity}}</td> 
-        <td>{{$storageLog->user_id}}</td> 
+        <td>{{$storageLog->quantity}}</td> 
+        <td>{{$storageLog->remark}}</td> 
         <td>{{$storageLog->created_at}}</td>          
      </tr>
      @endforeach

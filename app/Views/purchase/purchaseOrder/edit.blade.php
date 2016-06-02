@@ -13,7 +13,7 @@
             </div>
              <div class="form-group col-lg-4">
                 <strong>订单成本:
-                物流费{{$purchaseSumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{$purchaseSumPostage + $model->total_purchase_cost}}</strong>
+                物流费{{$purchaseSumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{$purchaseSumPostage + $purchaseSumPostage}}</strong>
             </div>
              
             </div>
@@ -52,13 +52,9 @@
         
             <div class="form-group col-lg-4">
             	<strong>导出该订单</strong>:
-                @if($model->supplier->type==1)
-                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>
-                @else
+               
                 <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
-                </a>
-                @endif     
+                </a>     
             </div> 
              <div class="form-group col-lg-4">
             	<strong>取消采购单</strong>:
@@ -68,26 +64,37 @@
            <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
-                <input class="form-control" type="text" name='assigner' value='{{$model->assigner}}'/>		
+                <select name="assigner">
+                @foreach($model->users as $k=>$user)
+                <option value="{{$user->id}}" {{$model->assigner == $k ? 'selected' : ''}}>{{$user->name}}</option>
+                @endforeach
+                </select>		
             </div>
-             <div class="form-group col-lg-4">
-                <strong>批量输入采购单:(在此输入物流单号则本页面采购条目列表的物流号全部跟新为输入的物流号)</strong>
-                <input class="form-control" type="text" id="batch_post_coding" onChange="batchPostCoding()" value=''/>		
-            </div>
+            
             <div class="form-group col-lg-4">
-            	<strong>采购单结算</strong>:
-                 @if($model->close_status ==0 && $model->status >1)
-                	<a href="{{ route('closePurchaseOrder.edit', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 结算该采购单
+            	<strong>为该采购单添加新采购条目</strong>:
+                	<a href="/purchaseOrder/addItem/{{$model->id}}" class="btn btn-info btn-xs"> 添加
                 </a>
-                @else
-                @if($model->close_status ==1)
-                已结算
-                @else
-                未结算
-                @endif 
-                @endif  
+               
             </div>
-                   
+            
+            <div class="form-group col-lg-4">
+            	<strong>审核该采购单</strong>:
+                @if($model->examineStatus == 0 || $model->examineStatus == 2)
+                {{$model->examineStatus == 0 ? '未审核':'二次审核'}}
+                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核通过
+                </a> 
+                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/3" class="btn btn-info btn-xs"> 审核不通过
+                </a>
+                @endif
+                @if($model->examineStatus == 1)
+                审核通过
+                @endif
+                @if($model->examineStatus == 3)
+                审核不通过
+                @endif
+            </div>
+           
       </div>
 
      <div class="panel panel-default">
@@ -101,16 +108,15 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td>采购类型</td> 
+            <td></td> 
             <td>model</td>
             <td>SKU*采购数量</td> 
             <td>供货商sku</td> 
             <td>样图</td>
             <td>状态</td>
-            <td>物流单号</td>
+            <td>物流单号: <input  type="text" id="batch_post_coding" onChange="batchPostCoding()" value='' /></td>
             <td>采购价格</td>
             <td>采购价格审核</td>
-            <td>所属平台</td>
             <td>购买链接</td> 
             <td>操作</td>           
         </tr>
@@ -121,11 +127,7 @@
         <tr> 
             <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
             <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
+               
             </td>
             <td>{{$purchaseItem->item->product->model}}</td>
             <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
@@ -139,19 +141,31 @@
             </td>
             
             <td>
+            @if($purchaseItem->status ==0)
            	<select name="arr[{{$k}}][status]" >
              @foreach(config('purchase.purchaseItem.status') as $key=>$v)
              	@if($key < 2)
-            	<option value="{{$key}}"  @if($purchaseItem->status == $key) selected = "selected" @endif>{{$v}}</option>
+            	<option value="{{$key}}"  @if(1 == $key) selected = "selected" @endif>{{$v}}</option>
                 @endif
              @endforeach
-            </select>  
+            </select> 
+            @else
+            @foreach(config('purchase.purchaseItem.status') as $key=>$v)
+            	@if($purchaseItem->status == $key) {{$v}} @endif
+             @endforeach
+             <input type="hidden" name="arr[{{$k}}][status]" value="{{$purchaseItem->status}}"/>
+            @endif 
              </td>
             <td>
-            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" id="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
+            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
             </td>
             <td>
+            @if($model->close_status ==0)
               <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+              @else
+              {{$purchaseItem->purchase_cost}}
+              <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+              @endif
  			</td>
             <td>
             @if($purchaseItem->costExamineStatus ==2)
@@ -167,13 +181,7 @@
               @endif
             @endif
             </td>    
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
+           
              <td>
             	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
             </td>  
@@ -187,12 +195,14 @@
                 正常
                 @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
-            @elseif($purchaseItem->active > 1)
-             @foreach(config('purchase.purchaseItem.active') as $key=>$v)
-             	@if($key ==$purchaseItem->active)
-            	{{$v}}
-            	@endif
-             @endforeach
+            @elseif($purchaseItem->active == 2)
+             报等
+             @if($purchaseItem->wait_time)
+             {{$purchaseItem->wait_time}}
+             备注：{{$purchaseItem->wait_remark}}
+            @else
+            <a href="/purchaseOrder/updateWaitTime/{{$purchaseItem->id}}">添加报等时间</a>
+            @endif
             <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
             @else
             <select name="arr[{{$k}}][active]}">
@@ -226,7 +236,6 @@
             <td>物流单号+物流费</td>
             <td>采购价格</td>
             <td>采购价格审核</td>
-            <td>所属平台</td>
             <td>购买链接</td>           
         </tr>
     </thead>
@@ -235,13 +244,7 @@
          @if($purchaseItem->storageStatus > 0)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
-            <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
-            </td>
+           
             <td>{{$purchaseItem->sku}}</td>
             <td>
             @if($purchaseItem->item->product->default_image>0) 
@@ -273,13 +276,7 @@
             	价格审核不通过
             @endif
             </td>    
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
+            
              <td>
             	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
             </td>  
@@ -304,8 +301,9 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
             </div>       
-            <div class='row'>
+           
              @foreach($purchasePostage as $key=>$post)
+              <div class='row'>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control post_coding" id="post[{{$key}}][post_coding]" name='post[{{$key}}][post_coding]' value="{{$post->post_coding}}">
                 </div>
@@ -314,13 +312,13 @@
                     <input type='text' class="form-control postage" id="post[{{$key}}][postage]" placeholder="物流费" name='post[{{$key}}][postage]' value="{{$post->postage}}">
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-                 @endforeach
+                </div>
+                 @endforeach 
                  	@if($current>0)
                     <input type="hidden" id="currrent" value="{{$current}}">
                     @else
                     <input type="hidden" id="currrent" value="1">
-                    @endif
-            </div>
+                    @endif    
         </div>
         <div class="panel-footer">
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
@@ -331,8 +329,8 @@
     <script type='text/javascript'>
 	//批量输入采购单号
 	function batchPostCoding(){
-		 var batch_post_coding=$('#batch_post_coding').val();
-		 $("#itemPostCoding").val(batch_post_coding);
+		 var batch_post_coding=$('#batch_post_coding').val(); 
+			$(".itemPostCoding").val(batch_post_coding);
 		}
 		//新增物流号对应物流费
         $(document).ready(function () {

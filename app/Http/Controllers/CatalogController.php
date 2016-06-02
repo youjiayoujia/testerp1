@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CatalogModel;
+use App\Models\ChannelModel;
 
 class CatalogController extends Controller
 {
@@ -18,6 +19,21 @@ class CatalogController extends Controller
         $this->mainIndex = route('catalog.index');
         $this->mainTitle = '品类Category';
         $this->viewPath = 'catalog.';
+    }
+
+    /**
+     * 新建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $channels = ChannelModel::all();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'channels' =>$channels,
+        ];
+        return view($this->viewPath . 'create', $response);
     }
 
     /**
@@ -36,8 +52,10 @@ class CatalogController extends Controller
         $extra['features'] = request()->input('features');
         //创建品类
         $this->model->createCatalog($data,$extra);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
+
+
 
     /**
      * 更新品类
@@ -61,7 +79,7 @@ class CatalogController extends Controller
         $extra['features'] = request()->input('features');
         //更新品类信息
         $catalogModel->updateCatalog($data,$extra);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -74,7 +92,7 @@ class CatalogController extends Controller
     {
         $catalogModel = $this->model->find($id);
         $catalogModel->destoryCatalog();
-        return redirect(route('catalog.index'));
+        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '删除成功.'));
     }
 
     /**

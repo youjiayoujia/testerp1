@@ -10,6 +10,10 @@
         <label for="name">分类名称英文</label>
         <input class="form-control" id="name" placeholder="名称" name='name' value="{{$model->name}}">
     </div>
+    <div class="form-group">
+        <label for="name">前缀</label>
+        <input class="form-control" id="code" placeholder="前缀" name='code' value="{{$model->code}}">
+    </div>
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>
         <div class="panel-body setfirst">
@@ -97,6 +101,22 @@
             <div class="create" id="featureadd"><i class="glyphicon glyphicon-plus"></i></div>
         </div>
     </div>
+    @foreach($model->channels as $channel)
+        <div class="form-group">
+            <div class="col-md-4">
+                <label for="size">渠道</label>
+                <input class="form-control" placeholder="渠道" disabled="disabled"  value="{{$channel->name}}">
+            </div>
+            <div class="col-md-4">
+                <label for="size">固定费</label>
+                <input class="form-control" placeholder="固定费" name='channel[flat][{{$channel->pivot->channel_id}}]' value="{{$channel->pivot->flat_rate}}">
+            </div>
+            <div class="col-md-4">
+                <label for="size">费率</label>
+                <input class="form-control" placeholder="费率" name='channel[name][{{$channel->pivot->channel_id}}]' value="{{$channel->pivot->rate}}">
+            </div>
+        </div>
+    @endforeach
     <input type='hidden' value='{{count($model->sets)-1}}' id='setnum' name="setnum" >
     <input type='hidden' value='{{count($model->variations)-1}}' id='attrnum' name="attrnum" >
     <input type='hidden' value='{{count($model->features)-1}}' id='featurenum' name="featurenum" >

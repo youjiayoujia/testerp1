@@ -1,5 +1,6 @@
 <?php
 namespace App\Models\Purchase;
+use Excel;
 use App\Base\BaseModel;
 use App\Models\ProductModel;
 use App\Models\Product\SupplierModel;
@@ -8,6 +9,7 @@ use App\Models\StockModel;
 use App\Models\Product\ImageModel;
 use App\Models\WarehouseModel;
 use App\Models\Purchase\PurchaseOrderModel;
+use App\Models\Purchase\PurchasePostageModel;
 
 class PurchaseItemModel extends BaseModel
 {
@@ -19,11 +21,7 @@ class PurchaseItemModel extends BaseModel
     protected $table = 'purchase_items';
     public $rules = [
         'create' => [
-            'type' => 'required',
-            'purchase_num' => 'required',
-            'warehouse_id' => 'required',
-            'user_id' => 'required',
-			'sku' => 'required',
+            
         ],
         'update' => [
  			'purchase_num' => 'required',
@@ -36,7 +34,7 @@ class PurchaseItemModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id'];
+    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id','wait_remark','wait_time'];
 	public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku','sku');
@@ -58,18 +56,123 @@ class PurchaseItemModel extends BaseModel
         return $this->belongsTo('App\Models\StockModel', 'stock_id');
     }
 	
-	
-	/*处理异常状态
-	*
-	* @param $data
-    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-	*/
+	 /**
+     * 整体流程处理excel
+     *
+     * @param $file 文件指针
+     *
+     */
+    public function excelProcess($file)
+    {
+        $path = config('setting.excelPath');
+        !file_exists($path . 'excelProcess.xls') or unlink($path . 'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        return $this->excelDataProcess($path . 'excelProcess.xls');
+    }
 
-	public function changActive($data){
-		$purchaseItem=$this->find($data['id']);
-		$purchaseItem->active=$data['active'];
-		$purchaseItem->active_status=$data['active_status'];
-		$purchaseItem->save();
-	}
-		
+    /**
+     * 处理excel数据
+     *
+     * @param $path excel文件路径
+     *
+     */
+    public function excelDataProcess($path)
+    {
+        $fd = fopen($path, 'r');
+        $arr = [];
+        while (!feof($fd)) {
+            $row = fgetcsv($fd);
+            $arr[] = $row;
+        }
+        fclose($fd);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
+        }
+        $arr = $this->transfer_arr($arr);
+        $error[] = $arr;
+        foreach ($arr as $key => $vo) {
+			$model=$this->find($vo['purchase_item_id']);
+			//回传采购价格
+			if($vo['purchase_price']>0){
+				if($vo['purchase_price'] > 0.6*$model->item->purchase_price && $vo['purchase_price'] < 1.3*$model->item->purchase_price){
+						ItemModel::where('sku',$model->sku)->update(['purchase_price'=>$vo['purchase_price']]);
+						$data['purchase_cost']=$vo['purchase_price'];
+						$data['costExamineStatus']=2;
+					}else{
+						$data['purchase_cost']=$vo['purchase_price'];
+					}
+			}
+			
+			$model->update($data);
+        }
+
+        
+    }
+	 /**
+     * 处理excel数据
+     *
+     * @param $path excel文件路径
+     *
+     */
+	
+	 public function postExcelDataProcess($path)
+    {
+        $fd = fopen($path, 'r');
+        $arr = [];
+        while (!feof($fd)) {
+            $row = fgetcsv($fd);
+            $arr[] = $row;
+        }
+        fclose($fd);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
+        }
+        $arr = $this->transfer_arr($arr);
+        $error[] = $arr;
+        foreach ($arr as $key => $vo) {
+			$model=$this->find($vo['purchase_item_id']);
+			//回传物流运单号和运费
+			if($vo['post_coding']){
+				$data['post_coding']=$vo['post_coding'];
+				$postNum=PurchasePostageModel::where('post_coding',$vo['post_coding'])->first();
+				if(count($postNum)==0){
+					$purchasePost['purchase_item_id']=$vo['purchase_item_id'];
+					$purchasePost['purchase_order_id']=$model->purchase_order_id;
+					$purchasePost['post_coding']=$vo['post_coding'];
+					$purchasePost['postage']=$vo['postage'];
+					PurchasePostageModel::create($purchasePost);
+				}else{
+					if($vo['postage'] > 0 && $vo['postage']!=$postNum->postage){
+						PurchasePostageModel::where('post_coding',$vo['post_coding'])->update(['postage'=>$vo['postage']]);
+					}
+				}
+				
+				}
+			$model->update($data);
+        }
+
+      
+    }
+	/**
+     * 将arr转换成相应的格式
+     *
+     * @param $arr type:array
+     * @return array
+     *
+     */
+    public function transfer_arr($arr)
+    {
+        $buf = [];
+        foreach ($arr as $key => $value) {
+            $tmp = [];
+            if ($key != 0) {
+                foreach ($value as $k => $v) {
+                    $tmp[$arr[0][$k]] = $v;
+                }
+                $buf[] = $tmp;
+            }
+        }
+
+        return $buf;
+    }	
 }

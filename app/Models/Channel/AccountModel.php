@@ -34,15 +34,41 @@ class AccountModel extends BaseModel
         'operator_id',
         'customer_service_id',
         'service_email',
-        'warehouse_id',
         'is_merge_package',
         'is_thanks',
         'is_picking_list',
         'is_rand_sku',
         'image_domain',
         'is_clearance',
-        'tracking_config',
         'order_prefix',
+        'amazon_api_url',
+        'amazon_marketplace_id',
+        'amazon_seller_id',
+        'amazon_accesskey_id',
+        'amazon_accesskey_secret',
+        'aliexpress_member_id',
+        'aliexpress_appkey',
+        'aliexpress_appsecret',
+        'aliexpress_returnurl',
+        'aliexpress_refresh_token',
+        'aliexpress_access_token',
+        'aliexpress_access_token_date',
+        'wish_publish_code',
+        'wish_client_id',
+        'wish_client_secret',
+        'wish_redirect_uri',
+        'wish_refresh_token',
+        'wish_access_token',
+        'wish_expiry_time',
+        'wish_proxy_address',
+        'wish_sku_resolve',
+        'lazada_access_key',
+        'lazada_user_id',
+        'lazada_site',
+        'lazada_currency_type',
+        'lazada_currency_type_cn',
+        'lazada_api_host',
+
     ];
 
     public $searchFields = ['account', 'alias'];
@@ -52,19 +78,15 @@ class AccountModel extends BaseModel
             'account' => 'required',
             'alias' => 'required',
             'channel_id' => 'required',
-            'country_id' => 'required',
             'operator_id' => 'required',
             'customer_service_id' => 'required',
-            'warehouse_id' => 'required|max:255',
         ],
         'update' => [
             'account' => 'required',
             'alias' => 'required',
             'channel_id' => 'required',
-            'country_id' => 'required',
             'operator_id' => 'required',
             'customer_service_id' => 'required',
-            'warehouse_id' => 'required|max:255',
         ]
     ];
 
@@ -75,7 +97,7 @@ class AccountModel extends BaseModel
 
     public function country()
     {
-        return $this->belongsTo('App\Models\CountryModel', 'country_id', 'id');
+        return $this->belongsTo('App\Models\CountriesModel', 'country_id', 'id');
     }
 
 
@@ -99,6 +121,11 @@ class AccountModel extends BaseModel
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
 
+    }
+
+    public function orders()
+    {
+        return $this->hasMany('App\Models\OrderModel', 'channel_account_id');
     }
 
     public function getMergePackageAttribute()
@@ -129,6 +156,78 @@ class AccountModel extends BaseModel
     public function getAvailableAttribute()
     {
         return $this->is_available ? '是' : '否';
+    }
+
+    public function getApiStatusAttribute()
+    {
+        $status = [];
+        switch ($this->channel->driver) {
+            case 'amazon':
+                $status = ['Unshipped', 'PartiallyShipped'];
+                break;
+            case 'aliexpress':
+                $status = ['WAIT_SELLER_SEND_GOODS'];
+                break;
+            case 'lazada':
+                $status = ['pending'];
+                break;
+            case 'wish':
+                $status = [];
+                break;
+        }
+        return $status;
+    }
+
+    public function getApiConfigAttribute()
+    {
+        $config = [];
+        switch ($this->channel->driver) {
+            case 'amazon':
+                $config = [
+                    'serviceUrl' => $this->amazon_api_url,
+                    'MarketplaceId.Id.1' => $this->amazon_marketplace_id,
+                    'SellerId' => $this->amazon_seller_id,
+                    'AWSAccessKeyId' => $this->amazon_accesskey_id,
+                    'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
+                ];
+                break;
+            case 'aliexpress':
+                $config = [
+                    'appkey' => $this->aliexpress_appkey,
+                    'appsecret' => $this->aliexpress_appsecret,
+                    'returnurl' => $this->aliexpress_returnurl,
+                    'access_token_date' => $this->aliexpress_access_token_date,
+                    'refresh_token' => $this->aliexpress_refresh_token,
+                    'access_token' => $this->aliexpress_access_token,
+                    'aliexpress_member_id' => $this->aliexpress_member_id,
+                ];
+                break;
+            case 'lazada':
+                $config = [
+                    'lazada_account' => $this->lazada_account,
+                    'lazada_access_key' => $this->lazada_access_key,
+                    'lazada_user_id' => $this->lazada_user_id,
+                    'lazada_site' => $this->lazada_site,
+                    'lazada_currency_type' => $this->lazada_currency_type,
+                    'lazada_currency_type_cn' => $this->lazada_currency_type_cn,
+                    'lazada_api_host' => $this->lazada_api_host,
+                ];
+                break;
+            case 'wish':
+                $config = [
+                    'publish_code' => $this->wish_publish_code,
+                    'client_id' => $this->wish_client_id,
+                    'client_secret' => $this->wish_client_secret,
+                    'redirect_uri' => $this->wish_redirect_uri,
+                    'refresh_token' => $this->wish_refresh_token,
+                    'access_token' => $this->wish_access_token,
+                    'expiry_time' => $this->wish_expiry_time,
+                    'proxy_address' => $this->wish_proxy_address,
+                    'sku_resolve' => $this->wish_sku_resolve,
+                ];
+                break;
+        }
+        return $config;
     }
 
     public function createAccount()

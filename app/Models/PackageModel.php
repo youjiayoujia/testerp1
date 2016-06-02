@@ -18,7 +18,46 @@ class PackageModel extends BaseModel
         'update' => [],
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'channel_id',
+        'channel_account_id',
+        'order_id',
+        'warehouse_id',
+        'logistics_id',
+        'picklist_id',
+        'assigner_id',
+        'shipper_id',
+        'type',
+        'status',
+        'cost',
+        'cost1',
+        'weight',
+        'actual_weight',
+        'length',
+        'width',
+        'height',
+        'tracking_no',
+        'tracking_link',
+        'email',
+        'shipping_firstname',
+        'shipping_lastname',
+        'shipping_address',
+        'shipping_address1',
+        'shipping_city',
+        'shipping_state',
+        'shipping_country',
+        'shipping_zipcode',
+        'shipping_phone',
+        'is_auto',
+        'remark',
+        'logistics_assigned_at',
+        'printed_at',
+        'shipped_at',
+        'delivered_at',
+        'created_at',
+        'is_tonanjing',
+        'is_over',
+    ];
 
     public function assigner()
     {
@@ -28,6 +67,11 @@ class PackageModel extends BaseModel
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id');
+    }
+
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
     }
 
     public function order()
@@ -48,7 +92,6 @@ class PackageModel extends BaseModel
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id');
-
     }
 
     public function items()
@@ -68,7 +111,7 @@ class PackageModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('pick.package');
+        $arr = config('package');
         return $arr[$this->status];
     }
 
@@ -77,9 +120,22 @@ class PackageModel extends BaseModel
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
             $packageLimit = $packageItem->item->product->package_limit;
-            $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            if ($packageLimit) {
+                $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
+            }
         }
         return $packageLimits->unique();
+    }
+
+    public function getHasPickAttribute()
+    {
+        $items = $this->items;
+        foreach($items as $item) {
+            if($item->picked_quantity) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -97,6 +153,62 @@ class PackageModel extends BaseModel
             return false;
         }
         return true;
+    }
+
+    public function calculateProfit()
+    {
+        $orderIds = $this->where('status', 'ASSIGNED')->get()->groupBy('order_id');
+        foreach($orderIds as $orderId => $value) {
+            $order = OrderModel::find($orderId);
+            $orderAmount = $this->calculateOrderAmount($order);
+            $orderCosting = $this->calculateOrderCosting($order);
+            if($orderAmount > $orderCosting) {
+                //利润率为负撤销
+                $this->OrderCancle($order);
+            }
+        }
+    }
+
+    public function OrderCancle($order)
+    {
+        $order->update(['status' => 'CANCLE']);
+        $orderItems = $order->orderItems;
+        foreach($orderItems as $orderItem) {
+            $orderItem->update(['is_active' => '1']);
+        }
+        $packages = $order->packages;
+        foreach($packages as $package) {
+            $package->update(['status' => 'CANCLE']);
+            foreach($package->items as $packageItem) {
+                $packageItem->update(['status' => 'CANCLE']);
+                $item = ItemModel::find($packageItem->item_id);
+                $item->in($packageItem->warehouse_position_id, $packageItem->quantity, $packageItem->quantity*$item->cost, 'PACKAGE_CANCLE', $order->ordernum.':'.$packageItem->id);
+            }
+        }
+    }
+
+    public function calculateOrderAmount($order)
+    {
+        $orderItems = $order->orderItems;
+        $sum = 0;
+        foreach($orderItems as $orderItem) {
+            $sum += $orderItem->amount;
+        }
+
+        return $sum;
+    }
+
+    public function calculateOrderCosting($order)
+    {
+        $orderItems = $order->orderItems;
+        $sum = 0;
+        foreach($orderItems as $orderItem)
+        {
+            $item = $orderItem->item;
+            $sum += round($item->cost * $orderItem->quantity, 3);
+        }
+
+        return $sum;
     }
 
     /**
@@ -117,7 +229,8 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where('weight_from', '<=', $weight)->where('weight_to', '>=', $weight)
+            where('weight_from', '<=', $weight)
+                ->where('weight_to', '>=', $weight)
                 ->where('order_amount', '>=', $amount)
                 ->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
@@ -129,23 +242,25 @@ class PackageModel extends BaseModel
                     continue;
                 }
                 //是否有物流限制
-                $limits = explode(",", $rule->logistics->limit);
-                if ($this->shipping_limits->intersect($limits)->count() > 0) {
-                    continue;
+                if ($this->shipping_limits) {
+                    $limits = explode(",", $rule->logistics->limit);
+                    if ($this->shipping_limits->intersect($limits)->count() > 0) {
+                        continue;
+                    }
                 }
-                //物流商下单
+                //物流查询链接
                 $trackingUrl = $rule->logistics->url;
+                $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
                 return $this->update([
                     'status' => 'ASSIGNED',
                     'logistics_id' => $rule->logistics->id,
                     'tracking_link' => $trackingUrl,
-                    'logistics_assigned_at' => date('Y-m-d H:i:s')
+                    'logistics_assigned_at' => date('Y-m-d H:i:s'),
+                    'is_auto' => $is_auto,
                 ]);
             }
-            //匹配失败,改为手工发货
-            $this->update([
-                'status' => 'PROCESSING',
-                'is_auto' => '0',
+            return $this->update([
+                'status' => 'ASSIGNFAILED',
                 'logistics_assigned_at' => date('Y-m-d H:i:s')
             ]);
         }
@@ -232,13 +347,14 @@ class PackageModel extends BaseModel
                 $error[] = $key;
                 continue;
             }
-            $this->find($content['package_id'])->update(['logistics_id' => $tmp_logistics->id, 
-                                                         'tracking_no' => $content['tracking_no'],
-                                                         'status' => 'SHIPPED',
-                                                         'shipped_at' => date('Y-m-d G:i:s', time()),
-                                                         'shipper_id' => '2']);
-            foreach($this->find($content['package_id'])->items as $packageitem)
-            {
+            $this->find($content['package_id'])->update([
+                'logistics_id' => $tmp_logistics->id,
+                'tracking_no' => $content['tracking_no'],
+                'status' => 'SHIPPED',
+                'shipped_at' => date('Y-m-d G:i:s', time()),
+                'shipper_id' => '2'
+            ]);
+            foreach ($this->find($content['package_id'])->items as $packageitem) {
                 $packageitem->orderItem->update(['status' => 'SHIPPED']);
             }
         }

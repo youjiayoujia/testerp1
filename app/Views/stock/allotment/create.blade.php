@@ -116,7 +116,7 @@
             $('.unit_cost').val('');
         });
 
-        $(document).on('blur', '.warehouse_position_id,.sku', function(){
+        $(document).on('change', '.warehouse_position_id,.sku', function(){
             block = $(this).parent().parent();
             sku = block.find('.sku').val();
             position = block.find('.warehouse_position_id').val();

@@ -27,6 +27,7 @@ class CreatePackages extends Migration
                 [
                     'NEW',
                     'ASSIGNED',
+                    'ASSIGNFAILED',
                     'PROCESSING',
                     'PICKING',
                     'PICKED',
@@ -56,6 +57,8 @@ class CreatePackages extends Migration
             $table->string('shipping_phone')->comment('发货电话');
             $table->enum('is_auto', [0, 1])->default(1)->comment('是否自动发货');
             $table->text('remark')->comment('备注');
+            $table->enum('is_tonanjing', [0, 1])->comment('发往南京')->default(0);
+            $table->enum('is_over', [0, 1])->comment('海关审结')->default(0);
             $table->timestamp('logistics_assigned_at')->comment('物流分配时间');
             $table->timestamp('logistics_order_at')->comment('物流下单时间');
             $table->timestamp('printed_at')->comment('打印面单时间');

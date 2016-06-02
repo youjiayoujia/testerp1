@@ -29,22 +29,21 @@ class PurchaseStockInController extends Controller
         $this->model = $purchaseStockIn;
         $this->mainIndex = route('purchaseStockIn.index');
         $this->mainTitle = '采购入库';
-		$this->viewPath = 'purchase.purchaseStockIn.';
+        $this->viewPath = 'purchase.purchaseStockIn.';
     }
-    
-	
-	public function index()
+
+
+    public function index()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('storageStatus','>',0)),
+            'data' => $this->autoList($this->model->where('storageStatus', '>', 0)),
         ];
         return view($this->viewPath . 'index', $response);
     }
-	
-	 
-	 
-	/**
+
+
+    /**
      * 批量入库
      *
      * @param $id
@@ -52,85 +51,85 @@ class PurchaseStockInController extends Controller
      */
     public function updateStorage()
     {
-        $data=request()->all();
-		if($data['storageInType']==1){
-			$data['storage_qty']=1;
-		}
-		$purchaseItemList=$this->model->where('sku',$data['sku'])->where('status','2')->orderby('storageStatus')->get();
-		$storage_num=$this->model->where('sku',$data['sku'])->where('status','2')->sum('lack_num');
-		if($storage_num == 0){
-			if($data['storageInType']==1){
-			return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
-			}else{
-				return redirect('manyStockIn')->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
-			}
-		}
-		foreach($purchaseItemList as $key=>$vo){
-			if($vo->bar_code){
-			if($data['storageInType']==1){
-				if(($data['storage_qty']+$vo->storage_qty) < $vo->purchase_num){
-					$storage['storage_qty']=$vo->storage_qty+$data['storage_qty'];
-					$storage['storageStatus']=1;
-					$data['storage_qty']=0;
-				}elseif(($data['storage_qty']+$vo->storage_qty) == $vo->purchase_num){
-					$storage['storage_qty']=$vo->storage_qty+$data['storage_qty'];
-					$storage['storageStatus']=2;
-					$data['storage_qty']=0;
-				}
-				$stoeagelog['storage_quantity']=1;
-			}else{
-				if(($data['storage_qty']+$vo->storage_qty) < $vo->purchase_num){
-					$storage['storage_qty']=$data['storage_qty']+$vo->storage_qty;
-					$storage['storageStatus']=1;
-					$stoeagelog['storage_quantity']=$data['storage_qty'];
-					$data['storage_qty']=0;					
-				}elseif(($data['storage_qty']+$vo->storage_qty) == $vo->purchase_num){
-					$storage['storage_qty']=$vo->purchase_num;
-					$storage['storageStatus']=2;
-					$stoeagelog['storage_quantity']=$data['storage_qty'];
-					$data['storage_qty']=0;
-				}else{
-					$storage['storage_qty']=$vo->purchase_num;
-					$storage['storageStatus']=2;
-					$stoeagelog['storage_quantity']=$vo->purchase_num - $vo->storage_qty;
-					$data['storage_qty']=$data['storage_qty']-$vo->purchase_num;				
-				}
-			}
-		}
-				if($data['storage_qty'] == 0){
-					return redirect(route('purchaseStockIn.create'))->with('alert', $this->alert('danger', $this->mainTitle . '仓库没有库位.'));
-					}	
-				$this->model->find($vo->id)->update($storage);
-				$stoeagelog['user_id']=1;
-				$stoeagelog['purchaseItemId']=$vo->id;
-				if($stoeagelog['storage_quantity']>0){
-				StorageLogModel::create($stoeagelog);
-				$stock=StockModel::find($vo->stock_id);
-				ItemModel::find($vo->item->id)->in($stock->warehouse_position_id,$stoeagelog['storage_quantity'], $vo->purchase_cost*$stoeagelog['storage_quantity'], "PURCHASE",$vo->id, $remark = '订单采购入库！');
-				}			
-			}
-	
-       $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
-		if($data['storageInType']==1){
-        return view($this->viewPath . 'create', $response);
-   		}else{
-		return view($this->viewPath . 'stockIn', $response);
-		}
-		}
-	/**
+        $data = request()->all();
+        if ($data['storageInType'] == 1) {
+            $data['storage_qty'] = 1;
+        }
+		$storageNum=$data['storage_qty'];
+        $purchaseItemList = $this->model->where('sku', $data['sku'])->where('status',
+            '2')->orderby('storageStatus')->get();
+        $arrival_num = $this->model->where('sku', $data['sku'])->where('status', '2')->sum('arrival_num');
+        $storage_qty = $this->model->where('sku', $data['sku'])->where('status', '2')->sum('storage_qty');
+        $storage_num = $arrival_num - $storage_qty;
+        //echo $arrival_num;echo ','.$storage_num;exit;
+        if ($storage_num == 0) {
+            if ($data['storageInType'] == 1) {
+                return redirect(route('purchaseStockIn.create'))->with('alert',$this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+            } else {
+                return redirect('manyStockIn')->with('alert', $this->alert('danger', $this->mainTitle . '没有可入库条目.'));
+            }
+        }
+        foreach ($purchaseItemList as $key => $vo) {
+            if ($vo->bar_code) {
+                if ($data['storageInType'] == 1) {
+                    if (($data['storage_qty'] + $vo->storage_qty) < $vo->purchase_num) {
+                        $storage['storage_qty'] = $vo->storage_qty + $data['storage_qty'];
+                        $storage['storageStatus'] = 1;
+                        $data['storage_qty'] = 0;
+                    } elseif (($data['storage_qty'] + $vo->storage_qty) == $vo->purchase_num) {
+                        $storage['storage_qty'] = $vo->storage_qty + $data['storage_qty'];
+                        $storage['storageStatus'] = 2;
+                        $data['storage_qty'] = 0;
+                    }
+                    $stoeagelog['storage_quantity'] = 1;
+                } else {
+                    if (($data['storage_qty'] + $vo->storage_qty) < $vo->purchase_num) {
+                        $storage['storage_qty'] = $data['storage_qty'] + $vo->storage_qty;
+                        $storage['storageStatus'] = 1;
+                        $stoeagelog['storage_quantity'] = $data['storage_qty'];
+                        $data['storage_qty'] = 0;
+                    } elseif (($data['storage_qty'] + $vo->storage_qty) == $vo->purchase_num) {
+                        $storage['storage_qty'] = $vo->purchase_num;
+                        $storage['storageStatus'] = 2;
+                        $stoeagelog['storage_quantity'] = $data['storage_qty'];
+                        $data['storage_qty'] = 0;
+                    } else {
+                        $storage['storage_qty'] = $vo->purchase_num;
+                        $storage['storageStatus'] = 2;
+                        $stoeagelog['storage_quantity'] = $vo->purchase_num - $vo->storage_qty;
+                        $data['storage_qty'] = $data['storage_qty'] - $vo->purchase_num;
+                    }
+                }
+            }
+            $this->model->find($vo->id)->update($storage);
+            $stoeagelog['user_id'] = 1;
+            $stoeagelog['purchaseItemId'] = $vo->id;
+            if ($stoeagelog['storage_quantity'] > 0) {
+                StorageLogModel::create($stoeagelog);
+                $stock = StockModel::find($vo->stock_id);
+                ItemModel::find($stock->item_id)->in($stock->warehouse_position_id,$stoeagelog['storage_quantity'], $vo->purchase_cost * $stoeagelog['storage_quantity'],"PURCHASE", $vo->id, $remark = '订单采购入库！',0);
+            }
+        } 
+        if ($data['storageInType'] == 1) {
+			return redirect(route('purchaseStockIn.create'))->with('alert',$this->alert('success', $this->mainTitle .$data['sku'].'入库成功1件！'));
+        } else {
+			return redirect('manyStockIn')->with('alert', $this->alert('success', $this->mainTitle . $data['sku'].'入库成功'.$storageNum.'件！'));
+        }
+    }
+
+    /**
      * 多件入库界面
      *
-     * 
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
- 	public function manyStockIn(){
-		$response = [
+    public function manyStockIn()
+    {
+        $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-		return view($this->viewPath . 'stockIn', $response);
-		}
+        return view($this->viewPath . 'stockIn', $response);
+    }
 }
 
 

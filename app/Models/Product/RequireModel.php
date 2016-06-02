@@ -9,7 +9,7 @@ class RequireModel extends BaseModel
 	protected $table = 'product_requires';
 
 	protected $fillable = [
-            'img1', 'img2', 'img3', 'img4', 'img5', 'img6', 'color', 'material', 'technique', 'parts',
+            'img1', 'img2', 'img3', 'img4', 'img5', 'img6', 'color', 'url1', 'url2', 'url3', 'material', 'technique', 'parts',
             'name', 'province', 'city', 'similar_sku', 'competition_url', 
             'remark', 'expected_date', 'needer_id', 'needer_shop_id', 
             'created_by', 'status', 'handle_id', 'handle_time', 'catalog_id'
@@ -93,5 +93,15 @@ class RequireModel extends BaseModel
     public function catalogByName()
     {
         return $this->belongsTo('App\Models\CatalogModel', 'catalog_id', 'id');
+    }
+
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'needer_id', 'id');
+    }
+
+    public function channelAccount()
+    {
+        return $this->belongsTo('App\Models\Channel\AccountModel', 'needer_shop_id', 'id');
     }
 }

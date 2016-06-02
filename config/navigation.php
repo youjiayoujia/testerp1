@@ -28,13 +28,18 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '产品Item',
+                    'name' => '产品SKU',
                     'url' => 'item.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '图片',
                     'url' => 'productImage.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '图片标签',
+                    'url' => 'label.index',
                     'icon' => '',
                 ],
             ],
@@ -66,7 +71,7 @@ return [
                 ],
                 [
                     'name' => '选款产品发布',
-                    'url' => 'dashboard.index',
+                    'url' => 'PublishProduct.index',
                     'icon' => '',
                 ],
             ],
@@ -84,11 +89,6 @@ return [
                 [
                     'name' => '三宝package',
                     'url' => 'bao3Package.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '国家Number信息',
-                    'url' => 'countries.index',
                     'icon' => '',
                 ],
             ],
@@ -116,6 +116,11 @@ return [
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
+			[
+                'name' => '订单投诉',
+                'url' => 'orderComplaint.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航
@@ -134,6 +139,11 @@ return [
                 [
                     'name' => '拣货',
                     'url' => 'pickList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '效能统计',
+                    'url' => 'pickList.performanceStatistics',
                     'icon' => '',
                 ],
                 [
@@ -156,6 +166,11 @@ return [
                 [
                     'name' => '库存',
                     'url' => 'stock.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '库存查询',
+                    'url' => 'stock.showStockInfo',
                     'icon' => '',
                 ],
                 [
@@ -255,29 +270,24 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '采购条目',
                     'url' => 'purchaseItemList.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '打印采购单',
-                    'url' => 'printPurchaseOrder.index',
+                    'url' => 'printPurchaseOrder.create',
                     'icon' => '',
-                ],
-                [
-                    'name' => '采购单结算',
-                    'url' => 'closePurchaseOrder.index',
-                    'icon' => '',
-                ],
+                ],*/
                 [
                     'name' => '采购对单',
                     'url' => 'purchaseList.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '采购入库',
-                    'url' => 'purchaseStockIn.create',
+				[
+                    'name' => '采购单结算',
+                    'url' => 'closePurchaseOrder.index',
                     'icon' => '',
                 ],
                 [
@@ -328,20 +338,20 @@ return [
         'url' => 'dashboard.index',
     ],
     //客户导航
-    [
-        'name' => '客户',
-        'icon' => 'user',
-        'url' => 'dashboard.index',
-        'type' => '',
-        'subnavigations' => [
-            [
-                'name' => 'CRM',
-                'url' => 'dashboard.index',
-                'icon' => '',
-            ],
-        ],
-
-    ],
+//    [
+//        'name' => '客户',
+//        'icon' => 'user',
+//        'url' => 'dashboard.index',
+//        'type' => '',
+//        'subnavigations' => [
+//            [
+//                'name' => 'CRM',
+//                'url' => 'dashboard.index',
+//                'icon' => '',
+//            ],
+//        ],
+//
+//    ],
     //系统导航
     [
         'name' => '系统',
@@ -372,6 +382,16 @@ return [
             [
                 'name' => '包装限制',
                 'url' => 'wrapLimits.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家Number信息',
+                'url' => 'countries.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '国家地区信息',
+                'url' => 'countriesSort.index',
                 'icon' => '',
             ],
         ],

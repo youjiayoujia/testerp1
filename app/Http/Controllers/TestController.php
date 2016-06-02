@@ -8,12 +8,13 @@
 
 namespace App\Http\Controllers;
 
+use Test;
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Modules\Channel\ChannelModule;
-
+use App\Models\PackageModel;
 
 class TestController extends Controller
 {
@@ -24,8 +25,8 @@ class TestController extends Controller
 
     public function test1()
     {
-        $buf = new ChannelModule();
-        $amazon = $buf->driver('amazon', )
+        $package = PackageModel::find(1);
+        $package->calculateProfitProcess();
     }
 
     public function index()

@@ -220,11 +220,11 @@ class AllotmentController extends Controller
         $arr = request()->all();
         $time = date('Y-m-d',time());       
         if($arr['result'] == 0) {
-            $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
+            $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]);
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核已拒绝...'));
         }
         $time = date('Y-m-d',time());       
-        $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
+        $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]); 
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
@@ -327,7 +327,7 @@ class AllotmentController extends Controller
         if(request()->ajax()) {
             $id = request()->input('id');
             $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'0', 'check_time'=>'0000-00-00',
-                'check_by'=>'0']);
+                'check_by'=>request()->user()->id]);
             return json_encode('111');
         }
 
@@ -425,7 +425,7 @@ class AllotmentController extends Controller
         request()->flash();
 
         $arr = request()->all();
-        $this->model->find($id)->update(['checkform_by'=>'3']);
+        $this->model->find($id)->update(['checkform_by'=>request()->user()->id]);
         $obj = $this->model->find($id)->allotmentforms;
         DB::beginTransaction();
         try {

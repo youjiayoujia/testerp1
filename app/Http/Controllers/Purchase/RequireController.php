@@ -111,6 +111,8 @@ class RequireController extends Controller
 	//计算建议采购数量
 	public function getNeedPurchaseNum($item_id){
 			$itemModel=ProductItemModel::find($item_id);
+			$bulkPurchasNum=$this->model->where('quantity','>',5)->where('is_require',1)->where('item_id',$item_id)->sum('quantity');
+			$bulkPurchasNum=$bulkPurchasNum > 0 ? $bulkPurchasNum : 0;
 			$trend='';
 			if($itemModel->is_sale ==1 ||$itemModel->is_sale ==4){
 			$seven_time=date('Y-m-d H:i:s',strtotime('-7 day'));
@@ -152,7 +154,7 @@ class RequireController extends Controller
 			//采购建议数量
 			if($itemModel->is_sale == 1 && $itemActiveNum == 0){
 			if($itemModel->purchase_price >3 && $itemModel->purchase_price <=40){
-					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(7+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity;
+					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(7+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
 				}elseif($itemModel->purchase_price >40){
 					if($itemModel->purchase_price >200 && $fourteenDaySellNum < 3){
 						$available_quantity=StockModel::where('item_id',$item_id)->sum('available_quantity');
@@ -160,10 +162,10 @@ class RequireController extends Controller
 						$needNum=$this->model->where('item_id',$vo->item_id)->sum('quantity');
 						$trend['ProposedpurchaseQuantity']=$needNum-$purchasingNum-$available_quantity;
 						}else{
-					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(5+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity;
+					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(5+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
 					}
 				}elseif($itemModel->purchase_price <=3){
-					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(12+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity;
+					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(12+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
 			}
 			}else{
 				if($itemModel->is_sale == 4){

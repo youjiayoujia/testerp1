@@ -13,7 +13,17 @@ class LabelModel extends BaseModel
      */
     protected $table = 'labels';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name','group_id'];
 
+	public $rules = [
+	        'create' => [
+	            'name' => 'required|unique:users,email,{id}',
+	            'group_id' => 'required',
+	        ],
+	        'update' => [
+	            'name' => 'required|unique:users,email,{id}',
+	            'group_id' => 'required',
+	        ]
+	    ];
 
 }

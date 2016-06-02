@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCatalogChannels extends Migration
+class CreateOrderRemarks extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,11 @@ class CreateCatalogChannels extends Migration
      */
     public function up()
     {
-        Schema::create('catalog_channels', function (Blueprint $table) {
+        Schema::create('order_remarks', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('catalog_id')->comment('catalog_id');
-            $table->integer('channel_id')->comment('channel_id');
-            $table->decimal('flat_rate',6,2)->comment('固定费率')->default(0);
-            $table->decimal('rate',6,2)->comment('费率');
+            $table->integer('order_id')->comment('订单ID');
+            $table->integer('user_id')->comment('用户ID');
+            $table->text('remark')->comment('备注');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +29,6 @@ class CreateCatalogChannels extends Migration
      */
     public function down()
     {
-        Schema::drop('catalog_channels');
+        Schema::drop('order_remarks');
     }
 }

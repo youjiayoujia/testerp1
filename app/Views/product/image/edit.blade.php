@@ -33,14 +33,19 @@
        </div>
       </div>
       <ul class="dowebok">
-        <li><input type="radio" name="is_link" data-labelauty="实拍图" value="1" {{ in_array(1, $label_arr)? 'checked' : '' }}></li>
-        <li><input type="radio" name="is_link" data-labelauty="链接图" value="2" {{ in_array(2, $label_arr)? 'checked' : '' }}></li>
+        @foreach($labels as $label)
+          @if($label->group_id==1)
+            <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{ in_array($label->id, $label_arr)? 'checked' : '' }}></li>
+
+          @endif  
+        @endforeach
       </ul>
       <ul class="dowebok">
-        <li><input type="checkbox" name="image_type[]" data-labelauty="普通图" value="3" {{ in_array(3, $label_arr)? 'checked' : '' }}></li>
-        <li><input type="checkbox" name="image_type[]" data-labelauty="色卡" value="4" {{ in_array(4, $label_arr)? 'checked' : '' }}></li>
-        <li><input type="checkbox" name="image_type[]" data-labelauty="Logo" value="5" {{ in_array(5, $label_arr)? 'checked' : '' }}></li>
-        <li><input type="checkbox" name="image_type[]" data-labelauty="Size" value="6" {{ in_array(6, $label_arr)? 'checked' : '' }}></li>
+        @foreach($labels as $label)
+          @if($label->group_id==2)
+            <li><input type="checkbox" name="image_type[]" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{ in_array($label->id, $label_arr)? 'checked' : '' }}></li>
+          @endif  
+        @endforeach
       </ul>
       <img src="{{ asset($model->path) }}/{{$model->name}}" width="600px" >
     </div>

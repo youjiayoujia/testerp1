@@ -62,7 +62,7 @@ class CatalogModel extends BaseModel
         $catalog = $this->create($data);
         foreach($data['channel']['name'] as $channel_id=>$rate){
             $arr['channel_id'] = $channel_id;
-            $catalog->channels()->attach($arr,['rate'=>$rate]);
+            $catalog->channels()->attach($arr,['rate'=>$rate,'flat_rate'=>$data['channel']['flat'][$channel_id]]);
         }
         //属性名属性值添加
         if ($extra) {
@@ -101,8 +101,8 @@ class CatalogModel extends BaseModel
         $arr=[];
         foreach($data['channel']['name'] as $channel_id=>$rate){
             $brr['rate'] = $rate;
-            $arr[$channel_id] = $brr;
-            
+            $brr['flat_rate'] = $data['channel']['flat'][$channel_id];
+            $arr[$channel_id] = $brr;         
         }
         $this->channels()->sync($arr);
         //更新分类属性

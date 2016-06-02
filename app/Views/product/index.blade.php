@@ -5,6 +5,18 @@
             <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
         </a>-->
     </div>
+    <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="glyphicon glyphicon-filter"></i> 语种切换
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="{{ DataList::filtersEncode(['language','=','zh']) }}">中国</a></li>
+                <li><a href="{{ DataList::filtersEncode(['language','=','fr']) }}">法语</a></li>
+                <li><a href="{{ DataList::filtersEncode(['language','=','de']) }}">德语</a></li>
+                <li><a href="{{ DataList::filtersEncode(['language','=','it']) }}">意大利语</a></li>
+            </ul>
+    </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
             <i class="glyphicon glyphicon-plus"></i> 新增
@@ -47,6 +59,9 @@
                 </a>
                 <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
+                </a>
+                <a href="{{ route('productMultiEdit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 小语言
                 </a>
                 <!--@if(!$product->status)
                     <a href="javascript:" class="btn btn-info btn-xs examine_model"

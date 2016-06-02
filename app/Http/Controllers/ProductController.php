@@ -197,6 +197,44 @@ class ProductController extends Controller
     }
 
     /**
+     * 小语言编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productMultiEdit()
+    {
+        $data = request()->all();
+        $language = config('product.multi_language');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' =>$this->model->find($data['id']),
+            'languages' => config('product.multi_language'),
+            'id' => $data['id'],
+        ];
+
+        return view($this->viewPath . 'language', $response);
+
+    }
+
+    /**
+     * 小语言更新
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productMultiUpdate()
+    {
+        $data = request()->all();
+    
+        $productModel = $this->model->find($data['product_id']);
+        $productModel->updateMulti($data);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
+
+    }
+
+    /**
      * 详情
      *
      * @param $id

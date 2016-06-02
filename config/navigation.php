@@ -389,6 +389,11 @@ return [
                 'url' => 'countriesSort.index',
                 'icon' => '',
             ],
+            [
+                'name' => 'paypal列表',
+                'url' => 'paypal.index',
+                'icon' => '',
+            ],
         ],
     ],
 ];

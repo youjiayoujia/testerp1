@@ -455,6 +455,8 @@ Route::group(['middleware' => 'auth'], function () {
     //用户路由
     Route::resource('user', 'UserController');
 
+    Route::resource('paypal', 'PaypalController');
+
 
 });
 

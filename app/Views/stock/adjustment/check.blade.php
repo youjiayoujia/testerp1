@@ -19,7 +19,7 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="adjust_by">调整人</label>
-            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ old('adjust_by') ? old('adjust_by') : $model->adjust_by }}" readonly>
+            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ $model->adjustByName->name }}" readonly>
         </div>
     </div>
     <div class='form-group'>

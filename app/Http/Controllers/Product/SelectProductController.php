@@ -90,7 +90,7 @@ class SelectProductController extends Controller
         $data['edit_status'] = 'canceled';
         $model->update($data);
         $model->destroy($id);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
 
     /**
@@ -101,7 +101,8 @@ class SelectProductController extends Controller
      */
     public function beChosed()
     {
-        $channel_id = request()->input('channel_id');
+        $channel_ids = request()->input('channel_ids');
+        $channel_ids_arr = explode(',', $channel_ids);
         $product_id_str = request()->input('product_ids');
         $product_id_arr = explode(',',$product_id_str);
         //创建亚马逊product
@@ -110,39 +111,42 @@ class SelectProductController extends Controller
             //ERP中如果该产品之前没有创建item,就创建item
             $data = [];
             //如果该渠道之前没有被选中过,创建该渠道下的product
-            switch ($channel_id) {
-                case '1':
-                    $model = new amazonProductModel();
-                    if(count($productModel->amazonProduct)==0){           
-                        $model->createAmazonProduct($productModel->toArray());
-                    }
-                    break;
+            foreach($channel_ids_arr as $channel_id){
+                switch ($channel_id) {
+                    case '1':
+                        $model = new amazonProductModel();
+                        if(count($productModel->amazonProduct)==0){           
+                            $model->createAmazonProduct($productModel->toArray());
+                        }
+                        break;
 
-                case '2':
-                    $model = new ebayProductModel();
-                    if(count($productModel->ebayProduct)==0){           
-                        $model->createEbayProduct($productModel->toArray());
-                    }
-                    break;
+                    case '2':
+                        $model = new ebayProductModel();
+                        if(count($productModel->ebayProduct)==0){           
+                            $model->createEbayProduct($productModel->toArray());
+                        }
+                        break;
 
-                case '3':
-                    $model = new aliexpressProductModel();
-                    if(count($productModel->aliexpressProduct)==0){           
-                        $model->createaliexpressProduct($productModel->toArray());
-                    }
-                    break;
+                    case '3':
+                        $model = new aliexpressProductModel();
+                        if(count($productModel->aliexpressProduct)==0){           
+                            $model->createaliexpressProduct($productModel->toArray());
+                        }
+                        break;
 
-                case '4':
-                    $model = new b2cProductModel();
-                    if(count($productModel->b2cProduct)==0){           
-                        $model->createb2cProduct($productModel->toArray());
-                    }
-                    break;
-                
-                default:
-                    # code...
-                    break;
+                    case '4':
+                        $model = new b2cProductModel();
+                        if(count($productModel->b2cProduct)==0){           
+                            $model->createb2cProduct($productModel->toArray());
+                        }
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }                
             }
+            
             $data['edit_status'] = "picked";
             $productModel->update($data);
         }

@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ChannelModel;
 use App\Models\Channel\AccountModel;
 use App\Models\WarehouseModel;
-use App\Models\CountryModel;
+use App\Models\CountriesModel;
 use App\Models\UserModel;
 
 class AccountController extends Controller
@@ -25,7 +25,6 @@ class AccountController extends Controller
         $this->viewPath = 'channel.account.';
     }
 
-
     public function create()
     {
         $response = [
@@ -33,7 +32,7 @@ class AccountController extends Controller
             'channels' => ChannelModel::all(),
             'warehouses' => WarehouseModel::all(),
             'users' => UserModel::orderBy('name', 'asc')->get(['id', 'name']),
-            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name'])
+            'countries' => CountriesModel::orderBy('code', 'asc')->get(['id', 'name'])
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -59,7 +58,7 @@ class AccountController extends Controller
             'channels' => ChannelModel::all(),
             'warehouses' => WarehouseModel::all(),
             'users' => UserModel::orderBy('name', 'asc')->get(['id', 'name']),
-            'countries' => CountryModel::orderBy('abbreviation', 'asc')->get(['id', 'name'])
+            'countries' => CountriesModel::orderBy('code', 'asc')->get(['id', 'name'])
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -85,5 +84,25 @@ class AccountController extends Controller
         $model->destoryAccount();
 
         return redirect($this->mainIndex);
+    }
+
+
+    public function getAccountUser()
+    {
+        $channel_id = request()->input('channel_id');
+        $account = AccountModel::where('channel_id', $channel_id)->get()->toArray();
+        return $account;
+    }
+
+    public function updateApi($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+
+        $model->update(request()->all());
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $model->alias . ' 设置API成功.'));
     }
 }

@@ -34,7 +34,7 @@
                 <strong>产品图片域名</strong>: {{ $model->image_domain }}
             </div>
             <div class="col-lg-3">
-                <strong>所在国家</strong>: {{ $model->country->name }}
+                <strong>所在国家</strong>: {{ $model->country->cn_name }}
             </div>
             <div class="col-lg-3">
                 <strong>默认运营人员</strong>: {{ $model->operator->name }}

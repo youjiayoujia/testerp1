@@ -25,9 +25,9 @@
                                         <li class="disabled"><a href="#">{{ $key }}</a></li>
                                         @foreach($subnavigations as $subnavigation)
                                             <li>
-                                            
+
                                                 <a href="{{ route($subnavigation['url']) }}">
-                                              
+
                                                     <span class="glyphicon glyphicon-{{ $subnavigation['icon'] }}"></span>
                                                     {{ $subnavigation['name'] }}
                                                 </a>
@@ -65,6 +65,12 @@
                         </li>
                     @endif
                 @endforeach
+                <li>
+                    <a href="http://crm.com">
+                        <span class="glyphicon glyphicon-user"></span>
+                        CRM
+                    </a>
+                </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -95,7 +101,7 @@
                         </ul>
                     @endif
                 </li>
-                
+
             </ul>
         </div>
     </div>

@@ -12,6 +12,7 @@
 namespace App\Http\Controllers\product;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Product\SupplierLevelModel;
 use App\Models\Product\SupplierChangeHistoryModel;
@@ -36,6 +37,7 @@ class SupplierController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'levels' => SupplierLevelModel::all(),
+            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -48,9 +50,9 @@ class SupplierController extends Controller
      */
     public function store()
     {
-        request()->flash();
+        $data=request()->all();
         $this->validate(request(), $this->model->rules('create'));
-        $model = $this->model->create(request()->all());
+        $model = $this->model->supplierCreate($data, request()->file('qualifications'));
         SupplierChangeHistoryModel::create([              
             'supplier_id' => $model->id,
             'to' =>request()->input('purchase_id'),
@@ -75,6 +77,7 @@ class SupplierController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'levels' => SupplierLevelModel::all(),
+            'users' => UserModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -91,7 +94,7 @@ class SupplierController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        request()->flash();
+        $data=request()->all();
         $this->validate(request(), $this->model->rules('update', $id));
         if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
@@ -101,7 +104,7 @@ class SupplierController extends Controller
                 'adjust_by' => '3',
             ]);
         }
-        $model->update(request()->all());
+        $this->model->updateSupplier($id,$data,request()->file('qualifications'));
         return redirect($this->mainIndex);
     }
 
@@ -134,4 +137,18 @@ class SupplierController extends Controller
 
         return redirect($this->mainIndex);
     }
+	
+	public function beExamine(){
+		$channel_id = request()->input('channel_id');
+        $product_id_str = request()->input('product_ids');
+        $product_id_arr = explode(',',$product_id_str);
+		$suppliers=$this->model->find($product_id_arr);
+		foreach($suppliers as $key=>$vo){
+			if($vo->examine_status <2){
+				$vo->update(['examine_status'=>$channel_id]);
+			}
+			}
+		return 1;	
+	}
+	
 }

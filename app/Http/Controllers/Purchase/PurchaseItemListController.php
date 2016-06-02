@@ -20,6 +20,7 @@ use App\Models\StockModel;
 use App\Models\Stock\InModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\Purchase\StorageLogModel;
+use Maatwebsite\Excel\Facades\Excel; 
 
 class PurchaseItemListController extends Controller
 {
@@ -79,7 +80,7 @@ class PurchaseItemListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-			'storageLogs'=>StorageLogModel::where('purchaseItemId',$id)->get(),
+			'storageLogs'=>InModel::where('relation_id',$id)->get(),
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -137,7 +138,11 @@ class PurchaseItemListController extends Controller
 					$item->update(['status'=>1]);
 				}			
 				PurchaseOrderModel::where('id',$item->purchase_order_id)->where('examineStatus',2)->update(['status'=>1]);	
-			}
+			}elseif($data['status'] == 3){
+				if($item->status < 2 ){
+					$item->destroy($item->id);
+				}
+				}
 		}
 		return redirect($this->mainIndex);
 	}
@@ -159,7 +164,116 @@ class PurchaseItemListController extends Controller
 				}
 		return redirect($this->mainIndex);
 	}
+	/**
+     * excel导入回传采购价格采购物流页面
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function excelReduction(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'excelReduction', $response);
+	}
+	/**
+     * excel导入回传采购价格采购物流页面
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function postExcelReduction(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        return view($this->viewPath . 'postExcelReduction', $response);
+	}
+	/**
+     * 回传采购物流单号及物流费用
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseItemPostExcel(){
+		$name='采购物流回传范本';
+		$rows ='';
+		$rows=[
+				[
+				 'purchase_item_id'=>'',
+				 'post_coding'=>'',
+				 'postage'=>'',
+				 ]
+			 ];
+		Excel::create($name, function($excel) use ($rows) {
+			$nameSheet='采购物流回传范本';
+			$excel->sheet($nameSheet, function($sheet) use ($rows) {
+				$sheet->fromArray($rows);
+			});
+		})->download('csv');
+		
+	}
+	/**
+     * 回传采购价格excel
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseItemPriceExcel(){
+		$name='采购价格回传范本';
+		$rows ='';
+		$rows=[
+				[
+				 'purchase_item_id'=>'',
+				 'purchase_price'=>'',
+				 ]
+			 ];
+		Excel::create($name, function($excel) use ($rows) {
+			$nameSheet='采购价格回传范本';
+			$excel->sheet($nameSheet, function($sheet) use ($rows) {
+				$sheet->fromArray($rows);
+			});
+		})->download('csv');
+	}	
+	/**
+     * excel采购价格回传
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+
+    public function excelReductionUpdate()
+    {
+        if (request()->hasFile('excel')) {
+            $file = request()->file('excel');
+            $errors = $this->model->excelProcess($file);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__, '导入结果'),
+                'errors' => $errors,
+            ];
+            return view($this->viewPath . 'excelReduction', $response);
+        }
+    }
 	
+	/**
+     * excel物流单号物流费用回传
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+
+    public function excelReductionUpdatePost()
+    { 
+        if (request()->hasFile('excel')) {
+            $file = request()->file('excel');
+            $errors = $this->model->postExcelDataProcess($file);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__, '导入结果'),
+                'errors' => $errors,
+            ];
+            return view($this->viewPath . 'postExcelReduction', $response);
+        }
+    }
+		
 }
 
 

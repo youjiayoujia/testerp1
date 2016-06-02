@@ -18,11 +18,24 @@
             </div>
             <div class="form-group col-lg-4">
                 <strong>订单成本</strong>:
-                物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}
+                物流费{{ $sumPostage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $sumPostage + $model->total_purchase_cost}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:            
             		{{$model->assigner}}
+            </div> 
+            <div class="form-group col-lg-4">
+                <strong>采购单结算方式</strong>:
+          		@if($model->close_status ==0)
+                <select name="close_status">
+               		@foreach(config('product.product_supplier.pay_type') as $k=>$v)           	
+            			<option value="{{$k}}" {{ $model->pay_type == $k ? 'selected' : '' }}>{{$v}}</option>
+ 					@endforeach
+                    </select>
+                @else
+                <input name="close_status" type="hidden" value="1"/>
+                已结算
+                @endif
             </div> 
              <div class="form-group col-lg-4">
                 <strong>采购单结算状态</strong>:
@@ -82,7 +95,6 @@
             <td>采购数量</td>
             <td>总价</td>
             <td>成本审核状态</td>	
-            <td>状态</td>
             <td>物流单号</td>
             <td>实际入库数量</td>
             <td>供应商sku</td>       
@@ -90,7 +102,6 @@
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)
-         @if($purchaseItem->storageStatus == 0)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
             <td>
@@ -117,11 +128,6 @@
             采购价格未审核
             @endif
             </td>
-            <td>     	
-            @foreach(config('purchase.purchaseItem.status') as $key=>$v)
-				@if($purchaseItem->status == $key) {{$v}} @endif
-            @endforeach     
-             </td>
             <td>
             {{$purchaseItem->post_coding }}
             </td>       
@@ -130,7 +136,6 @@
             </td>
             <td>{{$purchaseItem->item->supplier_sku}}</td>
         </tr>
-        @endif
         @endforeach
     </tbody>
     </table>

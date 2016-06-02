@@ -15,16 +15,16 @@
     @foreach($data as $purchaseOrder)
         <tr>
             <td>{{ $purchaseOrder->id }}</td> 
-            @foreach(config('purchase.purchaseOrder.status') as $k=>$status)
+           <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$status)
             	@if($purchaseOrder->status == $k)
-            	<td>{{ $status }}</td>
+            	{{ $status }}
                 @endif
-            @endforeach 
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
+            @endforeach </td>
+           <td> @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
             	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
+            	{{ $statu }}
                 @endif
-            @endforeach     
+            @endforeach</td>  
     		<td>
             @if($purchaseOrder->supplier_id >0)
             	{{ $purchaseOrder->supplier->name}}
@@ -35,7 +35,7 @@
             <td>
                 @if($purchaseOrder->examineStatus == 2)
                 <a href="{{ route('purchaseOrderAbnormal.edit', ['id'=>$purchaseOrder->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span>去处理
+                    <span class="glyphicon glyphicon-pencil"></span>处理
                 </a>
                 @endif       
                

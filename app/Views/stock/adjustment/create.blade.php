@@ -17,7 +17,11 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="adjust_by">调整人</label>
-            <input type='text' class="form-control" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ old('adjust_by') ? old('adjust_by') : '1'}}" readonly>
+            <select name='adjust_by' class='form-control'>
+            @foreach($users as $user)
+            <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+            </select>
         </div>
         <div class='form-group col-sm-12'>
             <label for='label'>备注(原因)</label>
@@ -67,7 +71,7 @@
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control unit_cost" id="arr[unit_cost][0]" placeholder="单价" name='arr[unit_cost][0]' value="{{ old('arr[unit_cost][0]') }}">
+                    <input type='text' class="form-control unit_cost" id="arr[unit_cost][0]" placeholder="单价" name='arr[unit_cost][0]' value="{{ old('arr[unit_cost][0]') }}" readonly>
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
             </div>
@@ -127,7 +131,7 @@
 
         $(document).on('blur', '.warehouse_position_id', function(){
             tmp = $(this);
-            warehouse_id = $('#warehous_id').val();
+            warehouse_id = $('#warehouse_id').val();
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();
@@ -165,13 +169,13 @@
 
         $(document).on('change', '.type', function(){
             block = $(this).parent().parent();
-            if($(this).val() == 'IN')
-                $(this).parent().parent().find('.unit_cost').attr('readonly', false);
-            else {
-                $(this).parent().parent().find('.unit_cost').attr('readonly', true);
+            name = block.find('.warehouse_position_id').attr('name');
+            if($(this).val() == 'IN') {
+                block.find('.position_html').html("<input type='text' name='"+name+"' class='form-control warehouse_position_id' placeholder='库位'>");
             }
             block.find('.sku').val('');
             block.find('.quantity').val('');
+            block.find('.access_quantity').val('');
             block.find('.unit_cost').val('');
         });
 
@@ -205,7 +209,7 @@
                             block.find('.position_html').html("<input type='text' name='"+position_name+"' class='form-control warehouse_position_id' placeholder='库位'>");
                             block.find('.access_quantity').val('');
                             block.find('.quantity').val('');
-                            block.find('.unit_cost').val('');
+                            block.find('.unit_cost').val(result[1]);
                         } else {
                             str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
                             str += "</select>";

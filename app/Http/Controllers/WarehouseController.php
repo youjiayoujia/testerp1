@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WarehouseModel;
+use App\Models\UserModel;
 
 class WarehouseController extends Controller
 {
@@ -32,7 +33,7 @@ class WarehouseController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'count' => $this->model->where(['is_available'=>'1', 'is_default'=>'1'])->count(),
+            'users' => UserModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -52,7 +53,7 @@ class WarehouseController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'count' => $this->model->where(['is_available'=>'1', 'is_default'=>'1'])->count(),
+            'users' => UserModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -89,7 +90,7 @@ class WarehouseController extends Controller
             }
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**

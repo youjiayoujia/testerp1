@@ -1,7 +1,7 @@
 @extends('common.form')
 @section('formAction') {{ route('productUpdateImage') }} @stop
 @section('formBody')
-	<input type='hidden' value='{{$model->id}}' name="id" >
+    <input type='hidden' value='{{$model->id}}' name="id" >
     <input type="hidden" name="user_id" value="1">
     <div class="form-group col-lg-12">
         <!--<label class='control-label'>SPU ID</label>-->

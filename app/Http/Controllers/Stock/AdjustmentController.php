@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Stock;
 
 use DB;
 use Exception;
+use App\Models\UserModel;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\AdjustmentModel;
 use App\Models\ItemModel;
@@ -81,6 +82,7 @@ class AdjustmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
+            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -112,10 +114,14 @@ class AdjustmentController extends Controller
             $buf['stock_adjustment_id'] = $obj->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
+            if($buf['type'] == 'OUT') {
+                $item = ItemModel::find($buf['item_id']);
+                $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ADJUSTMENT', $obj->id);
+            }
             AdjustFormModel::create($buf);
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
     /**
@@ -149,6 +155,7 @@ class AdjustmentController extends Controller
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
             'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
             'access_quantity' => $access_quantity,
+            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -190,7 +197,7 @@ class AdjustmentController extends Controller
             $i++;
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**
@@ -252,8 +259,7 @@ class AdjustmentController extends Controller
     {
         $result = request('result');
         $obj = $this->model->find($id);
-        if($result) {       
-            
+        if($result) {
             $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']); 
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
@@ -268,16 +274,17 @@ class AdjustmentController extends Controller
                         $item->in($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['amount'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
                     } else {
                         $tmp['type'] = 'ADJUSTMENT';
-                        $item->out($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
+                        $item->holdout($tmp['warehouse_position_id'], $tmp['quantity'], $tmp['type'], $tmp['relation_id'], $tmp['remark']);
                     }
                 }
             } catch (Exception $e) {
                 DB::rollback();
             }
             DB::commit();
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
         } else {
             $obj->update(['status'=>'1', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']);
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核未通过...'));
         }
-        return redirect($this->mainIndex);
     }
 }

@@ -5,11 +5,11 @@
    <div class='row'>
         <div class="form-group col-lg-6">
             <label for="code" class='control-label'>货币简称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="code" placeholder="仓库名字" name='code' value="{{ old('code') ? old('code') : $model->code }}">
+            <input type='text' class="form-control" id="code" placeholder="货币简称" name='code' value="{{ old('code') ? old('code') : $model->code }}">
         </div>
         <div class="form-group col-lg-6">
             <label for="name" class='control-label'>货币名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="name" placeholder="仓库名字" name='name' value="{{ old('name') ? old('name') : $model->name }}">
+            <input type='text' class="form-control" id="name" placeholder="货币名称" name='name' value="{{ old('name') ? old('name') : $model->name }}">
         </div>
     </div>
     <div class='row'>
@@ -19,7 +19,7 @@
         </div>
         <div class='form-group col-lg-6'> 
             <label for='rate'>货币汇率</label> 
-            <input type='text' class="form-control" name="rate" placeholder="货币标识" value="{{ old('rate') ? old('rate') : $model->rate }}">
+            <input type='text' class="form-control" name="rate" placeholder="货币汇率" value="{{ old('rate') ? old('rate') : $model->rate }}">
         </div>
     </div>
 @stop

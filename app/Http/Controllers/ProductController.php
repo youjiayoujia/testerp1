@@ -13,18 +13,20 @@ use App\Models\Product\SupplierModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
 use App\Models\ChannelModel;
+use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 
 class ProductController extends Controller
 {
 
-    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel)
+    public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel,WarehouseModel $warehouse)
     {
         $this->model = $product;
         $this->supplier = $supplier;
         $this->catalog = $catalog;
         $this->logisticsLimit = $limitsModel;
+        $this->warehouse = $warehouse;
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
@@ -38,6 +40,7 @@ class ProductController extends Controller
             'catalogs' => $this->catalog->all(),
             'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
+            'warehouses' => $this->warehouse->where('type','local')->get(),
             'logisticsLimit' => $this->logisticsLimit->all(),
         ];
 
@@ -56,7 +59,7 @@ class ProductController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         $this->model->createProduct(request()->all(),request()->files);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
     /**
@@ -94,6 +97,7 @@ class ProductController extends Controller
             'features_input' => array_values($product->featureTextValues->where('feature_value_id',0)->toArray()),
             'variation_value_id_arr' => $variation_value_id_arr,
             'features_value_id_arr' => $features_value_id_arr,
+            'warehouses' => $this->warehouse->where('type','local')->get(),
             'wrapLimit' => $this->wrapLimit->all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
         ];
@@ -115,7 +119,7 @@ class ProductController extends Controller
         $productModel = $this->model->find($id);
         $productModel->updateProduct(request()->all(),request()->files);
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
     /**
@@ -132,7 +136,7 @@ class ProductController extends Controller
         }
         $model->destoryProduct();
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
     }
 
     /**
@@ -190,6 +194,26 @@ class ProductController extends Controller
 
         return view($this->viewPath . 'chosechannel', $response);
 
+    }
+
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'warehouse' => $this->warehouse->find($model->warehouse_id),
+        ];
+        return view($this->viewPath . 'show', $response);
     }
 
     

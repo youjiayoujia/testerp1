@@ -150,6 +150,7 @@ return [
          */
         App\Providers\HelpServiceProvider::class,
         Chumper\Zipper\ZipperServiceProvider::class,
+        App\Modules\Channel\ChannelServiceProvider::class,
 
         /*
          * Debugbar
@@ -213,6 +214,7 @@ return [
         'DataList' => App\Facades\DataList::class,
         'Tool' => App\Facades\Tool::class,
         'Zipper' => Chumper\Zipper\Facades\Zipper::class,
+        'Channel' => App\Modules\Channel\ChannelFacade::class,
 
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 

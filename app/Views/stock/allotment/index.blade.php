@@ -29,7 +29,7 @@
             <td>{{ $allotment->allotmentByName ? $allotment->allotmentByName->name : '' }}</td>
             <td>{{ $allotment->status_name }}</td>
             <td>{{ $allotment->checkByName ? $allotment->checkByName->name : '' }}</td>
-            <td>{{ $allotment->check_status == '0' ? '未审核' : ($allotment->check_status == '1' ? '审核未通过' : '审核通过') }}</td>
+            <td>{{ $allotment->check_status == '0' ? '未审核' : ($allotment->check_status == '1' ? '未通过' : '已通过') }}</td>
             <td>{{ $allotment->check_time }}</td>
             <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->type : ''}}</td>
             <td>{{ $allotment->logistics->first() ? $allotment->logistics->first()->code : ''}}</td>
@@ -52,7 +52,7 @@
                     审核调拨单
                 </a>
                 @endif
-                @if($allotment->check_status == '2' && $allotment->allotment_status == 'new')
+                @if($allotment->check_status == '2')
                 <a href="{{ route('allotment.pick', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>生成拣货单
                 </a>
@@ -84,6 +84,20 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('tableToolButtons')
+<div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 查询状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ DataList::filtersEncode(['check_status','=','0']) }}">未审核</a></li>
+            <li><a href="{{ DataList::filtersEncode(['check_status','=','1']) }}">未通过</a></li>
+            <li><a href="{{ DataList::filtersEncode(['check_status','=','2']) }}">已通过</a></li>
+        </ul>
+</div>
+@parent
 @stop
 @section('childJs')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}

@@ -112,7 +112,7 @@
 
         $(document).on('blur', '.warehouse_position_id', function(){
             tmp = $(this);
-            warehouse_id = $('#warehous_id').val();
+            warehouse_id = $('#warehouse_id').val();
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();
@@ -150,15 +150,16 @@
 
         $(document).on('change', '.type', function(){
             block = $(this).parent().parent();
-            if($(this).val() == 'IN')
-                $(this).parent().parent().find('.unit_cost').attr('readonly', false);
-            else {
-                $(this).parent().parent().find('.unit_cost').attr('readonly', true);
+            name = block.find('.warehouse_position_id').attr('name');
+            if($(this).val() == 'IN') {
+                block.find('.position_html').html("<input type='text' name='"+name+"' class='form-control warehouse_position_id' placeholder='库位'>");
             }
             block.find('.sku').val('');
             block.find('.quantity').val('');
+            block.find('.access_quantity').val('');
             block.find('.unit_cost').val('');
         });
+
 
         $(document).on('change', '.sku', function(){
             var tmp = $(this);

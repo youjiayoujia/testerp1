@@ -10,11 +10,13 @@ namespace App\Http\Controllers;
 
 use Tool;
 use Excel;
+use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\PickListModel;
 
 class PackageController extends Controller
 {
@@ -26,29 +28,95 @@ class PackageController extends Controller
         $this->viewPath = 'package.';
     }
 
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'logisticses' => LogisticsModel::all(),
+            'status' => config('package'),
+        ];
+        return view($this->viewPath . 'edit', $response);
+    }
+
     public function flow()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => OrderModel::where('active', 'NORMAL')
                 ->whereIn('status', ['PREPARED', 'NEED'])->count(),
             'assignNum' => $this->model->where('status', 'NEW')->count(),
             'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
+            'printNum' => PickListModel::where('status', 'NONE')->count(),
+            'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status', ['PICKED', 'PACKAGEING','PICKING'])->count(),
+            'singleMultiPack' => PickListModel::where('type', 'SINGLEMULTI')->whereIn('status', ['PICKED', 'PACKAGEING','PICKING'])->count(),
+            'multiInbox' => PickListModel::where('type', 'MULTI')->whereIn('status', ['PICKED','PICKING'])->count(),
+            'multiPack' => PickListModel::where('type', 'MULTI')->whereIn('status', ['INBOXED','PACKAGEING'])->count(),
+            'packageShipping' => $this->model->where('status', 'PACKED')->count(),
+            'packageException' => $this->model->where('status', 'ERROR')->count(),
+            'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
-        return view($this->viewPath . 'workFlow', $response);
+        return view($this->viewPath . 'flow', $response);
+    }
+
+    public function allocateLogistics($id)
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '分配物流方式'),
+            'logisticses' => LogisticsModel::all(),
+            'id' => $id,
+        ];
+
+        return view($this->viewPath . 'allocateLogistics', $response);
+    }
+
+    public function storeAllocateLogistics($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $logistics = LogisticsModel::find(request('logistics_id'));
+        if($logistics->docking == '手工发货') {
+            $model->update(['is_auto' => '0']);
+        }
+        $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
+
+        return redirect($this->mainIndex);
     }
 
     public function doPackage()
     {
-        $begin = microtime(true);
+        set_time_limit(0);
+        $len = 1000;
+        $start = 0;
         $orders = OrderModel::where('active', 'NORMAL')
             ->whereIn('status', ['PREPARED', 'NEED'])
-            ->orderBy('package_times', 'desc')
+            ->orderBy('package_times', 'desc')->skip($start)->take($len)
             ->get();
-        foreach ($orders as $order) {
-            echo $order->id . '<br>';
-            $order->createPackage();
+        $begin = microtime(true);
+        while(count($orders)) {
+            foreach ($orders as $order) {
+                echo $order->id . '<br>';
+                $order->createPackage();
+            }
+            $start += $len;
+            $orders = OrderModel::where('active', 'NORMAL')
+            ->whereIn('status', ['PREPARED', 'NEED'])
+            ->orderBy('package_times', 'desc')->skip($start)->take($len)
+            ->get();
+            break;
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
@@ -64,6 +132,18 @@ class PackageController extends Controller
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+    public function ajaxQuantityProcess()
+    {
+        $buf = request()->input('buf');
+        foreach($buf as $v)
+        {
+            $model = $this->model->find($v);
+            $model->update(['status'=>'SHIPPED']);
+        }
+
+        return json_encode(true);
     }
 
     public function placeLogistics()
@@ -103,6 +183,47 @@ class PackageController extends Controller
         }
     }
 
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $model->update(request()->all());
+        $arr = explode(' ', request('name'));
+        $model->update([
+            'shipping_firstname' => array_key_exists('0', $arr) ? $arr['0'] : '',
+            'shipping_lastname' => array_key_exists('1', $arr) ? $arr['1'] : ''
+        ]);
+
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        foreach ($model->items as $packageItem) {
+            $stockout = $packageItem->stockout;
+            $stock = StockModel::find($stockout->stock_id);
+            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
+            $packageItem->delete();
+            $stockout->delete();
+        }
+        $model->destroy($id);
+        return redirect($this->mainIndex);
+    }
+
     public function ajaxGetOrder()
     {
         if (request()->ajax()) {
@@ -115,6 +236,42 @@ class PackageController extends Controller
             }
         }
         return 'error';
+    }
+
+    public function manualShipping()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logisticses' => LogisticsModel::all(),
+            'packages' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->get(),
+        ];
+
+        return view($this->viewPath.'manualShipping', $response);
+    }
+
+    public function manualLogistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logisticses' => LogisticsModel::all(),
+            'packages' => $this->model->where(['status' => 'ASSIGNFAILED', 'is_auto' => '1'])->get(),
+        ];
+
+        return view($this->viewPath.'manualLogistics', $response);
+    }
+
+    public function setManualLogistics()
+    {
+        $id = request('id');
+        $logistics_id = request('logistics');
+        $model = $this->model->find($id);
+        if(!$model) {
+            return json_encode(false);
+        }
+        $logistics = LogisticsModel::find($logistics_id);
+        $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
+        $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
+        return json_encode(true);
     }
 
     public function ajaxPackageSend()
@@ -130,6 +287,28 @@ class PackageController extends Controller
         $package->status = 'SHIPPED';
         $package->save();
         echo json_encode('success');
+    }
+
+    /**
+     * 撤销包装的单个package 
+     *
+     * @param none
+     * @return json
+     *
+     */
+    public function ctrlZ()
+    {
+        $packageId = request('packageId');
+        $package = $this->model->find($packageId);
+        $package->status = 'PICKING';
+        $package->save();
+        $items = $package->items;
+        foreach($items as $item)
+        {
+            $item->picked_quantity = 0;
+            $item->save();
+        }
+        return json_encode(true);
     }
 
     /**
@@ -201,12 +380,16 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
-        if ($package->logistics_id != $logistic_id) {
+        if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');
         }
-        $package->update(['status' => 'SHIPPED', 'shipped_at' => date('Y-m-d h:i:s', time()), 'shipper_id' => '2', 'actual_weight' => $weight]);
-        foreach($package->items as $packageitem)
-        {
+        $package->update([
+            'status' => 'SHIPPED',
+            'shipped_at' => date('Y-m-d h:i:s', time()),
+            'shipper_id' => '2',
+            'actual_weight' => $weight
+        ]);
+        foreach ($package->items as $packageitem) {
             $packageitem->orderItem->update(['status' => 'SHIPPED']);
         }
 

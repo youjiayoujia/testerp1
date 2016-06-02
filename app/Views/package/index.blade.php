@@ -25,8 +25,8 @@
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
-            <td>{{ $package->status }}</td>
-            <td>{{ $package->type }}</td>
+            <td>{{ $package->status_name }}</td>
+            <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->logistics ? $package->logistics->short_code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->logistics_assigned_at }}</td>
@@ -44,6 +44,11 @@
                 <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                @if($package->status == 'ASSIGNFAILED')
+                <a href="{{ route('package.allocateLogistics', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
+                    分配物流方式
+                </a>
+                @endif
                 @if($package->status == 'PACKED')
                     <a href="javascript:" class="btn btn-warning btn-xs send" data-id="{{ $package->id }}">
                         <span class="glyphicon glyphicon-pencil"></span> 发货

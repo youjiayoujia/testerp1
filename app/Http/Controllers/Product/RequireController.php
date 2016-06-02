@@ -13,6 +13,8 @@ namespace App\Http\Controllers\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product\RequireModel;
 use App\Models\CatalogModel;
+use App\Models\ChannelModel;
+use App\Models\Channel\AccountModel;
 
 class RequireController extends Controller
 {
@@ -34,6 +36,8 @@ class RequireController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => CatalogModel::all(),
+            'channel' =>ChannelModel::all(),
+            'channel_account' => AccountModel::where("channel_id",'=',1)->get(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -64,7 +68,7 @@ class RequireController extends Controller
         }
         $buf->update($data);
 
-        return redirect(route('productRequire.index'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
     /**
@@ -83,7 +87,10 @@ class RequireController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'catalogs' => CatalogModel::all(),
+            'channel' =>ChannelModel::all(),
+            'channel_account' => AccountModel::where("channel_id",$model->needer_id)->get(),
         ];
+        
         return view($this->viewPath . 'edit', $response);
     }
 
@@ -114,7 +121,7 @@ class RequireController extends Controller
         }
         $model->update($data);
 
-        return redirect(route('productRequire.index'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**

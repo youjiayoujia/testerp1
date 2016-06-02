@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CountriesModel;
+use App\Models\CountriesSortModel;
 
 class CountriesController extends Controller
 {
@@ -21,5 +22,25 @@ class CountriesController extends Controller
         $this->mainIndex = route('countries.index');
         $this->mainTitle = '国家信息';
         $this->viewPath = 'countries.';
+    }
+
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'sorts' => CountriesSortModel::all(),
+        ];
+        return view($this->viewPath . 'edit', $response);
     }
 }

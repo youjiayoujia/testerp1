@@ -10,7 +10,6 @@
     <th>类型</th>
     <th class="sort" data-field="volumn">容积</th>
     <th>是否启用</th>
-    <th>是否是默认仓库</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
 @stop
@@ -27,7 +26,6 @@
             <td>{{ $warehouse->type == 'local' ? '本地仓库' : ($warehouse->type == 'oversea' ? '海外仓库' : '第三方仓库') }} </td>
             <td>{{ $warehouse->volumn }}(m<small>3</small>)</td>
             <td>{{ $warehouse->is_available == '1' ? '是' : '否'}}</td>
-            <td>{{ $warehouse->is_default == '1' ? '是' : '否'}}</td>
             <td>{{ $warehouse->created_at }}</td>
             <td>
                 <a href="{{ route('warehouse.show', ['id'=>$warehouse->id]) }}" class="btn btn-info btn-xs">

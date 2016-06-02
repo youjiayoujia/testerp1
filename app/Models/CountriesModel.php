@@ -19,7 +19,7 @@ class CountriesModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'cn_name', 'code', 'number', 'created_at'];
+    protected $fillable = ['name', 'cn_name', 'code', 'number', 'parent_id', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -31,4 +31,9 @@ class CountriesModel extends BaseModel
 
     //查询
     public $searchFields=['name', 'cn_name'];
+
+    public function countriesSort()
+    {
+        return $this->belongsTo('App\Models\CountriesSortModel', 'parent_id', 'id');
+    }
 }

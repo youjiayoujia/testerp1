@@ -3,6 +3,7 @@
 namespace App\Models\product;
 
 use App\Base\BaseModel;
+use Tool;
 
 class SupplierModel extends BaseModel
 {
@@ -18,7 +19,7 @@ class SupplierModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'url', 'company', 'official_url', 'contact_name', 'email', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level_id'];
+    protected $fillable = ['name', 'url', 'company', 'official_url', 'contact_name', 'email', 'province', 'city', 'address', 'type', 'telephone', 'purchase_id', 'level_id', 'created_by','purchase_time','bank_account','bank_code','pay_type','qualifications','examine_status'];
 
     //查询
     public $searchFields = ['name','telephone']; 
@@ -46,7 +47,10 @@ class SupplierModel extends BaseModel
     {
         return $this->belongsTo('App\Models\UserModel', 'purchase_id', 'id');
     }
-
+	//获取供应商地址
+	public function getSupplierAddressAttribute(){
+		return $this->province.$this->city.$this->address;
+		}
     /**
      * return the relation between the two module 
      *
@@ -65,5 +69,35 @@ class SupplierModel extends BaseModel
     public function levelByName()
     {
         return $this->belongsTo('App\Models\Product\SupplierLevelModel', 'level_id', 'id');
+    }
+	
+	/**
+     * 创建新供应商
+     *
+     *
+     */
+    public function supplierCreate($data, $file= null)
+    {
+            $path = 'uploadSupplier/';
+			if ($file->getClientOriginalName()) {
+				$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
+				$file->move($path, $data['qualifications']);
+				return $this->create($data);
+			}         
+    }
+	
+	/**
+     * 创建新供应商
+     *
+     *
+     */
+    public function updateSupplier($id,$data, $file= null)
+    {
+            $path = 'uploadSupplier/';
+			if ($file->getClientOriginalName()) {
+				$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
+				$file->move($path, $data['qualifications']);
+				return $this->find($id)->update($data);
+			}         
     }
 }

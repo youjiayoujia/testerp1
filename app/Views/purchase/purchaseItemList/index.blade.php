@@ -1,6 +1,16 @@
 @extends('common.table')
 @section('tableToolButtons')
- <div class="btn-group">
+		 <div class="btn-group">
+         <a href="/purchaseItemList/excelReduction" class="btn btn-info" >
+             批量导入采购价格
+        </a>
+        </div>
+         <div class="btn-group">
+         <a href="/purchaseItemList/postExcelReduction" class="btn btn-info" >
+             批量导入物流单号
+        </a>
+        </div>
+         <div class="btn-group">
         <a href="/purchaseItemList/reduction" class="btn btn-info" id="batchexamine">
              批量处理采购条目
         </a>

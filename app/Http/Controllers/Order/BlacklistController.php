@@ -15,6 +15,7 @@ use App\Models\ChannelModel;
 use App\Models\Order\BlacklistModel;
 use App\Models\Order\RefundModel;
 use App\Models\OrderModel;
+use Excel;
 
 class BlacklistController extends Controller
 {
@@ -245,6 +246,33 @@ class BlacklistController extends Controller
             $model->update($data);
         }
         return 1;
+    }
+
+    /**
+     * 导出所有内单号
+     */
+    public function exportAll()
+    {
+        $rows = $this->model->exportAll();
+        $this->exportExcel($rows, 'export_all_blacklists', '导出所有内单号');
+    }
+
+    /**
+     * 导出勾选内单号
+     */
+    public function exportPart()
+    {
+        $rows = $this->model->exportPart();
+        $this->exportExcel($rows, 'export_part_blacklists', '导出勾选内单号');
+    }
+
+    public function exportExcel($rows, $name)
+    {
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 
 }

@@ -210,6 +210,7 @@ class ProductController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' =>$this->model->find($data['id']),
             'languages' => config('product.multi_language'),
+            'channels' => ChannelModel::all(),
             'id' => $data['id'],
         ];
 
@@ -226,7 +227,6 @@ class ProductController extends Controller
     public function productMultiUpdate()
     {
         $data = request()->all();
-    
         $productModel = $this->model->find($data['product_id']);
         $productModel->updateMulti($data);
 

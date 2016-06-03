@@ -14,7 +14,8 @@ class CreateProductMultiOptions extends Migration
     {
         Schema::create('product_multi_options', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('product_id')->comment('catalog_id');
+            $table->integer('product_id')->comment('product_id');
+            $table->integer('channel_id')->comment('channel_id');
             $table->string('de_name')->comment('de_name');
             $table->string('de_description')->comment('de_description');
             $table->string('de_keywords')->comment('de_keywords');
@@ -24,6 +25,9 @@ class CreateProductMultiOptions extends Migration
             $table->string('it_name')->comment('it_name');
             $table->string('it_description')->comment('it_description');
             $table->string('it_keywords')->comment('it_keywords');
+            $table->string('zh_name')->comment('it_name');
+            $table->string('zh_description')->comment('it_description');
+            $table->string('zh_keywords')->comment('it_keywords');
             $table->timestamps();
             $table->softDeletes();
         });

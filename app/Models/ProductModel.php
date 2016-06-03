@@ -6,6 +6,7 @@ use App\Base\BaseModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\ChannelModel;
 use Illuminate\Support\Facades\DB;
 use Tool;
 
@@ -176,7 +177,7 @@ class ProductModel extends BaseModel
 
     public function productMultiOption()
     {
-        return $this->hasOne('App\Models\Product\ProductMultiOptionModel','product_id');
+        return $this->hasMany('App\Models\Product\ProductMultiOptionModel','product_id');
     }
 
     /**
@@ -205,7 +206,12 @@ class ProductModel extends BaseModel
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
-                $product->productMultiOption()->create($data);
+                $channels = ChannelModel::all();
+                foreach($channels as $channel){
+                    $data['channel_id'] = $channel->id;
+                    $product->productMultiOption()->create($data);
+                }
+                
                 //默认图片id为0
                 $default_image_id = 0;
                 $imageModel = new ImageModel();
@@ -482,13 +488,21 @@ class ProductModel extends BaseModel
     }
 
     /**
-     * 渠道产品审核
-     * 2016-3-11 14:00:41 YJ
-     * @param int $status 审核状态
+     * 更新多渠道多语言信息
+     * 2016年6月3日10:43:18 YJ
+     * @param array data 修改的信息
      */
     public function updateMulti($data)
     {   
-        $this->productMultiOption->update($data);
+        foreach($data['info'] as $channel_id=>$language){
+            foreach($language as $prefix=>$value){
+                $arr[$prefix.'_name'] = $value[$prefix.'_name'];
+                $arr[$prefix.'_description'] = $value[$prefix.'_description'];
+                $arr[$prefix.'_keywords'] = $value[$prefix.'_keywords'];
+            }
+            $model = $this->productMultiOption->where("channel_id",$channel_id)->first();
+            $model->update($arr);
+        }
     }
 
 }

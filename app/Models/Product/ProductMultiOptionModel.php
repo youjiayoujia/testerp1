@@ -11,7 +11,9 @@ class ProductMultiOptionModel extends BaseModel
 	protected $fillable = [
         'it_name', 'it_description', 'it_keywords', 
         'de_name', 'de_description', 'de_keywords', 
-        'fr_name', 'fr_description', 'fr_keywords', 
+        'fr_name', 'fr_description', 'fr_keywords',
+        'zh_name', 'zh_description', 'zh_keywords',
+        'product_id','channel_id',
     ];
 
     // 规则验证

@@ -38,7 +38,7 @@
             </td>
             <td>{{ $order->channelAccount->alias }}</td>
             <td>{{ $order->status_name }}</td>
-            <td>{{ $order->userService->name }}</td>
+            <td>{{ $order->userService == NULL ? '' : $order->userService->name }}</td>
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href=".collapseExample{{$order->id}}" aria-expanded="true" aria-controls="collapseExample">
@@ -64,19 +64,23 @@
             </td>
             <td colspan="25" style="padding: 10px; margin: 10px">
                 @foreach($order->orderItem as $orderItem)
-                    <div class="row">
-                        <div class="col-lg-3" style="color: blue">{{ $orderItem->sku }}<strong style="color: black">{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong></div>
-                        <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
-                        <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
-                        <div class="col-lg-2">{{ 'X' . ' ' . $orderItem->quantity }}</div>
-                        <div class="col-lg-2" style="color: #2aabd2">
-                            <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                               data-id="{{ $orderItem->id }}"
-                               data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">
-                                <span class="glyphicon glyphicon-trash"></span> 删除
-                            </a>
-                        </div>
-                    </div>
+                    @if($orderItem->sku == '' && $orderItem->channel_sku == '')
+                    @endif
+                    @if($orderItem->sku != '' && $orderItem->item_id != 0)
+                            <div class="row">
+                                <div class="col-lg-3" style="color: blue">{{ $orderItem->sku }}<strong style="color: black">{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong></div>
+                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
+                                <div class="col-lg-2">{{ 'X' . ' ' . $orderItem->quantity }}</div>
+                                <div class="col-lg-2" style="color: #2aabd2">
+                                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                                       data-id="{{ $orderItem->id }}"
+                                       data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">
+                                        <span class="glyphicon glyphicon-trash"></span> 删除
+                                    </a>
+                                </div>
+                            </div>
+                    @endif
                 @endforeach
                 <div class="row col-lg-12" style="color: black; text-align: center;">
                     平台费: ${{ '' }},

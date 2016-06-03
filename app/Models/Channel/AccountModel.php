@@ -226,6 +226,16 @@ class AccountModel extends BaseModel
                     'sku_resolve' => $this->wish_sku_resolve,
                 ];
                 break;
+            case 'cdiscount':
+                $config = [
+                    'lazada_access_key' => $this->lazada_access_key,
+                    'lazada_user_id' => $this->lazada_user_id,
+                    'lazada_site' => $this->lazada_site,
+                    'lazada_currency_type' => $this->lazada_currency_type,
+                    'lazada_currency_type_cn' => $this->lazada_currency_type_cn,
+                    'lazada_api_host' => $this->lazada_api_host,
+                ];
+                break;
         }
         return $config;
     }

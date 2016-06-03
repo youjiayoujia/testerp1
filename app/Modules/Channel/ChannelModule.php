@@ -12,7 +12,7 @@ use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Modules\Channel\Adapter\LazadaAdapter;
 use App\Modules\Channel\Adapter\WishAdapter;
-
+use App\Modules\Channel\Adapter\CdiscountAdapter;
 
 Class ChannelModule
 {
@@ -55,5 +55,9 @@ Class ChannelModule
     public function createLazadaDriver($config)
     {
         return new LazadaAdapter($config);
+    }
+    public function createCdiscountDriver($config)
+    {
+        return new CdiscountAdapter($config);
     }
 }

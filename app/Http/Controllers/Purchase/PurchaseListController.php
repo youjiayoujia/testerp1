@@ -24,7 +24,7 @@ class PurchaseListController extends Controller
     {	
         $this->model = $purchaseList;
         $this->mainIndex = route('purchaseList.index');
-        $this->mainTitle = '采购对单';
+        $this->mainTitle = '采购到货';
 		$this->viewPath = 'purchase.purchaseList.';
     }
     
@@ -40,7 +40,16 @@ class PurchaseListController extends Controller
 			}
         return view($this->viewPath . 'index', $response);
     }
-
+	
+	public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		$response['metas']['title']='查询采购运单';
+        return view($this->viewPath . 'create', $response);
+    }
+	
 	/**
      * 批量对单
      *

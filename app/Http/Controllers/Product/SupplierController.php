@@ -53,12 +53,16 @@ class SupplierController extends Controller
         $data=request()->all();
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->supplierCreate($data, request()->file('qualifications'));
-        SupplierChangeHistoryModel::create([              
-            'supplier_id' => $model->id,
-            'to' =>request()->input('purchase_id'),
-            'adjust_by' => '3',
-        ]);
+		if($model=='imageError'){
+			return redirect(route('productSupplier.create'))->with('alert', $this->alert('danger', '图片格式不正确.'));
+		}else{
+			SupplierChangeHistoryModel::create([              
+				'supplier_id' => $model->id,
+				'to' =>request()->input('purchase_id'),
+				'adjust_by' => '3',
+			]);
         return redirect($this->mainIndex);
+		}
     }
 
     /**
@@ -95,7 +99,6 @@ class SupplierController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data=request()->all();
-        $this->validate(request(), $this->model->rules('update', $id));
         if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
                 'supplier_id' => $id,
@@ -104,8 +107,12 @@ class SupplierController extends Controller
                 'adjust_by' => '3',
             ]);
         }
-        $this->model->updateSupplier($id,$data,request()->file('qualifications'));
-        return redirect($this->mainIndex);
+        $res=$this->model->updateSupplier($id,$data,request()->file('qualifications'));
+		if($res =='imageError'){
+			return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '图片格式不正确.'));
+			}else{
+       		 return redirect($this->mainIndex);
+		}
     }
 
     /**

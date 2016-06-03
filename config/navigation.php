@@ -281,8 +281,8 @@ return [
                     'icon' => '',
                 ],*/
                 [
-                    'name' => '采购对单',
-                    'url' => 'purchaseList.index',
+                    'name' => '采购到货',
+                    'url' => 'purchaseList.create',
                     'icon' => '',
                 ],
 				[

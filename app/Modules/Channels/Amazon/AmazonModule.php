@@ -52,7 +52,80 @@ class AmazonModule extends BaseChannelModule
         $url = $this->getFinalUrl();
         $this->visitUrl($url);
     }
+/*************************************************************************************/
+    public function returnTracking()
+    {
+        $this->_config['Action'] = 'SubmitFeed';
+        $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
+        $this->_config['Version'] = '2009-01-01';
+        var_dump($this->_config);
+        $sign  = 'POST' . "\n";
+        $sign .= $this->signArrToString();
+        var_dump($sign);
+        $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
+        $signature = urlencode(base64_encode($signature));
+        $this->_config['Content-Type'] = 'text/html';
+        $this->_config['Signature'] = $signature;
+        $this->_config['User-Agent'] = 'php-amazon-mws/0.0.1 (Language=php)';
+        $this->_config['Host'] = 'mws.amazonservices.com';
+        var_dump($this->_config);
+        $url = [];
+        foreach($this->_config as $key => $value) {
+            $url[] = "{$key}={$value}";
+        }
+        sort($url);
+        var_dump($url);
+        $string = implode('&', $url);
+        var_dump($string);
+        $tmp = base64_encode(md5($string));
+        $this->_config['Content-MD5'] = $tmp;
+        $lasturl = $this->signArrToString();
+        var_dump($lasturl);exit;
+    }
 
+//A3THBIK7QYKUUV account id  marchant_id就是account_id
+    public function getXML($arr, $marchant)
+    {
+        $str = "<?xml version='1.0' encoding='UTF-8'?>
+    <AmazonEnvelope xsi:noNamespaceSchemaLocation='amzn-envelope.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+        <Header>
+            <DocumentVersion>1.01</DocumentVersion>
+            <MerchantIdentifier>".$marchant."</MerchantIdentifier>
+        </Header>
+        <MessageType>OrderFulfillment</MessageType>";
+        foreach($arr as $key => $value)
+        {
+            $str .= $this->getSingleXML(($key+1),$value['0'],$value['1'],$value['2'],$value['3'],$value['4'],$value['5']);
+        }
+    
+        $str .= "</AmazonEnvelope>";
+        return $str;
+    }
+
+    public function getSingleXML($i, $amazonOrderId, $FulfillmentDate, $CarrierName, $ShippingMethod, $shipperTrackingNumber, $arr)
+    {
+        $str = "<Message>
+            <MessageID>".$i."</MessageID>
+            <OrderFulfillment>
+                <AmazonOrderID>".$amazonOrderId."</AmazonOrderID>
+                <FulfillmentDate>".$FulfillmentDate."</FulfillmentDate>
+                <FulfillmentData>
+                    <CarrierName>".$CarrierName."</CarrierName>
+                    <ShippingMethod>".$ShippingMethod."</ShippingMethod>
+                    <ShipperTrackingNumber>".$shipperTrackingNumber."</ShipperTrackingNumber>
+                </FulfillmentData>";
+        foreach($arr as $key => $value) {
+            $str .= "<Item>
+                    <AmazonOrderItemCode>".$key."</AmazonOrderItemCode>
+                    <Quantity>".$value."</Quantity>
+                </Item>";
+        }
+        $str .= "</OrderFulfillment>
+            </Message>";
+
+        return $str;
+    }
+    /******************************************************************************************/
     /**
      * 订单列表 
      *

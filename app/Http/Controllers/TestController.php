@@ -12,12 +12,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Modules\SingleChannelModule;
+use App\Modules\Channels\Amazon\AmazonModule;
+
 
 class TestController extends Controller
 {
     public function test()
     {
-        $model = new SingleChannelModule('Amazon');
-        $model->listOrderItems();
+        $model = new AmazonModule();
+        echo "<pre>";
+        var_dump($model->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32'));
+        echo "</pre>";
     }
 }

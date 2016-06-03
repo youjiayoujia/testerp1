@@ -374,6 +374,8 @@ Route::group(['middleware' => 'auth'], function () {
     //产品管理路由
     Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
     Route::get('examine', ['uses' => 'ProductController@examine', 'as' => 'examine']);
+    Route::get('productMultiEdit', ['uses' => 'ProductController@productMultiEdit', 'as' => 'productMultiEdit']);
+    Route::any('productMultiUpdate', ['uses' => 'ProductController@productMultiUpdate', 'as' => 'productMultiUpdate']);
     Route::get('choseShop', ['uses' => 'ProductController@choseShop', 'as' => 'choseShop']);
     Route::any('product/examineProduct',
         ['uses' => 'Product\EditProductController@examineProduct', 'as' => 'examineProduct']);

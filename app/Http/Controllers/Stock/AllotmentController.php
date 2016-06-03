@@ -22,6 +22,7 @@ use App\Models\StockModel;
 use App\Models\Stock\AllotmentLogisticsModel;
 use App\Models\Stock\InModel;
 use App\Models\Stock\OutModel;
+use DNS1D;
 
 class AllotmentController extends Controller
 {
@@ -386,6 +387,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'allotmentforms' => $allotmentforms,
+            'barcode' => DNS1D::getBarcodeHTML($model->allotment_id, "C128"),
         ];
 
         return view($this->viewPath.'printAllotment', $response);

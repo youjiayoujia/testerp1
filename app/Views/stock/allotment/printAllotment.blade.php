@@ -13,6 +13,10 @@
             <label>审核人</label>
             <input type='text' class='form-control' value={{ $model->checkByName ? $model->checkByName->name : '' }}>
         </div>
+        <div class='form-group col-lg-2'>
+            <label>条码打印</label>
+            {!!$barcode!!}
+        </div>
     </div>
     <div class='row'>
         <div class='form-group col-lg-12'>

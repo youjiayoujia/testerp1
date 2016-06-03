@@ -12,7 +12,7 @@ use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Modules\Channel\Adapter\LazadaAdapter;
 use App\Modules\Channel\Adapter\WishAdapter;
-
+use App\Modules\Channel\Adapter\EbayAdapter;
 
 Class ChannelModule
 {
@@ -39,7 +39,7 @@ Class ChannelModule
 
     public function createEbayDriver($config)
     {
-
+        return new EbayAdapter($config);
     }
 
     public function createWishDriver($config)

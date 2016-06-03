@@ -469,6 +469,8 @@ Route::group(['middleware' => 'auth'], function () {
     //图片标签
     Route::resource('label', 'LabelController');
 
+    Route::resource('paypal', 'PaypalController');
+
 
 });
 

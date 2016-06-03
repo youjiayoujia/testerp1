@@ -35,6 +35,21 @@
             <input class="form-control" id="zipcode" placeholder="邮编" name='zipcode' value="{{ old('zipcode') }}">
         </div>
         <div class="form-group col-lg-2">
+            <label for="refund_order" class="control-label">退款订单数</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="refund_order" placeholder="退款订单数" name='refund_order' value="{{ old('refund_order') }}">
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="total_order" class="control-label">订单总数</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="total_order" placeholder="订单总数" name='total_order' value="{{ old('total_order') }}">
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="refund_rate" class="control-label">退款率</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="refund_rate" placeholder="退款率" name='refund_rate' value="{{ old('refund_rate') }}">
+        </div>
+        <div class="form-group col-lg-2">
             <label for="type" class='control-label'>类型</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="type" id="type">
@@ -44,21 +59,6 @@
                     </option>
                 @endforeach
             </select>
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="total_order" class="control-label">订单总数</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="total_order" placeholder="订单总数" name='total_order' value="{{ old('total_order') }}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="refund_order" class="control-label">退款订单数</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="refund_order" placeholder="退款订单数" name='refund_order' value="{{ old('refund_order') }}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="refund_rate" class="control-label">退款率</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="refund_rate" placeholder="退款率" name='refund_rate' value="{{ old('refund_rate') }}">
         </div>
         <div class="form-group col-lg-6">
             <label for="remark" class="control-label">备注</label>

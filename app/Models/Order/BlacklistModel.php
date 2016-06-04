@@ -85,28 +85,24 @@ class BlacklistModel extends BaseModel
         return $rows;
     }
 
-    public function exportPart()
+    public function exportPart($blacklist_id_arr)
     {
-        $blacklist_ids = request()->input('blacklist_ids');
-        $blacklist_id_arr = explode(',', $blacklist_ids);
+        $part = $this->whereIn('id', $blacklist_id_arr)->get();
         $rows = '';
-        foreach($blacklist_id_arr as $id) {
-            $part = $this->find($id);
-            foreach($part as $model) {
-                $rows[] = [
-                    'id' => $model->id,
-                    'channel_id' => $model->channel_id,
-                    'ordernum' => $model->ordernum,
-                    'name' => $model->name,
-                    'email' => $model->email,
-                    'zipcode' => $model->zipcode,
-                    'type' => $model->type,
-                    'remark' => $model->remark,
-                    'total_order' => $model->total_order,
-                    'refund_order' => $model->refund_order,
-                    'refund_rate' => $model->refund_rate,
-                ];
-            }
+        foreach($part as $model) {
+            $rows[] = [
+                'id' => $model->id,
+                'channel_id' => $model->channel_id,
+                'ordernum' => $model->ordernum,
+                'name' => $model->name,
+                'email' => $model->email,
+                'zipcode' => $model->zipcode,
+                'type' => $model->type,
+                'remark' => $model->remark,
+                'total_order' => $model->total_order,
+                'refund_order' => $model->refund_order,
+                'refund_rate' => $model->refund_rate,
+            ];
         }
         return $rows;
     }

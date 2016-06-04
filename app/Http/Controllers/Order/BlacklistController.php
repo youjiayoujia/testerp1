@@ -262,7 +262,9 @@ class BlacklistController extends Controller
      */
     public function exportPart()
     {
-        $rows = $this->model->exportPart();
+        $blacklist_ids = request()->input('blacklist_ids');
+        $blacklist_id_arr = explode(',', $blacklist_ids);
+        $rows = $this->model->exportPart($blacklist_id_arr);
         $this->exportExcel($rows, 'export_part_blacklists', '导出勾选内单号');
     }
 

@@ -18,7 +18,7 @@ class EditProductController extends Controller
 
     public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier,CurrencyModel $currencyModel,ImageModel $imageModel)
     {
-        $this->mainIndex = route('EditProduct.index');
+        $this->mainIndex = route('product.index');
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
         $this->image = $imageModel;

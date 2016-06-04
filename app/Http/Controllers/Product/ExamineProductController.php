@@ -15,7 +15,7 @@ class ExamineProductController extends Controller
 
     public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier)
     {
-        $this->mainIndex = route('ExamineProduct.index');
+        $this->mainIndex = route('product.index');
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
         $this->supplier = $supplier;

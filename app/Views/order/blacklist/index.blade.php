@@ -101,7 +101,6 @@
             });
 
             $('.exportPart').click(function(){
-                location.href = "{{ route('exportPart')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var blacklist_ids = "";
                 for (var i = 0; i < checkbox.length; i++) {
@@ -110,7 +109,7 @@
                 }
                 blacklist_ids = blacklist_ids.substr(0,(blacklist_ids.length)-1);
                 $.ajax({
-                    url : location.href,
+                    url : "{{ route('exportPart')}}",
                     data : {blacklist_ids:blacklist_ids},
                     dataType : 'json',
                     type : 'get',

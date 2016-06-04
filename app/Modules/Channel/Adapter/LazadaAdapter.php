@@ -73,7 +73,7 @@ Class LazadaAdapter implements AdapterInterface
 
             $offset = ($step - 1) * $this->perPage;
 
-            $orders_data = $this->getLazadaOrder($startDate, $endDate, $offset);
+            $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
 
 
             if(isset($orders_data['Head']['ErrorMessage']))
@@ -130,7 +130,7 @@ Class LazadaAdapter implements AdapterInterface
 
 
 
-    public function getLazadaOrder($startDate, $endDate,$offset){
+    public function getLazadaOrder($startDate, $endDate, $status, $offset){
         $api_key = $this->config['lazada_access_key'];
         $lazada_api_host = $this->config['lazada_api_host'];
         $lazada_user_id = $this->config['lazada_user_id'];
@@ -146,12 +146,16 @@ Class LazadaAdapter implements AdapterInterface
             'Action' => 'GetOrders',
             'Timestamp' => $now->format(\DateTime::ISO8601),
             //  'UpdatedAfter' => $after->format(DateTime::ISO8601),
-            'Status' => 'pending', // 只抓pending 状态下的订单
+            //'Status' => 'pending', // 只抓pending 状态下的订单
 
             'CreatedAfter'=>$after->format(\DateTime::ISO8601),
             'Limit'	=>  $this->perPage,
             'Offset'	=> $offset,
         );
+
+        if($status){
+            $parameters['Status'] = $status[0];
+        }
 
         ksort($parameters);
 

@@ -179,9 +179,11 @@
                         <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                     </a>  
                 <?php } ?>
+                <?php if($product->edit_status=="image_unedited"||$product->edit_status=="image_edited"){ ?>
                 <a href="{{ route('ExamineProduct.edit', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 查看并审核
                 </a>
+                <?php } ?>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">

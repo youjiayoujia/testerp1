@@ -133,7 +133,7 @@ class ImageModel extends BaseModel
                 break;
         }
 
-        return $imageModel;
+        return 1;
     }
 
     /**

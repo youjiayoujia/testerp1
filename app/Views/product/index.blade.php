@@ -1,22 +1,59 @@
 @extends('common.table')
 @section('tableToolButtons')
+
     <div class="btn-group">
-        <!--<a class="btn btn-info" id="batchexamine">
-            <i class="glyphicon glyphicon-ok-circle"></i> 批量审核
-        </a>-->
+        <a href="javascript:" data-channel="1" data-name="Amazon" class="btn btn-success choseShop">
+            选中
+        </a>
+    </div>
+
+    <div class="btn-group" role="group" >
+        <div class="form-group" style="margin-bottom:0px">
+            <select id="ms" multiple="multiple" style="width:200px" name="select_channel">
+                <option value="1" class='aa'>Amazon</option>
+                <option value="2" class='aa'>EBay</option>
+                <option value="3" class='aa'>速卖通</option>
+                <option value="4" class='aa'>B2C</option>
+            </select>
+        </div>
+    </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            批量审核
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:" class="shenhe" data-status="pass" data-name="审核通过" >通过</a></li>
+            <li><a href="javascript:" class="shenhe" data-status="notpass" data-name="审核不通过">不通过</a></li>
+            <li><a href="javascript:" class="shenhe" data-status="revocation" data-name="撤销审核">撤销审核</a></li>
+        </ul>
     </div>
     <div class="btn-group" role="group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="glyphicon glyphicon-filter"></i> 语种切换
+                <i class="glyphicon glyphicon-filter"></i> 查询审核状态
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-                <li><a href="{{ DataList::filtersEncode(['language','=','zh']) }}">中国</a></li>
-                <li><a href="{{ DataList::filtersEncode(['language','=','fr']) }}">法语</a></li>
-                <li><a href="{{ DataList::filtersEncode(['language','=','de']) }}">德语</a></li>
-                <li><a href="{{ DataList::filtersEncode(['language','=','it']) }}">意大利语</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','']) }}">未审核</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','pass']) }}">审核通过</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','notpass']) }}">审核不通过</a></li>
+                <li><a href="{{ DataList::filtersEncode(['examine_status','=','revocation']) }}">撤销审核</a></li>
             </ul>
-    </div>
+    </div>  
+
+    <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="glyphicon glyphicon-filter"></i> 查询编辑状态
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','picked']) }}">被选中</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','data_edited']) }}">资料已编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_edited']) }}">图片已编辑</a></li>
+                <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
+            </ul>
+    </div> 
+    
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
             <i class="glyphicon glyphicon-plus"></i> 新增
@@ -29,6 +66,10 @@
     <th class="sort" data-field="model">MODEL</th>
     <th>图片</th>
     <th>分类</th>
+    <th>状态</th>
+    <th>选中shop</th>
+    <th>编辑状态</th>
+    <th>审核状态</th>
     <th class="sort" data-field="name">名称</th>
     <th class="sort" data-field="c_name">中文名称</th>
     <th>供应商</th>
@@ -49,6 +90,72 @@
             <td>{{ $product->model }}</td>
             <td>@if($product->default_image>0)<img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="100px" >@else无图片@endif</td>
             <td>{{ $product->catalog->all_name }}</td>
+             <td><?php if($product->edit_status=="")echo "新品上传";if($product->edit_status=="picked")echo "被选中";if($product->edit_status=="canceled")echo "取消"; ?></td>
+            <td><?php if($product->amazonProduct)echo "amazon,";if($product->ebayProduct)echo "ebay,";if($product->aliexpressProduct)echo "aliexpress,";if($product->b2cProduct)echo "B2C,"; ?></td>
+            <?php switch ($product->edit_status) {
+                case '':
+                    ?>
+                    <td>新品上传</td>
+                    <?php
+                    break;
+
+                case 'canceled':
+                    ?>
+                    <td>取消</td>
+                    <?php
+                    break;
+
+                case 'picked':
+                    ?>
+                    <td>选中</td>
+                    <?php
+                    break;
+
+                case 'data_edited':
+                    ?>
+                    <td>资料已编辑</td>
+                    <?php
+                    break;
+
+                case 'image_edited':
+                    ?>
+                    <td>图片已编辑</td>
+                    <?php
+                    break;
+
+                case 'image_unedited':
+                    ?>
+                    <td>图片不编辑</td>
+                    <?php
+                    break;
+            } ?>
+            <?php switch ($product->examine_status) {
+                case 'pass':
+                    ?>
+                    <td>通过</td>
+                    <?php
+                    break;
+
+                case 'notpass':
+                    ?>
+                    <td class="notremark">未通过</td>
+                    
+                    <?php
+                    break;
+
+                case '':
+                    ?>
+                    <td>未审核</td>
+                    <?php
+                    break;
+
+                case 'revocation':
+                    ?>
+                    <td>撤销</td>
+                    <?php
+                    break;
+
+            } ?>
             <td>{{ $product->name }}</td>
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->supplier->name }}</td>
@@ -63,17 +170,18 @@
                 <a href="{{ route('productMultiEdit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 小语言
                 </a>
-                <!--@if(!$product->status)
-                    <a href="javascript:" class="btn btn-info btn-xs examine_model"
-                       data-id="{{ $product->id }}"
-                       data-url="{{route('examine')}}">
-                        <span class="glyphicon glyphicon-check"></span> <span class='examine_{{$product->id}}'>审核</span>
+                <?php if(($product->edit_status=='picked'||$product->edit_status=='data_edited'||$product->edit_status=="image_edited"||$product->edit_status=="image_unedited")&&$product->examine_status!='pass'){ ?>
+                    <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                     </a>
-                @else
-                    <a href="javascript:" class="btn btn-info btn-xs has_check">
-                        <span class="glyphicon glyphicon-check"></span> <span>已审核</span>
-                    </a>
-                @endif-->
+                <?php } if(($product->edit_status=="data_edited"||$product->edit_status=="image_edited")&&$product->examine_status!='pass'){ ?>
+                    <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span> 编辑图片
+                    </a>  
+                <?php } ?>
+                <a href="{{ route('ExamineProduct.edit', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span> 查看并审核
+                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">
@@ -84,73 +192,66 @@
     @endforeach
 @stop
 @section('childJs')
+    <link href="{{ asset('css/multiple-select.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script type="text/javascript">
-        //单个审核
-        $('.examine_model').click(function () {
-            var product_id = $(this).data('id');
-            if($(".examine_"+product_id).hasClass("hasexamine_"+product_id)){
-                alert("该产品已审核");return;
-            }
-            if (confirm("确认审核?")) {
-                var url = "{{route('examine')}}";
-                $.ajax({
-                    url:url,
-                    data:{product_ids:product_id},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result){
-                        if(result==1){
-                            $(".examine_"+product_id).text("已审核");
-                            $(".examine_"+product_id).addClass("hasexamine_"+product_id);
-                       }else{
-                            alert("审核失败");
-                       }                     
-                    }                  
-                })
-            }
-        });
-        $('.has_check').click(function () {
-            alert("该产品已审核");
-        });
-        //批量审核
-        $('#batchexamine').click(function () {
-            if (confirm("确认审核?")) {
-                var url = "{{route('examine')}}";
+
+        $('#ms').multipleSelect();
+        //批量选中
+        $('.choseShop').click(function () {
+            var channel_ids = "";
+            $("#ms option:selected").each(function() {
+                channel_ids += $(this).attr("value")+",";
+            });
+
+            channel_ids = channel_ids.substr(0,(channel_ids.length)-1);
+            if (confirm("确认选中?")) {
+                var url = "{{route('beChosed')}}";
                 var checkbox = document.getElementsByName("tribute_id");
                 var product_ids = "";
+                
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
-                    if(checkbox[i].getAttribute('isexamine')==1){
-                        alert("产品id为"+checkbox[i].value+"的model已经审核了");
-                        return;
-                    }
                     product_ids += checkbox[i].value+",";
                 }
                 product_ids = product_ids.substr(0,(product_ids.length)-1);
                 $.ajax({
                     url:url,
-                    data:{product_ids:product_ids},
+                    data:{product_ids:product_ids,channel_ids:channel_ids},
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        window.location.reload();
-                    }                    
-                })
+                        window.location.reload();                
+                    }                  
+                })     
             }
-        });
-
+                 
+        });     
 
         //批量审核
-        $('#choseShop').click(function () {
-            var url = "{{route('choseShop')}}";
-            var checkbox = document.getElementsByName("tribute_id");
-            var product_ids = "";
-            for (var i = 0; i < checkbox.length; i++) {
-                if(!checkbox[i].checked)continue;
-                product_ids += checkbox[i].value+",";
+        $('.shenhe').click(function () {
+            if (confirm("确认"+$(this).data('name')+"?")) {
+                var url = "{{route('productExamineAll')}}";
+                var checkbox = document.getElementsByName("tribute_id");
+                var product_ids = "";
+                var examine_status = $(this).data('status');
+                
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    product_ids += checkbox[i].value+",";
+                }
+                product_ids = product_ids.substr(0,(product_ids.length)-1);
+                $.ajax({
+                    url:url,
+                    data:{product_ids:product_ids,examine_status:examine_status},
+                    dataType:'json',
+                    type:'get',
+                    success:function(result){
+                        window.location.reload();             
+                    }                  
+                })     
             }
-            product_ids = product_ids.substr(0,(product_ids.length)-1);
-            window.location.href=url+"?product_ids="+product_ids;      
+                 
         });
 
         //全选

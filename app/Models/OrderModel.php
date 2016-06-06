@@ -278,10 +278,8 @@ class OrderModel extends BaseModel
             if ($orderItem) {
                 $item['item_id'] = $orderItem->id;
             } else {
-                echo $item['channel_sku'] . '<br>';
                 $channelProduct = ChannelProduct::where('channel_sku', $item['channel_sku'])->first();
                 if ($channelProduct) {
-                    echo $channelProduct->item->id . '<br/>';
                     $item['item_id'] = $channelProduct->item->id;
                 }
             }

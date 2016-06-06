@@ -372,6 +372,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('pickList', 'PickListController');
 
     //产品管理路由
+    Route::any('productBatchEdit', ['uses' => 'ProductController@productBatchEdit', 'as' => 'productBatchEdit']);
+    Route::any('productBatchUpdate', ['uses' => 'ProductController@productBatchUpdate', 'as' => 'productBatchUpdate']);
     Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
     Route::get('examine', ['uses' => 'ProductController@examine', 'as' => 'examine']);
     Route::get('productMultiEdit', ['uses' => 'ProductController@productMultiEdit', 'as' => 'productMultiEdit']);

@@ -285,7 +285,7 @@ class OrderModel extends BaseModel
                     $item['item_id'] = $channelProduct->item->id;
                 }
             }
-            if (!$item['item_id']) {
+            if (!isset($item['item_id'])) {
                 $item['item_id'] = 0;
                 $order->update(['status' => 'REVIEW', 'remark' => '渠道SKU找不到对应产品']);
             }

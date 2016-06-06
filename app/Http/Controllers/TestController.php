@@ -158,9 +158,9 @@ class TestController extends Controller
             $spu_id = DB::table('spus')->insertGetId(
                  array('spu' => $data->sku, 'status' =>  0,'created_at'=>'2015-10-16 16:33:00','updated_at'=>'2015-10-16 16:33:00')
             );
-            
+
             $product_id = DB::table('products')->insertGetId(
-                 array('spu_id' => $spu_id, 
+                 array('spu_id' => $spu_id,
                     'name' =>  $data->title,
                     'c_name'=>$data->c_name,
                     'model'=>$data->sku,
@@ -173,7 +173,7 @@ class TestController extends Controller
             );
 
             $sku_id = DB::table('items')->insertGetId(
-                 array('product_id' => $product_id, 
+                 array('product_id' => $product_id,
                     'name' =>  $data->title,
                     'c_name'=>$data->c_name,
                     'sku'=>$data->sku,

@@ -68,11 +68,11 @@
                     @endif
                     @if($orderItem->sku != '' && $orderItem->item_id != 0)
                             <div class="row">
-                                <div class="col-lg-3" style="color: blue">{{ $orderItem->sku }}<strong style="color: black">{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong></div>
+                                <div class="col-lg-5" style="color: blue">{{ $orderItem->sku .'('. $orderItem->channel_sku .')' }}<strong style="color: black">{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong></div>
                                 <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
                                 <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
-                                <div class="col-lg-2">{{ 'X' . ' ' . $orderItem->quantity }}</div>
-                                <div class="col-lg-2" style="color: #2aabd2">
+                                <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
+                                <div class="col-lg-1" style="color: #2aabd2">
                                     <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                                        data-id="{{ $orderItem->id }}"
                                        data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">

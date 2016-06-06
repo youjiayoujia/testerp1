@@ -15,7 +15,7 @@ class SelectProductController extends Controller
 
     public function __construct(amazonProductModel $amazonProductModel,ProductModel $productModel,SupplierModel $supplier)
     {
-        $this->mainIndex = route('SelectProduct.index');
+        $this->mainIndex = route('product.index');
         $this->channelProduct = $amazonProductModel;
         $this->product = $productModel;
         $this->supplier = $supplier;

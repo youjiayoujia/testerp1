@@ -13,7 +13,11 @@ namespace App\Models;
 use Exception;
 use Tool;
 use App\Base\BaseModel;
+use App\Models\Order\ItemModel;
+use App\Models\ItemModel as productItem;
+use App\Models\Channel\ProductModel as ChannelProduct;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order\RefundModel;
 
 class OrderModel extends BaseModel
 {
@@ -119,6 +123,11 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
     }
 
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
@@ -175,13 +184,47 @@ class OrderModel extends BaseModel
         return $arr[$this->address_confirm];
     }
 
+    public function getWithdrawNameAttribute()
+    {
+        $arr = config('order.withdraw');
+        return $arr[$this->withdraw];
+    }
+
+    /**
+     * 订单sku获取器
+     * @return string
+     */
+    public function getSkuNameAttribute()
+    {
+        $items = ItemModel::where('order_id', $this->id)->get()->toArray();
+        $sku = '';
+        foreach ($items as $item) {
+            $sku = $item['sku'] . ' ' . $sku;
+        }
+        return $sku;
+    }
+
+    /**
+     * 订单成本获取器
+     * @return int
+     */
+    public function getItemCostNameAttribute()
+    {
+        $orderItems = ItemModel::where('order_id', $this->id)->get()->toArray();
+        $all = 0;
+        foreach ($orderItems as $orderItem) {
+            $cost = productItem::where('id', $orderItem['item_id'])->first()->cost;
+            $all = $cost * $orderItem['quantity'] + $all;
+        }
+        return $all;
+    }
+
     public function getPartialOverAttribute()
     {
         $orderItems = $this->orderItem;
         $flag = 1;
-        foreach($orderItems as $orderItem)
-        {
-            if($orderItem->split_quantity != $orderItem->quantity) {
+        foreach ($orderItems as $orderItem) {
+            if ($orderItem->split_quantity != $orderItem->quantity) {
                 $flag = 0;
             }
         }
@@ -194,6 +237,16 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
 
+    public function remarks()
+    {
+        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany('App\Models\Order\RefundModel', 'order_id', 'id');
+    }
+
     public function package()
     {
         return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
@@ -204,24 +257,38 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\RequireModel', 'order_id');
     }
 
+    public function refundCreate($data, $file = null)
+    {
+        $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
+        if ($file->getClientOriginalName()) {
+            $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, time() . '.' . $file->getClientOriginalExtension());
+            return RefundModel::create($data);
+        }
+        return 1;
+    }
+
     public function createOrder($data)
     {
-        //todo: Ordernum Format
         $last = $this->all()->last();
         $data['ordernum'] = $last ? $last->id + 1 : 1;
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            //todo: Search item by channel sku
-            $obj = ItemModel::where('sku', $item['sku'])->get();
-            if (!count($obj)) {
+            $orderItem = productItem::where('sku', $item['sku'])->first();
+            if ($orderItem) {
+                $item['item_id'] = $orderItem->id;
+            } else {
+                $channelProduct = ChannelProduct::where('channel_sku', $item['channel_sku'])->first();
+                if ($channelProduct) {
+                    $item['item_id'] = $channelProduct->item->id;
+                }
+            }
+            if (!isset($item['item_id'])) {
                 $item['item_id'] = 0;
                 $order->update(['status' => 'REVIEW', 'remark' => '渠道SKU找不到对应产品']);
-            } else {
-                $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
             $order->items()->create($item);
         }
-
         return $order;
     }
 
@@ -285,9 +352,9 @@ class OrderModel extends BaseModel
                     $this->status = 'NEED';
                     $this->save();
                 } elseif ($this->status == 'NEED') {
-                    if(strtotime($this->created_at) < strtotime('-3 days')) {
+                    if (strtotime($this->created_at) < strtotime('-3 days')) {
                         $arr = $this->explodeOrder();
-                        if($arr) {
+                        if ($arr) {
                             $this->is_partial = 1;
                             $this->package_times += 1;
                             $this->save();
@@ -338,7 +405,7 @@ class OrderModel extends BaseModel
                             'PACKAGE',
                             $newPackageItem->id,
                             $key);
-                        if($flag == 1) {
+                        if ($flag == 1) {
                             $newPackageItem->orderItem->status = 'PACKED';
                         }
                         $newPackageItem->orderItem->split_quantity += $newPackageItem->quantity;
@@ -350,7 +417,7 @@ class OrderModel extends BaseModel
             }
         }
         DB::commit();
-        if($flag == 1) {
+        if ($flag == 1) {
             $this->status = 'PACKED';
         } else {
             $this->split_times += 1;
@@ -362,23 +429,22 @@ class OrderModel extends BaseModel
     {
         $arr = $this->orderStockDiff($this->orderNeedArray());
         $sum = $this->atLeastTimes($arr);
-        if($this->split_times > (4 - $sum)) {
+        if ($this->split_times > (4 - $sum)) {
             return false;
         }
         $stocks = [];
-        foreach($arr as $key => $value)
-        {
-            if(!($arr[$key]['allocateSum'] >= 5 && $arr[$key]['allocateSum']/$arr[$key]['sum'] >= 0.5 || $arr[$key]['allocateSum'] < 5 && $arr[$key]['allocateSum'] == $arr[$key]['sum'])) {
+        foreach ($arr as $key => $value) {
+            if (!($arr[$key]['allocateSum'] >= 5 && $arr[$key]['allocateSum'] / $arr[$key]['sum'] >= 0.5 || $arr[$key]['allocateSum'] < 5 && $arr[$key]['allocateSum'] == $arr[$key]['sum'])) {
                 continue;
             }
-            foreach($value as $k => $v)
-            {
-                if(!is_array($v)) {
+            foreach ($value as $k => $v) {
+                if (!is_array($v)) {
                     continue;
                 }
-                if($v['allocateQuantity']) {
-                    $defaultStocks = ItemModel::find($k)->assignDefaultStock($v['allocateQuantity'], $v['order_item_id']);
-                    if(array_key_exists($key, $stocks)) {
+                if ($v['allocateQuantity']) {
+                    $defaultStocks = ItemModel::find($k)->assignDefaultStock($v['allocateQuantity'],
+                        $v['order_item_id']);
+                    if (array_key_exists($key, $stocks)) {
                         $stocks[$key] = $stocks[$key] + $defaultStocks[$key];
                     } else {
                         $stocks += $defaultStocks;
@@ -393,9 +459,8 @@ class OrderModel extends BaseModel
     public function atLeastTimes($arr)
     {
         $sum = 0;
-        foreach($arr as $key => $value)
-        {
-            if($value['sum'] == $value['allocateSum'] || $value['allocateSum'] == 0) {
+        foreach ($arr as $key => $value) {
+            if ($value['sum'] == $value['allocateSum'] || $value['allocateSum'] == 0) {
                 $sum += 1;
             } else {
                 $sum += 2;
@@ -409,30 +474,29 @@ class OrderModel extends BaseModel
     {
         $orderItems = $this->orderItem;
         $arr = [];
-        foreach($orderItems as $orderItem)
-        {
+        foreach ($orderItems as $orderItem) {
             $item = $orderItem->item;
             $needQuantity = $orderItem->quantity - $orderItem->split_quantity;
-            if($needQuantity) {
-                if(!array_key_exists($item->warehouse_id, $arr)) {
+            if ($needQuantity) {
+                if (!array_key_exists($item->warehouse_id, $arr)) {
                     $arr[$item->warehouse_id] = [];
                     $arr[$item->warehouse_id]['sum'] = 0;
-                    if(!array_key_exists($orderItem->item_id, $arr[$item->warehouse_id])) {
+                    if (!array_key_exists($orderItem->item_id, $arr[$item->warehouse_id])) {
                         $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] = $needQuantity;
                         $arr[$item->warehouse_id][$orderItem->item_id]['order_item_id'] = $orderItem->id;
-                        $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
                     } else {
                         $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] += $needQuantity;
-                        $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
                     }
                 } else {
-                    if(!array_key_exists($orderItem->item_id, $arr[$item->warehouse_id])) {
+                    if (!array_key_exists($orderItem->item_id, $arr[$item->warehouse_id])) {
                         $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] = $needQuantity;
                         $arr[$item->warehouse_id][$orderItem->item_id]['order_item_id'] = $orderItem->id;
-                        $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
                     } else {
                         $arr[$item->warehouse_id][$orderItem->item_id]['quantity'] += $needQuantity;
-                        $arr[$item->warehouse_id]['sum'] += $needQuantity; 
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
                     }
                 }
             }
@@ -443,18 +507,15 @@ class OrderModel extends BaseModel
 
     public function orderStockDiff($arr)
     {
-        foreach($arr as $warehouseId => $singleWarehouseInfo)
-        {
+        foreach ($arr as $warehouseId => $singleWarehouseInfo) {
             $arr[$warehouseId]['allocateSum'] = 0;
-            foreach($singleWarehouseInfo as $key => $value) 
-            {
-                if($key == 0) {
+            foreach ($singleWarehouseInfo as $key => $value) {
+                if ($key == 0) {
                     continue;
                 }
-                foreach($value as $k => $v)
-                {
+                foreach ($value as $k => $v) {
                     $stocks = StockModel::where(['item_id' => $key, 'warehouse_id' => $warehouseId])->get();
-                    if(!count($stocks)) {
+                    if (!count($stocks)) {
                         $arr[$warehouseId][$key]['allocateQuantity'] = 0;
                     } else {
                         $stock_sum = $stocks->sum('available_quantity');
@@ -490,7 +551,7 @@ class OrderModel extends BaseModel
         $packageItem = [];
         $orderItem = $this->active_items->first();
         $quantity = $orderItem->quantity - $orderItem->split_quantity;
-        if(!$quantity) {
+        if (!$quantity) {
             return false;
         }
         $stocks = $orderItem->item->assignStock($quantity);
@@ -518,7 +579,7 @@ class OrderModel extends BaseModel
         $warehouses = [];
         foreach ($this->active_items as $orderItem) {
             $quantity = $orderItem->quantity - $orderItem->split_quantity;
-            if(!$quantity) {
+            if (!$quantity) {
                 continue;
             }
             $itemStocks = $orderItem->item ? $orderItem->item->matchStock($quantity) : false;

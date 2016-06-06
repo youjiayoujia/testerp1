@@ -197,6 +197,44 @@ class ProductController extends Controller
     }
 
     /**
+     * 小语言编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productMultiEdit()
+    {
+        $data = request()->all();
+        $language = config('product.multi_language');
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' =>$this->model->find($data['id']),
+            'languages' => config('product.multi_language'),
+            'channels' => ChannelModel::all(),
+            'id' => $data['id'],
+        ];
+
+        return view($this->viewPath . 'language', $response);
+
+    }
+
+    /**
+     * 小语言更新
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productMultiUpdate()
+    {
+        $data = request()->all();
+        $productModel = $this->model->find($data['product_id']);
+        $productModel->updateMulti($data);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
+
+    }
+
+    /**
      * 详情
      *
      * @param $id
@@ -214,6 +252,48 @@ class ProductController extends Controller
             'warehouse' => $this->warehouse->find($model->warehouse_id),
         ];
         return view($this->viewPath . 'show', $response);
+    }
+
+    /**
+     * 批量更新界面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function productBatchEdit()
+    {
+        $product_ids = request()->input("product_ids");
+        $arr = explode(',', $product_ids);
+        $param = request()->input('param');
+        
+        $products = $this->model->whereIn("id",$arr)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'products' => $products,
+            'product_ids'=>$product_ids,
+            'param'  =>$param,
+            'wrapLimit' => $this->wrapLimit->all(),
+        ];
+        return view($this->viewPath . 'batchEdit', $response);
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function productBatchUpdate()
+    {
+        $product_ids = request()->input("product_ids");
+        $arr = explode(',', $product_ids);
+        $products = $this->model->whereIn("id",$arr)->get();
+        $data = request()->all();
+        $data['package_limit'] = empty($data['package_limit_arr']) ? '':implode(',', $data['package_limit_arr']);
+        foreach($products as $productModel){
+            $productModel->update($data);
+        }       
+        return redirect($this->mainIndex);
     }
 
     

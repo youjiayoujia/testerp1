@@ -22,4 +22,13 @@ class ItemController extends Controller
         $this->mainTitle = '产品管理';
         $this->viewPath = 'order.item.';
     }
+
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+
+        $model->destroy($id);
+        return redirect(route('order.index'));
+    }
+
 }

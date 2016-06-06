@@ -101,7 +101,7 @@ class ImageModel extends BaseModel
         } else {
             $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
         }*/
-        $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['is_link'] . '/' . $data['tag'] . '/';
+        $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['is_link'] . '/';
         $disk = Storage::disk('product');
         switch ($data['uploadType']) {
             case 'image':
@@ -110,7 +110,10 @@ class ImageModel extends BaseModel
                         $data['name'] = time() . $key . '.' . $file->getClientOriginalExtension();
                         Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath()));
                         $imageModel = $this->create($data);
-                        $imageModel->labels()->attach($data['is_link']);
+                        $arr[] = $data['is_link'];
+
+                        $imageModel->labels()->attach($arr);
+                        $imageModel->labels()->attach($data['tag']);
                     }
                 }
                 break;
@@ -130,7 +133,7 @@ class ImageModel extends BaseModel
                 break;
         }
 
-        return $imageModel;
+        return 1;
     }
 
     /**

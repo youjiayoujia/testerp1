@@ -48,12 +48,15 @@
     <input type='hidden' value='0' id='featurenum' name="featurenum">
     @foreach($channels as $channel)
         <div class="form-group">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label for="size">渠道</label>
                 <input class="form-control" disabled="disabled" placeholder="渠道"  value="{{$channel->name}}">
             </div>
-
-            <div class="col-md-6">
+            <div class="col-md-4">
+                <label for="size">固定费</label>
+                <input class="form-control" placeholder="固定费" name='channel[flat][{{$channel->id}}]' value="">
+            </div>
+            <div class="col-md-4">
                 <label for="size">费率</label>
                 <input class="form-control" placeholder="费率" name='channel[name][{{$channel->id}}]' value="">
             </div>

@@ -16,6 +16,7 @@ class CreateCatalogChannels extends Migration
             $table->increments('id');
             $table->integer('catalog_id')->comment('catalog_id');
             $table->integer('channel_id')->comment('channel_id');
+            $table->decimal('flat_rate',6,2)->comment('固定费率')->default(0);
             $table->decimal('rate',6,2)->comment('费率');
             $table->timestamps();
             $table->softDeletes();

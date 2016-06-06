@@ -7,16 +7,34 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>收货人姓名</strong>: {{ $model->name }}
+                <strong>平台</strong>: {{ $model->channel->name }}
             </div>
             <div class="col-lg-2">
+                <strong>订单号</strong>: {{ $model->ordernum }}
+            </div>
+            <div class="col-lg-2">
+                <strong>姓名</strong>: {{ $model->name }}
+            </div>
+            <div class="col-lg-4">
                 <strong>邮箱</strong>: {{ $model->email }}
             </div>
             <div class="col-lg-2">
-                <strong>收货人邮编</strong>: {{ $model->zipcode }}
+                <strong>邮编</strong>: {{ $model->zipcode }}
             </div>
             <div class="col-lg-2">
-                <strong>纳入白名单</strong>: {{ $model->whitelist == '1' ? '是' : '否' }}
+                <strong>退款订单数</strong>: {{ $model->refund_order }}
+            </div>
+            <div class="col-lg-2">
+                <strong>订单总数</strong>: {{ $model->total_order }}
+            </div>
+            <div class="col-lg-4">
+                <strong>退款率</strong>: {{ $model->refund_rate }}
+            </div>
+            <div class="col-lg-2">
+                <strong>类型</strong>: {{ $model->type_name }}
+            </div>
+            <div class="col-lg-12">
+                <strong>备注</strong>: {{ $model->remark }}
             </div>
         </div>
     </div>

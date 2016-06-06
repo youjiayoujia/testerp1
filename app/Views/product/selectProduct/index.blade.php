@@ -24,10 +24,10 @@
 <div class="btn-group" role="group" >
     <div class="form-group">
         <select id="ms" multiple="multiple" style="width:200px" name="select_channel">
-            <option value="1">Amazon</option>
-            <option value="2">EBay</option>
-            <option value="3">速卖通</option>
-            <option value="4">B2C</option>
+            <option value="1" class='aa'>Amazon</option>
+            <option value="2" class='aa'>EBay</option>
+            <option value="3" class='aa'>速卖通</option>
+            <option value="4" class='aa'>B2C</option>
         </select>
     </div>
 </div>
@@ -101,9 +101,10 @@
         //批量选中
         $('.choseShop').click(function () {
             var channel_ids = "";
-            $("#ms option").each(function() {
+            $("#ms option:selected").each(function() {
                 channel_ids += $(this).attr("value")+",";
             });
+
             channel_ids = channel_ids.substr(0,(channel_ids.length)-1);
             if (confirm("确认选中?")) {
                 var url = "{{route('beChosed')}}";

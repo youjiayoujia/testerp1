@@ -119,4 +119,53 @@ class Tool
 
         return $response;
     }
+
+
+    // 1 处理捆绑的情况   A+B
+    // 2 去除前后缀    $type = 2 的时候 sku前缀是  S*001KU[TEST]  这样存在的
+    // 3 处理SKU（10）  处理打包的情况
+    public function filter_sku($channel_sku,$type=1){
+
+        $tmpSku = explode('+', $channel_sku);
+        $skuNum=0;
+        $returnSku =array();
+        foreach ($tmpSku as $k => $sku){
+
+            if (stripos($sku, '[') !== false) {
+                $sku = preg_replace('/\[.*\]/', '', $sku);
+            }
+            if($type==2){
+
+                $prePart = substr($sku,0,1);
+                $suffPart = substr($sku,4);
+                $sku = $prePart.$suffPart;
+                $newSku = $sku;
+            }else{
+
+                $tmpErpSku = explode('*', $sku);
+                $i = count($tmpErpSku)-1;
+                $newSku = $tmpErpSku[$i];
+            }
+
+
+            $qty = 1;
+            if (strpos($newSku, '(') !== false) {
+                $matches = array();
+                preg_match_all("/(.*?)\([a-z]?([0-9]*)\)?/i", $newSku, $matches);
+                $newSku = trim($matches[1][0]);
+                $qty = trim($matches[2][0]) ? trim($matches[2][0]) : 1;
+            }
+            $skuArray =array();
+            $skuArray['erpSku']=$newSku;
+            $skuArray['qty'] = $qty;
+
+            $skuNum = $skuNum+$qty;
+            $returnSku[]=$skuArray;
+        }
+
+        $returnSku['skuNum'] = $skuNum;
+
+        return $returnSku;
+
+    }
 }

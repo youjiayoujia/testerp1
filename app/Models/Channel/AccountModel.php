@@ -68,6 +68,20 @@ class AccountModel extends BaseModel
         'lazada_currency_type',
         'lazada_currency_type_cn',
         'lazada_api_host',
+        'ebay_developer_account',
+        'ebay_developer_devid',
+        'ebay_developer_appid',
+        'ebay_developer_certid',
+        'ebay_token',
+        'ebay_eub_developer',
+
+        'cd_currency_type',
+        'cd_currency_type_cn',
+        'cd_account',
+        'cd_token_id',
+        'cd_pw',
+        'cd_sales_account',
+
 
     ];
 
@@ -128,6 +142,12 @@ class AccountModel extends BaseModel
         return $this->hasMany('App\Models\OrderModel', 'channel_account_id');
     }
 
+    public function paypal()
+    {
+        return $this->belongsToMany('App\Models\PaypalsModel', 'channel_account_paypal',
+            'channel_account_id', 'paypal_id');
+    }
+
     public function getMergePackageAttribute()
     {
         return $this->is_merge_package ? '是' : '否';
@@ -173,6 +193,12 @@ class AccountModel extends BaseModel
                 break;
             case 'wish':
                 $status = [];
+                break;
+            case 'ebay':
+                $status=['All'];
+                break;
+            case 'cdiscount':
+                $status=['WaitingForShipmentAcceptation'];
                 break;
         }
         return $status;
@@ -224,6 +250,25 @@ class AccountModel extends BaseModel
                     'expiry_time' => $this->wish_expiry_time,
                     'proxy_address' => $this->wish_proxy_address,
                     'sku_resolve' => $this->wish_sku_resolve,
+                ];
+                break;
+            case 'ebay':
+                $config=[
+                    'requestToken'=>$this->ebay_token,
+                    'devID'=>$this->ebay_developer_devid,
+                    'appID'=>$this->ebay_developer_appid,
+                    'certID'=>$this->ebay_developer_certid,
+                ];
+                break;
+            case 'cdiscount':
+                $config = [
+                    'cd_sales_account' => $this->cd_sales_account,
+                    'cd_pw' => $this->cd_pw,
+                    'cd_token_id' => $this->cd_token_id,
+                    'cd_account' => $this->cd_account,
+                    'cd_currency_type_cn' => $this->cd_currency_type_cn,
+                    'cd_currency_type' => $this->cd_currency_type,
+                    'cd_expires_in' => $this->cd_expires_in,
                 ];
                 break;
         }

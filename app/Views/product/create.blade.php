@@ -6,6 +6,7 @@
 //echo '<pre>';
   //          print_r($logisticsLimit);exit;
 ?>
+
     <div class="form-group">
         <label for="catalog_id">分类</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select id="catalog_id" class="form-control" name="catalog_id">
@@ -135,9 +136,9 @@
         <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
-                    <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}'>{{$wrap_limit->name}}
-                    </label>
+                <label>
+                    <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}'>{{$wrap_limit->name}}
+                </label>
             @endforeach
         </div>
 
@@ -186,6 +187,9 @@
         }
     }
 
+$(function () {
+    $('#myTab a:first').tab('show');
+  })
     $(document).on('change','#catalog_id',function(){
         var catalog_id = $("#catalog_id").val();  
         $.ajax({

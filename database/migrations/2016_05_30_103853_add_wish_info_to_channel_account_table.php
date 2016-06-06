@@ -22,7 +22,7 @@ class AddWishInfoToChannelAccountTable extends Migration
             $table->string('wish_access_token')->comment('WISH ACCESS_TOKEN')->after('wish_refresh_token');
             $table->dateTime('wish_expiry_time')->comment('WISH ACCESS_TOKEN 过期时间')->after('wish_access_token');
             $table->string('wish_proxy_address')->comment('WISH 代理IP')->after('wish_expiry_time');
-            $table->enum('wish_sku_resolve', ['1', '2'])->comment('WISH SKU 解析方式')->default('1')->after('wish_proxy_address');;
+            $table->enum('wish_sku_resolve', ['1', '2'])->comment('WISH SKU 解析方式')->default('1')->after('wish_proxy_address');
         });
     }
 

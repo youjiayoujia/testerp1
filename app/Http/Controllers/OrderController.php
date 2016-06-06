@@ -14,6 +14,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
+use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
 use App\Models\product\ImageModel;
 use App\Models\UserModel;
@@ -58,13 +59,6 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $data = request()->all();
-        if($data['refund_account'] == null) {
-            $data['refund'] = '';
-            $data['refund_currency'] = '';
-            $data['refund_account'] = '';
-            $data['refund_amount'] = '';
-            $data['refund_time'] = '';
-        }
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
@@ -94,7 +88,7 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj) {
+            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
                 $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
                 $arr[$key] = $image;
             }
@@ -117,6 +111,86 @@ class OrderController extends Controller
     }
 
     /**
+     * 跳转退款页面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function refund($id)
+    {
+        $model = $this->model->find($id);
+        $arr = [];
+        foreach($model->orderItem as $orderItem)
+        {
+            $arr[] = $orderItem->sku;
+        }
+        foreach($arr as $key => $value) {
+            $obj = productItem::where(['sku' => $value])->first();
+            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
+                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                $arr[$key] = $image;
+            }
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'orderItems' => $model->orderItem,
+            'channels' => ChannelModel::all(),
+            'accounts' => AccountModel::all(),
+            'users' => UserModel::all(),
+            'currencys' => CurrencyModel::all(),
+            'items' => ItemModel::all(),
+            'aliases' => $model->channel->channelAccount,
+            'arr' => $arr,
+            'rows' => $model->items()->count(),
+        ];
+
+        return view($this->viewPath . 'refund', $response);
+    }
+
+    /**
+     * 保存退款信息
+     *
+     * @param $id
+     */
+    public function refundUpdate($id)
+    {
+        request()->flash();
+        $data = request()->all();
+        $data['order_id'] = $id;
+        $this->model->refundCreate($data, request()->file('image'));
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 跳转更新备注页面
+     */
+    public function remark($id)
+    {
+        $model = $this->model->find($id);
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'remarks' => $model->remarks,
+        ];
+
+        return view($this->viewPath . 'remark', $response);
+    }
+
+    /**
+     * 更新备注
+     */
+    public function remarkUpdate($id)
+    {
+        request()->flash();
+        $data = request()->all();
+        $data['user_id'] = request()->user()->id;
+        $this->model->find($id)->remarks()->create($data);
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * 数据更新
      *
      * @param $id
@@ -127,13 +201,7 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $data = request()->all();
-        if($data['refund_account'] == null) {
-            $data['refund'] = '';
-            $data['refund_currency'] = '';
-            $data['refund_account'] = '';
-            $data['refund_amount'] = '';
-            $data['refund_time'] = '';
-        }
+        $data['status'] = 'REVIEW';
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
@@ -186,7 +254,7 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj) {
+            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
                 $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
                 $arr[$key] = $image;
             }
@@ -270,6 +338,35 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
+    public function updateStatus()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['status' => 'PREPARED']);
+
+        return 1;
+    }
+
+    public function withdrawUpdate($id)
+    {
+        request()->flash();
+        $data = request()->all();
+        $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw' => $data['withdraw']]);
+
+        return redirect($this->mainIndex);
+    }
+
+    public function withdraw($id)
+    {
+        $model = $this->model->find($id);
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view($this->viewPath . 'withdraw', $response);
+    }
+
     /**
      * 获取choies订单数据
      *
@@ -305,11 +402,14 @@ class OrderController extends Controller
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['channel_ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['email'] = $channelOrder['email'];
-            $orders[$key]['status'] = 'NEW';
+            $orders[$key]['status'] = 'PAID';
             $orders[$key]['active'] = 'NORMAL';
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
+            if($orders[$key]['remark'] != NULL && $orders[$key]['remark'] != '') {
+                $orders[$key]['status'] = 'REVIEW';
+            }
             $orders[$key]['affair_time'] = NULL;
             $orders[$key]['create_time'] = $channelOrder['date_purchased'];
             $orders[$key]['is_partial'] = 0;
@@ -344,11 +444,6 @@ class OrderController extends Controller
             $orders[$key]['billing_zipcode'] = $channelOrder['billing_zip'];
             $orders[$key]['billing_phone'] = $channelOrder['billing_phone'];
             $orders[$key]['payment_date'] = $channelOrder['payment_date'];
-            $orders[$key]['refund'] = NULL;
-            $orders[$key]['refund_currency'] = NULL;
-            $orders[$key]['refund_account'] = NULL;
-            $orders[$key]['refund_amount'] = NULL;
-            $orders[$key]['refund_time'] = NULL;
             $orders[$key]['transaction_number'] = $channelOrder['trans_id'];
             $orders[$key]['cele_admin'] = $channelOrder['cele_admin'];
             $orders[$key]['priority'] = 0;

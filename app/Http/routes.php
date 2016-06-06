@@ -372,6 +372,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('pickList', 'PickListController');
 
     //产品管理路由
+    Route::any('productBatchEdit', ['uses' => 'ProductController@productBatchEdit', 'as' => 'productBatchEdit']);
+    Route::any('productBatchUpdate', ['uses' => 'ProductController@productBatchUpdate', 'as' => 'productBatchUpdate']);
     Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
     Route::get('examine', ['uses' => 'ProductController@examine', 'as' => 'examine']);
     Route::get('productMultiEdit', ['uses' => 'ProductController@productMultiEdit', 'as' => 'productMultiEdit']);
@@ -419,6 +421,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getBlacklist', ['uses' => 'Order\BlacklistController@getBlacklist', 'as' => 'getBlacklist']);
     Route::any('exportAll', ['uses' => 'Order\BlacklistController@exportAll', 'as' => 'exportAll']);
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
+    Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
+    Route::get('downloadUpdateBlacklist', ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
 
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');

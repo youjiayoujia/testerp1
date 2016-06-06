@@ -52,6 +52,21 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+    <div class="row">
+        <form method="POST" action="{{ route('uploadBlacklist') }}" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="form-group col-lg-7">
+                <label for="name" class='control-label'>批量导入黑名单客户:</label>
+            </div>
+            <div class="form-group col-lg-3">
+                <input type='file' name='excel'>
+            </div>
+            <div class="form-group col-lg-2">
+                <a href='javascript:' class='downloadUpdateBlacklist'>格式下载(CSV)</a>
+                <button type='submit' class='btn btn-info btn-xs' value='submit'>submit</button>
+            </div>
+        </form>
+    </div>
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 查询平台
@@ -96,6 +111,10 @@
 @section('childJs')
     <script type="text/javascript">
         $(document).ready(function(){
+            $('.downloadUpdateBlacklist').click(function(){
+                location.href="{{ route('downloadUpdateBlacklist')}}";
+            });
+
             $('.exportAll').click(function(){
                 location.href = "{{ route('exportAll')}}";
             });

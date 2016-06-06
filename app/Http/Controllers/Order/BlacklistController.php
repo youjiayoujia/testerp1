@@ -277,4 +277,40 @@ class BlacklistController extends Controller
         })->download('csv');
     }
 
+    public function uploadBlacklist()
+    {
+        if(request()->hasFile('excel'))
+        {
+            $file = request()->file('excel');
+            $function = 'excelBlacklistProcess';
+            $errors = $this->model->excelProcess($file, $function);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'errors' => $errors,
+            ];
+
+            return view($this->viewPath.'uploadBlacklistResult', $response);
+        }
+    }
+
+    public function downloadUpdateBlacklist()
+    {
+        $rows = [
+            [
+                'channel_id' => '1',
+                'ordernum' => '17905581340',
+                'name' => 'ThaiDiane',
+                'email' => 'hannawysz@gmail.com',
+                'zipcode' => '210000',
+                'type' => 'SUSPECTED',
+                'remark' => '',
+                'refund_order' => '1',
+                'total_order' => '10',
+                'refund_rate' => '10%',
+            ]
+        ];
+        $name = 'update_blacklist';
+        $this->exportExcel($rows, '更新黑名单用户');
+    }
+
 }

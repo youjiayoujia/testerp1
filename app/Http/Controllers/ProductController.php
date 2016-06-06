@@ -254,6 +254,48 @@ class ProductController extends Controller
         return view($this->viewPath . 'show', $response);
     }
 
+    /**
+     * 批量更新界面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function productBatchEdit()
+    {
+        $product_ids = request()->input("product_ids");
+        $arr = explode(',', $product_ids);
+        $param = request()->input('param');
+        
+        $products = $this->model->whereIn("id",$arr)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'products' => $products,
+            'product_ids'=>$product_ids,
+            'param'  =>$param,
+            'wrapLimit' => $this->wrapLimit->all(),
+        ];
+        return view($this->viewPath . 'batchEdit', $response);
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function productBatchUpdate()
+    {
+        $product_ids = request()->input("product_ids");
+        $arr = explode(',', $product_ids);
+        $products = $this->model->whereIn("id",$arr)->get();
+        $data = request()->all();
+        $data['package_limit'] = empty($data['package_limit_arr']) ? '':implode(',', $data['package_limit_arr']);
+        foreach($products as $productModel){
+            $productModel->update($data);
+        }       
+        return redirect($this->mainIndex);
+    }
+
     
 
 }

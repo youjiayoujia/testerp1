@@ -27,13 +27,12 @@
     <th>建议采购数量</th>
     <th>趋势系数</th>
     <th>备注</th>
-    <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $requireItem)
         <tr>
             <td>
-             @if($requireItem->purchase_order_id >0)
+             @if($requireItem->is_sale !=1)
                 <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="1" >
                 @else
                 <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="0" >
@@ -41,9 +40,9 @@
             {{ $requireItem->id }}</td>
             <td>{{ $requireItem->sku}}</td>   
             <td>
-            {{$requireItem->item->c_name}}
+            {{$requireItem->c_name}}
             </td>
-            <td>{{$requireItem->item->supplier->name}}</td>
+            <td>{{$requireItem->supplier->name}}</td>
             <td>{{ $requireItem->warehouse->name}}</td>
             <td>{{ $requireItem->order_need_num}}</td>
             <td>{{$requireItem->all_quantity}}</td>
@@ -63,9 +62,7 @@
             @endif
             </td>
             <td>{{ $requireItem->remark}}</td>
-            <td><a href="{{ route('require.show', ['id'=>$requireItem->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
-                </a></td> 
+             
         </tr>
     @endforeach
  <script type="text/javascript">		 

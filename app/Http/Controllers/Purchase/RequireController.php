@@ -24,9 +24,10 @@ use App\Models\Order\ItemModel as orderItemModel;
 class RequireController extends Controller
 {
 
-    public function __construct(RequireModel $require )
+    public function __construct(RequireModel $require,ProductItemModel $productItem )
     {
         $this->model = $require;
+		$this->productItem=$productItem;
         $this->mainIndex = route('require.index');
         $this->mainTitle = '采购需求';
 		$this->viewPath = 'purchase.require.';
@@ -37,12 +38,12 @@ class RequireController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('is_require',1)->groupby('item_id')),
+            'data' => $this->autoList($this->productItem),
         ];
 		foreach($response['data'] as $key=>$vo){
-			$trend=$this->getNeedPurchaseNum($vo->item_id);
-			$response['data'][$key]['order_need_num']=$this->model->where('item_id',$vo->item_id)->sum('quantity');
-			$response['data'][$key]['all_quantity']=StockModel::where('item_id',$vo->item_id)->sum('available_quantity');
+			$trend=$this->getNeedPurchaseNum($vo->id);
+			$response['data'][$key]['order_need_num']=$this->model->where('item_id',$vo->id)->sum('quantity');
+			$response['data'][$key]['all_quantity']=StockModel::where('item_id',$vo->id)->sum('available_quantity');
 			$response['data'][$key]['seven_time']=$trend['sevenDaySellNum'];
 			$response['data'][$key]['fourteen_time']=$trend['fourteenDaySellNum'];
 			$response['data'][$key]['thirty_time']=$trend['thirtyDaySellNum'];
@@ -73,17 +74,17 @@ class RequireController extends Controller
 	{	
 		$purchaseIds=explode(',',request()->get('purchase_ids'));
 		if(request()->get('purchase_ids')){
-			$needPurchases=$this->model->find($purchaseIds);
+			$needPurchases=$this->productItem->find($purchaseIds);
 		}else{
-			$needPurchases=$this->model->where('is_require',1)->groupby('item_id')->get();
+			$needPurchases=$this->productItem->get();
 		}
 		foreach($needPurchases as $key=>$v){
-		$trend=$this->getNeedPurchaseNum($v->item_id);
+		$trend=$this->getNeedPurchaseNum($v->id);
 		
 		$data['type']=0;
 		$data['warehouse_id']=$v->warehouse_id;
 		$data['sku']=$v->sku;
-		$data['supplier_id']=$v->item->supplier_id;
+		$data['supplier_id']=$v->supplier_id;
 		$data['purchase_num']=$trend['ProposedpurchaseQuantity'];
 		$data['lack_num']=$data['purchase_num'];
 		if($data['purchase_num']>0){
@@ -159,7 +160,7 @@ class RequireController extends Controller
 					if($itemModel->purchase_price >200 && $fourteenDaySellNum < 3){
 						$available_quantity=StockModel::where('item_id',$item_id)->sum('available_quantity');
 						$purchasingNum=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$itemModel->sku)->where('purchase_items.status','<',4)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
-						$needNum=$this->model->where('item_id',$vo->item_id)->sum('quantity');
+						$needNum=$this->model->where('item_id',$item_id)->sum('quantity');
 						$trend['ProposedpurchaseQuantity']=$needNum-$purchasingNum-$available_quantity;
 						}else{
 					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(5+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;

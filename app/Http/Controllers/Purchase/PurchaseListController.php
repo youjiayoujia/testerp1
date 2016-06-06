@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseOrderModel;
+use App\Models\Purchase\PurchasePostageModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\Warehouse\PositionModel;
@@ -49,7 +50,36 @@ class PurchaseListController extends Controller
 		$response['metas']['title']='查询采购运单';
         return view($this->viewPath . 'create', $response);
     }
-	
+	/**
+     * 关联运单号
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function selectPurchaseOrder()
+    { 
+		$data=request()->all();
+		$postcodingNum=PurchasePostageModel::where('post_coding',$data['post_coding'])->count();
+		if($postcodingNum>0){
+		$res['postcoding']=PurchasePostageModel::where('post_coding',$data['post_coding'])->first();
+		$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
+		$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'postcodingNum' =>$postcodingNum,
+			'data' =>$res,
+			'postCoding' =>$data['post_coding'],
+        ];
+		}else{
+			$response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'postcodingNum' =>$postcodingNum,
+			'postCoding' =>$data['post_coding'],
+        ];
+			}
+		$response['metas']['title']='查询采购运单';
+        return view($this->viewPath . 'show', $response);
+    }
 	/**
      * 批量对单
      *
@@ -183,6 +213,25 @@ class PurchaseListController extends Controller
 			}
 		return 1;
 		}
+		
+	public function binding(){
+		$postage=request()->get('postage');
+		$purchaseOrderId=request()->get('purchaseOrderId');
+		$postCoding=request()->get('postCoding');
+		$purchaseNum=PurchaseOrderModel::where('id',$purchaseOrderId)->count();
+		$num=PurchasePostageModel::where('purchase_order_id',$purchaseOrderId)->count();
+		$userID=request()->user()->id;
+		if($purchaseNum>0){
+			if($num ==0){
+			PurchasePostageModel::create(['post_coding'=>$postCoding,'postage'=>$postage,'purchase_order_id'=>$purchaseOrderId]);
+			}
+			return 1;
+			}else{
+				return 2;
+				}
+			
+		}	
+	
 }
 
 

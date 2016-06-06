@@ -58,7 +58,10 @@ class ItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
-
+	 public function warehouse()
+    {
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
+    }
     public function purchase()
     {
         return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku', 'sku');

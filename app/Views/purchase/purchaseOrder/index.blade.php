@@ -21,9 +21,9 @@
     @foreach($data as $purchaseOrder)
         <tr>
        		
-            <td>单据号：NO.{{ $purchaseOrder->id }}</br>
+            <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
-                外部单号：@if($purchaseOrder->purchase_post_num > 0) {{$purchaseOrder->purchase_post->post_coding}} @else 暂无单号 @endif
+               外部单号：@if($purchaseOrder->purchase_post_num > 0) {{$purchaseOrder->purchase_post->post_coding}} @else 暂无单号 @endif
             </td>
            <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)

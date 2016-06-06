@@ -274,15 +274,15 @@ class OrderModel extends BaseModel
         $data['ordernum'] = $last ? $last->id + 1 : 1;
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            if ($item['channel_sku']) {
+            $orderItem = productItem::where('sku', $item['sku'])->first();
+            if ($orderItem) {
+                $item['item_id'] = $orderItem->id;
+            } else {
+                echo $item['channel_sku'] . '<br>';
                 $channelProduct = ChannelProduct::where('channel_sku', $item['channel_sku'])->first();
                 if ($channelProduct) {
+                    echo $channelProduct->item->id . '<br/>';
                     $item['item_id'] = $channelProduct->item->id;
-                }
-            } elseif (!empty($item['sku'])) {
-                $orderItem = ItemModel::where('sku', $item['sku'])->first();
-                if ($orderItem) {
-                    $item['item_id'] = $orderItem->id;
                 }
             }
             if (!isset($item['item_id'])) {

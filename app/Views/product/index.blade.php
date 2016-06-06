@@ -1,6 +1,18 @@
 @extends('common.table')
 @section('tableToolButtons')
 
+    <div class="btn-group btn-info" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 批量修改属性
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:" class="batchedit"  data-name="name" >中英文资料</a></li>
+            <li><a href="javascript:" class="batchedit"  data-name="quality_standard">质检</a></li>
+            <li><a href="javascript:" class="batchedit"  data-name="package_limit">包装方式</a></li>
+            <li><a href="javascript:" class="batchedit"  data-name="purchase_url">参考链接</a></li>
+        </ul>
+    </div>
     <div class="btn-group">
         <a href="javascript:" data-channel="1" data-name="Amazon" class="btn btn-success choseShop">
             选中
@@ -228,7 +240,20 @@
                 })     
             }
                  
-        });     
+        });
+
+        $('.batchedit').click(function () {
+            var checkbox = document.getElementsByName("tribute_id");
+            var product_ids = "";
+            var param = $(this).data("name");
+            for (var i = 0; i < checkbox.length; i++) {
+                if(!checkbox[i].checked)continue;
+                product_ids += checkbox[i].value+",";
+            }
+            product_ids = product_ids.substr(0,(product_ids.length)-1);
+            var url = "{{ route('productBatchEdit') }}";
+            window.location.href=url+"?product_ids="+product_ids+"&param="+param;
+        });
 
         //批量审核
         $('.shenhe').click(function () {

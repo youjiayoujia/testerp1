@@ -80,7 +80,11 @@
                 <td>{{$purchase_item->active_num}}</td>
                 <td>{{$purchase_item->start_buying_time}}</td>
                 <td>{{$purchase_item->arrival_time}}</td>
-                <td>{{$purchase_item->status}}</td>
+                <td>
+                 @foreach(config('purchase.purchaseItem.status') as $key=>$status)
+                {{$purchase_item->status == $key ? $status : ''}}
+                @endforeach
+                </td>
                 <td>{{$purchase_item->purchase_cost}}</td>
                 <td>{{$purchase_item->item->purchase_price}}</td>
                 <td>{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>

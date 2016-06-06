@@ -274,7 +274,7 @@ class OrderModel extends BaseModel
         $data['ordernum'] = $last ? $last->id + 1 : 1;
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            if ($item['sku']) {
+            if (!empty($item['sku'])) {
                 $orderItem = ItemModel::where('sku', $item['sku'])->first();
                 if ($orderItem) {
                     $item['item_id'] = $orderItem->id;

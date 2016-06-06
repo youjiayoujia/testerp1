@@ -15,6 +15,7 @@ use Tool;
 use App\Base\BaseModel;
 use App\Models\Order\ItemModel;
 use App\Models\ItemModel as productItem;
+use App\Models\Channel\ProductModel as ChannelProduct;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order\RefundModel;
 
@@ -269,22 +270,27 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-        //todo: Ordernum Format
         $last = $this->all()->last();
         $data['ordernum'] = $last ? $last->id + 1 : 1;
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            //todo: Search item by channel sku
-            $obj = ItemModel::where('sku', $item['sku'])->get();
-            if (!count($obj)) {
+            if ($item['sku']) {
+                $orderItem = ItemModel::where('sku', $item['sku'])->first();
+                if ($orderItem) {
+                    $item['item_id'] = $orderItem->id;
+                }
+            } elseif ($item['channel_sku']) {
+                $channelProduct = ChannelProduct::where('channel_sku', $item['channel_sku'])->first();
+                if ($channelProduct) {
+                    $item['item_id'] = $channelProduct->item->id;
+                }
+            }
+            if (!$item['item_id']) {
                 $item['item_id'] = 0;
                 $order->update(['status' => 'REVIEW', 'remark' => '渠道SKU找不到对应产品']);
-            } else {
-                $item['item_id'] = ItemModel::where('sku', $item['sku'])->first()->id;
             }
             $order->items()->create($item);
         }
-
         return $order;
     }
 

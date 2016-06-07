@@ -77,158 +77,95 @@ class BlacklistController extends Controller
 
     public function getBlacklist()
     {
-        $orders = OrderModel::all()->groupBy('shipping_zipcode');
-        foreach($orders as $key1 => $order) {
-            $lastnames = $order->groupBy('shipping_lastname');
-            foreach($lastnames as $key2 => $lastname) {
-                $firstnames = $lastname->groupBy('shipping_firstname');
-                foreach($firstnames as $key3 => $firstname) {
-                    if(count($firstname) >= 5) {
-                        $count2 = 0;
-                        foreach($firstname as $value) {
-                            $refunds = RefundModel::where('order_id', $value['id'])->get();
-                            if($refunds) {
-                                $count2++;
-                            }
+        $orders2 = OrderModel::all()
+//            ->where('create_time', '<=', date('Y-m-d'))
+//            ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
+            ->groupBy('email');
+        foreach($orders2 as $key2 => $order2) {
+            if(count($order2) >= 5) {
+                $count2 = 0;
+                foreach($order2 as $val) {
+                    $refund = RefundModel::where('order_id', $val['id'])->get();
+                    if($refund) {
+                        $count2++;
+                    }
+                }
+                if($count2 >= 5) {
+                    $channels2 = [];
+                    foreach($order2 as $v2) {
+                        $v2->update(['blacklist' => '0']);
+                        if(!in_array($v2['channel_id'], $channels2)) {
+                            $channels2[] = $v2['channel_id'];
                         }
-                        if($count2 >= 5) {
-                            foreach($firstname as $value) {
-                                $value->update(['blacklist' => '0']);
-                            }
-                            $obj = OrderModel::where('shipping_zipcode', $firstname->first()->shipping_zipcode)->first();
-                            $data['channel_id'] = $obj->channel_id;
-                            $data['ordernum'] = $obj->ordernum;
-                            $data['name'] = $obj->shipping_lastname . $obj->shipping_firstname;
-                            $data['email'] = $obj->email;
-                            $data['zipcode'] = $obj->shipping_zipcode;
-                            $data['type'] = 'SUSPECTED';
-                            $data['remark'] = NULL;
-                            $data['total_order'] = count($firstname);
-                            $data['refund_order'] = $count2;
-                            $data['refund_rate'] = ($count2 / count($firstname)) * 100 . '%';
-                            $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])->where('name', $data['name'])->count();
-                            if($blacklist <= 0) {
-                                $this->model->create($data);
-                            }
+                    }
+                    foreach($channels2 as $channel2) {
+                        $obj = OrderModel::where('email', $key2)->first();
+                        $data['channel_id'] = $channel2;
+                        $data['ordernum'] = $obj->ordernum;
+                        $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
+                        $data['email'] = $obj->email;
+                        $data['zipcode'] = $obj->shipping_zipcode;
+                        $data['type'] = 'SUSPECTED';
+                        $data['remark'] = NULL;
+                        $data['total_order'] = count($order2);
+                        $data['refund_order'] = $count2;
+                        $data['refund_rate'] = ($count2 / count($order2)) * 100 . '%';
+                        $data['color'] = 'green';
+                        $blacklist = BlacklistModel::where('email', $data['email'])->where('channel_id', $channel2)->count();
+                        if($blacklist <= 0) {
+                            $this->model->create($data);
                         }
                     }
                 }
             }
         }
-        $emails = OrderModel::distinct()
-            ->where('create_time', '<=', date('Y-m-d'))
-            ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
-            ->get(['email'])->toArray();
-        foreach($emails as $email) {
-            $orders = OrderModel::where('create_time', '<=', date('Y-m-d'))
-                ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
-                ->where('email', $email)
-                ->get();
-            if(count($orders) >= 5) {
+
+        $orders = OrderModel::all()
+//            ->where('create_time', '<=', date('Y-m-d'))
+//            ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
+            ->groupBy('shipping_zipcode', 'shipping_lastname', 'shipping_firstname');
+        foreach($orders as $key => $order) {
+            if(count($order) >= 5) {
                 $count = 0;
-                foreach($orders as $order) {
-                    $refunds = RefundModel::where('order_id', $order['id'])->get();
+                foreach($order as $value) {
+                    $refunds = RefundModel::where('order_id', $value['id'])->get();
                     if($refunds) {
                         $count++;
                     }
                 }
                 if($count >= 5) {
-                    foreach($orders as $order) {
-                        $order->update(['blacklist' => '0']);
+                    $channels = [];
+                    foreach($order as $v) {
+                        $v->update(['blacklist' => '0']);
+                        if(!in_array($v['channel_id'], $channels)) {
+                            $channels[] = $v['channel_id'];
+                        }
                     }
-                    $obj = OrderModel::where('email', $email)->first();
-                    $data['channel_id'] = $obj->channel_id;
-                    $data['ordernum'] = $obj->ordernum;
-                    $data['name'] = $obj->shipping_lastname . $obj->shipping_firstname;
-                    $data['email'] = $obj->email;
-                    $data['zipcode'] = $obj->shipping_zipcode;
-                    $data['type'] = 'SUSPECTED';
-                    $data['remark'] = NULL;
-                    $data['total_order'] = count($orders);
-                    $data['refund_order'] = $count;
-                    $data['refund_rate'] = ($count / count($orders)) * 100 . '%';
-                    $blacklist = BlacklistModel::where(['email' => $data['email']])->count();
-                    if($blacklist <= 0) {
-                        $this->model->create($data);
+                    foreach($channels as $channel) {
+                        $obj = OrderModel::where('shipping_zipcode', $key)->first();
+                        $data['channel_id'] = $channel;
+                        $data['ordernum'] = $obj->ordernum;
+                        $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
+                        $data['email'] = $obj->email;
+                        $data['zipcode'] = $obj->shipping_zipcode;
+                        $data['type'] = 'SUSPECTED';
+                        $data['remark'] = NULL;
+                        $data['total_order'] = count($order);
+                        $data['refund_order'] = $count;
+                        $data['refund_rate'] = ($count / count($order)) * 100 . '%';
+                        $data['color'] = 'orange';
+                        $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])
+                            ->where('name', $data['name'])
+                            ->where('channel_id', $channel)
+                            ->count();
+                        if($blacklist <= 0) {
+                            $this->model->create($data);
+                        }
                     }
                 }
             }
         }
     }
-
-//    public function index()
-//    {
-//        request()->flash();
-//        $orders = OrderModel::where(['status' => 'CANCEL'])->get()->toArray();
-//        foreach($orders as $order) {
-//            $count = OrderModel::where(['email' => $order['email'], 'status' => 'CANCEL'])->count();
-//            if($count >= 5) {
-//                $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
-//                $data['email'] = $order['email'];
-//                $data['zipcode'] = $order['shipping_zipcode'];
-//                $data['whitelist'] = '0';
-//                $count1 = BlacklistModel::where(['name' => $data['name']])->count();
-//                if($count1 == 0) {
-//                    $this->model->create($data);
-//                    $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
-//                    $order->update(['blacklist' => '0', 'status' => 'NEW',
-//                        'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
-//                }
-//            }
-//        }
-//
-//        $emails = OrderModel::distinct()->get(['email'])->toArray();
-//        foreach($emails as $email) {
-//            $orders = OrderModel::where(['email' => $email, 'status' => 'CANCEL'])->get();
-//            if($orders->count() >= 5) {
-//                foreach($orders as $order) {
-//                    $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
-//                    $data['email'] = $email['email'];
-//                    $data['zipcode'] = $order['shipping_zipcode'];
-//                    $data['whitelist'] = '0';
-//                    $count = BlacklistModel::where(['name' => $data['name']])->count();
-//                    $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
-//                    $order->update(['blacklist' => '0', 'status' => 'NEW',
-//                        'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
-//                    if($count == 0) {
-//                        $this->model->create($data);
-//                    }
-//                }
-//            }
-//        }
-//        $zipcodes = OrderModel::distinct()->get(['shipping_zipcode'])->toArray();
-//        foreach($zipcodes as $zipcode) {
-//            $firstnames = OrderModel::distinct()->get(['shipping_firstname'])->toArray();
-//            foreach($firstnames as $firstname) {
-//                $lastnames = OrderModel::distinct()->get(['shipping_lastname'])->toArray();
-//                foreach($lastnames as $lastname) {
-//                    $orders = OrderModel::where(['shipping_zipcode' => $zipcode,
-//                        'shipping_firstname' => $firstname, 'shipping_lastname' => $lastname,
-//                        'status' => 'CANCEL'])->get();
-//                    if($orders->count() >= 5) {
-//                        foreach($orders as $order) {
-//                            $data['name'] = $order['shipping_lastname'] . $order['shipping_firstname'];
-//                            $data['email'] = $order['email'];
-//                            $data['zipcode'] = $order['shipping_zipcode'];
-//                            $data['whitelist'] = '0';
-//                            $count = BlacklistModel::where(['name' => $data['name']])->count();
-//                            if($count == 0) {
-//                                $this->model->create($data);
-//                                $id = BlacklistModel::where(['name' => $data['name']])->first()->id;
-//                                $order->update(['blacklist' => '0', 'status' => 'NEW',
-//                                    'import_remark' => '邮箱'.$data['email'].'/收货人邮编'.$data['zipcode'].'+收货人姓名'.$data['name'].'存在黑名单中,id为'.$id]);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        $response = [
-//            'metas' => $this->metas(__FUNCTION__),
-//            'data' => $this->autoList($this->model),
-//        ];
-//        return view($this->viewPath . 'index', $response);
-//    }
 
     /**
      * 批量审核

@@ -54,7 +54,7 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="type" id="type">
                 @foreach(config('order.blacklist_type') as $type_key => $type)
-                    <option value="{{ $type_key }}" {{ old('type') == $type_key ? 'selected' : '' }}>
+                    <option value="{{ $type_key }}" {{ $type_key == 'SUSPECTED' ? 'selected' : '' }}>
                         {{ $type }}
                     </option>
                 @endforeach

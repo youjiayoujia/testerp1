@@ -50,7 +50,7 @@
             <td colspan="5" style="padding: 10px; margin: 10px">
                 <div>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</div>
                 <div>{{ $order->shipping_address . ' ' . $order->shipping_city . ' ' . $order->shipping_state }}</div>
-                <div>{{ $order->shipping_country . ' ' . $order->country->name . ' ' . $order->country->cn_name }}</div>
+                <div>{{ $order->shipping_country . ' ' . $order->country ? $order->country->name : '' . ' ' . $order->country ? $order->country->cn_name : '' }}</div>
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div style="color: red">

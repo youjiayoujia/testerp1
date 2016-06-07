@@ -41,17 +41,16 @@ class PurchaseOrderController extends Controller
 			$response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->count();
 			$response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
 			foreach($response['data'][$key]['purchase_items'] as $v){
-			$response['data'][$key]['sum_purchase_num'] =$response['data'][$key]['sum_purchase_num']+$v->purchase_num;
-			$response['data'][$key]['sum_arrival_num'] =$response['data'][$key]['sum_arrival_num']+$v->arrival_num;
-			$response['data'][$key]['sum_storage_qty'] =$response['data'][$key]['sum_storage_qty']+$v->storage_qty;
-			$response['data'][$key]['sum_purchase_account'] =$response['data'][$key]['sum_purchase_account'] + ($v->purchase_num * $v->purchase_cost);
-			$response['data'][$key]['sum_purchase_storage_account'] =$response['data'][$key]['sum_purchase_storage_account'] + ($v->storage_qty * $v->purchase_cost);
+			$response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
+			$response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
+			$response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
+			$response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
+			$response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
 			}
 			/*$response['data'][$key]['sum_purchase_num']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('purchase_num');
 			$response['data'][$key]['sum_arrival_num']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('arrival_num');
 			$response['data'][$key]['sum_storage_qty']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('storage_qty');*/
 			}
-			
         return view($this->viewPath . 'index', $response);
     }
 	
@@ -292,11 +291,14 @@ class PurchaseOrderController extends Controller
 		$model=$this->model->find($id);
 		$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
 		$Inum=ItemModel::where('sku',$data['sku'])->where('is_sale','<>',1)->count();
+		$item=ItemModel::where('sku',$data['sku'])->where('is_sale',1)->first();
 		if($num > 0 || $Inum > 0){
 			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
 		}
+		if($model->close_status == 1){
+			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已结算，不能新增Item.'));
+			}
 		$data['lack_num']=$data['purchase_num'];
-		$item=ItemModel::where('sku',$data['sku'])->get();
 		$data['warehouse_id']=$model->warehouse_id;
 		$data['supplier_id']=$item->supplier_id;
 		$data['purchase_order_id']=$id;

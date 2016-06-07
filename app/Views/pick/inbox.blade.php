@@ -20,9 +20,12 @@
         <div class='form-group col-lg-2'>
             <input type='text' class='form-control searchsku' placeholder='sku'>
         </div>
-        <div class='form-group'>
+        <div class='form-group col-lg-2'>
             <button type='button' class='btn btn-info search'>确认</button>
             <button type='button' class='btn btn-warning printException'>打印异常</button>
+        </div>
+        <div class='form-group col-lg-8'>
+            <font color='red' size='7px' class='notFindSku'></font>
         </div>
     </div>
     <div class='row'>
@@ -72,6 +75,13 @@
     <button type="submit" class="btn btn-success">拣货完成</button>
 @stop
 <script type='text/javascript'>
+$(document).on('keypress', function (event) {
+    if(event.keyCode == '13') {
+        $('.search').trigger("click"); 
+        return false;
+    }
+});
+
 $(document).ready(function(){
     $('.printException').click(function(){
         $.each($('.sku'), function(){
@@ -90,10 +100,12 @@ $(document).ready(function(){
         });
     });
 
-    $('.search').click(function(){
+    $(document).on('click', '.search', function(){
         val = $('.searchsku').val();
         if(val) {
             $('.result').html('');
+            $('.notFindSku').html('');
+            $('.image').html('');
             outflag = 0;
             $.each($('.sku'), function(){
                 if($(this).text() == val) {
@@ -132,9 +144,26 @@ $(document).ready(function(){
                 }
             });
             if(outflag == 0) {
-                alert('sku不存在或者该对应的拣货单上sku已满');
+                $('.notFindSku').text("sku不存在或者对应的拣货单上sku已满");
             }
+            $('.searchSku').val('');
+            $('.searchSku').focus();
         }
     });
+
+    //阻止表单通过回车键提交
+    // $(document).on("keypress", "input", function (e) {
+    //     var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode;
+    //     if (keyCode == 13) {
+    //         for (var i = 0; i < this.form.elements.length; i++) {
+    //             if (this == this.form.elements[i]) break;
+    //         }
+    //         i = (i + 1) % this.form.elements.length;
+    //         this.form.elements[i].focus();
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+    // });
 });
 </script>

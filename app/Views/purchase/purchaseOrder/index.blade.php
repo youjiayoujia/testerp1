@@ -21,9 +21,9 @@
     @foreach($data as $purchaseOrder)
         <tr>
        		
-            <td>单据号：NO.{{ $purchaseOrder->id }}</br>
+            <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
-                外部单号：@if($purchaseOrder->purchase_post_num > 0) {{$purchaseOrder->purchase_post->post_coding}} @else 暂无单号 @endif
+               外部单号：@if($purchaseOrder->purchase_post_num > 0) {{$purchaseOrder->purchase_post->post_coding}} @else 暂无单号 @endif
             </td>
            <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
@@ -80,7 +80,11 @@
                 <td>{{$purchase_item->active_num}}</td>
                 <td>{{$purchase_item->start_buying_time}}</td>
                 <td>{{$purchase_item->arrival_time}}</td>
-                <td>{{$purchase_item->status}}</td>
+                <td>
+                 @foreach(config('purchase.purchaseItem.status') as $key=>$status)
+                {{$purchase_item->status == $key ? $status : ''}}
+                @endforeach
+                </td>
                 <td>{{$purchase_item->purchase_cost}}</td>
                 <td>{{$purchase_item->item->purchase_price}}</td>
                 <td>{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>
@@ -107,7 +111,7 @@
                 </table>
                 @endif
             </td>
-            <td>{{ $purchaseOrder->warehouse->name}}</td>
+            <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
                   
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>

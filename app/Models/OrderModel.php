@@ -232,6 +232,40 @@ class OrderModel extends BaseModel
         return $flag ? true : false;
     }
 
+    public function getOrderQuantityAttribute()
+    {
+        $orderItems  = $this->orderItem;
+        $sum = 0;
+        foreach($orderItems as $orderItem) {
+            $sum += $orderItem->quantity;
+        }
+
+        return $sum;
+    }
+
+    public function getLogisticsFeeAttribute()
+    {
+        $packages = $this->packages;
+        $sum = 0;
+        foreach($packages as $package) {
+            $sum += $package->cost + $package->cost1;
+        }
+
+        return $sum;
+    }
+
+    public function getAllCostAttribute()
+    {
+        $orderItems = $this->orderItem;
+        $sum = 0;
+        foreach($orderItems as $orderItem) {
+            $item = $orderItem->item;
+            $sum += round($item->cost * $orderItem->quantity, 3);
+        }
+
+        return $sum;
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');

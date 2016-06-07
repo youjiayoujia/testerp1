@@ -18,7 +18,7 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
-Route::get('test', 'TestController@test');
+Route::get('test1', 'TestController@test1');
 
 //国家
 Route::resource('countries', 'CountriesController');
@@ -213,6 +213,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
     Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
+	Route::any('selectPurchaseOrder', ['uses' => 'Purchase\PurchaseListController@selectPurchaseOrder', 'as' => 'selectPurchaseOrder']);
+	Route::any('binding', ['uses' => 'Purchase\PurchaseListController@binding', 'as' => 'binding']);
     Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
     Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
     Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
@@ -481,6 +483,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 });
+
 
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);

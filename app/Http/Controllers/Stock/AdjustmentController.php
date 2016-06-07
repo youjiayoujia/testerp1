@@ -260,7 +260,7 @@ class AdjustmentController extends Controller
         $result = request('result');
         $obj = $this->model->find($id);
         if($result) {
-            $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']); 
+            $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>request()->user()->id]); 
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustments->toArray();

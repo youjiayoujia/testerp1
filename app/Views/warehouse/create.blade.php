@@ -25,7 +25,8 @@
         </div>
         <div class='form-group col-lg-3'> 
             <label for='city'>联系人</label> 
-            <select name='contact_by' class='form-control'>
+            <select name='contact_by' class='form-control contact_by'>
+            <option value=''></option>
             @foreach($users as $user)
             <option value="{{ $user->id }}">{{ $user->name }}</option>
             @endforeach
@@ -67,4 +68,11 @@
             </div>    
         </div>
     </div>
+@stop
+@section('pageJs')
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('.contact_by').select2();
+});
+</script>
 @stop

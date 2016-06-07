@@ -53,7 +53,7 @@ class CatalogModel extends BaseModel
 
     public function channels()
     {
-        return $this->belongsToMany('App\Models\ChannelModel','catalog_channels','catalog_id','channel_id')->withPivot('rate','flat_rate')->withTimestamps();
+        return $this->belongsToMany('App\Models\ChannelModel','catalog_channels','catalog_id','channel_id')->withPivot('rate', 'flat_rate')->withTimestamps();
     }
 
     public function createCatalog($data,$extra=[])

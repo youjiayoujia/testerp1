@@ -295,6 +295,9 @@ class PurchaseOrderController extends Controller
 		if($num > 0 || $Inum > 0){
 			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
 		}
+		if($model->close_status == 1){
+			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已结算，不能新增Item.'));
+			}
 		$data['lack_num']=$data['purchase_num'];
 		$data['warehouse_id']=$model->warehouse_id;
 		$data['supplier_id']=$item->supplier_id;

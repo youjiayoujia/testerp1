@@ -14,12 +14,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Purchase\RequireModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseOrderModel;
+use App\Models\Purchase\PurchaseRequireModel;
 use App\Models\Product\SupplierModel;
 use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\Package\ItemModel;
 use App\Models\ItemModel as ProductItemModel;
-use App\Models\Order\ItemModel as orderItemModel;
+use App\Models\Order\ItemModel as OrderItemModel;
+
 
 class RequireController extends Controller
 {
@@ -79,16 +81,20 @@ class RequireController extends Controller
 			$needPurchases=$this->productItem->get();
 		}
 		foreach($needPurchases as $key=>$v){
-		$trend=$this->getNeedPurchaseNum($v->id);
-		
+		$sumtrend=PurchaseRequireModel::where('item_id',$v->id)->where('status',0)->sum('quantity');
+		if($sumtrend == 0){
+			continue;	
+			}	
+		$trend=PurchaseRequireModel::where('item_id',$v->id)->first();
 		$data['type']=0;
 		$data['warehouse_id']=$v->warehouse_id;
 		$data['sku']=$v->sku;
 		$data['supplier_id']=$v->supplier_id;
-		$data['purchase_num']=$trend['ProposedpurchaseQuantity'];
+		$data['purchase_num']=$trend->quantity;
 		$data['lack_num']=$data['purchase_num'];
 		if($data['purchase_num']>0){
 			PurchaseItemModel::create($data);
+			PurchaseRequireModel::where('item_id',$v->id)->update(['starus'=>1]);
 		}
 		}
 		$warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
@@ -119,9 +125,9 @@ class RequireController extends Controller
 			$seven_time=date('Y-m-d H:i:s',strtotime('-7 day'));
 			$fourteen_time=date('Y-m-d H:i:s',strtotime('-14 day'));
 			$thirty_time=date('Y-m-d H:i:s',strtotime('-30 day'));
-			$sevenDaySellNum=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$item_id)->where('packages.shipped_at','>',$seven_time)->where('package_items.quantity','<',5)->sum('package_items.quantity');
-			$fourteenDaySellNum=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$item_id)->where('packages.shipped_at','>',$fourteen_time)->where('package_items.quantity','<',5)->sum('package_items.quantity');
-			$thirtyDaySellNum=ItemModel::leftjoin('packages','package_items.package_id','=','packages.id')->where('package_items.item_id',$item_id)->where('package_items.quantity','<',5)->where('packages.shipped_at','>',$thirty_time)->sum('package_items.quantity');
+			$sevenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$seven_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
+			$fourteenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$fourteen_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
+			$thirtyDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$thirty_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
 			$trend['sevenDaySellNum']=$sevenDaySellNum ? $sevenDaySellNum : 0;
 			$trend['fourteenDaySellNum']=$fourteenDaySellNum ? $fourteenDaySellNum : 0;
 			$trend['thirtyDaySellNum']=$thirtyDaySellNum ? $thirtyDaySellNum : 0;
@@ -178,11 +184,26 @@ class RequireController extends Controller
 				$trend['ProposedpurchaseQuantity']=0;
 				}
 			}
+			//任务计划使用该函数
+			//$this->intoPurchaseRequire($item_id,$trend['ProposedpurchaseQuantity']);
 			//退货率
 			//$orderNum=orderItemModel::leftjoin('orders','orders.id','=','orderitems.order_id')->where('orders.status',)->where('orderitems.item_id',$item_id)->count();	
 			//$orderNum=orderItemModel::where('item_id',$item_id)->count();
 			return $trend;
 		}
+		
+		
+		
+		//加入采购需求表中
+	public function intoPurchaseRequire($item_id,$quantity=0){
+		$is_be=PurchaseRequireModel::where('item_id',$item_id)->count();
+		if($is_be == 0){
+			PurchaseRequireModel::create(['quantity'=>$quantity,'item_id'=>$item_id]);
+		}else{
+			PurchaseRequireModel::where('item_id',$item_id)->update(['quantity'=>$quantity,'status'=>0]);
+		}		
+	}
+		
 }
 
 

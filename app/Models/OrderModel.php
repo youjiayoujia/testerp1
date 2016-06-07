@@ -268,6 +268,19 @@ class OrderModel extends BaseModel
         return 1;
     }
 
+    public function checkBlack()
+    {
+        $isBlack = '';
+        if ($isBlack == 'confirm') {
+            $this->status = 'REVIEW';
+        } else {
+            if ($this->status == 'PAID') {
+                $this->status = 'PREPARED';
+            }
+        }
+        return $this->save();
+    }
+
     public function createOrder($data)
     {
         $last = $this->all()->last();

@@ -2,14 +2,17 @@
 
 namespace App\Console\Commands;
 
-use Channel;
 use App\Models\OrderModel;
+use Channel;
 use App\Models\CommandModel;
 use App\Models\Channel\AccountModel;
+use App\Jobs\DoPackage;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Console\Command;
 
 class OrdersGet extends Command
 {
+    use DispatchesJobs;
     /**
      * The name and signature of the console command.
      *
@@ -41,22 +44,32 @@ class OrdersGet extends Command
      */
     public function handle(OrderModel $orderModel)
     {
+        foreach (OrderModel::all() as $order) {
+            foreach ($order->items as $item) {
+                $item->delete();
+            }
+            $order->delete();
+        }
         foreach (AccountModel::all() as $account) {
             $begin = microtime(true);
-            $startDate = date("Y-m-d H:i:s", strtotime('-30 day'));
-            $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
+            $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
+            $endDate = date("Y-m-d H:i:s", time());
             $status = $account->api_status;
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $status, 100);
             foreach ($orderList as $order) {
+                $order['channel_id'] = $account->channel->id;
+                $order['channel_account_id'] = $account->id;
+                $order['status'] = 'PAID';
                 $thisOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
-                if ($thisOrder) {
-                    $thisOrder->updateOrder($order);
-                } else {
-                    $order['channel_id'] = $account->channel->id;
-                    $order['channel_account_id'] = $account->id;
-                    $orderModel->createOrder($order);
+                if (!$thisOrder) {
+//                    $thisOrder = $thisOrder->updateOrder($order);
+//                } else {
+                    $thisOrder = $orderModel->createOrder($order);
                 }
+                $thisOrder->checkBlack();
+//                $this->info($thisOrder->status);
+                $this->dispatch(new DoPackage($thisOrder));
             }
             $end = microtime(true);
             $lasting = round($end - $begin, 3);

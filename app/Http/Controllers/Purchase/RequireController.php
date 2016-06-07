@@ -87,23 +87,23 @@ class RequireController extends Controller
 			}	
 		$trend=PurchaseRequireModel::where('item_id',$v->id)->first();
 		$data['type']=0;
-		$data['warehouse_id']=$v->warehouse_id;
+		$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
 		$data['sku']=$v->sku;
-		$data['supplier_id']=$v->supplier_id;
+		$data['supplier_id']=$v->supplier_id ? $v->supplier_id : 0;
 		$data['purchase_num']=$trend->quantity;
 		$data['lack_num']=$data['purchase_num'];
 		if($data['purchase_num']>0){
 			PurchaseItemModel::create($data);
-			PurchaseRequireModel::where('item_id',$v->id)->update(['starus'=>1]);
+			PurchaseRequireModel::where('item_id',$v->id)->update(['status'=>1]);
 		}
 		}
 		$warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
 			if(isset($warehouse_supplier)){
 			foreach($warehouse_supplier as $key=>$v){
-				$data['warehouse_id']=$v['warehouse_id'];		 
-				$data['supplier_id']=$v['supplier_id'];
+				$data['warehouse_id']=$v['warehouse_id'] ? $v['warehouse_id'] : 0;		 
+				$data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
 				$supplier=SupplierModel::find($v['supplier_id']);
-				$data['assigner']=$supplier->purchase_id;
+				$data['assigner']=$supplier->purchase_id ? $supplier->purchase_id : 0;
 				$purchaseOrder=PurchaseOrderModel::create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){

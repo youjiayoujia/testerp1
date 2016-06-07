@@ -111,7 +111,7 @@
                 </table>
                 @endif
             </td>
-            <td>{{ $purchaseOrder->warehouse->name}}</td>
+            <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
                   
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>

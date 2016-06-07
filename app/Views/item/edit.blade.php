@@ -12,17 +12,12 @@
         <div class="form-group col-md-3">
             <label for="size">item英文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="name" placeholder="item英文" disabled="disabled" name='name' value="{{ old('name') ?  old('name') : $model->product->productEnglishValue->name }}">
+            <input class="form-control" id="name" placeholder="item英文" disabled="disabled" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">item中文</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="item中文" disabled="disabled" name='c_name' value="{{ old('c_name') ?  old('c_name') : $model->c_name }}">
-        </div>
-        <div class="form-group col-md-3">
-            <label for="color">item报关中文</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="c_name" placeholder="item报关中文" disabled="disabled" name='c_name' value="{{ $model->product->productEnglishValue->baoguan_name }}">
         </div>
     </div>
     <div class="row">

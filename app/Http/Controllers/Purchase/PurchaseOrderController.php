@@ -96,7 +96,17 @@ class PurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'purchaseItemsNum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
+			'purchaseItemsArrivalNum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('arrival_num'),
+			'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
+			'postage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage')
         ];
+		$response['purchaseCost']=0;
+		$response['storageCost']=0;
+		foreach($response['purchaseItems'] as  $key=>$v){
+			$response['purchaseCost'] +=$v->purchase_num * $v->purchase_cost;
+			$response['storageCost'] +=$v->storage_qty * $v->purchase_cost;
+			}
         return view($this->viewPath . 'show', $response);
     }
 	
@@ -291,11 +301,14 @@ class PurchaseOrderController extends Controller
 		$model=$this->model->find($id);
 		$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
 		$Inum=ItemModel::where('sku',$data['sku'])->where('is_sale','<>',1)->count();
+		$item=ItemModel::where('sku',$data['sku'])->where('is_sale',1)->first();
 		if($num > 0 || $Inum > 0){
 			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
 		}
+		if($model->close_status == 1){
+			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已结算，不能新增Item.'));
+			}
 		$data['lack_num']=$data['purchase_num'];
-		$item=ItemModel::where('sku',$data['sku'])->get();
 		$data['warehouse_id']=$model->warehouse_id;
 		$data['supplier_id']=$item->supplier_id;
 		$data['purchase_order_id']=$id;
@@ -329,7 +342,7 @@ class PurchaseOrderController extends Controller
 		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
 		}
 	/**
-	* 添加报等时间
+	* 打印
 	*
 	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
 	*/

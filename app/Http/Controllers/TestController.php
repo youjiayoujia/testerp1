@@ -17,7 +17,9 @@ use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Modules\Channel\ChannelModule;
 use App\Models\PackageModel;
+use App\Jobs\DoPackage;
 use DNS1D;
+use App\Http\Controllers\Controller;
 
 class TestController extends Controller
 {
@@ -63,6 +65,12 @@ class TestController extends Controller
 
     public function index()
     {
+        foreach (OrderModel::all() as $order) {
+            foreach ($order->items as $item) {
+                $item->delete();
+            }
+            $order->delete();
+        }
         $accountID = request()->get('id');
         $begin = microtime(true);
         $account = AccountModel::findOrFail($accountID);
@@ -76,11 +84,14 @@ class TestController extends Controller
             $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
             $order['channel_id'] = $account->channel->id;
             $order['channel_account_id'] = $account->id;
+            $order['status'] = 'PAID';
             if ($thisOrder) {
-                $thisOrder->updateOrder($order);
+                $thisOrder = $thisOrder->updateOrder($order);
             } else {
-                $this->orderModel->createOrder($order);
+                $thisOrder = $this->orderModel->createOrder($order);
             }
+            $thisOrder->checkBlack();
+            var_dump($thisOrder);
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

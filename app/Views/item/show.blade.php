@@ -10,7 +10,7 @@
                 <strong>sku</strong>: {{ $model->sku }}
             </div>
             <div class="col-lg-3">
-                <strong>产品中文名</strong>: {{ $model->product->productEnglishValue->name }}
+                <strong>产品中文名</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-3">
                 <strong>产品英文名</strong>: {{ $model->c_name }}
@@ -18,9 +18,6 @@
         </div>
 
         <div class="panel-body">
-            <div class="col-lg-3">
-                <strong>产品报关中文名</strong>: {{ $model->product->productEnglishValue->baoguan_name }}
-            </div>
             <div class="col-lg-3">
                 <strong>创建时间</strong>: {{ $model->created_at }}
             </div>

@@ -66,7 +66,7 @@
                         
                         @if($getfeature->type==1)
                             <div class="featurestyle" style="padding-bottom:10px">                           
-                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
+                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php if(count($features_input)>0)echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
                             </div>
                             
                         @elseif($getfeature->type==2)

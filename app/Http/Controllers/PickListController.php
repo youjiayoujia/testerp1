@@ -15,6 +15,7 @@ use App\Models\PackageModel;
 use App\Models\ChannelModel;
 use App\Models\LogisticsModel;
 use App\Models\Pick\PackageScoreModel;
+use Tool;
 
 class PickListController extends Controller
 {
@@ -70,6 +71,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'picklistitems' => $model->pickListItem,
+            'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);

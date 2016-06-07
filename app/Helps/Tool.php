@@ -19,7 +19,7 @@ class Tool
 
     public function barcodePrint($content, $type = 'C128') 
     {
-        echo DNS1D::getBarcodeHTML($content, $type);
+        return DNS1D::getBarcodeHTML($content, $type);
     }
 
     public function getFileExtension($fileName)

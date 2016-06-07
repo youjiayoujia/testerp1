@@ -44,12 +44,12 @@ class OrdersGet extends Command
      */
     public function handle(OrderModel $orderModel)
     {
-        foreach (OrderModel::all() as $order) {
-            foreach ($order->items as $item) {
-                $item->delete();
-            }
-            $order->delete();
-        }
+//        foreach (OrderModel::all() as $order) {
+//            foreach ($order->items as $item) {
+//                $item->delete();
+//            }
+//            $order->delete();
+//        }
         foreach (AccountModel::all() as $account) {
             $begin = microtime(true);
             $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));

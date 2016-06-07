@@ -23,7 +23,7 @@
         </div>
         <div class='form-group col-lg-3'> 
             <label for='city'>联系人</label> 
-            <select name='contact_by' class='form-control'>
+            <select name='contact_by' class='form-control contact_by'>
             @foreach($users as $user)
             <option value="{{ $user->id }}" {{ $user->id == $model->contact_by ? 'selected' : ''}}>{{ $user->name }}</option>
             @endforeach
@@ -66,6 +66,7 @@
         </div>
     </div>
 @stop
+@section('pageJs')
 <script type='text/javascript'>
     window.onload = function(){
         var buf = new Array();
@@ -73,4 +74,9 @@
         buf[1] = "{{ old('city') ? old('city') : $model->city }}" ;
         init(buf[0],buf[1]);
     };
+
+    $(document).ready(function(){
+        $('.contact_by').select2();
+    });
 </script>
+@stop

@@ -20,9 +20,12 @@
         <div class='form-group col-lg-2'>
             <input type='text' class='form-control searchsku' placeholder='sku'>
         </div>
-        <div class='form-group'>
+        <div class='form-group col-lg-2'>
             <button type='button' class='btn btn-info search'>确认</button>
             <button type='button' class='btn btn-warning printException'>打印异常</button>
+        </div>
+        <div class='form-group col-lg-8'>
+            <font color='red' size='7px' class='notFindSku'></font>
         </div>
     </div>
     <div class="panel panel-default">
@@ -115,6 +118,12 @@
     <button type="reset" class="btn btn-default">取消</button>
 @stop
 <script type='text/javascript'>
+$(document).on('keypress', function (event) {
+    if(event.keyCode == '13') {
+        $('.search').trigger("click"); 
+        return false;
+    }
+});
 $(document).ready(function(){
     $('.printException').click(function(){
         $.each($('.sku'), function(){
@@ -245,8 +254,10 @@ $(document).ready(function(){
             });
         }
         if(!extern_flag) {
-            alert('sku不存在或者该对应的拣货单上sku已满');
+            $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
         }
+        $('.searchSku').val('');
+        $('.searchSku').focus();
     });
 });
 </script>

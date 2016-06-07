@@ -11,6 +11,7 @@
 namespace App\Models\Order;
 
 use App\Base\BaseModel;
+use App\Models\OrderModel;
 
 class BlacklistModel extends BaseModel
 {
@@ -147,10 +148,23 @@ class BlacklistModel extends BaseModel
             $blacklist['total_order'] = iconv('gb2312','utf-8',$blacklist['total_order']);
             $blacklist['refund_order'] = iconv('gb2312','utf-8',$blacklist['refund_order']);
             $blacklist['refund_rate'] = iconv('gb2312','utf-8',$blacklist['refund_rate']);
-//            if($this->where('channel_id', $blacklist['channel_id'])->count()) {
-//                $error[] = $key;
-//                continue;
-//            }
+            $orders1 = OrderModel::where('email', $blacklist['email'])->get();
+            if(count($orders1)) {
+                foreach($orders1 as $order1) {
+                    $order1->update(['blacklist' => '0']);
+                }
+            }
+            $lastname = explode(' ', $blacklist['name'])[0];
+            $firstname = explode(' ', $blacklist['name'])[1];
+            $orders2 = OrderModel::where('shipping_zipcode', $blacklist['zipcode'])
+                ->where('shipping_lastname', $lastname)
+                ->where('shipping_firstname', $firstname)
+                ->get();
+            if(count($orders2)) {
+                foreach($orders2 as $order2) {
+                    $order2->update(['blacklist' => '0']);
+                }
+            }
             $this->create($blacklist);
         }
 

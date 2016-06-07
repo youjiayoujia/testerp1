@@ -102,7 +102,7 @@ class BlacklistController extends Controller
                         $obj = OrderModel::where('email', $key2)->first();
                         $data['channel_id'] = $channel2;
                         $data['ordernum'] = $obj->ordernum;
-                        $data['name'] = $obj->shipping_lastname . $obj->shipping_firstname;
+                        $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
                         $data['email'] = $obj->email;
                         $data['zipcode'] = $obj->shipping_zipcode;
                         $data['type'] = 'SUSPECTED';
@@ -144,7 +144,7 @@ class BlacklistController extends Controller
                         $obj = OrderModel::where('shipping_zipcode', $key)->first();
                         $data['channel_id'] = $channel;
                         $data['ordernum'] = $obj->ordernum;
-                        $data['name'] = $obj->shipping_lastname . $obj->shipping_firstname;
+                        $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
                         $data['email'] = $obj->email;
                         $data['zipcode'] = $obj->shipping_zipcode;
                         $data['type'] = 'SUSPECTED';

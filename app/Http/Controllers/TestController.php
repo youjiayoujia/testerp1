@@ -17,7 +17,9 @@ use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Modules\Channel\ChannelModule;
 use App\Models\PackageModel;
+use App\Jobs\DoPackage;
 use DNS1D;
+use App\Http\Controllers\Controller;
 
 class TestController extends Controller
 {

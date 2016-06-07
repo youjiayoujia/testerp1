@@ -68,8 +68,7 @@ class OrdersGet extends Command
                     $thisOrder = $orderModel->createOrder($order);
                 }
                 $thisOrder->checkBlack();
-//                $this->info($thisOrder->status);
-                $this->dispatch(new DoPackage($thisOrder));
+                $this->dispatch((new DoPackage($thisOrder))->onQueue('doPackages'));
             }
             $end = microtime(true);
             $lasting = round($end - $begin, 3);

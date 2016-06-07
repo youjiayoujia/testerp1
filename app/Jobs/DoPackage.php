@@ -31,5 +31,8 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $this->order->createPackage();
+        if ($this->order->status == 'PACKED') {
+            $this->dispatch();
+        }
     }
 }

@@ -30,6 +30,7 @@ class BlacklistModel extends BaseModel
         'total_order',
         'refund_order',
         'refund_rate',
+        'color',
     ];
 
     public $rules = [
@@ -148,6 +149,7 @@ class BlacklistModel extends BaseModel
             $blacklist['total_order'] = iconv('gb2312','utf-8',$blacklist['total_order']);
             $blacklist['refund_order'] = iconv('gb2312','utf-8',$blacklist['refund_order']);
             $blacklist['refund_rate'] = iconv('gb2312','utf-8',$blacklist['refund_rate']);
+            $blacklist['color'] = iconv('gb2312','utf-8','white');
             $orders1 = OrderModel::where('email', $blacklist['email'])->get();
             if(count($orders1)) {
                 foreach($orders1 as $order1) {

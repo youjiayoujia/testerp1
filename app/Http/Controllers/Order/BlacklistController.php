@@ -110,6 +110,7 @@ class BlacklistController extends Controller
                         $data['total_order'] = count($order2);
                         $data['refund_order'] = $count2;
                         $data['refund_rate'] = ($count2 / count($order2)) * 100 . '%';
+                        $data['color'] = 'green';
                         $blacklist = BlacklistModel::where('email', $data['email'])->where('channel_id', $channel2)->count();
                         if($blacklist <= 0) {
                             $this->model->create($data);
@@ -152,6 +153,7 @@ class BlacklistController extends Controller
                         $data['total_order'] = count($order);
                         $data['refund_order'] = $count;
                         $data['refund_rate'] = ($count / count($order)) * 100 . '%';
+                        $data['color'] = 'orange';
                         $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])
                             ->where('name', $data['name'])
                             ->where('channel_id', $channel)

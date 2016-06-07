@@ -61,6 +61,7 @@ class StockController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::where('is_available','1')->get(),
             'uses' => UserModel::all(),
+            'skus' => ItemModel::all(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -75,10 +76,8 @@ class StockController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $item = ItemModel::where('sku', trim(request()->input('sku')))->first();
-        $item_id = $item->id;
-        $warehouse_position_id = PositionModel::where(['name' => trim(request()->input('warehouse_position_id')), 'is_available' => '1'])->first()->id;
-        $item->in($warehouse_position_id, request()->input('all_quantity'), request()->input('all_quantity') * $item->purchase_price, 'MAKE_ACCOUNT');
+        $item = ItemModel::find(request('item_id'));
+        $item->in(request('warehouse_position_id'), request()->input('all_quantity'), request()->input('all_quantity') * ($item->cost ? $item->cost : $item->purchase_price), 'MAKE_ACCOUNT');
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功'));
     }
 
@@ -188,23 +187,23 @@ class StockController extends Controller
      */
     public function ajaxGetMessage()
     {
-            $sku = request()->input('sku');
-            $warehouse_id = request()->input('warehouse_id');
-            $obj = ItemModel::where(['sku'=>$sku])->first();
-            if(!$obj) {
-                return json_encode('sku_none');
-            }
-            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$obj->id])->with('position')->get();
-            if(!count($obj1)) {
-                return json_encode('stock_none');
-            }
-            $arr[] = $obj1->toArray();
-            $arr[] = $obj1->first()->unit_cost;
-            if($arr) {
-                return json_encode($arr);
-            } else {
-                return json_encode('false');
-            }
+        $item_id = request()->input('item_id');
+        $warehouse_id = request()->input('warehouse_id');
+        $obj = ItemModel::find($item_id);
+        if(!$obj) {
+            return json_encode('sku_none');
+        }
+        $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
+        if(!count($obj1)) {
+            return json_encode('stock_none');
+        }
+        $arr[] = $obj1->toArray();
+        $arr[] = $obj1->first()->unit_cost;
+        if($arr) {
+            return json_encode($arr);
+        } else {
+            return json_encode('false');
+        }
     }
 
     /**
@@ -306,9 +305,15 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $sku = trim(request()->input('sku'));
-            $count = ItemModel::where('sku', $sku)->count();
-            if($count)
-                return json_encode('true');
+            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            $total = $skus->count();
+            $arr = [];
+            foreach($skus as $key => $sku) {
+                $arr[$key]['id'] = $sku->id;
+                $arr[$key]['text'] = $sku->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
             else 
                 return json_encode('false');
         }

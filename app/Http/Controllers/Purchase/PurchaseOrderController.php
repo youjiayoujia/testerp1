@@ -291,11 +291,11 @@ class PurchaseOrderController extends Controller
 		$model=$this->model->find($id);
 		$num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
 		$Inum=ItemModel::where('sku',$data['sku'])->where('is_sale','<>',1)->count();
+		$item=ItemModel::where('sku',$data['sku'])->where('is_sale',1)->first();
 		if($num > 0 || $Inum > 0){
 			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
 		}
 		$data['lack_num']=$data['purchase_num'];
-		$item=ItemModel::where('sku',$data['sku'])->get();
 		$data['warehouse_id']=$model->warehouse_id;
 		$data['supplier_id']=$item->supplier_id;
 		$data['purchase_order_id']=$id;

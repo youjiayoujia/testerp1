@@ -27,7 +27,7 @@ class CreateOrderBlacklists extends Migration
             $table->integer('total_order')->comment('订单总数');
             $table->integer('refund_order')->comment('退款订单数');
             $table->string('refund_rate')->comment('退款率');
-            $table->enum('color', ['orange', 'blue', 'green', 'white'])->comment('颜色分类')->default('white');
+            $table->enum('color', ['orange', 'green', 'white'])->comment('颜色分类')->default('white');
             $table->timestamps();
             $table->softDeletes();
         });

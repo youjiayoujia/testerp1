@@ -96,7 +96,17 @@ class PurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'purchaseItemsNum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
+			'purchaseItemsArrivalNum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('arrival_num'),
+			'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
+			'postage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage')
         ];
+		$response['purchaseCost']=0;
+		$response['storageCost']=0;
+		foreach($response['purchaseItems'] as  $key=>$v){
+			$response['purchaseCost'] +=$v->purchase_num * $v->purchase_cost;
+			$response['storageCost'] +=$v->storage_qty * $v->purchase_cost;
+			}
         return view($this->viewPath . 'show', $response);
     }
 	
@@ -332,7 +342,7 @@ class PurchaseOrderController extends Controller
 		return redirect( route('purchaseOrder.edit', $purchaseItem->purchase_order_id));	
 		}
 	/**
-	* 添加报等时间
+	* 打印
 	*
 	* @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
 	*/

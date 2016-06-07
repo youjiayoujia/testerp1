@@ -14,6 +14,7 @@ use App\Models\Channel\AccountModel;
 use App\Models\WarehouseModel;
 use App\Models\CountriesModel;
 use App\Models\UserModel;
+use App\Models\PaypalsModel;
 
 class AccountController extends Controller
 {
@@ -25,6 +26,15 @@ class AccountController extends Controller
         $this->viewPath = 'channel.account.';
     }
 
+    public function index(){
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'paypals' => PaypalsModel::orderBy('id', 'asc')->get(['id', 'paypal_email_address']),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
     public function create()
     {
         $response = [
@@ -45,6 +55,8 @@ class AccountController extends Controller
         $this->model->createAccount(request()->all());
         return redirect($this->mainIndex);
     }
+
+
 
     public function edit($id)
     {
@@ -101,7 +113,12 @@ class AccountController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
 
+
+
         $model->update(request()->all());
+
+        $paypalIds = explode(',', request()->input("paypal_ids"));
+        $model->paypal()->sync($paypalIds);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $model->alias . ' 设置API成功.'));
     }

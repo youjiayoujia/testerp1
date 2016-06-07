@@ -7,10 +7,10 @@
     <th>姓名</th>
     <th>邮箱</th>
     <th>邮编</th>
-    <th>类型</th>
-    <th>订单总数</th>
     <th>退款订单数</th>
+    <th>订单总数</th>
     <th>退款率</th>
+    <th>类型</th>
     <th>备注</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -28,10 +28,10 @@
             <td>{{ $blacklist->name }}</td>
             <td>{{ $blacklist->email }}</td>
             <td>{{ $blacklist->zipcode }}</td>
-            <td>{{ $blacklist->type_name }}</td>
-            <td>{{ $blacklist->total_order }}</td>
             <td>{{ $blacklist->refund_order }}</td>
+            <td>{{ $blacklist->total_order }}</td>
             <td>{{ $blacklist->refund_rate }}</td>
+            <td>{{ $blacklist->type_name }}</td>
             <td>{{ $blacklist->remark }}</td>
             <td>{{ $blacklist->updated_at }}</td>
             <td>{{ $blacklist->created_at }}</td>
@@ -52,6 +52,21 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+    <div class="row">
+        <form method="POST" action="{{ route('uploadBlacklist') }}" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="form-group col-lg-7">
+                <label for="name" class='control-label'>批量导入黑名单客户:</label>
+            </div>
+            <div class="form-group col-lg-3">
+                <input type='file' name='excel'>
+            </div>
+            <div class="form-group col-lg-2">
+                <a href='javascript:' class='downloadUpdateBlacklist'>格式下载(CSV)</a>
+                <button type='submit' class='btn btn-info btn-xs' value='submit'>submit</button>
+            </div>
+        </form>
+    </div>
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 查询平台
@@ -63,7 +78,6 @@
             @endforeach
         </ul>
     </div>
-
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 查询类型
@@ -86,10 +100,37 @@
             <li><a href="javascript:" class="shenhe" data-status="WHITE" data-name="白名单">白名单</a></li>
         </ul>
     </div>
+    <div class="btn-group">
+        <a href='javascript:' class='btn btn-info exportAll' value='导出所有内单号'>导出所有内单号</a>
+    </div>
+    <div class="btn-group">
+        <a href='javascript:' class='btn btn-info exportPart' value='导出勾选内单号'>导出勾选内单号</a>
+    </div>
 @parent
 @stop
 @section('childJs')
     <script type="text/javascript">
+        $(document).ready(function(){
+            $('.downloadUpdateBlacklist').click(function(){
+                location.href="{{ route('downloadUpdateBlacklist')}}";
+            });
+
+            $('.exportAll').click(function(){
+                location.href = "{{ route('exportAll')}}";
+            });
+
+            $('.exportPart').click(function(){
+                var checkbox = document.getElementsByName("tribute_id");
+                var blacklist_ids = "";
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    blacklist_ids += checkbox[i].value+",";
+                }
+                blacklist_ids = blacklist_ids.substr(0,(blacklist_ids.length)-1);
+                location.href = "{{ route('exportPart') }}?blacklist_ids=" + blacklist_ids;
+            });
+        });
+
         //批量审核
         $('.shenhe').click(function () {
             if (confirm("确认")) {

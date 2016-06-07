@@ -19,7 +19,7 @@
             <div class="form-group col-lg-2">
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
+                <select name="channel_account_id" class="form-control channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
                             {{$account->alias}}

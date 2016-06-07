@@ -102,11 +102,14 @@ class ItemController extends Controller
     {
         $item_ids = request()->input("item_ids");
         $arr = explode(',', $item_ids);
+        $param = request()->input('param');
+        
         $skus = $this->model->whereIn("id",$arr)->get();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'skus' => $skus,
             'item_ids'=>$item_ids,
+            'param'  =>$param,
         ];
         return view($this->viewPath . 'batchEdit', $response);
     }

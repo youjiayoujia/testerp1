@@ -15,6 +15,7 @@ use App\Models\ChannelModel;
 use App\Models\Order\BlacklistModel;
 use App\Models\Order\RefundModel;
 use App\Models\OrderModel;
+use Excel;
 
 class BlacklistController extends Controller
 {
@@ -245,6 +246,71 @@ class BlacklistController extends Controller
             $model->update($data);
         }
         return 1;
+    }
+
+    /**
+     * 导出所有内单号
+     */
+    public function exportAll()
+    {
+        $rows = $this->model->exportAll();
+        $this->exportExcel($rows, 'export_all_blacklists', '导出所有内单号');
+    }
+
+    /**
+     * 导出勾选内单号
+     */
+    public function exportPart()
+    {
+        $blacklist_ids = request()->input('blacklist_ids');
+        $blacklist_id_arr = explode(',', $blacklist_ids);
+        $rows = $this->model->exportPart($blacklist_id_arr);
+        $this->exportExcel($rows, 'export_part_blacklists', '导出勾选内单号');
+    }
+
+    public function exportExcel($rows, $name)
+    {
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function uploadBlacklist()
+    {
+        if(request()->hasFile('excel'))
+        {
+            $file = request()->file('excel');
+            $function = 'excelBlacklistProcess';
+            $errors = $this->model->excelProcess($file, $function);
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'errors' => $errors,
+            ];
+
+            return view($this->viewPath.'uploadBlacklistResult', $response);
+        }
+    }
+
+    public function downloadUpdateBlacklist()
+    {
+        $rows = [
+            [
+                'channel_id' => '1',
+                'ordernum' => '17905581340',
+                'name' => 'ThaiDiane',
+                'email' => 'hannawysz@gmail.com',
+                'zipcode' => '210000',
+                'type' => 'SUSPECTED',
+                'remark' => '',
+                'refund_order' => '1',
+                'total_order' => '10',
+                'refund_rate' => '10%',
+            ]
+        ];
+        $name = 'update_blacklist';
+        $this->exportExcel($rows, '更新黑名单用户');
     }
 
 }

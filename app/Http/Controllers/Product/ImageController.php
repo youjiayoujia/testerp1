@@ -73,11 +73,11 @@ class ImageController extends Controller
         $data['product_id'] = $productModel->id;
         $data['spu_id'] = $productModel->spu->id;
         $data['is_link'] = $data['is_link'];
-        $data['tag'] = $data['image_type'];
+        $data['tag'] = explode(',', substr($data['image_type'],0, strlen($data['image_type'])-1));
         $data['uploadType'] = 'image';
         $path = $this->model->imageCreate($data, request()->files);
         //echo $this->model->id;exit;
-        //print_r($imageModel);exit;
+        
         
         echo json_encode($path);
         //return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));

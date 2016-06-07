@@ -1,8 +1,17 @@
 @extends('common.table')
 @section('tableToolButtons')
-<a class="btn btn-info" id="batchedit">
-    <i class="glyphicon glyphicon-ok-circle"></i> 批量修改属性
-</a>
+<div class="btn-group btn-info" role="group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="glyphicon glyphicon-filter"></i> 批量修改属性
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="javascript:" class="batchedit"  data-name="weight" >重量</a></li>
+        <li><a href="javascript:" class="batchedit"  data-name="purchase_price">参考成本</a></li>
+        <li><a href="javascript:" class="batchedit"  data-name="status">SKU状态</a></li>
+        <li><a href="javascript:" class="batchedit"  data-name="package_size">体积</a></li>
+    </ul>
+</div> 
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
@@ -53,17 +62,18 @@
 
 @section('childJs')
     <script type="text/javascript">
-    $('#batchedit').click(function () {
+    $('.batchedit').click(function () {
         var checkbox = document.getElementsByName("tribute_id");
         var item_ids = "";
+        var param = $(this).data("name");
         for (var i = 0; i < checkbox.length; i++) {
             if(!checkbox[i].checked)continue;
             item_ids += checkbox[i].value+",";
         }
         item_ids = item_ids.substr(0,(item_ids.length)-1);
-        //alert(item_ids);return;
+        
         var url = "{{ route('batchEdit') }}";
-        window.location.href=url+"?item_ids="+item_ids;
+        window.location.href=url+"?item_ids="+item_ids+"&param="+param;
     });
 
     //全选

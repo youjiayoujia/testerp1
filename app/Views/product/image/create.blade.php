@@ -39,7 +39,7 @@
       <ul class="dowebok">
         @foreach($labels as $label)
             @if($label->group_id==2)
-                <li><input type="checkbox" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
+                <li><input type="checkbox" name="image_type" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
             @endif
               
         @endforeach
@@ -83,11 +83,20 @@
             //uploadAsync: false,   
             uploadUrl: "{{route('productImage.store')}}",
             uploadExtraData: function() {
-              return {
+                var str=document.getElementsByName("image_type");
+                var chestr="";
+                for (i=0;i<str.length;i++)
+                {
+                  if(str[i].checked == true)
+                  {
+                    chestr+=str[i].value+",";
+                  }
+                }
+                return {
                   is_link:$('input[name="is_link"]:checked').val(),
-                  image_type: $('input[name="image_type"]:checked').val(),
+                  image_type:chestr,
                   model:$("#model").val(),
-              };
+                };
             }
             //key: 100,
             //data:{"id":"12234"},

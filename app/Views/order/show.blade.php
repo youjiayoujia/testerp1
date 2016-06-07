@@ -27,12 +27,12 @@
             <div class="col-lg-2">
                 <strong>售后状态</strong>: {{ $model->active_name }}
             </div>
-            <div class="col-lg-2">
-                <strong>客服人员</strong>: {{ $model->userService->name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>运营人员</strong>: {{ $model->userOperator->name }}
-            </div>
+            {{--<div class="col-lg-2">--}}
+                {{--<strong>客服人员</strong>: {{ $model->userService->name }}--}}
+            {{--</div>--}}
+            {{--<div class="col-lg-2">--}}
+                {{--<strong>运营人员</strong>: {{ $model->userOperator->name }}--}}
+            {{--</div>--}}
             <div class="col-lg-2">
                 <strong>地址验证</strong>: {{ $model->address_confirm_name }}
             </div>
@@ -57,9 +57,9 @@
             <div class="col-lg-2">
                 <strong>做账时间</strong>: {{ $model->affair_time == '0000-00-00' ? '' : $model->affair_time }}
             </div>
-            <div class="col-lg-2">
-                <strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}
-            </div>
+            {{--<div class="col-lg-2">--}}
+                {{--<strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}--}}
+            {{--</div>--}}
             <div class="col-lg-2">
                 <strong>是否做账</strong>: {{ $model->is_affair_name }}
             </div>

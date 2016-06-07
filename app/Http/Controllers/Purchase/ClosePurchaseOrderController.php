@@ -54,7 +54,7 @@ class ClosePurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-		if ($model->examineStatus !=2) {
+		if ($model->costExamineStatus !=2) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '成本未审核通过的采购单.'));
         }
         $response = [

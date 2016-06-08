@@ -106,6 +106,7 @@
                 <th>&nbsp;</th>
                 <th>{{ $purchaseOrder->sum_purchase_account}}</th>
                 <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
+                <th>&nbsp;</th>
                 </tr>
                 </tbody>
                 </table>
@@ -124,9 +125,19 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-                 <a href="/purchaseOrder/write_off/{{$purchaseOrder->id}}" title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
+                @if($purchaseOrder->status < 4)
+                 <a  @if($purchaseOrder->write_off == 0) href="/purchaseOrder/write_off/{{$purchaseOrder->id}}"  @endif title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
                      <span class="glyphicon glyphicon-yen"></span>
                 </a>
+                @endif
+                
+               <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                </a> 
+                
+                <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs">
+                    <span class="glyphicon glyphicon-zoom-in"></span>
+                </a> 
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
@@ -137,6 +148,127 @@
             </td>
         </tr>
     @endforeach
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               添加物流单号
+            </h4>
+         </div>
+         <form action="/purchaseOrder/addPost/{{$purchaseOrder->id}}" method="post">
+         <input type="hidden" name="_token" value="{{ csrf_token() }}">
+         <div class="panel panel-default">
+        <div class="panel-heading">产品信息</div>
+        <div class="panel-body" id="itemDiv">
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <label  class='control-label'>物流号</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div> 
+                 <div class="form-group col-sm-2">
+                    <label  class='control-label'>物流费</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>             
+            </div>       
+           
+             
+              <div class='row'>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
+                </div>
+               
+                <div class="form-group col-sm-1">
+                    <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
+                </div>
+                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
+                </div>
+                 
+                 
+                    <input type="hidden" id="currrent" value="1">
+                     
+        </div>
+        <div class="panel-footer">
+            <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
+        </div>
+    </div> 
+         
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal">关闭
+            </button>
+            <button type="submit" class="btn btn-primary" >
+               提交
+            </button>
+         </div>
+         </form>
+      </div>
+</div>
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModala" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               查询物流单号
+            </h4>
+         </div>
+         <div style="text-align: center">
+         <iframe name="kuaidi100" src="http://www.kuaidi100.com/frame/app/index2.html" width="800" height="400" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
+      </div>
+      </div>
+      
+</div>
+</div>
 
 
+@stop
+
+@section('pageJs')
+    <script type='text/javascript'>
+	
+		 $(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
+		
+	//批量输入采购单号
+	function batchPostCoding(){
+		 var batch_post_coding=$('#batch_post_coding').val(); 
+			$(".itemPostCoding").val(batch_post_coding);
+		}
+		//新增物流号对应物流费
+        $(document).ready(function () {
+            var current = $('#currrent').val();
+            $('#addItem').click(function () {
+                $.ajax({
+                    url: "{{ route('postAdd') }}",
+                    data: {current: current},
+                    dataType: 'html',
+                    type: 'get',
+                    success: function (result) {
+                        $('#itemDiv').append(result);
+                    }
+                });
+                current++;
+            });
+
+ 			$(document).on('click', '.bt_right', function () {
+				if(current >1) {
+                $(this).parent().remove();
+                current--; 
+                }
+            });
+           
+        });
+    </script>
 @stop

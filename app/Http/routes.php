@@ -193,7 +193,8 @@ Route::group(['middleware' => 'auth'], function () {
 //未结算订单
     Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
-//采购单e
+//采购单e/purchaseOrder/addPost/
+	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');   
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');

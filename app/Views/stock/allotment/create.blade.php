@@ -55,7 +55,7 @@
             </div>
             <div class='row'>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku sku1" placeholder="sku" name='arr[item_id][0]' value="{{ old('arr[item_id][0]') }}">
+                    <select class='form-control sku sku1' name="arr[item_id][0]"></select>
                 </div>
                 <div class="form-group col-sm-2 position_html">
                     <input type='text' class="form-control warehouse_position_id" placeholder="库位" name='arr[warehouse_position_id][0]' value="{{ old('arr[warehouse_position_id][0]') }}">
@@ -90,6 +90,27 @@
                 type:'get',
                 success:function(result) {
                     $('.add_row').children('div:last').after(result);
+                    $('.sku1').select2({
+                        ajax: {
+                            url: "{{ route('stock.ajaxSku') }}",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                              return {
+                                sku: params.term, // search term
+                                page: params.page,
+                              };
+                            },
+                            results: function(data, page) {
+                                if((data.results).length > 0) {
+                                    var more = (page * 20)<data.total;
+                                    return {results:data.results,more:more};
+                                } else {
+                                    return {results:data.results};
+                                }
+                            }
+                        },
+                    });
                     current++;
                 }
             })
@@ -97,6 +118,28 @@
 
         $(document).on('click', '.bt_right', function(){
             $(this).parent().remove();
+        });
+
+        $('.sku1').select2({
+            ajax: {
+                url: "{{ route('stock.ajaxSku') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    sku: params.term, // search term
+                    page: params.page,
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            },
         });
 
         $(document).on('change', '#out_warehouse_id, #in_warehouse_id', function(){
@@ -169,23 +212,23 @@
             }
         });
 
-        $(document).on('blur', '.sku', function(){
+        $(document).on('change', '.sku', function(){
             tmp = $(this);
             block = $(this).parent().parent();
             warehouse = $('#out_warehouse_id').val();
             position = block.find('.warehouse_position_id');
             position_name = position.prop('name');
-            sku = $(this).val();
-            if(sku) {
+            item_id = $(this).val();
+            if(item_id) {
                 $.ajax({
                     url:"{{ route('stock.allotSku' )}}",
-                    data: {warehouse:warehouse, sku:sku},
+                    data: {warehouse:warehouse, item_id:item_id},
                     dataType:'json',
                     type:'get',
                     success:function(result) {
                         if(result == 'none') {
                             alert('sku有误或对应没有库存');
-                            tmp.val('');
+                            tmp.html('');
                             return;
                         }
                         if(result != false) {

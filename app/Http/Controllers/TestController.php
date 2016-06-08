@@ -30,7 +30,7 @@ class TestController extends Controller
 
     public function test1()
     {
-        echo DNS1D::getBarcodeHTML("hello", "c128", '2', '30');
+        echo DNS1D::getBarcodeHTML("tFX3w-green-XL", "c128", '1', '30');
         // echo DNS1D::getBarcodeHTML("4445645656", "C39");
         // echo DNS1D::getBarcodeHTML("4445645656", "C39+");
         // echo DNS1D::getBarcodeHTML("4445645656", "C39E");

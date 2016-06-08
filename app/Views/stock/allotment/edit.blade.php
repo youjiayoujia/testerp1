@@ -56,7 +56,9 @@
             @foreach($allotmentforms as $key => $allotmentform)
                 <div class='row'>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control sku" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : ($allotmentform->item ? $allotmentform->item->sku : '') }}">
+                        <select class='form-control sku sku1' name="arr[item_id][{{$key}}]">
+                            <option value="{{ $allotmentform->item->id}}">{{ $allotmentform->item->sku }}</option>
+                        </select>
                     </div>
                     <div class="form-group col-sm-2 position_html">
                         <input type='text' class="form-control warehouse_position_id" placeholder="库位" name='arr[warehouse_position_id][{{$key}}]' value="{{ old('arr[warehouse_position_id][$key]') ? old('arr[warehouse_position_id][$key]') : ($allotmentform->position ? $allotmentform->position->name : '') }}">
@@ -99,6 +101,28 @@
             $('.access_quantity').val('');
             $('.quantity').val('');
             $('.unit_cost').val('');
+        });
+
+        $('.sku1').select2({
+            ajax: {
+                url: "{{ route('stock.ajaxSku') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    sku: params.term, // search term
+                    page: params.page,
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            },
         });
 
         $(document).on('blur', '.warehouse_position_id,.sku', function(){
@@ -160,22 +184,27 @@
             }
         });
 
-        $(document).on('blur', '.sku', function(){
+        $(document).on('change', '.sku', function(){
             tmp = $(this);
             block = $(this).parent().parent();
             warehouse = $('#out_warehouse_id').val();
             position = block.find('.warehouse_position_id');
             position_name = position.prop('name');
-            sku = $(this).val();
+            item_id = $(this).val();
             $.ajax({
                 url:"{{ route('stock.allotSku' )}}",
-                data: {warehouse:warehouse, sku:sku},
+                data: {warehouse:warehouse, item_id:item_id},
                 dataType:'json',
                 type:'get',
                 success:function(result) {
                     if(result == 'none') {
                         alert('sku有误或对应没有库存');
-                        tmp.val('');
+                        str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
+                        str += "</select>";
+                        block.find('.position_html').html(str);
+                        block.find('.access_quantity').val('');
+                        block.find('.quantity').val('');
+                        block.find('.unit_cost').val('');
                         return;
                     }
                     if(result != false) {
@@ -183,6 +212,7 @@
                         str += "</select>";
                         block.find('.position_html').html(str);
                         block.find('.access_quantity').val('');
+                        block.find('.quantity').val('');
                         block.find('.unit_cost').val('');
                         str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
                         for(i=0; i<result[0].length; i++)

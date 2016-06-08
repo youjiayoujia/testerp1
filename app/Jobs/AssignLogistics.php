@@ -11,15 +11,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class AssignLogistics extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
+    protected $package;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($package)
     {
-        //
+        $this->package = $package;
     }
 
     /**
@@ -29,6 +30,6 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        $this->release();
+        $this->package->assignLogistics();
     }
 }

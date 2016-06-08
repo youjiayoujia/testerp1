@@ -18,7 +18,7 @@ class OrdersGet extends Command
      *
      * @var string
      */
-    protected $signature = 'orders:get';
+    protected $signature = 'orders:get {accountID}';
 
     /**
      * The console command description.
@@ -44,31 +44,26 @@ class OrdersGet extends Command
      */
     public function handle(OrderModel $orderModel)
     {
-//        foreach (OrderModel::all() as $order) {
-//            foreach ($order->items as $item) {
-//                $item->delete();
-//            }
-//            $order->delete();
-//        }
-        foreach (AccountModel::all() as $account) {
+        $account = AccountModel::find($this->argument('accountID'));
+        if ($account) {
             $begin = microtime(true);
             $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
             $endDate = date("Y-m-d H:i:s", time());
-            $status = $account->api_status;
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $orderList = $channel->listOrders($startDate, $endDate, $status, 100);
+            $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, 100);
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
                 $order['status'] = 'PAID';
-                $thisOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
+                $thisOrder = $orderModel
+                    ->where('channel_ordernum', $order['channel_ordernum'])
+                    ->first();
+                //todo:是否要更新订单
                 if (!$thisOrder) {
-//                    $thisOrder = $thisOrder->updateOrder($order);
-//                } else {
                     $thisOrder = $orderModel->createOrder($order);
+                    $thisOrder->checkBlack();
+                    $this->dispatch((new DoPackage($thisOrder))->onQueue('doPackages'));
                 }
-                $thisOrder->checkBlack();
-                $this->dispatch((new DoPackage($thisOrder))->onQueue('doPackages'));
             }
             $end = microtime(true);
             $lasting = round($end - $begin, 3);
@@ -81,6 +76,8 @@ class OrdersGet extends Command
                 'result' => 'success.',
                 'remark' => 'success.',
             ]);
+        } else {
+            $this->error('Account is not exist.');
         }
     }
 }

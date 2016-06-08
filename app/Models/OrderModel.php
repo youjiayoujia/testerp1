@@ -13,8 +13,7 @@ namespace App\Models;
 use Exception;
 use Tool;
 use App\Base\BaseModel;
-use App\Models\Order\ItemModel;
-use App\Models\ItemModel as productItem;
+use App\Models\ItemModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order\RefundModel;
@@ -108,7 +107,7 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
-    public function orderItem()
+    public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
     }
@@ -123,14 +122,14 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
     }
 
-    public function country()
-    {
-        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
-    }
-
     public function channelAccount()
     {
         return $this->belongsTo('App\Models\Channel\AccountModel', 'channel_account_id', 'id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
     }
 
     public function userAffairer()
@@ -146,6 +145,21 @@ class OrderModel extends BaseModel
     public function userOperator()
     {
         return $this->belongsTo('App\Models\UserModel', 'operator', 'id');
+    }
+
+    public function remarks()
+    {
+        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
+    }
+
+    public function refunds()
+    {
+        return $this->hasMany('App\Models\Order\RefundModel', 'order_id', 'id');
+    }
+
+    public function requires()
+    {
+        return $this->hasMany('App\Models\RequireModel', 'order_id');
     }
 
     public function getStatusNameAttribute()
@@ -191,104 +205,45 @@ class OrderModel extends BaseModel
     }
 
     /**
-     * 订单sku获取器
-     * @return string
-     */
-    public function getSkuNameAttribute()
-    {
-        $items = ItemModel::where('order_id', $this->id)->get()->toArray();
-        $sku = '';
-        foreach ($items as $item) {
-            $sku = $item['sku'] . ' ' . $sku;
-        }
-        return $sku;
-    }
-
-    /**
      * 订单成本获取器
      * @return int
      */
-    public function getItemCostNameAttribute()
+    public function getAllItemCostAttribute()
     {
-        $orderItems = ItemModel::where('order_id', $this->id)->get()->toArray();
-        $all = 0;
-        foreach ($orderItems as $orderItem) {
-            $cost = productItem::where('id', $orderItem['item_id'])->first()->cost;
-            $all = $cost * $orderItem['quantity'] + $all;
+        $total = 0;
+        foreach ($this->items as $item) {
+            $total += $item->item->cost * $item->item->quantity;
         }
-        return $all;
+        return $total;
     }
 
     public function getPartialOverAttribute()
     {
-        $orderItems = $this->orderItem;
-        $flag = 1;
-        foreach ($orderItems as $orderItem) {
-            if ($orderItem->split_quantity != $orderItem->quantity) {
-                $flag = 0;
+        foreach ($this->items as $item) {
+            if ($item->split_quantity != $item->quantity) {
+                return false;
             }
         }
-
-        return $flag ? true : false;
+        return true;
     }
 
     public function getOrderQuantityAttribute()
     {
-        $orderItems = $this->orderItem;
-        $sum = 0;
-        foreach ($orderItems as $orderItem) {
-            $sum += $orderItem->quantity;
-        }
-
-        return $sum;
+        return $this->items->sum('quantity');
     }
 
     public function getLogisticsFeeAttribute()
     {
-        $packages = $this->packages;
-        $sum = 0;
-        foreach ($packages as $package) {
-            $sum += $package->cost + $package->cost1;
+        $total = 0;
+        foreach ($this->packages as $package) {
+            $total += $package->cost + $package->cost1;
         }
-
-        return $sum;
+        return $total;
     }
 
-    public function getAllCostAttribute()
+    public function getActiveItemsAttribute()
     {
-        $orderItems = $this->orderItem;
-        $sum = 0;
-        foreach ($orderItems as $orderItem) {
-            $item = $orderItem->item;
-            $sum += round($item->cost * $orderItem->quantity, 3);
-        }
-
-        return $sum;
-    }
-
-    public function items()
-    {
-        return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
-    }
-
-    public function remarks()
-    {
-        return $this->hasMany('App\Models\Order\RemarkModel', 'order_id', 'id');
-    }
-
-    public function refunds()
-    {
-        return $this->hasMany('App\Models\Order\RefundModel', 'order_id', 'id');
-    }
-
-    public function package()
-    {
-        return $this->hasMany('App\Models\PackageModel', 'order_id', 'id');
-    }
-
-    public function requires()
-    {
-        return $this->hasMany('App\Models\RequireModel', 'order_id');
+        return $this->items->where('is_active', '1');
     }
 
     public function refundCreate($data, $file = null)
@@ -302,26 +257,26 @@ class OrderModel extends BaseModel
         return 1;
     }
 
+    //todo:黑名单逻辑
     public function checkBlack()
     {
-        $isBlack = '';
+        $isBlack = 'confirm';
         if ($isBlack == 'confirm') {
-            $this->status = 'REVIEW';
-        } else {
-            if ($this->status == 'PAID') {
-                $this->status = 'PREPARED';
-            }
+            return true;
         }
-        return $this->save();
+        return false;
     }
 
     public function createOrder($data)
     {
         $last = $this->all()->last();
         $data['ordernum'] = $last ? $last->id + 1 : 1;
+        if ($this->checkBlack()) {
+            $data['status'] = 'REVIEW';
+        }
         $order = $this->create($data);
         foreach ($data['items'] as $item) {
-            $orderItem = productItem::where('sku', $item['sku'])->first();
+            $orderItem = ItemModel::where('sku', $item['sku'])->first();
             if ($orderItem) {
                 $item['item_id'] = $orderItem->id;
             } else {
@@ -347,11 +302,6 @@ class OrderModel extends BaseModel
         return $order;
     }
 
-    public function getActiveItemsAttribute()
-    {
-        return $this->items->where('is_active', '1');
-    }
-
     public function canPackage()
     {
         //判断订单ACTIVE状态
@@ -375,8 +325,6 @@ class OrderModel extends BaseModel
     /**
      * @param array $items
      * @return bool
-     * todo:判断订单是否需要拆单先发
-     * todo:判断订单是否要hold库存
      */
     public function createPackage()
     {
@@ -519,9 +467,8 @@ class OrderModel extends BaseModel
 
     public function orderNeedArray()
     {
-        $orderItems = $this->orderItem;
         $arr = [];
-        foreach ($orderItems as $orderItem) {
+        foreach ($this->items as $orderItem) {
             $item = $orderItem->item;
             $needQuantity = $orderItem->quantity - $orderItem->split_quantity;
             if ($needQuantity) {

@@ -91,7 +91,6 @@ class TestController extends Controller
                 $thisOrder = $this->orderModel->createOrder($order);
             }
             $thisOrder->checkBlack();
-            var_dump($thisOrder);
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

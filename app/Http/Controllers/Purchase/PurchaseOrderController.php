@@ -372,6 +372,15 @@ class PurchaseOrderController extends Controller
 		$this->model->find($id)->update(['write_off'=>1,'status'=>4]);
 		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '核销成功'));
 		}
+	public function addPost($id){
+		$data=request()->all();
+		$model=$this->model->find($id);
+		foreach($data as $v){
+			$model->update($v);
+			}
+		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '成功添加运单号'));	
+		}	
+		
 }
 
 

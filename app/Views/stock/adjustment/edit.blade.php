@@ -58,9 +58,11 @@
                         </select>
                     </div>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $adjustment->item->sku }}">
+                        <select name="arr[item_id][{{$key}}]" class="form-control sku sku1">
+                            <option value="{{ $adjustment->item ? $adjustment->item->id : ''}}">{{ $adjustment->item ? $adjustment->item->sku : ''}}</option>
+                        </select>
                     </div>
-                    <div class="form-group col-sm-2">
+                    <div class="form-group col-sm-2 position_html">
                         <input type='text' name='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][$key]') ? old('arr[warehouse_position_id][$key]') : $adjustment->position->name }}">
                     </div>
                     <div class="form-group col-sm-1">
@@ -83,6 +85,28 @@
     $(document).ready(function(){
         $(document).on('click', '.bt_right', function(){
             $(this).parent().remove();
+        });
+
+        $('.sku1').select2({
+            ajax: {
+                url: "{{ route('stock.ajaxSku') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    sku: params.term, // search term
+                    page: params.page,
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            },
         });
 
         $(document).on('blur', '.unit_cost', function(){
@@ -165,13 +189,13 @@
             var tmp = $(this);
             var block = $(this).parent().parent();
             var type = block.find('.type').val();
-            var sku = $(this).val();
+            var item_id = $(this).val();
             var warehouse_id = $('#warehouse_id').val();
             var position_name = block.find('.warehouse_position_id').prop('name');
-            if(sku && warehouse_id){
+            if(item_id && warehouse_id){
                 $.ajax({
                     url: "{{route('stock.getMessage')}}",
-                    data: {sku:sku, warehouse_id:warehouse_id},
+                    data: {item_id:item_id, warehouse_id:warehouse_id},
                     dataType: 'json',
                     type: 'get',
                     success: function(result){
@@ -197,6 +221,7 @@
                             str += "</select>";
                             block.find('.position_html').html(str);
                             block.find('.access_quantity').val('');
+                            block.find('.quantity').val('');
                             block.find('.unit_cost').val('');
                             str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
                             for(i=0; i<result[0].length; i++)

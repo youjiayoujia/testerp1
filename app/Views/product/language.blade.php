@@ -26,15 +26,15 @@
                         $multiOption = $model->productMultiOption->where("channel_id",$channel->id)->first();
                     ?>
                     <div class="form-group col-lg-4">
-                        <input type='text' class="form-control" id="{{$name}}_name" placeholder="标题" name='info[{{$channel->id}}][{{$name}}][{{$name}}_name]' value="{{ old($name.'_name')?old($name.'_name'):$multiOption->$temp }}">
+                        <input type='text' class="form-control" id="{{$name}}_name" placeholder="标题" name='info[{{$channel->id}}][{{$name}}][{{$name}}_name]' value="{{ old($name.'_name')?old($name.'_name'):$multiOption?$multiOption->$temp:'' }}">
                     </div>
                     <?php $temp=$name."_description" ?>
                     <div class="form-group  col-lg-4">  
-                        <textarea cols="50" rows="10" id="{{$name}}_description" name="info[{{$channel->id}}][{{$name}}][{{$name}}_description]">{{$multiOption->$temp}}</textarea>
+                        <textarea cols="50" rows="10" id="{{$name}}_description" name="info[{{$channel->id}}][{{$name}}][{{$name}}_description]">{{$multiOption?$multiOption->$temp:''}}</textarea>
                     </div>
                     <?php $temp=$name."_keywords" ?>
                     <div class="form-group  col-lg-4">    
-                        <input type='text' class="form-control" id="{{$name}}_keywords" placeholder="关键词" name='info[{{$channel->id}}][{{$name}}][{{$name}}_keywords]' value="{{ old($name.'_keywords')?old($name.'_keywords'):$multiOption->$temp }}">
+                        <input type='text' class="form-control" id="{{$name}}_keywords" placeholder="关键词" name='info[{{$channel->id}}][{{$name}}][{{$name}}_keywords]' value="{{ old($name.'_keywords')?old($name.'_keywords'):$multiOption?$multiOption->$temp:'' }}">
                     </div>
                 </div> 
             

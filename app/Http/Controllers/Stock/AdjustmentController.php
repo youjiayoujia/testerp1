@@ -99,7 +99,7 @@ class AdjustmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         $arr = request()->input('arr');
@@ -110,7 +110,6 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['stock_adjustment_id'] = $obj->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
@@ -172,7 +171,7 @@ class AdjustmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->find($id)->adjustments;
         $obj_len = count($obj);
@@ -187,7 +186,6 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $id;
-            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $obj[$i]->update($buf);

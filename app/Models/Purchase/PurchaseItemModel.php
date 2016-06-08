@@ -24,7 +24,7 @@ class PurchaseItemModel extends BaseModel
             
         ],
         'update' => [
- 			'purchase_num' => 'required',
+ 			
         ]
     ];
     public $searchFields = ['id','sku','supplier_id','warehouse_id','user_id'];

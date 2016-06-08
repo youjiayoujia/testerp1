@@ -1,8 +1,12 @@
-@extends('common.form')
-@section('formBody')
+@extends('layouts.default')
+@section('body')
     <div class='row'>
         <div class='form-group col-lg-offset-5'>
-            <label>仓库发货拣货单</label>
+            <h3>拣货单</h3>
+        </div>
+        <div class='form-group col-lg-offset-8'>
+            {!! $barcode !!}
+            <p>{{ $model->picknum }}</p>
         </div>
     </div>
     <div class='row'>
@@ -63,7 +67,7 @@
             @endforeach
         </tbody>
     </table>
-@stop
-@section('formButton')
-    <button type="button" class="btn btn-success">打印</button>
+    <div clas='row'>
+        <button type="button" class="btn btn-success">打印</button>
+    </div>
 @stop

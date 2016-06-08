@@ -7,20 +7,20 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Bus\Queueable;
 
-class test extends Job implements SelfHandling, ShouldQueue
+class AssignLogistics extends Job implements SelfHandling, ShouldQueue
 {
-    use InteractsWithQueue, SerializesModels, Queueable;
+    use InteractsWithQueue, SerializesModels;
+    protected $package;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($package)
     {
-        //
+        $this->package = $package;
     }
 
     /**
@@ -30,6 +30,6 @@ class test extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-       echo 'test';
+        $this->package->assignLogistics();
     }
 }

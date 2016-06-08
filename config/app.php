@@ -136,6 +136,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Milon\Barcode\BarcodeServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -149,16 +150,13 @@ return [
          * Coffee Providers
          */
         App\Providers\HelpServiceProvider::class,
-        Chumper\Zipper\ZipperServiceProvider::class,
         App\Modules\Channel\ChannelServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Debugbar
          */
         Barryvdh\Debugbar\ServiceProvider::class,
-
-        'Maatwebsite\Excel\ExcelServiceProvider',
-
     ],
 
     /*
@@ -213,10 +211,10 @@ return [
          */
         'DataList' => App\Facades\DataList::class,
         'Tool' => App\Facades\Tool::class,
-        'Zipper' => Chumper\Zipper\Facades\Zipper::class,
         'Channel' => App\Modules\Channel\ChannelFacade::class,
-
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
+        'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
 
     ],
 

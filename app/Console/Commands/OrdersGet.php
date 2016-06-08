@@ -2,20 +2,23 @@
 
 namespace App\Console\Commands;
 
-use Channel;
 use App\Models\OrderModel;
+use Channel;
 use App\Models\CommandModel;
 use App\Models\Channel\AccountModel;
+use App\Jobs\DoPackage;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Console\Command;
 
 class OrdersGet extends Command
 {
+    use DispatchesJobs;
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'orders:get';
+    protected $signature = 'orders:get {accountID}';
 
     /**
      * The console command description.
@@ -41,21 +44,25 @@ class OrdersGet extends Command
      */
     public function handle(OrderModel $orderModel)
     {
-        foreach (AccountModel::all() as $account) {
+        $account = AccountModel::find($this->argument('accountID'));
+        if ($account) {
             $begin = microtime(true);
-            $startDate = date("Y-m-d H:i:s", strtotime('-30 day'));
-            $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
-            $status = $account->api_status;
+            $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
+            $endDate = date("Y-m-d H:i:s", time());
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $orderList = $channel->listOrders($startDate, $endDate, $status, 100);
+            $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, 100);
             foreach ($orderList as $order) {
-                $thisOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
-                if ($thisOrder) {
-                    $thisOrder->updateOrder($order);
-                } else {
-                    $order['channel_id'] = $account->channel->id;
-                    $order['channel_account_id'] = $account->id;
-                    $orderModel->createOrder($order);
+                $order['channel_id'] = $account->channel->id;
+                $order['channel_account_id'] = $account->id;
+                $order['status'] = 'PAID';
+                $thisOrder = $orderModel
+                    ->where('channel_ordernum', $order['channel_ordernum'])
+                    ->first();
+                //todo:是否要更新订单
+                if (!$thisOrder) {
+                    $thisOrder = $orderModel->createOrder($order);
+                    $thisOrder->checkBlack();
+                    $this->dispatch((new DoPackage($thisOrder))->onQueue('doPackages'));
                 }
             }
             $end = microtime(true);
@@ -69,6 +76,8 @@ class OrdersGet extends Command
                 'result' => 'success.',
                 'remark' => 'success.',
             ]);
+        } else {
+            $this->error('Account is not exist.');
         }
     }
 }

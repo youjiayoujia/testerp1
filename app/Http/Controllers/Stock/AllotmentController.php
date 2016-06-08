@@ -22,6 +22,7 @@ use App\Models\StockModel;
 use App\Models\Stock\AllotmentLogisticsModel;
 use App\Models\Stock\InModel;
 use App\Models\Stock\OutModel;
+use Tool;
 
 class AllotmentController extends Controller
 {
@@ -83,7 +84,7 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         for($i=0; $i<$len; $i++)
@@ -97,7 +98,6 @@ class AllotmentController extends Controller
             $buf['stock_allotment_id'] = $obj->id;
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
-            $buf['item_id'] = ItemModel::where('sku', trim($buf['sku']))->first()->id;
             AllotmentFormModel::create($buf);
             $item = ItemModel::find($buf['item_id']);
             $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ALLOTMENT', $obj->id);
@@ -157,7 +157,7 @@ class AllotmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->find($id)->allotmentforms;
         $obj_len = count($obj);
@@ -172,7 +172,6 @@ class AllotmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['stock_allotment_id'] = $id;
-            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>$buf['warehouse_position_id']])->first()->id;
             $buf['amount'] = round($buf['unit_cost'] * $buf['quantity'], 3);
             $obj[$i]->update($buf);
@@ -220,11 +219,11 @@ class AllotmentController extends Controller
         $arr = request()->all();
         $time = date('Y-m-d',time());       
         if($arr['result'] == 0) {
-            $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']);
+            $model->update(['check_status'=>'1', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]);
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核已拒绝...'));
         }
         $time = date('Y-m-d',time());       
-        $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>'2']); 
+        $model->update(['check_status'=>'2', 'remark'=>$arr['remark'], 'check_time'=>$time, 'check_by'=>request()->user()->id]); 
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '已审核...'));
     }
@@ -327,7 +326,7 @@ class AllotmentController extends Controller
         if(request()->ajax()) {
             $id = request()->input('id');
             $this->model->find($id)->update(['allotment_status'=>'new', 'check_status'=>'0', 'check_time'=>'0000-00-00',
-                'check_by'=>'0']);
+                'check_by'=>request()->user()->id]);
             return json_encode('111');
         }
 
@@ -386,6 +385,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'allotmentforms' => $allotmentforms,
+            'barcode' => Tool::barcodePrint($model->allotment_id, "C128"),
         ];
 
         return view($this->viewPath.'printAllotment', $response);
@@ -425,7 +425,7 @@ class AllotmentController extends Controller
         request()->flash();
 
         $arr = request()->all();
-        $this->model->find($id)->update(['checkform_by'=>'3']);
+        $this->model->find($id)->update(['checkform_by'=>request()->user()->id]);
         $obj = $this->model->find($id)->allotmentforms;
         DB::beginTransaction();
         try {

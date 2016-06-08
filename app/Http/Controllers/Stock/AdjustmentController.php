@@ -99,7 +99,7 @@ class AdjustmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->create($buf);
         $arr = request()->input('arr');
@@ -110,7 +110,6 @@ class AdjustmentController extends Controller
                 $val = array_values($val);
                 $buf[$key] = $val[$i];      
             }
-            $buf['item_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['stock_adjustment_id'] = $obj->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
@@ -172,7 +171,7 @@ class AdjustmentController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
-        $len = count(array_keys(request()->input('arr.sku')));
+        $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
         $obj = $this->model->find($id)->adjustments;
         $obj_len = count($obj);
@@ -187,7 +186,6 @@ class AdjustmentController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $buf['adjust_forms_id'] = $id;
-            $buf['items_id'] = ItemModel::where('sku', $buf['sku'])->first()->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
             $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $obj[$i]->update($buf);
@@ -260,7 +258,7 @@ class AdjustmentController extends Controller
         $result = request('result');
         $obj = $this->model->find($id);
         if($result) {
-            $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>'2']); 
+            $obj->update(['status'=>'2', 'check_time'=>date('Y-m-d h:i:s'), 'check_by'=>request()->user()->id]); 
             $obj->relation_id = $obj->id;
             $arr = $obj->toArray();
             $buf = $obj->adjustments->toArray();

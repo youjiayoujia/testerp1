@@ -15,7 +15,7 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
     ID</th>
     <th>sku</th>
-    <th>产品图片</th>
+    <th>中文名</th>
     <th>供应商</th>
     <th>采购去向</th>
     <th>订单需求</th>
@@ -27,13 +27,12 @@
     <th>建议采购数量</th>
     <th>趋势系数</th>
     <th>备注</th>
-    <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $requireItem)
         <tr>
             <td>
-             @if($requireItem->purchase_order_id >0)
+             @if($requireItem->is_sale !=1)
                 <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="1" >
                 @else
                 <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="0" >
@@ -41,13 +40,9 @@
             {{ $requireItem->id }}</td>
             <td>{{ $requireItem->sku}}</td>   
             <td>
-             @if($requireItem->item->product->default_image>0)
-             <img src="{{$requireItem->item->product->image->src}}" height="50px"/>
-            @else
-           该图片不存在
-            @endif
+            {{$requireItem->c_name}}
             </td>
-            <td>{{$requireItem->item->supplier->name}}</td>
+            <td>{{$requireItem->supplier->name}}</td>
             <td>{{ $requireItem->warehouse->name}}</td>
             <td>{{ $requireItem->order_need_num}}</td>
             <td>{{$requireItem->all_quantity}}</td>
@@ -67,9 +62,7 @@
             @endif
             </td>
             <td>{{ $requireItem->remark}}</td>
-            <td><a href="{{ route('require.show', ['id'=>$requireItem->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-eye-open"></span> 查看
-                </a></td> 
+             
         </tr>
     @endforeach
  <script type="text/javascript">		 

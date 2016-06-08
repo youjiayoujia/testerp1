@@ -21,6 +21,13 @@ return [
     	'3'=>'test3',
     ],
 	
+    //产品包装限制
+    'multi_language' => [
+        'de'=>'德语',
+        'it'=>'意大利语',
+        'fr'=>'法语',
+        'zh'=>'中文',
+    ],
 	
 	//产品投诉配置
 	'productcomplaint'=>[

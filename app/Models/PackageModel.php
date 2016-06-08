@@ -130,8 +130,8 @@ class PackageModel extends BaseModel
     public function getHasPickAttribute()
     {
         $items = $this->items;
-        foreach($items as $item) {
-            if($item->picked_quantity) {
+        foreach ($items as $item) {
+            if ($item->picked_quantity) {
                 return true;
             }
         }
@@ -153,62 +153,6 @@ class PackageModel extends BaseModel
             return false;
         }
         return true;
-    }
-
-    public function calculateProfit()
-    {
-        $orderIds = $this->where('status', 'ASSIGNED')->get()->groupBy('order_id');
-        foreach($orderIds as $orderId => $value) {
-            $order = OrderModel::find($orderId);
-            $orderAmount = $this->calculateOrderAmount($order);
-            $orderCosting = $this->calculateOrderCosting($order);
-            if($orderAmount > $orderCosting) {
-                //利润率为负撤销
-                $this->OrderCancle($order);
-            }
-        }
-    }
-
-    public function OrderCancle($order)
-    {
-        $order->update(['status' => 'CANCLE']);
-        $orderItems = $order->orderItems;
-        foreach($orderItems as $orderItem) {
-            $orderItem->update(['is_active' => '1']);
-        }
-        $packages = $order->packages;
-        foreach($packages as $package) {
-            $package->update(['status' => 'CANCLE']);
-            foreach($package->items as $packageItem) {
-                $packageItem->update(['status' => 'CANCLE']);
-                $item = ItemModel::find($packageItem->item_id);
-                $item->in($packageItem->warehouse_position_id, $packageItem->quantity, $packageItem->quantity*$item->cost, 'PACKAGE_CANCLE', $order->ordernum.':'.$packageItem->id);
-            }
-        }
-    }
-
-    public function calculateOrderAmount($order)
-    {
-        $orderItems = $order->orderItems;
-        $sum = 0;
-        foreach($orderItems as $orderItem) {
-            $sum += $orderItem->amount;
-        }
-
-        return $sum;
-    }
-
-    public function calculateOrderCosting($order)
-    {
-        $orderItems = $order->orderItems;
-        $sum = 0;
-        foreach($orderItems as $orderItem)
-        {
-            $item = $orderItem->item;
-            $sum += round($item->cost * $orderItem->quantity, 3);
-        }
-
-        return $sum;
     }
 
     /**
@@ -519,5 +463,98 @@ class PackageModel extends BaseModel
                 $sheet->fromArray($rows);
             });
         })->download('csv');
+    }
+
+    /**
+     * 计算利润率并处理
+     *
+     * @param none
+     * @return 利润率 小数
+     *
+     */
+    public function calculateProfitProcess()
+    {
+        $order = $this->order;
+        $orderItems = $order->orderItem;
+        $orderAmount = $order->amount;
+        $orderCosting = $order->all_item_cost;
+        $orderChannelFee = $this->calculateOrderChannelFee($order, $orderItems);
+        $orderRate = ($order->amount - ($orderCosting + $this->calculateOrderChannelFee($order,
+                        $orderItems) + $order->logistics_fee)) / $order->amount;
+        if ($orderRate <= 0) {
+            //利润率为负撤销
+            $this->OrderCancle($order, $orderItems);
+        }
+
+        return $orderRate;
+    }
+
+    /**
+     *  计算平台费
+     *
+     * @param $order 订单 $orderItems 订单条目
+     * @return $sum
+     *
+     */
+    public function calculateOrderChannelFee($order, $orderItems)
+    {
+        $sum = 0;
+        $channel = $order->channel;
+        if ($channel->flat_rate == 'channel' && $channel->rate == 'channel') {
+            return ($order->amount + $order->logistics_fee) * $channel->rate_value + $channel->flat_rate_value;
+        }
+        if ($channel->flat_rate == 'channel' && $channel->rate == 'catalog') {
+            $sum += $channel->flat_rate_value;
+            foreach ($orderItems as $orderItem) {
+                $rate = $orderItem->item->catalog->channels->first()->pivot->rate;
+                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $order->logistics_fee) * $rate;
+                $sum += $tmp;
+            }
+            return $sum;
+        }
+        if ($channel->flat_rate == 'catalog' && $channel->rate == 'channel') {
+            $sum = ($order->amount + $order->logistics_fee) * $channel->rate_value;
+            foreach ($orderItems as $orderItem) {
+                $flat_rate_value = $orderItem->item->catalog->channels->first()->pivot->flat_rate_value;
+                $sum += $flat_rate_value;
+            }
+            return $sum;
+        }
+        if ($channel->flat_rate == 'catalog' && $channel->rate == 'catalog') {
+            foreach ($orderItems as $orderItem) {
+                $buf = $orderItem->item->catalog->channels->first()->pivot;
+                $flat_rate_value = $buf->flat_rate_value;
+                $rate_value = $buf->rate_value;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $order->logistics_fee) * $rate_value + $flat_rate_value;
+            }
+            return $sum;
+        }
+    }
+
+    /**
+     * 订单取消
+     *
+     * @param $order 订单 $orderItems 订单条目
+     * @return none
+     *
+     */
+    public function OrderCancle($order, $orderItems)
+    {
+        $order->update(['status' => 'CANCLE']);
+        foreach ($orderItems as $orderItem) {
+            $orderItem->update(['is_active' => '0']);
+        }
+        $packages = $order->packages;
+        var_dump($packages->toArray());
+        exit;
+        foreach ($packages as $package) {
+            $package->update(['status' => 'CANCLE']);
+            foreach ($package->items as $packageItem) {
+                $item = $packageItem->item;
+                $item->in($packageItem->warehouse_position_id, $packageItem->quantity,
+                    $packageItem->quantity * $item->cost, 'PACKAGE_CANCLE', '',
+                    ('订单号:' . $order->ordernum . ' 包裹号:' . $package->id));
+            }
+        }
     }
 }

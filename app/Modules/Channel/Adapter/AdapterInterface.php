@@ -33,6 +33,7 @@ interface AdapterInterface
      *          'email' => '',
      *          'amount' => '',
      *          'currency' => '',
+     *          'status' => '',
      *          'payment' => '',
      *          'shipping_method' => '',
      *          'shipping_firstname' => '',

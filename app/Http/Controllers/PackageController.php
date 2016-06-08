@@ -116,7 +116,6 @@ class PackageController extends Controller
             ->whereIn('status', ['PREPARED', 'NEED'])
             ->orderBy('package_times', 'desc')->skip($start)->take($len)
             ->get();
-            break;
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
@@ -124,11 +123,23 @@ class PackageController extends Controller
 
     public function assignLogistics()
     {
+        set_time_limit(0);
+        $len = 1000;
+        $start = 0;
+        $packages = PackageModel::where('status', 'NEW')
+                ->where('is_auto', '1')->skip($start)->take($len)
+                ->get();
         $begin = microtime(true);
-        $packages = PackageModel::where('status', 'NEW')->where('is_auto', '1')->get();
-        foreach ($packages as $package) {
-            echo $package->id . '<br>';
-            $package->assignLogistics();
+        while(count($packages)) {
+            foreach ($packages as $package) {
+                echo $package->id . '<br>';
+                $package->assignLogistics();
+                //$package->calculateProfitProcess();
+            }
+            $start += $len;
+            $packages = PackageModel::where('status', 'NEW')
+                ->where('is_auto', '1')->skip($start)->take($len)
+                ->get();
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

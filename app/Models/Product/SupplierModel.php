@@ -77,13 +77,20 @@ class SupplierModel extends BaseModel
      *
      */
     public function supplierCreate($data, $file= null)
-    {
-            $path = 'uploadSupplier/';
-			if ($file->getClientOriginalName()) {
-				$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
-				$file->move($path, $data['qualifications']);
-				return $this->create($data);
-			}         
+    {	
+			if($data['type']==0){
+            	$path = 'uploadSupplier/';
+				if ($file->getClientOriginalName()) {
+					$originalExtension=$file->getClientOriginalExtension();
+					if($originalExtension=='jpg' || $originalExtension=='png' || $originalExtension=='jpeg'){
+						$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
+						$file->move($path, $data['qualifications']);
+					}else{
+						return 'imageError';
+						}
+				} 
+			}
+			 return $this->create($data);       
     }
 	
 	/**
@@ -92,12 +99,19 @@ class SupplierModel extends BaseModel
      *
      */
     public function updateSupplier($id,$data, $file= null)
-    {
+    {		
+		if($data['type']==0){
             $path = 'uploadSupplier/';
-			if ($file->getClientOriginalName()) {
-				$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
-				$file->move($path, $data['qualifications']);
-				return $this->find($id)->update($data);
+			if ($file->getClientOriginalName()){
+				$originalExtension=$file->getClientOriginalExtension();
+					if($originalExtension=='jpg' || $originalExtension=='png' || $originalExtension=='jpeg'){
+					$data['qualifications'] = $path.time() . '.' . $file->getClientOriginalExtension();
+					$file->move($path, $data['qualifications']);
+					}else{
+						return 'imageError';
+						}
 			}         
-    }
+    	}
+		return $this->find($id)->update($data);
+		}
 }

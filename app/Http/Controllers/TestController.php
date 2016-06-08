@@ -8,12 +8,18 @@
 
 namespace App\Http\Controllers;
 
+
+use Test;
+
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
-use DB;
-
+use App\Modules\Channel\ChannelModule;
+use App\Models\PackageModel;
+use App\Jobs\DoPackage;
+use DNS1D;
+use App\Http\Controllers\Controller;
 
 class TestController extends Controller
 {
@@ -22,25 +28,69 @@ class TestController extends Controller
         $this->orderModel = $orderModel;
     }
 
+    public function test1()
+    {
+        echo DNS1D::getBarcodeHTML("tFX3w-green-XL", "c128", '1', '30');
+        // echo DNS1D::getBarcodeHTML("4445645656", "C39");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C39+");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C39E");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C39E+");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C93");
+        // echo DNS1D::getBarcodeHTML("4445645656", "S25");
+        // echo DNS1D::getBarcodeHTML("4445645656", "S25+");
+        // echo DNS1D::getBarcodeHTML("4445645656", "I25");
+        // echo DNS1D::getBarcodeHTML("4445645656", "I25+");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C128");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C128A");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C128B");
+        // echo DNS1D::getBarcodeHTML("4445645656", "C128C");
+        // echo DNS1D::getBarcodeHTML("44455656", "EAN2");
+        // echo DNS1D::getBarcodeHTML("4445656", "EAN5");
+        // echo DNS1D::getBarcodeHTML("4445", "EAN8");
+        // echo DNS1D::getBarcodeHTML("4445", "EAN13");
+        // echo DNS1D::getBarcodeHTML("4445645656", "UPCA");
+        // echo DNS1D::getBarcodeHTML("4445645656", "UPCE");
+        // echo DNS1D::getBarcodeHTML("4445645656", "MSI");
+        // echo DNS1D::getBarcodeHTML("4445645656", "MSI+");
+        // echo DNS1D::getBarcodeHTML("4445645656", "POSTNET");
+        // echo DNS1D::getBarcodeHTML("4445645656", "PLANET");
+        // echo DNS1D::getBarcodeHTML("4445645656", "RMS4CC");
+        // echo DNS1D::getBarcodeHTML("4445645656", "KIX");
+        // echo DNS1D::getBarcodeHTML("4445645656", "IMB");
+        // echo DNS1D::getBarcodeHTML("4445645656", "CODABAR");
+        // echo DNS1D::getBarcodeHTML("4445645656", "CODE11");
+        // echo DNS1D::getBarcodeHTML("4445645656", "PHARMA");
+        // echo DNS1D::getBarcodeHTML("4445645656", "PHARMA2T");
+    }
+
     public function index()
     {
+        foreach (OrderModel::all() as $order) {
+            foreach ($order->items as $item) {
+                $item->delete();
+            }
+            $order->delete();
+        }
         $accountID = request()->get('id');
         $begin = microtime(true);
         $account = AccountModel::findOrFail($accountID);
-        $startDate = date("Y-m-d H:i:s", strtotime('-30 day'));
+        $startDate = date("Y-m-d H:i:s", strtotime('-3 day'));
         $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
         $status = $account->api_status;
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $orderList = $channel->listOrders($startDate, $endDate, $status, 20);
         foreach ($orderList as $order) {
+            echo '<hr>' . $order['channel_ordernum'] . '<hr>';
             $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
             $order['channel_id'] = $account->channel->id;
             $order['channel_account_id'] = $account->id;
+            $order['status'] = 'PAID';
             if ($thisOrder) {
-                $thisOrder->updateOrder($order);
+                $thisOrder = $thisOrder->updateOrder($order);
             } else {
-                $this->orderModel->createOrder($order);
+                $thisOrder = $this->orderModel->createOrder($order);
             }
+            $thisOrder->checkBlack();
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
@@ -101,7 +151,8 @@ class TestController extends Controller
 
     }
 
-    public function lazadaOrdersList(){
+    public function lazadaOrdersList()
+    {
         $begin = microtime(true);
         $account = AccountModel::findOrFail(4);
         $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
@@ -126,40 +177,75 @@ class TestController extends Controller
 
     }
 
-    public function test(){
+    public function cdiscountOrdersList()
+    {
+
+        $begin = microtime(true);
+        $account = AccountModel::findOrFail(10);
+        $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
+        $endDate = date("Y-m-d H:i:s");
+        $status = $account->api_status;
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+        $orderList = $channel->listOrders($startDate, $endDate, $status);
+
+        foreach ($orderList as $order) {
+            $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
+            $order['channel_id'] = $account->channel->id;
+            $order['channel_account_id'] = $account->id;
+            if ($thisOrder) {
+                //$thisOrder->updateOrder($order);
+            } else {
+                $this->orderModel->createOrder($order);
+            }
+        }
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+    public function test()
+    {
         $datas = DB::table('test')->get();
 
-        foreach ($datas as $data)
-        {
+        foreach ($datas as $data) {
             $spu_id = DB::table('spus')->insertGetId(
-                 array('spu' => $data->sku, 'status' =>  0,'created_at'=>'2015-10-16 16:33:00','updated_at'=>'2015-10-16 16:33:00')
+                array(
+                    'spu' => $data->sku,
+                    'status' => 0,
+                    'created_at' => '2015-10-16 16:33:00',
+                    'updated_at' => '2015-10-16 16:33:00'
+                )
             );
-            
+
             $product_id = DB::table('products')->insertGetId(
-                 array('spu_id' => $spu_id, 
-                    'name' =>  $data->title,
-                    'c_name'=>$data->c_name,
-                    'model'=>$data->sku,
-                    'weight'=>$data->weight,
-                    'catalog_id'=>1,
-                    'supplier_id'=>1,
-                    'warehouse_id'=>1,
-                    'default_image'=>0,
-                    'status'=>1)
+                array(
+                    'spu_id' => $spu_id,
+                    'name' => $data->title,
+                    'c_name' => $data->c_name,
+                    'model' => $data->sku,
+                    'weight' => $data->weight,
+                    'catalog_id' => 1,
+                    'supplier_id' => 1,
+                    'warehouse_id' => 1,
+                    'default_image' => 0,
+                    'status' => 1
+                )
             );
 
             $sku_id = DB::table('items')->insertGetId(
-                 array('product_id' => $product_id, 
-                    'name' =>  $data->title,
-                    'c_name'=>$data->c_name,
-                    'sku'=>$data->sku,
-                    'weight'=>$data->weight,
-                    'purchase_price'=>$data->value,
-                    'warehouse_position'=>$data->location,
-                    'warehouse_id'=>1,
-                    'catalog_id'=>1,
-                    'supplier_id'=>1,
-                    'status'=>1)
+                array(
+                    'product_id' => $product_id,
+                    'name' => $data->title,
+                    'c_name' => $data->c_name,
+                    'sku' => $data->sku,
+                    'weight' => $data->weight,
+                    'purchase_price' => $data->value,
+                    'warehouse_position' => $data->location,
+                    'warehouse_id' => 1,
+                    'catalog_id' => 1,
+                    'supplier_id' => 1,
+                    'status' => 1
+                )
             );
 
 

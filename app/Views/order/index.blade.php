@@ -30,7 +30,7 @@
                 @if($order->gross_margin != null)
                     <div>{{ $order->gross_margin }}</div>
                     <div>产品成本: {{ $order->all_item_cost }}RMB</div>
-                    <div>运费成本: {{ $order->package->sum('cost') }}RMB</div>
+                    <div>运费成本: {{ $order->packages->sum('cost') }}RMB</div>
                     <div>平台费: {{ '' }}USD</div>
                     <div>毛利润: {{ '' }}USD</div>
                 @endif
@@ -65,7 +65,7 @@
                 @endif
             </td>
             <td colspan="25" style="padding: 10px; margin: 10px">
-                @foreach($order->orderItem as $orderItem)
+                @foreach($order->items as $orderItem)
                     @if($orderItem->sku == '' && $orderItem->channel_sku == '')
                     @endif
                     @if($orderItem->sku != '' && $orderItem->item_id != 0)
@@ -88,9 +88,9 @@
                 @endforeach
                 <div class="row col-lg-12" style="color: black; text-align: center;">
                     平台费: ${{ '' }},
-                    总运费: {{ $order->package->sum('cost') }}RMB,
-                    包裹重: {{ $order->package->sum('weight') }}Kg,
-                    物品数量: {{ $order->orderItem->sum('quantity') }}
+                    总运费: {{ $order->packages->sum('cost') }}RMB,
+                    包裹重: {{ $order->packages->sum('weight') }}Kg,
+                    物品数量: {{ $order->items->sum('quantity') }}
                 </div>
             </td>
         </tr>

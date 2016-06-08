@@ -124,7 +124,7 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="核销" class="btn btn-success btn-xs">
+                 <a href="/purchaseOrder/write_off/{{$purchaseOrder->id}}" title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
                      <span class="glyphicon glyphicon-yen"></span>
                 </a>
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">

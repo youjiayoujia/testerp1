@@ -280,7 +280,7 @@ class StockModel extends BaseModel
     public function out($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $price = $this->unit_cost;
-        if($this->unit_cost <= 0) {
+        if($price <= 0) {
             throw new Exception('单价不是正数，出错');
         }
         $this->all_quantity -= $quantity;

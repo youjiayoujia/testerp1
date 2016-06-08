@@ -18,7 +18,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $blacklist)
-        @if($blacklist->color == 'white')
+        @if($blacklist->color == 'white' && $blacklist->type != 'CONFIRMED')
             <tr style="background: white">
                 <td>
                     <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
@@ -51,7 +51,7 @@
                 </td>
             </tr>
         @endif
-        @if($blacklist->color == 'green')
+        @if($blacklist->color == 'green' && $blacklist->type != 'CONFIRMED')
             <tr style="background: #90EE90">
                 <td>
                     <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">
@@ -84,7 +84,7 @@
                 </td>
             </tr>
         @endif
-        @if($blacklist->color == 'orange')
+        @if($blacklist->color == 'orange' && $blacklist->type != 'CONFIRMED')
             <tr style="background: #FFCC99">
                 <td>
                     <input type="checkbox" name="tribute_id" value="{{$blacklist->id}}">

@@ -275,21 +275,26 @@ class OrderModel extends BaseModel
             $data['status'] = 'REVIEW';
         }
         $order = $this->create($data);
-        foreach ($data['items'] as $item) {
-            $orderItem = ItemModel::where('sku', $item['sku'])->first();
-            if ($orderItem) {
-                $item['item_id'] = $orderItem->id;
+        foreach ($data['items'] as $orderItem) {
+            $item = ItemModel::where('sku', $orderItem['sku'])->first();
+            if ($item) {
+                $orderItem['item_id'] = $item->id;
             } else {
-                $channelProduct = ChannelProduct::where('channel_sku', $item['channel_sku'])->first();
+                $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
                 if ($channelProduct) {
-                    $item['item_id'] = $channelProduct->item->id;
+                    $orderItem['item_id'] = $channelProduct->item->id;
                 }
             }
-            if (!isset($item['item_id'])) {
-                $item['item_id'] = 0;
-                $order->update(['status' => 'REVIEW', 'remark' => '渠道SKU找不到对应产品']);
+            if (!isset($orderItem['item_id'])) {
+                $orderItem['item_id'] = 0;
+                $order->update(['status' => 'REVIEW']);
+                $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
             }
-            $order->items()->create($item);
+            $order->items()->create($orderItem);
+        }
+        if ($this->checkBlack()) {
+            $order->update(['status' => 'REVIEW']);
+            $order->remark('黑名单订单.');
         }
         return $order;
     }
@@ -300,6 +305,11 @@ class OrderModel extends BaseModel
         unset($data['items']);
         $order = $this->update($data);
         return $order;
+    }
+
+    public function remark($remark, $user_id = 0)
+    {
+        return $this->remarks()->create(['remark' => $remark, 'user_id' => $user_id]);
     }
 
     public function canPackage()

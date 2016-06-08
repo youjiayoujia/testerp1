@@ -106,6 +106,7 @@
                 <th>&nbsp;</th>
                 <th>{{ $purchaseOrder->sum_purchase_account}}</th>
                 <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
+                <th>&nbsp;</th>
                 </tr>
                 </tbody>
                 </table>
@@ -124,9 +125,11 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-                 <a href="/purchaseOrder/write_off/{{$purchaseOrder->id}}" title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
+                @if($purchaseOrder->status < 4)
+                 <a  @if($purchaseOrder->write_off == 0) href="/purchaseOrder/write_off/{{$purchaseOrder->id}}"  @endif title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
                      <span class="glyphicon glyphicon-yen"></span>
                 </a>
+                @endif
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>

@@ -234,9 +234,9 @@ class OrderModel extends BaseModel
 
     public function getOrderQuantityAttribute()
     {
-        $orderItems  = $this->orderItem;
+        $orderItems = $this->orderItem;
         $sum = 0;
-        foreach($orderItems as $orderItem) {
+        foreach ($orderItems as $orderItem) {
             $sum += $orderItem->quantity;
         }
 
@@ -247,7 +247,7 @@ class OrderModel extends BaseModel
     {
         $packages = $this->packages;
         $sum = 0;
-        foreach($packages as $package) {
+        foreach ($packages as $package) {
             $sum += $package->cost + $package->cost1;
         }
 
@@ -258,7 +258,7 @@ class OrderModel extends BaseModel
     {
         $orderItems = $this->orderItem;
         $sum = 0;
-        foreach($orderItems as $orderItem) {
+        foreach ($orderItems as $orderItem) {
             $item = $orderItem->item;
             $sum += round($item->cost * $orderItem->quantity, 3);
         }
@@ -420,7 +420,6 @@ class OrderModel extends BaseModel
 
     public function createPackageDetail($items, $flag = 1)
     {
-        DB::beginTransaction();
         foreach ($items as $warehouseId => $packageItems) {
             $package = [];
             //channel
@@ -445,6 +444,7 @@ class OrderModel extends BaseModel
             if ($package) {
                 foreach ($packageItems as $key => $packageItem) {
                     $newPackageItem = $package->items()->create($packageItem);
+                    DB::beginTransaction();
                     try {
                         $newPackageItem->item->out(
                             $packageItem['warehouse_position_id'],
@@ -460,10 +460,10 @@ class OrderModel extends BaseModel
                     } catch (Exception $e) {
                         DB::rollBack();
                     }
+                    DB::commit();
                 }
             }
         }
-        DB::commit();
         if ($flag == 1) {
             $this->status = 'PACKED';
         } else {

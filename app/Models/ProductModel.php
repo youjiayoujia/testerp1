@@ -493,13 +493,12 @@ class ProductModel extends BaseModel
      * @param array data 修改的信息
      */
     public function updateMulti($data)
-    {   
+    {  
         foreach($data['info'] as $channel_id=>$language){
-            foreach($language as $prefix=>$value){
-                $arr[$prefix.'_name'] = $value[$prefix.'_name'];
-                $arr[$prefix.'_description'] = $value[$prefix.'_description'];
-                $arr[$prefix.'_keywords'] = $value[$prefix.'_keywords'];
-            }
+            $arr[$language['language'].'_name'] = $language['name'];
+            $arr[$language['language'].'_description'] = $language['description'];
+            $arr[$language['language'].'_keywords'] = $language['keywords'];
+
             $model = $this->productMultiOption->where("channel_id",$channel_id)->first();
             $model->update($arr);
         }

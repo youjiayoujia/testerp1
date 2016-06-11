@@ -227,6 +227,8 @@ class ProductController extends Controller
     public function productMultiUpdate()
     {
         $data = request()->all();
+        //echo '<pre>';
+        //print_r($data);exit;
         $productModel = $this->model->find($data['product_id']);
         $productModel->updateMulti($data);
 

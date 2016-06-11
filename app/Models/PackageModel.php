@@ -182,7 +182,7 @@ class PackageModel extends BaseModel
                 ->orderBy('priority', 'desc')
                 ->get();
             foreach ($rules as $rule) {
-                是否在物流方式国家中
+                //是否在物流方式国家中
                 $countries = $rule->rule_countries_through;
                 $flag = 0;
                 foreach($countries as $country) {
@@ -194,7 +194,7 @@ class PackageModel extends BaseModel
                 if($flag == 0) {
                     continue;
                 }
-                是否有物流限制
+                //是否有物流限制
                 if ($this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
                     $limits = $this->rule_limits_through;

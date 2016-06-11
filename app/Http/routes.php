@@ -343,6 +343,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
     Route::resource('logisticsRule', 'Logistics\RuleController');
     Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
+    Route::resource('logisticsCatalog', 'Logistics\CatalogController');
 
     //拣货单异常
     Route::get('errorList/ajaxProcess',

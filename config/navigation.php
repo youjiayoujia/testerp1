@@ -225,6 +225,11 @@ return [
         'subnavigations' => [
             '物流管理' => [
                 [
+                    'name' => '物流分类',
+                    'url' => 'logisticsCatalog.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',

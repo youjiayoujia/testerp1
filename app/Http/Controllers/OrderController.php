@@ -82,7 +82,7 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $arr = [];
-        foreach($model->orderItem as $orderItem)
+        foreach($model->items as $orderItem)
         {
             $arr[] = $orderItem->sku;
         }
@@ -96,7 +96,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'orderItems' => $model->orderItem,
+            'orderItems' => $model->items,
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
@@ -120,7 +120,7 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $arr = [];
-        foreach($model->orderItem as $orderItem)
+        foreach($model->items as $orderItem)
         {
             $arr[] = $orderItem->sku;
         }
@@ -134,7 +134,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'orderItems' => $model->orderItem,
+            'orderItems' => $model->items,
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
@@ -248,7 +248,7 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $arr = [];
-        foreach($model->orderItem as $orderItem)
+        foreach($model->items as $orderItem)
         {
             $arr[] = $orderItem->sku;
         }
@@ -261,8 +261,8 @@ class OrderController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'orderItems' => $model->orderItem,
-            'packages' => $model->package,
+            'orderItems' => $model->items,
+            'packages' => $model->packages,
             'model' => $model,
             'arr' => $arr,
         ];
@@ -279,7 +279,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach ($obj->orderItem as $val) {
+        foreach ($obj->items as $val) {
             $val->delete();
         }
         $obj->delete($id);

@@ -193,7 +193,8 @@ Route::group(['middleware' => 'auth'], function () {
 //未结算订单
     Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
-//采购单e
+//采购单e/purchaseOrder/addPost/
+	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');   
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
@@ -202,6 +203,7 @@ Route::group(['middleware' => 'auth'], function () {
         'Purchase\PurchaseOrderController@changeExamineStatus');
     Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
     Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
+	Route::any('purchaseOrder/write_off/{id}', 'Purchase\PurchaseOrderController@write_off');
     Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');

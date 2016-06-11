@@ -73,6 +73,10 @@ class TestController extends Controller
     public function index()
     {
         foreach (OrderModel::all() as $order) {
+            $order->createPackage();
+        }
+        exit;
+        foreach (OrderModel::all() as $order) {
             foreach ($order->items as $item) {
                 $item->delete();
             }
@@ -98,7 +102,6 @@ class TestController extends Controller
                 $thisOrder = $this->orderModel->createOrder($order);
             }
             $thisOrder->checkBlack();
-            var_dump($thisOrder);
         }
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';

@@ -256,8 +256,8 @@ class PurchaseOrderController extends Controller
 			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '此采购单不能取消.'));
 			}
 		$purchaseItem=PurchaseItemModel::where('purchase_order_id',$id)->update(['status'=>5]);
-		$this->model->update(['status'=>5,'examineStatus'=>3]);
-		return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '改采购单已取消退回'));	
+		$this->model->find($id)->update(['status'=>5,'examineStatus'=>3]);
+		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '改采购单已退回'));	
 	}
 	
 	/**
@@ -309,8 +309,8 @@ class PurchaseOrderController extends Controller
 			return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已结算，不能新增Item.'));
 			}
 		$data['lack_num']=$data['purchase_num'];
-		$data['warehouse_id']=$model->warehouse_id;
-		$data['supplier_id']=$item->supplier_id;
+		$data['warehouse_id']=$model->warehouse_id ? $model->warehouse_id : 0;
+		$data['supplier_id']=$item->supplier_id ? $item->supplier_id : 0;
 		$data['purchase_order_id']=$id;
 		PurchaseItemModel::create($data);
 		if($model->examineStatus >0){
@@ -366,7 +366,21 @@ class PurchaseOrderController extends Controller
 			$response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
 		}
-
+	
+	
+	public function write_off($id){
+		$this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '核销成功'));
+		}
+	public function addPost($id){
+		$data=request()->all();
+		$model=$this->model->find($id);
+		foreach($data as $v){
+			$model->update($v);
+			}
+		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '成功添加运单号'));	
+		}	
+		
 }
 
 

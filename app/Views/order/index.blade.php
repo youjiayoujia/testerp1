@@ -23,12 +23,14 @@
             <td>{{ $order->logistics_id }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
-            <td>{{ $order->currency . ' ' . $order->amount }}<strong style="color: red">({{ $order->amount_shipping }})</strong></td>
+            <td>{{ $order->currency . ' ' . $order->amount }}
+                <strong style="color: red">({{ $order->amount_shipping }})</strong>
+            </td>
             <td>
                 @if($order->gross_margin != null)
                     <div>{{ $order->gross_margin }}</div>
-                    <div>产品成本: {{ $order->item_cost_name }}RMB</div>
-                    <div>运费成本: {{ $order->package->sum('cost') }}RMB</div>
+                    <div>产品成本: {{ $order->all_item_cost }}RMB</div>
+                    <div>运费成本: {{ $order->packages->sum('cost') }}RMB</div>
                     <div>平台费: {{ '' }}USD</div>
                     <div>毛利润: {{ '' }}USD</div>
                 @endif
@@ -38,7 +40,7 @@
             </td>
             <td>{{ $order->channelAccount->alias }}</td>
             <td>{{ $order->status_name }}</td>
-            <td>{{ $order->userService == NULL ? '' : $order->userService->name }}</td>
+            <td>{{ $order->userService == null ? '' : $order->userService->name }}</td>
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href=".collapseExample{{$order->id}}" aria-expanded="true" aria-controls="collapseExample">
@@ -63,30 +65,32 @@
                 @endif
             </td>
             <td colspan="25" style="padding: 10px; margin: 10px">
-                @foreach($order->orderItem as $orderItem)
+                @foreach($order->items as $orderItem)
                     @if($orderItem->sku == '' && $orderItem->channel_sku == '')
                     @endif
                     @if($orderItem->sku != '' && $orderItem->item_id != 0)
-                            <div class="row">
-                                <div class="col-lg-5" style="color: blue">{{ $orderItem->sku .'('. $orderItem->channel_sku .')' }}<strong style="color: black">{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong></div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
-                                <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
-                                <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
-                                <div class="col-lg-1" style="color: #2aabd2">
-                                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                                       data-id="{{ $orderItem->id }}"
-                                       data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">
-                                        <span class="glyphicon glyphicon-trash"></span> 删除
-                                    </a>
-                                </div>
+                        <div class="row">
+                            <div class="col-lg-5" style="color: blue">{{ $orderItem->sku .'('. $orderItem->channel_sku .')' }}
+                                <strong style="color: black">{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong>
                             </div>
+                            <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                            <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
+                            <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
+                            <div class="col-lg-1" style="color: #2aabd2">
+                                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                                   data-id="{{ $orderItem->id }}"
+                                   data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">
+                                    <span class="glyphicon glyphicon-trash"></span> 删除
+                                </a>
+                            </div>
+                        </div>
                     @endif
                 @endforeach
                 <div class="row col-lg-12" style="color: black; text-align: center;">
                     平台费: ${{ '' }},
-                    总运费: {{ $order->package->sum('cost') }}RMB,
-                    包裹重: {{ $order->package->sum('weight') }}Kg,
-                    物品数量: {{ $order->orderItem->sum('quantity') }}
+                    总运费: {{ $order->packages->sum('cost') }}RMB,
+                    包裹重: {{ $order->packages->sum('weight') }}Kg,
+                    物品数量: {{ $order->items->sum('quantity') }}
                 </div>
             </td>
         </tr>
@@ -167,16 +171,16 @@
 @stop
 @section('childJs')
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.review').click(function () {
                 if (confirm("确认审核?")) {
                     var order_id = $(this).data('id');
                     $.ajax({
-                        url : "{{ route('updateStatus') }}",
-                        data : { order_id : order_id },
-                        dataType : 'json',
-                        type : 'get',
-                        success : function(result) {
+                        url: "{{ route('updateStatus') }}",
+                        data: {order_id: order_id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
                             window.location.reload();
                         }
                     });

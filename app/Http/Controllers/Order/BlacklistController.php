@@ -77,6 +77,7 @@ class BlacklistController extends Controller
 
     public function getBlacklist()
     {
+        //根据邮箱相同抓取黑名单用户
         $orders2 = OrderModel::all()
 //            ->where('create_time', '<=', date('Y-m-d'))
 //            ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
@@ -99,7 +100,7 @@ class BlacklistController extends Controller
                         }
                     }
                     foreach($channels2 as $channel2) {
-                        $obj = OrderModel::where('email', $key2)->first();
+                        $obj = OrderModel::where('email', $key2)->orderBy('id', 'DESC')->first();
                         $data['channel_id'] = $channel2;
                         $data['ordernum'] = $obj->ordernum;
                         $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
@@ -109,7 +110,7 @@ class BlacklistController extends Controller
                         $data['remark'] = NULL;
                         $data['total_order'] = count($order2);
                         $data['refund_order'] = $count2;
-                        $data['refund_rate'] = ($count2 / count($order2)) * 100 . '%';
+                        $data['refund_rate'] = round(($count2 / count($order2)) * 100) . '%';
                         $data['color'] = 'green';
                         $blacklist = BlacklistModel::where('email', $data['email'])->where('channel_id', $channel2)->count();
                         if($blacklist <= 0) {
@@ -120,6 +121,7 @@ class BlacklistController extends Controller
             }
         }
 
+        //根据邮编和收货人相同抓取黑名单用户
         $orders = OrderModel::all()
 //            ->where('create_time', '<=', date('Y-m-d'))
 //            ->where('create_time', '>=', date('Y-m-d', strtotime("last year")))
@@ -142,7 +144,7 @@ class BlacklistController extends Controller
                         }
                     }
                     foreach($channels as $channel) {
-                        $obj = OrderModel::where('shipping_zipcode', $key)->first();
+                        $obj = OrderModel::where('shipping_zipcode', $key)->orderBy('id', 'DESC')->first();
                         $data['channel_id'] = $channel;
                         $data['ordernum'] = $obj->ordernum;
                         $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
@@ -152,7 +154,7 @@ class BlacklistController extends Controller
                         $data['remark'] = NULL;
                         $data['total_order'] = count($order);
                         $data['refund_order'] = $count;
-                        $data['refund_rate'] = ($count / count($order)) * 100 . '%';
+                        $data['refund_rate'] = round(($count / count($order)) * 100) . '%';
                         $data['color'] = 'orange';
                         $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])
                             ->where('name', $data['name'])
@@ -165,6 +167,39 @@ class BlacklistController extends Controller
                 }
             }
         }
+
+        //周日更新黑名单
+        if(date('w') == 0) {
+            foreach($this->model->all() as $blacklist) {
+                if($blacklist->channel->name == 'Wish') {
+                    $lastname = explode(' ', $blacklist['name'])[0];
+                    $firstname = explode(' ', $blacklist['name'])[1];
+                    $orders = OrderModel::where('shipping_zipcode', $blacklist->zipcode)
+                        ->where('shipping_lastname', $lastname)
+                        ->where('shipping_firstname', $firstname)
+                        ->orderBy('id', 'ASC')
+                        ->get();
+                }else {
+                    $orders = OrderModel::where('email', $blacklist->email)
+                        ->orderBy('id', 'ASC')
+                        ->get();
+                }
+                $count3 = 0;
+                $ordernum = '';
+                foreach($orders as $order) {
+                    if(count($order->refunds)) {
+                        $count3++;
+                    }
+                    $ordernum = $order['ordernum'];
+                }
+                $data['ordernum'] = $ordernum;
+                $data['refund_order'] = $count3;
+                $data['total_order'] = count($orders);
+                $data['refund_rate'] = round(($count3 / count($orders)) * 100) . '%';
+                $blacklist->update($data);
+            }
+        }
+
     }
 
     /**

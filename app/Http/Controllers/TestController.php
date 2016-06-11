@@ -66,6 +66,10 @@ class TestController extends Controller
     public function index()
     {
         foreach (OrderModel::all() as $order) {
+            $order->createPackage();
+        }
+        exit;
+        foreach (OrderModel::all() as $order) {
             foreach ($order->items as $item) {
                 $item->delete();
             }

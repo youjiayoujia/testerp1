@@ -260,7 +260,7 @@ class OrderModel extends BaseModel
     //todo:黑名单逻辑
     public function checkBlack()
     {
-        $isBlack = 'confirm';
+        $isBlack = '';
         if ($isBlack == 'confirm') {
             return true;
         }
@@ -271,9 +271,6 @@ class OrderModel extends BaseModel
     {
         $last = $this->all()->last();
         $data['ordernum'] = $last ? $last->id + 1 : 1;
-        if ($this->checkBlack()) {
-            $data['status'] = 'REVIEW';
-        }
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             $item = ItemModel::where('sku', $orderItem['sku'])->first();
@@ -295,6 +292,8 @@ class OrderModel extends BaseModel
         if ($this->checkBlack()) {
             $order->update(['status' => 'REVIEW']);
             $order->remark('黑名单订单.');
+        } else {
+            $order->update(['status' => 'PREPARED']);
         }
         return $order;
     }

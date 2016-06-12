@@ -151,7 +151,7 @@ class RequireController extends Controller
 			}
 			}
 			//计算交期
-			$trend['delivery']=$itemModel->supplier->purchase_time;
+			$trend['delivery']=$itemModel->supplier?$itemModel->supplier->purchase_time:'';
 			//计算可用库存
 			$availableQuantity=StockModel::where('item_id',$item_id)->sum('available_quantity');
 			//计算可用在途数量

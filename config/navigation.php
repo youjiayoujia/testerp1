@@ -230,6 +230,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '回邮模版',
+                    'url' => 'logisticsEmailTemplate.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',

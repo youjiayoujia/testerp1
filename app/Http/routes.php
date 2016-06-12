@@ -344,6 +344,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logisticsRule', 'Logistics\RuleController');
     Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');
+    Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
 
     //拣货单异常
     Route::get('errorList/ajaxProcess',

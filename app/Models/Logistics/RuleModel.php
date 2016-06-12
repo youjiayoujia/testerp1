@@ -35,32 +35,26 @@ class RuleModel extends BaseModel
         'is_clearance',
         'priority',
         'type_id',
+        'weight_section', 
+        'order_amount_section', 
+        'catalog_section', 
+        'channel_section', 
+        'country_section', 
+        'limit_section'
     ];
 
     public $rules = [
         'create' => [
-            'countrys' => 'required',
-            'weight_from' => 'required',
-            'weight_to' => 'required',
-            'order_amount_from' => 'required',
-            'order_amount_to' => 'required',
             'is_clearance' => 'required',
             'priority' => 'required',
             'type_id' => 'required',
-            'channels' => 'required', 
-            'catalogs' => 'required',
+            'name' => 'required',
         ],
         'update' => [
-            'countrys' => 'required',
-            'weight_from' => 'required',
-            'weight_to' => 'required',
-            'order_amount_from' => 'required',
-            'order_amount_to' => 'required',
             'is_clearance' => 'required',
             'priority' => 'required',
             'type_id' => 'required',
-            'channels' => 'required', 
-            'catalogs' => 'required',
+            'name' => 'required',
         ],
     ];
 
@@ -162,24 +156,18 @@ class RuleModel extends BaseModel
 
     public function createAll($arr)
     {
-        if(array_key_exists('catalogs', $arr)) {
-            foreach($arr['catalogs'] as $catalog) {
-                $this->rule_catalogs()->create(['catalog_id' => $catalog]);
-            }
+        if(array_key_exists('catalog_section', $arr) && array_key_exists('catalogs', $arr)) {
+            $this->rule_catalogs_through()->attach($arr['catalogs']);
         }
-        if(array_key_exists('channels', $arr)) {
-            foreach($arr['channels'] as $channel) {
-                $this->rule_channels()->create(['channel_id' => $channel]);
-            }
+        if(array_key_exists('channel_section', $arr) && array_key_exists('channels', $arr)) {
+            $this->rule_channels_through()->attach($arr['channels']);
         }
-        if(array_key_exists('countrys', $arr)) {
-            foreach($arr['countrys'] as $country) {
-                $this->rule_countries()->create(['country_id' => $country]);
-            }
+        if(array_key_exists('country_section', $arr) && array_key_exists('countrys', $arr)) {
+            $this->rule_countries_through()->attach($arr['countrys']);
         }
-        if(array_key_exists('limits', $arr)) {
-            foreach($arr['limits'] as $key => $limit) {
-                $this->rule_limits()->create(['logistics_limit_id' => $key, 'type' => $limit]);
+        if(array_key_exists('limit_section', $arr) && array_key_exists('limits', $arr)) {
+            foreach($arr['limits'] as $key => $value) {
+                $this->rule_limits_through()->attach([$key => ['type' => $value]]);
             }
         }
     }
@@ -232,41 +220,39 @@ class RuleModel extends BaseModel
     public function updateAll($arr)
     {
         $this->update($arr);
-        if(array_key_exists('catalogs', $arr)) {
-            $catalogs = $this->rule_catalogs;
-            foreach($catalogs as $catalog) {
-                $catalog->forceDelete();
-            }
-            foreach($arr['catalogs'] as $catalog) {
-                $this->rule_catalogs()->create(['catalog_id' => $catalog]);
-            }
+        if(!array_key_exists('weight_section', $arr)) {
+            $this->update(['weight_section' => '0', 'weight_from' => '0', 'weight_to' => '0']);
         }
-        if(array_key_exists('channels', $arr)) {
-            $channels = $this->rule_channels;
-            foreach($channels as $channel) {
-                $channel->forceDelete();
-            }
-            foreach($arr['channels'] as $channel) {
-                $this->rule_channels()->create(['channel_id' => $channel]);
-            }
+        if(!array_key_exists('order_amount_section', $arr)) {
+            $this->update(['order_amount_section' => '0', 'order_amount_section' => '0', 'order_amount_to' => '0']);
         }
-        if(array_key_exists('countrys', $arr)) {
-            $countrys = $this->rule_countries;
-            foreach($countrys as $country) {
-                $country->forceDelete();
-            }
-            foreach($arr['countrys'] as $country) {
-                $this->rule_countries()->create(['country_id' => $country]);
-            }
+        if(array_key_exists('catalog_section', $arr) && array_key_exists('catalogs', $arr)) {
+            $this->rule_catalogs_through()->sync($arr['catalogs']);
+        } else {
+            $this->update(['catalog_section' => '0']);
+            $this->rule_catalogs_through()->sync([]);
         }
-        if(array_key_exists('limits', $arr)) {
-            $limits = $this->rule_limits;
-            foreach($limits as $limit) {
-                $limit->forceDelete();
+        if(array_key_exists('channel_section', $arr) && array_key_exists('channels', $arr)) {
+            $this->rule_channels_through()->sync($arr['channels']);
+        } else {
+            $this->update(['channel_section' => '0']);
+            $this->rule_channels_through()->sync([]);
+        }
+        if(array_key_exists('country_section', $arr) && array_key_exists('countrys', $arr)) {
+            $this->rule_countries_through()->sync($arr['countrys']);
+        } else {
+            $this->update(['country_section' => '0']);
+            $this->rule_countries_through()->sync([]);
+        }
+        if(array_key_exists('limit_section', $arr) && array_key_exists('limits', $arr)) {
+            $tmp = [];
+            foreach($arr['limits'] as $key => $value) {
+                $tmp[$key] = ['type' => $value]; 
             }
-            foreach($arr['limits'] as $key => $limit) {
-                $this->rule_limits()->create(['logistics_limit_id' => $key, 'type' => $limit]);
-            }
+            $this->rule_limits_through()->sync($tmp);
+        } else {
+            $this->update(['limit_section' => '0']);
+            $this->rule_limits_through()->sync([]);
         }
     }
 }

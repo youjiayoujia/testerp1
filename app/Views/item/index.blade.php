@@ -35,11 +35,13 @@
             <td><input type="checkbox" name="tribute_id"  value="{{$item->id}}" ></td>
             <td>{{ $item->id }}</td>
             <td>{{ $item->sku }}</td>
-            <td>@if($item->product->default_image>0)<img src="{{ asset($item->product->image->path) }}/{{$item->product->image->name}}" width="100px" >@else无图片@endif</td>
-            <td>{{ $item->product->catalog->name }}</td>
+            <td>@if($item->product->default_image>0)
+                    <img src="{{ asset($item->product->image->path) }}/{{$item->product->image->name}}" width="100px">@else
+                    无图片@endif</td>
+            <td>{{ $item->product->catalog ? $item->product->catalog->name : ''}}</td>
             <td>{{ $item->name }}</td>
             <td>{{ $item->c_name }}</td>
-            <td>{{ $item->supplier->name }}</td>
+            <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
             <td>{{ $item->updated_at }}</td>
             <td>{{ $item->created_at }}</td>
             <td>

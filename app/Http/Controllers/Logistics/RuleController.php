@@ -135,4 +135,23 @@ class RuleController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->rule_limits_through()->sync([]);
+        $model->rule_channels_through()->sync([]);
+        $model->rule_catalogs_through()->sync([]);
+        $model->rule_countries_through()->sync([]);
+        $model->destroy($id);
+        return redirect($this->mainIndex);
+    }
 }

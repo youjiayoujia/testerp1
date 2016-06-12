@@ -174,10 +174,10 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where(function($query){
+            where(function($query) use ($weight){
                 $query->where('weight_from', '<=', $weight)
                 ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
-            })->where(function($query){
+            })->where(function($query) use ($weight){
                 $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])

@@ -8,7 +8,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\CodeModel;
+use App\Models\Logistics\EmailTemplateModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
@@ -36,6 +38,8 @@ class LogisticsController extends Controller
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
             'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
+            'catalogs' => CatalogModel::all(),
+            'templates' => EmailTemplateModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }

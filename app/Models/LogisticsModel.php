@@ -59,22 +59,6 @@ class LogisticsModel extends BaseModel
         ],
     ];
 
-
-    /**
-     * 批量倒入号码池
-     *
-     * @param $file 导入所需的Excel文件
-     *
-     */
-    public function batchImport($file)
-    {
-        $filePath = '' . $file;
-        Excel::load($filePath, function ($reader) {
-            $data = $reader->all();
-            dd($data);
-        });
-    }
-
     public function supplier()
     {
         return $this->belongsTo('App\Models\Logistics\SupplierModel', 'logistics_supplier_id', 'id');
@@ -93,6 +77,16 @@ class LogisticsModel extends BaseModel
     public function codes()
     {
         return $this->hasMany('App\Models\Logistics\CodeModel', 'logistics_id');
+    }
+
+    public function catalog()
+    {
+        return $this->belongsTo('App\Models\Logistics\CatalogModel', 'logistics_catalog_id', 'id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo('App\Models\Logistics\EmailTemplateModel', 'logistics_email_template_id', 'id');
     }
 
     public function getDockingNameAttribute()

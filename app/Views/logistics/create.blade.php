@@ -60,23 +60,25 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="template" class="control-label">面单模版</label>
+            <label for="logistics_catalog_id" class="control-label">物流分类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" name="template" id="template">
-                @foreach(config('logistics.template') as $template)
-                    <option value="{{ $template }}" {{ old('template') == $template ? 'selected' : '' }}>
-                        {{ $template }}
+            <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
+                <option value="0">==选择物流分类==</option>
+                @foreach($catalogs as $catalog)
+                    <option value="{{$catalog->id}}" {{ Tool::isSelected('logistics_catalog_id', $catalog->id) }}>
+                        {{$catalog->name}}
                     </option>
                 @endforeach
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="return_address" class="control-label">回邮地址</label>
+            <label for="logistics_email_template_id" class="control-label">回邮模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" name="return_address" id="return_address">
-                @foreach(config('logistics.return_address') as $return_address)
-                    <option value="{{ $return_address }}" {{ old('return_address') == $return_address ? 'selected' : '' }}>
-                        {{ $return_address }}
+            <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
+                <option value="0">==选择回邮模版==</option>
+                @foreach($templates as $template)
+                    <option value="{{$template->id}}" {{ Tool::isSelected('logistics_email_template_id', $template->id) }}>
+                        {{$template->customer}}
                     </option>
                 @endforeach
             </select>

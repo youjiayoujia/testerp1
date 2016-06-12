@@ -338,10 +338,29 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
+    //审核
     public function updateStatus()
     {
         $order_id = request()->input('order_id');
         $this->model->find($order_id)->update(['status' => 'PREPARED']);
+
+        return 1;
+    }
+
+    //暂停发货
+    public function updatePrepared()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'STOP']);
+
+        return 1;
+    }
+
+    //恢复正常
+    public function updateNormal()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'NORMAL']);
 
         return 1;
     }

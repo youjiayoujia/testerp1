@@ -44,7 +44,7 @@
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs" role="button" data-toggle="collapse" href=".collapseExample{{$order->id}}" aria-expanded="true" aria-controls="collapseExample">
-                    <span class="glyphicon glyphicon-eye-open"></span> 
+                    <span class="glyphicon glyphicon-eye-open"></span>
                 </a>
             </td>
         </tr>

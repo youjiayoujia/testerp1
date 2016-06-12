@@ -177,7 +177,7 @@ class PackageModel extends BaseModel
             where(function($query) use ($weight){
                 $query->where('weight_from', '<=', $weight)
                 ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
-            })->where(function($query) use ($weight){
+            })->where(function($query) use ($amount){
                 $query->where('order_amount_from', '<=', $amount)
                 ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])

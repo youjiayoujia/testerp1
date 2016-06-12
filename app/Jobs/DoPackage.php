@@ -39,7 +39,7 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
             }
         }
         if ($this->order->status == 'NEED') {
-            $this->release();
+            $this->release(60);
 //            $this->dispatch((new DoPackage($this->order))->onQueue('redoPackages'));
         }
     }

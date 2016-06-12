@@ -119,11 +119,12 @@ class PackageModel extends BaseModel
     {
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
-            $packageLimit = $packageItem->item->product->package_limit;
+            $packageLimit = $packageItem->item->product->carriage_limit;
             if ($packageLimit) {
                 $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
             }
         }
+
         return $packageLimits->unique();
     }
 
@@ -175,21 +176,34 @@ class PackageModel extends BaseModel
             $rules = RuleModel::
             where('weight_from', '<=', $weight)
                 ->where('weight_to', '>=', $weight)
-                ->where('order_amount', '>=', $amount)
+                ->where('order_amount_from', '<=', $amount)
+                ->where('order_amount_to', '>=', $amount)
                 ->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中
-                $countries = explode(",", $rule->country);
-                if (!in_array($this->shipping_country, $countries)) {
+                $countries = $rule->rule_countries_through;
+                $flag = 0;
+                foreach($countries as $country) {
+                    if($country->id == $this->shipping_country) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if($flag == 0) {
                     continue;
                 }
                 //是否有物流限制
                 if ($this->shipping_limits) {
-                    $limits = explode(",", $rule->logistics->limit);
-                    if ($this->shipping_limits->intersect($limits)->count() > 0) {
-                        continue;
+                    $shipping_limits = $this->shipping_limits->toArray();
+                    $limits = $this->rule_limits_through;
+                    foreach($limits as $limit) {
+                        if(in_array($limit->id, $shipping_limits)) {
+                            if($limit->pivot->type == '3') {
+                                continue 2;
+                            }
+                        }
                     }
                 }
                 //物流查询链接
@@ -208,6 +222,7 @@ class PackageModel extends BaseModel
                 'logistics_assigned_at' => date('Y-m-d H:i:s')
             ]);
         }
+
         return false;
     }
 

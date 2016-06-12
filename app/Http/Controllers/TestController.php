@@ -20,17 +20,24 @@ use App\Models\PackageModel;
 use App\Jobs\DoPackage;
 use DNS1D;
 use App\Http\Controllers\Controller;
+use App\Models\CurrencyModel;
 
 class TestController extends Controller
 {
     public function __construct(OrderModel $orderModel)
     {
-        $this->orderModel = $orderModel;
+        
     }
 
     public function test1()
     {
-        echo DNS1D::getBarcodeHTML("tFX3w-green-XL", "c128", '1', '30');
+        $package = PackageModel::find(97);
+        $package->assignLogistics();
+        
+        // $response = [
+        //     'metas' => $this->metas(__FUNCTION__),
+        // ];
+        // return view('test', $response);
         // echo DNS1D::getBarcodeHTML("4445645656", "C39");
         // echo DNS1D::getBarcodeHTML("4445645656", "C39+");
         // echo DNS1D::getBarcodeHTML("4445645656", "C39E");
@@ -65,6 +72,10 @@ class TestController extends Controller
 
     public function index()
     {
+        foreach (OrderModel::all() as $order) {
+            $order->createPackage();
+        }
+        exit;
         foreach (OrderModel::all() as $order) {
             foreach ($order->items as $item) {
                 $item->delete();

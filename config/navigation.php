@@ -281,7 +281,7 @@ return [
                     'icon' => '',
                 ],*/
                 [
-                    'name' => '采购到货',
+                    'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
                     'icon' => '',
                 ],

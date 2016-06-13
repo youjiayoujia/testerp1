@@ -28,6 +28,8 @@ class LogisticsModel extends BaseModel
         'type',
         'url',
         'docking',
+        'logistics_catalog_id',
+        'logistics_email_template_id',
         'pool_quantity',
         'is_enable',
         'limit',
@@ -44,6 +46,8 @@ class LogisticsModel extends BaseModel
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
             'is_enable' => 'required',
         ],
         'update' => [
@@ -55,6 +59,8 @@ class LogisticsModel extends BaseModel
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
             'is_enable' => 'required',
         ],
     ];

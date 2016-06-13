@@ -31,6 +31,12 @@
                 <strong>对接方式</strong>: {{ $model->docking_name }}
             </div>
             <div class="col-lg-4">
+                <strong>物流分类</strong>: {{ $model->logistics_catalog_id == '0' ? '未选择' : $model->catalog->name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>回邮模版</strong>: {{ $model->logistics_email_template_id == '0' ? '未选择' : $model->template->customer }}
+            </div>
+            <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
             <div class="col-lg-12">

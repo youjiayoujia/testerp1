@@ -208,14 +208,16 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
 	 Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
-    Route::get('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
+    Route::any('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
     Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 //打印采购单
     Route::any('/checkWarehouse/address', 'Purchase\PrintPurchaseOrderController@warehouseAddress');
     Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
     Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
+    Route::any('purchaseItemArrival', ['uses' => 'Purchase\PurchaseListController@purchaseItemArrival', 'as' => 'purchaseItemArrival']);
 	Route::any('selectPurchaseOrder', ['uses' => 'Purchase\PurchaseListController@selectPurchaseOrder', 'as' => 'selectPurchaseOrder']);
+    Route::any('deletePostage', ['uses' => 'Purchase\PurchaseListController@deletePostage', 'as' => 'deletePostage']);
 	Route::any('binding', ['uses' => 'Purchase\PurchaseListController@binding', 'as' => 'binding']);
     Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
     Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');

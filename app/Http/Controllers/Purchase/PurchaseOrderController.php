@@ -375,8 +375,11 @@ class PurchaseOrderController extends Controller
 	public function addPost($id){
 		$data=request()->all();
 		$model=$this->model->find($id);
-		foreach($data as $v){
-			$model->update($v);
+		//echo '<pre>';
+		//print_r($data);exit;
+		foreach($data['post'] as $v){
+			//
+			PurchasePostageModel::create(['purchase_order_id'=>$id,'post_coding'=>$v['post_coding'],'postage'=>$v['postage']]);
 			}
 		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '成功添加运单号'));	
 		}	

@@ -86,6 +86,7 @@ class PurchaseListController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
+	//public function examinePurchaseItem($purchase_item_id,$arrival_num)
 	public function examinePurchaseItem()
 	{ 
 		$purcahse_active=explode(',',request()->get('purcahse_active'));
@@ -150,7 +151,7 @@ class PurchaseListController extends Controller
 		}
 	}
 	/**
-     * 生成条码
+     * 查看条码
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -161,7 +162,33 @@ class PurchaseListController extends Controller
 			'model' => $this->model->find($id),
         ];
 		 return view($this->viewPath . 'printBarCode', $response);
-		}
+	}
+
+	/**
+     * 保存到货数量
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseItemArrival(){
+		$num = request()->input("num");
+
+		echo $num;exit;
+	}
+
+	/**
+     * 删除采购单和运单关联关系
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function deletePostage(){
+		$id = request()->input("id");
+		$model = PurchasePostageModel::find($id);
+		$model->delete();
+		echo json_encode(1);
+	}
+
 	/**
      * ajax回传修改产品重量
      *
@@ -220,10 +247,14 @@ class PurchaseListController extends Controller
 		$postCoding=request()->get('postCoding');
 		$purchaseNum=PurchaseOrderModel::where('id',$purchaseOrderId)->count();
 		$num=PurchasePostageModel::where('purchase_order_id',$purchaseOrderId)->count();
-		$userID=request()->user()->id;
+		$data['post_coding']=$postCoding;
+		$data['postage']=$postage;
+		$data['purchase_order_id']=$purchaseOrderId;
+		$data['user_id'] = request()->user()->id;
+
 		if($purchaseNum>0){
 			if($num ==0){
-			PurchasePostageModel::create(['post_coding'=>$postCoding,'postage'=>$postage,'purchase_order_id'=>$purchaseOrderId]);
+				PurchasePostageModel::create($data);
 			}
 			return 1;
 			}else{

@@ -31,12 +31,7 @@
             <td>{{ $purchaseItem->supplier->name}}</td>
             <td>{{ $purchaseItem->warehouse->name}}</td>
         
-             <td>@foreach(config('purchase.purchaseItem.channels') as $k=>$channel)
-            	@if($purchaseItem->platform_id == $k)
-            	{{ $channel }}
-                @endif
-            @endforeach
-            </td>
+            
             <td>
             @foreach(config('purchase.purchaseItem.active') as $k=>$status)
             	@if($purchaseItem->active == $k)

@@ -47,6 +47,7 @@ class CatalogController extends Controller
         $this->validate(request(), $this->model->rules('create'));
         //封装数据
         $data = request()->all();
+        echo '<pre>';print_r($data);exit;
         $extra['sets'] = request()->input('sets');
         $extra['variations'] = request()->input('variations');
         $extra['features'] = request()->input('features');

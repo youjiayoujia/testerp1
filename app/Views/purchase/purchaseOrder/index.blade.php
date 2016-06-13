@@ -195,9 +195,9 @@
                     <input type="hidden" id="currrent" value="1">
                      
         </div>
-        <div class="panel-footer">
+        <!--<div class="panel-footer">
             <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>
+        </div>-->
     </div> 
          
          <div class="modal-footer">

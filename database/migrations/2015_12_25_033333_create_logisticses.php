@@ -24,6 +24,7 @@ class CreateLogisticses extends Migration
             $table->string('docking')->comment('对接方式')->default(NULL);
             $table->integer('logistics_catalog_id')->comment('物流分类')->nullable()->default(0);
             $table->integer('logistics_email_template_id')->comment('回邮模版')->nullable()->default(0);
+            $table->integer('logistics_template_id')->comment('面单模版')->nullable()->default(0);
             $table->string('pool_quantity')->comment('号码池数量')->nullable()->default(NULL);
             $table->string('limit')->comment('物流限制')->nullable()->default(NULL);
             $table->enum('is_enable', ['0', '1'])->comment('是否启用');

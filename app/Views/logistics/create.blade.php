@@ -76,9 +76,21 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
                 <option value="0">==选择回邮模版==</option>
+                @foreach($emailTemplates as $emailTemplate)
+                    <option value="{{$emailTemplate->id}}" {{ Tool::isSelected('logistics_email_template_id', $emailTemplate->id) }}>
+                        {{$emailTemplate->customer}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="logistics_template_id" class="control-label">面单模版</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="logistics_template_id" id="logistics_template_id">
+                <option value="0">==选择面单模版==</option>
                 @foreach($templates as $template)
-                    <option value="{{$template->id}}" {{ Tool::isSelected('logistics_email_template_id', $template->id) }}>
-                        {{$template->customer}}
+                    <option value="{{$template->id}}" {{ Tool::isSelected('logistics_template_id', $template->id) }}>
+                        {{$template->name}}
                     </option>
                 @endforeach
             </select>

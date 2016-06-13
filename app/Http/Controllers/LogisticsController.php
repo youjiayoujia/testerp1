@@ -12,6 +12,7 @@ use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\EmailTemplateModel;
 use App\Models\Logistics\LimitsModel;
+use App\Models\Logistics\TemplateModel;
 use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
@@ -39,7 +40,8 @@ class LogisticsController extends Controller
             'suppliers'=>SupplierModel::all(),
             'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
             'catalogs' => CatalogModel::all(),
-            'templates' => EmailTemplateModel::all(),
+            'emailTemplates' => EmailTemplateModel::all(),
+            'templates' => TemplateModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -65,7 +67,8 @@ class LogisticsController extends Controller
             'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
             'selectedLimits' => $selectedLimits,
             'catalogs' => CatalogModel::all(),
-            'templates' => EmailTemplateModel::all(),
+            'emailTemplates' => EmailTemplateModel::all(),
+            'templates' => TemplateModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
 

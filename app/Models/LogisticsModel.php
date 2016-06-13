@@ -30,6 +30,7 @@ class LogisticsModel extends BaseModel
         'docking',
         'logistics_catalog_id',
         'logistics_email_template_id',
+        'logistics_template_id',
         'pool_quantity',
         'is_enable',
         'limit',
@@ -48,6 +49,7 @@ class LogisticsModel extends BaseModel
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
             'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
         'update' => [
@@ -61,6 +63,7 @@ class LogisticsModel extends BaseModel
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
             'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
     ];
@@ -90,9 +93,14 @@ class LogisticsModel extends BaseModel
         return $this->belongsTo('App\Models\Logistics\CatalogModel', 'logistics_catalog_id', 'id');
     }
 
-    public function template()
+    public function emailTemplate()
     {
         return $this->belongsTo('App\Models\Logistics\EmailTemplateModel', 'logistics_email_template_id', 'id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo('App\Models\Logistics\TemplateModel', 'logistics_template_id', 'id');
     }
 
     public function getDockingNameAttribute()

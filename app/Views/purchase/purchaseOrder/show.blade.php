@@ -155,6 +155,18 @@
        <td>{{$storageCost}} + YF{{$postage ? $postage : 0}}={{$storageCost + $postage}}</td>
        <td></td>
        </tr>
+        <tr>
+            <td>订单运费：</td>
+            <td colspan="13">{{$purchaseCost + $postage}}</td>
+        </tr>
+        <tr>
+            <td>订单总金额：</td>
+            <td colspan="13">{{$storageCost + $postage}}</td>
+        </tr>
+        <tr>
+            <td>采购员：</td>
+            <td colspan="13">{{$model->assigner_name}}</td>
+        </tr>
     </tbody>
     </table>
    

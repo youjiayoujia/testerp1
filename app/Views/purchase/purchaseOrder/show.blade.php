@@ -1,5 +1,6 @@
 @extends('common.detail')
 @section('detailBody')
+
 <div class="panel panel-default">
         <div class="panel-heading">单头</div>
         <div class="panel-body">
@@ -96,6 +97,7 @@
             <td>不合格数量</td>
             <td>预计到达日期</td>
             <td>实际到货日期</td>
+            <td>状态</td>
             <td>单价</td>
             <td>系统采购价格</td>
             <td>小计</td> 
@@ -123,6 +125,7 @@
             <td>
               {{$purchaseItem->arrival_time}}
  			</td>
+            <td>{{config('purchase.purchaseItem.status')[$purchaseItem->status]}}</td>
             <td>
            {{$purchaseItem->purchase_cost}}
             </td>    

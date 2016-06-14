@@ -35,7 +35,20 @@ class TemplateController extends Controller
             'model' => $model,
         ];
 
-        return view($this->viewPath . 'tpl.' . $model->name, $response);
+        return view($this->viewPath . 'tpl.' . explode('.', $model->view)[0], $response);
+    }
+
+    /**
+     * 保存
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $this->model->create(request()->all());
+        $path = '../app/Views/logistics/template/tpl/';
+        fopen($path . request()->all()['view'], 'w');
+        return redirect($this->mainIndex);
     }
 
 }

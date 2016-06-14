@@ -23,4 +23,19 @@ class TemplateController extends Controller
         $this->viewPath = 'logistics.template.';
     }
 
+    /**
+     * 跳转面单模版页面
+     */
+    public function view($id)
+    {
+        $model = $this->model->find($id);
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view($this->viewPath . 'tpl.' . $model->name, $response);
+    }
+
 }

@@ -174,28 +174,32 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where('weight_from', '<=', $weight)
-                ->where('weight_to', '>=', $weight)
-                ->where('order_amount_from', '<=', $amount)
-                ->where('order_amount_to', '>=', $amount)
-                ->where(['is_clearance' => $isClearance])
+            where(function($query) use ($weight){
+                $query->where('weight_from', '<=', $weight)
+                ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
+            })->where(function($query) use ($amount){
+                $query->where('order_amount_from', '<=', $amount)
+                ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
+            })->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
                 ->get();
             foreach ($rules as $rule) {
-                //是否在物流方式国家中
-                $countries = $rule->rule_countries_through;
-                $flag = 0;
-                foreach($countries as $country) {
-                    if($country->id == $this->shipping_country) {
-                        $flag = 1;
-                        break;
+                    //是否在物流方式国家中
+                if($rule->country_section) {
+                    $countries = $rule->rule_countries_through;
+                    $flag = 0;
+                    foreach($countries as $country) {
+                        if($country->id == $this->shipping_country) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if($flag == 0) {
+                        continue;
                     }
                 }
-                if($flag == 0) {
-                    continue;
-                }
                 //是否有物流限制
-                if ($this->shipping_limits) {
+                if ($rule->limit_section && $this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
                     $limits = $this->rule_limits_through;
                     foreach($limits as $limit) {
@@ -560,8 +564,6 @@ class PackageModel extends BaseModel
             $orderItem->update(['is_active' => '0']);
         }
         $packages = $order->packages;
-        var_dump($packages->toArray());
-        exit;
         foreach ($packages as $package) {
             $package->update(['status' => 'CANCLE']);
             foreach ($package->items as $packageItem) {

@@ -147,7 +147,7 @@
                         @foreach($logisticsLimits as $key => $logisticsLimit)
                             <div class='form-group row'>
                                 <label>{{ $logisticsLimit->name }}:</label>
-                                <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="0" 'checked'>含
+                                <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="0" checked>含
                                 <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="1">不含
                                 <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="2">可以含
                             </div>
@@ -158,41 +158,53 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class='form-group col-lg-1'>
+            <h5>重量(kg)<input type='checkbox' class='weight_section' name='weight_section' value='1'></h5>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 weight" id="weight_from" placeholder="重量从" name='weight_from' value="{{ old('weight_from') }}" disabled>
+        </div>
+        <div class='col-lg-1'>
+            <h5><=  重量区间  <=</h5>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 weight" id="weight_to" placeholder="重量至" name='weight_to' value="{{ old('weight_to') }}" disabled>
+        </div>
 
-    <div class='row'>
-        <div class="form-group col-lg-3">
-            <label for="weight_from" class="control-label">起始重量(kg)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="weight_from" placeholder="重量从" name='weight_from' value="{{ old('weight_from') }}">
+        <div class='form-group col-lg-1'>
+            <h5>金额($)<input type='checkbox' class='order_amount_section' name='order_amount_section' value='1'></h5>
         </div>
-        <div class="form-group col-lg-3">
-            <label for="weight_to" class="control-label">结束重量至(kg)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="weight_to" placeholder="重量至" name='weight_to' value="{{ old('weight_to') }}">
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 order_amount" id="order_amount_from" placeholder="金额从" name='order_amount_from' value="{{ old('order_amount_from') }}" disabled>
         </div>
-        <div class="form-group col-lg-3">
-            <label for="order_amount_from" class="control-label">起始订单金额($)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="order_amount_from" placeholder="订单金额" name='order_amount_from' value="{{ old('order_amount_from') }}">
+        <div class='col-lg-1'>
+            <h5><=  金额区间  <=</h5>
         </div>
-        <div class="form-group col-lg-3">
-            <label for="order_amount_to" class="control-label">结束订单金额($)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="order_amount_to" placeholder="订单金额" name='order_amount_to' value="{{ old('order_amount_to') }}">
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 order_amount" id="order_amount_to" placeholder="金额至" name='order_amount_to' value="{{ old('order_amount_to') }}" disabled>
         </div>
     </div>
     <div class='row'>
         <div class="form-group col-lg-3">
             <label for="catalogs" class="control-label">产品分类:</label>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#catalogs">产品分类</button>
+            <input type='checkbox' class='catalog_section' name='catalog_section' value='1'>
+            <button type="button" class="btn btn-success catalog_button" data-toggle="modal" data-target="#catalogs" disabled>产品分类</button>
         </div>
         <div class="form-group col-lg-3">
             <label for="channels" class="control-label">订单来源渠道:</label>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#channels">订单来源渠道</button>
+            <input type='checkbox' class='channel_section' name='channel_section' value='1'>
+            <button type="button" class="btn btn-success channel_button" data-toggle="modal" data-target="#channels" disabled>订单来源渠道</button>
         </div>
         <div class="form-group col-lg-3">
             <label for="countrys" class="control-label">发货国家:</label>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#countrys">发货国家</button>
+            <input type='checkbox' class='country_section' name='country_section' value='1'>
+            <button type="button" class="btn btn-success country_button" data-toggle="modal" data-target="#countrys" disabled>发货国家</button>
         </div>
         <div class="form-group col-lg-3">
             <label for="countrys" class="control-label">物流限制:</label>
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#logistics_limit">物流限制</button>
+            <input type='checkbox' class='limit_section' name='limit_section' value='1'>
+            <button type="button" class="btn btn-success limit_button" data-toggle="modal" data-target="#logistics_limit" disabled>物流限制</button>
         </div>
     </div>
 @stop
@@ -206,6 +218,56 @@
         $(document).on('click', '.opposite_select', function(){
             block = $(this).parent().parent();
             block.find("input[type='checkbox']").prop('checked', false);
+        });
+
+        $(document).on('click', '.weight_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.weight').val('');
+                $('.weight').prop('disabled', false);
+            } else {
+                $('.weight').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.order_amount_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.order_amount').val('');
+                $('.order_amount').prop('disabled', false);
+            } else {
+                $('.order_amount').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.catalog_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.catalog_button').prop('disabled', false);
+            } else {
+                $('.catalog_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.channel_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.channel_button').prop('disabled', false);
+            } else {
+                $('.channel_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.country_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.country_button').prop('disabled', false);
+            } else {
+                $('.country_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.limit_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.limit_button').prop('disabled', false);
+            } else {
+                $('.limit_button').prop('disabled', true);
+            }
         });
     });
 </script>

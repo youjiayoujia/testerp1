@@ -125,19 +125,26 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-                @if($purchaseOrder->status < 4)
-                 <a  @if($purchaseOrder->write_off == 0) href="/purchaseOrder/write_off/{{$purchaseOrder->id}}"  @endif title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
-                     <span class="glyphicon glyphicon-yen"></span>
-                </a>
+                @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
+                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}"  title="需要核销" class="btn btn-danger btn-xs">
+                         <span class="glyphicon glyphicon-yen"></span>
+                    </a>
+                @endif
+
+                @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
+                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}" title="核销完成" class="btn btn-success btn-xs">
+                         <span class="glyphicon glyphicon-yen"></span>
+                    </a>
                 @endif
                 
                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
-                
+                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
                 <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-zoom-in"></span>
-                </a> 
+                </a>
+                @endif 
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
@@ -184,7 +191,7 @@
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
                
-                <div class="form-group col-sm-1">
+                <div class="form-group col-sm-2">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
@@ -194,9 +201,9 @@
                     <input type="hidden" id="currrent" value="1">
                      
         </div>
-        <div class="panel-footer">
-            <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>
+        <!--<div class="panel-footer">
+            <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
+        </div>-->
     </div> 
          
          <div class="modal-footer">
@@ -249,7 +256,7 @@
 		//新增物流号对应物流费
         $(document).ready(function () {
             var current = $('#currrent').val();
-            $('#addItem').click(function () {
+            $('.addItem').click(function () {
                 $.ajax({
                     url: "{{ route('postAdd') }}",
                     data: {current: current},

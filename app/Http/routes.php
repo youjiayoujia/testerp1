@@ -329,6 +329,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
+
+
+    Route::get('logisticsZone/getCountries', ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
+    Route::get('logisticsZone/sectionAdd', ['uses' => 'Logistics\ZoneController@sectionAdd', 'as' => 'logisticsZone.sectionAdd']);
     Route::resource('logisticsZone', 'Logistics\ZoneController');
     Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
     Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);

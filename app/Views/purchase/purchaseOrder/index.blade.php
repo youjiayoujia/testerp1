@@ -10,6 +10,7 @@
     <th>ID</th> 
     <th>采购单信息</th> 
     <th>采购单审核状态</th>
+    <th>核销状态</th>
     <th>采购人</th>
    	<th>供应商</th>
     <th>采购物品</th>
@@ -34,7 +35,8 @@
             	@if($purchaseOrder->examineStatus == $k)
             	<td>{{ $statu }}</td>
                 @endif
-            @endforeach     
+            @endforeach   
+            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
     		<td>{{ $purchaseOrder->assigner_name }}
             </td>
             <td>
@@ -126,13 +128,13 @@
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
-                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}"  title="需要核销" class="btn btn-danger btn-xs">
+                    <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>
                     </a>
                 @endif
 
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
-                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}" title="核销完成" class="btn btn-success btn-xs">
+                    <a  href="javascript:" title="核销" class="btn btn-success btn-xs hexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>
                     </a>
                 @endif
@@ -243,11 +245,24 @@
 
 @stop
 
-@section('pageJs')
+@section('childJs')
     <script type='text/javascript'>
 	
-		 $(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
-		
+	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
+
+	$(".hexiao").click(function(){
+        if (confirm("确认核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
+    $(".daihexiao").click(function(){
+        if (confirm("确认待核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
 	//批量输入采购单号
 	function batchPostCoding(){
 		 var batch_post_coding=$('#batch_post_coding').val(); 

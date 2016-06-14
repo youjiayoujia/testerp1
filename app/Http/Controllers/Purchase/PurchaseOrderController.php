@@ -365,19 +365,22 @@ class PurchaseOrderController extends Controller
 			}
 			$response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
-		}
+	}
 	
 	
 	public function write_off($id){
 		$off = request()->input("off");
 		if($off==1){
 			$this->model->find($id)->update(['write_off'=>$off+1,'status'=>4]);
+			$remark = "核销成功";
 		}else{
 			$this->model->find($id)->update(['write_off'=>$off+1]);
+			$remark = "待核销成功";
 		}
 		
-		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '核销成功'));
-		}
+		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . $remark));
+	}
+
 	public function addPost($id){
 		$data=request()->all();
 		$model=$this->model->find($id);
@@ -388,7 +391,27 @@ class PurchaseOrderController extends Controller
 			PurchasePostageModel::create(['purchase_order_id'=>$id,'post_coding'=>$v['post_coding'],'postage'=>$v['postage']]);
 			}
 		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '成功添加运单号'));	
-		}	
+	}
+
+	public function recieve(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		$response['metas']['title']='采购收货';
+        return view($this->viewPath . 'recieve', $response);
+	}
+
+	public function ajaxRecieve(){
+		$id = request()->input('id');
+		$purchase_order = $this->model->find($id);
+		print_r($purchase_order->purchaseItem->toArray());exit;
+		$response = [
+                'purchase_order' => $purchase_order,
+                'id'=>$id,
+            ];
+
+        return view($this->viewPath . 'recieveList', $response);
+	}
 		
 }
 

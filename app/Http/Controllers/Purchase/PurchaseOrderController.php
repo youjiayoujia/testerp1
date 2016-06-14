@@ -369,7 +369,13 @@ class PurchaseOrderController extends Controller
 	
 	
 	public function write_off($id){
-		$this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+		$off = request()->input("off");
+		if($off==1){
+			$this->model->find($id)->update(['write_off'=>$off+1,'status'=>4]);
+		}else{
+			$this->model->find($id)->update(['write_off'=>$off+1]);
+		}
+		
 		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '核销成功'));
 		}
 	public function addPost($id){

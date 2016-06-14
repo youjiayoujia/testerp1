@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCountries extends Migration
+class CreateLogisticsZoneCountry extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,10 @@ class CreateCountries extends Migration
      */
     public function up()
     {
-        Schema::create('countries', function (Blueprint $table) {
+        Schema::create('logistics_zone_countries', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('国家')->default(NULL);
-            $table->string('cn_name')->comment('中文名称')->default(NULL);
-            $table->string('code')->comment('缩写')->default(NULL);
-            $table->integer('number')->comment('number')->default(0);
+            $table->integer('logistics_zone_id')->comment("分区报价id")->default(0);
+            $table->integer('country_id')->comment('国家id')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +28,6 @@ class CreateCountries extends Migration
      */
     public function down()
     {
-        Schema::drop('countries');
+        Schema::drop('logistics_zone_countries');
     }
 }

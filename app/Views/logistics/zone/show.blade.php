@@ -1,7 +1,5 @@
 @extends('common.detail')
-
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-
 @section('detailBody')
     <div class="panel panel-default">
         <div class="panel-heading">基本信息</div>
@@ -13,44 +11,42 @@
                 <strong>物流分区</strong>: {{ $model->zone }}
             </div>
             <div class="col-lg-2">
-                <strong>物流方式</strong>: {{ $model->logistics->logistics_type }}
+                <strong>物流方式</strong>: {{ $model->logistics ? $model->logistics->logistics_type : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>物流方式简码</strong>: {{ $model->logistics->short_code }}
+                <strong>物流方式简码</strong>: {{ $model->logistics ? $model->logistics->short_code : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>种类</strong>: {{ $model->shipping_id == 'express' ? '快递' : '小包' }}
-            </div>
-            <div class="col-lg-2" id="express">
                 <strong>首重(kg)</strong>: {{ $model->fixed_weight }}
             </div>
-            <div class="col-lg-2" id="express">
+            <div class="col-lg-2">
                 <strong>首重价格(/kg)</strong>: {{ $model->fixed_price }}
             </div>
-            <div class="col-lg-2" id="express">
+            <div class="col-lg-2">
                 <strong>续重(kg)</strong>: {{ $model->continued_weight }}
             </div>
-            <div class="col-lg-2" id="express">
+            <div class="col-lg-2">
                 <strong>续重价格(/kg)</strong>: {{ $model->continued_price }}
             </div>
-            <div class="col-lg-2" id="express">
+            <div class="col-lg-2">
                 <strong>其他固定费用</strong>: {{ $model->other_fixed_price }}
-            </div>
-            <div class="col-lg-2" id="express">
-                <strong>其他比例费用(%)</strong>: {{ $model->other_scale_price }}
-            </div>
-            <div class="col-lg-2" id="packet">
-                <strong>价格(/kg)</strong>: {{ $model->price }}
-            </div>
-            <div class="col-lg-2" id="packet">
-                <strong>其他费用</strong>: {{ $model->other_price }}
             </div>
             <div class="col-lg-2">
                 <strong>最后折扣</strong>: {{ $model->discount }}
             </div>
-            <div class="col-lg-12">
-                <strong>国家</strong>: {{ $model->country($model->country_id) }}
+            <div class="col-lg-2">
+                <strong>是否通折</strong>: {{ $model->discount_weather_all ? '是' : '否' }}
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">国家</div>
+        <div class="panel-body">
+            @foreach($countries as $country)
+            <div class='col-lg-2'>
+                <input type='text' class='form-control' value="{{ $country->cn_name }}">
+            </div>
+            @endforeach
         </div>
     </div>
     <div class="panel panel-default">

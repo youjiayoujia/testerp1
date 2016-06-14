@@ -59,6 +59,7 @@
     <table border="0"  width="100%" cellpadding="0" cellspacing="1" bgcolor="#000">
     <thead >
         <tr bgcolor="#fff">
+            <td>序号</td>
             <td>采购条目ID</td> 
             <td>单据号</td>
             <td>SKU</td>
@@ -73,6 +74,7 @@
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)  
         <tr bgcolor="#fff"> 
+            <td>{{$k+1}}</td>
             <td>{{$purchaseItem->id}}</td>
             
             <td>{{$purchaseItem->post_coding}}</td>

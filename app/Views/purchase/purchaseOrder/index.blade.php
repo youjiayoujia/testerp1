@@ -125,10 +125,16 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-                @if($purchaseOrder->status < 4)
-                 <a  @if($purchaseOrder->write_off == 0) href="/purchaseOrder/write_off/{{$purchaseOrder->id}}"  @endif title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
-                     <span class="glyphicon glyphicon-yen"></span>
-                </a>
+                @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
+                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}"  title="需要核销" class="btn btn-danger btn-xs">
+                         <span class="glyphicon glyphicon-yen"></span>
+                    </a>
+                @endif
+
+                @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
+                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}" title="核销完成" class="btn btn-success btn-xs">
+                         <span class="glyphicon glyphicon-yen"></span>
+                    </a>
                 @endif
                 
                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >

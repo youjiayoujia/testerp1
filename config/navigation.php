@@ -225,6 +225,16 @@ return [
         'subnavigations' => [
             '物流管理' => [
                 [
+                    'name' => '物流分类',
+                    'url' => 'logisticsCatalog.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '回邮模版',
+                    'url' => 'logisticsEmailTemplate.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',
@@ -281,7 +291,7 @@ return [
                     'icon' => '',
                 ],*/
                 [
-                    'name' => '采购到货',
+                    'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
                     'icon' => '',
                 ],

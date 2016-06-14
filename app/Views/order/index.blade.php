@@ -109,17 +109,27 @@
                             <span class="glyphicon glyphicon-pencil"></span> 审核
                         </a>
                     @endif
-                    <a href="{{ route('order.edit', ['id'=>$order->id]) }}" class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 编辑
-                    </a>
-                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                       data-id="{{ $order->id }}"
-                       data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
-                        <span class="glyphicon glyphicon-pencil"></span> 删除
-                    </a>
-                    @if($order->status != 'CANCEL')
+                    @if($order->status == 'PREPARED')
+                        <a href="javascript:" class="btn btn-success btn-xs prepared" data-id="{{ $order->id }}">
+                            <span class="glyphicon glyphicon-pencil"></span> 暂停发货
+                        </a>
+                    @endif
+                    @if($order->active != 'NORMAL')
+                        <a href="javascript:" class="btn btn-success btn-xs normal" data-id="{{ $order->id }}">
+                            <span class="glyphicon glyphicon-pencil"></span> 恢复正常
+                        </a>
+                    @endif
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
+                        <a href="{{ route('order.edit', ['id'=>$order->id]) }}" class="btn btn-warning btn-xs">
+                            <span class="glyphicon glyphicon-pencil"></span> 编辑
+                        </a>
                         <a href="{{ route('withdraw', ['id'=>$order->id]) }}" class="btn btn-success btn-xs">
                             <span class="glyphicon glyphicon-pencil"></span> 撤单
+                        </a>
+                        <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                           data-id="{{ $order->id }}"
+                           data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
+                            <span class="glyphicon glyphicon-pencil"></span> 删除
                         </a>
                     @endif
                     <a href="{{ route('refund', ['id'=>$order->id]) }}" class="btn btn-warning btn-xs">
@@ -172,11 +182,44 @@
 @section('childJs')
     <script type="text/javascript">
         $(document).ready(function () {
+            //审核
             $('.review').click(function () {
                 if (confirm("确认审核?")) {
                     var order_id = $(this).data('id');
                     $.ajax({
                         url: "{{ route('updateStatus') }}",
+                        data: {order_id: order_id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            //暂停发货
+            $('.prepared').click(function () {
+                if (confirm("确认暂停发货?")) {
+                    var order_id = $(this).data('id');
+                    $.ajax({
+                        url: "{{ route('updatePrepared') }}",
+                        data: {order_id: order_id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            //恢复正常
+            $('.normal').click(function () {
+                if (confirm("确认恢复正常?")) {
+                    var order_id = $(this).data('id');
+                    $.ajax({
+                        url: "{{ route('updateNormal') }}",
                         data: {order_id: order_id},
                         dataType: 'json',
                         type: 'get',

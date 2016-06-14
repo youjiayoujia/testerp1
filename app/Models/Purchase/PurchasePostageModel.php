@@ -25,6 +25,11 @@ class PurchasePostageModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['id','purchase_item_id','purchase_order_id','post_coding','postage']; 	
+    protected $fillable = ['id','purchase_item_id','purchase_order_id','post_coding','postage','user_id']; 	
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id');
+    }
 	
 }

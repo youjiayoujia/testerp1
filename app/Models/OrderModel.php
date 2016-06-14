@@ -292,7 +292,8 @@ class OrderModel extends BaseModel
         if ($this->checkBlack()) {
             $order->update(['status' => 'REVIEW']);
             $order->remark('黑名单订单.');
-        } else {
+        }
+        if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
         return $order;

@@ -42,8 +42,8 @@
             <td>
             {{$requireItem->c_name}}
             </td>
-            <td>{{$requireItem->supplier->name}}</td>
-            <td>{{ $requireItem->warehouse->name}}</td>
+            <td>{{ $requireItem->supplier?$requireItem->supplier->name:''}}</td>
+            <td>{{ $requireItem->warehouse?$requireItem->warehouse->name:''}}</td>
             <td>{{ $requireItem->order_need_num}}</td>
             <td>{{$requireItem->all_quantity}}</td>
             <td>{{$requireItem->purchaseing_quantity}}</td>

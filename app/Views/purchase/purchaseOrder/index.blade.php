@@ -10,6 +10,7 @@
     <th>ID</th> 
     <th>采购单信息</th> 
     <th>采购单审核状态</th>
+    <th>核销状态</th>
     <th>采购人</th>
    	<th>供应商</th>
     <th>采购物品</th>
@@ -34,7 +35,8 @@
             	@if($purchaseOrder->examineStatus == $k)
             	<td>{{ $statu }}</td>
                 @endif
-            @endforeach     
+            @endforeach   
+            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
     		<td>{{ $purchaseOrder->assigner_name }}
             </td>
             <td>
@@ -125,19 +127,26 @@
                  <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-                @if($purchaseOrder->status < 4)
-                 <a  @if($purchaseOrder->write_off == 0) href="/purchaseOrder/write_off/{{$purchaseOrder->id}}"  @endif title="{{$purchaseOrder->write_off == 0 ?'核销':'已核销'}}" class="btn btn-success btn-xs">
-                     <span class="glyphicon glyphicon-yen"></span>
-                </a>
+                @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
+                    <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
+                         <span class="glyphicon glyphicon-yen"></span>
+                    </a>
+                @endif
+
+                @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
+                    <a  href="javascript:" title="核销" class="btn btn-success btn-xs hexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
+                         <span class="glyphicon glyphicon-yen"></span>
+                    </a>
                 @endif
                 
                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
-                
+                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
                 <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-zoom-in"></span>
-                </a> 
+                </a>
+                @endif 
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
@@ -184,7 +193,7 @@
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
                
-                <div class="form-group col-sm-1">
+                <div class="form-group col-sm-2">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
                 <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
@@ -194,9 +203,9 @@
                     <input type="hidden" id="currrent" value="1">
                      
         </div>
-        <div class="panel-footer">
-            <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>
+        <!--<div class="panel-footer">
+            <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
+        </div>-->
     </div> 
          
          <div class="modal-footer">
@@ -236,11 +245,24 @@
 
 @stop
 
-@section('pageJs')
+@section('childJs')
     <script type='text/javascript'>
 	
-		 $(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
-		
+	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
+
+	$(".hexiao").click(function(){
+        if (confirm("确认核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
+    $(".daihexiao").click(function(){
+        if (confirm("确认待核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
 	//批量输入采购单号
 	function batchPostCoding(){
 		 var batch_post_coding=$('#batch_post_coding').val(); 
@@ -249,7 +271,7 @@
 		//新增物流号对应物流费
         $(document).ready(function () {
             var current = $('#currrent').val();
-            $('#addItem').click(function () {
+            $('.addItem').click(function () {
                 $.ajax({
                     url: "{{ route('postAdd') }}",
                     data: {current: current},

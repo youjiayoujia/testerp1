@@ -11,7 +11,7 @@
               @if($postcodingNum >0)
              <div class="form-group col-lg-6">
              <strong>已关联采购单:</strong>
-             NO.{{$data['purchaseOrder']->id}}
+             <span id="guanlian">NO.{{$data['purchaseOrder']->id}}</span>
              </div>
              @else
              <div class="form-group col-lg-6">
@@ -34,36 +34,42 @@
             </div>
        </div>
        @else
-       <div class="row">
+       <div class="row" id="po_{{$data['postcoding']->id}}">
         <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
-                <th>sku</th>
-                <th>状态</th>
-                <th>采购数量</th>
-                <th>到货数量</th>
+                    <th>ID</th>
+                    <th>运单号</th>
+                    <th>运单状态</th>
+                    <th>关联采购单</th>
+                    <th>扫描人</th>
+                    <th>扫描时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($data['purchaseItems'] as $purchaseItem)
+                
                 <tr>
-                <td>{{$purchaseItem->sku}}</td>
-                <td>
-                @foreach(config('purchase.purchaseItem.status') as $key=>$status)
-                {{$purchaseItem->status == $key ? $status : ''}}
-                @endforeach
-                </td>
-                <td>{{$purchaseItem->purchase_num}}</td>
-                <td>{{$purchaseItem->arrival_num}}</td>
+                    <td>{{$data['postcoding']->id}}</td>
+                    <td>{{$data['postcoding']->post_coding}}</td>
+                    <td>已关联</td>
+                    <td>{{$data['postcoding']->purchase_order_id}}</td>
+                    <td>{{$data['postcoding']->user?$data['postcoding']->user->name:''}}</td>
+                    <td>{{$data['postcoding']->updated_at}}</td>
+                    <td>
+                        <a href="javascript:" class="btn btn-danger btn-xs delete_item" data-id="{{$data['postcoding']->id}}">
+                            <span class="glyphicon glyphicon-trash"></span> 删除关联
+                        </a>
+                    </td>
                 </tr>
-                @endforeach
+                
                  </tbody>
                 </table>
        </div>
        @endif
    
        <script type="text/javascript">
-	   function binding(){
+	    function binding(){
 		   var postage = $('#postage').val();
 		   var purchaseOrderId = $('#purchase_order_id').val();
 		   var postCoding = $('#post_coding').val();
@@ -74,11 +80,28 @@
                     type: 'get',
                     success: function (result) {
                         if(result == 1){
-							alert('绑定成功');
+							//alert('绑定成功');
 							}
                     }
+            });
+		}
+
+        $(".delete_item").click(function(){
+            if (confirm("确认删除关联?")) {
+                var id = $(this).data("id");
+                $.ajax({
+                        url: "{{ route('deletePostage') }}",
+                        data: {id:id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            $("#po_"+id).css("display","none");
+                            $("#guanlian").html("");
+                        }
                 });
-		   }
+            }
+
+        })
 	   </script>
        
 @stop

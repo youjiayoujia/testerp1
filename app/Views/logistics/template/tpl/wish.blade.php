@@ -23,7 +23,7 @@
     <div style="width:379px;height:150px;border:1px solid #000;border-bottom:none;">
         <p style="float:left;width:140px;height:30px;line-height:30px;text-align:center;font-size:12px;border-right:1px solid #000;"><img src="" /></p>
         <p style="float:left;width:120px;height:30px;line-height:30px;text-align:center;font-size:12px;border-right:1px solid #000;">Small Packet By Air</p>
-        <p style="float:left;width:50px;height:30px;line-height:30px;text-align:center;font-weight:bold;border-right:1px solid #000;">FR26</p>
+        <p style="float:left;width:50px;height:30px;line-height:30px;text-align:center;font-weight:bold;border-right:1px solid #000;">{{ $model->shipping_country }}</p>
         <p style="float:left;width:64px;height:30px;line-height:30px;text-align:center;font-weight:bold;font-size:14px;">476</p>
         <p style="float:left;width:140px;height:90px;border:1px solid #000;border-right:none;font-family:STHeiti;font-size:12px;">
             From:<br/>
@@ -42,9 +42,9 @@
             France<br/>
             Phone：0033607152794<br/>
         </p>
-        <p style="float:left;width:141px;height:30px;font-size:10px;border-right:1px solid #000;">自编号:24323955</p>
+        <p style="float:left;width:141px;height:30px;font-size:10px;border-right:1px solid #000;">{{ $model->order->ordernum }}自编号:24323955</p>
         <p style="float:left;width:120px;height:30px;font-size:10px;text-align:center;border-right:1px solid #000;">4</p>
-        <p style="float:left;width:114px;height:30px;font-size:10px;text-align:center;">法国</p>
+        <p style="float:left;width:114px;height:30px;font-size:10px;text-align:center;">{{ $model->country->cn_name }}</p>
     </div>
     <table style="width:381px;height:155px;border: 1px;" cellspacing="0" cellpadding="0">
         <tr style="height: 55px;">

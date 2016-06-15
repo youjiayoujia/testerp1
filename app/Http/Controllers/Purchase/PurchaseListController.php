@@ -246,22 +246,19 @@ class PurchaseListController extends Controller
 		$purchaseOrderId=request()->get('purchaseOrderId');
 		$postCoding=request()->get('postCoding');
 		$purchaseNum=PurchaseOrderModel::where('id',$purchaseOrderId)->count();
-		$num=PurchasePostageModel::where('purchase_order_id',$purchaseOrderId)->count();
 		$data['post_coding']=$postCoding;
 		$data['postage']=$postage;
 		$data['purchase_order_id']=$purchaseOrderId;
 		$data['user_id'] = request()->user()->id;
 
 		if($purchaseNum>0){
-			if($num ==0){
-				PurchasePostageModel::create($data);
-			}
+			PurchasePostageModel::create($data);
 			return 1;
-			}else{
-				return 2;
-				}
+		}else{
+			return 2;
+		}
 			
-		}	
+	}	
 	
 }
 

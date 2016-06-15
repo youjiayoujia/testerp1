@@ -134,7 +134,7 @@ class PackageController extends Controller
             foreach ($packages as $package) {
                 echo $package->id . '<br>';
                 $package->assignLogistics();
-                //$package->calculateProfitProcess();
+                $package->calculateProfitProcess();
             }
             $start += $len;
             $packages = PackageModel::where('status', 'NEW')

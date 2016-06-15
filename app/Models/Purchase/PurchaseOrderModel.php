@@ -42,6 +42,10 @@ class PurchaseOrderModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
+    public function purchaseItem()
+    {
+        return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'purchase_order_id');
+    }
 	public function getAssignerNameAttribute()
     {
         return UserModel::find($this->assigner)->name;

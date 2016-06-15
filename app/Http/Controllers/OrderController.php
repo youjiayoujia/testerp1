@@ -88,9 +88,8 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product && $obj->product->default_image != NULL && $obj->product->default_image != 0) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
+            if ($obj->product && $obj->product->url1 != '') {
+                $arr[$key] = $obj->product->url1;
             }
         }
         $response = [

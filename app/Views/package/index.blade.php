@@ -57,6 +57,11 @@
                         <span class="glyphicon glyphicon-eye-open"></span> 面单详情
                     </a>
                 @endif
+                @if($package->status == 'PICKED')
+                    <a href="{{ route('templateMsg', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 面单详情
+                    </a>
+                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $package->id }}"
                    data-url="{{ route('package.destroy', ['id' => $package->id]) }}">

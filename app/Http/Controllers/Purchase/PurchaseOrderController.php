@@ -384,12 +384,9 @@ class PurchaseOrderController extends Controller
 	public function addPost($id){
 		$data=request()->all();
 		$model=$this->model->find($id);
-		//echo '<pre>';
-		//print_r($data);exit;
 		foreach($data['post'] as $v){
-			//
 			PurchasePostageModel::create(['purchase_order_id'=>$id,'post_coding'=>$v['post_coding'],'postage'=>$v['postage']]);
-			}
+		}
 		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '成功添加运单号'));	
 	}
 
@@ -404,13 +401,25 @@ class PurchaseOrderController extends Controller
 	public function ajaxRecieve(){
 		$id = request()->input('id');
 		$purchase_order = $this->model->find($id);
-		print_r($purchase_order->purchaseItem->toArray());exit;
 		$response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
             ];
-
         return view($this->viewPath . 'recieveList', $response);
+	}
+
+	public function updateArriveNum(){
+		$data = request()->input("data");
+		$data = substr($data, 0,strlen($data)-1);
+		$arr = explode(',', $data);
+		foreach ($arr as $value) {
+			$update_data = explode(':', $value);
+			$purchase_item = PurchaseItemModel::find($update_data[0]);
+			$filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1];
+			$filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num'];
+			$filed['arrival_time'] = date('Y-m-d H:i:s',time());
+			$purchase_item->update($filed);
+		}
 	}
 		
 }

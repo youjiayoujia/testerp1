@@ -88,7 +88,7 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
+            if ($obj->product && $obj->product->default_image != NULL && $obj->product->default_image != 0) {
                 $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
                 $arr[$key] = $image;
             }
@@ -126,7 +126,7 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
+            if ($obj->product && $obj->product->default_image != NULL && $obj->product->default_image != 0) {
                 $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
                 $arr[$key] = $image;
             }
@@ -254,7 +254,7 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
+            if ($obj->product && $obj->product->default_image != NULL && $obj->product->default_image != 0) {
                 $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
                 $arr[$key] = $image;
             }

@@ -82,6 +82,7 @@ class ZoneController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'countries' => $model->logistics_zone_countries,
+            'sectionPrices' => $model->zone_section_prices,
         ];
 
         return view($this->viewPath . 'show', $response);

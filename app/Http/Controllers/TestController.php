@@ -31,7 +31,9 @@ class TestController extends Controller
 
     public function test1()
     {
-        $order = OrderModel::create(['channel_id' => '1', 'status' => 'PREPARED', 'active' => 'NORMAL', ])
+        $package = PackageModel::find(60);
+        $fee =  $package->calculateLogisticsFee();
+        var_dump($fee);
     }
 
     public function index()

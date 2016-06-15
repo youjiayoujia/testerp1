@@ -58,6 +58,42 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
+            <label for="logistics_catalog_id">物流分类</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
+                <option value="0">==选择物流分类==</option>
+                @foreach($catalogs as $catalog)
+                    <option value="{{$catalog->id}}" {{ $catalog->id == $model->logistics_catalog_id ? 'selected' : '' }}>
+                        {{$catalog->name}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="logistics_email_template_id">回邮模版</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
+                <option value="0">==选择回邮模版==</option>
+                @foreach($emailTemplates as $emailTemplate)
+                    <option value="{{$emailTemplate->id}}" {{ $emailTemplate->id == $model->logistics_email_template_id ? 'selected' : '' }}>
+                        {{$emailTemplate->customer}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="logistics_template_id">面单模版</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select class="form-control" name="logistics_template_id" id="logistics_template_id">
+                <option value="0">==选择面单模版==</option>
+                @foreach($templates as $template)
+                    <option value="{{$template->id}}" {{ $template->id == $model->logistics_template_id ? 'selected' : '' }}>
+                        {{$template->name}}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group col-lg-2">
             <label for="species" class="control-label">种类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">

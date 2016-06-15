@@ -235,6 +235,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '面单模版',
+                    'url' => 'logisticsTemplate.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',

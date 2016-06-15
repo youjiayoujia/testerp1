@@ -109,6 +109,11 @@ class PackageModel extends BaseModel
         return $this->hasMany('App\Models\Package\LogisticModel', 'package_id', 'id');
     }
 
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+
     public function getStatusNameAttribute()
     {
         $arr = config('package');

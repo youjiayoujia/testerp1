@@ -125,9 +125,8 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product && $obj->product->default_image != NULL && $obj->product->default_image != 0) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
+            if ($obj->product && $obj->product->url1 != '') {
+                $arr[$key] = $obj->product->url1;
             }
         }
         $response = [
@@ -253,9 +252,8 @@ class OrderController extends Controller
         }
         foreach($arr as $key => $value) {
             $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product && $obj->product->default_image != NULL && $obj->product->default_image != 0) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
+            if ($obj->product && $obj->product->url1 != '') {
+                $arr[$key] = $obj->product->url1;
             }
         }
         $response = [
@@ -297,7 +295,7 @@ class OrderController extends Controller
             $sku = request()->input('sku');
             $obj = productItem::where(['sku' => $sku])->first();
             if ($obj) {
-                $result = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                $result = $obj->product->url1;
                 return json_encode($result);
             }else{
                 return json_encode(false);

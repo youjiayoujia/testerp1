@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
+use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
@@ -415,10 +416,14 @@ class PurchaseOrderController extends Controller
 		foreach ($arr as $value) {
 			$update_data = explode(':', $value);
 			$purchase_item = PurchaseItemModel::find($update_data[0]);
+			$filed['purchase_item_id'] = $purchase_item['id'];
+			$filed['sku'] = $purchase_item['sku'];
 			$filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1];
 			$filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num'];
 			$filed['arrival_time'] = date('Y-m-d H:i:s',time());
 			$purchase_item->update($filed);
+			$filed['arrival_num'] = $update_data[1];
+			PurchaseItemArrivalLogModel::create($filed);
 		}
 	}
 		

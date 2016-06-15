@@ -46,8 +46,8 @@ class TemplateController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $this->model->create(request()->all());
-        $path = '../app/Views/logistics/template/tpl/';
-        fopen($path . request()->all()['view'], 'w');
+//        $path = '../app/Views/logistics/template/tpl/';
+//        fopen($path . request()->all()['view'], 'w');
         return redirect($this->mainIndex);
     }
 

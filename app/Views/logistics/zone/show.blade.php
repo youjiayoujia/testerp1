@@ -40,12 +40,41 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">国家</div>
+        <div class="panel-heading">区间价格</div>
         <div class="panel-body">
             @foreach($countries as $country)
             <div class='col-lg-2'>
                 <input type='text' class='form-control' value="{{ $country->cn_name }}">
             </div>
+            @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">国家</div>
+        <div class="panel-body">
+            <div class='row'>
+                <div class='form-group col-sm-3'>
+                    <label for="weight_from">开始重量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="weight_to">结束重量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+                <div class="form-group col-sm-3">
+                    <label for="price">价格</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
+            </div>
+            @foreach($sectionPrices as $key => $sectionPrice)
+                <div class='row'>
+                    <div class='form-group col-sm-3'>
+                        <input class="form-control" placeholder="开始重量" name="arr[weight_from][{{$key}}]" value="{{ old('arr[weight_from][$key]') ? old('arr[weight_from][$key]') : $sectionPrice->weight_from }}">
+                    </div>
+                    <div class="form-group col-sm-3">
+                        <input class="form-control" placeholder="结束重量" name="arr[weight_to][{{$key}}]" value="{{ old('arr[weight_to][$key]') ? old('arr[weight_to][$key]') : $sectionPrice->weight_to }}">
+                    </div>
+                    <div class="form-group col-sm-3 position_html">
+                        <input class="form-control" placeholder="价格" name="arr[price][{{$key}}]" value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $sectionPrice->price }}">
+                    </div>
+                </div>
             @endforeach
         </div>
     </div>

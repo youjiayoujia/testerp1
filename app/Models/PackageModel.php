@@ -6,6 +6,7 @@ use App\Base\BaseModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\Logistics\ZoneModel;
 
 class PackageModel extends BaseModel
 {
@@ -154,6 +155,37 @@ class PackageModel extends BaseModel
             return false;
         }
         return true;
+    }
+
+    public function calculateLogisticsFee()
+    {
+        $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        foreach($zones as $zone) {
+            if($zone->inZone($this->shipping_country)) {
+                $fee = '';
+                if($zone->type == 'first') {
+                    if($this->weight <= $zone->fixed_weight) {
+                        $fee = $this->fixed_price;
+                    } else {
+                        $fee = $this->fixed_price;
+                        $weight = $this->weight - $zone->fixed_weight;
+                        $fee += ceil($wegith/$zone->continued_weight) * $zone->continued_price;
+                    }
+                    if($zone->discount_weather_all) {
+                        $fee = ($fee + $zone->other_fixed_price) * $zone->discount;
+                    } else {
+                        $fee = $fee * $zone->discount + $zone->other_fixed_price;
+                    }
+                    return $fee;
+                } else {
+                    $sectionPrice = $zone->zone_section_prices->sortByDesc('weight_to')->first();
+                    $fee = $sectionPrice->price;
+                    return $fee;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

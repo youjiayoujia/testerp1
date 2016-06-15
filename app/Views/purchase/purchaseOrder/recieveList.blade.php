@@ -104,10 +104,11 @@ table.gridtable td {
 					<td>质检</td>
 					<td>跟踪</td>
 				</tr>
+			<?php $i=0; ?>
 			@foreach($purchase_order->purchaseItem as $item)
-				@foreach($item->arrivalLog as $log_key=>$log)
+				@foreach($item->arrivalLog as $log)
 					<tr>
-						<td>{{$log_key+1}}</td>
+						<td>{{$i+1}}</td>
 						<td>{{$log->sku}}</td>
 						<td>{{$log->arrival_num}}</td>
 						<td>{{$log->created_at}}</td>
@@ -116,6 +117,7 @@ table.gridtable td {
 						<td>{{$log->quality_time}}</td>
 						<td></td>
 					</tr>
+					<?php $i++; ?>
 				@endforeach
 			@endforeach
 			</table>

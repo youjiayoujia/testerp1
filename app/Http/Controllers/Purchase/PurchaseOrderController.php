@@ -411,6 +411,7 @@ class PurchaseOrderController extends Controller
 
 	public function updateArriveNum(){
 		$data = request()->input("data");
+		$p_id = request()->input("p_id");
 		$data = substr($data, 0,strlen($data)-1);
 		$arr = explode(',', $data);
 		foreach ($arr as $value) {
@@ -425,6 +426,7 @@ class PurchaseOrderController extends Controller
 			$filed['arrival_num'] = $update_data[1];
 			PurchaseItemArrivalLogModel::create($filed);
 		}
+		echo json_encode(67);
 	}
 		
 }

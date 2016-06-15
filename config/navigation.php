@@ -285,6 +285,11 @@ return [
                     'url' => 'purchaseList.create',
                     'icon' => '',
                 ],
+                [
+                    'name' => '采购收货',
+                    'url' => 'recieve',
+                    'icon' => '',
+                ],
 				[
                     'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',

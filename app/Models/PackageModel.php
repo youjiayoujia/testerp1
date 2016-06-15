@@ -178,9 +178,12 @@ class PackageModel extends BaseModel
                     }
                     return $fee;
                 } else {
-                    $sectionPrice = $zone->zone_section_prices->sortByDesc('weight_to')->first();
-                    $fee = $sectionPrice->price;
-                    return $fee;
+                    $sectionPrices = $zone->zone_section_prices;
+                    foreach($sectionPrices as $sectionPrice) {
+                        if($this->weight >= $sectionPrice->weight_from && $this->weight < $sectionPrice->weight_to) {
+                            return $sectionPrice->price;
+                        }
+                    }
                 }
             }
         }

@@ -290,6 +290,11 @@ return [
                     'url' => 'recieve',
                     'icon' => '',
                 ],
+                [
+                    'name' => '采购入库',
+                    'url' => 'recieve',
+                    'icon' => '',
+                ],
 				[
                     'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',

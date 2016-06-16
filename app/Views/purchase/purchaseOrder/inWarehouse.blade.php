@@ -21,7 +21,7 @@
     	$(document).on('keydown', function (event) {
     	    if(event.keyCode == '13') {
     	    	$.ajax({
-                    url: "{{ route('ajaxRecieve') }}",
+                    url: "{{ route('ajaxInWarehouse') }}",
                     data: {id: $("#p_id").val()},
                     dataType: 'html',
                     type: 'get',
@@ -37,14 +37,17 @@
 
 	$(document).on('click','.modify',function(){
         var data = ""
-		$("input[name^='arrivenum_']").each(function(){
+		$("input[name^='goodnum_']").each(function(){
 			id = $(this).attr("name");
-            id = id.substr(10);
-            data += id+":"+$(this).val()+",";
+            if($(this).val()!=0){
+                id = id.substr(8);
+                data += id+":"+$(this).val();
+                data +=":"+$('#badnum_'+id).val()+",";
+            }   
 　　　　});
 
         $.ajax({
-            url:"{{ route('updateArriveNum') }}",
+            url:"{{ route('updateArriveLog') }}",
             data:{data:data,p_id:$("#p_id").val()},
             dataType:'json',
             type:'get',

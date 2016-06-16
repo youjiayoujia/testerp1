@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
+use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
@@ -365,30 +366,68 @@ class PurchaseOrderController extends Controller
 			}
 			$response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
-		}
+	}
 	
 	
 	public function write_off($id){
 		$off = request()->input("off");
 		if($off==1){
 			$this->model->find($id)->update(['write_off'=>$off+1,'status'=>4]);
+			$remark = "核销成功";
 		}else{
 			$this->model->find($id)->update(['write_off'=>$off+1]);
+			$remark = "待核销成功";
 		}
 		
-		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '核销成功'));
-		}
+		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . $remark));
+	}
+
 	public function addPost($id){
 		$data=request()->all();
 		$model=$this->model->find($id);
-		//echo '<pre>';
-		//print_r($data);exit;
 		foreach($data['post'] as $v){
-			//
 			PurchasePostageModel::create(['purchase_order_id'=>$id,'post_coding'=>$v['post_coding'],'postage'=>$v['postage']]);
-			}
+		}
 		return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '成功添加运单号'));	
-		}	
+	}
+
+	public function recieve(){
+		$response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+		$response['metas']['title']='采购收货';
+        return view($this->viewPath . 'recieve', $response);
+	}
+
+	public function ajaxRecieve(){
+		$id = request()->input('id');
+		$purchase_order = $this->model->find($id);
+		$response = [
+                'purchase_order' => $purchase_order,
+                'id'=>$id,
+            ];
+        return view($this->viewPath . 'recieveList', $response);
+	}
+
+	public function updateArriveNum(){
+		$data = request()->input("data");
+		$p_id = request()->input("p_id");
+		$data = substr($data, 0,strlen($data)-1);
+		$arr = explode(',', $data);
+		foreach ($arr as $value) {
+			$update_data = explode(':', $value);
+			$purchase_item = PurchaseItemModel::find($update_data[0]);
+			$filed['purchase_item_id'] = $purchase_item['id'];
+			$filed['sku'] = $purchase_item['sku'];
+			$filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1];
+			$filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num'];
+			$filed['arrival_time'] = date('Y-m-d H:i:s',time());
+			$purchase_item->update($filed);
+			$filed['arrival_num'] = $update_data[1];
+			PurchaseItemArrivalLogModel::create($filed);
+		}
+		echo json_encode(67);
+	}
 		
 }
 

@@ -8,8 +8,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logistics\CatalogModel;
 use App\Models\Logistics\CodeModel;
+use App\Models\Logistics\EmailTemplateModel;
 use App\Models\Logistics\LimitsModel;
+use App\Models\Logistics\TemplateModel;
 use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
@@ -17,9 +20,9 @@ use App\Models\Logistics\SupplierModel;
 class LogisticsController extends Controller
 {
 
-    public function __construct(LogisticsModel $logisticsModel)
+    public function __construct(LogisticsModel $logistics)
     {
-        $this->model = $logisticsModel;
+        $this->model = $logistics;
         $this->mainIndex = route('logistics.index');
         $this->mainTitle = '物流';
         $this->viewPath = 'logistics.';
@@ -36,6 +39,9 @@ class LogisticsController extends Controller
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
             'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
+            'catalogs' => CatalogModel::all(),
+            'emailTemplates' => EmailTemplateModel::all(),
+            'templates' => TemplateModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -47,19 +53,22 @@ class LogisticsController extends Controller
      */
     public function edit($id)
     {
-        $logistic = $this->model->find($id);
-        $limits = explode(",",$logistic->limit);
+        $logistics = $this->model->find($id);
+        $limits = explode(",",$logistics->limit);
         $selectedLimits = LimitsModel::whereIn('id', $limits)->get();
-        if (!$logistic) {
+        if (!$logistics) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'model' => $logistic,
+            'model' => $logistics,
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
             'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
             'selectedLimits' => $selectedLimits,
+            'catalogs' => CatalogModel::all(),
+            'emailTemplates' => EmailTemplateModel::all(),
+            'templates' => TemplateModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
 

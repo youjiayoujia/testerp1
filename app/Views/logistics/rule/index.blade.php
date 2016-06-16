@@ -1,6 +1,7 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
+    <th>名称</th>
     <th class="sort" data-field="type_id">物流方式</th>
     <th>物流方式简码</th>
     <th class="sort" data-field="priority">优先级</th>
@@ -17,6 +18,7 @@
     @foreach($data as $rule)
         <tr>
             <td>{{ $rule->id }}</td>
+            <td>{{ $rule->name }}</td>
             <td>{{ $rule->logistics->type }}</td>
             <td>{{ $rule->logistics->short_code }}</td>
             <td>{{ $rule->priority }}</td>

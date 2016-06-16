@@ -236,7 +236,7 @@ class OrderModel extends BaseModel
     {
         $total = 0;
         foreach ($this->packages as $package) {
-            $total += $package->cost + $package->cost1;
+            $total += $package->calculateLogisticsFee();
         }
         return $total;
     }

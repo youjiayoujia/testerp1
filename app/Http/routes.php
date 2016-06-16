@@ -194,7 +194,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
 //采购单e/purchaseOrder/addPost/
-	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');   
+	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
+    Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/ajaxRecieve', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
+    Route::any('purchaseOrder/updateArriveNum', [ 'uses'=>'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
@@ -331,6 +334,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
+
+
+    Route::get('logisticsZone/getCountries', ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
+    Route::get('logisticsZone/sectionAdd', ['uses' => 'Logistics\ZoneController@sectionAdd', 'as' => 'logisticsZone.sectionAdd']);
     Route::resource('logisticsZone', 'Logistics\ZoneController');
     Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
     Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
@@ -348,6 +355,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
     Route::resource('logisticsCatalog', 'Logistics\CatalogController');
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
+    Route::resource('logisticsTemplate', 'Logistics\TemplateController');
+    Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
+    Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
 
     //拣货单异常
     Route::get('errorList/ajaxProcess',

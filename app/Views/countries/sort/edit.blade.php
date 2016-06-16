@@ -16,7 +16,7 @@
             <select name="country_id" class="form-control" multiple style="height:300px;width:400px;">
                 @foreach($countries as $country)
                     <option class="form-control" value="{{ $country->id }}" {{ old('country_id') ? old('country_id') == $country->id ? 'selected' : '' : ''}} onclick="addCountry( this )">
-                        {{ $country->name }}
+                        {{ $country->cn_name }}
                     </option>
                 @endforeach
             </select>

@@ -511,4 +511,20 @@ class PackageController extends Controller
             return view($this->viewPath . 'excelFeeResult', $response);
         }
     }
+
+    /**
+     * 包裹面单信息
+     */
+    public function templateMsg($id)
+    {
+        $model = $this->model->find($id);
+        $view = $model->logistics->template;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
+    }
+
 }

@@ -24,7 +24,7 @@ class RuleModel extends BaseModel
 {
     protected $table = 'logistics_rules';
 
-    public $searchFields = ['country', 'weight_from', 'weight_to', 'order_amount', 'is_clearance', 'priority', 'type_id'];
+    public $searchFields = [];
 
     protected $fillable = [
         'name',

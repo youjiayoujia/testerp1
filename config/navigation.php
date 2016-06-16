@@ -235,6 +235,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '面单模版',
+                    'url' => 'logisticsTemplate.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',
@@ -293,6 +298,11 @@ return [
                 [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购收货',
+                    'url' => 'recieve',
                     'icon' => '',
                 ],
 				[

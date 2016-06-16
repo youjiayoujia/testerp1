@@ -159,11 +159,11 @@
        <td></td>
        </tr>
         <tr>
-            <td>订单运费：</td>
+            <td>订单总金额：</td>
             <td colspan="13">{{$purchaseCost + $postage}}</td>
         </tr>
         <tr>
-            <td>订单总金额：</td>
+            <td>订单运费：</td>
             <td colspan="13">{{$storageCost + $postage}}</td>
         </tr>
         <tr>

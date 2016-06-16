@@ -80,8 +80,11 @@
                     type: 'get',
                     success: function (result) {
                         if(result == 1){
-							//alert('绑定成功');
-							}
+							alert('绑定成功');
+						}
+                        if(result == 2){
+                            alert('绑定失败');
+                        }
                     }
             });
 		}

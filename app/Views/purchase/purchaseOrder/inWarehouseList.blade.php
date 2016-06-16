@@ -27,7 +27,7 @@ table.gridtable td {
 <!-- Table goes in the document BODY -->
 <table class="gridtable">
 	<tr>
-		<th colspan="3">查看采购单详情：采购单号{{$id}}</th>
+		<th colspan="3">查看采购单详情：采购单号<span id="ajaxp_id" value="{{$id}}">{{$id}}</span></th>
 	</tr>
 	<tr>
 		<td>下单时间</td>

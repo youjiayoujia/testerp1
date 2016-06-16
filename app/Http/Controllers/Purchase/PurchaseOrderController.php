@@ -426,7 +426,7 @@ class PurchaseOrderController extends Controller
 			$filed['arrival_num'] = $update_data[1];
 			PurchaseItemArrivalLogModel::create($filed);
 		}
-		echo json_encode(1);
+		echo json_encode($p_id);
 	}
 
 	public function inWarehouse(){
@@ -461,7 +461,7 @@ class PurchaseOrderController extends Controller
 			$filed['quality_time'] = date('Y-m-d H:i:s',time());
 			$arrivel_log->update($filed);
 		}
-		echo json_encode(67);
+		echo json_encode($p_id);
 	}
 		
 }

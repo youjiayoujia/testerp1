@@ -27,7 +27,7 @@
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
-                        $("#p_id").val("");
+                        //$("#p_id").val("");
                     }
                 });
     	    }
@@ -48,7 +48,7 @@
 
         $.ajax({
             url:"{{ route('updateArriveLog') }}",
-            data:{data:data,p_id:$("#p_id").val()},
+            data:{data:data,p_id:$("#ajaxp_id").val()},
             dataType:'json',
             type:'get',
             success:function(result){

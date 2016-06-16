@@ -292,7 +292,7 @@ return [
                 ],
                 [
                     'name' => '采购入库',
-                    'url' => 'recieve',
+                    'url' => 'inWarehouse',
                     'icon' => '',
                 ],
 				[

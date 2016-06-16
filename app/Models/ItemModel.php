@@ -63,10 +63,12 @@ class ItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
-	 public function warehouse()
+
+    public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
     }
+
     public function purchase()
     {
         return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku', 'sku');
@@ -87,7 +89,10 @@ class ItemModel extends BaseModel
 
     public function getImageAttribute()
     {
-        return $this->product->image->path . $this->product->image->name;
+        if ($this->product->image) {
+            return $this->product->image->path . $this->product->image->name;
+        }
+        return '/default.jpg';
     }
 
     public function getAllQuantityAttribute()
@@ -110,7 +115,7 @@ class ItemModel extends BaseModel
     public function getStock($warehousePosistionId, $stock_id = 0)
     {
         $stock = '';
-        if(!$stock_id) {
+        if (!$stock_id) {
             $stock = $this->stocks()->where('warehouse_position_id', $warehousePosistionId)->first();
             if (!$stock) {
                 $warehouse = PositionModel::where(['id' => $warehousePosistionId])->first()->warehouse_id;
@@ -142,8 +147,15 @@ class ItemModel extends BaseModel
      *
      * @return
      */
-    public function in($warehousePosistionId, $quantity, $amount, $type = '', $relation_id = '', $remark = '', $flag = 1)
-    {
+    public function in(
+        $warehousePosistionId,
+        $quantity,
+        $amount,
+        $type = '',
+        $relation_id = '',
+        $remark = '',
+        $flag = 1
+    ) {
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
             $cost = $amount / $quantity;

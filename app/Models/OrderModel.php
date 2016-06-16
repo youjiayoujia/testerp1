@@ -269,8 +269,8 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-        $last = $this->all()->last();
-        $data['ordernum'] = $last ? $last->id + 1 : 1;
+//        $last = $this->all()->last();
+        $data['ordernum'] = $begin = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             $item = ItemModel::where('sku', $orderItem['sku'])->first();
@@ -355,7 +355,7 @@ class OrderModel extends BaseModel
                     }
                     $this->package_times += 1;
                     $this->status = 'NEED';
-                    $this->save();
+                    return $this->save();
                 } elseif ($this->status == 'NEED') {
                     if (strtotime($this->created_at) < strtotime('-3 days')) {
                         $arr = $this->explodeOrder();
@@ -368,7 +368,7 @@ class OrderModel extends BaseModel
                         }
                     }
                     $this->package_times += 1;
-                    $this->save();
+                    return $this->save();
                 }
             }
         }

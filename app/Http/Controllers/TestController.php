@@ -26,14 +26,14 @@ class TestController extends Controller
 {
     public function __construct(OrderModel $orderModel)
     {
-        
+
     }
 
     public function test1()
     {
         $package = PackageModel::find(97);
         $package->assignLogistics();
-        
+
         // $response = [
         //     'metas' => $this->metas(__FUNCTION__),
         // ];

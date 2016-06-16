@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\OrderModel;
 use Channel;
-use App\Models\CommandModel;
+use App\Jobs\InOrders;
+use App\Models\Log\CommandModel as CommandLog;
 use App\Models\Channel\AccountModel;
-use App\Jobs\DoPackage;
-use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Console\Command;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class OrdersGet extends Command
 {
@@ -25,7 +24,7 @@ class OrdersGet extends Command
      *
      * @var string
      */
-    protected $description = 'Get Orders.';
+    protected $description = 'Get Orders From Channels.';
 
     /**
      * Create a new command instance.
@@ -42,11 +41,12 @@ class OrdersGet extends Command
      *
      * @return mixed
      */
-    public function handle(OrderModel $orderModel)
+    public function handle()
     {
+        $start = microtime(true);
         $account = AccountModel::find($this->argument('accountID'));
         if ($account) {
-            $begin = microtime(true);
+            //todo:订单起始周期设置 & 每页抓取数量设置
             $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
             $endDate = date("Y-m-d H:i:s", time());
             $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -54,30 +54,29 @@ class OrdersGet extends Command
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
+                //todo:订单状态获取
                 $order['status'] = 'PAID';
-                $thisOrder = $orderModel
-                    ->where('channel_ordernum', $order['channel_ordernum'])
-                    ->first();
-                //todo:是否要更新订单
-                if (!$thisOrder) {
-                    $thisOrder = $orderModel->createOrder($order);
-                    $thisOrder->checkBlack();
-                    $this->dispatch((new DoPackage($thisOrder))->onQueue('doPackages'));
-                }
+                $job = new InOrders($order);
+                $job = $job->onQueue('inOrders');
+                $this->dispatch($job);
             }
-            $end = microtime(true);
-            $lasting = round($end - $begin, 3);
-            $this->info($account->alias . ' 耗时' . $lasting . '秒');
-            CommandModel::create([
-                'account_id' => $account->id,
-                'signature' => $this->signature,
-                'description' => $this->description,
-                'lasting' => $lasting,
-                'result' => 'success.',
-                'remark' => 'success.',
-            ]);
+            //todo::Adapter->error()
+            $result['status'] = 'success';
+            $result['remark'] = 'Success.';
         } else {
-            $this->error('Account is not exist.');
+            $result['status'] = 'fail';
+            $result['remark'] = 'Account is not exist.';
         }
+        $end = microtime(true);
+        $lasting = round($end - $start, 3);
+        CommandLog::create([
+            'relation_id' => $account->id,
+            'signature' => $this->signature,
+            'description' => $this->description,
+            'lasting' => $lasting,
+            'result' => $result['status'],
+            'remark' => $result['remark']
+        ]);
+        $this->info($account->alias . ' 耗时' . $lasting . '秒');
     }
 }

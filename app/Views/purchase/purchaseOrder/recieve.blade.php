@@ -26,8 +26,8 @@
                     dataType: 'html',
                     type: 'get',
                     success: function (result) {
-
                         $(".purchase").html(result);
+                        $("#p_id").val("");
                     }
                 });
     	    }
@@ -46,13 +46,17 @@
 
         $.ajax({
             url:"{{ route('updateArriveNum') }}",
-            data:{data:data},
+            data:{data:data,p_id:$("#p_id").val()},
             dataType:'json',
             type:'get',
             success:function(result){
-                alert('ok'); 
-            }                  
-        })  
+                $("#p_id").val(result);
+                javascript:document.getElementById("p_id").focus();
+                var e = jQuery.Event("keydown");//模拟一个键盘事件
+                e.keyCode =13;//keyCode=13是回车
+                $("#p_id").trigger(e); 
+            }
+        });                         
 	});
 
 </script>

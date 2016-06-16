@@ -195,7 +195,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 //采购单e/purchaseOrder/addPost/
 	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
-    Route::any('purchaseOrder/recieve', 'Purchase\PurchaseOrderController@recieve');
+    Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
     Route::any('purchaseOrder/ajaxRecieve', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
     Route::any('purchaseOrder/updateArriveNum', [ 'uses'=>'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');

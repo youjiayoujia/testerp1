@@ -86,12 +86,12 @@ class OrderController extends Controller
         {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product && $obj->product->url1 != '') {
-                $arr[$key] = $obj->product->url1;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -123,12 +123,12 @@ class OrderController extends Controller
         {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product && $obj->product->url1 != '') {
-                $arr[$key] = $obj->product->url1;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -250,12 +250,12 @@ class OrderController extends Controller
         {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product && $obj->product->url1 != '') {
-                $arr[$key] = $obj->product->url1;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'orderItems' => $model->items,

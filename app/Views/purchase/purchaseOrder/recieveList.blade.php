@@ -27,7 +27,7 @@ table.gridtable td {
 <!-- Table goes in the document BODY -->
 <table class="gridtable">
 	<tr>
-		<th colspan="3">查看采购单详情：采购单号{{$id}}</th>
+		<th colspan="3">查看采购单详情：采购单号<span>{{$id}}</span></th>
 	</tr>
 	<tr>
 		<td>下单时间</td>
@@ -67,7 +67,7 @@ table.gridtable td {
 					<td></td>
 					<td>{{$item->purchase_num}}</td>
 					<td>{{$item->arrival_num}}</td>
-					<td><input type="text" value="0" name="arrivenum_{{$item->id}}"></td>
+					<td><input type="text" value="0" id="arrivenum_{{$item->id}}" name="arrivenum_{{$item->id}}"></td>
 					<td><button>打印</button></td>
 				</tr>
 			@endforeach
@@ -95,14 +95,31 @@ table.gridtable td {
 		<td>
 			<table class="gridtable">
 				<tr>
-					<td></td>
+					<td>序号</td>
+					<td>编码</td>
+					<td>到货</td>
+					<td>时间</td>
+					<td>优品</td>
+					<td>误差</td>
+					<td>质检</td>
+					<td>跟踪</td>
 				</tr>
-				<tr>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-				</tr>
+			<?php $i=0; ?>
+			@foreach($purchase_order->purchaseItem as $item)
+				@foreach($item->arrivalLog as $log)
+					<tr>
+						<td>{{$i+1}}</td>
+						<td>{{$log->sku}}</td>
+						<td>{{$log->arrival_num}}</td>
+						<td>{{$log->created_at}}</td>
+						<td>{{$log->good_num}}</td>
+						<td>{{$log->bad_num}}</td>
+						<td>{{$log->quality_time}}</td>
+						<td></td>
+					</tr>
+					<?php $i++; ?>
+				@endforeach
+			@endforeach
 			</table>
 		</td>
 	</tr>

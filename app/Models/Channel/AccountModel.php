@@ -23,80 +23,20 @@ class AccountModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = [
-        'account',
-        'alias',
-        'channel_id',
-        'country_id',
-        'domain',
-        'sync_cycle',
-        'is_available',
-        'operator_id',
-        'customer_service_id',
-        'service_email',
-        'is_merge_package',
-        'is_thanks',
-        'is_picking_list',
-        'is_rand_sku',
-        'image_domain',
-        'is_clearance',
-        'order_prefix',
-        'amazon_api_url',
-        'amazon_marketplace_id',
-        'amazon_seller_id',
-        'amazon_accesskey_id',
-        'amazon_accesskey_secret',
-        'aliexpress_member_id',
-        'aliexpress_appkey',
-        'aliexpress_appsecret',
-        'aliexpress_returnurl',
-        'aliexpress_refresh_token',
-        'aliexpress_access_token',
-        'aliexpress_access_token_date',
-        'wish_publish_code',
-        'wish_client_id',
-        'wish_client_secret',
-        'wish_redirect_uri',
-        'wish_refresh_token',
-        'wish_access_token',
-        'wish_expiry_time',
-        'wish_proxy_address',
-        'wish_sku_resolve',
-        'lazada_access_key',
-        'lazada_user_id',
-        'lazada_site',
-        'lazada_currency_type',
-        'lazada_currency_type_cn',
-        'lazada_api_host',
-        'ebay_developer_account',
-        'ebay_developer_devid',
-        'ebay_developer_appid',
-        'ebay_developer_certid',
-        'ebay_token',
-        'ebay_eub_developer',
-
-        'cd_currency_type',
-        'cd_currency_type_cn',
-        'cd_account',
-        'cd_token_id',
-        'cd_pw',
-        'cd_sales_account',
-
-
-    ];
+    protected $guarded = [];
 
     public $searchFields = ['account', 'alias'];
 
     protected $rules = [
         'create' => [
-            'account' => 'required',
+            'account' => 'required|unique:channel_accounts,account',
             'alias' => 'required',
             'channel_id' => 'required',
             'operator_id' => 'required',
             'customer_service_id' => 'required',
         ],
         'update' => [
-            'account' => 'required',
+            'account' => 'required|unique:channel_accounts,account,{id}',
             'alias' => 'required',
             'channel_id' => 'required',
             'operator_id' => 'required',
@@ -114,13 +54,6 @@ class AccountModel extends BaseModel
         return $this->belongsTo('App\Models\CountriesModel', 'country_id', 'id');
     }
 
-
-    public function operators()
-    {
-        return $this->belongsToMany('App\Models\UserModel', 'channel_account_operators',
-            'channel_account_id', 'user_id');
-    }
-
     public function operator()
     {
         return $this->belongsTo('App\Models\UserModel', 'operator_id', 'id');
@@ -129,12 +62,6 @@ class AccountModel extends BaseModel
     public function customer_service()
     {
         return $this->belongsTo('App\Models\UserModel', 'customer_service_id', 'id');
-    }
-
-    public function warehouse()
-    {
-        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
-
     }
 
     public function orders()
@@ -146,26 +73,6 @@ class AccountModel extends BaseModel
     {
         return $this->belongsToMany('App\Models\PaypalsModel', 'channel_account_paypal',
             'channel_account_id', 'paypal_id');
-    }
-
-    public function getMergePackageAttribute()
-    {
-        return $this->is_merge_package ? '是' : '否';
-    }
-
-    public function getThanksAttribute()
-    {
-        return $this->is_thanks ? '是' : '否';
-    }
-
-    public function getPickingListAttribute()
-    {
-        return $this->is_picking_list ? '是' : '否';
-    }
-
-    public function getRandSkuAttribute()
-    {
-        return $this->is_rand_sku ? '是' : '否';
     }
 
     public function getClearanceAttribute()
@@ -195,10 +102,10 @@ class AccountModel extends BaseModel
                 $status = [];
                 break;
             case 'ebay':
-                $status=['All'];
+                $status = ['All'];
                 break;
             case 'cdiscount':
-                $status=['WaitingForShipmentAcceptation'];
+                $status = ['WaitingForShipmentAcceptation'];
                 break;
         }
         return $status;
@@ -253,11 +160,11 @@ class AccountModel extends BaseModel
                 ];
                 break;
             case 'ebay':
-                $config=[
-                    'requestToken'=>$this->ebay_token,
-                    'devID'=>$this->ebay_developer_devid,
-                    'appID'=>$this->ebay_developer_appid,
-                    'certID'=>$this->ebay_developer_certid,
+                $config = [
+                    'requestToken' => $this->ebay_token,
+                    'devID' => $this->ebay_developer_devid,
+                    'appID' => $this->ebay_developer_appid,
+                    'certID' => $this->ebay_developer_certid,
                 ];
                 break;
             case 'cdiscount':
@@ -274,27 +181,4 @@ class AccountModel extends BaseModel
         }
         return $config;
     }
-
-    public function createAccount()
-    {
-        $channel = $this->create(request()->all());
-        $operatorIds = explode(',', request()->input("operator_ids"));
-        $channel->operators()->attach($operatorIds);
-        return $channel;
-    }
-
-    public function updateAccount()
-    {
-        $this->update(request()->all());
-        $operatorIds = explode(',', request()->input("operator_ids"));
-        $this->operators()->sync($operatorIds);
-        return $this;
-    }
-
-    public function destoryAccount()
-    {
-        $this->operators()->detach();
-        $this->delete();
-    }
-
 }

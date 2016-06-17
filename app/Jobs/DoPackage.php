@@ -8,11 +8,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class DoPackage extends Job implements SelfHandling, ShouldQueue
 {
-    use InteractsWithQueue, SerializesModels, DispatchesJobs;
+    use InteractsWithQueue, SerializesModels;
     protected $order;
 
     /**
@@ -23,6 +22,8 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
     public function __construct($order)
     {
         $this->order = $order;
+        $this->relation_id = $this->order->id;
+        $this->description = 'Order:' . $this->order->id . ' do package.';
     }
 
     /**
@@ -32,15 +33,25 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        $this->order->createPackage();
-        if ($this->order->status == 'PACKED') {
-            foreach ($this->order->packages as $package) {
-                $this->dispatch((new AssignLogistics($package))->onQueue('assignLogistics'));
+        $start = microtime(true);
+        if ($this->order->createPackage()) {
+            if ($this->order->status == 'PACKED') {
+                foreach ($this->order->packages as $package) {
+                    $job = new AssignLogistics($package);
+                    $job = $job->onQueue('assignLogistics');
+                    $this->dispatch($job);
+                }
             }
+            if ($this->order->status == 'NEED') {
+                $this->release(3600);
+            }
+            $this->result['status'] = 'success';
+            $this->result['remark'] = 'Success.';
+        } else {
+            $this->result['status'] = 'fail';
+            $this->result['remark'] = 'Fail to do package.';
         }
-        if ($this->order->status == 'NEED') {
-            $this->release(60);
-//            $this->dispatch((new DoPackage($this->order))->onQueue('redoPackages'));
-        }
+        $this->lasting = round(microtime(true) - $start, 3);
+        $this->log();
     }
 }

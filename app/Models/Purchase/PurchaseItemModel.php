@@ -55,6 +55,10 @@ class PurchaseItemModel extends BaseModel
     {
         return $this->belongsTo('App\Models\StockModel', 'stock_id');
     }
+    public function arrivalLog()
+    {
+        return $this->hasMany('App\Models\Purchase\PurchaseItemArrivalLogModel', 'purchase_item_id');
+    }
 	
 	 /**
      * 整体流程处理excel

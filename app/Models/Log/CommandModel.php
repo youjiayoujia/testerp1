@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Log;
 
 use App\Base\BaseModel;
 
@@ -12,7 +12,7 @@ class CommandModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'commands';
+    protected $table = 'log_commands';
 
     /**
      * The attributes that are mass assignable.

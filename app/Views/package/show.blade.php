@@ -40,7 +40,6 @@
                 </thead>
                 <tbody>
                 @foreach($model->items as $item)
-
                     <tr>
                         <td><img src="{{ asset($item->item->image) }}" width="100"></td>
                         <td>{{ $item->item->sku }}</td>

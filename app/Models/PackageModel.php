@@ -174,7 +174,7 @@ class PackageModel extends BaseModel
                     } else {
                         $fee = $this->fixed_price;
                         $weight = $this->weight - $zone->fixed_weight;
-                        $fee += ceil($wegith/$zone->continued_weight) * $zone->continued_price;
+                        $fee += ceil($weight/$zone->continued_weight) * $zone->continued_price;
                     }
                     if($zone->discount_weather_all) {
                         $fee = ($fee + $zone->other_fixed_price) * $zone->discount;
@@ -229,7 +229,7 @@ class PackageModel extends BaseModel
                     $countries = $rule->rule_countries_through;
                     $flag = 0;
                     foreach($countries as $country) {
-                        if($country->id == $this->shipping_country) {
+                        if($country->code == $this->shipping_country) {
                             $flag = 1;
                             break;
                         }
@@ -249,6 +249,11 @@ class PackageModel extends BaseModel
                             }
                         }
                     }
+                }
+                //查看对应的物流方式是否是所属仓库
+                $warehouse = WarehouseModel::find($this->warehouse_id);
+                if(!$warehouse->logisticsIn($rule->type_id)) {
+                    continue;
                 }
                 //物流查询链接
                 $trackingUrl = $rule->logistics->url;
@@ -534,7 +539,7 @@ class PackageModel extends BaseModel
     public function calculateProfitProcess()
     {
         $order = $this->order;
-        $orderItems = $order->orderItem;
+        $orderItems = $order->items;
         $orderAmount = $order->amount;
         $orderCosting = $order->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee($order, $orderItems);

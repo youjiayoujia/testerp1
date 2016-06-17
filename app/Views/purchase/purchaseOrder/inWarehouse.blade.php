@@ -59,6 +59,9 @@
             dataType:'json',
             type:'get',
             success:function(result){
+                if(typeof(result)=='string'){
+                    alert("sku:"+result+"库位不存在");return;
+                }
                 $("#p_id").val(result);
                 javascript:document.getElementById("p_id").focus();
                 var e = jQuery.Event("keydown");//模拟一个键盘事件

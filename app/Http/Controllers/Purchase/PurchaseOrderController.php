@@ -457,12 +457,15 @@ class PurchaseOrderController extends Controller
 		foreach ($arr as $value) {
 			$update_data = explode(':', $value);
 			$arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
+			$purchase_item = $arrivel_log->purchaseItem;
+			if($purchase_item->item->warehouse_position==''){
+				echo json_encode($purchase_item->item->sku);exit;
+			}
 			$filed['good_num'] = $update_data[1];
 			$filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
 			$filed['quality_time'] = date('Y-m-d H:i:s',time());
 			$arrivel_log->update($filed);
-			
-			$purchase_item = $arrivel_log->purchaseItem;
+			//purchaseitem
 			$datas['status'] = 3;
 			$datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
 			$datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];

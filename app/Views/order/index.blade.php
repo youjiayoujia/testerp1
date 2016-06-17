@@ -119,10 +119,12 @@
                             <span class="glyphicon glyphicon-pencil"></span> 恢复正常
                         </a>
                     @endif
-                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW' || $order->status == 'NEED')
                         <a href="{{ route('order.edit', ['id'=>$order->id]) }}" class="btn btn-warning btn-xs">
                             <span class="glyphicon glyphicon-pencil"></span> 编辑
                         </a>
+                    @endif
+                    @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
                         <a href="{{ route('withdraw', ['id'=>$order->id]) }}" class="btn btn-success btn-xs">
                             <span class="glyphicon glyphicon-pencil"></span> 撤单
                         </a>

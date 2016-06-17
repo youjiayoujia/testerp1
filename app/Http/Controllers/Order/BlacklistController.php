@@ -94,33 +94,27 @@ class BlacklistController extends Controller
                     }
                 }
                 if($count >= 5) {
-                    $channels = [];
                     foreach($order as $v) {
                         $v->update(['blacklist' => '0']);
-                        if(!in_array($v['channel_id'], $channels)) {
-                            $channels[] = $v['channel_id'];
-                        }
                     }
-                    foreach($channels as $channel) {
-                        $obj = OrderModel::where('shipping_zipcode', $key)->orderBy('id', 'DESC')->first();
-                        $data['channel_id'] = $channel;
-                        $data['ordernum'] = $obj->ordernum;
-                        $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
-                        $data['email'] = $obj->email;
-                        $data['zipcode'] = $obj->shipping_zipcode;
-                        $data['type'] = 'SUSPECTED';
-                        $data['remark'] = NULL;
-                        $data['total_order'] = count($order);
-                        $data['refund_order'] = $count;
-                        $data['refund_rate'] = round(($count / count($order)) * 100) . '%';
-                        $data['color'] = 'orange';
-                        $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])
-                            ->where('name', $data['name'])
-                            ->where('channel_id', $channel)
-                            ->count();
-                        if($blacklist <= 0) {
-                            $this->model->create($data);
-                        }
+                    $obj = OrderModel::where('shipping_zipcode', $key)->orderBy('id', 'DESC')->first();
+                    $data['channel_id'] = $channel_id;
+                    $data['ordernum'] = $obj->ordernum;
+                    $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;
+                    $data['email'] = $obj->email;
+                    $data['zipcode'] = $obj->shipping_zipcode;
+                    $data['type'] = 'SUSPECTED';
+                    $data['remark'] = NULL;
+                    $data['total_order'] = count($order);
+                    $data['refund_order'] = $count;
+                    $data['refund_rate'] = round(($count / count($order)) * 100) . '%';
+                    $data['color'] = 'orange';
+                    $blacklist = BlacklistModel::where('zipcode', $data['zipcode'])
+                        ->where('name', $data['name'])
+                        ->where('channel_id', $channel_id)
+                        ->count();
+                    if($blacklist <= 0) {
+                        $this->model->create($data);
                     }
                 }
             }
@@ -150,7 +144,7 @@ class BlacklistController extends Controller
                         }
                     }
                     foreach($channels2 as $channel2) {
-                        $obj = OrderModel::where('email', $key2)->orderBy('id', 'DESC')->first();
+                        $obj = OrderModel::where('email', $key2)->where('channel_id', $channel2)->orderBy('id', 'DESC')->first();
                         $data['channel_id'] = $channel2;
                         $data['ordernum'] = $obj->ordernum;
                         $data['name'] = $obj->shipping_lastname . ' ' . $obj->shipping_firstname;

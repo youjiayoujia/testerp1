@@ -21,7 +21,6 @@
 @section('tableBody')
     @foreach($data as $purchaseOrder)
         <tr>
-       		
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
                 外部单号：

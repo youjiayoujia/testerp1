@@ -86,13 +86,12 @@ class OrderController extends Controller
         {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -124,13 +123,12 @@ class OrderController extends Controller
         {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -252,13 +250,12 @@ class OrderController extends Controller
         {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj->product->default_image != NULL && $obj->product->default_image != 0) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'orderItems' => $model->items,
@@ -298,7 +295,7 @@ class OrderController extends Controller
             $sku = request()->input('sku');
             $obj = productItem::where(['sku' => $sku])->first();
             if ($obj) {
-                $result = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                $result = $obj->product->url1;
                 return json_encode($result);
             }else{
                 return json_encode(false);
@@ -338,10 +335,29 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
+    //审核
     public function updateStatus()
     {
         $order_id = request()->input('order_id');
         $this->model->find($order_id)->update(['status' => 'PREPARED']);
+
+        return 1;
+    }
+
+    //暂停发货
+    public function updatePrepared()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'STOP']);
+
+        return 1;
+    }
+
+    //恢复正常
+    public function updateNormal()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'NORMAL']);
 
         return 1;
     }

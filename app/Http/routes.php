@@ -337,6 +337,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
+
+
+    Route::get('logisticsZone/getCountries', ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
+    Route::get('logisticsZone/sectionAdd', ['uses' => 'Logistics\ZoneController@sectionAdd', 'as' => 'logisticsZone.sectionAdd']);
     Route::resource('logisticsZone', 'Logistics\ZoneController');
     Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
     Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
@@ -352,6 +356,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('scanAddTrCodeFn', ['uses' => 'Logistics\CodeController@scanAddTrCodeFn', 'as' => 'scanAddTrCodeFn']);
     Route::resource('logisticsRule', 'Logistics\RuleController');
     Route::get('bhw', ['uses' => 'Logistics\RuleController@bhw', 'as' => 'bhw']);
+    Route::resource('logisticsCatalog', 'Logistics\CatalogController');
+    Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
+    Route::resource('logisticsTemplate', 'Logistics\TemplateController');
+    Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
+    Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
 
     //拣货单异常
     Route::get('errorList/ajaxProcess',
@@ -424,6 +433,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
     Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
+    Route::get('updatePrepared', ['uses' => 'OrderController@updatePrepared', 'as' => 'updatePrepared']);
+    Route::get('updateNormal', ['uses' => 'OrderController@updateNormal', 'as' => 'updateNormal']);
     Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
     Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);

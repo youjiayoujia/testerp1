@@ -28,6 +28,9 @@ class LogisticsModel extends BaseModel
         'type',
         'url',
         'docking',
+        'logistics_catalog_id',
+        'logistics_email_template_id',
+        'logistics_template_id',
         'pool_quantity',
         'is_enable',
         'limit',
@@ -44,6 +47,9 @@ class LogisticsModel extends BaseModel
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
         'update' => [
@@ -55,25 +61,12 @@ class LogisticsModel extends BaseModel
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
     ];
-
-
-    /**
-     * 批量倒入号码池
-     *
-     * @param $file 导入所需的Excel文件
-     *
-     */
-    public function batchImport($file)
-    {
-        $filePath = '' . $file;
-        Excel::load($filePath, function ($reader) {
-            $data = $reader->all();
-            dd($data);
-        });
-    }
 
     public function supplier()
     {
@@ -93,6 +86,21 @@ class LogisticsModel extends BaseModel
     public function codes()
     {
         return $this->hasMany('App\Models\Logistics\CodeModel', 'logistics_id');
+    }
+
+    public function catalog()
+    {
+        return $this->belongsTo('App\Models\Logistics\CatalogModel', 'logistics_catalog_id', 'id');
+    }
+
+    public function emailTemplate()
+    {
+        return $this->belongsTo('App\Models\Logistics\EmailTemplateModel', 'logistics_email_template_id', 'id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo('App\Models\Logistics\TemplateModel', 'logistics_template_id', 'id');
     }
 
     public function getDockingNameAttribute()

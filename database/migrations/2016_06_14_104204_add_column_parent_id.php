@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddFieldsExpiresInForCdiscountInChannelAccountsTable extends Migration
+class AddColumnParentId extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,8 @@ class AddFieldsExpiresInForCdiscountInChannelAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::table('channel_accounts', function (Blueprint $table) {
-            //
-            $table->integer('cd_expires_in')->nullable()->after('cd_currency_type');
+        Schema::table('countries', function (Blueprint $table) {
+            $table->integer('parent_id')->comment('分类地区')->default(0);
         });
     }
 
@@ -25,8 +24,8 @@ class AddFieldsExpiresInForCdiscountInChannelAccountsTable extends Migration
      */
     public function down()
     {
-        Schema::table('channel_accounts', function (Blueprint $table) {
-            //
+        Schema::table('countries', function (Blueprint $table) {
+            $table->dropColumn('parent_id');
         });
     }
 }

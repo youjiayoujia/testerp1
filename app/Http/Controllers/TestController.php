@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use Test;
 
+use App\Models\Purchase\PurchaseOrderModel;
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
@@ -26,52 +27,22 @@ class TestController extends Controller
 {
     public function __construct(OrderModel $orderModel)
     {
-        
+
     }
 
     public function test1()
     {
-        $package = PackageModel::find(97);
-        $package->assignLogistics();
-        
-        // $response = [
-        //     'metas' => $this->metas(__FUNCTION__),
-        // ];
-        // return view('test', $response);
-        // echo DNS1D::getBarcodeHTML("4445645656", "C39");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C39+");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C39E");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C39E+");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C93");
-        // echo DNS1D::getBarcodeHTML("4445645656", "S25");
-        // echo DNS1D::getBarcodeHTML("4445645656", "S25+");
-        // echo DNS1D::getBarcodeHTML("4445645656", "I25");
-        // echo DNS1D::getBarcodeHTML("4445645656", "I25+");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C128");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C128A");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C128B");
-        // echo DNS1D::getBarcodeHTML("4445645656", "C128C");
-        // echo DNS1D::getBarcodeHTML("44455656", "EAN2");
-        // echo DNS1D::getBarcodeHTML("4445656", "EAN5");
-        // echo DNS1D::getBarcodeHTML("4445", "EAN8");
-        // echo DNS1D::getBarcodeHTML("4445", "EAN13");
-        // echo DNS1D::getBarcodeHTML("4445645656", "UPCA");
-        // echo DNS1D::getBarcodeHTML("4445645656", "UPCE");
-        // echo DNS1D::getBarcodeHTML("4445645656", "MSI");
-        // echo DNS1D::getBarcodeHTML("4445645656", "MSI+");
-        // echo DNS1D::getBarcodeHTML("4445645656", "POSTNET");
-        // echo DNS1D::getBarcodeHTML("4445645656", "PLANET");
-        // echo DNS1D::getBarcodeHTML("4445645656", "RMS4CC");
-        // echo DNS1D::getBarcodeHTML("4445645656", "KIX");
-        // echo DNS1D::getBarcodeHTML("4445645656", "IMB");
-        // echo DNS1D::getBarcodeHTML("4445645656", "CODABAR");
-        // echo DNS1D::getBarcodeHTML("4445645656", "CODE11");
-        // echo DNS1D::getBarcodeHTML("4445645656", "PHARMA");
-        // echo DNS1D::getBarcodeHTML("4445645656", "PHARMA2T");
+
+        $package = PackageModel::find(60);
+        $fee = $package->calculateLogisticsFee();
+        var_dump($fee);
     }
 
     public function index()
     {
+        $order = PurchaseOrderModel::find(54);
+        var_dump($order->purchase_post);
+        exit;
         foreach (OrderModel::all() as $order) {
             $order->createPackage();
         }

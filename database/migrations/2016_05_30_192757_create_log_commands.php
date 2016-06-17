@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCommands extends Migration
+class CreateLogCommands extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,9 @@ class CreateCommands extends Migration
      */
     public function up()
     {
-        Schema::create('commands', function (Blueprint $table) {
+        Schema::create('log_commands', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('account_id')->comment('帐号ID');
+            $table->string('relation_id')->comment('关联ID');
             $table->string('signature')->comment('命令');
             $table->string('description')->comment('描述');
             $table->string('lasting')->comment('执行时间');
@@ -32,6 +32,6 @@ class CreateCommands extends Migration
      */
     public function down()
     {
-        Schema::drop('commands');
+        Schema::drop('log_commands');
     }
 }

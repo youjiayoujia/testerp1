@@ -53,6 +53,14 @@
                     <a href="javascript:" class="btn btn-warning btn-xs send" data-id="{{ $package->id }}">
                         <span class="glyphicon glyphicon-pencil"></span> 发货
                     </a>
+                    <a href="{{ route('templateMsg', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 面单详情
+                    </a>
+                @endif
+                @if($package->status == 'PICKED')
+                    <a href="{{ route('templateMsg', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 面单详情
+                    </a>
                 @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $package->id }}"

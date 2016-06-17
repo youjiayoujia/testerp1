@@ -196,8 +196,11 @@ Route::group(['middleware' => 'auth'], function () {
 //采购单e/purchaseOrder/addPost/
 	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
     Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/ajaxInWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
+    Route::any('purchaseOrder/inWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
     Route::any('purchaseOrder/updateArriveNum', [ 'uses'=>'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
+    Route::any('purchaseOrder/updateArriveLog', [ 'uses'=>'Purchase\PurchaseOrderController@updateArriveLog', 'as' => 'updateArriveLog']);
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
@@ -210,7 +213,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
-	 Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
+	Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
     Route::any('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
     Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 //打印采购单

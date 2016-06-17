@@ -454,9 +454,46 @@ class PurchaseOrderController extends Controller
             $filed['arrival_num'] = $update_data[1];
             PurchaseItemArrivalLogModel::create($filed);
         }
-        echo json_encode(67);
+        echo json_encode($p_id);
     }
 
+    public function inWarehouse()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        $response['metas']['title'] = '采购入库';
+        return view($this->viewPath . 'inWarehouse', $response);
+    }
+
+    public function ajaxInWarehouse()
+    {
+        $id = request()->input('id');
+        $purchase_order = $this->model->find($id);
+        $response = [
+            'purchase_order' => $purchase_order,
+            'id' => $id,
+        ];
+        return view($this->viewPath . 'inWarehouseList', $response);
+    }
+
+    public function updateArriveLog()
+    {
+        $data = request()->input("data");
+        $p_id = request()->input("p_id");
+        $data = substr($data, 0, strlen($data) - 1);
+        $arr = explode(',', $data);
+
+        foreach ($arr as $value) {
+            $update_data = explode(':', $value);
+            $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
+            $filed['good_num'] = $update_data[1];
+            $filed['bad_num'] = $arrivel_log->arrival_num - $update_data[1];
+            $filed['quality_time'] = date('Y-m-d H:i:s', time());
+            $arrivel_log->update($filed);
+        }
+        echo json_encode($p_id);
+    }
 }
 
 

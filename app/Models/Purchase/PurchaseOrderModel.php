@@ -62,6 +62,11 @@ class PurchaseOrderModel extends BaseModel
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
     }
 
+    public function purchasePostage()
+    {
+        return $this->hasMany('App\Models\Purchase\PurchasePostageModel', 'purchase_order_id');
+    }
+
     public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');

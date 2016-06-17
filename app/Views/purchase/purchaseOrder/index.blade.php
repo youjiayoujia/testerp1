@@ -21,11 +21,12 @@
 @section('tableBody')
     @foreach($data as $purchaseOrder)
         <tr>
-       		
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
-                {{ Tool::show($purchaseOrder['purchase_post111']) }}
-               外部单号：@if($purchaseOrder->purchase_post_num > 0) {{$purchaseOrder->purchase_post->post_coding}} @else 暂无单号 @endif
+                外部单号：
+                @foreach($purchaseOrder->purchasePostage as $ppostage)
+                    {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
+                @endforeach
             </td>
            <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)

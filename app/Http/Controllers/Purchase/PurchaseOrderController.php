@@ -465,6 +465,7 @@ class PurchaseOrderController extends Controller
 			$purchase_item = $arrivel_log->purchaseItem;
 			$datas['status'] = 3;
 			$datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+			$datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
 			if($datas['storage_qty']>=$purchase_item->purchase_num){
 				$datas['status'] = 4;
 			}

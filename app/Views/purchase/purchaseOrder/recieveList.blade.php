@@ -27,7 +27,7 @@ table.gridtable td {
 <!-- Table goes in the document BODY -->
 <table class="gridtable">
 	<tr>
-		<th colspan="3">查看采购单详情：采购单号{{$id}}</th>
+		<th colspan="3">查看采购单详情：采购单号<span>{{$id}}</span></th>
 	</tr>
 	<tr>
 		<td>下单时间</td>
@@ -67,7 +67,7 @@ table.gridtable td {
 					<td></td>
 					<td>{{$item->purchase_num}}</td>
 					<td>{{$item->arrival_num}}</td>
-					<td><input type="text" value="0" name="arrivenum_{{$item->id}}"></td>
+					<td><input type="text" value="0" id="arrivenum_{{$item->id}}" name="arrivenum_{{$item->id}}"></td>
 					<td><button>打印</button></td>
 				</tr>
 			@endforeach

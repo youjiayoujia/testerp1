@@ -422,6 +422,7 @@ class PurchaseOrderController extends Controller
 			$filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1];
 			$filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num'];
 			$filed['arrival_time'] = date('Y-m-d H:i:s',time());
+			$filed['status'] = 2;
 			$purchase_item->update($filed);
 			$filed['arrival_num'] = $update_data[1];
 			PurchaseItemArrivalLogModel::create($filed);
@@ -460,7 +461,24 @@ class PurchaseOrderController extends Controller
 			$filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
 			$filed['quality_time'] = date('Y-m-d H:i:s',time());
 			$arrivel_log->update($filed);
+			
+			$purchase_item = $arrivel_log->purchaseItem;
+			$datas['status'] = 3;
+			$datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+			if($datas['storage_qty']>=$purchase_item->purchase_num){
+				$datas['status'] = 4;
+			}
+			$purchase_item->update($datas);
+			
 		}
+		$p_status = 4;
+		$purchasrOrder = $this->model->find($p_id);
+		foreach($purchasrOrder->purchaseItem as $p_item){
+			if($p_item->status!=4){
+				$p_status = 3;
+			}
+		}
+		$purchasrOrder->update(['status'=>$p_status]);
 		echo json_encode($p_id);
 	}
 		

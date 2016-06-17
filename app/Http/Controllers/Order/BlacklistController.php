@@ -82,8 +82,8 @@ class BlacklistController extends Controller
         $orders = OrderModel::where('created_at', '<=', date('Y-m-d H:m:s'))
             ->where('created_at', '>=', date('Y-m-d H:m:s', strtotime("last year")))
             ->where('channel_id', $channel_id)
-            ->groupBy('shipping_zipcode', 'shipping_lastname', 'shipping_firstname')
-            ->get();
+            ->get()
+            ->groupBy('shipping_zipcode', 'shipping_lastname', 'shipping_firstname');
         foreach($orders as $key => $order) {
             if(count($order) >= 5) {
                 $count = 0;
@@ -127,12 +127,11 @@ class BlacklistController extends Controller
         }
 
         //根据邮箱相同抓取黑名单用户
-        $channel_id2 = ChannelModel::where('name', 'Wish')->first()->id;
         $orders2 = OrderModel::where('created_at', '<=', date('Y-m-d H:m:s'))
             ->where('created_at', '>=', date('Y-m-d H:m:s', strtotime("last year")))
-            ->where('channel_id', '!=', $channel_id2)
-            ->groupBy('email')
-            ->get();
+            ->where('channel_id', '!=', $channel_id)
+            ->get()
+            ->groupBy('email');
         foreach($orders2 as $key2 => $order2) {
             if(count($order2) >= 5) {
                 $count2 = 0;

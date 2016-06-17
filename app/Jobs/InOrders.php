@@ -9,11 +9,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class InOrders extends Job implements SelfHandling, ShouldQueue
 {
-    use InteractsWithQueue, SerializesModels, DispatchesJobs;
+    use InteractsWithQueue, SerializesModels;
     protected $order;
 
     /**
@@ -24,7 +23,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
     public function __construct($order)
     {
         $this->order = $order;
-        $this->description = 'Put [' . $this->order['channel_account_id'] . ':' . $this->order['channel_ordernum'] . '] in SYS.';
+        $this->description = 'Put Order:[' . $this->order['channel_account_id'] . ':' . $this->order['channel_ordernum'] . '] in SYS.';
     }
 
     /**

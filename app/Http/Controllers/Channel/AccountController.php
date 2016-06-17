@@ -26,7 +26,8 @@ class AccountController extends Controller
         $this->viewPath = 'channel.account.';
     }
 
-    public function index(){
+    public function index()
+    {
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -35,6 +36,7 @@ class AccountController extends Controller
         ];
         return view($this->viewPath . 'index', $response);
     }
+
     public function create()
     {
         $response = [
@@ -46,17 +48,6 @@ class AccountController extends Controller
         ];
         return view($this->viewPath . 'create', $response);
     }
-
-
-    public function store()
-    {
-        request()->flash();
-        $this->validate(request(), $this->model->rules('create'));
-        $this->model->createAccount(request()->all());
-        return redirect($this->mainIndex);
-    }
-
-
 
     public function edit($id)
     {
@@ -75,51 +66,15 @@ class AccountController extends Controller
         return view($this->viewPath . 'edit', $response);
     }
 
-    public function update($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        request()->flash();
-        $this->validate(request(), $this->model->rules('update', $id));
-        $model->updateAccount(request()->all());
-        return redirect($this->mainIndex);
-    }
-
-    public function destroy($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $model->destoryAccount();
-
-        return redirect($this->mainIndex);
-    }
-
-
-    public function getAccountUser()
-    {
-        $channel_id = request()->input('channel_id');
-        $account = AccountModel::where('channel_id', $channel_id)->get()->toArray();
-        return $account;
-    }
-
     public function updateApi($id)
     {
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-
-
-
         $model->update(request()->all());
-
         $paypalIds = explode(',', request()->input("paypal_ids"));
         $model->paypal()->sync($paypalIds);
-
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $model->alias . ' 设置API成功.'));
     }
 }

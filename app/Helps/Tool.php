@@ -17,7 +17,7 @@ class Tool
         }
     }
 
-    public function barcodePrint($content, $type = 'C128') 
+    public function barcodePrint($content, $type = 'C128')
     {
         return DNS1D::getBarcodeHTML($content, $type);
     }
@@ -71,10 +71,10 @@ class Tool
      * 2015-12-18 10:43:21 YJ
      * @return str
      */
-    public function createSku($code,$code_num)
+    public function createSku($code, $code_num)
     {
-        $spu = $code.sprintf("%05d", $code_num+1);
-        
+        $spu = $code . sprintf("%05d", $code_num + 1);
+
         return $spu;
 
     }
@@ -130,26 +130,27 @@ class Tool
     // 1 处理捆绑的情况   A+B
     // 2 去除前后缀    $type = 2 的时候 sku前缀是  S*001KU[TEST]  这样存在的
     // 3 处理SKU（10）  处理打包的情况
-    public function filter_sku($channel_sku,$type=1){
+    public function filter_sku($channel_sku, $type = 1)
+    {
 
         $tmpSku = explode('+', $channel_sku);
-        $skuNum=0;
-        $returnSku =array();
-        foreach ($tmpSku as $k => $sku){
+        $skuNum = 0;
+        $returnSku = array();
+        foreach ($tmpSku as $k => $sku) {
 
             if (stripos($sku, '[') !== false) {
                 $sku = preg_replace('/\[.*\]/', '', $sku);
             }
-            if($type==2){
+            if ($type == 2) {
 
-                $prePart = substr($sku,0,1);
-                $suffPart = substr($sku,4);
-                $sku = $prePart.$suffPart;
+                $prePart = substr($sku, 0, 1);
+                $suffPart = substr($sku, 4);
+                $sku = $prePart . $suffPart;
                 $newSku = $sku;
-            }else{
+            } else {
 
                 $tmpErpSku = explode('*', $sku);
-                $i = count($tmpErpSku)-1;
+                $i = count($tmpErpSku) - 1;
                 $newSku = $tmpErpSku[$i];
             }
 
@@ -161,12 +162,12 @@ class Tool
                 $newSku = trim($matches[1][0]);
                 $qty = trim($matches[2][0]) ? trim($matches[2][0]) : 1;
             }
-            $skuArray =array();
-            $skuArray['erpSku']=$newSku;
+            $skuArray = array();
+            $skuArray['erpSku'] = $newSku;
             $skuArray['qty'] = $qty;
 
-            $skuNum = $skuNum+$qty;
-            $returnSku[]=$skuArray;
+            $skuNum = $skuNum + $qty;
+            $returnSku[] = $skuArray;
         }
 
         $returnSku['skuNum'] = $skuNum;

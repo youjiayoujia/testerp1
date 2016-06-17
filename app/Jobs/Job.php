@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
 use App\Models\Log\QueueModel as QueueLog;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 abstract class Job
 {
@@ -18,7 +19,7 @@ abstract class Job
     |
     */
 
-    use Queueable;
+    use Queueable, DispatchesJobs;
 
     protected $relation_id = 0;
     protected $description = 'init';

@@ -46,14 +46,15 @@ class OrdersGet extends Command
         $start = microtime(true);
         $account = AccountModel::find($this->argument('accountID'));
         if ($account) {
-            //todo:订单起始周期设置 & 每页抓取数量设置
-            $startDate = date("Y-m-d H:i:s", strtotime('-1 day'));
+            $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' day'));
             $endDate = date("Y-m-d H:i:s", time());
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, 100);
+            $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
+                $order['customer_service'] = $account->customer_service->id;
+                $order['operator'] = $account->operator->id;
                 //todo:订单状态获取
                 $order['status'] = 'PAID';
                 $job = new InOrders($order);

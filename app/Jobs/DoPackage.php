@@ -8,11 +8,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class DoPackage extends Job implements SelfHandling, ShouldQueue
 {
-    use InteractsWithQueue, SerializesModels, DispatchesJobs;
+    use InteractsWithQueue, SerializesModels;
     protected $order;
 
     /**
@@ -24,7 +23,7 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
     {
         $this->order = $order;
         $this->relation_id = $this->order->id;
-        $this->description = '[' . $this->order->id . '] do package.';
+        $this->description = 'Order:' . $this->order->id . ' do package.';
     }
 
     /**
@@ -44,7 +43,7 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
                 }
             }
             if ($this->order->status == 'NEED') {
-                $this->release();
+                $this->release(3600);
             }
             $this->result['status'] = 'success';
             $this->result['remark'] = 'Success.';

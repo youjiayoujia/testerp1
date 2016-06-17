@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use Test;
 
+use App\Models\Purchase\PurchaseOrderModel;
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
@@ -39,6 +40,9 @@ class TestController extends Controller
 
     public function index()
     {
+        $order = PurchaseOrderModel::find(54);
+        var_dump($order->purchase_post);
+        exit;
         foreach (OrderModel::all() as $order) {
             $order->createPackage();
         }

@@ -152,9 +152,11 @@
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
-				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-print"></span>
-                </a>                       
+                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
+    				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
+                        <span class="glyphicon glyphicon-print"></span>
+                    </a>
+                @endif                      
                 
             </td>
         </tr>

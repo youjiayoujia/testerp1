@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
+use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
 use App\Models\Order\RemarkModel;
@@ -70,6 +71,22 @@ class OrderController extends Controller
         $this->model->createOrder($data);
 
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 首页
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'countries' => CountriesModel::all(),
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     /**

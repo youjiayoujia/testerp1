@@ -9,21 +9,25 @@
                 @section('tableToolbar')
                     <div class="row toolbar">
                         <form action="" method="get">
-                            <div class="col-lg-3">
+                            <div class="col-lg-2">
                                 <div class="input-group">
                                     <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="查找..."/>
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="submit">
-                                    <i class="glyphicon glyphicon-search"></i>
-                                </button>
-                                <a class="btn btn-default" href="{{ request()->url() }}">
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                </a>
-                            </span>
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default" type="submit">
+                                            <i class="glyphicon glyphicon-search"></i>
+                                        </button>
+                                        <a class="btn btn-default" href="{{ request()->url() }}">
+                                            <i class="glyphicon glyphicon-remove"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </form>
-                        <div class="text-right col-lg-9">
+                        <div class="col-lg-6">
+                            @section('tableToolRelatedSeach')
+                            @show{{-- 关联查询 --}}
+                        </div>
+                        <div class="text-right col-lg-4">
                             @section('tableToolButtons')
                                 <div class="btn-group">
                                     <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -51,7 +55,7 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <span>每页&nbsp;</span>
-                        <select id="pageSize" data-url="{{ request()->url() }}">
+                        <select id="pageSize">
                             @foreach(config('setting.pageSizes') as $page)
                                 <option value="{{ $page }}" {{ $page == request()->input('pageSize') ? 'selected' : '' }}>
                                     {{ $page }}
@@ -96,9 +100,7 @@
         {{-- 更改显示条数  --}}
         $('#pageSize').change(function () {
             var size = $(this).val();
-            var url = $(this).data('url');
-            var action = url + '?pageSize=' + size;
-            location.href = action;
+            location.href = new URI().setQuery('pageSize', size);
         });
         {{-- 排序 --}}
         $('.sort').click(function () {
@@ -122,13 +124,12 @@
                 } else {
                     sortsNew = field + '.asc';
                 }
-                window.location.href = uri.setQuery('sorts', sortsNew);
+                location.href = uri.setQuery('sorts', sortsNew);
             });
         });
         $('.sort').each(function (k, obj) {
             var field = $(obj).data('field');
-            var uri = new URI();
-            uri.hasQuery('sorts', function (value) {
+            new URI().hasQuery('sorts', function (value) {
                 if (value) {
                     var srotsQuery = value.split(',');
                     $.each(srotsQuery, function (sortsKey, sortsValue) {
@@ -139,6 +140,10 @@
                     });
                 }
             });
+        });
+        $('.relatedSelect').select2();
+        $('.relatedSelect').change(function () {
+            location.href = $(this).val();
         });
     </script>
 @section('childJs')@show

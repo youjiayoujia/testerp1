@@ -63,21 +63,21 @@ class RequireModel extends BaseModel
 
             //7天销量
             $sevenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')
-                            ->where('orders.status','SHIPPED')
+                            ->whereIn('orders.status',['PAID', 'PREPARED','NEED','PACKED','SHIPPED','COMPLETE'])
                             ->where('orders.create_time','>',date('Y-m-d H:i:s',strtotime('-7 day')))
                             ->where('order_items.quantity','<',5)
                             ->sum('order_items.quantity');
         
             //14天销量
             $fourteenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')
-                                ->where('orders.status','SHIPPED')
+                                ->whereIn('orders.status',['PAID', 'PREPARED','NEED','PACKED','SHIPPED','COMPLETE'])
                                 ->where('orders.create_time','>',date('Y-m-d H:i:s',strtotime('-14 day')))
                                 ->where('order_items.quantity','<',5)
                                 ->sum('order_items.quantity');
 
             //30天销量
             $thirtyDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')
-                                ->where('orders.status','SHIPPED')
+                                ->whereIn('orders.status',['PAID', 'PREPARED','NEED','PACKED','SHIPPED','COMPLETE'])
                                 ->where('orders.create_time','>',date('Y-m-d H:i:s',strtotime('-30 day')))
                                 ->where('order_items.quantity','<',5)
                                 ->sum('order_items.quantity');

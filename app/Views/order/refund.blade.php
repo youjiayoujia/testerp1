@@ -90,6 +90,9 @@
                     <input type="checkbox" isCheck="true" id="checkall" placeholder="" onclick="quanxuan()">全选
                 </div>
                 <div class="form-group col-sm-2">
+                    <label for="id" class='control-label'>ID</label>
+                </div>
+                <div class="form-group col-sm-2">
                     <label for="sku" class='control-label'>sku</label>
                 </div>
                 <div class="form-group col-sm-1">
@@ -103,6 +106,9 @@
                 <div class='row'>
                     <div class="form-group col-sm-1">
                         <input type="checkbox" name="tribute_id" placeholder="全选" value="{{$orderItem->id}}">
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <input type='text' class="id" id="arr[id][{{$key}}]" style="border: 0" placeholder="id" name='arr[id][{{$key}}]' value="{{ old('arr[id][$key]') ? old('arr[id][$key]') : $orderItem->id }}" readonly>
                     </div>
                     <div class="form-group col-sm-2">
                         <input type='text' class="sku" id="arr[sku][{{$key}}]" style="border: 0" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}" readonly>

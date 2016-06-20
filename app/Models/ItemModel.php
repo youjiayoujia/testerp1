@@ -315,7 +315,7 @@ class ItemModel extends BaseModel
                             $warehouseStock[$stock->id] = $this->setStockData($stock);
                             $matchQuantity -= $stock->available_quantity;
                         } else {
-                            $warehouseStock[$stock->id] = $this->setStockData($stock, $matchQuantity);;
+                            $warehouseStock[$stock->id] = $this->setStockData($stock, $matchQuantity);
                             break;
                         }
                     }

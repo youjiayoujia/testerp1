@@ -228,13 +228,8 @@ class PackageModel extends BaseModel
                 if ($rule->country_section) {
                     $countries = $rule->rule_countries_through;
                     $flag = 0;
-<<<<<<< HEAD
                     foreach($countries as $country) {
                         if($country->code == $this->shipping_country) {
-=======
-                    foreach ($countries as $country) {
-                        if ($country->id == $this->shipping_country) {
->>>>>>> master
                             $flag = 1;
                             break;
                         }

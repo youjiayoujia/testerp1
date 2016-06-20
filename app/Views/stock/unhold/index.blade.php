@@ -16,7 +16,7 @@
     @foreach($data as $stockUnhold)
         <tr>
             <td>{{ $stockUnhold->id }}</td>
-            <td>{{ $stockUnhold->stock ? $stockUnhold->stock->items ? $stockUnhold->stock->items->sku : '' : '' }}</td>
+            <td>{{ $stockUnhold->stock ? $stockUnhold->stock->item ? $stockUnhold->stock->item->sku : '' : '' }}</td>
             <td>{{ $stockUnhold->quantity}}</td>
             <td>{{ $stockUnhold->stock ? $stockUnhold->stock->warehouse ? $stockUnhold->stock->warehouse->name : '' : '' }}</td>
             <td>{{ $stockUnhold->stock ? $stockUnhold->stock->position ? $stockUnhold->stock->position->name : '' : '' }}</td>

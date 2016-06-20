@@ -32,10 +32,9 @@ class TestController extends Controller
 
     public function test1()
     {
-
-        $package = PackageModel::find(60);
-        $fee = $package->calculateLogisticsFee();
-        var_dump($fee);
+        $package = PackageModel::find(1);
+        $html = $package->templateMsg($package->id);
+        var_dump($html);
     }
 
     public function index()

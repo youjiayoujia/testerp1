@@ -6,7 +6,7 @@
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet">{{-- BOOTSTRAP CSS --}}
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">{{-- OUR CSS --}}
     <link href="{{ asset('css/jquery.cxcalendar.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">s
+    <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
 @stop
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}

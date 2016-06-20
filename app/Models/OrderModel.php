@@ -410,11 +410,12 @@ class OrderModel extends BaseModel
                             'PACKAGE',
                             $newPackageItem->id,
                             $key);
+                        $orderItem = $newPackageItem->orderItem;
                         if ($flag == 1) {
-                            $newPackageItem->orderItem->status = 'PACKED';
+                            $orderItem->status = 'PACKED';
                         }
-                        $newPackageItem->orderItem->split_quantity += $newPackageItem->quantity;
-                        $newPackageItem->orderItem->save();
+                        $orderItem->split_quantity += $newPackageItem->quantity;
+                        $orderItem->save();
                     } catch (Exception $e) {
                         DB::rollBack();
                     }

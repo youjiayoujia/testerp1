@@ -18,6 +18,7 @@ use App\Models\WarehouseModel;
 use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
+use Tool;
 
 class PurchaseOrderController extends Controller
 {
@@ -366,6 +367,16 @@ class PurchaseOrderController extends Controller
             }
             $response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
+    }
+
+    /**
+    * 打印
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function printpo(){
+        $id = request()->input('id');
+        echo Tool::barcodePrint($id);
     }
     
     

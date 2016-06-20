@@ -103,13 +103,34 @@ class RequireModel extends BaseModel
             $delivery=$itemModel->supplier?$itemModel->supplier->purchase_time:0;
 
             //采购建议数量
-            if($itemModel->purchase_price >3 && $itemModel->purchase_price <=40){
-                $needPurchaseNum = ($fourteenDaySellNum/14)*(7+$delivery)*$coefficient-$xu_kucun-$zaitu_num;
+            if($itemModel->purchase_price > 200 && $fourteenDaySellNum <3 || $itemModel->status ==4){
+                $needPurchaseNum = 0-$xu_kucun-$zaitu_num;
+            }else{
+                if($itemModel->purchase_price >3 && $itemModel->purchase_price <=40){
+                    $needPurchaseNum = ($fourteenDaySellNum/14)*(7+$delivery)*$coefficient-$xu_kucun-$zaitu_num;
+                }elseif($itemModel->purchase_price <=3){
+                    $needPurchaseNum = ($fourteenDaySellNum/14)*(12+$delivery)*$coefficient-$xu_kucun-$zaitu_num;
+                }elseif ($itemModel->purchase_price > 40) {
+                    $needPurchaseNum = ($fourteenDaySellNum/14)*(12+$delivery)*$coefficient-$xu_kucun-$zaitu_num;  
+                }
             }
-            print_r($coefficient_status);
-            exit;
+            
+            //平均利润率
+
+            //利润率
+
+            //退款率
+
+            //数组
+            $trend['sevenDaySellNum'] = $sevenDaySellNum;
+            $trend['fourteenDaySellNum'] = $fourteenDaySellNum;
+            $trend['thirtyDaySellNum'] = $thirtyDaySellNum;
+            $trend['coefficient'] = $thirtyDaySellNum;
+            $trend['status'] = $thirtyDaySellNum;
+            $trend['delivery'] = $thirtyDaySellNum;
+            $trend['needPurchaseNum'] = $needPurchaseNum;
             //任务计划使用该函数
-            $this->intoPurchaseRequire($item_id,$trend['ProposedpurchaseQuantity']); 
+            $this->intoPurchaseRequire($item['item_id'],$needPurchaseNum); 
             
         }
             
@@ -121,12 +142,11 @@ class RequireModel extends BaseModel
     }
 
         //加入采购需求表中
-    public function intoPurchaseRequire($item_id,$quantity=0){
-        $is_be=PurchaseRequireModel::where('item_id',$item_id)->count();
-        if($is_be == 0){
-            PurchaseRequireModel::create(['quantity'=>$quantity,'item_id'=>$item_id]);
+    public function intoPurchaseRequire($item_id,$needPurchaseNum){
+        if(PurchaseRequireModel::where('item_id',$item_id)->count()){
+            PurchaseRequireModel::where('item_id',$item_id)->update(['quantity'=>$needPurchaseNum,'status'=>0]);
         }else{
-            PurchaseRequireModel::where('item_id',$item_id)->update(['quantity'=>$quantity,'status'=>0]);
+            PurchaseRequireModel::create(['quantity'=>$needPurchaseNum,'item_id'=>$item_id]);
         }       
     }
 }

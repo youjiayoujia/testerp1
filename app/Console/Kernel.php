@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\DoPackages::class,
         \App\Console\Commands\OrdersGet::class,
+        \App\Console\Commands\CreatePurchase::class,
     ];
 
     /**

@@ -1,7 +1,7 @@
 @extends('common.table')
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
-    <th>sku</th>  
+    <th>sku</th>
     <th>仓库</th>
     <th>库位</th>
     <th class='sort' data-field='all_quantity'>总数量</th>
@@ -38,27 +38,42 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolRelatedSeach')
+    <div class="col-lg-3">
+        <select class="form-control relatedSelect">
+            <option>sku查询</option>
+            @foreach(App\Models\ItemModel::all() as $item)
+                <option value="{{ DataList::filtersEncode(['item_id','=', $item->id]) }}"
+                        {{ DataList::filtersDecode(request()->input('filters'), 'item_id')==$item->id?'selected':'' }}>
+                    {{ $item->sku }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+@stop
 @section('tableToolButtons')
-<div class="btn-group" role="group">
+    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 仓库查询
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
             @foreach($warehouses as $warehouse)
-            <li><a href="{{ DataList::filtersEncode(['warehouse_id','=', $warehouse->id]) }}">{{ $warehouse->name }}</a></li>
+                <li>
+                    <a href="{{ DataList::filtersEncode(['warehouse_id','=', $warehouse->id]) }}">{{ $warehouse->name }}</a>
+                </li>
             @endforeach
         </ul>
-</div>
-@parent
-<div class="btn-group">
-    <a class="btn btn-info" href="{{ route('stock.getExcel') }}">
-        获取excel
-    </a>
-</div>
-<div class="btn-group">
-    <a class="btn btn-success" href="{{ route('stock.importByExcel') }}">
-        excel导入
-    </a>
-</div>
+    </div>
+    @parent
+    <div class="btn-group">
+        <a class="btn btn-info" href="{{ route('stock.getExcel') }}">
+            获取excel
+        </a>
+    </div>
+    <div class="btn-group">
+        <a class="btn btn-success" href="{{ route('stock.importByExcel') }}">
+            excel导入
+        </a>
+    </div>
 @stop

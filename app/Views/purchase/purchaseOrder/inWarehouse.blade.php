@@ -20,14 +20,21 @@
     	javascript:document.getElementById("p_id").focus();
     	$(document).on('keydown', function (event) {
     	    if(event.keyCode == '13') {
+                var p_id = $("#p_id").val();
+                if(p_id==''){
+                    p_id = $("#ajaxp_id").val();
+                }
     	    	$.ajax({
                     url: "{{ route('ajaxInWarehouse') }}",
-                    data: {id: $("#p_id").val()},
+                    data: {id: p_id},
                     dataType: 'html',
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
-                        //$("#p_id").val("");
+                        if($("#ajaxp_id").val()==''){
+                            $("#ajaxp_id").val($("#p_id").val());
+                        }
+                        $("#p_id").val("");
                     }
                 });
     	    }
@@ -52,6 +59,9 @@
             dataType:'json',
             type:'get',
             success:function(result){
+                if(typeof(result)=='string'){
+                    alert("sku:"+result+"库位不存在");return;
+                }
                 $("#p_id").val(result);
                 javascript:document.getElementById("p_id").focus();
                 var e = jQuery.Event("keydown");//模拟一个键盘事件

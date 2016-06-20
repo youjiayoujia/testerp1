@@ -63,13 +63,13 @@ table.gridtable td {
 			@foreach($purchase_order->purchaseItem as $item)
 				@foreach($item->arrivalLog as $log)
 					<tr>
-						<td><input type="checkbox" ></td>
+						<td><input type="checkbox" {{$log->good_num?'disabled':''}}></td>
 						<td><img src="" alt=""></td>
 						<td>{{$item->sku}}</td>
 						<td>{{$item->item->name}}<br><span style="color:gray">到货时间：{{$log->created_at}}</span><br><span style="color:gray">质检时间：{{$log->quality_time}}</span></td>
 						<td></td>
 						<td>{{$log->arrival_num}}</td>
-						<td><input type="text" name="goodnum_{{$log->id}}" id="goodnum_{{$log->id}}" value="{{$log->good_num}}"></td>
+						<td><input type="text" {{$log->good_num?'disabled':''}} name="goodnum_{{$log->id}}" id="goodnum_{{$log->id}}" value="{{$log->good_num}}"></td>
 						<td><input type="text" name="badnum_{{$log->id}}" id="badnum_{{$log->id}}" value="{{$log->bad_num}}"></td>
 					</tr>
 					<?php $i++; ?>

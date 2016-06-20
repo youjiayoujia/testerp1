@@ -50,6 +50,7 @@ class OrdersGet extends Command
             $endDate = date("Y-m-d H:i:s", time());
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
+//            for ($i = 1; $i < 20001; $i++) {
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
@@ -61,6 +62,7 @@ class OrdersGet extends Command
                 $job = $job->onQueue('inOrders');
                 $this->dispatch($job);
             }
+//            }
             //todo::Adapter->error()
             $result['status'] = 'success';
             $result['remark'] = 'Success.';

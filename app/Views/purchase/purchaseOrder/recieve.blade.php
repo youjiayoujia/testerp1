@@ -20,15 +20,22 @@
     	javascript:document.getElementById("p_id").focus();
     	$(document).on('keydown', function (event) {
     	    if(event.keyCode == '13') {
+                var p_id = $("#p_id").val();
+                if(p_id==''){
+                    p_id = $("#ajaxp_id").val();
+                }
+                //$("#p_id").val("");
     	    	$.ajax({
                     url: "{{ route('ajaxRecieve') }}",
-                    data: {id: $("#p_id").val()},
+                    data: {id: p_id},
                     dataType: 'html',
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
-                        $("#ajaxp_id").val($("#p_id").val());
-                        //$("#p_id").val("");
+                        if($("#ajaxp_id").val()==''){
+                            $("#ajaxp_id").val($("#p_id").val());
+                        }
+                        $("#p_id").val("");
                     }
                 });
     	    }
@@ -46,7 +53,7 @@
                 data += id+":"+$(this).val()+",";
             }
 　　　　});
-        
+        //alert($("#ajaxp_id").val());
         $.ajax({
             url:"{{ route('updateArriveNum') }}",
             data:{data:data,p_id:$("#ajaxp_id").val()},

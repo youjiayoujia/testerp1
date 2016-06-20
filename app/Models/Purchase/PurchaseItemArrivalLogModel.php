@@ -35,5 +35,10 @@ class PurchaseItemArrivalLogModel extends BaseModel
      */
 	 
     protected $fillable = ['id','sku','purchase_item_id','arrival_num','good_num','bad_num','quality_time'];
+
+    public function purchaseItem()
+    {
+        return $this->belongsTo('App\Models\Purchase\PurchaseItemModel', 'purchase_item_id');
+    }
 	
 }

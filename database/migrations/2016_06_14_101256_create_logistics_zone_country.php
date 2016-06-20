@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateChannelAccountOperator extends Migration
+class CreateLogisticsZoneCountry extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,10 @@ class CreateChannelAccountOperator extends Migration
      */
     public function up()
     {
-        Schema::create('channel_account_operators', function (Blueprint $table) {
+        Schema::create('logistics_zone_countries', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('channel_account_id')->comment('渠道账号');
-            $table->integer('user_id')->comment('运营人员');
+            $table->integer('logistics_zone_id')->comment("分区报价id")->default(0);
+            $table->integer('country_id')->comment('国家id')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +28,6 @@ class CreateChannelAccountOperator extends Migration
      */
     public function down()
     {
-        Schema::drop('channel_account_operators');
+        Schema::drop('logistics_zone_countries');
     }
 }

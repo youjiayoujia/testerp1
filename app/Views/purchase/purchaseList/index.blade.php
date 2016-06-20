@@ -43,7 +43,7 @@
             <td>{{ $purchaseList->purchase_order_id }}</td>
             <td>{{ $purchaseList->sku}}*{{$purchaseList->purchase_num}}</td>
            
-            <td><img src="{{ asset($purchaseList->item->product->image->src)}}" height="50px"/></td>
+            <td><img src="{{ $purchaseList->item->product->image?asset($purchaseList->item->product->image->src):''}}" height="50px"/></td>
             <td>{{ $purchaseList->supplier->name}}</td>
             <td>{{ $purchaseList->item->supplier_sku}}</td>
             <td>

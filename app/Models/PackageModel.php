@@ -6,6 +6,7 @@ use App\Base\BaseModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\Logistics\ZoneModel;
 
 class PackageModel extends BaseModel
 {
@@ -161,6 +162,40 @@ class PackageModel extends BaseModel
         return true;
     }
 
+    public function calculateLogisticsFee()
+    {
+        $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        foreach ($zones as $zone) {
+            if ($zone->inZone($this->shipping_country)) {
+                $fee = '';
+                if ($zone->type == 'first') {
+                    if ($this->weight <= $zone->fixed_weight) {
+                        $fee = $this->fixed_price;
+                    } else {
+                        $fee = $this->fixed_price;
+                        $weight = $this->weight - $zone->fixed_weight;
+                        $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                    }
+                    if ($zone->discount_weather_all) {
+                        $fee = ($fee + $zone->other_fixed_price) * $zone->discount;
+                    } else {
+                        $fee = $fee * $zone->discount + $zone->other_fixed_price;
+                    }
+                    return $fee;
+                } else {
+                    $sectionPrices = $zone->zone_section_prices;
+                    foreach ($sectionPrices as $sectionPrice) {
+                        if ($this->weight >= $sectionPrice->weight_from && $this->weight < $sectionPrice->weight_to) {
+                            return $sectionPrice->price;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * 自动分配物流方式
      */
@@ -179,27 +214,27 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where(function($query) use ($weight){
+            where(function ($query) use ($weight) {
                 $query->where('weight_from', '<=', $weight)
-                ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
-            })->where(function($query) use ($amount){
+                    ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
+            })->where(function ($query) use ($amount) {
                 $query->where('order_amount_from', '<=', $amount)
-                ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
+                    ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
                 ->get();
             foreach ($rules as $rule) {
-                    //是否在物流方式国家中
-                if($rule->country_section) {
+                //是否在物流方式国家中
+                if ($rule->country_section) {
                     $countries = $rule->rule_countries_through;
                     $flag = 0;
-                    foreach($countries as $country) {
-                        if($country->id == $this->shipping_country) {
+                    foreach ($countries as $country) {
+                        if ($country->id == $this->shipping_country) {
                             $flag = 1;
                             break;
                         }
                     }
-                    if($flag == 0) {
+                    if ($flag == 0) {
                         continue;
                     }
                 }
@@ -207,9 +242,9 @@ class PackageModel extends BaseModel
                 if ($rule->limit_section && $this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
                     $limits = $this->rule_limits_through;
-                    foreach($limits as $limit) {
-                        if(in_array($limit->id, $shipping_limits)) {
-                            if($limit->pivot->type == '3') {
+                    foreach ($limits as $limit) {
+                        if (in_array($limit->id, $shipping_limits)) {
+                            if ($limit->pivot->type == '3') {
                                 continue 2;
                             }
                         }

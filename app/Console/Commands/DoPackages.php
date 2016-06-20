@@ -47,16 +47,16 @@ class DoPackages extends Command
             ->orderBy('package_times', 'desc')->skip($start)->take($len)
             ->get();
         $begin = microtime(true);
-        while(count($orders)) {
+        while (count($orders)) {
             foreach ($orders as $order) {
                 echo $order->id . '<br>';
                 $order->createPackage();
             }
             $start += $len;
             $orders = OrderModel::where('active', 'NORMAL')
-            ->whereIn('status', ['PREPARED', 'NEED'])
-            ->orderBy('package_times', 'desc')->skip($start)->take($len)
-            ->get();
+                ->whereIn('status', ['PREPARED', 'NEED'])
+                ->orderBy('package_times', 'desc')->skip($start)->take($len)
+                ->get();
             break;
         }
         $end = microtime(true);

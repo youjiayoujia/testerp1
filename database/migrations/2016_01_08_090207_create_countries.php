@@ -18,7 +18,6 @@ class CreateCountries extends Migration
             $table->string('cn_name')->comment('中文名称')->default(NULL);
             $table->string('code')->comment('缩写')->default(NULL);
             $table->integer('number')->comment('number')->default(0);
-            $table->integer('parent_id')->comment('分类地区')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

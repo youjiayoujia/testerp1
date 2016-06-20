@@ -10,6 +10,7 @@
     <th>ID</th> 
     <th>采购单信息</th> 
     <th>采购单审核状态</th>
+    <th>核销状态</th>
     <th>采购人</th>
    	<th>供应商</th>
     <th>采购物品</th>
@@ -20,10 +21,12 @@
 @section('tableBody')
     @foreach($data as $purchaseOrder)
         <tr>
-       		
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
-               外部单号：@if($purchaseOrder->purchase_post_num > 0) {{$purchaseOrder->purchase_post->post_coding}} @else 暂无单号 @endif
+                外部单号：
+                @foreach($purchaseOrder->purchasePostage as $ppostage)
+                    {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
+                @endforeach
             </td>
            <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
             	@if($purchaseOrder->status == $k)
@@ -34,7 +37,8 @@
             	@if($purchaseOrder->examineStatus == $k)
             	<td>{{ $statu }}</td>
                 @endif
-            @endforeach     
+            @endforeach   
+            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
     		<td>{{ $purchaseOrder->assigner_name }}
             </td>
             <td>
@@ -126,13 +130,13 @@
                    <span class="glyphicon glyphicon-pencil"></span>
                 </a>
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
-                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}"  title="需要核销" class="btn btn-danger btn-xs">
+                    <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>
                     </a>
                 @endif
 
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
-                    <a  href="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}" title="核销完成" class="btn btn-success btn-xs">
+                    <a  href="javascript:" title="核销" class="btn btn-success btn-xs hexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>
                     </a>
                 @endif
@@ -148,9 +152,11 @@
                  <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
-				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-print"></span>
-                </a>                       
+                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
+    				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
+                        <span class="glyphicon glyphicon-print"></span>
+                    </a>
+                @endif                      
                 
             </td>
         </tr>
@@ -243,11 +249,24 @@
 
 @stop
 
-@section('pageJs')
+@section('childJs')
     <script type='text/javascript'>
 	
-		 $(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
-		
+	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
+
+	$(".hexiao").click(function(){
+        if (confirm("确认核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
+    $(".daihexiao").click(function(){
+        if (confirm("确认待核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
 	//批量输入采购单号
 	function batchPostCoding(){
 		 var batch_post_coding=$('#batch_post_coding').val(); 

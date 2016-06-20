@@ -34,7 +34,7 @@ class PurchaseItemModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = ['type','status','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id','wait_remark','wait_time'];
+    protected $fillable = ['type','status','unqualified_qty','order_item_id','sku','supplier_id','purchase_num','arrival_num','lack_num','user_id','update_userid','warehouse_id','purchase_order_id','postage','post_coding','storageStatus','purchase_cost','costExamineStatus','active','active_status','start_buying_time','arrival_time','bar_code','storage_qty','remark','stock_id','wait_remark','wait_time'];
 	public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'sku','sku');
@@ -54,6 +54,10 @@ class PurchaseItemModel extends BaseModel
 	 public function stock()
     {
         return $this->belongsTo('App\Models\StockModel', 'stock_id');
+    }
+    public function arrivalLog()
+    {
+        return $this->hasMany('App\Models\Purchase\PurchaseItemArrivalLogModel', 'purchase_item_id');
     }
 	
 	 /**

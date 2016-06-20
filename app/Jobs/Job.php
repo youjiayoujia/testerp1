@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
+use App\Models\Log\QueueModel as QueueLog;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 abstract class Job
 {
@@ -17,5 +19,22 @@ abstract class Job
     |
     */
 
-    use Queueable;
+    use Queueable, DispatchesJobs;
+
+    protected $relation_id = 0;
+    protected $description = 'init';
+    protected $lasting = 0.00;
+    protected $result = ['status' => 'init', 'remark' => 'init'];
+
+    public function log()
+    {
+        QueueLog::create([
+            'relation_id' => $this->relation_id,
+            'queue' => __CLASS__,
+            'description' => $this->description,
+            'lasting' => $this->lasting,
+            'result' => $this->result['status'],
+            'remark' => $this->result['remark']
+        ]);
+    }
 }

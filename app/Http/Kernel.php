@@ -30,5 +30,6 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'StockIOStatus' => \App\Http\Middleware\StockIOStatus::class,
+        'roleCheck' => \App\Http\Middleware\RoleCheck::class,
     ];
 }

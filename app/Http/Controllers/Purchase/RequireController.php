@@ -65,7 +65,7 @@ class RequireController extends Controller
             'result' =>$this->model->where('sku',$model->sku)->get(),
         ];
         return view($this->viewPath . 'show', $response);
-		}
+	}
 	/**
      * AJAX创建采购单生成采购条目
      *
@@ -81,24 +81,27 @@ class RequireController extends Controller
 			$needPurchases=$this->productItem->get();
 		}
 		foreach($needPurchases as $key=>$v){
-		$sumtrend=PurchaseRequireModel::where('item_id',$v->id)->where('status',0)->sum('quantity');
-		if($sumtrend == 0){
-			continue;	
+			$sumtrend=PurchaseRequireModel::where('item_id',$v->id)->where('status',0)->sum('quantity');
+			if($sumtrend == 0){
+				continue;	
 			}	
-		$trend=PurchaseRequireModel::where('item_id',$v->id)->first();
-		$data['type']=0;
-		$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
-		$data['sku']=$v->sku;
-		$data['supplier_id']=$v->supplier_id ? $v->supplier_id : 0;
-		$data['purchase_num']=$trend->quantity;
-		$data['lack_num']=$data['purchase_num'];
-		if($data['purchase_num']>0){
-			PurchaseItemModel::create($data);
-			PurchaseRequireModel::where('item_id',$v->id)->update(['status'=>1]);
+			$trend=PurchaseRequireModel::where('item_id',$v->id)->first();
+			$data['type']=0;
+			$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
+			$data['sku']=$v->sku;
+			$data['supplier_id']=$v->supplier_id ? $v->supplier_id : 0;
+			$data['purchase_num']=$trend->quantity;
+			$data['user_id']=$v->product->purchase_adminer;
+			$data['lack_num']=$data['purchase_num'];
+			if($data['purchase_num']>0){
+				PurchaseItemModel::create($data);
+				PurchaseRequireModel::where('item_id',$v->id)->update(['status'=>1]);
+			}
 		}
-		}
-		$warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->get()->toArray();
-			if(isset($warehouse_supplier)){
+
+		$warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id','user_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->groupBy('user_id')->get()->toArray();
+		
+		if(isset($warehouse_supplier)){
 			foreach($warehouse_supplier as $key=>$v){
 				$data['warehouse_id']=$v['warehouse_id'] ? $v['warehouse_id'] : 0;		 
 				$data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
@@ -107,10 +110,9 @@ class RequireController extends Controller
 				$purchaseOrder=PurchaseOrderModel::create($data);
 				$purchaseOrderId=$purchaseOrder->id; 
 				if($purchaseOrderId >0){
-					PurchaseItemModel::where('warehouse_id',$v['warehouse_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
+					PurchaseItemModel::where('warehouse_id',$v['warehouse_id'])->where('user_id',$v['user_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
 				}				 
-			}
-			
+			}		
 		}
 		return 1;
 	}
@@ -122,33 +124,33 @@ class RequireController extends Controller
 			$bulkPurchasNum=$bulkPurchasNum > 0 ? $bulkPurchasNum : 0;
 			$trend='';
 			if($itemModel->is_sale ==1 ||$itemModel->is_sale ==4){
-			$seven_time=date('Y-m-d H:i:s',strtotime('-7 day'));
-			$fourteen_time=date('Y-m-d H:i:s',strtotime('-14 day'));
-			$thirty_time=date('Y-m-d H:i:s',strtotime('-30 day'));
-			$sevenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$seven_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
-			$fourteenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$fourteen_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
-			$thirtyDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$thirty_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
-			$trend['sevenDaySellNum']=$sevenDaySellNum ? $sevenDaySellNum : 0;
-			$trend['fourteenDaySellNum']=$fourteenDaySellNum ? $fourteenDaySellNum : 0;
-			$trend['thirtyDaySellNum']=$thirtyDaySellNum ? $thirtyDaySellNum : 0;
-			
-			
-			//开始计算趋势系数
-			if($sevenDaySellNum == 0 || $fourteenDaySellNum== 0){
-				$trend['coefficient']=1;
-				$trend['status']=4;
-				}else{
-				if(($sevenDaySellNum/7)/($fourteenDaySellNum/14*1.1) >=1){
-					$trend['coefficient']=1.3;
-					$trend['status']=1;
-				}elseif(($fourteenDaySellNum/14*0.9)/($sevenDaySellNum/7) >=1){
-					$trend['coefficient']=0.6;
-					$trend['status']=2;
-				}else{
+				$seven_time=date('Y-m-d H:i:s',strtotime('-7 day'));
+				$fourteen_time=date('Y-m-d H:i:s',strtotime('-14 day'));
+				$thirty_time=date('Y-m-d H:i:s',strtotime('-30 day'));
+				$sevenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$seven_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
+				$fourteenDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$fourteen_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
+				$thirtyDaySellNum=OrderItemModel::leftjoin('orders','orders.id','=','order_items.order_id')->where('orders.status','SHIPPED')->where('orders.create_time','>',$thirty_time)->where('order_items.quantity','<',5)->sum('order_items.quantity');
+				$trend['sevenDaySellNum']=$sevenDaySellNum ? $sevenDaySellNum : 0;
+				$trend['fourteenDaySellNum']=$fourteenDaySellNum ? $fourteenDaySellNum : 0;
+				$trend['thirtyDaySellNum']=$thirtyDaySellNum ? $thirtyDaySellNum : 0;
+				
+				
+				//开始计算趋势系数
+				if($sevenDaySellNum == 0 || $fourteenDaySellNum== 0){
 					$trend['coefficient']=1;
-					$trend['status']=3;
+					$trend['status']=4;
+				}else{
+					if(($sevenDaySellNum/7)/($fourteenDaySellNum/14*1.1) >=1){
+						$trend['coefficient']=1.3;
+						$trend['status']=1;
+					}elseif(($fourteenDaySellNum/14*0.9)/($sevenDaySellNum/7) >=1){
+						$trend['coefficient']=0.6;
+						$trend['status']=2;
+					}else{
+						$trend['coefficient']=1;
+						$trend['status']=3;
+					}
 				}
-			}
 			}
 			//计算交期
 			$trend['delivery']=$itemModel->supplier?$itemModel->supplier->purchase_time:'';
@@ -160,7 +162,7 @@ class RequireController extends Controller
 			$itemActiveNum=PurchaseItemModel::where('sku',$itemModel->sku)->where('active_status','>',0)->count();
 			//采购建议数量
 			if($itemModel->is_sale == 1 && $itemActiveNum == 0){
-			if($itemModel->purchase_price >3 && $itemModel->purchase_price <=40){
+				if($itemModel->purchase_price >3 && $itemModel->purchase_price <=40){
 					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(7+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
 				}elseif($itemModel->purchase_price >40){
 					if($itemModel->purchase_price >200 && $fourteenDaySellNum < 3){
@@ -168,12 +170,12 @@ class RequireController extends Controller
 						$purchasingNum=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$itemModel->sku)->where('purchase_items.status','<',4)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
 						$needNum=$this->model->where('item_id',$item_id)->sum('quantity');
 						$trend['ProposedpurchaseQuantity']=$needNum-$purchasingNum-$available_quantity;
-						}else{
-					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(5+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
-					}
-				}elseif($itemModel->purchase_price <=3){
-					$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(12+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
-			}
+					}else{
+						$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(5+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
+						}
+					}elseif($itemModel->purchase_price <=3){
+						$trend['ProposedpurchaseQuantity']=$fourteenDaySellNum/14*(12+$trend['delivery'])*$trend['coefficient']-$availableQuantity-$purchaseQuantity+$bulkPurchasNum;
+				}
 			}else{
 				if($itemModel->is_sale == 4){
 					$available_quantity=StockModel::where('item_id',$item_id)->sum('available_quantity');
@@ -181,7 +183,7 @@ class RequireController extends Controller
 						$needNum=$this->model->where('item_id',$item_id)->sum('quantity');
 						$trend['ProposedpurchaseQuantity']=$needNum-$purchasingNum-$available_quantity;
 				}else{
-				$trend['ProposedpurchaseQuantity']=0;
+					$trend['ProposedpurchaseQuantity']=0;
 				}
 			}
 			//任务计划使用该函数
@@ -194,7 +196,7 @@ class RequireController extends Controller
 		
 		
 		
-		//加入采购需求表中
+	//加入采购需求表中
 	public function intoPurchaseRequire($item_id,$quantity=0){
 		$is_be=PurchaseRequireModel::where('item_id',$item_id)->count();
 		if($is_be == 0){

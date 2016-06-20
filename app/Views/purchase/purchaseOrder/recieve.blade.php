@@ -46,6 +46,7 @@
         var purchase_item_id = $(this).val();
         var url = "{{route('printpo')}}"
         window.open(url+"?id="+purchase_item_id);
+        
     });
 
 

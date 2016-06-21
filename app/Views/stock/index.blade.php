@@ -40,14 +40,8 @@
 @stop
 @section('tableToolRelatedSeach')
     <div class="col-lg-3">
-        <select class="form-control relatedSelect">
+        <select class="form-control relatedSelect" data-url="aaa">
             <option>sku查询</option>
-            @foreach(App\Models\ItemModel::all() as $item)
-                <option value="{{ DataList::filtersEncode(['item_id','=', $item->id]) }}"
-                        {{ DataList::filtersDecode(request()->input('filters'), 'item_id')==$item->id?'selected':'' }}>
-                    {{ $item->sku }}
-                </option>
-            @endforeach
         </select>
     </div>
 @stop

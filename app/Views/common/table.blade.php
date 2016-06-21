@@ -23,11 +23,11 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="col-lg-6">
+                        <div class="col-lg-4">
                             @section('tableToolRelatedSeach')
                             @show{{-- 关联查询 --}}
                         </div>
-                        <div class="text-right col-lg-4">
+                        <div class="text-right col-lg-6">
                             @section('tableToolButtons')
                                 <div class="btn-group">
                                     <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">

@@ -19,10 +19,12 @@
                                         <a class="btn btn-default" href="{{ request()->url() }}">
                                             <i class="glyphicon glyphicon-remove"></i>
                                         </a>
-                                        <a class="btn btn-primary" role="button" data-toggle="collapse"
-                                           href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                                            更多查询
-                                        </a>
+                                        @if($relatedSearchFields)
+                                            <a class="btn btn-primary" role="button" data-toggle="collapse"
+                                               href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                更多查询
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -37,20 +39,22 @@
                             @show{{-- 工具按钮 --}}
                         </div>
                     </div>
-                    <div class="col-lg-12">
-                        <div class="collapse" id="collapseExample">
-                            <div class="well row">
-                                @foreach($relatedSearchFields as $relatedSearchField => $relatedSearchFieldColumn)
+                    @if($relatedSearchFields)
+                        <div class="col-lg-12">
+                            <div class="collapse" id="collapseExample">
+                                <div class="well row">
+                                    @foreach($relatedSearchFields as $relatedSearchField => $relatedSearchFieldColumn)
+                                        <div class="col-lg-1">
+                                            <input type="text" class="form-control" name="{{ $relatedSearchField }}" value="{{ old('keywords') }}" placeholder="{{ $relatedSearchField }}.{{ $relatedSearchFieldColumn }}"/>
+                                        </div>
+                                    @endforeach
                                     <div class="col-lg-1">
-                                        <input type="text" class="form-control" name="{{ $relatedSearchField }}" value="{{ old('keywords') }}" placeholder="{{ $relatedSearchField }}.{{ $relatedSearchFieldColumn }}"/>
+                                        <button class="btn btn-success" type="submit">提交</button>
                                     </div>
-                                @endforeach
-                                <div class="col-lg-1">
-                                    <button class="btn btn-success" type="submit">提交</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 @show{{-- 列表工具栏 --}}
                 <div class="row">
                     <div class="col-lg-12">

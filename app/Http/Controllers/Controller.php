@@ -36,7 +36,7 @@ abstract class Controller extends BaseController
         return view('common.alert', $response)->render();
     }
 
-    public function autoList($model,$list=null, $fields = ['*'], $pageSize = null)
+    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null)
     {
         $list = $list ? $list : $model;
         if (request()->has('keywords')) {
@@ -77,6 +77,7 @@ abstract class Controller extends BaseController
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
+            'relatedSearchFields' => $this->model->relatedSearchFields,
         ];
         return view($this->viewPath . 'index', $response);
     }

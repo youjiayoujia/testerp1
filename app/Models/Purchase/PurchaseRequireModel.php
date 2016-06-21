@@ -26,7 +26,7 @@ class PurchaseRequireModel extends BaseModel
      * @var array
      */
 	 
-    protected $fillable = [];
+    protected $fillable = ['quantity','status','item_id'];
 	public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id');

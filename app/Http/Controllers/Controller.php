@@ -48,6 +48,9 @@ abstract class Controller extends BaseController
                 }
             });
         }
+        if(request()->has('related')) {
+            var_dump(request()->all());exit;
+        }
         if (request()->has('filters')) {
             foreach (DataList::filtersDecode(request()->input('filters')) as $filter) {
                 $list = $list->where($filter['field'], $filter['oprator'], $filter['value']);

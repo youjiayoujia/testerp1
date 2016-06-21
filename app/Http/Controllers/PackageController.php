@@ -29,6 +29,21 @@ class PackageController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'relatedSearchFields' => $this->model->relatedSearchFields,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+    /**
      * 编辑
      *
      * @param $id

@@ -39,16 +39,18 @@
                     </div>
                     <div class="col-lg-12">
                         <div class="collapse" id="collapseExample">
+                        <form action="" method="get">
                             <div class="well row">
                                 @foreach($relatedSearchFields as $relatedSearchField => $relatedSearchFieldColumn)
                                     <div class="col-lg-1">
-                                        <input type="text" class="form-control" name="{{ $relatedSearchField }}" value="{{ old('keywords') }}" placeholder="{{ $relatedSearchField }}.{{ $relatedSearchFieldColumn }}"/>
+                                        <input type="text" class="form-control" name="related[{{ $relatedSearchField }}]" value="{{ old('keywords') }}" placeholder="{{ $relatedSearchField }}.{{ $relatedSearchFieldColumn }}"/>
                                     </div>
                                 @endforeach
                                 <div class="col-lg-1">
                                     <button class="btn btn-success" type="submit">提交</button>
                                 </div>
                             </div>
+                        </form>
                         </div>
                     </div>
                 @show{{-- 列表工具栏 --}}

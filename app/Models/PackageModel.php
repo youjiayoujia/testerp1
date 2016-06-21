@@ -60,6 +60,8 @@ class PackageModel extends BaseModel
         'is_over',
     ];
 
+    public $relatedSearchFields = ['warehouse' => 'name', 'item' => 'sku'];
+
     public function assigner()
     {
         return $this->belongsTo('App\Models\UserModel', 'assigner_id');

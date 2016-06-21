@@ -41,7 +41,8 @@
 @stop
 @section('tableToolRelatedSeach')
     <div class="col-lg-3">
-        <select class="form-control searchSku" data-param="sku" data-url="{{ route('stock.ajaxSku') }}">
+
+        <select class="form-control relatedSelect" data-url="aaa">
             <option>sku查询</option>
         </select>
     </div>

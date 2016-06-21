@@ -16,6 +16,7 @@ use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
 use App\Models\PackageModel;
 use App\Jobs\DoPackage;
@@ -27,9 +28,11 @@ use App\Models\Warehouse\PositionModel;
 
 class TestController extends Controller
 {
-    public function __construct(OrderModel $orderModel)
-    {
+    private $itemModel;
 
+    public function __construct(OrderModel $orderModel, ItemModel $itemModel)
+    {
+        $this->itemModel = $itemModel;
     }
 
     public function test1()
@@ -43,42 +46,13 @@ class TestController extends Controller
 
     public function index()
     {
-        $order = PurchaseOrderModel::find(54);
-        var_dump($order->purchase_post);
-        exit;
-        foreach (OrderModel::all() as $order) {
-            $order->createPackage();
+        $items = $this->itemModel->whereHas('product', function ($query) {
+            $query->where('model', 'like', '%BB00001B%');
+        })->get();
+        foreach ($items as $item) {
+            echo $item->sku;
         }
         exit;
-        foreach (OrderModel::all() as $order) {
-            foreach ($order->items as $item) {
-                $item->delete();
-            }
-            $order->delete();
-        }
-        $accountID = request()->get('id');
-        $begin = microtime(true);
-        $account = AccountModel::findOrFail($accountID);
-        $startDate = date("Y-m-d H:i:s", strtotime('-3 day'));
-        $endDate = date("Y-m-d H:i:s", strtotime('-12 hours'));
-        $status = $account->api_status;
-        $channel = Channel::driver($account->channel->driver, $account->api_config);
-        $orderList = $channel->listOrders($startDate, $endDate, $status, 20);
-        foreach ($orderList as $order) {
-            echo '<hr>' . $order['channel_ordernum'] . '<hr>';
-            $thisOrder = $this->orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
-            $order['channel_id'] = $account->channel->id;
-            $order['channel_account_id'] = $account->id;
-            $order['status'] = 'PAID';
-            if ($thisOrder) {
-                $thisOrder = $thisOrder->updateOrder($order);
-            } else {
-                $thisOrder = $this->orderModel->createOrder($order);
-            }
-            $thisOrder->checkBlack();
-        }
-        $end = microtime(true);
-        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 
 

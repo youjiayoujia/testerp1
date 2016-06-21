@@ -179,6 +179,17 @@
             <li><a href="{{ DataList::filtersEncode(['active', '=', 'RESUME']) }}">恢复正常</a></li>
         </ul>
     </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 国家
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach($countries as $country)
+                <li><a href="{{ DataList::filtersEncode(['shipping_country', '=', $country->code]) }}">{{ $country->cn_name }}</a></li>
+            @endforeach
+        </ul>
+    </div>
     @parent
 @stop
 @section('childJs')

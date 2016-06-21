@@ -13,10 +13,10 @@ namespace App\Models;
 use Exception;
 use Tool;
 use App\Base\BaseModel;
-use App\Models\ItemModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order\RefundModel;
+use App\Models\Order\ItemModel;
 
 class OrderModel extends BaseModel
 {
@@ -26,14 +26,9 @@ class OrderModel extends BaseModel
 
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
-    public $searchFields = [
-        'channel_id',
-        'channel_account_id',
-        'ordernum',
-        'email',
-        'customer_service',
-        'operator',
-    ];
+    public $searchFields = ['ordernum', 'email'];
+    
+    public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
 
     public function rule($request)
     {
@@ -252,6 +247,12 @@ class OrderModel extends BaseModel
         if ($file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
             $file->move($path, time() . '.' . $file->getClientOriginalExtension());
+            if ($data['type'] == 'FULL') {
+                foreach ($data['arr']['id'] as $id) {
+                    $orderItem = ItemModel::find($id);
+                    $orderItem->update(['is_refund' => 1]);
+                }
+            }
             return RefundModel::create($data);
         }
         return 1;

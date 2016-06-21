@@ -196,6 +196,7 @@ Route::group(['middleware' => 'auth'], function () {
 //采购单e/purchaseOrder/addPost/
 	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
     Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printpo', [ 'uses'=>'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
     Route::any('purchaseOrder/ajaxInWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
     Route::any('purchaseOrder/inWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
@@ -447,6 +448,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
     Route::get('downloadUpdateBlacklist', ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
+    Route::any('refundAll', ['uses' => 'OrderController@refundAll', 'as' => 'refundAll']);
 
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');

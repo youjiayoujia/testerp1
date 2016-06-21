@@ -3,9 +3,8 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddPurchaseItemsTable extends Migration
+class AddOrderItemsTable extends Migration
 {
-   
     /**
      * Run the migrations.
      *
@@ -13,10 +12,11 @@ class AddPurchaseItemsTable extends Migration
      */
     public function up()
     {
-        Schema::table('purchase_items', function (Blueprint $table) {
-            $table->integer('active_num')->nullable()->default(0)->after('active');		
+        Schema::table('order_items', function (Blueprint $table) {
+            $table->enum('is_refund', [0, 1])->comment('是否退款')->default(0);
         });
     }
+
     /**
      * Reverse the migrations.
      *
@@ -24,8 +24,8 @@ class AddPurchaseItemsTable extends Migration
      */
     public function down()
     {
-        Schema::table('purchase_items', function (Blueprint $table) {
-            $table->dropColumn(['active_num']);
+        Schema::table('order_items', function (Blueprint $table) {
+            $table->dropColumn('is_refund');
         });
     }
 }

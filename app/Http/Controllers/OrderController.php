@@ -20,6 +20,7 @@ use App\Models\OrderModel;
 use App\Models\product\ImageModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
+use App\Models\Order\ItemModel as orderItem;
 
 class OrderController extends Controller
 {
@@ -175,6 +176,22 @@ class OrderController extends Controller
         $data['order_id'] = $id;
         $this->model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 部分退款
+     */
+    public function refundAll()
+    {
+        $ids = request()->input('ids');
+        $id_arr = explode(',', $ids);
+        if(!empty($id_arr)) {
+            foreach($id_arr as $id) {
+                $model = orderItem::find($id);
+                $model->update(['is_refund' => 1]);
+            }
+        }
+        return 1;
     }
 
     /**

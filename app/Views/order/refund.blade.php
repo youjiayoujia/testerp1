@@ -143,12 +143,18 @@
         </div>
     </div>
 @stop
+@section('formButton')
+    <button type="submit" class="btn btn-success sub" id="tj">提交</button>
+    <button type="reset" class="btn btn-default" id="qx">取消</button>
+@show
 @section('pageJs')
     <script type='text/javascript'>
         $(document).ready(function(){
             $('#refund_time').cxCalendar();
 
             document.getElementById('payment').style.display='none';
+            document.getElementById('tj').style.display='none';
+            document.getElementById('qx').style.display='none';
 
             var nowTime = new Date().getTime();
             var payTime = new Date($('#payment_date').val()).getTime();
@@ -158,6 +164,29 @@
 
         $(document).on('click', '.bt_right', function(){
             $(this).parent().remove();
+        });
+
+        //批量退款
+        $('.sub').click(function () {
+            if ($('#type').val() == 'PARTIAL') {
+                var checkbox = document.getElementsByName("tribute_id");
+                var ids = "";
+
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)continue;
+                    ids += checkbox[i].value+",";
+                }
+                ids = ids.substr(0,(ids.length)-1);
+                $.ajax({
+                    url : "{{route('refundAll')}}",
+                    data : {ids:ids},
+                    dataType : 'json',
+                    type : 'get',
+                    success:function(result){
+                        window.location.reload();
+                    }
+                })
+            }
         });
 
         //全选

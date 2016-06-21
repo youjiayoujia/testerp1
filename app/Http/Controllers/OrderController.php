@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
+use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
 use App\Models\Order\RemarkModel;
@@ -19,6 +20,7 @@ use App\Models\OrderModel;
 use App\Models\product\ImageModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
+use App\Models\Order\ItemModel as orderItem;
 
 class OrderController extends Controller
 {
@@ -70,6 +72,22 @@ class OrderController extends Controller
         $this->model->createOrder($data);
 
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 首页
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'countries' => CountriesModel::all(),
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 
     /**
@@ -158,6 +176,22 @@ class OrderController extends Controller
         $data['order_id'] = $id;
         $this->model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 部分退款
+     */
+    public function refundAll()
+    {
+        $ids = request()->input('ids');
+        $id_arr = explode(',', $ids);
+        if(!empty($id_arr)) {
+            foreach($id_arr as $id) {
+                $model = orderItem::find($id);
+                $model->update(['is_refund' => 1]);
+            }
+        }
+        return 1;
     }
 
     /**

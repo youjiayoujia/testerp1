@@ -420,6 +420,31 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'recieveList', $response);
     }
 
+    public function trackingNoSearch(){
+        $data = request()->all();
+        if(count($data)==0){
+            $result = PurchasePostageModel::all();
+        }else{
+            $result = new PurchasePostageModel();
+            if($data['po_id']!=''){
+                $result = $result->where("purchase_order_id",$data["po_id"]);
+            }
+            if($data['status']!=''){
+               $data['status']?$result = $result->where("purchase_order_id",'!=',''):$result->where("purchase_order_id",'');
+            }
+            if($data['trackingNo']!=''){
+                $result = $result->where("post_coding",$data["trackingNo"]);
+            }
+            $result = $result->get();
+        }
+        
+        $response = [
+            'result' => $result,
+        ];
+        
+        return view($this->viewPath . 'scanList', $response);
+    }
+
     public function updateArriveNum(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");

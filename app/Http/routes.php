@@ -343,7 +343,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('logisticsZone/getCountries', ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
     Route::get('logisticsZone/sectionAdd', ['uses' => 'Logistics\ZoneController@sectionAdd', 'as' => 'logisticsZone.sectionAdd']);
     Route::resource('logisticsZone', 'Logistics\ZoneController');
-    Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
     Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
     Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
     Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);

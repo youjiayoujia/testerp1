@@ -19,7 +19,7 @@
                                         <a class="btn btn-default" href="{{ request()->url() }}">
                                             <i class="glyphicon glyphicon-remove"></i>
                                         </a>
-                                        @if($relatedSearchFields)
+                                        @if(isset($relatedSearchFields))
                                             <a class="btn btn-primary" role="button" data-toggle="collapse"
                                                href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
                                                 更多查询
@@ -39,7 +39,7 @@
                             @show{{-- 工具按钮 --}}
                         </div>
                     </div>
-                    @if($relatedSearchFields)
+                    @if(isset($relatedSearchFields))
                         <div class="col-lg-12">
                             <div class="collapse" id="collapseExample">
                                 <div class="well row">

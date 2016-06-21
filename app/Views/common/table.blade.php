@@ -1,6 +1,6 @@
 @extends('layouts.default')
 @section('content')
-    <div class="panel panel-default">
+    <div class="panel panel-default" xmlns="http://www.w3.org/1999/html">
         <div class="panel-heading">
             <strong>@section('tableTitle') {{ $metas['title'] }} @show{{-- 列表标题 --}}</strong>
         </div>
@@ -9,7 +9,7 @@
                 @section('tableToolbar')
                     <div class="row toolbar">
                         <form action="" method="get">
-                            <div class="col-lg-2">
+                            <div class="col-lg-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="查找..."/>
                                     <div class="input-group-btn">
@@ -19,15 +19,15 @@
                                         <a class="btn btn-default" href="{{ request()->url() }}">
                                             <i class="glyphicon glyphicon-remove"></i>
                                         </a>
+                                        <a class="btn btn-primary" role="button" data-toggle="collapse"
+                                           href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                            更多查询
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </form>
-                        <div class="col-lg-4">
-                            @section('tableToolRelatedSeach')
-                            @show{{-- 关联查询 --}}
-                        </div>
-                        <div class="text-right col-lg-6">
+                        <div class="text-right col-lg-9">
                             @section('tableToolButtons')
                                 <div class="btn-group">
                                     <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -35,6 +35,20 @@
                                     </a>
                                 </div>
                             @show{{-- 工具按钮 --}}
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="collapse" id="collapseExample">
+                            <div class="well row">
+                                @foreach($relatedSearchFields as $relatedSearchField => $relatedSearchFieldColumn)
+                                    <div class="col-lg-1">
+                                        <input type="text" class="form-control" name="{{ $relatedSearchField }}" value="{{ old('keywords') }}" placeholder="{{ $relatedSearchField }}.{{ $relatedSearchFieldColumn }}"/>
+                                    </div>
+                                @endforeach
+                                <div class="col-lg-1">
+                                    <button class="btn btn-success" type="submit">提交</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @show{{-- 列表工具栏 --}}

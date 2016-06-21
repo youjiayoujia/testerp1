@@ -15,7 +15,7 @@
     <tr>
         <td>{{$_result->id}}</td>
         <td>{{$_result->post_coding}}</td>
-        <td>已关联</td>
+        <td><?php if($_result->purchase_order_id!=''){echo "未关联";}else{echo "已关联";} ?></td>
         <td><a target="_blank" href="{{ route('purchaseOrder.show', ['id'=>$_result->purchase_order_id]) }}">{{$_result->purchase_order_id}}</a></td>
         <td></td>
         <td>{{$_result->updated_at}}</td>

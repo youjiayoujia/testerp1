@@ -22,6 +22,8 @@ use App\Jobs\DoPackage;
 use DNS1D;
 use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 
 class TestController extends Controller
 {
@@ -32,9 +34,11 @@ class TestController extends Controller
 
     public function test1()
     {
-        $package = PackageModel::find(1);
-        $html = $package->templateMsg($package->id);
-        var_dump($html);
+       $warehouses = PositionModel::whereHas('warehouse', function($query){
+        $query->where('telephone', 'like', '%'.'232'.'%');
+       })collect('id');
+       var_dump($warehouses->toArray());exit;
+
     }
 
     public function index()

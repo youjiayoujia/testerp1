@@ -455,7 +455,7 @@ class OrderModel extends BaseModel
         } else {
             $this->split_times += 1;
         }
-        $this->save();
+        return $this->save();
     }
 
     public function explodeOrder()

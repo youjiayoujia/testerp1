@@ -256,6 +256,10 @@
                     <label for="sku" class='control-label'>sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
+                <div class="form-group col-sm-2">
+                    <label for="channel_sku" class='control-label'>渠道sku</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
                 <div class="form-group col-sm-1">
                     <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -282,7 +286,10 @@
             </div>
             <div class='row'>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+                    <select class="form-control sku" id="arr[sku][0]" name='arr[sku][0]'></select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <input type='text' class="form-control channel_sku" id="arr[channel_sku][0]" placeholder="渠道sku" name='arr[channel_sku][0]' value="{{ old('arr[channel_sku][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
@@ -359,6 +366,27 @@
                     type: 'get',
                     success: function (result) {
                         $('#itemDiv').append(result);
+                        $('.sku').select2({
+                            ajax: {
+                                url: "{{ route('order.ajaxSku') }}",
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        sku: params.term,
+                                        page: params.page
+                                    };
+                                },
+                                results: function(data, page) {
+                                    if((data.results).length > 0) {
+                                        var more = (page * 20)<data.total;
+                                        return {results:data.results,more:more};
+                                    } else {
+                                        return {results:data.results};
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
                 current++;
@@ -435,6 +463,28 @@
                     data: function (params) {
                         return {
                             shipping_country: params.term,
+                            page: params.page
+                        };
+                    },
+                    results: function(data, page) {
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
+                    }
+                }
+            });
+
+            $('.sku').select2({
+                ajax: {
+                    url: "{{ route('order.ajaxSku') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            sku: params.term,
                             page: params.page
                         };
                     },

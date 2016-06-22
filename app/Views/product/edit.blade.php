@@ -173,9 +173,13 @@
     </div>
     <div class="row">
         <div class="form-group col-md-3">
-            <label for="color">采购负责人</label>
-            <input class="form-control" id="purchase_adminer" placeholder="采购负责人" name='purchase_adminer' value="{{ old('purchase_adminer') ?  old('purchase_adminer') : $product->purchase_adminer }}">
-        </div>
+            <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id="supplier_id" class="form-control" name="purchase_adminer">
+                @foreach($users as $user)
+                    <option value="{{ $user->id}}" {{ $user->id == $product->purchase_adminer ? 'selected' : '' }}>{{$user->name}}</option>
+                @endforeach
+            </select>
+        </div> 
         <div class="form-group col-md-3">
             <label for="color">url1</label>
             <input class="form-control" id="url1" placeholder="url" name='url1' value="{{ old('url1') ?  old('url1') : $product->url1 }}">

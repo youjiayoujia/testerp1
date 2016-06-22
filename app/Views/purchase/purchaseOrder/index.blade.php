@@ -108,7 +108,7 @@
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
                     <th>&nbsp;</th>
-                    <th>{{ $purchaseOrder->sum_purchase_account}}</th>
+                    <th>{{ $purchaseOrder->sum_purchase_account}}(YF{{$purchaseOrder->purchase_post_num}})</th>
                     <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
                     <th>&nbsp;</th>
                 </tr>

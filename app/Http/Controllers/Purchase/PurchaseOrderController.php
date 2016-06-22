@@ -40,7 +40,7 @@ class PurchaseOrderController extends Controller
         ];
         foreach($response['data'] as $key=>$vo){
             $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
-            $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->count();
+            $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
             $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
             foreach($response['data'][$key]['purchase_items'] as $v){
             $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
@@ -448,21 +448,40 @@ class PurchaseOrderController extends Controller
     public function updateArriveNum(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");
-        $data = substr($data, 0,strlen($data)-1);
-        $arr = explode(',', $data);
-        foreach ($arr as $value) {
-            $update_data = explode(':', $value);
-            $purchase_item = PurchaseItemModel::find($update_data[0]);
-            $filed['purchase_item_id'] = $purchase_item['id'];
-            $filed['sku'] = $purchase_item['sku'];
-            $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1];
-            $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num'];
-            $filed['arrival_time'] = date('Y-m-d H:i:s',time());
-            $filed['status'] = 2;
-            $purchase_item->update($filed);
-            $filed['arrival_num'] = $update_data[1];
-            PurchaseItemArrivalLogModel::create($filed);
+        if($data!=''){
+            $data = substr($data, 0,strlen($data)-1);
+            $arr = explode(',', $data);
+            foreach ($arr as $value) {
+                $update_data = explode(':', $value);
+                $purchase_item = PurchaseItemModel::find($update_data[0]);
+                //print_r($purchase_item);exit;
+                if($purchase_item->arrival_num!=$purchase_item->purchase_num){
+                    $filed['purchase_item_id'] = $purchase_item['id'];
+                    $filed['sku'] = $purchase_item['sku'];
+                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>10?10:$purchase_item['arrival_num']+$update_data[1];
+                    $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num']<0?0:$purchase_item['purchase_num']-$filed['arrival_num'];
+                    $filed['arrival_time'] = date('Y-m-d H:i:s',time());
+                    $filed['status'] = 2;
+                    $purchase_item->update($filed);
+                    $filed['arrival_num'] = $update_data[1];
+                    PurchaseItemArrivalLogModel::create($filed);
+                }
+                
+            } 
+        }else{
+            $purchaseOrderModel = $this->model->find($p_id);
+            foreach($purchaseOrderModel->purchaseItem as $p_item){
+                if($p_item->purchase_num!=$p_item->arrival_num){
+                    $p_item->update(['arrival_num'=>$p_item->purchase_num,'lack_num'=>0]);
+                    $filed['purchase_item_id'] = $p_item->id;
+                    $filed['sku'] = $p_item->sku;
+                    $filed['status'] =2;
+                    $filed['arrival_num'] = $p_item->lack_num;
+                    PurchaseItemArrivalLogModel::create($filed);
+                }
+            }
         }
+        
         echo json_encode($p_id);
     }
 

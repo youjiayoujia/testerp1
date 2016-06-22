@@ -1,3 +1,4 @@
+        <input type="hidden" value="{{$bang}}" id="bang">
         <div class="row">
              <div class="form-group col-lg-6">
              <strong>运单号:</strong>

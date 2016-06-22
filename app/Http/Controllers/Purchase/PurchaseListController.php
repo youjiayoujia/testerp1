@@ -275,15 +275,16 @@ class PurchaseListController extends Controller
 				'postcodingNum' =>$postcodingNum,
 				'data' =>$res,
 				'postCoding' =>$id,
+				'bang'=>0,
 	        ];
 		}else{
 			$model = PurchasePostageModel::create(['post_coding'=>$id]);
-			//echo $model->id;exit;
 			$response = [
             'metas' => $this->metas(__FUNCTION__),
 			'postcodingNum' =>$postcodingNum,
 			'postCoding' =>$id,
 			'wuliu_id' =>$model->id,
+			'bang'=>1,
         	];
 		}
         return view($this->viewPath . 'ajaxScan', $response);

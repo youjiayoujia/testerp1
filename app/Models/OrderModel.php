@@ -56,7 +56,6 @@ class OrderModel extends BaseModel
             'amount_product' => 'required',
             'amount_shipping' => 'required',
             'amount_coupon' => 'required',
-            'shipping' => 'required',
             'shipping_firstname' => 'required',
             'shipping_lastname' => 'required',
             'shipping_address' => 'required',

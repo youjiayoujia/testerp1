@@ -27,7 +27,6 @@ class ProductModel extends BaseModel
             'supplier_id' => 'required',
             'product_size' => 'required',
             'weight' => 'required|numeric',
-            'upload_user' => 'required',
             'catalog_id' => 'required',
         ],
         'update' => [
@@ -35,8 +34,7 @@ class ProductModel extends BaseModel
             'purchase_price' => 'required|numeric',
             'purchase_carriage' => 'required|numeric',
             'product_size' => 'required',
-            'weight' => 'required|numeric',
-            'upload_user' => 'required',
+            'weight' => 'required|numeric',    
         ]
     ];
 
@@ -213,7 +211,7 @@ class ProductModel extends BaseModel
                 }
                 
                 //默认图片id为0
-                $default_image_id = 0;
+                /*$default_image_id = 0;
                 $imageModel = new ImageModel();
                 $i=0;
                 foreach ($model['image'] as $key => $file) {     
@@ -227,7 +225,7 @@ class ProductModel extends BaseModel
                     }
                 }
                 //更新产品首图
-                $product->update(['default_image' => $default_image_id]);
+                $product->update(['default_image' => $default_image_id]);*/
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {

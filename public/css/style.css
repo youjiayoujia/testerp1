@@ -4,7 +4,6 @@
 body,
 .btn,
 .form-control,
-.table td,
 .dropdown-menu {
     font-size: 10px;
 }
@@ -18,7 +17,11 @@ body,
 }
 
 .main {
-    padding: 60px 10px 10px;
+    padding: 45px 10px 10px;
+}
+
+.table tbody tr td{
+    vertical-align: middle;
 }
 
 .tr_bgcolor {
@@ -37,7 +40,7 @@ body,
     width: 500px;
     height: 500px;
     background: #ddd;
-    left : 15px;
+    left: 15px;
 }
 
 .inboxImage {
@@ -107,13 +110,3 @@ th:hover:not([data-sort=false]) {
     opacity: .8;
     cursor: pointer;
 }
-
-.table.table-bordered td {
-    vertical-align: middle;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-.table.table-bordered td .col-lg-3 {
-    padding-left: 0px
-}
-

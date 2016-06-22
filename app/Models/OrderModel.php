@@ -159,8 +159,36 @@ class OrderModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('order.status');
-        return $arr[$this->status];
+        $config = config('order.status');
+        return $config[$this->status];
+    }
+
+    public function getStatusColorAttribute()
+    {
+        switch ($this->status) {
+            case 'REVIEW':
+                $color = 'danger';
+                break;
+            case 'CANCEL':
+                $color = 'active';
+                break;
+            case 'NEED':
+                $color = 'warning';
+                break;
+            case 'COMPLETE':
+                $color = 'success';
+                break;
+            case 'SHIPPED':
+                $color = 'success';
+                break;
+            case 'UNPAID':
+                $color = '';
+                break;
+            default:
+                $color = 'info';
+                break;
+        }
+        return $color;
     }
 
     public function getActiveNameAttribute()

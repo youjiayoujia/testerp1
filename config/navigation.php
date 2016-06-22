@@ -426,5 +426,11 @@ return [
             ],
         ],
     ],
+    //财务导航
+    [
+        'name' => '信息',
+        'icon' => 'envelope',
+        'url' => 'message.index',
+    ],
 ];
 

@@ -495,13 +495,16 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
     Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
+    //邮件信息
+    Route::resource('message', 'MessageController');
+
+
     //用户路由
     Route::resource('user', 'UserController');
     //图片标签
     Route::resource('label', 'LabelController');
 
     Route::resource('paypal', 'PaypalController');
-
 
 });
 

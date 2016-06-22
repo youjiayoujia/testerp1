@@ -91,7 +91,6 @@ table.gridtable td {
 	<tr>
 		<td colspan="2">
 			<button class="modify">修改</button>
-			<button>返回</button>
 		</td>
 	</tr>
 </table>

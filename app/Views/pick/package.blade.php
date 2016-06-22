@@ -274,21 +274,5 @@ $(document).ready(function(){
         $('.searchSku').val('');
         $('.searchSku').focus();
     });
-
-    function do_print(id_str)
-    {
-        var el = document.getElementById(id_str);
-        if(el.attachEvent) {
-            el.attachEvent("onload", function(){
-                el.contentWindow.focus();
-                el.contentWindow.print();
-            });
-        } else {
-            el.onload = function(){
-                el.contentWindow.focus();
-                el.contentWindow.print();
-            }
-        }
-    }
 });
 </script>

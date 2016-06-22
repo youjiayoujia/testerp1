@@ -223,8 +223,8 @@
                 }
             });
         });
-        $('.datetime_select').cxCalendar();
 
+        $('.datetime_select').datetimepicker({theme:'dark'});
         $('.relatedSelect').select2();
         $('.relatedSelect').change(function () {
             location.href = $(this).val();

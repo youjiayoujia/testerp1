@@ -17,7 +17,7 @@
     @foreach($data as $stockin)
         <tr>
             <td>{{ $stockin->id }}</td>
-            <td>{{ $stockin->stock ? $stockin->stock->items ? $stockin->stock->items->sku : '' : '' }}</td>
+            <td>{{ $stockin->stock ? $stockin->stock->item ? $stockin->stock->item->sku : '' : '' }}</td>
             <td>{{ $stockin->quantity}}</td>
             <td>{{ $stockin->amount}}</td>
             <td>{{ $stockin->stock ? $stockin->stock->warehouse ? $stockin->stock->warehouse->name : '' : '' }}</td>

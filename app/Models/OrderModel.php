@@ -10,13 +10,13 @@
 
 namespace App\Models;
 
-use Exception;
 use Tool;
+use Exception;
 use App\Base\BaseModel;
+use App\Models\ItemModel;
+use App\Models\Order\RefundModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
 use Illuminate\Support\Facades\DB;
-use App\Models\Order\RefundModel;
-use App\Models\Order\ItemModel;
 
 class OrderModel extends BaseModel
 {
@@ -26,14 +26,9 @@ class OrderModel extends BaseModel
 
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
-    public $searchFields = [
-        'channel_id',
-        'channel_account_id',
-        'ordernum',
-        'email',
-        'customer_service',
-        'operator',
-    ];
+    public $searchFields = ['ordernum', 'email'];
+
+    public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
 
     public function rule($request)
     {
@@ -106,6 +101,18 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['channel' => ['name'], 'country' => ['code']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
+            'selectRelatedSearchs' => [
+                
+            ],
+        ];
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
@@ -163,8 +170,36 @@ class OrderModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('order.status');
-        return $arr[$this->status];
+        $config = config('order.status');
+        return $config[$this->status];
+    }
+
+    public function getStatusColorAttribute()
+    {
+        switch ($this->status) {
+            case 'REVIEW':
+                $color = 'danger';
+                break;
+            case 'CANCEL':
+                $color = 'active';
+                break;
+            case 'NEED':
+                $color = 'warning';
+                break;
+            case 'COMPLETE':
+                $color = 'success';
+                break;
+            case 'SHIPPED':
+                $color = 'success';
+                break;
+            case 'UNPAID':
+                $color = '';
+                break;
+            default:
+                $color = 'info';
+                break;
+        }
+        return $color;
     }
 
     public function getActiveNameAttribute()
@@ -251,9 +286,9 @@ class OrderModel extends BaseModel
         if ($file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
             $file->move($path, time() . '.' . $file->getClientOriginalExtension());
-            if($data['type'] == 'FULL') {
-                foreach($data['arr']['id'] as $id) {
-                    $orderItem = ItemModel::find($id);
+            if ($data['type'] == 'FULL') {
+                foreach ($data['arr']['id'] as $id) {
+                    $orderItem = $this->items->find($id);
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
@@ -274,7 +309,6 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-//        $last = $this->all()->last();
         $data['ordernum'] = $begin = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
@@ -415,11 +449,12 @@ class OrderModel extends BaseModel
                             'PACKAGE',
                             $newPackageItem->id,
                             $key);
+                        $orderItem = $newPackageItem->orderItem;
                         if ($flag == 1) {
-                            $newPackageItem->orderItem->status = 'PACKED';
+                            $orderItem->status = 'PACKED';
                         }
-                        $newPackageItem->orderItem->split_quantity += $newPackageItem->quantity;
-                        $newPackageItem->orderItem->save();
+                        $orderItem->split_quantity += $newPackageItem->quantity;
+                        $orderItem->save();
                     } catch (Exception $e) {
                         DB::rollBack();
                     }

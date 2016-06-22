@@ -1,6 +1,6 @@
 @extends('layouts.default')
 @section('content')
-    <div class="panel panel-default">
+    <div class="panel panel-default" xmlns="http://www.w3.org/1999/html">
         <div class="panel-heading">
             <strong>@section('tableTitle') {{ $metas['title'] }} @show{{-- 列表标题 --}}</strong>
         </div>
@@ -9,7 +9,7 @@
                 @section('tableToolbar')
                     <div class="row toolbar">
                         <form action="" method="get">
-                            <div class="col-lg-2">
+                            <div class="col-lg-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="查找..."/>
                                     <div class="input-group-btn">
@@ -19,15 +19,17 @@
                                         <a class="btn btn-default" href="{{ request()->url() }}">
                                             <i class="glyphicon glyphicon-remove"></i>
                                         </a>
+                                        @if(isset($mixedSearchFields))
+                                            <a class="btn btn-primary" role="button" data-toggle="collapse"
+                                               href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                更多查询
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </form>
-                        <div class="col-lg-6">
-                            @section('tableToolRelatedSeach')
-                            @show{{-- 关联查询 --}}
-                        </div>
-                        <div class="text-right col-lg-4">
+                        <div class="text-right col-lg-9">
                             @section('tableToolButtons')
                                 <div class="btn-group">
                                     <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -36,6 +38,86 @@
                                 </div>
                             @show{{-- 工具按钮 --}}
                         </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="collapse" id="collapseExample">
+                            <form action="" method="get">
+                            <div class="well row">
+                                @foreach($mixedSearchFields as $type => $value)
+                                    @if($type == 'relatedSearchFields')
+                                        @if(count($value))
+                                            @foreach($value as $relation_ship => $name_arr)
+                                                @foreach($name_arr as $name)
+                                                <div class="col-lg-1">
+                                                    <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" value="{{ old('keywords') }}" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
+                                                </div>
+                                                @endforeach
+                                            @endforeach
+                                        @endif
+                                    @endif
+                                    @if($type == 'filterFields')
+                                        @foreach($value as $name)
+                                            <div class="col-lg-1">
+                                            <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" value="{{ old('mixedSearchFields[$type][$name]') }}" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                    @if($type == 'filterSelects')
+                                        @foreach($value as $name => $content)
+                                            <div class="col-lg-1">
+                                                <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control'>
+                                                    <option value=''>{{config('setting.transfer_search')[$name]}}</option>
+                                                    @foreach($content as $k => $v)  
+                                                    <option value="{{ $k}}">{{$v}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                    @if($type == 'selectRelatedSearchs')
+                                        @foreach($value as $relation_ship => $contents)
+                                            @foreach($contents as $name => $single)
+                                                <div class='col-lg-1'>
+                                                <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control'>
+                                                <option value=''>{{config('setting.transfer_search')[$relation_ship.'.'.$name]}}</option>
+                                                @foreach($single as $key => $value1)
+                                                    <option value="{{ $key }}">{{$value1}}</option>
+                                                @endforeach
+                                                </select>  
+                                                </div>
+                                            @endforeach
+                                        @endforeach
+                                    @endif
+                                    @if($type == 'sectionSelect')
+                                        @foreach($value as $kind => $contents)
+                                            @foreach($contents as $content)
+                                                @if($kind == 'time')
+                                                    <div class='col-lg-1'>
+                                                    <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    </div>
+                                                    <div class='col-lg-1'>
+                                                    <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    </div>
+                                                @endif
+                                                @if($kind == 'price')
+                                                    <div class='col-lg-1'>
+                                                    <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    </div>
+                                                    <div class='col-lg-1'>
+                                                    <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        @endforeach
+                                    @endif
+                                @endforeach
+                                <div class="col-lg-1">
+                                    <button class="btn btn-success" type="submit">提交</button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </form>
                     </div>
                 @show{{-- 列表工具栏 --}}
                 <div class="row">
@@ -141,6 +223,8 @@
                 }
             });
         });
+
+        $('.datetime_select').datetimepicker({theme:'dark'});
         $('.relatedSelect').select2();
         $('.relatedSelect').change(function () {
             location.href = $(this).val();

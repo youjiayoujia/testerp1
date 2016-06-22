@@ -46,7 +46,7 @@ class OrdersGet extends Command
         $start = microtime(true);
         $account = AccountModel::find($this->argument('accountID'));
         if ($account) {
-            $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' day'));
+            $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time());
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);

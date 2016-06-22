@@ -21,24 +21,24 @@ use App\Models\Warehouse\PositionModel;
 class PurchaseListController extends Controller
 {
 
-    public function __construct(PurchaseItemModel $purchaseList)
+    public function __construct(PurchasePostageModel $PurchasePostageModel)
     {	
-        $this->model = $purchaseList;
+        $this->model = $PurchasePostageModel;
         $this->mainIndex = route('purchaseList.index');
-        $this->mainTitle = '采购到货';
+        $this->mainTitle = '包裹扫描';
 		$this->viewPath = 'purchase.purchaseList.';
     }
     
 	
 	public function index()
     {
+		request()->flash();
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','asc')),
+            'data' => $this->autoList($this->model),
         ];
-		foreach($response['data'] as $key=>$vo){
-			$response['data'][$key]['position_num']=PositionModel::where('warehouse_id',$vo->warehouse_id)->count();			
-			}
+    
         return view($this->viewPath . 'index', $response);
     }
 	
@@ -245,6 +245,7 @@ class PurchaseListController extends Controller
 		$postage=request()->get('postage');
 		$purchaseOrderId=request()->get('purchaseOrderId');
 		$postCoding=request()->get('postCoding');
+		$wuliu_id = request()->input('wuliu_id');
 		$purchaseNum=PurchaseOrderModel::where('id',$purchaseOrderId)->count();
 		$data['post_coding']=$postCoding;
 		$data['postage']=$postage;
@@ -252,13 +253,41 @@ class PurchaseListController extends Controller
 		$data['user_id'] = request()->user()->id;
 
 		if($purchaseNum>0){
-			PurchasePostageModel::create($data);
+			$model = PurchasePostageModel::find($wuliu_id);
+			$model->update($data);
 			return 1;
 		}else{
 			return 2;
 		}
 			
-	}	
+	}
+
+	public function ajaxScan(){
+        $id = request()->input('id');
+
+		$postcodingNum=PurchasePostageModel::where('post_coding',$id)->count();
+		if($postcodingNum>0){
+			$res['postcoding']=PurchasePostageModel::where('post_coding',$id)->first();
+			$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
+			$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
+	        $response = [
+	            'metas' => $this->metas(__FUNCTION__),
+				'postcodingNum' =>$postcodingNum,
+				'data' =>$res,
+				'postCoding' =>$id,
+	        ];
+		}else{
+			$model = PurchasePostageModel::create(['post_coding'=>$id]);
+			//echo $model->id;exit;
+			$response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'postcodingNum' =>$postcodingNum,
+			'postCoding' =>$id,
+			'wuliu_id' =>$model->id,
+        	];
+		}
+        return view($this->viewPath . 'ajaxScan', $response);
+    }	
 	
 }
 

@@ -16,8 +16,6 @@
     <button type="submit" class="btn btn-success">导出交接单</button>
 @stop
 @section('pageJs')
-<link rel="stylesheet" href="{{ asset('css/jquery.datetimepicker.css') }}">
-<script src="{{ asset('js/jquery.datetimepicker.full.js') }}"></script>
 <script>
     $('.datetimepicker_dark').datetimepicker({theme:'dark'})
 </script>

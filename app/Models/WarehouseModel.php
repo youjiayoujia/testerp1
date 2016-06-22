@@ -62,4 +62,20 @@ class WarehouseModel extends BaseModel
     {
         return $this->belongsTo('App\Models\UserModel', 'contact_by', 'id');
     }
+
+    public function logistics()
+    {
+        return $this->hasMany('App\Models\LogisticsModel', 'warehouse_id', 'id');
+    }
+
+    public function logisticsIn($id) 
+    {
+        $logisticses = $this->logistics;
+        foreach($logisticses as $logistics) {
+            if($logistics->id == $id) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

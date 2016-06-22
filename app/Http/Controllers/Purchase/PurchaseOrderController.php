@@ -18,6 +18,7 @@ use App\Models\WarehouseModel;
 use App\Models\ItemModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
+use Tool;
 
 class PurchaseOrderController extends Controller
 {
@@ -36,10 +37,11 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         foreach($response['data'] as $key=>$vo){
             $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
-            $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->count();
+            $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
             $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
             foreach($response['data'][$key]['purchase_items'] as $v){
             $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
@@ -367,6 +369,16 @@ class PurchaseOrderController extends Controller
             $response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
     }
+
+    /**
+    * 打印
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function printpo(){
+        $id = request()->input('id');
+        echo Tool::barcodePrint($id);
+    }
     
     
     public function write_off($id){
@@ -409,24 +421,68 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'recieveList', $response);
     }
 
+    public function trackingNoSearch(){
+        $data = request()->all();
+        if(count($data)==0){
+            $result = PurchasePostageModel::all();
+        }else{
+            $result = new PurchasePostageModel();
+            if($data['po_id']!=''){
+                $result = $result->where("purchase_order_id",$data["po_id"]);
+            }
+            if($data['status']!=''){
+               $data['status']?$result = $result->where("purchase_order_id",'!=',''):$result->where("purchase_order_id",'');
+            }
+            if($data['trackingNo']!=''){
+                $result = $result->where("post_coding",$data["trackingNo"]);
+            }
+            $result = $result->get();
+        }
+        
+        $response = [
+            'result' => $result,
+        ];
+        
+        return view($this->viewPath . 'scanList', $response);
+    }
+
     public function updateArriveNum(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");
-        $data = substr($data, 0,strlen($data)-1);
-        $arr = explode(',', $data);
-        foreach ($arr as $value) {
-            $update_data = explode(':', $value);
-            $purchase_item = PurchaseItemModel::find($update_data[0]);
-            $filed['purchase_item_id'] = $purchase_item['id'];
-            $filed['sku'] = $purchase_item['sku'];
-            $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1];
-            $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num'];
-            $filed['arrival_time'] = date('Y-m-d H:i:s',time());
-            $filed['status'] = 2;
-            $purchase_item->update($filed);
-            $filed['arrival_num'] = $update_data[1];
-            PurchaseItemArrivalLogModel::create($filed);
+        if($data!=''){
+            $data = substr($data, 0,strlen($data)-1);
+            $arr = explode(',', $data);
+            foreach ($arr as $value) {
+                $update_data = explode(':', $value);
+                $purchase_item = PurchaseItemModel::find($update_data[0]);
+                
+                if($purchase_item->arrival_num!=$purchase_item->purchase_num){
+                    $filed['purchase_item_id'] = $purchase_item['id'];
+                    $filed['sku'] = $purchase_item['sku'];
+                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>10?10:$purchase_item['arrival_num']+$update_data[1];
+                    $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num']<0?0:$purchase_item['purchase_num']-$filed['arrival_num'];
+                    $filed['arrival_time'] = date('Y-m-d H:i:s',time());
+                    $filed['status'] = 2;
+                    $purchase_item->update($filed);
+                    $filed['arrival_num'] = $update_data[1];
+                    PurchaseItemArrivalLogModel::create($filed);
+                }
+                
+            } 
+        }else{
+            $purchaseOrderModel = $this->model->find($p_id);
+            foreach($purchaseOrderModel->purchaseItem as $p_item){
+                if($p_item->purchase_num!=$p_item->arrival_num){
+                    $p_item->update(['arrival_num'=>$p_item->purchase_num,'lack_num'=>0]);
+                    $filed['purchase_item_id'] = $p_item->id;
+                    $filed['sku'] = $p_item->sku;
+                    $filed['status'] =2;
+                    $filed['arrival_num'] = $p_item->lack_num;
+                    PurchaseItemArrivalLogModel::create($filed);
+                }
+            }
         }
+        
         echo json_encode($p_id);
     }
 
@@ -458,23 +514,27 @@ class PurchaseOrderController extends Controller
             $update_data = explode(':', $value);
             $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
             $purchase_item = $arrivel_log->purchaseItem;
+            //print_r($purchase_item->item->sku);exit;
             if($purchase_item->item->warehouse_position==''){
                 echo json_encode($purchase_item->item->sku);exit;
-            }
-            $filed['good_num'] = $update_data[1];
-            $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
-            $filed['quality_time'] = date('Y-m-d H:i:s',time());
-            $arrivel_log->update($filed);
-            //purchaseitem
-            $datas['status'] = 3;
-            $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
-            $datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
-            if($datas['storage_qty']>=$purchase_item->purchase_num){
-                $datas['status'] = 4;
-            }
-            $purchase_item->update($datas);
-            
+            }else{
+                $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
+                $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
+                $filed['quality_time'] = date('Y-m-d H:i:s',time());
+                
+                $arrivel_log->update($filed);
+                //purchaseitem
+                $datas['status'] = 3;
+                $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+                $datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
+                if($datas['storage_qty']>=$purchase_item->purchase_num){
+                    $datas['status'] = 4;
+                }
+                //print_r($datas);
+                $purchase_item->update($datas);  
+            }       
         }
+        
         $p_status = 4;
         $purchasrOrder = $this->model->find($p_id);
         foreach($purchasrOrder->purchaseItem as $p_item){
@@ -483,6 +543,7 @@ class PurchaseOrderController extends Controller
             }
         }
         $purchasrOrder->update(['status'=>$p_status]);
+        $p_id = (int)$p_id;
         echo json_encode($p_id);
     }
         

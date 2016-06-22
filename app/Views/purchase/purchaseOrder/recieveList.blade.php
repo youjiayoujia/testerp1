@@ -68,7 +68,7 @@ table.gridtable td {
 					<td>{{$item->purchase_num}}</td>
 					<td>{{$item->arrival_num}}</td>
 					<td><input type="text" value="0" id="arrivenum_{{$item->id}}" name="arrivenum_{{$item->id}}"></td>
-					<td><button class="printpo">打印</button></td>
+					<td><button class="printpo" value="{{$item->id}}">打印</button></td>
 				</tr>
 			@endforeach
 			</table>
@@ -126,7 +126,7 @@ table.gridtable td {
 	<tr>
 		<td colspan="2">
 			<button class="modify">修改</button>
-			<button>设置全部到货</button>
+			<button class="modify" value="all">设置全部到货</button>
 		</td>
 	</tr>
 </table>

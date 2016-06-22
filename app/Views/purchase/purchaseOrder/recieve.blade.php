@@ -42,17 +42,30 @@
     	});
     })
 
+    $(document).on('click','.printpo',function(){
+        var purchase_item_id = $(this).val();
+        var url = "{{route('printpo')}}"
+        window.open(url+"?id="+purchase_item_id);
+        
+    });
+
 
 	$(document).on('click','.modify',function(){
         //alert($("#ajaxp_id").val());
+
         var data = "";
-		$("input[name^='arrivenum_']").each(function(){
-			id = $(this).attr("name");
-            id = id.substr(10);
-            if($("#arrivenum_"+id).val()>0){
-                data += id+":"+$(this).val()+",";
-            }
-　　　　});
+        var all = $(this).val();
+        if(all==''){
+            $("input[name^='arrivenum_']").each(function(){
+                id = $(this).attr("name");
+                id = id.substr(10);
+                if($("#arrivenum_"+id).val()>0){
+                    data += id+":"+$(this).val()+",";
+                }
+　　　　    });
+            
+        }
+		
         //alert($("#ajaxp_id").val());
         $.ajax({
             url:"{{ route('updateArriveNum') }}",

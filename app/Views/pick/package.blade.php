@@ -112,6 +112,9 @@
     <div class='old2'>
     <label>未扫描</label>
     </div>
+    <div class='row'>
+        <iframe id='barcode' style='display:none'></iframe>
+    </div>
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success">包装完成</button>
@@ -124,6 +127,7 @@ $(document).on('keypress', function (event) {
         return false;
     }
 });
+
 $(document).ready(function(){
     $('.printException').click(function(){
         $.each($('.sku'), function(){
@@ -157,6 +161,7 @@ $(document).ready(function(){
     $(document).on('click', '.search', function(){
         val = $('.searchsku').val();
         extern_flag = 0;
+        $('.notFindSku').text('');
         if(val) {
             $.each($('.new tr'), function(){
                 tmp = $(this);
@@ -190,6 +195,11 @@ $(document).ready(function(){
                             if(flag) {
                                 id = tmp.data('id');
                                 $("."+id).find('.status').text('已包装');
+                                $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                                $('#barcode').load(function(){
+                                    $('#barcode')[0].contentWindow.focus();
+                                    $('#barcode')[0].contentWindow.print();
+                                });
                             }
                         }
                     exit;
@@ -215,6 +225,11 @@ $(document).ready(function(){
                         });
                         if(flag) {
                             tmp.find('.status').text('已包装');
+                            $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                            $('#barcode').load(function(){
+                                $('#barcode')[0].contentWindow.focus();
+                                $('#barcode')[0].contentWindow.print();
+                            });
                         }
                     }
                     package_id = tmp.data('id');

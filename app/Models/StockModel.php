@@ -122,7 +122,7 @@ class StockModel extends BaseModel
      * @return relation
      *
      */
-    public function items()
+    public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }

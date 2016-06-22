@@ -13,9 +13,6 @@
         <label for="name">前缀</label>
         <input class="form-control" id="code" placeholder="前缀" name='code' value="{{old('code')}}">
     </div>
-
-   
-
     <div class="panel panel-info">
         <div class="panel-heading">Set属性(影响产品图片的属性 例如:产品颜色)</div>
         <div class="panel-body setfirst">
@@ -46,22 +43,29 @@
     <input type='hidden' value='0' id='setnum' name="setnum">
     <input type='hidden' value='0' id='attrnum' name="attrnum">
     <input type='hidden' value='0' id='featurenum' name="featurenum">
-    @foreach($channels as $channel)
-        <div class="form-group">
-            <div class="col-md-4">
-                <label for="size">渠道</label>
-                <input class="form-control" disabled="disabled" placeholder="渠道"  value="{{$channel->name}}">
-            </div>
-            <div class="col-md-4">
-                <label for="size">固定费</label>
-                <input class="form-control" placeholder="固定费" name='channel[flat][{{$channel->id}}]' value="">
-            </div>
-            <div class="col-md-4">
-                <label for="size">费率</label>
-                <input class="form-control" placeholder="费率" name='channel[name][{{$channel->id}}]' value="">
+    <div class="panel panel-warning">
+        <div class="panel-heading">渠道费率</div>
+        <div class="panel-body">
+            <div class="form-group">
+                @foreach($channels as $channel)
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="size">渠道</label>
+                            <input class="form-control" disabled="disabled" placeholder="渠道" value="{{$channel->name}}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="size">固定费</label>
+                            <input class="form-control" placeholder="固定费" name='channel[flat][{{$channel->id}}]' value="">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="size">费率</label>
+                            <input class="form-control" placeholder="费率" name='channel[name][{{$channel->id}}]' value="">
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
-    @endforeach
+    </div>
 @stop
 
 @section('pageJs')

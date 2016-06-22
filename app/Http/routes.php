@@ -195,7 +195,10 @@ Route::group(['middleware' => 'auth'], function () {
 
 //采购单e/purchaseOrder/addPost/
 	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
+    Route::any('PurchaseOrder/trackingNoSearch', [ 'uses'=>'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
+    Route::any('purchaseList/ajaxScan', [ 'uses'=>'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printpo', [ 'uses'=>'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
     Route::any('purchaseOrder/ajaxInWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
     Route::any('purchaseOrder/inWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
@@ -274,6 +277,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('catalog', 'CatalogController');
 
     //item路由
+    Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as'=>'item.getModel']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as'=>'item.getImage']);
     Route::resource('item', 'ItemController');
 
@@ -446,11 +450,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
     Route::get('downloadUpdateBlacklist', ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
+    Route::any('refundAll', ['uses' => 'OrderController@refundAll', 'as' => 'refundAll']);
 
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
 
+    Route::get('package/multiPackage', ['uses' => 'PackageController@multiPackage', 'as' => 'package.multiPackage']);
     Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
     Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
     Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);

@@ -44,6 +44,7 @@ class StockController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
             'warehouses' => WarehouseModel::where(['is_available' => '1'])->get(),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -102,7 +103,9 @@ class StockController extends Controller
         $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
         foreach($stocks as $stock)
         {
-            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->items ? $stock->items->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
+            if($stock->available_quantity || $stock->hold_quantity) {
+            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
+            }
         }
         $str .= "</tbody>";
 
@@ -121,7 +124,9 @@ class StockController extends Controller
         $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
         foreach($stocks as $stock)
         {
-            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->items ? $stock->items->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
+            if($stock->available_quantity || $stock->hold_quantity) {
+            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
+            }
         }
         $str .= "</tbody>";
 

@@ -146,4 +146,11 @@ class ItemController extends Controller
         else 
             return json_encode(false);
     }
+
+    public function getModel()
+    {
+        $sku = trim(request('sku'));
+        $model = $this->model->where('sku', $sku)->first();
+        return json_encode($model);
+    }
 }

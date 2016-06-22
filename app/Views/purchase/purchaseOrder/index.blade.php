@@ -76,41 +76,41 @@
                 <tbody>
                 @foreach($purchaseOrder->purchase_items as $purchase_item)
                 <tr>
-                <td>{{$purchase_item->sku}}</td>
-                <td>{{$purchase_item->item->c_name}}</td>
-                <td>{{$purchase_item->purchase_num}}</td>
-                <td>{{$purchase_item->arrival_num}}</td>
-                <td>{{$purchase_item->storage_qty}}</td>
-                <td>{{$purchase_item->active_num}}</td>
-                <td>{{$purchase_item->start_buying_time}}</td>
-                <td>{{$purchase_item->arrival_time}}</td>
-                <td>
-                 @foreach(config('purchase.purchaseItem.status') as $key=>$status)
-                {{$purchase_item->status == $key ? $status : ''}}
-                @endforeach
-                </td>
-                <td>{{$purchase_item->purchase_cost}}</td>
-                <td>{{$purchase_item->item->purchase_price}}</td>
-                <td>{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>
-                <td>{{$purchase_item->purchase_cost * $purchase_item->storage_qty}}</td>
-                <td>{{$purchase_item->remark}}</td>
+                    <td>{{$purchase_item->sku}}</td>
+                    <td>{{$purchase_item->item?$purchase_item->item->c_name:''}}</td>
+                    <td>{{$purchase_item->purchase_num}}</td>
+                    <td>{{$purchase_item->arrival_num}}</td>
+                    <td>{{$purchase_item->storage_qty}}</td>
+                    <td>{{$purchase_item->active_num}}</td>
+                    <td>{{$purchase_item->start_buying_time}}</td>
+                    <td>{{$purchase_item->arrival_time}}</td>
+                    <td>
+                        @foreach(config('purchase.purchaseItem.status') as $key=>$status)
+                            {{$purchase_item->status == $key ? $status : ''}}
+                        @endforeach
+                    </td>
+                    <td>{{$purchase_item->purchase_cost}}</td>
+                    <td>{{$purchase_item->item?$purchase_item->item->purchase_price:''}}</td>
+                    <td>{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>
+                    <td>{{$purchase_item->purchase_cost * $purchase_item->storage_qty}}</td>
+                    <td>{{$purchase_item->remark}}</td>
                 </tr>
                 @endforeach
                 <tr>
-                <th>合计</th>
-                <th>&nbsp;</th>
-                <th>{{ $purchaseOrder->sum_purchase_num}}</th>
-                <th>{{ $purchaseOrder->sum_arrival_num}}</th>
-                <th>{{ $purchaseOrder->sum_storage_qty}}</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>{{ $purchaseOrder->sum_purchase_account}}</th>
-                <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
-                <th>&nbsp;</th>
+                    <th>合计</th>
+                    <th>&nbsp;</th>
+                    <th>{{ $purchaseOrder->sum_purchase_num}}</th>
+                    <th>{{ $purchaseOrder->sum_arrival_num}}</th>
+                    <th>{{ $purchaseOrder->sum_storage_qty}}</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <th>{{ $purchaseOrder->sum_purchase_account}}+YF{{$purchaseOrder->purchase_post_num}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</th>
+                    <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
+                    <th>&nbsp;</th>
                 </tr>
                 </tbody>
                 </table>

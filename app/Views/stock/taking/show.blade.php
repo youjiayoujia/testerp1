@@ -35,7 +35,7 @@
             <tbody>
                 @foreach($stockTakingForms as $stockTakingForm)
                 <tr>
-                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->items ? $stockTakingForm->stock->items->sku : '' : ''}}</td>
+                    <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->item ? $stockTakingForm->stock->item->sku : '' : ''}}</td>
                     <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->warehouse ? $stockTakingForm->stock->warehouse->name : '' : ''}}</td>
                     <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->position ? $stockTakingForm->stock->position->name : '' : ''}}</td>
                     <td>{{ $stockTakingForm->stock ? $stockTakingForm->stock->available_quantity : '' }}</td>
@@ -55,7 +55,7 @@
         @foreach($stockouts as $stockout)
             <div class='row'>
                 <div class="col-lg-2">
-                    <strong>sku</strong>: {{ $stockout->stock ? $stockout->stock->items ? $stockout->stock->items->sku : '' : '' }}
+                    <strong>sku</strong>: {{ $stockout->stock ? $stockout->stock->item ? $stockout->stock->item->sku : '' : '' }}
                 </div>
                 <div class="col-lg-2">
                     <strong>出库仓库</strong>: {{ $stockout->stock ? $stockout->stock->warehouse ? $stockout->stock->warehouse->name : '' : '' }}
@@ -82,7 +82,7 @@
         @foreach($stockins as $stockin)
         <div class='row'>
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $stockin->stock ? $stockin->stock->items ? $stockin->stock->items->sku : '' : '' }}
+                <strong>sku</strong>: {{ $stockin->stock ? $stockin->stock->item ? $stockin->stock->item->sku : '' : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>入库仓库</strong>: {{ $stockin->stock ? $stockin->stock->warehouse ? $stockin->stock->warehouse->name : '' : '' }}

@@ -12,7 +12,7 @@ class PackageModel extends BaseModel
 {
     protected $table = 'packages';
 
-    public $searchFields = ['email'];
+    public $searchFields = ['tracking_no'];
 
     public $rules = [
         'create' => ['ordernum' => 'required'],
@@ -60,7 +60,18 @@ class PackageModel extends BaseModel
         'is_over',
     ];
 
-    public $relatedSearchFields = ['warehouse' => 'name', 'item' => 'sku'];
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
+            'filterFields' => ['tracking_no'],
+            'filterSelects' => ['status' => config('package')],
+            'selectRelatedSearchs' => [
+                'order' => ['status' => config('order.status'), 'active' => config('order.active')],
+            ],
+            'sectionSelect' => ['time' => ['created_at']],
+        ];
+    }
 
     public function assigner()
     {

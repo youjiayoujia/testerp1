@@ -44,6 +44,7 @@ class StockController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
             'warehouses' => WarehouseModel::where(['is_available' => '1'])->get(),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
     }

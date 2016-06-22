@@ -102,6 +102,18 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['channel' => ['name'], 'country' => ['code']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
+            'selectRelatedSearchs' => [
+                
+            ],
+        ];
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');

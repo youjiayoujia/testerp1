@@ -36,5 +36,20 @@ return [
     'excelPath' => './uploads/excel/',
 
     'stockExcelPath' => './uploads/stockExcel/',
+
+    'transfer_search' => [
+        'warehouse.name' => '仓库',
+        'channel.name' => '渠道',
+        'channelAccount.account' => '渠道帐号',
+        'logistics.short_code' => '物流简码',
+        'logistics.logistics_type' => '物流方式',
+        'tracking_no' => '物流追踪号',
+        'status' => '状态',
+        'order.status' => '订单状态',
+        'order.active' => '订单售后状态',
+        'active' => '订单售后状态',
+        'country.code' => '国家简称',
+        'time.created_at' => '创建时间',
+    ],
 ];
 

@@ -32,7 +32,7 @@ class OrderModel extends BaseModel
         'ordernum',
         'email',
         'customer_service',
-        'operator',
+        'operator'
     ];
 
     public function rule($request)

@@ -454,7 +454,7 @@ class PurchaseOrderController extends Controller
             foreach ($arr as $value) {
                 $update_data = explode(':', $value);
                 $purchase_item = PurchaseItemModel::find($update_data[0]);
-                //print_r($purchase_item);exit;
+                
                 if($purchase_item->arrival_num!=$purchase_item->purchase_num){
                     $filed['purchase_item_id'] = $purchase_item['id'];
                     $filed['sku'] = $purchase_item['sku'];
@@ -513,23 +513,27 @@ class PurchaseOrderController extends Controller
             $update_data = explode(':', $value);
             $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
             $purchase_item = $arrivel_log->purchaseItem;
+            //print_r($purchase_item->item->sku);exit;
             if($purchase_item->item->warehouse_position==''){
                 echo json_encode($purchase_item->item->sku);exit;
-            }
-            $filed['good_num'] = $update_data[1];
-            $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
-            $filed['quality_time'] = date('Y-m-d H:i:s',time());
-            $arrivel_log->update($filed);
-            //purchaseitem
-            $datas['status'] = 3;
-            $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
-            $datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
-            if($datas['storage_qty']>=$purchase_item->purchase_num){
-                $datas['status'] = 4;
-            }
-            $purchase_item->update($datas);
-            
+            }else{
+                $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
+                $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
+                $filed['quality_time'] = date('Y-m-d H:i:s',time());
+                
+                $arrivel_log->update($filed);
+                //purchaseitem
+                $datas['status'] = 3;
+                $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+                $datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
+                if($datas['storage_qty']>=$purchase_item->purchase_num){
+                    $datas['status'] = 4;
+                }
+                //print_r($datas);
+                $purchase_item->update($datas);  
+            }       
         }
+        
         $p_status = 4;
         $purchasrOrder = $this->model->find($p_id);
         foreach($purchasrOrder->purchaseItem as $p_item){
@@ -538,6 +542,7 @@ class PurchaseOrderController extends Controller
             }
         }
         $purchasrOrder->update(['status'=>$p_status]);
+        $p_id = (int)$p_id;
         echo json_encode($p_id);
     }
         

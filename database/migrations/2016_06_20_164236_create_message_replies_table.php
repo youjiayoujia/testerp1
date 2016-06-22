@@ -14,13 +14,13 @@ class CreateMessageRepliesTable extends Migration
     {
         Schema::create('message_replies',function (Blueprint $table){
             $table->increments('id');
-            $table->integer('message_id')->default(NULL);
+            $table->integer('message_id')->nullable()->default(NULL);
             $table->string('to');
             $table->string('to_email');
-            $table->string('title')->default(NULL);
+            $table->string('title')->nullable()->default(NULL);
             $table->text('content');
-            $table->enum('status',['NEW','SENT','FAIL'])->defalut('NEW');
-            $table->string('updatefile')->defalut(NULL);
+            $table->enum('status',['NEW','SENT','FAIL'])->defalut('NEW')->nullable();
+            $table->string('updatefile')->nullable()->defalut(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

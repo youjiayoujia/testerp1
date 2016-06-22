@@ -1,9 +1,8 @@
 <?php
-
 /**
  * Message配置文件
- *
- * @author Vincent <nyewon@gmail.com>
+ * @author jiangdi
+ * @datetime 2016-6-21 16:37:32
  */
 return [
     'attachmentPath' => 'public/uploads/message/attachments/',

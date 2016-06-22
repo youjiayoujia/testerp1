@@ -12,7 +12,14 @@ class CreateMessageTemplateTypesTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('message_template_types',function (Blueprint $table){
+            $table->increments('id');
+            $table->integer('parent_id')->nullable()->default(NULL);
+            $table->string('name')->nullable()->default(NULL);
+            $table->timestamps();
+            $table->softDeletes();
+
+        });
     }
 
     /**

@@ -12,7 +12,15 @@ class CreateMessageAccountsTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('message_accounts',function (Blueprint $table){
+            $table->increments('id');
+            $table->string('account')->nullable()->default(NULL);
+            $table->string('name')->nullable()->default(NULL);
+            $table->text('secret')->nullable()->default(NULL);
+            $table->text('token')->nullable()->default(NULL);
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**

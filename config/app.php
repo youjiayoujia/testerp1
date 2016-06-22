@@ -157,6 +157,11 @@ return [
          * Debugbar
          */
         Barryvdh\Debugbar\ServiceProvider::class,
+
+        /**
+         * PHPStorm的laravel插件
+         */
+        //Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider,
     ],
 
     /*

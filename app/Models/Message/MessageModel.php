@@ -6,6 +6,8 @@
  */
 namespace App\Models\Message;
 use App\Base\BaseModel;
+use App\Models\Order\PackageModel;
+use Tool;
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -63,5 +65,52 @@ class MessageModel extends BaseModel{
     {
         return config('message.statusText.' . $this->status);
     }
+
+    public function relatedOrders()
+    {
+        return $this->hasMany('App\Models\Message\OrderModel', 'message_id');
+    }
+
+    /**
+     * 分配
+     * @param $userId
+     * @return bool
+     */
+    public function assign($userId)
+    {
+        switch ($this->status) {
+            case 'UNREAD':
+                $this->assign_id = $userId;
+                $this->status = 'PROCESS';
+                return $this->save();
+                break;
+            default:
+                return $this->assign_id == $userId;
+                break;
+        }
+    }
+
+    public function getOne($userId)
+    {
+        return $this
+            ->where('label', 'INBOX')
+            ->where('status', 'UNREAD')
+            ->orWhere(function ($query) use ($userId) {
+                $query->where('assign_id', $userId)->where('status', 'PROCESS')->where('dont_reply','<>',1);
+            })->first();
+    }
+
+    public function guessRelatedOrders($email = null)
+    {
+        $relatedOrders = [];
+        if ($this->last) {
+            $relatedOrders['history'] = $this->last->relatedOrders;
+        }
+        $email = $email ? $email : $this->from;
+        
+        $relatedOrders['email'] = OrderModel::where('email', $email)->get();
+        return $relatedOrders;
+    }
+
 
 }

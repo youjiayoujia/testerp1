@@ -12,7 +12,13 @@ class CreateMessageOrdersTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('message_orders',function (Blueprint $table){
+            $table->increments('id');
+            $table->integer('message_id')->nullable()->default(NULL);
+            $table->integer('order_id')->nullable()->default(NULL);
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**

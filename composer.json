@@ -54,5 +54,14 @@
   },
   "config": {
     "preferred-install": "dist"
-  }
+  },
+  "require": {
+    "laravel/framework": "5.0.*",
+    "barryvdh/laravel-ide-helper":"dev-master"
+  },
+  "post-update-cmd": [
+    "php artisan clear-compiled",
+    "php artisan optimize",
+    "php artisan ide-helper:generate"
+  ],
 }

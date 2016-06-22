@@ -10,6 +10,11 @@
   |
  */
 
+//暂时放在这边
+Route::any('message/process',
+    ['as' => 'message.process', 'uses' => 'MessageController@process']);
+
+
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -495,8 +500,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
     Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
+    //分类-邮件路由 》》》》》》》》》》》》》》》》》》
     //邮件信息
     Route::resource('message', 'MessageController');
+    
+    //处理信息
+/*    Route::any('message/process',
+        ['as' => 'message.process', 'uses' => 'MessageController@process']);*/
+    //分类-邮件路由 《《《《《《《《《《《《《《《《《《
 
 
     //用户路由

@@ -8,6 +8,7 @@ namespace App\Http\Controllers;
 use App\Models\Message\MessageModel;
 use App\Models\UserModel;
 use App\Models\Message\Template\TypeModel;
+use App\Http\Controllers\AccountModel;
 
 use Illuminate\Http\Request;
 
@@ -60,9 +61,7 @@ class MessageController extends Controller
         }
 
         if ($message->assign(request()->user()->id)) {
-
-            print_r($message->guessRelatedOrders(request()->input('email')));exit;
-
+            
             $userarr=config('user.staff');
             $emailarr=config('user.email');
             $response = [

@@ -7,7 +7,9 @@
 namespace App\Models\Message;
 use App\Base\BaseModel;
 use App\Models\Order\PackageModel;
+use App\Models\OrderModel;
 use Tool;
+
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
     protected $table = 'messages';
@@ -107,7 +109,6 @@ class MessageModel extends BaseModel{
             $relatedOrders['history'] = $this->last->relatedOrders;
         }
         $email = $email ? $email : $this->from;
-        
         $relatedOrders['email'] = OrderModel::where('email', $email)->get();
         return $relatedOrders;
     }

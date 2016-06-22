@@ -52,6 +52,29 @@ class OrderController extends Controller
     }
 
     /**
+     * 获取国家信息
+     */
+    public function ajaxCountry()
+    {
+        if(request()->ajax()) {
+            $country = trim(request()->input('shipping_country'));
+            $buf = CountriesModel::where('code', 'like', '%'.$country.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->code;
+                $arr[$key]['text'] = $value->code;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
+
+    /**
      * 保存数据
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector

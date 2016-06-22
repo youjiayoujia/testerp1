@@ -197,7 +197,7 @@
             <div class="form-group col-lg-2">
                 <label for="shipping_country" class='control-label'>发货国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') }}">
+                <select class="form-control shipping_country" id="shipping_country" name='shipping_country'></select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_zipcode" class='control-label'>发货邮编</label>
@@ -426,6 +426,29 @@
                     alert('请输入sku');
                 }
             });
+
+            $('.shipping_country').select2({
+                ajax: {
+                    url: "{{ route('order.ajaxCountry') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            shipping_country: params.term,
+                            page: params.page
+                        };
+                    },
+                    results: function(data, page) {
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
+                    }
+                }
+            });
+
         });
     </script>
 @stop

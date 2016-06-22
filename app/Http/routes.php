@@ -195,6 +195,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 //采购单e/purchaseOrder/addPost/
 	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
+    Route::any('PurchaseOrder/trackingNoSearch', [ 'uses'=>'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
+    Route::any('purchaseList/ajaxScan', [ 'uses'=>'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
     Route::any('purchaseOrder/printpo', [ 'uses'=>'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
     Route::any('purchaseOrder/ajaxInWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);

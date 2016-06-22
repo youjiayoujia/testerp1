@@ -126,7 +126,7 @@ table.gridtable td {
 	<tr>
 		<td colspan="2">
 			<button class="modify">修改</button>
-			<button>设置全部到货</button>
+			<button class="modify" value="all">设置全部到货</button>
 		</td>
 	</tr>
 </table>

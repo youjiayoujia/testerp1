@@ -98,12 +98,12 @@
                 <h4 class="modal-title" id="myModalLabel">邮件历史</h4>
             </div>
             <div class="modal-body">
-			
+
                 @foreach($message->histories->take(5) as $history)
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <strong>Message <a href="{{ url('message',$history->id)}}">#{{ $history->id }}</a></strong>
-							
+
 							<br/>
                         </div>
                         <div class="panel-body">

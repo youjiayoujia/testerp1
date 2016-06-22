@@ -10,11 +10,6 @@
   |
  */
 
-//暂时放在这边
-Route::any('message/process',
-    ['as' => 'message.process', 'uses' => 'MessageController@process']);
-
-
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -500,13 +495,48 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
     Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
-    //分类-邮件路由 》》》》》》》》》》》》》》》》》》
+    //分类-邮件路由 《《《《《《《《《《《《《《《《《《
+    //稍后处理
+    Route::any('message/{id}/dontRequireReply',
+        ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
+    //无需回复
+    Route::any('message/{id}/notRequireReply',
+        ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
+    //处理信息
+    Route::any('message/process',
+        ['as' => 'message.process', 'uses' => 'MessageController@process']);
+    //邮件内容
+    Route::any('message/{id}/content',
+        ['as' => 'message.content', 'uses' => 'MessageController@content']);
     //邮件信息
     Route::resource('message', 'MessageController');
-    
-    //处理信息
-/*    Route::any('message/process',
-        ['as' => 'message.process', 'uses' => 'MessageController@process']);*/
+    //邮件转发控制器
+    Route::any('message/{id}/foremail',
+        ['as' => 'message.foremail', 'uses' => 'MessageController@foremail']);
+    Route::get('forwardemail/edit/{id}', 'Message\ForemailController@edit');
+    //转交他人
+    Route::any('message/{id}/assignToOther',
+        ['as' => 'message.assignToOther', 'uses' => 'MessageController@assignToOther']);
+    Route::resource('message', 'MessageController');
+    //设置关联订单
+    Route::any('message/{id}/setRelatedOrders',
+        ['as' => 'message.setRelatedOrders', 'uses' => 'MessageController@setRelatedOrders']);
+    //无需关联订单
+    Route::any('message/{id}/notRelatedOrder',
+        ['as' => 'message.notRelatedOrder', 'uses' => 'MessageController@notRelatedOrder']);
+    Route::resource('message', 'MessageController');
+    //信息模版类型路由
+    Route::any('messageTemplateType/ajaxGetChildren',
+        ['as' => 'messageTemplateType.ajaxGetChildren', 'uses' => 'Message\Template\TypeController@ajaxGetChildren']);
+    Route::any('messageTemplateType/ajaxGetTemplates',
+        ['as' => 'messageTemplateType.ajaxGetTemplates', 'uses' => 'Message\Template\TypeController@ajaxGetTemplates']);
+    Route::resource('messageTemplateType', 'Message\Template\TypeController');
+    //信息模版路由
+    Route::any('messageTemplate/ajaxGetTemplate',
+        ['as' => 'messageTemplate.ajaxGetTemplate', 'uses' => 'Message\TemplateController@ajaxGetTemplate']);
+    //回复信息
+    Route::any('message/{id}/reply',
+        ['as' => 'message.reply', 'uses' => 'MessageController@reply']);
     //分类-邮件路由 《《《《《《《《《《《《《《《《《《
 
 

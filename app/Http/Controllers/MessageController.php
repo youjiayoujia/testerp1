@@ -8,9 +8,7 @@ namespace App\Http\Controllers;
 use App\Models\Message\MessageModel;
 use App\Models\UserModel;
 use App\Models\Message\Template\TypeModel;
-use App\Http\Controllers\AccountModel;
-
-use Illuminate\Http\Request;
+use App\Models\Message\AccountModel;
 
 class MessageController extends Controller
 {
@@ -60,8 +58,8 @@ class MessageController extends Controller
             $count='';
         }
 
+        
         if ($message->assign(request()->user()->id)) {
-            
             $userarr=config('user.staff');
             $emailarr=config('user.email');
             $response = [
@@ -74,11 +72,41 @@ class MessageController extends Controller
                 //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
             ];
+
             return view($this->viewPath . 'process', $response)->with('count',$count);
 
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '该信息已被他人处理.'));
 
+    }
+
+    public function content($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+
+        return $model->message_content;
+    }
+
+    /**
+     * 无需关联订单
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function notRelatedOrder($id)
+    {
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        if ($message->notRelatedOrder()) {
+            $alert = $this->alert('success', '无需关联订单设置成功.');
+        } else {
+            $alert = $this->alert('danger', '无需关联订单设置失败.');
+        }
+        return redirect(route('message.process', ['id' => $id]))->with('alert', $alert);
     }
 
 

@@ -113,5 +113,59 @@ class MessageModel extends BaseModel{
         return $relatedOrders;
     }
 
+    public function assignToOther($fromId, $assignId)
+    {
+
+        if ($this->assign_id == $fromId) {
+            $assignUser = UserModel::find($assignId);
+            if ($assignUser) {
+                $this->assign_id = $assignId;
+                return $this->save();
+            }
+        }
+        return false;
+    }
+
+    public function getHistoriesAttribute()
+    {
+        return MessageModel::where('from','=', $this->from)
+            ->where('id', '<>', $this->id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+    }
+
+    public function replies()
+    {
+        return $this->hasMany('App\Models\Message\ReplyModel', 'message_id');
+    }
+
+    public function parts()
+    {
+        return $this->hasMany('App\Models\Message\PartModel', 'message_id');
+    }
+
+    public function getMessageContentAttribute()
+    {
+        $plainBody = '';
+        foreach ($this->parts as $part) {
+            if ($part->mime_type == 'text/html') {
+                $htmlBody = Tool::base64Decode($part->body);
+                $htmlBody=preg_replace("/<(\/?body.*?)>/si","",$htmlBody);
+            }
+            if ($part->mime_type == 'text/plain') {
+                $plainBody .= nl2br(Tool::base64Decode($part->body));
+            }
+        }
+        $body = isset($htmlBody) && $htmlBody != '' ? $htmlBody : $plainBody;
+        
+        return $body;
+    }
+
+    public function notRelatedOrder()
+    {
+        $this->related = 1;
+        return $this->save();
+    }
 
 }

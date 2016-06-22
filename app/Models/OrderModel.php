@@ -10,13 +10,13 @@
 
 namespace App\Models;
 
-use Exception;
 use Tool;
+use Exception;
 use App\Base\BaseModel;
+use App\Models\ItemModel;
+use App\Models\Order\RefundModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
 use Illuminate\Support\Facades\DB;
-use App\Models\Order\RefundModel;
-use App\Models\Order\ItemModel;
 
 class OrderModel extends BaseModel
 {
@@ -27,7 +27,7 @@ class OrderModel extends BaseModel
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
     public $searchFields = ['ordernum', 'email'];
-    
+
     public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
 
     public function rule($request)
@@ -171,8 +171,36 @@ class OrderModel extends BaseModel
 
     public function getStatusNameAttribute()
     {
-        $arr = config('order.status');
-        return $arr[$this->status];
+        $config = config('order.status');
+        return $config[$this->status];
+    }
+
+    public function getStatusColorAttribute()
+    {
+        switch ($this->status) {
+            case 'REVIEW':
+                $color = 'danger';
+                break;
+            case 'CANCEL':
+                $color = 'active';
+                break;
+            case 'NEED':
+                $color = 'warning';
+                break;
+            case 'COMPLETE':
+                $color = 'success';
+                break;
+            case 'SHIPPED':
+                $color = 'success';
+                break;
+            case 'UNPAID':
+                $color = '';
+                break;
+            default:
+                $color = 'info';
+                break;
+        }
+        return $color;
     }
 
     public function getActiveNameAttribute()
@@ -261,7 +289,7 @@ class OrderModel extends BaseModel
             $file->move($path, time() . '.' . $file->getClientOriginalExtension());
             if ($data['type'] == 'FULL') {
                 foreach ($data['arr']['id'] as $id) {
-                    $orderItem = ItemModel::find($id);
+                    $orderItem = $this->items->find($id);
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
@@ -282,7 +310,6 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-//        $last = $this->all()->last();
         $data['ordernum'] = $begin = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {

@@ -47,13 +47,30 @@ class TestController extends Controller
 
     public function index()
     {
-        $items = $this->itemModel->whereHas('product', function ($query) {
-            $query->where('model', 'like', '%BB00001B%');
-        })->get();
-        foreach ($items as $item) {
-            echo $item->sku;
+        $orderModel = new OrderModel;
+        $start = microtime(true);
+        $account = AccountModel::find(1);
+        if ($account) {
+            $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
+            $endDate = date("Y-m-d H:i:s", time());
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
+            foreach ($orderList as $order) {
+                $order['channel_id'] = $account->channel->id;
+                $order['channel_account_id'] = $account->id;
+                $order['customer_service'] = $account->customer_service->id;
+                $order['operator'] = $account->operator->id;
+                //todo:订单状态获取
+                $order['status'] = 'PAID';
+                $oldOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
+                if (!$oldOrder) {
+                    $orderModel->createOrder($order);
+                }
+            }
+            $end = microtime(true);
+            $lasting = round($end - $start, 3);
+            echo $account->alias . ' 耗时' . $lasting . '秒';
         }
-        exit;
     }
 
 

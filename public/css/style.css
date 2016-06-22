@@ -4,6 +4,7 @@
 body,
 .btn,
 .form-control,
+.table td,
 .dropdown-menu {
     font-size: 10px;
 }
@@ -109,7 +110,6 @@ th:hover:not([data-sort=false]) {
 
 .table.table-bordered td {
     vertical-align: middle;
-    font-size: 14px;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 

@@ -46,6 +46,7 @@ class PackageController extends Controller
             'logisticses' => LogisticsModel::all(),
             'status' => config('package'),
         ];
+        
         return view($this->viewPath . 'edit', $response);
     }
 
@@ -81,6 +82,22 @@ class PackageController extends Controller
         ];
 
         return view($this->viewPath . 'allocateLogistics', $response);
+    }
+
+    public function multiPackage()
+    {
+        $package_id = trim(request('package_id'));
+        $package = $this->model->find($package_id);
+        if(!$package) {
+            return json_encode(false);
+        }
+        $items = $package->items;
+        foreach($items as $item) {
+            $item->update(['picked_quantity' => $item->quantity]);
+        }
+        $package->update(['status' => 'PACKED']);
+        
+        return json_encode(true);
     }
 
     public function storeAllocateLogistics($id)
@@ -136,7 +153,7 @@ class PackageController extends Controller
             foreach ($packages as $package) {
                 echo $package->id . '<br>';
                 $package->assignLogistics();
-                //$package->calculateProfitProcess();
+                $package->calculateProfitProcess();
             }
             $start += $len;
             $packages = PackageModel::where('status', 'NEW')

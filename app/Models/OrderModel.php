@@ -102,6 +102,18 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['channel' => ['name'], 'country' => ['code']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
+            'selectRelatedSearchs' => [
+                
+            ],
+        ];
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
@@ -438,11 +450,12 @@ class OrderModel extends BaseModel
                             'PACKAGE',
                             $newPackageItem->id,
                             $key);
+                        $orderItem = $newPackageItem->orderItem;
                         if ($flag == 1) {
-                            $newPackageItem->orderItem->status = 'PACKED';
+                            $orderItem->status = 'PACKED';
                         }
-                        $newPackageItem->orderItem->split_quantity += $newPackageItem->quantity;
-                        $newPackageItem->orderItem->save();
+                        $orderItem->split_quantity += $newPackageItem->quantity;
+                        $orderItem->save();
                     } catch (Exception $e) {
                         DB::rollBack();
                     }

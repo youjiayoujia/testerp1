@@ -277,6 +277,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('catalog', 'CatalogController');
 
     //item路由
+    Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as'=>'item.getModel']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as'=>'item.getImage']);
     Route::resource('item', 'ItemController');
 
@@ -455,6 +456,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
 
+    Route::get('package/multiPackage', ['uses' => 'PackageController@multiPackage', 'as' => 'package.multiPackage']);
     Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
     Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
     Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);

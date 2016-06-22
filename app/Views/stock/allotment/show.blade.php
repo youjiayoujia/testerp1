@@ -78,7 +78,7 @@
     @foreach($stockouts as $stockout)
         <div class='row'>
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $stockout->stock ? $stockout->stock->items ? $stockout->stock->items->sku : '' : '' }}
+                <strong>sku</strong>: {{ $stockout->stock ? $stockout->stock->item ? $stockout->stock->item->sku : '' : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>出库数量</strong>: {{ $stockout->quantity }}
@@ -102,7 +102,7 @@
     @foreach($stockins as $stockin)
     <div class='row'>
         <div class="col-lg-2">
-            <strong>sku</strong>: {{ $stockin->stock ? $stockin->stock->items ? $stockin->stock->items->sku : '' : '' }}
+            <strong>sku</strong>: {{ $stockin->stock ? $stockin->stock->item ? $stockin->stock->item->sku : '' : '' }}
         </div>
         <div class="col-lg-2">
             <strong>入库数量</strong>: {{ $stockin->quantity }}

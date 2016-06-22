@@ -52,7 +52,7 @@
                     <input type='text' name='arr[id][]' class='form-control' value="{{ $stockTakingForm->id }}" readonly>
                 </div>
                 <div class="form-group col-lg-1">
-                    <input type='text' name='arr[sku][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->items ? $stockTakingForm->stock->items->sku : '' : '' }}" readonly>
+                    <input type='text' name='arr[sku][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->item ? $stockTakingForm->stock->item->sku : '' : '' }}" readonly>
                 </div>
                 <div class="form-group col-lg-2">
                     <input type='text' name='arr[warehouse_id][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->warehouse ? $stockTakingForm->stock->warehouse->name : '' : '' }}" readonly>

@@ -85,7 +85,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
-            'relatedSearchFields' => $this->model->relatedSearchFields,
+            'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
         ];
         return view($this->viewPath . 'index', $response);

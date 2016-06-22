@@ -268,7 +268,8 @@ class PurchaseListController extends Controller
 		$postcodingNum=PurchasePostageModel::where('post_coding',$id)->count();
 		if($postcodingNum>0){
 			$res['postcoding']=PurchasePostageModel::where('post_coding',$id)->first();
-			$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
+			$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id)?PurchaseOrderModel::find($res['postcoding']->purchase_order_id)->id:'0';
+			//print_r($res['purchaseOrder']);exit;
 			$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
 	        $response = [
 	            'metas' => $this->metas(__FUNCTION__),

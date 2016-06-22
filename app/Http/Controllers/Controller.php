@@ -48,6 +48,56 @@ abstract class Controller extends BaseController
                 }
             });
         }
+        if(request()->has('mixedSearchFields')) {
+            $relateds = request()->input('mixedSearchFields');
+            foreach($relateds as $type => $related) {
+                switch($type) {
+                    case 'relatedSearchFields':
+                        foreach($related as $relation_ship => $name_arr) {
+                            foreach($name_arr as $k => $name) {
+                                if($name) {
+                                    $list = $list->whereHas($relation_ship, function($query) use ($k, $name){
+                                        $query = $query->where($k, 'like', '%'.$name.'%');
+                                    });
+                                }     
+                            }
+                        }
+                        break;
+                    case 'filterFields':
+                        foreach($related as $key => $value3) {
+                            if($value3) {
+                                $list = $list->where($key, 'like', '%'.$value3.'%');
+                            }
+                        }
+                        break;
+                    case 'filterSelects':
+                        foreach($related as $key => $value2) {
+                            if($value2) {
+                                $list = $list->where($key, $value2);
+                            }
+                        }
+                        break;
+                    case 'selectRelatedSearchs':
+                        foreach($related as $relation_ship => $contents) {
+                            foreach($contents as $name => $single) {
+                                if($single) {
+                                    $list = $list->whereHas($relation_ship, function($query) use ($name, $single){
+                                        $query = $query->where($name, $single);
+                                    });
+                                }
+                            }
+                        }
+                        break;
+                    case 'sectionSelect':
+                        foreach($related as $kind => $content) {
+                            if($content['begin'] && $content['end']) {
+                                $list = $list->whereBetween($kind, [$content['begin'], $content['end']]);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
         if (request()->has('filters')) {
             foreach (DataList::filtersDecode(request()->input('filters')) as $filter) {
                 $list = $list->where($filter['field'], $filter['oprator'], $filter['value']);
@@ -77,7 +127,7 @@ abstract class Controller extends BaseController
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
-            'relatedSearchFields' => $this->model->relatedSearchFields,
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
     }

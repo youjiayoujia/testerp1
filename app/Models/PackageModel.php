@@ -12,7 +12,7 @@ class PackageModel extends BaseModel
 {
     protected $table = 'packages';
 
-    public $searchFields = ['email'];
+    public $searchFields = ['tracking_no'];
 
     public $rules = [
         'create' => ['ordernum' => 'required'],
@@ -59,6 +59,19 @@ class PackageModel extends BaseModel
         'is_tonanjing',
         'is_over',
     ];
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
+            'filterFields' => ['tracking_no'],
+            'filterSelects' => ['status' => config('package')],
+            'selectRelatedSearchs' => [
+                'order' => ['status' => config('order.status'), 'active' => config('order.active')],
+            ],
+            'sectionSelect' => ['time' => ['created_at']],
+        ];
+    }
 
     public function assigner()
     {
@@ -228,8 +241,8 @@ class PackageModel extends BaseModel
                 if ($rule->country_section) {
                     $countries = $rule->rule_countries_through;
                     $flag = 0;
-                    foreach ($countries as $country) {
-                        if ($country->id == $this->shipping_country) {
+                    foreach($countries as $country) {
+                        if($country->code == $this->shipping_country) {
                             $flag = 1;
                             break;
                         }
@@ -249,6 +262,11 @@ class PackageModel extends BaseModel
                             }
                         }
                     }
+                }
+                //查看对应的物流方式是否是所属仓库
+                $warehouse = WarehouseModel::find($this->warehouse_id);
+                if(!$warehouse->logisticsIn($rule->type_id)) {
+                    continue;
                 }
                 //物流查询链接
                 $trackingUrl = $rule->logistics->url;
@@ -534,7 +552,7 @@ class PackageModel extends BaseModel
     public function calculateProfitProcess()
     {
         $order = $this->order;
-        $orderItems = $order->orderItem;
+        $orderItems = $order->items;
         $orderAmount = $order->amount;
         $orderCosting = $order->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee($order, $orderItems);

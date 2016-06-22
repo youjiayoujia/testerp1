@@ -1,3 +1,4 @@
+        <input type="hidden" value="{{$bang}}" id="bang">
         <div class="row">
              <div class="form-group col-lg-6">
              <strong>运单号:</strong>
@@ -8,7 +9,7 @@
              @if($postcodingNum >0)
              <div class="form-group col-lg-6">
              <strong>已关联采购单:</strong>
-             <span id="guanlian">NO.{{$data['purchaseOrder']->id}}</span>
+             <span id="guanlian">NO.{{$data['purchaseOrder']}}</span>
              </div>
              @else
              <div class="form-group col-lg-6">
@@ -49,7 +50,7 @@
                 <tr>
                     <td>{{$data['postcoding']->id}}</td>
                     <td>{{$data['postcoding']->post_coding}}</td>
-                    <td>已关联</td>
+                    <td><?php if($data['purchaseOrder']==0){echo "未关联"; }else{echo "已关联";} ?></td>
                     <td><a target="_blank" href="{{ route('purchaseOrder.show', ['id'=>$data['postcoding']->purchase_order_id]) }}">{{$data['postcoding']->purchase_order_id}}</a></td>
                     <td>{{$data['postcoding']->user?$data['postcoding']->user->name:''}}</td>
                     <td>{{$data['postcoding']->updated_at}}</td>

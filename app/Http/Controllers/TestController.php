@@ -23,6 +23,8 @@ use App\Jobs\DoPackage;
 use DNS1D;
 use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
+use App\Models\WarehouseModel;
+use App\Models\Warehouse\PositionModel;
 
 class TestController extends Controller
 {
@@ -35,10 +37,12 @@ class TestController extends Controller
 
     public function test1()
     {
-
-        $package = PackageModel::find(60);
-        $fee = $package->calculateLogisticsFee();
-        var_dump($fee);
+       // $warehouses = PositionModel::whereHas('warehouse', function($query){
+       //  $query->where('telephone', 'like', '%'.'890'.'%');
+       // })->get();
+       // var_dump($warehouses->toArray());exit;
+        //$arr = [''];
+        var_dump(config('order.status'));
     }
 
     public function index()

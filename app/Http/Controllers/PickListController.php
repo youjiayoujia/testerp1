@@ -190,7 +190,9 @@ class PickListController extends Controller
             'packages' => $model->package,
             'logistics' => LogisticsModel::all(),
         ];
-    
+        if($model->type == 'MULTI')
+            return view($this->viewPath.'packageMulti', $response);
+        
         return view($this->viewPath.'package', $response);
     }
 

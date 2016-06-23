@@ -31,9 +31,9 @@
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
-                        if($("#ajaxp_id").val()==''){
+                        //if($("#ajaxp_id").val()==''){
                             $("#ajaxp_id").val($("#p_id").val());
-                        }
+                        //}
                         $("#p_id").val("");
                     }
                 });

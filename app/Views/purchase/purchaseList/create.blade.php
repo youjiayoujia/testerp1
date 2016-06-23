@@ -63,6 +63,9 @@
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
+                        if($("#bang").val()==1){
+                            $("#p_id").attr("disabled","disabled");
+                        }
                     }
                 });
     	    }
@@ -82,6 +85,8 @@
                 success: function (result) {
                     if(result == 1){
 						alert('绑定成功');
+                        $("#p_id").removeAttr("disabled");
+                        window.location.reload();
 					}
                     if(result == 2){
                         alert('绑定失败');

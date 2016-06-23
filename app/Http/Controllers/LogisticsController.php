@@ -105,16 +105,6 @@ class LogisticsController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
-    /**
-     *ajax获取zone
-     */
-    public function zone()
-    {
-        $id = request()->input("id");
-        $buf =$this->model->find($id)->species;
-        return json_encode($buf);
-    }
-
     public function getLogistics()
     {
         $logistics_id = request('logistics');

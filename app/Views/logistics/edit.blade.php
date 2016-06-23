@@ -94,20 +94,6 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="species" class="control-label">种类</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="species" value="express" {{ $model->species == 'express' ? 'checked' : '' }}>快递
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="species" value="packet" {{ $model->species == 'packet' ? 'checked' : '' }}>小包
-                </label>
-            </div>
-        </div>
-        <div class="form-group col-lg-2">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">

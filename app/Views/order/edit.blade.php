@@ -203,7 +203,11 @@
             <div class="form-group col-lg-2">
                 <label for="shipping_country" class='control-label'>发货国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') ? old('shipping_country') : $model->shipping_country }}">
+                <select name="shipping_country" class="form-control shipping_country" id="shipping_country">
+                    @foreach($countries as $country)
+                        <option value="{{ $country->code }}" {{ $country->code == $model->shipping_country ? 'selected' : ''}}>{{ $country->code }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_zipcode" class='control-label'>发货邮编</label>
@@ -262,6 +266,10 @@
                     <label for="sku" class='control-label'>sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
+                <div class="form-group col-sm-2">
+                    <label for="channel_sku" class='control-label'>渠道sku</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                </div>
                 <div class="form-group col-sm-1">
                     <label for="quantity" class='control-label'>数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -289,7 +297,12 @@
             @foreach($orderItems as $key => $orderItem)
                 <div class='row'>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}">
+                        <select name="arr[sku][{{$key}}]" class="form-control sku" id="arr[sku][{{$key}}]">
+                            <option value="{{ $orderItem->item ? $orderItem->item->sku : '' }}">{{ $orderItem->item ? $orderItem->sku : ''}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <input type='text' class="form-control channel_sku" id="arr[channel_sku][{{$key}}" placeholder="渠道sku" name='arr[channel_sku][{{$key}}]' value="{{ old('arr[channel_sku][$key]') ? old('arr[channel_sku][$key]') : $orderItem->channel_sku }}">
                     </div>
                     <div class="form-group col-sm-1">
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}">
@@ -382,6 +395,27 @@
                     type: 'get',
                     success: function (result) {
                         $('#itemDiv').append(result);
+                        $('.sku').select2({
+                            ajax: {
+                                url: "{{ route('order.ajaxSku') }}",
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        sku: params.term,
+                                        page: params.page
+                                    };
+                                },
+                                results: function(data, page) {
+                                    if((data.results).length > 0) {
+                                        var more = (page * 20)<data.total;
+                                        return {results:data.results,more:more};
+                                    } else {
+                                        return {results:data.results};
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
                 current++;
@@ -425,10 +459,36 @@
                     }
                 });
             });
+
+            $('.shipping_country').select2();
+
+            $('.sku').select2({
+                ajax: {
+                    url: "{{ route('order.ajaxSku') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            sku: params.term,
+                            page: params.page
+                        };
+                    },
+                    results: function(data, page) {
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
+                    }
+                }
+            });
+
         });
 
         $(document).on('click', '.bt_right', function(){
             $(this).parent().remove();
         });
+
     </script>
 @stop

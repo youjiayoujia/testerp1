@@ -168,6 +168,7 @@ class OrderController extends Controller
             'aliases' => $model->channel->channelAccount,
             'arr' => $arr,
             'rows' => $model->items()->count(),
+            'countries' => CountriesModel::all(),
         ];
 
         return view($this->viewPath . 'edit', $response);

@@ -9,11 +9,15 @@ use App\Models\Message\MessageModel;
 use App\Models\UserModel;
 use App\Models\Message\Template\TypeModel;
 use App\Models\Message\AccountModel;
+use App\Models\Message\Message_logModel;
+use App\Models\Message\ReplyModel;
+
 
 class MessageController extends Controller
 {
     public function __construct(MessageModel $message)
     {
+
         $this->model = $message;
         $this->mainIndex = route('message.index');
         $this->mainTitle = '信息';
@@ -110,6 +114,160 @@ class MessageController extends Controller
         return redirect(route('message.process', ['id' => $id]))->with('alert', $alert);
     }
 
+    /**
+     * 转交给其他人
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function assignToOther($id)
+    {
+        $message = $this->model->find($id);
+        $touser=UserModel::find(request()->input('assign_id'))->name;
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        if ($message->assignToOther(request()->user()->id ,request()->input('assign_id'))) {
+            $data=array();
+            $data['message_id']=$id;
+            $data['foruser']=request()->user()->name;
+            $data['assign_id']=request()->input('assign_id');
+            $data['touser']=$touser;
+            Message_logModel::create($data);
+            if ($this->workflow == 'keeping') {
+                return redirect(route('message.process'))
+                    ->with('alert', $this->alert('success', '上条信息已转交他人.'));
+            }
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '转交成功.'));
+        }
+        return redirect($this->mainIndex)->with('alert', $this->alert('danger', '转交失败.'));
+    }
+
+    /**
+     * 无需回复
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function notRequireReply($id)
+    {
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        if ($message->notRequireReply(request()->user()->id)) {
+            if ($this->workflow == 'keeping') {
+                return redirect(route('message.process'))
+                    ->with('alert', $this->alert('success', '上条信息已标记无需回复.'));
+            }
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));
+        }
+        return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败.'));
+    }
+
+    /**
+     * 新增单个无需回复处理
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function notRequireReply_1($id)
+    {
+        $message = $this->model->find($id);
+        if($message->status!="COMPLETE"){
+            $message->assign_id=request()->user()->id;
+            $message->required=0;
+            $message->status="COMPLETE";
+            $message->save();
+        }
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '批量无需回复处理成功.'));
+    }
+
+    /**
+     * 稍后处理
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function dontRequireReply($id)
+    {
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        if ($message->dontRequireReply(request()->user()->id)) {
+            if ($this->workflow == 'keeping') {
+                return redirect(route('message.process1',['id'=>$id]))
+                    ->with('alert', $this->alert('success', '上条信息已标记稍后处理.'));
+            }
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));
+        }
+    }
+
+    /**
+     * 关联订单
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function setRelatedOrders($id)
+    {
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        $numbers = request()->input('relatedOrdernums');
+        if (request()->input('numbers')) {
+            foreach (explode(',', request()->input('numbers')) as $number) {
+                $numbers[] = $number;
+            }
+        }
+
+        if ($message->setRelatedOrders($numbers)) {
+            $alert = $this->alert('success', '关联订单成功.');
+        } else {
+            $alert = $this->alert('danger', '关联订单失败.');
+        }
+        return redirect(route('message.process', ['id' => $id]))->with('alert', $alert);
+    }
+
+    /**
+     * 开启工作流
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function startWorkflow()
+    {
+        request()->session()->put('workflow', 'keeping');
+        return redirect(route('message.process'))
+            ->with('alert', $this->alert('success', '工作流已开启.'));
+    }
+
+    /**
+     * 关闭工作流
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function endWorkflow($id)
+    {
+        request()->session()->pull('workflow');
+        return redirect(route('message.process', ['id' => $id]))
+            ->with('alert', $this->alert('danger', '工作流已终止.'));
+    }
+
+    public function reply($id, ReplyModel $reply)
+    {
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $reply->rules('create')); //
+        
+        if ($message->reply(request()->all())) {
+            if ($this->workflow == 'keeping') {
+                return redirect(route('message.process'))
+                    ->with('alert', $this->alert('success', '上条信息已成功回复.'));
+            }
+
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '回复成功.'));
+        }
+        return redirect($this->mainIndex)->with('alert', $this->alert('danger', '回复失败.'));
+    }
 
 
 }

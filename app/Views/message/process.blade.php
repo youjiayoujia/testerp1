@@ -1,5 +1,11 @@
 @extends('layouts.default')
 @section('content')
+    <!--编辑工具插件-->
+    <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">{{-- OUR CSS --}}
+
+    <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
     <div class="row">
         <div class="col-lg-8">
             @include('message.process.content')
@@ -96,4 +102,6 @@
             );
         }
     </script>
+
+
 @stop

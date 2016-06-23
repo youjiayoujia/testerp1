@@ -201,56 +201,6 @@
                 </button>
             </div>
         </div>
-        <div class="panel panel-success">
-            <div class="panel-heading">转发邮件</div>
-            <div class="panel-body">
-                <form action="{{ route('message.foremail', ['id'=>$message->id]) }}" method="POST">
-                    {!! csrf_field() !!}
-                    <div class="row form-group">
-                        <div class="col-lg-8">
-                            <div id="change">
-                                <select class="form-control" name="email">
-                                    <option>请选择</option>
-                                    @foreach($emailarr as $email_name)
-                                        <option value="{{ $email_name }}">
-                                            {{ $email_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <input type="radio" name="payMethod" value="1" checked/>请选择
-                            <input type="radio" name="payMethod" value="2"/>自定义
-                            <input type="hidden" name="content"
-                                   value="<iframe class='embed-responsive-item' src='{{ route('message.content', ['id'=>$message->id]) }}'></iframe>"/>
-                        </div>
-                        <div class="col-lg-4">
-                            <button type="submit" class="btn btn-success">
-                                <span class="glyphicon glyphicon-search"></span> 转发
-                            </button>
-                        </div>
-                    </div>
-                </form>
-                <script type="text/javascript">
-                    $(function () {
-                        $(":radio").click(function () {
-                            var str = "";
-                            if ($(this).val() == 1) {
-                                str = "<select class='form-control' name='email'>";
-                                str += "<option>请选择</option>";
-                                @foreach($emailarr as $email_name)
-                           str += "<option value='{{ $email_name }}'>{{ $email_name }}</option>"
-                                @endforeach
-                           str += "</select>";
-                                $("#change").html(str);
-                            } else {
-                                str = "<input class='form-control' type='text' name='email' >";
-                                $("#change").html(str);
-                            }
-                        });
-                    });
-                </script>
-            </div>
-        </div>
         <script type="text/javascript">
             window.onload = function () {
                 // 加载页面时判断是否有数据并加载\localStorage["a"]

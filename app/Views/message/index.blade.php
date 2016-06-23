@@ -1,7 +1,9 @@
 @extends('common.table')
 @section('tableToolButtons')
     <div class="btn-group">
-
+        <a class="btn btn-success" href="{{ route('message.startWorkflow') }}">
+            <i class="glyphicon glyphicon-play"></i> 开始工作流
+        </a>
 
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -84,7 +86,7 @@
             <td>{{ $message->from_name }}</td>
             <td>{{ $message->from }}</td>
             <td>{{ date('Y-m-d H:i:s',strtotime($message->date)) }}</td>
-            <td>{{ $message->id }}</td>
+            <td>{{ $message->assign_id ? $message->assign_id : '未分配' }}</td>
             <td>{{ $message->created_at }}</td>
             <td>{{ $message->updated_at }}</td>
             <td>
@@ -107,12 +109,12 @@
                     </a>
                 @endif
                 @if($message->status == 'PROCESS' and $message->assign_id == request()->user()->id)
-                    <a href="" class="btn btn-warning btn-xs">
+                    <a href="{{ route('message.process', ['id'=>$message->id]) }}" class="btn btn-warning btn-xs">
                         <span class="glyphicon glyphicon-pause"></span> 继续处理
                     </a>
                 @endif
                 @if($message->status == 'COMPLETE' or request()->user()->group == 'super')
-                    <a href="" class="btn btn-info btn-xs">
+                    <a href="{{ route('message.show', ['id'=>$message->id]) }}" class="btn btn-info btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 查看
                     </a>
                 @endif
@@ -122,12 +124,12 @@
 
                 @else
                     @if($message->status == 'PROCESS' and $message->assign_id == request()->user()->id)
-                        <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button">
+                        <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button" onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply_1', ['id'=>$message->id]) }}'}">
                             <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                         </button>
                     @endif
                     @if($message->status == 'UNREAD')
-                        <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button">
+                        <button class="btn btn-warning btn-xs" style="background-color: #88775A;border-color: #FFFFFF;" type="button" onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply_1', ['id'=>$message->id]) }}'}">
                             <span class="glyphicon glyphicon-minus-sign"></span> 无需回复
                         </button>
                     @endif
@@ -135,13 +137,6 @@
                 @endif
 
             </td>
-
-
-
-
-
-
-
         </tr>
 
     @endforeach

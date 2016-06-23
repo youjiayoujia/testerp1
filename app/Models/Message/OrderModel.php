@@ -11,6 +11,10 @@ use App\Base\BaseModel;
 class OrderModel extends BaseModel{
 
     protected $table = 'message_orders';
+    protected $fillable = [
+        'message_id',
+        'order_id',
+    ];
 
     public function message()
     {

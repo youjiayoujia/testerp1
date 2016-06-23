@@ -502,6 +502,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
     //分类-邮件路由 《《《《《《《《《《《《《《《《《《
+    //开启工作流
+    Route::any('message/startWorkflow',
+        ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
+    //关闭工作流
+    Route::any('message/{id}/endWorkflow',
+        ['as' => 'message.endWorkflow', 'uses' => 'MessageController@endWorkflow']);
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
@@ -543,6 +549,17 @@ Route::group(['middleware' => 'auth'], function () {
     //回复信息
     Route::any('message/{id}/reply',
         ['as' => 'message.reply', 'uses' => 'MessageController@reply']);
+    //信息模版路由
+    Route::any('messageTemplate/ajaxGetTemplate',
+        ['as' => 'messageTemplate.ajaxGetTemplate', 'uses' => 'Message\TemplateController@ajaxGetTemplate']);
+    Route::resource('messageTemplate', 'Message\TemplateController');
+    //新增单个无需回复
+    Route::any('message/{id}/notRequireReply_1',
+        ['as' => 'message.notRequireReply_1', 'uses' => 'MessageController@notRequireReply_1']);
+    //转发邮件
+    Route::resource('message_log', 'Message\Messages_logController');
+    //开启工作流
+
     //分类-邮件路由 《《《《《《《《《《《《《《《《《《
 
 

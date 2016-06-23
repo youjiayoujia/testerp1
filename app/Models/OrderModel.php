@@ -671,4 +671,15 @@ class OrderModel extends BaseModel
         return $packageItem;
     }
 
+    /**
+     * 根据单号取订单记录
+     * @param $query
+     * @param $ordernum
+     * @return mixed
+     */
+    public function scopeOfOrdernum($query, $ordernum)
+    {
+        return $query->where('ordernum', $ordernum);
+    }
+
 }

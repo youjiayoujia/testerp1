@@ -6,8 +6,9 @@
  */
 namespace App\Models\Message;
 use App\Base\BaseModel;
-use App\Models\Order\PackageModel;
+use App\Models\PackageModel;
 use App\Models\OrderModel;
+use App\Models\UserModel;
 use Tool;
 
 //use App\Models\Order\PackageModel;
@@ -166,6 +167,72 @@ class MessageModel extends BaseModel{
     {
         $this->related = 1;
         return $this->save();
+    }
+
+    public function notRequireReply($userId)
+    {
+        if ($this->assign_id == $userId) {
+            $this->required = 0;
+            $this->status = 'COMPLETE';
+            return $this->save();
+        }
+        return false;
+    }
+
+    public function dontRequireReply($userId)
+    {
+        if ($this->assign_id == $userId) {
+            $this->required = 0;
+            $this->status = 'PROCESS';
+            $this->dont_reply = 1;
+            return $this->save();
+        }
+        return false;
+    }
+
+
+    public function setRelatedOrders($numbers)
+    {
+        if ($numbers) {
+            foreach ($numbers as $number) {
+                
+                $order = OrderModel::ofOrdernum($number)->first();
+                if ($order) {
+                    $this->relatedOrders()->create(['order_id' => $order->id]);
+                } else {
+                    $package = PackageModel::ofTrackingNo($number)->first();
+
+                    //var_dump($package);exit;
+                    if ($package) {
+                        $this->relatedOrders()->create(['order_id' => $package->order_id]);
+                    }
+                }
+            }
+            if ($this->relatedOrders()->count() > 0) {
+                $this->related = 1;
+                $this->start_at = date('Y-m-d H:i:s', time());
+                return $this->save();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 回复
+     * @param $data
+     * @return bool
+     */
+    public function reply($data)
+    {
+        $data['to_email'] = trim($data['to_email']);
+        if ($this->replies()->create($data)) {
+            //记录回复邮件类型
+            $this->type_id = $data['type_id']?$data['type_id']:"";
+            $this->status = 'COMPLETE';
+            $this->end_at = date('Y-m-d H:i:s', time());
+            return $this->save();
+        }
+        return false;
     }
 
 }

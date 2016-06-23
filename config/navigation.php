@@ -428,9 +428,22 @@ return [
     ],
     //财务导航
     [
-        'name' => '信息',
+        'name' => '邮件',
         'icon' => 'envelope',
-        'url' => 'message.index',
+        'url' => '',
+        'type' => '',
+        'subnavigations' =>  [
+            [
+                'name' => '信息',
+                'url'  => 'message.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '转交历史',
+                'url' => 'message_log.index',
+                'icon' => '',
+            ],
+        ]
     ],
 ];
 

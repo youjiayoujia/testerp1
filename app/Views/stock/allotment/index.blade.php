@@ -60,7 +60,7 @@
                 @if($allotment->allotment_status == 'pick')
                 <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    new
+                    重置
                 </a>
                 <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
                     <span class="glyphicon glyphicon-pencil"></span>

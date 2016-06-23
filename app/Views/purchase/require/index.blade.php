@@ -14,54 +14,57 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
     ID</th>
+    <th>产品ID</th>
     <th>sku</th>
     <th>中文名</th>
-    <th>供应商</th>
-    <th>采购去向</th>
-    <th>订单需求</th>
-    <th>库存数量</th>
-    <th>采购中</th>
+    <th>可用库存</th>
+    <th>实库存</th>
+    <th>在途</th>
     <th>近30天销量</th>
     <th>近14天销量</th>
     <th>近7天销量</th>
     <th>建议采购数量</th>
     <th>趋势系数</th>
-    <th>备注</th>
+    <th>平均利润率</th>
+    <th>退款率</th>
+    <th>状态</th>
 @stop
 @section('tableBody')
-    @foreach($data as $requireItem)
+    @foreach($data as $item)
         <tr>
             <td>
-             @if($requireItem->is_sale !=1)
-                <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="1" >
+             @if($item->is_sale !=1)
+                <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="1" >
                 @else
-                <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="0" >
+                <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="0" >
                 @endif
-            {{ $requireItem->id }}</td>
-            <td>{{ $requireItem->sku}}</td>   
+            {{ $item->id }}</td>
+            <td>{{ $item->item_id}}</td>
+            <td>{{ $item->sku}}</td>   
             <td>
-            {{$requireItem->c_name}}
+            {{$item->c_name}}
             </td>
-            <td>{{ $requireItem->supplier?$requireItem->supplier->name:''}}</td>
-            <td>{{ $requireItem->warehouse?$requireItem->warehouse->name:''}}</td>
-            <td>{{ $requireItem->order_need_num}}</td>
-            <td>{{$requireItem->all_quantity}}</td>
-            <td>{{$requireItem->purchaseing_quantity}}</td>
-            <td>{{$requireItem->thirty_time}}</td>
-            <td>{{$requireItem->fourteen_time}}</td>
-            <td>{{$requireItem->seven_time}}</td>
-            <td>{{$requireItem->ProposedpurchaseQuantity}}</td>
-            <td>@if($requireItem->sell_status == 1)
+            
+            <td>{{$item->available_quantity}}</td>
+            <td>{{$item->all_quantity}}</td>
+            <td>{{$item->zaitu_num}}</td>
+            <td>{{$item->thirty_sales}}</td>
+            <td>{{$item->fourteen_sales}}</td>
+            <td>{{$item->seven_sales}}</td>
+            <td>{{$item->need_purchase_num>0?$item->need_purchase_num:0}}</td>
+            <td>@if($item->thrend == 1)
             	上涨
-            @elseif($requireItem->sell_status == 2)
+            @elseif($item->thrend == 2)
             	下跌
-            @elseif($requireItem->sell_status == 3)
+            @elseif($item->thrend == 3)
             	持平
-            @elseif($requireItem->sell_status == 4)
+            @elseif($item->thrend == 4)
             	无销量
             @endif
             </td>
-            <td>{{ $requireItem->remark}}</td>
+            <td></td>
+            <td></td>
+            <td></td>
              
         </tr>
     @endforeach

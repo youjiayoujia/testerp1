@@ -42,6 +42,7 @@ class LogisticsController extends Controller
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'create', $response);
     }

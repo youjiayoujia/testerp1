@@ -76,13 +76,8 @@
     <label for='remark'>备注</label>
     <textarea name='remark' class='form-control'>{{ old('remark') ? old('remark') : $model->remark }}</textarea>
 </div>
-<div class='form-group row'>
-    <div class='col-lg-4'>
-        <label for='checkout'>审核结果</label>
-        <select name='result' class='form-control'>
-            <option value='1'>审核通过</option>
-            <option value='0'>拒绝</option>
-        </select>
-    </div>
-</div>
+@stop
+@section('formButton')
+    <button type="submit" name='result' value='1' class="btn btn-success">审核通过</button>
+    <button type="submit" name='result' value='0' class="btn btn-default">审核未通过</button>
 @stop

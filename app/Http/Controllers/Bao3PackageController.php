@@ -34,7 +34,9 @@ class Bao3PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, '3宝package'),
             'data' => $this->autoList($this->model->where('is_tonanjing', '1')),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
+        
         return view($this->viewPath . 'index', $response);
     }
 }

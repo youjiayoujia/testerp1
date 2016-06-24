@@ -120,6 +120,8 @@
                             </div>
                             </form>
                         </div>
+                    </form>
+                    </div>
                     @endif
                 @show{{-- 列表工具栏 --}}
                 <div class="row">

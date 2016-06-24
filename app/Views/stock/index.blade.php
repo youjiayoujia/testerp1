@@ -1,5 +1,4 @@
 @extends('common.table')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th>sku</th>  

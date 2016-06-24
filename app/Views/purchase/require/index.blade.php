@@ -57,14 +57,14 @@
             @elseif($item->thrend == 2)
             	下跌
             @elseif($item->thrend == 3)
-            	持平
-            @elseif($item->thrend == 4)
             	无销量
+            @elseif($item->thrend == 4)
+            	持平
             @endif
             </td>
             <td>{{$item->profit*100}}%</td>
             <td>{{$item->refund_rate*100}}%</td>
-            <td></td>
+            <td>{{config('item.status')[$item->status]}}</td>
              
         </tr>
     @endforeach

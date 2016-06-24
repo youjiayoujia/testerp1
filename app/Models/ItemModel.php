@@ -432,7 +432,7 @@ class ItemModel extends BaseModel
             $data['seven_sales'] = $sevenDaySellNum;
             $data['fourteen_sales'] = $fourteenDaySellNum;
             $data['thirty_sales'] = $thirtyDaySellNum;
-            $data['thrend'] = $coefficient;
+            $data['thrend'] = $coefficient_status;
 
             //预交期
             $delivery=$this->supplier?$this->supplier->purchase_time:7;
@@ -473,7 +473,7 @@ class ItemModel extends BaseModel
             //平均利润率
             $data['profit'] = $total_profit_num?$total_profit_rate/$total_profit_num:'0';
             
-            $data['status'] = $item->status;
+            $data['status'] = $item->is_sale;
             PurchaseCrontabsModel::create($data);
         }
     }

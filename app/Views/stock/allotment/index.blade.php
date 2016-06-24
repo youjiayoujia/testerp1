@@ -4,7 +4,7 @@
     <th class='sort' data-field='allotment_id'>调拨单号</th>
     <th>调出仓库</th>
     <th>调入仓库</th>
-    <th>备注</th>  
+    <th>备注</th>
     <th>调拨人</th>
     <th>调拨状态</th>
     <th class='sort' data-field='check_man_id'>审核人</th>
@@ -42,51 +42,51 @@
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
                 @if($allotment->check_status == '0')
-                <a href="{{ route('stockAllotment.edit', ['id'=>$allotment->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
+                    <a href="{{ route('stockAllotment.edit', ['id'=>$allotment->id]) }}" class="btn btn-warning btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    </a>
                 @endif
                 @if($allotment->allotment_status == 'new' && $allotment->check_status == '0')
-                <a href="{{ route('allotment.check', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                    审核调拨单
-                </a>
+                    <a href="{{ route('allotment.check', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        审核调拨单
+                    </a>
                 @endif
                 @if($allotment->check_status == '2')
-                <a href="{{ route('allotment.pick', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span>生成拣货单
-                </a>
+                    <a href="{{ route('allotment.pick', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span>生成拣货单
+                    </a>
                 @endif
                 @if($allotment->allotment_status == 'pick')
-                <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                    重置
-                </a>
-                <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
-                    <span class="glyphicon glyphicon-pencil"></span>
-                    确认出库
-                </a>
+                    <a href="javascript:" class="btn btn-success btn-xs new" data-id="{{ $allotment->id }}">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        重置
+                    </a>
+                    <a href="{{ route('allotment.checkout', ['id'=> $allotment->id]) }}" class="btn btn-success btn-xs" data-id="{{ $allotment->id }}">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        确认出库
+                    </a>
                 @endif
                 @if($allotment->check_status == '2' && ($allotment->allotment_status == 'out' || $allotment->allotment_status == 'check'))
                     @if($allotment->allotment_status != 'over')
-                    <a href="{{ route('allotment.checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 对单
-                    </a>
+                        <a href="{{ route('allotment.checkform', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                            <span class="glyphicon glyphicon-eye-open"></span> 对单
+                        </a>
                     @endif
                 @endif
                 @if($allotment->check_status != '2')
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $allotment->id }}"
-                   data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
-                </a>
+                    <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                       data-id="{{ $allotment->id }}"
+                       data-url="{{ route('stockAllotment.destroy', ['id' => $allotment->id]) }}">
+                        <span class="glyphicon glyphicon-trash"></span> 删除
+                    </a>
                 @endif
             </td>
         </tr>
     @endforeach
 @stop
 @section('tableToolButtons')
-<div class="btn-group" role="group">
+    <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 查询状态
             <span class="caret"></span>
@@ -96,42 +96,42 @@
             <li><a href="{{ DataList::filtersEncode(['check_status','=','1']) }}">未通过</a></li>
             <li><a href="{{ DataList::filtersEncode(['check_status','=','2']) }}">已通过</a></li>
         </ul>
-</div>
-@parent
+    </div>
+    @parent
 @stop
 @section('childJs')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
-<script type='text/javascript'>
-$(document).ready(function(){   
-    $(document).on('click', '.pick', function(){
-        obj = $(this).parent().parent();
-        tmp = $(this);
-        id = $(this).data('id');
-        $.ajax({
-                url:"{{ route('allotment.pick') }}",
-                data:{id:id},
-                dataType:'json',
-                type:'get',
-                success:function(result){
-                    location.reload();
-                }
+    <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $(document).on('click', '.pick', function () {
+                obj = $(this).parent().parent();
+                tmp = $(this);
+                id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('allotment.pick') }}",
+                    data: {id: id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        location.reload();
+                    }
+                });
             });
-    });
 
-    $(document).on('click', '.new', function(){
-        id = $(this).data('id');
-        obj = $(this);
-        td = obj.parent();
-        $.ajax({
-            url:"{{ route('allotment.new') }}",
-            data:{id:id},
-            dataType:'json',
-            type:'get',
-            success:function(result) {
-                location.reload();
-            }
+            $(document).on('click', '.new', function () {
+                id = $(this).data('id');
+                obj = $(this);
+                td = obj.parent();
+                $.ajax({
+                    url: "{{ route('allotment.new') }}",
+                    data: {id: id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        location.reload();
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 @stop

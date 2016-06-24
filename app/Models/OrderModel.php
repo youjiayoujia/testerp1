@@ -108,7 +108,7 @@ class OrderModel extends BaseModel
             'filterFields' => [],
             'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
             'selectRelatedSearchs' => [
-                
+
             ],
         ];
     }

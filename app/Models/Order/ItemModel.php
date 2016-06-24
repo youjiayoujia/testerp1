@@ -50,4 +50,9 @@ class ItemModel extends BaseModel
         return $arr[$this->is_gift];
     }
 
+    public function order()
+    {
+        return $this->belongsTo('App\Models\OrderModel','order_id');
+    }
+
 }

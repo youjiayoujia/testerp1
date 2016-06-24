@@ -9,12 +9,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Sellmore\ProductModel as smProduct;
 use App\Models\ItemModel;
+use App\Models\Sellmore\SupplierModel as smSupplier;
+use App\Models\Product\SupplierModel;
+use App\Models\Channel\AccountModel;
+
 
 class DataController extends Controller
 {
     public function __construct(smProduct $model)
     {
-
+        set_time_limit(0);
     }
 
     public function index()
@@ -50,6 +54,68 @@ class DataController extends Controller
                 'is_sale' => $smProduct->products_sku,
                 'remark' => $smProduct->products_sku,
             ];
+        }
+    }
+
+    public function transfer_supplier()
+    {
+        $len = 100;
+        $start = 0;
+        $smSuppliers = smSupplier::skip($start)->take($len)->get();
+        while($smSuppliers->count()) {
+            $start += $len;
+            foreach($smSuppliers as $smSupplier) {
+                $supplier = [
+                    'old_id' => $smSupplier->suppliers_id,
+                    'name' => $smSupplier->suppliers_name,
+                    'contact_name' => $smSupplier->suppliers_name,
+                    'address' => $smSupplier->suppliers_address,
+                    'company' => $smSupplier->suppliers_company,
+                    'url' => $smSupplier->suppliers_website, 
+                    'official_url' => $smSupplier->suppliers_website, 
+                    'telephone' => $smSupplier->suppliers_phone,
+                    'purchase_time' => $smSupplier->supplierArrivalMinDays,
+                    'bank_account' => $smSupplier->suppliers_bank,
+                    'bank_code' => $smSupplier->suppliers_card_number,
+                    'examine_status' => $smSupplier->suppliers_status,
+                    'email' => $smSupplier->supplier_email ? $smSupplier->supplier_email : '',
+                    'created_at' => $smSupplier->create_time,
+                    'updated_at' => $smSupplier->modify_time,
+                ];
+                SupplierModel::create($supplier);
+            }
+            $smSuppliers = smSupplier::skip($start)->take($len)->get();
+        }
+    }
+
+    public function transfer_amazon()
+    {
+        $len = 100;
+        $start = 0;
+        $smSuppliers = smSupplier::skip($start)->take($len)->get();
+        while($smSuppliers->count()) {
+            $start += $len;
+            foreach($smSuppliers as $smSupplier) {
+                $supplier = [
+                    'old_id' => $smSupplier->suppliers_id,
+                    'name' => $smSupplier->suppliers_name,
+                    'contact_name' => $smSupplier->suppliers_name,
+                    'address' => $smSupplier->suppliers_address,
+                    'company' => $smSupplier->suppliers_company,
+                    'url' => $smSupplier->suppliers_website, 
+                    'official_url' => $smSupplier->suppliers_website, 
+                    'telephone' => $smSupplier->suppliers_phone,
+                    'purchase_time' => $smSupplier->supplierArrivalMinDays,
+                    'bank_account' => $smSupplier->suppliers_bank,
+                    'bank_code' => $smSupplier->suppliers_card_number,
+                    'examine_status' => $smSupplier->suppliers_status,
+                    'email' => $smSupplier->supplier_email ? $smSupplier->supplier_email : '',
+                    'created_at' => $smSupplier->create_time,
+                    'updated_at' => $smSupplier->modify_time,
+                ];
+                SupplierModel::create($supplier);
+            }
+            $smSuppliers = smSupplier::skip($start)->take($len)->get();
         }
     }
 }

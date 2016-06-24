@@ -439,8 +439,8 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '转交历史',
-                'url' => 'message_log.index',
+                'name' => '发送队列',
+                'url' => 'messageReply.index',
                 'icon' => '',
             ],
         ]

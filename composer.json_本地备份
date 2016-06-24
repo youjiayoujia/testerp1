@@ -13,8 +13,7 @@
     "barryvdh/laravel-debugbar": "^2.0",
     "maatwebsite/excel": "~2.1.0",
     "milon/barcode": "^5.1",
-    "predis/predis": "~1.0",
-    "google/apiclient": "1.*"
+    "predis/predis": "~1.0"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",
@@ -55,5 +54,14 @@
   },
   "config": {
     "preferred-install": "dist"
-  }
+  },
+  "require": {
+    "laravel/framework": "5.0.*",
+    "barryvdh/laravel-ide-helper":"dev-master"
+  },
+  "post-update-cmd": [
+    "php artisan clear-compiled",
+    "php artisan optimize",
+    "php artisan ide-helper:generate"
+  ],
 }

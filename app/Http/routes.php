@@ -558,8 +558,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['as' => 'message.notRequireReply_1', 'uses' => 'MessageController@notRequireReply_1']);
     //转发邮件
     Route::resource('message_log', 'Message\Messages_logController');
-    //开启工作流
-
+    //回复队列路由
+    Route::resource('messageReply', 'Message\ReplyController');
     //分类-邮件路由 《《《《《《《《《《《《《《《《《《
 
 

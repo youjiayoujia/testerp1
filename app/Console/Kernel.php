@@ -17,6 +17,14 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\DoPackages::class,
         \App\Console\Commands\OrdersGet::class,
         \App\Console\Commands\CreatePurchase::class,
+
+        //邮件
+        \App\Console\Commands\Inspire::class,
+        \App\Console\Commands\GetGmailLables::class,
+        \App\Console\Commands\GetGmailCredentials::class,
+        \App\Console\Commands\GetMessages::class,
+/*        \App\Console\Commands\SendMessages::class,
+        \App\Console\Commands\SetMessageRead::class,*/
     ];
 
     /**

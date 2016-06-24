@@ -47,7 +47,7 @@ class ReplyModel extends BaseModel
 
     public function message()
     {
-        return $this->belongsTo('App\Models\MessageModel', 'message_id');
+        return $this->belongsTo('App\Models\Message\MessageModel', 'message_id');
     }
 
 }

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\MessageModel;
+use App\Models\Message\MessageModel;
 use App\Models\Message\AccountModel;
 use App\Models\Message\ListModel;
 use App\Models\Message\PartModel;
@@ -112,6 +112,7 @@ class GetMessages extends Command
      */
     public function handle()
     {
+
         foreach (AccountModel::all() as $account) {
             $client = $this->getClient($account);
             $service = new Google_Service_Gmail($client);

@@ -76,5 +76,7 @@ interface AdapterInterface
      *
      */
     public function returnTrack();
+    
+    public function getMessages();
 
 }

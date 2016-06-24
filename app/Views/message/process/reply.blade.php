@@ -22,79 +22,8 @@
                                     <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                                 @endforeach
                             </select>
-
-                            <div class="topNavList">
-                                @foreach($parents as $parent)
-                                    <a href="#" id="{{ $parent->id }}"
-                                       value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>{{ $parent->name }}</a>
-                                @endforeach
-                            </div>
-                            <div class="subNav">
-                            </div>
-                            <div class="subNav1">
-                            </div>
                         </div>
                     </div>
-                    <script type="text/javascript">
-                        $(".topNavList a").hover(function () {
-                            var parent_id = this.id;
-                            $.post(
-                                    '{{ route('messageTemplateType.ajaxGetChildren') }}',
-                                    {id: parent_id},
-                                    function (response) {
-                                        $('.subNav').html("");
-                                        if (response != 'error') {
-                                            $.each(response, function (n, child) {
-                                                $('.subNav').append('<a id="' + child.id + '">' + child.name + '</a><br/><br/>');
-                                            });
-                                        }
-
-                                    }, 'json'
-                            );
-                            return false;
-                        });
-
-                        $(".subNav").on('mouseover', 'a', function () {
-                            var parent_id1 = this.id;
-                            $.post(
-                                    '{{ route('messageTemplateType.ajaxGetTemplates') }}',
-                                    {id: parent_id1},
-                                    function (response) {
-                                        $('.subNav1').html("");
-                                        if (response != 'error') {
-                                            $.each(response, function (n, template) {
-                                                $('.subNav1').append('<a id="' + template.id + '">' + template.name + '</a><br/>');
-                                            });
-                                        }
-                                    }, 'json'
-                            );
-                        });
-
-                        $(".subNav1").on('mouseover', 'a', function () {
-                            var parent_id1 = this.id;
-                            $.post(
-                                    '{{ route('messageTemplate.ajaxGetTemplate') }}',
-                                    {id: parent_id1},
-                                    function (response) {
-                                        var messgae_id = "{{ $message->id }}";
-                                        var assign_name = "{{ $message->assigner->name_en }}";
-                                        if (response != 'error') {
-                                            //替换字符串
-
-                                            response['content'] = response['content'].replace("署名", assign_name);
-                                            editor.setContent(response['content']);
-                                            /*
-                                            $('#templateContent').html('<div class="form-group"><textarea rows="16" name="content" style="width:100%;height:400px;">' + response['content'] + '</textarea></div>');
-                                            */
-                                            //记录回复邮件的类型
-                                            $('#tem_type').val(response.type_id);
-                                        }
-                                        $('#loadingDiv').hide();
-                                    }, 'json'
-                            );
-                        });
-
-                    </script>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <select class="form-control" id="children" onchange="changeTemplateType($(this));">

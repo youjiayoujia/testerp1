@@ -19,9 +19,12 @@ class ReplyController extends Controller
         $this->mainIndex = route('messageReply.index');
         $this->mainTitle = '回复队列';
         $this->viewPath = 'message.reply.';
-        if (!in_array(request()->user()->group, ['leader', 'super'])) {
+
+
+
+/*        if (!in_array(request()->user()->group, ['leader', 'super'])) {
             exit($this->alert('danger', '无权限'));
-        }
+        }*/
     }
 
 }

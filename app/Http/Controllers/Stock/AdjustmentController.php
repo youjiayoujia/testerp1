@@ -172,7 +172,14 @@ class AdjustmentController extends Controller
         $this->validate(request(), $this->model->rule(request()));
         $len = count(array_keys(request()->input('arr.item_id')));
         $buf = request()->all();
-        $obj = $this->model->find($id)->adjustments;
+        $model = $this->model->find($id);
+        foreach($model->adjustments as $single) {
+            if($single->type == 'OUT') {
+                $item = ItemModel::find($single->item_id);
+                $item->unhold($single->warehouse_position_id, $single->quantity, 'ADJUSTMENT', $model->id);
+            }
+        }
+        $obj = $model->adjustments;
         $obj_len = count($obj);
         $this->model->find($id)->update($buf);
         for($i=0; $i<$len; $i++)
@@ -191,6 +198,13 @@ class AdjustmentController extends Controller
         while($i != $obj_len) {
             $obj[$i]->delete();
             $i++;
+        }
+        $model = $this->model->find($id);
+        foreach($model->adjustments as $single) {
+            if($single->type == 'OUT') {
+                $item = ItemModel::find($single->item_id);
+                $item->hold($single->warehouse_position_id, $single->quantity, 'ADJUSTMENT', $model->id);
+            }
         }
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));

@@ -37,12 +37,8 @@ class TestController extends Controller
 
     public function test1()
     {
-       // $warehouses = PositionModel::whereHas('warehouse', function($query){
-       //  $query->where('telephone', 'like', '%'.'890'.'%');
-       // })->get();
-       // var_dump($warehouses->toArray());exit;
-        //$arr = [''];
-        var_dump(config('order.status'));
+       
+        echo Tool::barcodePrint('67');
     }
 
     public function index()

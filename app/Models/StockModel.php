@@ -50,6 +50,18 @@ class StockModel extends BaseModel
         ]
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['item' => ['sku']],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+
     /**
      * get the relationship between the two model
      *
@@ -219,12 +231,12 @@ class StockModel extends BaseModel
     {
         $price = $this->unit_cost;
         if($this->unit_cost <= 0) {
-            throw new Exception('单价不是正数，出错');
+            echo "<script>alert('单价不是正数，出错');</script>";
         }
         $this->hold_quantity -= $quantity;
         $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
-            throw new Exception('unhold时，hold数量为负了');
+            echo "<script>alert('unhold时，hold数量为负了');</script>";
         }
         $this->save();
         $this->stockUnhold()->create([

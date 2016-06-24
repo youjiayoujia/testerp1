@@ -85,7 +85,7 @@
             warehouse = $('#out_warehouse_id').val();
             $.ajax({
                 url:"{{ route('allotment.add') }}",
-                data:{current:current, warehouse:warehouse},
+                data:{current:current},
                 dataType:'html',
                 type:'get',
                 success:function(result) {
@@ -159,56 +159,22 @@
             $('.unit_cost').val('');
         });
 
-        $(document).on('change', '.warehouse_position_id,.sku', function(){
-            block = $(this).parent().parent();
-            sku = block.find('.sku').val();
-            position = block.find('.warehouse_position_id').val();
-            if(sku && position) {
-                $.ajax({
-                    url:"{{ route('stock.allotPosition' )}}",
-                    data: {position:position, sku:sku},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result) {
-                        if(result != 'none') {
-                            block.find('.access_quantity').val(result[0]['available_quantity']);
-                            if(block.find('.quantity').val() && block.find('.quantity').val() > result[0]['available_quantity']) 
-                            {
-                                alert('数量超过了可用数量');
-                                block.find('.quantity').val('');
-                            }
-                        } else {
-                            block.find('.access_quantity').val('');
-                            block.find('.quantity').val('');
-                        }
-                    }
-                });
-            }
-        });
-
         $(document).on('change', '.warehouse_position_id', function(){
-            block = $(this).parent().parent();
             tmp = $(this);
-            warehouse = $('#out_warehouse_id').val();
-            position = $(this).val();
+            block = tmp.parent().parent();
             sku = block.find('.sku').val();
+            position = tmp.val();
             if(position) {
                 $.ajax({
-                    url:"{{ route('stock.ajaxPosition') }}",
+                    url:"{{route('stock.ajaxGetOnlyPosition')}}",
                     data:{position:position, sku:sku},
                     dataType:'json',
                     type:'get',
-                    success:function(result) {
-                        if(result == 'false') {
-                            alert('sku或库存不存在');
-                            tmp.val('');
-                            block.find('.access_quantity').val('');
-                            block.find('.quantity').val('');
-                            return;
-                        }
+                    success:function(result){
                         block.find('.access_quantity').val(result);
+                        block.find('.quantity').val('');
                     }
-                })
+                });
             }
         });
 
@@ -240,11 +206,12 @@
                             str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
                             for(i=0; i<result[0].length; i++)
                             {
-                                str += "<option value='"+result[0][i]['position']['name']+"'>"+result[0][i]['position']['name']+"</option>";
+                                str += "<option value='"+result[0][i]['position']['id']+"'>"+result[0][i]['position']['name']+"</option>";
                             }
                             str += "</select>";
                             block.find('.position_html').html(str);
                             block.find('.access_quantity').val(result[0][0]['available_quantity']);
+                            block.find('.quantity').val('');
                             block.find('.unit_cost').val(result[2]);
                         }
                     }
@@ -252,7 +219,7 @@
             }
         });
 
-        $(document).on('blur', '.quantity', function(){
+        $(document).on('change', '.quantity', function(){
             if($(this).val()) {
                 var reg = /^(\d)+$/gi;
                 if(!reg.test($(this).val())) {

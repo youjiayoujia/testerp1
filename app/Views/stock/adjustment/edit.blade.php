@@ -63,7 +63,9 @@
                         </select>
                     </div>
                     <div class="form-group col-sm-2 position_html">
-                        <input type='text' name='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][$key]') ? old('arr[warehouse_position_id][$key]') : $adjustment->position->name }}">
+                        <select name='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id warehouse_position_id1'>
+                            <option value="{{ $adjustment->position->id}}">{{ $adjustment->position->name }}</option>
+                        </select>
                     </div>
                     <div class="form-group col-sm-1">
                         <input type='text' class="form-control access_quantity" id="arr[access_quantity][{{$key}}]" placeholder="可用数量" name='arr[access_quantity][{{$key}}]' value="{{ $access_quantity[$key] }}" readonly>
@@ -72,7 +74,7 @@
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
                     </div>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$key}}]" placeholder="单价" name='arr[unit_cost][{{$key}}]' value="{{ old('arr[unit_cost][$key]') ? old('arr[unit_cost][$key]') : round($adjustment->amount/$adjustment->quantity, 3) }}" {{ $adjustment->type == 'OUT' ? 'readonly' : ''}}>
+                        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$key}}]" placeholder="单价" name='arr[unit_cost][{{$key}}]' value="{{ old('arr[unit_cost][$key]') ? old('arr[unit_cost][$key]') : round($adjustment->amount/$adjustment->quantity, 3) }}" readonly>
                     </div>
                     <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
                 </div>
@@ -83,10 +85,6 @@
 @section('pageJs')
 <script type='text/javascript'>
     $(document).ready(function(){
-        $(document).on('click', '.bt_right', function(){
-            $(this).parent().remove();
-        });
-
         $('.sku1').select2({
             ajax: {
                 url: "{{ route('stock.ajaxSku') }}",
@@ -96,6 +94,7 @@
                   return {
                     sku: params.term, // search term
                     page: params.page,
+                    'warehouse_id': $('#warehouse_id').val(),
                   };
                 },
                 results: function(data, page) {
@@ -109,55 +108,30 @@
             },
         });
 
-        $(document).on('blur', '.unit_cost', function(){
-            tmp = $(this);
-            block = tmp.parent().parent();
-            type = block.find('.type').val();
-            unit_cost = block.find('.unit_cost').val();
-            sku = block.find('.sku').val();
-            warehouse_id = $('#warehouse_id').val();
-            if(sku && warehouse_id){
-                $.ajax({
-                    url: "{{route('stock.getMessage')}}",
-                    data: {sku:sku, warehouse_id:warehouse_id},
-                    dataType: 'json',
-                    type: 'get',
-                    success: function(result){
-                        if(type == 'IN' && unit_cost) {
-                            if(unit_cost > result[1]*1.3 || unit_cost < result[1]*0.7) {
-                                alert('调整单价超出范围0.7-1.3,库存单价为'+result[1]);
-                                block.find('.unit_cost').val('');
-                            }
-                        }
-                    }
-                })
-            }
+        $(document).on('click', '.bt_right', function(){
+            $(this).parent().remove();
         });
 
-        $(document).on('blur', '.warehouse_position_id', function(){
+        $(document).on('change', '.warehouse_position_id', function(){
             tmp = $(this);
-            warehouse_id = $('#warehouse_id').val();
             block = tmp.parent().parent();
             sku = block.find('.sku').val();
             position = tmp.val();
-            type = block.find('.type').val();
             if(position) {
                 $.ajax({
-                    url:"{{route('stock.getByPosition')}}",
-                    data:{position:position, sku:sku, type:type, warehouse_id:warehouse_id},
+                    url:"{{route('stock.ajaxGetOnlyPosition')}}",
+                    data:{position:position, sku:sku},
                     dataType:'json',
                     type:'get',
                     success:function(result){
-                        if(result == false) {
-                            alert('库位超过两个||库位或库存不存在');
-                            tmp.val('');
-                            return;
-                        }
                         block.find('.access_quantity').val(result);
+                        block.find('.quantity').val('');
                     }
                 });
             }
         });
+
+        
 
         $(document).on('blur', '.quantity', function(){
             tmp = $(this);
@@ -176,13 +150,14 @@
             block = $(this).parent().parent();
             name = block.find('.warehouse_position_id').attr('name');
             if($(this).val() == 'IN') {
-                block.find('.position_html').html("<input type='text' name='"+name+"' class='form-control warehouse_position_id' placeholder='库位'>");
+                block.find('.position_html').html("<select name='"+name+"' class='form-control warehouse_position_id warehouse_position_id1'></select>");
             }
             block.find('.sku').val('');
             block.find('.quantity').val('');
             block.find('.access_quantity').val('');
             block.find('.unit_cost').val('');
         });
+
 
 
         $(document).on('change', '.sku', function(){
@@ -192,10 +167,15 @@
             var item_id = $(this).val();
             var warehouse_id = $('#warehouse_id').val();
             var position_name = block.find('.warehouse_position_id').prop('name');
+            if(!warehouse_id) {
+                alert('请选择仓库');
+                location.reload();
+                return false;
+            }
             if(item_id && warehouse_id){
                 $.ajax({
                     url: "{{route('stock.getMessage')}}",
-                    data: {item_id:item_id, warehouse_id:warehouse_id},
+                    data: {item_id:item_id, warehouse_id:warehouse_id, type:type},
                     dataType: 'json',
                     type: 'get',
                     success: function(result){
@@ -212,21 +192,66 @@
                             }
                         }
                         if(type == 'IN') {
-                            block.find('.position_html').html("<input type='text' name='"+position_name+"' class='form-control warehouse_position_id' placeholder='库位'>");
+                            str = '';
+                            if(result[0] == '2') {
+                                str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
+                                str +=
+                                "<option value='"+result[1][0]['position']['id']+"'>"+result[1][0]['position']['name']+"</option>"+
+                                "<option value='"+result[1][1]['position']['id']+"'>"+result[1][1]['position']['name']+"</option>";
+                                str += '</select>';
+                            }
+                            if(result[0] == '1') {
+                                str = "<select name='"+position_name+"' class='form-control warehouse_position_id warehouse_position_id1'>";
+                                str +=
+                                "<option value='"+result[1][0]['position']['id']+"'>"+result[1][0]['position']['name']+"</option>";
+                                str += '</select>';
+                            }
+                            if(result[0] == '0') {
+                                str = "<select name='"+position_name+"' class='form-control warehouse_position_id warehouse_position_id1'></select>";
+                            }
+                            block.find('.position_html').html(str);
+                            $('.warehouse_position_id1').select2({
+                                ajax: {
+                                    url: "{{ route('stock.ajaxGetByPosition') }}",
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function (params) {
+                                      return {
+                                        position: params.term, // search term
+                                        page: params.page,
+                                        warehouse_id: $('#warehouse_id').val(),
+                                        sku: $(this).val(),
+                                      };
+                                    },
+                                    results: function(data, page) {
+                                        if((data.results).length > 0) {
+                                            var more = (page * 20)<data.total;
+                                            return {results:data.results,more:more};
+                                        } else {
+                                            return {results:data.results};
+                                        }
+                                    }
+                                },
+                            });
+                            if(result[0]) {
+                                block.find('.access_quantity').val(result[1][0]['available_quantity']);
+                                block.find('.quantity').val('');
+                                block.find('.unit_cost').val(result[2]);
+                                return false;
+                            }
                             block.find('.access_quantity').val('');
                             block.find('.quantity').val('');
-                            block.find('.unit_cost').val('');
+                            block.find('.unit_cost').val();
                         } else {
                             str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
                             str += "</select>";
                             block.find('.position_html').html(str);
                             block.find('.access_quantity').val('');
-                            block.find('.quantity').val('');
                             block.find('.unit_cost').val('');
                             str = "<select name='"+position_name+"' class='form-control warehouse_position_id'>";
                             for(i=0; i<result[0].length; i++)
                             {
-                                str += "<option value='"+result[0][i]['position']['name']+"'>"+result[0][i]['position']['name']+"</option>";
+                                str += "<option value='"+result[0][i]['position']['id']+"'>"+result[0][i]['position']['name']+"</option>";
                             }
                             str += "</select>";
                             block.find('.position_html').html(str);
@@ -238,6 +263,30 @@
             }
         });
 
+        $('.warehouse_position_id1').select2({
+            ajax: {
+                url: "{{ route('stock.ajaxGetByPosition') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    position: params.term, // search term
+                    page: params.page,
+                    warehouse_id: $('#warehouse_id').val(),
+                    sku: $(this).val(),
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            },
+        });
+
         $(document).on('change', '#warehouse_id', function(){
             $('.warehouse_position_id').val('');
             $('.type').val('IN');
@@ -246,6 +295,8 @@
             $('.unit_price').val('');
             $('.sku').val('');
         });
+        
+        $('#check_time').cxCalendar();
     });
 </script>
 @stop

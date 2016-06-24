@@ -14,7 +14,7 @@
     @foreach($data as $code)
         <tr>
             <td>{{ $code->id }}</td>
-            <td>{{ $code->logistics->logistics_type}}</td>
+            <td>{{ $code->logistics->name}}</td>
             <td>{{ $code->code }}</td>
             <td>{{ $code->package_id }}</td>
             <td>{{ $code->status == '1' ? '启用' : '未启用'}}</td>

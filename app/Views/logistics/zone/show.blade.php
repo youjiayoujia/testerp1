@@ -11,10 +11,10 @@
                 <strong>物流分区</strong>: {{ $model->zone }}
             </div>
             <div class="col-lg-2">
-                <strong>物流方式</strong>: {{ $model->logistics ? $model->logistics->logistics_type : '' }}
+                <strong>物流方式</strong>: {{ $model->logistics ? $model->logistics->name : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>物流方式简码</strong>: {{ $model->logistics ? $model->logistics->short_code : '' }}
+                <strong>物流方式简码</strong>: {{ $model->logistics ? $model->logistics->code : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>首重(kg)</strong>: {{ $model->fixed_weight }}

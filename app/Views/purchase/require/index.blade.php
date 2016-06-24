@@ -62,8 +62,8 @@
             	无销量
             @endif
             </td>
-            <td></td>
-            <td></td>
+            <td>{{$item->profit*100}}%</td>
+            <td>{{$item->refund_rate*100}}%</td>
             <td></td>
              
         </tr>

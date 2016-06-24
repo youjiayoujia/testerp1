@@ -447,6 +447,30 @@ class ItemModel extends BaseModel
                 }
             }
             $data['need_purchase_num'] = $needPurchaseNum;
+            //退款订单数
+            $refund_num = $item->orderItem->where('is_refund','1')->count();
+            $all_order_num = 0;
+            $total_profit_rate = 0;
+            $total_profit_num = 0;
+            foreach($item->orderItem as $o_item){
+                if($o_item->order){
+                    if(in_array($o_item->order->status, array('PACKED','SHIPPED','COMPLETE'))){
+                        $total_profit_rate += $o_item->order->profit_rate;
+                        $total_profit_num ++;
+                    }
+                    if(in_array($o_item->order->status, array('PAID','PREPARED','NEED','PACKED','SHIPPED','COMPLETE'))){
+                        $all_order_num ++;
+                    }
+                }
+                
+            }
+            $refund_rate = $all_order_num?$refund_num/$all_order_num:'100';
+            //退款率
+            $data['refund_rate'] = $refund_rate;
+            //平均利润率
+            $data['profit'] = $total_profit_num?$total_profit_rate/$total_profit_num:'0';
+            
+            $data['status'] = $item->status;
             PurchaseCrontabsModel::create($data);
         }
     }

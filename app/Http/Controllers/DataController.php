@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sellmore\ProductModel as smProduct;
 use App\Models\ItemModel;
+use App\Models\Product\SupplierModel;
 
 class DataController extends Controller
 {
@@ -31,17 +32,26 @@ class DataController extends Controller
 //                'inventory' => $smProduct->products_sku,
                 'warehouse_id' => $smProduct->product_warehouse_id,
                 'warehouse_position' => $smProduct->products_location,
-                'alias_name' => $smProduct->products_sku,
-                'alias_cname' => $smProduct->products_sku,
-                'supplier_id' => $smProduct->products_sku,
-                'supplier_sku' => $smProduct->products_sku,
-                'second_supplier_id' => $smProduct->products_sku,
-                'second_supplier_sku' => $smProduct->products_sku,
+                'alias_name' => $smProduct->products_declared_en,
+                'alias_cname' => $smProduct->products_declared_cn,
+                'supplier_id' => SupplierModel::where('old_id', $smProduct->products_suppliers_id)->get()->id,
+                'supplier_sku' => '',
+                'second_supplier_id' => function ($smProduct) {
+                    $suppliers = explode(',', $smProduct->products_suppliers_id);
+                    if (isset($suppliers[1])) {
+                        $secondSupplier = SupplierModel::where('old_id', $suppliers[1])->get();
+                        if ($secondSupplier) {
+                            return $secondSupplier->id;
+                        }
+                    }
+                    return '';
+                },
+                'second_supplier_sku' => '',
                 'supplier_info' => $smProduct->products_sku,
-                'purchase_url' => $smProduct->products_sku,
-                'purchase_price' => $smProduct->products_sku,
-                'purchase_carriage' => $smProduct->products_sku,
-                'cost' => $smProduct->products_sku,
+                'purchase_url' => $smProduct->productsPhotoStandard,
+                'purchase_price' => $smProduct->products_value,
+                'purchase_carriage' => '',
+                'cost' => $smProduct->products_value,
                 'product_size' => $smProduct->products_sku,
                 'package_size' => $smProduct->products_sku,
                 'carriage_limit' => $smProduct->products_sku,

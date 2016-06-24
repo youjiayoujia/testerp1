@@ -34,6 +34,7 @@ class CreateChannelAccounts extends Migration
             $table->string('amazon_marketplace_id')->comment('AWS MarketplaceId');
             $table->string('amazon_seller_id')->comment('AWS SellerId');
             $table->string('amazon_accesskey_id')->comment('AWS AWSAccessKeyId');
+            $table->string('amazon_accesskey_secret')->comment('AWS Accesskey Secret');
             //WISH API
             $table->string('wish_publish_code')->comment('wish刊登代码');
             $table->string('wish_client_id')->comment('WISH CLIENT_ID');

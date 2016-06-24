@@ -39,6 +39,7 @@
                             @show{{-- 工具按钮 --}}
                         </div>
                     </div>
+                    @if(isset($mixedSearchFields))
                     <div class="col-lg-12">
                         <div class="collapse" id="collapseExample">
                             <form action="" method="get">
@@ -93,18 +94,18 @@
                                             @foreach($contents as $content)
                                                 @if($kind == 'time')
                                                     <div class='col-lg-1'>
-                                                    <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content.'.'.'begin']}}">
                                                     </div>
                                                     <div class='col-lg-1'>
-                                                    <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content.'.'.'end']}}">
                                                     </div>
                                                 @endif
                                                 @if($kind == 'price')
                                                     <div class='col-lg-1'>
-                                                    <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content.'.'.'begin']}}">
                                                     </div>
                                                     <div class='col-lg-1'>
-                                                    <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                    <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content.'.'.'end']}}">
                                                     </div>
                                                 @endif
                                             @endforeach
@@ -119,6 +120,7 @@
                         </div>
                     </form>
                     </div>
+                    @endif
                 @show{{-- 列表工具栏 --}}
                 <div class="row">
                     <div class="col-lg-12">

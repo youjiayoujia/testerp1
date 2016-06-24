@@ -84,6 +84,21 @@ class PackageController extends Controller
         return view($this->viewPath . 'allocateLogistics', $response);
     }
 
+    public function downloadType()
+    {
+        $rows[] = [
+            'package_id' => '',
+            'logistics_id' => '',
+            'tracking_no' => '',
+        ];
+        $name = 'returnTrack';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function multiPackage()
     {
         $package_id = trim(request('package_id'));

@@ -34,6 +34,7 @@ class CustomsClearanceController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -131,7 +132,7 @@ class CustomsClearanceController extends Controller
     public function exportFailItem()
     {
         $rows = $this->model->exportFailItem();
-        $this->exportExcel($rows, 'export_fail_item', '导出item信息残缺');
+        $this->exportExcel($rows, 'export_fail_item');
     }
 
     public function exportProduct()

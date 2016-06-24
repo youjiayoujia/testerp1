@@ -1,5 +1,6 @@
 @extends('common.table')
 @section('tableHeader')
+    <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class='sort' data-field='id'>ID</th>
     <th>拣货单号</th>
     <th>类型</th>
@@ -15,6 +16,7 @@
 @section('tableBody')
     @foreach($data as $pickList)
         <tr>
+            <td><input type='checkbox' name='single[]' class='single'></td>
             <td>{{ $pickList->id }}</td>
             <td>{{ $pickList->picknum }}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
@@ -52,8 +54,14 @@
             </td>
         </tr>
     @endforeach
+    <iframe src='' id='iframe_print' style='display:none'></iframe>
 @stop
 @section('tableToolButtons')
+<div class="btn-group">
+    <a href="javascript:" class="btn btn-success multiPrint" >
+        批量打印拣货单
+    </a>
+</div>
 <div class="btn-group" role="group">
     <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="glyphicon glyphicon-filter"></i> 类型
@@ -72,5 +80,29 @@
 </div>
 @stop
 @section('childJs')
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('.select_all').click(function () {
+        if ($(this).prop('checked') == true) {
+            $('.single').prop('checked', true);
+        } else {
+            $('.single').prop('checked', false);
+        }
+    });
+
+    $('.multiPrint').click(function(){
+        $.each($('.single'), function(){
+            if($(this).parent().parent().find('td:eq(5)').text() == '未处理') {
+                id = $(this).parent().next().text();
+                src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
+                $('#iframe_print').attr('src', src);
+                $('#iframe_print').load(function(){
+                    $('#iframe_print')[0].contentWindow.focus();
+                    $('#iframe_print')[0].contentWindow.print();
+                });
+            }
+        });
+    });
+});
+</script>
 @stop

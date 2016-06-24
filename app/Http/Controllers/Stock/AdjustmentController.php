@@ -112,7 +112,6 @@ class AdjustmentController extends Controller
             }
             $buf['stock_adjustment_id'] = $obj->id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
-            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             if($buf['type'] == 'OUT') {
                 $item = ItemModel::find($buf['item_id']);
                 $item->hold($buf['warehouse_position_id'], $buf['quantity'], 'ADJUSTMENT', $obj->id);
@@ -187,7 +186,6 @@ class AdjustmentController extends Controller
             }
             $buf['adjust_forms_id'] = $id;
             $buf['amount'] = $buf['quantity'] * $buf['unit_cost'];
-            $buf['warehouse_position_id'] = PositionModel::where(['is_available'=>'1', 'name'=>trim($buf['warehouse_position_id'])])->first()->id;
             $obj[$i]->update($buf);
         }
         while($i != $obj_len) {

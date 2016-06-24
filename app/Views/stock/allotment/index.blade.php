@@ -53,7 +53,7 @@
                     </a>
                 @endif
                 @if($allotment->check_status == '2')
-                    <a href="{{ route('allotment.pick', ['id'=>$allotment->id]) }}" class="btn btn-success btn-xs">
+                    <a href="javascript:" class="btn btn-success btn-xs print">
                         <span class="glyphicon glyphicon-pencil"></span>生成拣货单
                     </a>
                 @endif
@@ -84,6 +84,7 @@
             </td>
         </tr>
     @endforeach
+    <iframe src='' id='iframe_print' style='display:none'></iframe>
 @stop
 @section('tableToolButtons')
     <div class="btn-group" role="group">
@@ -130,6 +131,16 @@
                     success: function (result) {
                         location.reload();
                     }
+                });
+            });
+
+            $(document).on('click', '.print', function () {
+                id = $(this).parent().parent().find('td:eq(0)').text();
+                src = "{{ route('allotment.pick', ['id'=>'']) }}/" + id;
+                $('#iframe_print').attr('src', src);
+                $('#iframe_print').load(function () {
+                    $('#iframe_print')[0].contentWindow.focus();
+                    $('#iframe_print')[0].contentWindow.print();
                 });
             });
         });

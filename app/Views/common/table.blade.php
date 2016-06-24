@@ -49,7 +49,7 @@
                                                 @if(count($value))
                                                     @foreach($value as $relation_ship => $name_arr)
                                                         @foreach($name_arr as $name)
-                                                            <div class="col-lg-1">
+                                                            <div class="col-lg-2">
                                                                 <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" value="{{ old('keywords') }}" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
@@ -58,14 +58,14 @@
                                             @endif
                                             @if($type == 'filterFields')
                                                 @foreach($value as $name)
-                                                    <div class="col-lg-1">
+                                                    <div class="col-lg-2">
                                                         <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" value="{{ old('mixedSearchFields[$type][$name]') }}" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
                                                     </div>
                                                 @endforeach
                                             @endif
                                             @if($type == 'filterSelects')
                                                 @foreach($value as $name => $content)
-                                                    <div class="col-lg-1">
+                                                    <div class="col-lg-2">
                                                         <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
@@ -78,7 +78,7 @@
                                             @if($type == 'selectRelatedSearchs')
                                                 @foreach($value as $relation_ship => $contents)
                                                     @foreach($contents as $name => $single)
-                                                        <div class='col-lg-1'>
+                                                        <div class='col-lg-2'>
                                                             <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control'>
                                                                 <option value=''>{{config('setting.transfer_search')[$relation_ship.'.'.$name]}}</option>
                                                                 @foreach($single as $key => $value1)
@@ -93,18 +93,18 @@
                                                 @foreach($value as $kind => $contents)
                                                     @foreach($contents as $content)
                                                         @if($kind == 'time')
-                                                            <div class='col-lg-1'>
+                                                            <div class='col-lg-2'>
                                                                 <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
-                                                            <div class='col-lg-1'>
+                                                            <div class='col-lg-2'>
                                                                 <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
                                                         @if($kind == 'price')
-                                                            <div class='col-lg-1'>
+                                                            <div class='col-lg-2'>
                                                                 <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
-                                                            <div class='col-lg-1'>
+                                                            <div class='col-lg-2'>
                                                                 <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif

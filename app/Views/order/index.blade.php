@@ -164,15 +164,9 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'UNPAID']) }}">未付款</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PAID']) }}">已付款</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PREPARED']) }}">准备发货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEED']) }}">缺货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PACKED']) }}">打包完成</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'SHIPPED']) }}">发货完成</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'COMPLETE']) }}">订单完成</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'CANCEL']) }}">取消订单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'REVIEW']) }}">需审核</a></li>
+            @foreach(config('order.status') as $status_key => $status)
+                <li><a href="{{ DataList::filtersEncode(['status', '=', $status_key]) }}">{{ $status }}</a></li>
+            @endforeach
         </ul>
     </div>
     <div class="btn-group" role="group">
@@ -181,11 +175,9 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'NORMAL']) }}">正常</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'VERIFY']) }}">验证中</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'CHARGEBACK']) }}">客户CB</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'STOP']) }}">暂停发货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'RESUME']) }}">恢复正常</a></li>
+            @foreach(config('order.active') as $active_key => $active)
+                <li><a href="{{ DataList::filtersEncode(['active', '=', $active_key]) }}">{{ $active }}</a></li>
+            @endforeach
         </ul>
     </div>
     <div class="btn-group" role="group">

@@ -13,6 +13,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
 use App\Models\ChannelModel;
+use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
@@ -40,6 +41,7 @@ class ProductController extends Controller
             'catalogs' => $this->catalog->all(),
             'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
+            'users' => UserModel::all(),
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'logisticsLimit' => $this->logisticsLimit->all(),
         ];
@@ -99,6 +101,7 @@ class ProductController extends Controller
             'features_value_id_arr' => $features_value_id_arr,
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'wrapLimit' => $this->wrapLimit->all(),
+            'users' => UserModel::all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
         ];
 

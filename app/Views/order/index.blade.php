@@ -84,13 +84,13 @@
                             @endif
                             <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
-                            <div class="col-lg-1">
-                                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                                   data-id="{{ $orderItem->id }}"
-                                   data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">
-                                    <span class="glyphicon glyphicon-trash"></span> 删除
-                                </a>
-                            </div>
+                            {{--<div class="col-lg-1">--}}
+                                {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                                   {{--data-id="{{ $orderItem->id }}"--}}
+                                   {{--data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">--}}
+                                    {{--<span class="glyphicon glyphicon-trash"></span> 删除--}}
+                                {{--</a>--}}
+                            {{--</div>--}}
                         </div>
                     @endforeach
                 </div>

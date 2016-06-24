@@ -37,37 +37,7 @@
                 <strong>地址验证</strong>: {{ $model->address_confirm_name }}
             </div>
             <div class="col-lg-2">
-                <strong>IP地址</strong>: {{ $model->ip }}
-            </div>
-            <div class="col-lg-2">
-                <strong>备用字段</strong>: {{ $model->comment }}
-            </div>
-            <div class="col-lg-2">
-                <strong>红人/choies用</strong>: {{ $model->comment1 }}
-            </div>
-            <div class="col-lg-2">
-                <strong>订单备注</strong>: {{ $model->remark }}
-            </div>
-            <div class="col-lg-2">
-                <strong>导单备注</strong>: {{ $model->import_remark }}
-            </div>
-            <div class="col-lg-2">
                 <strong>渠道创建时间</strong>: {{ $model->create_time }}
-            </div>
-            <div class="col-lg-2">
-                <strong>做账时间</strong>: {{ $model->affair_time == '0000-00-00' ? '' : $model->affair_time }}
-            </div>
-            {{--<div class="col-lg-2">--}}
-                {{--<strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}--}}
-            {{--</div>--}}
-            <div class="col-lg-2">
-                <strong>是否做账</strong>: {{ $model->is_affair_name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>是否分批发货</strong>: {{ $model->is_partial_name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>是否手工</strong>: {{ $model->by_hand_name }}
             </div>
             <div class="col-lg-2">
                 <strong>黑名单订单</strong>: {{ $model->blacklist == '1' ? '否' : '是' }}
@@ -109,9 +79,6 @@
     <div class="panel panel-default">
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>种类</strong>: {{ $model->shipping == 'PACKET' ? '小包' : '快递' }}
-            </div>
             <div class="col-lg-2">
                 <strong>发货名字</strong>: {{ $model->shipping_firstname }}
             </div>
@@ -175,7 +142,6 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-2"><strong>sku</strong></div>
-                <div class="col-lg-2"><strong>图片</strong></div>
                 <div class="col-lg-1"><strong>数量</strong></div>
                 <div class="col-lg-1"><strong>单价</strong></div>
                 <div class="col-lg-1"><strong>是否有效</strong></div>
@@ -186,7 +152,6 @@
             @foreach($orderItems as $key => $orderItem)
                 <div class="row">
                     <div class="col-lg-2">{{ $orderItem->sku }}</div>
-                    <div class="col-lg-2"><img src="/{{ $arr[$key] }}" width="25px" height="25px"></div>
                     <div class="col-lg-1">{{ $orderItem->quantity }}</div>
                     <div class="col-lg-1">{{ $orderItem->price }}</div>
                     <div class="col-lg-1">{{ $orderItem->is_active_name }}</div>

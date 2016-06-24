@@ -37,6 +37,7 @@ class PurchaseListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
     
         return view($this->viewPath . 'index', $response);
@@ -268,22 +269,24 @@ class PurchaseListController extends Controller
 		$postcodingNum=PurchasePostageModel::where('post_coding',$id)->count();
 		if($postcodingNum>0){
 			$res['postcoding']=PurchasePostageModel::where('post_coding',$id)->first();
-			$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
+			$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id)?PurchaseOrderModel::find($res['postcoding']->purchase_order_id)->id:'0';
+			//print_r($res['purchaseOrder']);exit;
 			$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
 	        $response = [
 	            'metas' => $this->metas(__FUNCTION__),
 				'postcodingNum' =>$postcodingNum,
 				'data' =>$res,
 				'postCoding' =>$id,
+				'bang'=>0,
 	        ];
 		}else{
 			$model = PurchasePostageModel::create(['post_coding'=>$id]);
-			//echo $model->id;exit;
 			$response = [
             'metas' => $this->metas(__FUNCTION__),
 			'postcodingNum' =>$postcodingNum,
 			'postCoding' =>$id,
 			'wuliu_id' =>$model->id,
+			'bang'=>1,
         	];
 		}
         return view($this->viewPath . 'ajaxScan', $response);

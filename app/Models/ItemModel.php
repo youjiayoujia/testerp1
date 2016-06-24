@@ -394,6 +394,7 @@ class ItemModel extends BaseModel
                             ->whereIn('orders.status',['PAID', 'PREPARED','NEED','PACKED','SHIPPED','COMPLETE'])
                             ->where('orders.create_time','>',date('Y-m-d H:i:s',strtotime('-7 day')))
                             ->where('order_items.quantity','<',5)
+                            ->where('order_items.item_id',$item['id'])
                             ->sum('order_items.quantity');
         
             //14天销量
@@ -401,6 +402,7 @@ class ItemModel extends BaseModel
                                 ->whereIn('orders.status',['PAID', 'PREPARED','NEED','PACKED','SHIPPED','COMPLETE'])
                                 ->where('orders.create_time','>',date('Y-m-d H:i:s',strtotime('-14 day')))
                                 ->where('order_items.quantity','<',5)
+                                ->where('order_items.item_id',$item['id'])
                                 ->sum('order_items.quantity');
 
             //30天销量
@@ -408,8 +410,9 @@ class ItemModel extends BaseModel
                                 ->whereIn('orders.status',['PAID', 'PREPARED','NEED','PACKED','SHIPPED','COMPLETE'])
                                 ->where('orders.create_time','>',date('Y-m-d H:i:s',strtotime('-30 day')))
                                 ->where('order_items.quantity','<',5)
+                                ->where('order_items.item_id',$item['id'])
                                 ->sum('order_items.quantity');
-
+print_r($sevenDaySellNum);exit;
             //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
             if($sevenDaySellNum==0||$fourteenDaySellNum==0){
                 $coefficient_status=3;

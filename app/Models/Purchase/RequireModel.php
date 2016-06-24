@@ -50,9 +50,11 @@ class RequireModel extends BaseModel
             //在途数量
             $purchaseItems = PurchaseItemModel::where("sku",$item['sku'])->whereIn("status",['1', '2','3'])->get();
             $zaitu_num = 0;
-            foreach ($purchaseItems as $purchaseItem) {
-                if(!$purchaseItem->purchaseOrder->write_off){
-                    $zaitu_num += $purchaseItem->purchase_num-$purchaseItem->storage_qty-$purchaseItem->unqualified_qty;
+            foreach ($item->purchase as $purchaseItem) {
+                if($purchaseItem->status>0||$purchaseItem->status<4){
+                    if(!$purchaseItem->purchaseOrder->write_off){
+                        $zaitu_num += $purchaseItem->purchase_num-$purchaseItem->storage_qty-$purchaseItem->unqualified_qty;
+                    }
                 }
             }
             //实库存
@@ -103,7 +105,7 @@ class RequireModel extends BaseModel
             }
             
             //预交期
-            $delivery=$itemModel->supplier?$itemModel->supplier->purchase_time:0;
+            $delivery=$itemModel->supplier?$itemModel->supplier->purchase_time:7;
 
             //采购建议数量
             if($itemModel->purchase_price > 200 && $fourteenDaySellNum <3 || $itemModel->status ==4){
@@ -117,21 +119,7 @@ class RequireModel extends BaseModel
                     $needPurchaseNum = ($fourteenDaySellNum/14)*(12+$delivery)*$coefficient-$xu_kucun-$zaitu_num;  
                 }
             }
-            
-            //平均利润率
 
-            //利润率
-
-            //退款率
-
-            //数组
-            $trend['sevenDaySellNum'] = $sevenDaySellNum;
-            $trend['fourteenDaySellNum'] = $fourteenDaySellNum;
-            $trend['thirtyDaySellNum'] = $thirtyDaySellNum;
-            $trend['coefficient'] = $thirtyDaySellNum;
-            $trend['status'] = $thirtyDaySellNum;
-            $trend['delivery'] = $thirtyDaySellNum;
-            $trend['needPurchaseNum'] = $needPurchaseNum;
             //任务计划使用该函数
             $this->intoPurchaseRequire($item['item_id'],$needPurchaseNum); 
             

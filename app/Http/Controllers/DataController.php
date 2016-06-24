@@ -28,12 +28,11 @@ class DataController extends Controller
                 'sku' => $smProduct->products_sku,
                 'name' => $smProduct->products_title,
                 'c_name' => $smProduct->products_name_cn,
-                'weight' => $smProduct->weightWithPacket,
-//                'inventory' => $smProduct->products_sku,
+                'weight' => $smProduct->products_weight,
                 'warehouse_id' => $smProduct->product_warehouse_id,
                 'warehouse_position' => $smProduct->products_location,
-                'alias_name' => $smProduct->products_declared_en,
-                'alias_cname' => $smProduct->products_declared_cn,
+//                'alias_name' => $smProduct->products_declared_en,
+//                'alias_cname' => $smProduct->products_declared_cn,
                 'supplier_id' => SupplierModel::where('old_id', $smProduct->products_suppliers_id)->get()->id,
                 'supplier_sku' => '',
                 'second_supplier_id' => function ($smProduct) {
@@ -52,11 +51,21 @@ class DataController extends Controller
                 'purchase_price' => $smProduct->products_value,
                 'purchase_carriage' => '',
                 'cost' => $smProduct->products_value,
-                'product_size' => $smProduct->products_sku,
-                'package_size' => $smProduct->products_sku,
-                'carriage_limit' => $smProduct->products_sku,
-                'package_limit' => $smProduct->products_sku,
-                'status' => $smProduct->products_sku,
+                'product_size' => function ($smProduct) {
+                    if ($smProduct->products_volume) {
+                        $volumes = unserialize($smProduct->products_volume);
+                        return $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'];
+                    }
+                },
+                'package_size' => function ($smProduct) {
+                    if ($smProduct->products_volume) {
+                        $volumes = unserialize($smProduct->products_volume);
+                        return $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'];
+                    }
+                },
+                'carriage_limit' => '',
+                'package_limit' => '',
+                'status' => $smProduct->products_status_2,
                 'is_sale' => $smProduct->products_sku,
                 'remark' => $smProduct->products_sku,
             ];

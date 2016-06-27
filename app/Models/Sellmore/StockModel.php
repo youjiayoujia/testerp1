@@ -14,6 +14,6 @@ class StockModel extends SellMoreModel
 
     public function item()
     {
-        return $this->belongsTo('App\Models\ItemModel', 'products_id', 'old_id');
+        return $this->belongsTo('App\Models\ItemModel', 'products_id', 'id');
     }
 }

@@ -395,14 +395,14 @@ class DataController extends Controller
                 $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
             }
             //供货商
-            $supplier = SupplierModel::Where('old_id', $smProduct->products_suppliers_id)->first();
+            $supplier = SupplierModel::find($smProduct->products_suppliers_id);
             $supplierId = $supplier ? $supplier->id : 0;
             $secondSupplierId = 0;
             if ($smProduct->products_suppliers_ids) {
                 $supplierIds = explode(',', $smProduct->products_suppliers_ids);
                 if (isset($supplierIds[0])) {
                     if ($supplierIds[0] != $smProduct->products_suppliers_id) {
-                        $secondSupplier = SupplierModel::Where('old_id', $supplierIds[0])->first();
+                        $secondSupplier = SupplierModel::find($supplierIds[0]);
                         $secondSupplierId = $secondSupplier ? $secondSupplier->id : 0;
                     }
                 }
@@ -410,9 +410,11 @@ class DataController extends Controller
             //仓库
             $warehouseId = $smProduct->product_warehouse_id == 1000 ? 1 : 2;
             //库位
-            $position = PositionModel::Where('name', $smProduct->products_location)->first();
-            if (!$position) {
-                PositionModel::create(['name' => $smProduct->products_location, 'warehouse_id' => $warehouseId]);
+            if ($smProduct->products_location) {
+                $position = PositionModel::Where('name', $smProduct->products_location)->first();
+                if (!$position) {
+                    PositionModel::create(['name' => $smProduct->products_location, 'warehouse_id' => $warehouseId]);
+                }
             }
             $data = [
                 'catalog_id' => 0,
@@ -436,7 +438,7 @@ class DataController extends Controller
                 'status' => $smProduct->products_status_2,
                 'is_available' => $smProduct->productsIsActive,
                 'remark' => $smProduct->products_warring_string,
-                'old_id' => $smProduct->products_id,
+                'id' => $smProduct->products_id,
             ];
             $existItem = ItemModel::Where('sku', $smProduct->products_sku)->first();
             if ($existItem) {
@@ -451,10 +453,12 @@ class DataController extends Controller
     {
         $smStocks = smStock::Where('products_id', '<', '65726')->limit(1000)->orderBy('products_id', 'desc')->get();
         foreach ($smStocks as $smStock) {
-            if ($smStock->item and $smStock->actual_stock > 0) {
+            if ($smStock->item) {
                 $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
-                $smStock->item->in($position->id, $smStock->actual_stock,
-                    $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
+                if ($position) {
+                    $smStock->item->in($position->id, $smStock->actual_stock,
+                        $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
+                }
             }
         }
     }
@@ -468,7 +472,7 @@ class DataController extends Controller
             $start += $len;
             foreach ($smSuppliers as $smSupplier) {
                 $supplier = [
-                    'old_id' => $smSupplier->suppliers_id,
+                    'id' => $smSupplier->suppliers_id,
                     'name' => $smSupplier->suppliers_name,
                     'contact_name' => $smSupplier->suppliers_name,
                     'address' => $smSupplier->suppliers_address,

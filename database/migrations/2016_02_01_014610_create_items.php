@@ -43,7 +43,6 @@ class CreateItems extends Migration
             $table->string('remark')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            $table->integer('old_id')->nullable();
         });
     }
 

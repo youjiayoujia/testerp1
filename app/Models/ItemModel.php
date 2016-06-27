@@ -22,6 +22,7 @@ class ItemModel extends BaseModel
     ];
 
     protected $fillable = [
+        'id',
         'product_id',
         'sku',
         'weight',
@@ -50,7 +51,6 @@ class ItemModel extends BaseModel
         'is_available',
         'remark',
         'cost',
-        'old_id'
     ];
 
     public function product()
@@ -98,7 +98,7 @@ class ItemModel extends BaseModel
 
     public function getImageAttribute()
     {
-        if ($this->product->image) {
+        if ($this->product and $this->product->image) {
             return $this->product->image->path . $this->product->image->name;
         }
         return '/default.jpg';

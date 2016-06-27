@@ -19,6 +19,7 @@ class SupplierModel extends BaseModel
     public $searchFields = ['name', 'customer_id'];
 
     protected $fillable = [
+        'id',
         'name',
         'customer_id',
         'secret_key',

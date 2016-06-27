@@ -105,15 +105,7 @@ class ItemModel extends BaseModel
 
     public function getAllQuantityAttribute()
     {
-        $data['all_quantity'] = 0;
-        $data['available_quantity'] = 0;
-
-        foreach ($this->stocks as $stock) {
-            $data['all_quantity'] += $stock->all_quantity;
-            $data['available_quantity'] += $stock->available_quantity;
-        }
-        $data['all_amount'] = $data['all_quantity'] * $this->cost;
-        return $data;
+        return $this->stocks->sum('all_quantity');
     }
 
     /**

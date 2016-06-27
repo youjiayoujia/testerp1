@@ -44,6 +44,7 @@ class DataController extends Controller
             $start += $len;
             foreach($smCds as $smCd) {
                 $cd = [
+                    'id' => $smCd->suppliers_id,
                     'name' => $smCd->suppliers_name,
                     'client_manager' => $smCd->suppliers_services ? $smCd->suppliers_services : '',
                     'manager_tel' => $smCd->suppliers_services_phoneorqq,
@@ -444,10 +445,11 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
-        $smAmazons = smAmazon::skip($start)->take($len)->get();
+        $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         while ($smAmazons->count()) {
             $start += $len;
             foreach ($smAmazons as $smAmazon) {
+                $url = pathinfo($smAmazon->place_site);
                 $amazon = [
                     'channel_id' => '3',
                     'country_id' => '0',
@@ -457,7 +459,7 @@ class DataController extends Controller
                     'sync_cycle' => '0',
                     'sync_days' => 30,
                     'sync_pages' => 100,
-                    'amazon_api_url' => $smAmazon->place_site,
+                    'amazon_api_url' => $url['dirname'],
                     'amazon_marketplace_id' => $smAmazon->place_id,
                     'amazon_seller_id' => $smAmazon->merchant_id,
                     'amazon_accesskey_id' => $smAmazon->access_key,
@@ -466,7 +468,7 @@ class DataController extends Controller
                 ];
                 AccountModel::create($amazon);
             }
-            $smAmazons = smAmazon::skip($start)->take($len)->get();
+            $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         }
     }
 }

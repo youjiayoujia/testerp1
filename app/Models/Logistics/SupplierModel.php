@@ -27,7 +27,9 @@ class SupplierModel extends BaseModel
         'manager_tel',
         'technician',
         'technician_tel',
-        'remark'
+        'remark',
+        'bank',
+        'card_number',
     ];
 
     public $rules = [

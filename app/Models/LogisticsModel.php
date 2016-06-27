@@ -20,6 +20,7 @@ class LogisticsModel extends BaseModel
     public $searchFields = ['code', 'name', 'logistics_supplier_id', 'type'];
 
     protected $fillable = [
+        'id',
         'code',
         'name',
         'warehouse_id',
@@ -102,7 +103,7 @@ class LogisticsModel extends BaseModel
 
     public function channelName()
     {
-        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_channel_id', 'logistics_id', 'channel_id')->withPivot('name');
+        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_channel_names', 'logistics_id', 'channel_id')->withPivot('name');
     }
 
     public function getDockingNameAttribute()

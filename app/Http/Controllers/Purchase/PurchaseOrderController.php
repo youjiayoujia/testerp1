@@ -357,6 +357,7 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'id' => $id,
             'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
             'purchase_num_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
             'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
@@ -371,13 +372,34 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-    * 打印
+    * 修改打印状态
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function changePrintStatus(){
+        $id = request()->input('id');
+        $this->model->find($id)->update(['print_status'=>1]);
+    }
+
+    /**
+    * 收货节面打印采购条目
     *
     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
     */
     public function printpo(){
         $id = request()->input('id');
         echo Tool::barcodePrint($id);
+    }
+
+    /**
+    * 收货节面打印采购条目
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function payOrder($id){
+        $model=$this->model->find($id);
+        $model->update(['close_status'=>1]);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . "已付款"));
     }
     
     

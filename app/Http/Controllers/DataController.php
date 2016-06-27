@@ -121,16 +121,11 @@ class DataController extends Controller
     {
         $smProducts = smProduct::limit(100)->orderBy('products_id', 'desc')->get();
         foreach ($smProducts as $smProduct) {
-            $volumes = ['bp' => '', 'ap' => ''];
+            $volumes = ['product_size' => '', 'package_size' => ''];
             if ($smProduct->products_volume) {
                 $volumes = unserialize($smProduct->products_volume);
-            }
-            $supplierId = SupplierModel::where('old_id', $smProduct->products_suppliers_id)->get()->id;
-            $secondSupplierId = 0;
-            $suppliers = explode(',', $smProduct->products_suppliers_id);
-            if (isset($suppliers[1])) {
-                $secondSupplier = SupplierModel::where('old_id', $suppliers[1])->get();
-                $secondSupplierId = $secondSupplier->id;
+                $volumes['product_size'] = isset($volumes['bp']) ? $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'] : '';
+                $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
             }
             $item = [
                 'catalog_id' => 0,
@@ -143,21 +138,16 @@ class DataController extends Controller
                 'warehouse_position' => $smProduct->products_location,
                 'alias_name' => $smProduct->products_declared_en,
                 'alias_cname' => $smProduct->products_declared_cn,
-                'supplier_id' => $supplierId,
-                'supplier_sku' => '',
-                'second_supplier_id' => $secondSupplierId,
-                'second_supplier_sku' => '',
-                'supplier_info' => $smProduct->products_sku,
                 'purchase_url' => $smProduct->productsPhotoStandard,
                 'purchase_price' => $smProduct->products_value,
                 'purchase_carriage' => '',
                 'cost' => $smProduct->products_value,
-                'product_size' => $volumes['bp'],
-                'package_size' => $volumes['ap'],
+                'product_size' => $volumes['product_size'],
+                'package_size' => $volumes['package_size'],
                 'carriage_limit' => '',
                 'package_limit' => '',
                 'status' => $smProduct->products_status_2,
-                'is_sale' => $smProduct->productsIsActive,
+                'is_available' => $smProduct->productsIsActive,
                 'remark' => $smProduct->products_remark,
             ];
             ItemModel::create($item);

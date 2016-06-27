@@ -22,7 +22,6 @@ class LogisticsModel extends BaseModel
     protected $fillable = [
         'short_code',
         'logistics_type',
-        'species',
         'warehouse_id',
         'logistics_supplier_id',
         'type',
@@ -41,7 +40,6 @@ class LogisticsModel extends BaseModel
         'create' => [
             'short_code' => 'required',
             'logistics_type' => 'required',
-            'species' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
@@ -55,7 +53,6 @@ class LogisticsModel extends BaseModel
         'update' => [
             'short_code' => 'required',
             'logistics_type' => 'required',
-            'species' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',

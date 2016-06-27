@@ -86,7 +86,7 @@
             <td>{{ $message->from_name }}</td>
             <td>{{ $message->from }}</td>
             <td>{{ date('Y-m-d H:i:s',strtotime($message->date)) }}</td>
-            <td>{{ $message->assign_id ? $message->assign_id : '未分配' }}</td>
+            <td>{{ $message->assign_id ? $message->assigner->name : '未分配' }}</td>
             <td>{{ $message->created_at }}</td>
             <td>{{ $message->updated_at }}</td>
             <td>

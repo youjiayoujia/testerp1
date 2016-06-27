@@ -163,7 +163,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('warehousePosition', 'Warehouse\PositionController');
 
     //库存
-    Route::get('stock/getSinglePosition', ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
+    Route::get('stock/getSinglePosition',
+        ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
     Route::get('stock/getSingleSku', ['uses' => 'StockController@getSingleSku', 'as' => 'stock.getSingleSku']);
     Route::get('stock/showStockInfo', ['uses' => 'StockController@showStockInfo', 'as' => 'stock.showStockInfo']);
     Route::get('stock/getExcel', ['uses' => 'StockController@getExcel', 'as' => 'stock.getExcel']);
@@ -175,7 +176,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('stock/allotSku', ['uses' => 'StockController@ajaxAllotSku', 'as' => 'stock.allotSku']);
     Route::get('stock/allotOutWarehouse',
         ['uses' => 'StockController@ajaxAllotOutWarehouse', 'as' => 'stock.allotOutWarehouse']);
-    Route::get('stock/getByPosition', ['uses' => 'StockController@ajaxGetByPosition', 'as' => 'stock.getByPosition']);
     Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
     Route::get('stock/getMessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'stock.getMessage']);
     Route::get('stock/allotPosition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'stock.allotPosition']);
@@ -186,7 +186,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}',
         'Purchase\PurchaseItemController@costExamineStatus');
     Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
-	Route::any('beExamine', ['uses' => 'Product\SupplierController@beExamine', 'as' => 'beExamine']);
+    Route::any('beExamine', ['uses' => 'Product\SupplierController@beExamine', 'as' => 'beExamine']);
 //采购需求
     Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
     Route::resource('require', 'Purchase\RequireController');
@@ -194,16 +194,22 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
 
 //采购单e/purchaseOrder/addPost/
-	Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost'); 
-    Route::any('PurchaseOrder/trackingNoSearch', [ 'uses'=>'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
-    Route::any('purchaseList/ajaxScan', [ 'uses'=>'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
-    Route::any('purchaseOrder/recieve', [ 'uses'=>'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
-    Route::any('purchaseOrder/printpo', [ 'uses'=>'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
-    Route::any('purchaseOrder/ajaxInWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
-    Route::any('purchaseOrder/inWarehouse', [ 'uses'=>'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
-    Route::any('purchaseOrder/ajaxRecieve', [ 'uses'=>'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
-    Route::any('purchaseOrder/updateArriveNum', [ 'uses'=>'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
-    Route::any('purchaseOrder/updateArriveLog', [ 'uses'=>'Purchase\PurchaseOrderController@updateArriveLog', 'as' => 'updateArriveLog']);
+    Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
+    Route::any('PurchaseOrder/trackingNoSearch',
+        ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
+    Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
+    Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
+    Route::any('purchaseOrder/ajaxInWarehouse',
+        ['uses' => 'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
+    Route::any('purchaseOrder/inWarehouse',
+        ['uses' => 'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
+    Route::any('purchaseOrder/ajaxRecieve',
+        ['uses' => 'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
+    Route::any('purchaseOrder/updateArriveNum',
+        ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
+    Route::any('purchaseOrder/updateArriveLog',
+        ['uses' => 'Purchase\PurchaseOrderController@updateArriveLog', 'as' => 'updateArriveLog']);
     Route::any('/purchaseOrder/updateItemWaitTime/{id}', 'Purchase\PurchaseOrderController@updateItemWaitTime');
     Route::any('/purchaseOrder/updateWaitTime/{id}', 'Purchase\PurchaseOrderController@updateWaitTime');
     Route::any('/purchaseOrder/createItem/{id}', 'Purchase\PurchaseOrderController@createItem');
@@ -212,11 +218,11 @@ Route::group(['middleware' => 'auth'], function () {
         'Purchase\PurchaseOrderController@changeExamineStatus');
     Route::any('purchaseOrder/examinePurchaseOrder', 'Purchase\PurchaseOrderController@examinePurchaseOrder');
     Route::any('purchaseOrder/excelOut/{id}', 'Purchase\PurchaseOrderController@excelOut');
-	Route::any('purchaseOrder/write_off/{id}', 'Purchase\PurchaseOrderController@write_off');
+    Route::any('purchaseOrder/write_off/{id}', 'Purchase\PurchaseOrderController@write_off');
     Route::any('purchaseOrder/purchaseOrdersOut', 'Purchase\PurchaseOrderController@purchaseOrdersOut');
     Route::any('purchaseOrder/excelOrderOut/{num}', 'Purchase\PurchaseOrderController@excelOrderOut');
     Route::any('/purchaseOrder/cancelOrder/{id}', 'Purchase\PurchaseOrderController@cancelOrder');
-	Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
+    Route::any('/purchaseOrder/printOrder/{id}', 'Purchase\PurchaseOrderController@printOrder');
     Route::any('postAdd', ['uses' => 'Purchase\PurchaseOrderController@ajaxPostAdd', 'as' => 'postAdd']);
     Route::resource('purchaseOrder', 'Purchase\PurchaseOrderController');
 //打印采购单
@@ -224,10 +230,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/checkWarehouse', 'Purchase\PrintPurchaseOrderController@checkWarehouse');
     Route::resource('printPurchaseOrder', 'Purchase\PrintPurchaseOrderController');
 //采购列表
-    Route::any('purchaseItemArrival', ['uses' => 'Purchase\PurchaseListController@purchaseItemArrival', 'as' => 'purchaseItemArrival']);
-	Route::any('selectPurchaseOrder', ['uses' => 'Purchase\PurchaseListController@selectPurchaseOrder', 'as' => 'selectPurchaseOrder']);
+    Route::any('purchaseItemArrival',
+        ['uses' => 'Purchase\PurchaseListController@purchaseItemArrival', 'as' => 'purchaseItemArrival']);
+    Route::any('selectPurchaseOrder',
+        ['uses' => 'Purchase\PurchaseListController@selectPurchaseOrder', 'as' => 'selectPurchaseOrder']);
     Route::any('deletePostage', ['uses' => 'Purchase\PurchaseListController@deletePostage', 'as' => 'deletePostage']);
-	Route::any('binding', ['uses' => 'Purchase\PurchaseListController@binding', 'as' => 'binding']);
+    Route::any('binding', ['uses' => 'Purchase\PurchaseListController@binding', 'as' => 'binding']);
     Route::any('purchaseList/stockIn/{id}', 'Purchase\PurchaseListController@stockIn');
     Route::any('purchaseList/generateDarCode/{id}', 'Purchase\PurchaseListController@generateDarCode');
     Route::any('purchaseList/printBarCode/{id}', 'Purchase\PurchaseListController@printBarCode');
@@ -235,7 +243,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseList/updateActive/{id}', 'Purchase\PurchaseListController@updateActive');
     Route::any('/changeItemWeight', 'Purchase\PurchaseListController@changeItemWeight');
     Route::any('/changePurchaseItemPostcoding', 'Purchase\PurchaseListController@changePurchaseItemPostcoding');
-	Route::any('/changePurchaseItemStorageQty', 'Purchase\PurchaseListController@changePurchaseItemStorageQty');
+    Route::any('/changePurchaseItemStorageQty', 'Purchase\PurchaseListController@changePurchaseItemStorageQty');
     Route::any('examinePurchaseItem',
         ['uses' => 'Purchase\PurchaseListController@examinePurchaseItem', 'as' => 'examinePurchaseItem']);
     Route::resource('purchaseList', 'Purchase\PurchaseListController');
@@ -266,10 +274,10 @@ Route::group(['middleware' => 'auth'], function () {
      */
     Route::get('allotsku', ['uses' => 'StockController@ajaxAllotSku', 'as' => 'allotsku']);
     Route::get('allotoutwarehouse', ['uses' => 'StockController@ajaxAllotOutWarehouse', 'as' => 'allotoutwarehouse']);
-    Route::get('getbyposition', ['uses' => 'StockController@ajaxGetByPosition', 'as' => 'getbyposition']);
+    Route::get('stock/ajaxGetByPosition', ['uses' => 'StockController@ajaxGetByPosition', 'as' => 'stock.ajaxGetByPosition']);
     Route::get('getmessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'getmessage']);
     Route::get('allotposition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'allotposition']);
-
+    Route::get('stock/ajaxGetOnlyPosition', ['uses' => 'StockController@ajaxGetOnlyPosition', 'as' => 'stock.ajaxGetOnlyPosition']);
     Route::resource('stock', 'StockController');
 
 
@@ -277,8 +285,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('catalog', 'CatalogController');
 
     //item路由
-    Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as'=>'item.getModel']);
-    Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as'=>'item.getImage']);
+    Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
+    Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::resource('item', 'ItemController');
 
     //渠道路由
@@ -337,16 +345,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logisticsLimits', 'Logistics\LimitsController');
 
     //物流路由
-    Route::get('logistics/getLogistics', ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
+    Route::get('logistics/getLogistics',
+        ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
 
 
-    Route::get('logisticsZone/getCountries', ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
-    Route::get('logisticsZone/sectionAdd', ['uses' => 'Logistics\ZoneController@sectionAdd', 'as' => 'logisticsZone.sectionAdd']);
+    Route::get('logisticsZone/getCountries',
+        ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
+    Route::get('logisticsZone/sectionAdd',
+        ['uses' => 'Logistics\ZoneController@sectionAdd', 'as' => 'logisticsZone.sectionAdd']);
     Route::resource('logisticsZone', 'Logistics\ZoneController');
-    Route::get('zone', ['uses' => 'LogisticsController@zone', 'as' => 'zone']);
     Route::get('country', ['uses' => 'Logistics\ZoneController@country', 'as' => 'country']);
     Route::get('zoneShipping', ['uses' => 'Logistics\ZoneController@zoneShipping', 'as' => 'zoneShipping']);
     Route::get('count', ['uses' => 'Logistics\ZoneController@count', 'as' => 'count']);
@@ -372,8 +382,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('errorList', 'Picklist\ErrorListController');
 
     //拣货路由
-    Route::post('pickList/statisticsProcess', ['uses' => 'PickListController@statisticsProcess', 'as' => 'pickList.statisticsProcess']);
-    Route::get('pickList/performanceStatistics', ['uses' => 'PickListController@performanceStatistics', 'as' => 'pickList.performanceStatistics']);
+    Route::post('pickList/statisticsProcess',
+        ['uses' => 'PickListController@statisticsProcess', 'as' => 'pickList.statisticsProcess']);
+    Route::get('pickList/performanceStatistics',
+        ['uses' => 'PickListController@performanceStatistics', 'as' => 'pickList.performanceStatistics']);
     Route::get('pickList/oldPrint', ['uses' => 'PickListController@oldPrint', 'as' => 'pickList.oldPrint']);
     Route::get('pickList/updatePrint', ['uses' => 'PickListController@updatePrint', 'as' => 'pickList.updatePrint']);
 
@@ -427,10 +439,12 @@ Route::group(['middleware' => 'auth'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
 
-	
+
     //订单管理路由
     Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
+    Route::get('order/ajaxCountry', ['uses' => 'OrderController@ajaxCountry', 'as' => 'order.ajaxCountry']);
+    Route::get('order/ajaxSku', ['uses' => 'OrderController@ajaxSku', 'as' => 'order.ajaxSku']);
     Route::resource('order', 'OrderController');
     Route::resource('orderItem', 'Order\ItemController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
@@ -449,7 +463,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('exportAll', ['uses' => 'Order\BlacklistController@exportAll', 'as' => 'exportAll']);
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
-    Route::get('downloadUpdateBlacklist', ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
+    Route::get('downloadUpdateBlacklist',
+        ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
     Route::any('refundAll', ['uses' => 'OrderController@refundAll', 'as' => 'refundAll']);
 
     //订单投诉
@@ -458,12 +473,16 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('package/multiPackage', ['uses' => 'PackageController@multiPackage', 'as' => 'package.multiPackage']);
     Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
-    Route::get('package/manualLogistics', ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
-    Route::get('package/manualShipping', ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
-    Route::get('package/setManualLogistics', ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
-    Route::get('package/ajaxQuantityProcess', ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
+    Route::get('package/manualLogistics',
+        ['uses' => 'PackageController@manualLogistics', 'as' => 'package.manualLogistics']);
+    Route::get('package/manualShipping',
+        ['uses' => 'PackageController@manualShipping', 'as' => 'package.manualShipping']);
+    Route::get('package/setManualLogistics',
+        ['uses' => 'PackageController@setManualLogistics', 'as' => 'package.setManualLogistics']);
+    Route::get('package/ajaxQuantityProcess',
+        ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
 
-
+    Route::get('package/downloadType', ['uses' => 'PackageController@downloadType', 'as' => 'package.downloadType']);
     Route::get('package/allocateLogistics/{id}',
         ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);
     Route::post('package/storeAllocateLogistics/{id}',
@@ -501,7 +520,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getCode', ['uses' => 'OrderController@getCode', 'as' => 'getCode']);
     Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
-    //分类-邮件路由 《《《《《《《《《《《《《《《《《《
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
@@ -533,6 +551,9 @@ Route::group(['middleware' => 'auth'], function () {
     //设置关联订单
     Route::any('message/{id}/setRelatedOrders',
         ['as' => 'message.setRelatedOrders', 'uses' => 'MessageController@setRelatedOrders']);
+    //取消关联订单
+    Route::any('message/{id}/cancelRelatedOrder/{relatedOrderId}',
+        ['as' => 'message.cancelRelatedOrder', 'uses' => 'MessageController@cancelRelatedOrder']);
     //无需关联订单
     Route::any('message/{id}/notRelatedOrder',
         ['as' => 'message.notRelatedOrder', 'uses' => 'MessageController@notRelatedOrder']);
@@ -560,9 +581,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('message_log', 'Message\Messages_logController');
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
-    //分类-邮件路由 《《《《《《《《《《《《《《《《《《
-
-
+    
     //用户路由
     Route::resource('user', 'UserController');
     //图片标签
@@ -575,10 +594,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);
+Route::any('data', ['uses' => 'DataController@index']);
 Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 
 
 //jiangdi test routes
-Route::resource('test1','JdTestController');
+Route::resource('test1','JdTestController@index');

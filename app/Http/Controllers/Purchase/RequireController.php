@@ -20,16 +20,18 @@ use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\Package\ItemModel;
 use App\Models\ItemModel as ProductItemModel;
+use App\Models\Purchase\PurchaseCrontabsModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 
 
 class RequireController extends Controller
 {
 
-    public function __construct(RequireModel $require,ProductItemModel $productItem )
+    public function __construct(RequireModel $require,ProductItemModel $productItem, PurchaseCrontabsModel $purchaseCrontabs)
     {
         $this->model = $require;
 		$this->productItem=$productItem;
+		$this->crontabs = $purchaseCrontabs;
         $this->mainIndex = route('require.index');
         $this->mainTitle = '采购需求';
 		$this->viewPath = 'purchase.require.';
@@ -40,19 +42,9 @@ class RequireController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->productItem),
+            'data' => $this->autoList($this->crontabs),
         ];
-		foreach($response['data'] as $key=>$vo){
-			$trend=$this->getNeedPurchaseNum($vo->id);
-			$response['data'][$key]['order_need_num']=$this->model->where('item_id',$vo->id)->sum('quantity');
-			$response['data'][$key]['all_quantity']=StockModel::where('item_id',$vo->id)->sum('available_quantity');
-			$response['data'][$key]['seven_time']=$trend['sevenDaySellNum'];
-			$response['data'][$key]['fourteen_time']=$trend['fourteenDaySellNum'];
-			$response['data'][$key]['thirty_time']=$trend['thirtyDaySellNum'];
-			$response['data'][$key]['purchaseing_quantity']=PurchaseItemModel::leftjoin('purchase_orders','purchase_orders.id','=','purchase_items.purchase_order_id')->where('purchase_items.sku',$vo->sku)->where('purchase_items.status','<',4)->where('purchase_orders.examineStatus','<>',3)->sum('purchase_items.purchase_num');
-			$response['data'][$key]['sell_status']=$trend['status'];
-			$response['data'][$key]['ProposedpurchaseQuantity']=$trend['ProposedpurchaseQuantity'];
-			}
+        
         return view($this->viewPath . 'index', $response);
     }
 	

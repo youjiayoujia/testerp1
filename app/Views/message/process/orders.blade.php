@@ -28,7 +28,7 @@
                     <strong>{{ $relatedOrder->order->active_text }}</strong>
 
                     <div class="close">
-                        <a href="javascript:void(0);" onclick="if(confirm('确认取消订单: {{ $relatedOrder->order->ordernum }} ?')){location.href='{{ route('message.cancelRelatedOrder', ['id'=>$message->id,'relatedOrderId'=>$relatedOrder->id]) }}'}">
+                        <a href="javascript:void(0);" onclick="if(confirm('确认取消此关联订单: {{ $relatedOrder->order->ordernum }} ?')){location.href='{{ route('message.cancelRelatedOrder', ['id'=>$message->id,'relatedOrderId'=>$relatedOrder->id]) }}'}">
                             <small class="glyphicon glyphicon glyphicon-off"></small>
                         </a>
                     </div>

@@ -129,6 +129,7 @@ abstract class Controller extends BaseController
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
+        //dd($this->autoList($this->model));
         return view($this->viewPath . 'index', $response);
     }
 
@@ -141,12 +142,15 @@ abstract class Controller extends BaseController
     public function show($id)
     {
         $model = $this->model->find($id);
+        $count = $this->model->where('from','=',$model->from)->where('status','=','UNREAD')->count();
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'count' => $count,
+
         ];
         return view($this->viewPath . 'show', $response);
     }

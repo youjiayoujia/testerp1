@@ -37,6 +37,7 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['status'] = 'success';
             $this->result['remark'] = 'Success.';
         } else {
+            $this->release();
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'Fail to place logistics order.';
         }

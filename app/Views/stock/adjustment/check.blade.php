@@ -1,12 +1,10 @@
 @extends('common.form')
-<link rel="stylesheet" href="{{ asset('css/jquery.cxcalendar.css') }}">
-<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 @section('formAction') {{ route('stockAdjustment.checkResult', ['id'=>$model->id]) }} @stop
 @section('formBody')
     <div class='row'>
         <div class='form-group col-sm-4'>
             <label for='adjust_form_id'>调整单号</label>
-            <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : $model->adjust_form_id }}" readonly>
+            <input type='text' class='form-control' name='adjust_form_id' id='adjust_form_id' value="{{ old('adjust_form_id') ? old('adjust_form_id') : $model->adjust_form_id }}">
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -19,7 +17,7 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="adjust_by">调整人</label>
-            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ $model->adjustByName->name }}" readonly>
+            <input type='text' class="form-control adjust_by" id="adjust_by" placeholder="调整人" name='adjust_by' value="{{ $model->adjustByName->name }}">
         </div>
     </div>
     <div class='form-group'>
@@ -64,19 +62,14 @@
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $adjustment->quantity }}">
                     </div>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$key}}]" placeholder="单价" name='arr[unit_cost][{{$key}}]' value="{{ old('arr[unit_cost][$key]') ? old('arr[unit_cost][$key]') : round($adjustment->amount/$adjustment->quantity, 3) }}" {{ $adjustment->type == 'OUT' ? 'readonly' : ''}}>
+                        <input type='text' class="form-control unit_cost" id="arr[unit_cost][{{$key}}]" placeholder="单价" name='arr[unit_cost][{{$key}}]' value="{{ old('arr[unit_cost][$key]') ? old('arr[unit_cost][$key]') : round($adjustment->amount/$adjustment->quantity, 3) }}">
                     </div>
                 </div>
             @endforeach
         </div>
     </div>
-    <div class='form-group row'>
-        <div class='col-lg-4'>
-            <label for='checkout'>审核结果</label>
-            <select name='result' class='form-control'>
-                <option value='1'>审核通过</option>
-                <option value='0'>拒绝</option>
-            </select>
-        </div>
-    </div>
+@stop
+@section('formButton')
+    <button type="submit" name='result' value='1' class="btn btn-success">审核通过</button>
+    <button type="submit" name='result' value='0' class="btn btn-default">审核未通过</button>
 @stop

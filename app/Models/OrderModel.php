@@ -51,7 +51,6 @@ class OrderModel extends BaseModel
             'amount_product' => 'required',
             'amount_shipping' => 'required',
             'amount_coupon' => 'required',
-            'shipping' => 'required',
             'shipping_firstname' => 'required',
             'shipping_lastname' => 'required',
             'shipping_address' => 'required',
@@ -109,7 +108,7 @@ class OrderModel extends BaseModel
             'filterFields' => [],
             'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
             'selectRelatedSearchs' => [
-                
+
             ],
         ];
     }
@@ -468,7 +467,7 @@ class OrderModel extends BaseModel
         } else {
             $this->split_times += 1;
         }
-        $this->save();
+        return $this->save();
     }
 
     public function explodeOrder()

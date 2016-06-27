@@ -96,6 +96,25 @@ class MessageController extends Controller
     }
 
     /**
+     * 取消订单关联
+     * @param $id
+     * @param $relatedOrderId
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cancelRelatedOrder($id, $relatedOrderId)
+    {
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        if ($message->cancelRelatedOrder($relatedOrderId)) {
+            $alert = $this->alert('success', '取消订单关联成功.');
+        } else {
+            $alert = $this->alert('danger', '取消订单关联失败.');
+        }
+        return redirect(route('message.process', ['id' => $id]))->with('alert', $alert);
+    }
+    /**
      * 无需关联订单
      * @param $id
      * @return \Illuminate\Http\RedirectResponse

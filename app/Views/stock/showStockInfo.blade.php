@@ -1,25 +1,26 @@
 @extends('common.form')
 @section('formAction')@stop
 @section('formBody')
-<div class='row'>
-    <div class='form-group col-lg-2'>
+<div class='form-group'>
+    <div class='input-group col-lg-2'>
         <input type='text' class='form-control sku' placeholder='sku'>
+        <div class='input-group-btn'>
+            <button type='button' class='btn btn-info searchSku'>sku查询</button>
+        </div>
+    </div>
     </div>
     <div class='form-group'>
-        <button type='button' class='btn btn-info searchSku'>sku查询</button>
-    </div>
-</div>
-<div class='row'>
-    <div class='form-group col-lg-2'>
-        <input type='text' class='form-control position' placeholder='库位'>
-    </div>
-    <div class='form-group'>
-        <button type='button' class='btn btn-info searchPosition'>库位查询</button>
-    </div>
-</div>
-<div class='buf'>
 
-</div>
+    <div class='input-group col-lg-2'>
+        <input type='text' class='form-control position' placeholder='库位'>
+        <div class='input-group-btn'>
+            <button type='button' class='btn btn-info searchPosition'>库位查询</button>
+        </div>
+    </div>
+    </div>
+    <div class='buf'>
+
+    </div>
 @stop
 @section('formButton')@stop
 @section('pageJs')

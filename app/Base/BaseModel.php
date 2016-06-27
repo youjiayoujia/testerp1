@@ -20,11 +20,5 @@ class BaseModel extends Model
             }
         }
         return $rules;
-    }
-
-    public function getMixedSearchAttribute()
-    {
-        return [];
-    }
-    
+    }    
 }

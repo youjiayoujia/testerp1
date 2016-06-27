@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 use App\Models\JdTest\Test1Model;
+use App\Modules\Channel\ChannelModule;
+use App\Models\Message\AccountModel;
+use App\Models\OrderModel;
+use App\Models\Message\MessageModel;
+use DB;
 
 class JdTestController extends Controller
 {
@@ -21,23 +26,15 @@ class JdTestController extends Controller
      */
     public function index()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
-        ];
-        return view($this->viewPath . 'index', $response);
+        $number = [17];
+        $message = new MessageModel();
+        $data = $message->setRelatedOrders($number);
+var_dump($data);exit;
+        //$order = OrderModel::ofOrdernum($number)->first();
+
+        return view($this->viewPath . 'index');
+
 
     }
-    public function edit($id)
-    {
-        $row = $this->model->find($id);
-        if(!$row){
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = array(
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $row
-        );
-        return view($this->viewPath . 'edit',$response);
-    }
+
 }

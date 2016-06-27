@@ -160,7 +160,9 @@ $(document).ready(function(){
 
     $(document).on('click', '.search', function(){
         val = $('.searchsku').val();
+        $('.notFindSku').text('');
         extern_flag = 0;
+        out_js = 0;
         $('.notFindSku').text('');
         if(val) {
             $.each($('.new tr'), function(){
@@ -193,6 +195,7 @@ $(document).ready(function(){
                                 }
                             });
                             if(flag) {
+                                out_js = 1;
                                 id = tmp.data('id');
                                 $("."+id).find('.status').text('已包装');
                                 $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
@@ -200,15 +203,19 @@ $(document).ready(function(){
                                     $('#barcode')[0].contentWindow.focus();
                                     $('#barcode')[0].contentWindow.print();
                                 });
+                                return false;
                             }
                         }
-                    exit;
                     }
                 }
             });
+            if(out_js) {
+                return false;
+            }
             $.each($('.old tr'), function(){
                 tmp = $(this);
                 old_flag = 0;
+                package_id = tmp.data('id');
                 if(tmp.find('.sku').text() == val && parseInt(tmp.find('.quantity').text()) >  parseInt(tmp.find('.picked_quantity').text())) {
                     old_flag = 1;
                     tmp.find('.picked_quantity').text(parseInt(tmp.find('.picked_quantity').text()) + 1);
@@ -224,6 +231,7 @@ $(document).ready(function(){
                             }
                         });
                         if(flag) {
+                            out_js = 1;
                             tmp.find('.status').text('已包装');
                             $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
                             $('#barcode').load(function(){
@@ -232,7 +240,6 @@ $(document).ready(function(){
                             });
                         }
                     }
-                    package_id = tmp.data('id');
                     sku = tmp.find('.sku').text();
                     $.ajax({
                         url:"{{ route('pickList.packageItemUpdate')}}",
@@ -262,11 +269,12 @@ $(document).ready(function(){
                         }
                     }
                     $('.new').append(str);
-                }
-                if(old_flag) {
-                    exit;
+                    out_js = 1;
                 }
             });
+        }
+        if(out_js) {
+            return false;
         }
         if(!extern_flag) {
             $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');

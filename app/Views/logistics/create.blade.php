@@ -101,20 +101,6 @@
             <input class="form-control" id="pool_quantity" placeholder="号码池数量" name='pool_quantity' value="{{ old('pool_quantity') }}">
         </div>
         <div class="form-group col-lg-2">
-            <label for="species" class="control-label">种类</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="species" value="express" {{ old('species') ? (old('species') == 'express' ? 'checked' : '') : '' }}>快递
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="species" value="packet" {{ old('species') ? (old('species') == 'packet' ? 'checked' : '') : 'checked' }}>小包
-                </label>
-            </div>
-        </div>
-        <div class="form-group col-lg-2">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">

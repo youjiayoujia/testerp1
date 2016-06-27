@@ -14,7 +14,7 @@ return [
         '1' => '激活登陆',
         '0' => '不可登陆',
     ],
-    'staff'=>array(6,7,10,15,14,16,19,20,21),
+    'staff'=>array(5,6,7,10,15,14,16,19,20,21),
     //转交邮件
     'email' => [
         'business@choies.com' => 'business@choies.com',

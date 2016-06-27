@@ -69,7 +69,7 @@ class PackageModel extends BaseModel
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
             ],
-            'sectionSelect' => ['time' => ['created_at']],
+            'sectionSelect' => [],
         ];
     }
 
@@ -485,7 +485,7 @@ class PackageModel extends BaseModel
                 $package->id);
             $arr[$package->logistic->logistics_supplier_id][$package->logistic_id]['quantity'] += 1;
             $arr[$package->logistic->logistics_supplier_id][$package->logistic_id]['weight'] += $package->weight;
-        }
+        } 
         $this->loadExcel($arr);
     }
 
@@ -498,40 +498,50 @@ class PackageModel extends BaseModel
      */
     public function loadExcel($arr)
     {
-        $j = 0;
-        $k = 0;
-        foreach ($arr as $key1 => $value1) {
-            $i = 0;
-            $k++;
-            foreach ($value1 as $key2 => $value2) {
-                foreach ($value2['package_id'] as $key3 => $value3) {
-                    $i++;
-                    if ($i == 1 && $k != 1) {
+        if(count($arr)) {
+            $j = 0;
+            $k = 0;
+            foreach ($arr as $key1 => $value1) {
+                $i = 0;
+                $k++;
+                foreach ($value1 as $key2 => $value2) {
+                    foreach ($value2['package_id'] as $key3 => $value3) {
+                        $i++;
+                        if ($i == 1 && $k != 1) {
+                            $rows[] = [
+                                '供货商' => '',
+                                '物流方式' => '',
+                                '发货日期' => '',
+                                '运单号' => '',
+                                '重量' => '',
+                                '总包裹数' => '',
+                                '总重量' => '',
+                            ];
+                            $j++;
+                        }
                         $rows[] = [
-                            '供货商' => '',
-                            '物流方式' => '',
-                            '发货日期' => '',
-                            '运单号' => '',
-                            '重量' => '',
-                            '总包裹数' => '',
-                            '总重量' => '',
+                            '供货商' => SupplierModel::find($key1)->name,
+                            '物流方式' => LogisticsModel::find($key2)->logistics_type,
+                            '发货日期' => iconv('utf-8', 'gb2312', PackageModel::find($value3)->shipped_at),
+                            '运单号' => PackageModel::find($value3)->tracking_no,
+                            '重量' => PackageModel::find($value3)->weight,
                         ];
+                        if ($i == 1) {
+                            $rows[$j] += ['总包裹数' => $value2['quantity']];
+                            $rows[$j] += ['总重量' => $value2['weight']];
+                        }
                         $j++;
                     }
-                    $rows[] = [
-                        '供货商' => SupplierModel::find($key1)->name,
-                        '物流方式' => LogisticsModel::find($key2)->logistics_type,
-                        '发货日期' => iconv('utf-8', 'gb2312', PackageModel::find($value3)->shipped_at),
-                        '运单号' => PackageModel::find($value3)->tracking_no,
-                        '重量' => PackageModel::find($value3)->weight,
-                    ];
-                    if ($i == 1) {
-                        $rows[$j] += ['总包裹数' => $value2['quantity']];
-                        $rows[$j] += ['总重量' => $value2['weight']];
-                    }
-                    $j++;
                 }
             }
+        } else {
+            $rows[] = [
+                    '供货商' => '',
+                    '物流方式' => '',
+                    '发货日期' => '',
+                    '运单号' => '',
+                    '重量' => '',
+                ];
         }
         $name = '发货复查';
         Excel::create($name, function ($excel) use ($rows) {
@@ -540,6 +550,7 @@ class PackageModel extends BaseModel
                 $sheet->fromArray($rows);
             });
         })->download('csv');
+        
     }
 
     /**
@@ -635,7 +646,6 @@ class PackageModel extends BaseModel
 
     public function scopeOfTrackingNo($query, $trackingNo)
     {
-        $trackingNo = 2131253151;
         return $query->where('tracking_no', $trackingNo);
     }
 }

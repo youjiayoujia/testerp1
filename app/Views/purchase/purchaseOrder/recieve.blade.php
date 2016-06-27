@@ -24,7 +24,7 @@
                 if(p_id==''){
                     p_id = $("#ajaxp_id").val();
                 }
-                //$("#p_id").val("");
+                
     	    	$.ajax({
                     url: "{{ route('ajaxRecieve') }}",
                     data: {id: p_id},
@@ -32,9 +32,9 @@
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
-                        if($("#ajaxp_id").val()==''){
+                        //if($("#ajaxp_id").val()==''){
                             $("#ajaxp_id").val($("#p_id").val());
-                        }
+                        //}
                         $("#p_id").val("");
                     }
                 });
@@ -51,8 +51,6 @@
 
 
 	$(document).on('click','.modify',function(){
-        //alert($("#ajaxp_id").val());
-
         var data = "";
         var all = $(this).val();
         if(all==''){
@@ -66,10 +64,9 @@
             
         }
 		
-        //alert($("#ajaxp_id").val());
         $.ajax({
             url:"{{ route('updateArriveNum') }}",
-            data:{data:data,p_id:$("#ajaxp_id").val()},
+            data:{data:data,p_id:$("#p_id").val()},
             dataType:'json',
             type:'get',
             success:function(result){
@@ -77,7 +74,8 @@
                 javascript:document.getElementById("p_id").focus();
                 var e = jQuery.Event("keydown");//模拟一个键盘事件
                 e.keyCode =13;//keyCode=13是回车
-                $("#p_id").trigger(e); 
+                $("#p_id").trigger(e);
+                javascript:document.getElementById("p_id").focus();
             }
         });                         
 	});

@@ -163,6 +163,20 @@ class MessageModel extends BaseModel{
         return $body;
     }
 
+    public function cancelRelatedOrder($relatedOrderId)
+    {
+        $relatedOrder = $this->relatedOrders()->find($relatedOrderId);
+        if ($relatedOrder) {
+            $relatedOrder->delete();
+            if ($this->relatedOrders()->count() < 1) {
+                $this->related = 0;
+                $this->save();
+            }
+            return true;
+        }
+        return false;
+    }
+
     public function notRelatedOrder()
     {
         $this->related = 1;

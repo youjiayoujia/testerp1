@@ -27,7 +27,7 @@ class StockController extends Controller
     {
         $this->model = $stock;
         $this->mainIndex = route('stock.index');
-        $this->mainTitle = '库存开帐';
+        $this->mainTitle = '库存';
         $this->viewPath = 'stock.';
         $this->middleware('StockIOStatus');
     }
@@ -150,35 +150,6 @@ class StockController extends Controller
 
         return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
     }
-    /**
-     * 获取库存对象，通过库位
-     * 某仓库某库位的对象里面的所有sku
-     *
-     * @return obj
-     * @var array
-     *
-     */
-    public function ajaxGetByPosition()
-    {
-        $warehouse_id = trim(request()->input('warehouse_id'));
-        $position = PositionModel::where(['name' => trim(request()->input('position')), 'warehouse_id'=>$warehouse_id, 'is_available' => '1'])->first();
-        if(!$position) {
-            return json_encode(false);
-        }
-        $type = request()->input('type');
-        $warehouse_position_id = $position->id;
-        $sku = trim(request()->input('sku'));
-        $item_id = ItemModel::where('sku', $sku)->first()->id;
-        $obj = StockModel::where(['warehouse_position_id'=>$warehouse_position_id, 'item_id'=>$item_id])->first();
-        if($obj) {
-            return json_encode($obj->available_quantity);
-        }
-        if(StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->count() < 2) {
-            return json_encode(true);
-        } else {
-            return json_encode(false);
-        }
-    }
 
     /**
      * 获取信息 
@@ -194,22 +165,99 @@ class StockController extends Controller
     {
         $item_id = request()->input('item_id');
         $warehouse_id = request()->input('warehouse_id');
+        $type = request()->input('type');
         $obj = ItemModel::find($item_id);
         if(!$obj) {
             return json_encode('sku_none');
         }
-        $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
-        if(!count($obj1)) {
-            return json_encode('stock_none');
-        }
-        $arr[] = $obj1->toArray();
-        $arr[] = $obj1->first()->unit_cost;
-        if($arr) {
-            return json_encode($arr);
+        if($type == 'OUT') {
+            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
+            if(!count($obj1)) {
+                return json_encode('stock_none');
+            }
+            $arr[] = $obj1->toArray();
+            $arr[] = $obj1->first()->unit_cost;
+            if(count($arr)) {
+                return json_encode($arr);
+            } else {
+                return json_encode('false');
+            }
         } else {
-            return json_encode('false');
+            $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
+            $arr[] = $obj1->count();
+            if($arr[0]) {
+                $arr[] = $obj1->toArray();
+                $arr[] = $obj1->first()->unit_cost;
+            }
+            return json_encode($arr);
         }
     }
+
+    public function ajaxGetOnlyPosition()
+    {
+        $warehouse_position_id = request('position');
+        $item_id = request('sku');
+        $stock = $this->model->where(['warehouse_position_id' => $warehouse_position_id, 'item_id' => $item_id])->first();
+        if($stock) {
+            return json_encode($stock->available_quantity);
+        }
+        return json_encode(0);
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function ajaxSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            $total = $skus->count();
+            $arr = [];
+            foreach($skus as $key => $sku) {
+                $arr[$key]['id'] = $sku->id;
+                $arr[$key]['text'] = $sku->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
+    }
+
+    /**
+     * 获取库存对象，通过库位
+     * 某仓库某库位的对象里面的所有sku
+     *
+     * @return obj
+     * @var array
+     *
+     */
+    public function ajaxGetByPosition()
+    {
+        $warehouse_id = trim(request()->input('warehouse_id'));
+        $item_id = trim(request()->input('sku'));
+        $position = trim(request()->input('position'));
+        $obj = PositionModel::where('warehouse_id', $warehouse_id)->where('name', 'like', '%'.$position.'%')->get();
+        $total = $obj->count();
+        $arr = [];
+        foreach($obj as $key => $position) {
+            $arr[$key]['id'] = $position->id;
+            $arr[$key]['text'] = $position->name;
+        }
+        if($total)
+            return json_encode(['results' => $arr, 'total' => $total]);
+        else 
+            return json_encode('false');
+    }
+
+    
 
     /**
      * 调拨调出仓库对应的ajax调用
@@ -239,6 +287,8 @@ class StockController extends Controller
 
         return json_encode('false');
     }
+
+
 
     /**
      * 调拨库位对应的ajax调用
@@ -295,32 +345,7 @@ class StockController extends Controller
         return json_encode('false');
     }
 
-    /**
-     * ajax请求  sku
-     *
-     * @param none
-     * @return obj
-     * 
-     */
-    public function ajaxSku()
-    {
-        if(request()->ajax()) {
-            $sku = trim(request()->input('sku'));
-            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
-            $total = $skus->count();
-            $arr = [];
-            foreach($skus as $key => $sku) {
-                $arr[$key]['id'] = $sku->id;
-                $arr[$key]['text'] = $sku->sku;
-            }
-            if($total)
-                return json_encode(['results' => $arr, 'total' => $total]);
-            else 
-                return json_encode('false');
-        }
-
-        return json_encode('false');
-    }
+    
 
     /**
      * ajax请求   position

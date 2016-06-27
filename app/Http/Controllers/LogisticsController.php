@@ -42,6 +42,7 @@ class LogisticsController extends Controller
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -103,16 +104,6 @@ class LogisticsController extends Controller
             'data' => $this->autoList($this->model),
         ];
         return view($this->viewPath . 'index', $response);
-    }
-
-    /**
-     *ajax获取zone
-     */
-    public function zone()
-    {
-        $id = request()->input("id");
-        $buf =$this->model->find($id)->species;
-        return json_encode($buf);
     }
 
     public function getLogistics()

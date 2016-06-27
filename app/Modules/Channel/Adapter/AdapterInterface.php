@@ -76,7 +76,11 @@ interface AdapterInterface
      *
      */
     public function returnTrack();
-    
+
+    /**
+     * 获取平台邮件
+     * @return mixed
+     */
     public function getMessages();
 
 }

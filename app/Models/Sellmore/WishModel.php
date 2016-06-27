@@ -8,7 +8,7 @@
  */
 namespace App\Models\Sellmore;
 
-class AmazonModel extends SellMoreModel
+class WishModel extends SellMoreModel
 {
-    protected $table = 'erp_amz_config';
+    protected $table = 'wish_user_tokens';
 }

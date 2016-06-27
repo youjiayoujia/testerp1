@@ -8,7 +8,7 @@
  */
 namespace App\Models\Sellmore;
 
-class AmazonModel extends SellMoreModel
+class LazadaModel extends SellMoreModel
 {
-    protected $table = 'erp_amz_config';
+    protected $table = 'erp_lazada_token';
 }

@@ -8,7 +8,7 @@
  */
 namespace App\Models\Sellmore;
 
-class AmazonModel extends SellMoreModel
+class SmtModel extends SellMoreModel
 {
-    protected $table = 'erp_amz_config';
+    protected $table = 'smt_user_tokens';
 }

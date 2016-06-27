@@ -109,10 +109,24 @@
         </tr> 
     </tbody>
     </table>
-    
-            <div class="form-group col-lg-4">
-                <strong>打印日期</strong>:
-                <?php echo date('Y-m-d H:i:s',time());?>
-            </div>
+        <div class="form-group col-lg-4">
+            <strong>打印日期</strong>:
+            <?php echo date('Y-m-d H:i:s',time());?>
+        </div>
    </div>
-<input type="button" value="打印" onclick="window.print();"/>
+<input type="button" value="打印" onclick="changeStatus({{$id}});window.print()"/>
+
+    <script src="../../js/jquery.min.js"></script>
+    <script type='text/javascript'>
+        function changeStatus(id){
+            $.ajax({
+                url: "{{ route('changePrintStatus') }}",
+                data: {id: id},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    
+                }
+            });
+        }
+    </script>

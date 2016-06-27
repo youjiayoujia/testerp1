@@ -51,7 +51,7 @@ return [
         'country.code' => '国家简称',
         'time.created_at' => '时间',
         'price.amount' => '金额',
-        'items.sku' => 'SKU',
+        'item.sku' => 'SKU',
         'ordernum' => '订单号',
         'channel_ordernum' => '渠道订单号',
         'channelAccount.alias' => '渠道账号',

@@ -120,9 +120,11 @@
                   
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
-            	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
-                     <span class="glyphicon glyphicon-ok-sign"></span>
-                </a>
+                @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
+                	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign"></span>
+                    </a>
+                @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
                      <span class="glyphicon glyphicon-eye-open"></span>  
                 </a>
@@ -151,9 +153,11 @@
                     <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 @endif 
-                <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
-                    <span class="glyphicon glyphicon-remove-sign"></span>
-                </a>
+                @if($purchaseOrder->examineStatus == 0||$purchaseOrder->examineStatus == 2)
+                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
+                        <span class="glyphicon glyphicon-remove-sign"></span>
+                    </a>
+                @endif
                 @if($purchaseOrder->close_status == 0)
                 <a href="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" title="付款" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
                     <span class="glyphicon glyphicon glyphicon-usd"></span>

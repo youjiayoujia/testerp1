@@ -22,13 +22,13 @@
                      ?>
                      <div class="form-group col-md-3">
                         <label for="size">状态</label>
-                        <select id="is_sale" class="form-control" name="is_sale">
-                            <option value="0">待售</option>
-                            <option value="1">在售</option>
-                            <option value="2">卖完下架</option>
-                            <option value="3">停产</option>
-                            <option value="4">试销</option>
-                            <option value="5">货源待定</option>
+                        <select id="status" class="form-control" name="status">
+                            <option value="sellWaiting">待售</option>
+                            <option value="selling">在售</option>
+                            <option value="saleOutStopping">卖完下架</option>
+                            <option value="stopping">停产</option>
+                            <option value="trySale">试销</option>
+                            <option value="unSellTemp">货源待定</option>
                         </select>
                     </div>
                 <?php 

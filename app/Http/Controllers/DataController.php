@@ -3,16 +3,13 @@
  * Created by PhpStorm.
  * User: Vincent
  * Date: 16/6/24
- * Time: ����11:05
+ * Time: 11:05
  */
 namespace App\Http\Controllers;
 
 use Tool;
 use App\Models\Sellmore\ProductModel as smProduct;
-use App\Models\ItemModel;
 use App\Models\Sellmore\SupplierModel as smSupplier;
-use App\Models\Product\SupplierModel;
-use App\Models\Channel\AccountModel;
 use App\Models\Sellmore\AmazonModel as smAmazon;
 use App\Models\Sellmore\WishModel as smWish;
 use App\Models\Sellmore\SmtModel as smSmt;
@@ -23,15 +20,22 @@ use App\Models\Sellmore\EbayDeveloperModel as smEbayDeveloper;
 use App\Models\Sellmore\ShipmentCategoryModel as smShipmentCategory;
 use App\Models\Logistics\CatalogModel;
 use App\Models\Sellmore\ShipmentModel as smShipment;
-use App\Models\LogisticsModel;
 use App\Models\Sellmore\AmaLogisticsModel as smAmaLogistics;
-use App\Models\ChannelModel;
 use App\Models\Sellmore\WishLogisticsModel as smWishLogistics;
 use App\Models\Sellmore\DhgateLogisticsModel as smDhgateLogistics;
 use App\Models\Sellmore\LazadaLogisticsModel as smLazadaLogistics;
 use App\Models\Sellmore\AliExpressLogisticsModel as smAliExpressLogistics;
 use App\Models\Sellmore\ShipmentSupplierModel as smShipmentSupplier;
+use App\Models\Sellmore\StockModel as smStock;
 use App\Models\Logistics\SupplierModel as originSupplier;
+use App\Models\ItemModel;
+use App\Models\WarehouseModel;
+use App\Models\StockModel;
+use App\Models\Product\SupplierModel;
+use App\Models\Channel\AccountModel;
+use App\Models\Warehouse\PositionModel;
+use App\Models\LogisticsModel;
+use App\Models\ChannelModel;
 
 class DataController extends Controller
 {
@@ -40,9 +44,9 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smCds = smShipmentSupplier::skip($start)->take($len)->get();
-        while($smCds->count()) {
+        while ($smCds->count()) {
             $start += $len;
-            foreach($smCds as $smCd) {
+            foreach ($smCds as $smCd) {
                 $cd = [
                     'id' => $smCd->suppliers_id,
                     'name' => $smCd->suppliers_name,
@@ -66,11 +70,11 @@ class DataController extends Controller
         $start = 0;
         $id = ChannelModel::where(['name' => 'AliExpress'])->first()->id;
         $dhgates = smAliExpressLogistics::skip($start)->take($len)->get();
-        while($dhgates->count()) {
+        while ($dhgates->count()) {
             $start += $len;
-            foreach($dhgates as $dhgate) {
-                if($dhgate->logisticses) {
-                    foreach($dhgate->logisticses as $logistics) {
+            foreach ($dhgates as $dhgate) {
+                if ($dhgate->logisticses) {
+                    foreach ($dhgate->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $dhgate->logistics_key]]);
                     }
                 }
@@ -86,17 +90,17 @@ class DataController extends Controller
         $id = ChannelModel::where(['name' => 'Cdiscount'])->first()->id;
 
         $smShipments = smShipment::skip($start)->take($len)->get();
-        while($smShipments->count()) {
+        while ($smShipments->count()) {
             $start += $len;
-            foreach($smShipments as $smShipment) {
+            foreach ($smShipments as $smShipment) {
                 $model = LogisticsModel::find($smShipment->shipmentID);
-                if($model) {
-                    if($smShipment->shipmentCdiscountCodeID) {
+                if ($model) {
+                    if ($smShipment->shipmentCdiscountCodeID) {
                         $model->channelName()->attach([$id => ['name' => $smShipment->shipmentAMZCode]]);
                     }
                 } else {
                     var_dump($smShipment->shipmentID);
-                }   
+                }
             }
             $smShipments = smShipment::skip($start)->take($len)->get();
         }
@@ -108,11 +112,11 @@ class DataController extends Controller
         $start = 0;
         $id = ChannelModel::where(['name' => 'Lazada'])->first()->id;
         $dhgates = smLazadaLogistics::skip($start)->take($len)->get();
-        while($dhgates->count()) {
+        while ($dhgates->count()) {
             $start += $len;
-            foreach($dhgates as $dhgate) {
-                if($dhgate->logisticses) {
-                    foreach($dhgate->logisticses as $logistics) {
+            foreach ($dhgates as $dhgate) {
+                if ($dhgate->logisticses) {
+                    foreach ($dhgate->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $dhgate->logistics_name]]);
                     }
                 }
@@ -127,11 +131,11 @@ class DataController extends Controller
         $start = 0;
         $id = ChannelModel::where(['name' => 'Dhgate'])->first()->id;
         $dhgates = smDhgateLogistics::skip($start)->take($len)->get();
-        while($dhgates->count()) {
+        while ($dhgates->count()) {
             $start += $len;
-            foreach($dhgates as $dhgate) {
-                if($dhgate->logisticses) {
-                    foreach($dhgate->logisticses as $logistics) {
+            foreach ($dhgates as $dhgate) {
+                if ($dhgate->logisticses) {
+                    foreach ($dhgate->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $dhgate->logistics_name]]);
                     }
                 }
@@ -146,11 +150,11 @@ class DataController extends Controller
         $start = 0;
         $id = ChannelModel::where(['name' => 'Wish'])->first()->id;
         $wishes = smWishLogistics::skip($start)->take($len)->get();
-        while($wishes->count()) {
+        while ($wishes->count()) {
             $start += $len;
-            foreach($wishes as $wish) {
-                if($wish->logisticses) {
-                    foreach($wish->logisticses as $logistics) {
+            foreach ($wishes as $wish) {
+                if ($wish->logisticses) {
+                    foreach ($wish->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $wish->logistics_name]]);
                     }
                 }
@@ -166,15 +170,15 @@ class DataController extends Controller
         $id = ChannelModel::where(['name' => 'Amazon'])->first()->id;
 
         $smShipments = smShipment::skip($start)->take($len)->get();
-        while($smShipments->count()) {
+        while ($smShipments->count()) {
             $start += $len;
-            foreach($smShipments as $smShipment) {
+            foreach ($smShipments as $smShipment) {
                 $model = LogisticsModel::find($smShipment->shipmentID);
-                if($model) {
+                if ($model) {
                     $model->channelName()->attach([$id => ['name' => $smShipment->shipmentAMZCode]]);
                 } else {
                     var_dump($smShipment->shipmentID);
-                }   
+                }
             }
             $smShipments = smShipment::skip($start)->take($len)->get();
         }
@@ -186,9 +190,9 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smShipments = smShipment::skip($start)->take($len)->get();
-        while($smShipments->count()) {
+        while ($smShipments->count()) {
             $start += $len;
-            foreach($smShipments as $smShipment) {
+            foreach ($smShipments as $smShipment) {
                 $shipment = [
                     'id' => $smShipment->shipmentID,
                     'code' => $smShipment->shipmentTitle,
@@ -208,9 +212,9 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smShipmentCategorys = smShipmentCategory::skip($start)->take($len)->get();
-        while($smShipmentCategorys->count()) {
+        while ($smShipmentCategorys->count()) {
             $start += $len;
-            foreach($smShipmentCategorys as $smShipmentCategory) {
+            foreach ($smShipmentCategorys as $smShipmentCategory) {
                 $shipmentCategory = [
                     'id' => $smShipmentCategory->shipmentCatID,
                     'name' => $smShipmentCategory->shipmentCatName
@@ -227,11 +231,11 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smEbays = smEbay::skip($start)->take($len)->get();
-        while($smEbays->count()) {
+        while ($smEbays->count()) {
             $start += $len;
-            foreach($smEbays as $smEbay) {
+            foreach ($smEbays as $smEbay) {
                 $ebay = [
-                    'channel_id' => '2', 
+                    'channel_id' => '2',
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -255,11 +259,11 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smCds = smCd::skip($start)->take($len)->get();
-        while($smCds->count()) {
+        while ($smCds->count()) {
             $start += $len;
-            foreach($smCds as $smCd) {
+            foreach ($smCds as $smCd) {
                 $cd = [
-                    'channel_id' => '2', 
+                    'channel_id' => '2',
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -375,25 +379,55 @@ class DataController extends Controller
 
     public function index()
     {
-        $smProducts = smProduct::limit(100)->orderBy('products_id', 'desc')->get();
+        if (WarehouseModel::count() < 1) {
+            exit('先导入仓库信息,深圳仓ID=1,义乌仓ID=2');
+        }
+        if (SupplierModel::count() < 1) {
+            exit('先导入供货商信息');
+        }
+        $smProducts = smProduct::limit(1000)->orderBy('products_id', 'desc')->get();
+
         foreach ($smProducts as $smProduct) {
+            //体积
             $volumes = ['product_size' => '', 'package_size' => ''];
             if ($smProduct->products_volume) {
                 $volumes = unserialize($smProduct->products_volume);
                 $volumes['product_size'] = isset($volumes['bp']) ? $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'] : '';
                 $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
             }
-            $item = [
+            //供货商
+            $supplier = SupplierModel::find($smProduct->products_suppliers_id);
+            $supplierId = $supplier ? $supplier->id : 0;
+            $secondSupplierId = 0;
+            if ($smProduct->products_suppliers_ids) {
+                $supplierIds = explode(',', $smProduct->products_suppliers_ids);
+                if (isset($supplierIds[0])) {
+                    if ($supplierIds[0] != $smProduct->products_suppliers_id) {
+                        $secondSupplier = SupplierModel::find($supplierIds[0]);
+                        $secondSupplierId = $secondSupplier ? $secondSupplier->id : 0;
+                    }
+                }
+            }
+            //仓库
+            $warehouseId = $smProduct->product_warehouse_id == 1000 ? 1 : 2;
+            //库位
+            if ($smProduct->products_location) {
+                $position = PositionModel::Where('name', $smProduct->products_location)->first();
+                if (!$position) {
+                    PositionModel::create(['name' => $smProduct->products_location, 'warehouse_id' => $warehouseId]);
+                }
+            }
+            $data = [
                 'catalog_id' => 0,
                 'product_id' => 0,
                 'sku' => $smProduct->products_sku,
                 'name' => $smProduct->products_title,
                 'c_name' => $smProduct->products_name_cn,
                 'weight' => $smProduct->products_weight,
-                'warehouse_id' => $smProduct->product_warehouse_id,
+                'warehouse_id' => $warehouseId,
                 'warehouse_position' => $smProduct->products_location,
-                'alias_name' => $smProduct->products_declared_en,
-                'alias_cname' => $smProduct->products_declared_cn,
+                'supplier_id' => $supplierId,
+                'second_supplier_id' => $secondSupplierId,
                 'purchase_url' => $smProduct->productsPhotoStandard,
                 'purchase_price' => $smProduct->products_value,
                 'purchase_carriage' => '',
@@ -404,9 +438,29 @@ class DataController extends Controller
                 'package_limit' => '',
                 'status' => $smProduct->products_status_2,
                 'is_available' => $smProduct->productsIsActive,
-                'remark' => $smProduct->products_remark,
+                'remark' => $smProduct->products_warring_string,
+                'id' => $smProduct->products_id,
             ];
-            ItemModel::create($item);
+            $existItem = ItemModel::Where('sku', $smProduct->products_sku)->first();
+            if ($existItem) {
+                $existItem->update($data);
+            } else {
+                ItemModel::create($data);
+            }
+        }
+    }
+
+    public function transfer_stock()
+    {
+        $smStocks = smStock::Where('products_id', '<', '65726')->limit(1000)->orderBy('products_id', 'desc')->get();
+        foreach ($smStocks as $smStock) {
+            if ($smStock->item) {
+                $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
+                if ($position) {
+                    $smStock->item->in($position->id, $smStock->actual_stock,
+                        $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
+                }
+            }
         }
     }
 
@@ -419,7 +473,7 @@ class DataController extends Controller
             $start += $len;
             foreach ($smSuppliers as $smSupplier) {
                 $supplier = [
-                    'old_id' => $smSupplier->suppliers_id,
+                    'id' => $smSupplier->suppliers_id,
                     'name' => $smSupplier->suppliers_name,
                     'contact_name' => $smSupplier->suppliers_name,
                     'address' => $smSupplier->suppliers_address,

@@ -27,7 +27,7 @@ class CreatePurchaseCrontabs extends Migration
             $table->integer('need_purchase_num')->comment('建议采购数量')->default(0);
             $table->decimal('refund_rate',7,2)->comment('退款率')->default(0);
             $table->decimal('profit',7,2)->comment('利润率')->default(0);
-            $table->tinyInteger('status')->comment('状态')->default(0);
+            $table->string('status')->comment('状态')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

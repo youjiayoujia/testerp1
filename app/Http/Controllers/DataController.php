@@ -7,6 +7,7 @@
  */
 namespace App\Http\Controllers;
 
+use Tool;
 use App\Models\Sellmore\ProductModel as smProduct;
 use App\Models\ItemModel;
 use App\Models\Sellmore\SupplierModel as smSupplier;
@@ -89,11 +90,11 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smLazadas = smLazada::skip($start)->take($len)->get();
-        while($smLazadas->count()) {
+        while ($smLazadas->count()) {
             $start += $len;
-            foreach($smLazadas as $smLazada) {
+            foreach ($smLazadas as $smLazada) {
                 $lazada = [
-                    'channel_id' => '2', 
+                    'channel_id' => '2',
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -105,6 +106,7 @@ class DataController extends Controller
                     'lazada_currency_type_cn' => $smLazada->currency_type_cn,
                     'lazada_api_host' => $smLazada->api_host,
                 ];
+
                 AccountModel::create($lazada);
             }
             $smLazadas = smLazada::skip($start)->take($len)->get();
@@ -116,11 +118,11 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smSmts = smSmt::skip($start)->take($len)->get();
-        while($smSmts->count()) {
+        while ($smSmts->count()) {
             $start += $len;
-            foreach($smSmts as $smSmt) {
+            foreach ($smSmts as $smSmt) {
                 $smt = [
-                    'channel_id' => '2', 
+                    'channel_id' => '2',
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -146,11 +148,11 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smWishes = smWish::skip($start)->take($len)->get();
-        while($smWishes->count()) {
+        while ($smWishes->count()) {
             $start += $len;
-            foreach($smWishes as $smWish) {
+            foreach ($smWishes as $smWish) {
                 $wish = [
-                    'channel_id' => '4', 
+                    'channel_id' => '4',
                     'country_id' => '0',
                     'account' => $smWish->account_name,
                     'sync_cycle' => '0',
@@ -182,6 +184,12 @@ class DataController extends Controller
     {
         $smProducts = smProduct::limit(100)->orderBy('products_id', 'desc')->get();
         foreach ($smProducts as $smProduct) {
+            $volumes = ['product_size' => '', 'package_size' => ''];
+            if ($smProduct->products_volume) {
+                $volumes = unserialize($smProduct->products_volume);
+                $volumes['product_size'] = isset($volumes['bp']) ? $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'] : '';
+                $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
+            }
             $item = [
                 'catalog_id' => 0,
                 'product_id' => 0,
@@ -191,45 +199,18 @@ class DataController extends Controller
                 'weight' => $smProduct->products_weight,
                 'warehouse_id' => $smProduct->product_warehouse_id,
                 'warehouse_position' => $smProduct->products_location,
-
-//                'alias_name' => $smProduct->products_declared_en,
-//                'alias_cname' => $smProduct->products_declared_cn,
-//                'supplier_id' => SupplierModel::where('old_id', $smProduct->products_suppliers_id)->get()->id,
-//                'supplier_sku' => '',
-//                'second_supplier_id' => function ($smProduct) {
-//                    $suppliers = explode(',', $smProduct->products_suppliers_id);
-//                    if (isset($suppliers[1])) {
-//                        $secondSupplier = SupplierModel::where('old_id', $suppliers[1])->get();
-//                        if ($secondSupplier) {
-//                            return $secondSupplier->id;
-//                        }
-//                    }
-//                    return '';
-//                },
-                'second_supplier_sku' => '',
-                'supplier_info' => $smProduct->products_sku,
+                'alias_name' => $smProduct->products_declared_en,
+                'alias_cname' => $smProduct->products_declared_cn,
                 'purchase_url' => $smProduct->productsPhotoStandard,
                 'purchase_price' => $smProduct->products_value,
                 'purchase_carriage' => '',
                 'cost' => $smProduct->products_value,
-                'product_size' => function ($smProduct) {
-                    if ($smProduct->products_volume) {
-                        $volumes = unserialize($smProduct->products_volume);
-                        return $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'];
-                    }
-                    return '';
-                },
-                'package_size' => function ($smProduct) {
-                    if ($smProduct->products_volume) {
-                        $volumes = unserialize($smProduct->products_volume);
-                        return $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'];
-                    }
-                    return '';
-                },
+                'product_size' => $volumes['product_size'],
+                'package_size' => $volumes['package_size'],
                 'carriage_limit' => '',
                 'package_limit' => '',
                 'status' => $smProduct->products_status_2,
-                'is_sale' => $smProduct->productsIsActive,
+                'is_available' => $smProduct->productsIsActive,
                 'remark' => $smProduct->products_remark,
             ];
             ItemModel::create($item);
@@ -241,17 +222,17 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smSuppliers = smSupplier::skip($start)->take($len)->get();
-        while($smSuppliers->count()) {
+        while ($smSuppliers->count()) {
             $start += $len;
-            foreach($smSuppliers as $smSupplier) {
+            foreach ($smSuppliers as $smSupplier) {
                 $supplier = [
                     'old_id' => $smSupplier->suppliers_id,
                     'name' => $smSupplier->suppliers_name,
                     'contact_name' => $smSupplier->suppliers_name,
                     'address' => $smSupplier->suppliers_address,
                     'company' => $smSupplier->suppliers_company,
-                    'url' => $smSupplier->suppliers_website, 
-                    'official_url' => $smSupplier->suppliers_website, 
+                    'url' => $smSupplier->suppliers_website,
+                    'official_url' => $smSupplier->suppliers_website,
                     'telephone' => $smSupplier->suppliers_phone,
                     'purchase_time' => $smSupplier->supplierArrivalMinDays,
                     'bank_account' => $smSupplier->suppliers_bank,
@@ -272,11 +253,11 @@ class DataController extends Controller
         $len = 100;
         $start = 0;
         $smAmazons = smAmazon::skip($start)->take($len)->get();
-        while($smAmazons->count()) {
+        while ($smAmazons->count()) {
             $start += $len;
-            foreach($smAmazons as $smAmazon) {
+            foreach ($smAmazons as $smAmazon) {
                 $amazon = [
-                    'channel_id' => '3', 
+                    'channel_id' => '3',
                     'country_id' => '0',
                     'account' => $smAmazon->seller_account,
                     'alias' => $smAmazon->seller_account,

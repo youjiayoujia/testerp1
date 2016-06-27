@@ -126,9 +126,11 @@
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
                      <span class="glyphicon glyphicon-eye-open"></span>  
                 </a>
-                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
-                   <span class="glyphicon glyphicon-pencil"></span>
-                </a>
+                @if($purchaseOrder->status != 4 || ($purchaseOrder->close_status==1&&$purchaseOrder->status==2))
+                    <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
+                       <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                @endif
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
                     <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>
@@ -140,23 +142,28 @@
                          <span class="glyphicon glyphicon-yen"></span>
                     </a>
                 @endif
-                
-               <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
+                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
+                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
-                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
+                
                 <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 @endif 
-                 <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
+                <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-remove-sign"></span>
                 </a>
-                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
+                @if($purchaseOrder->close_status == 0)
+                <a href="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" title="付款" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
+                    <span class="glyphicon glyphicon glyphicon-usd"></span>
+                </a>
+                @endif 
+                {{--@if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)--}}
     				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-print"></span>
                     </a>
-                @endif                      
+                {{--@endif--}}            
                 
             </td>
         </tr>
@@ -263,6 +270,13 @@
 
     $(".daihexiao").click(function(){
         if (confirm("确认待核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
+    $(".fukuan").click(function(){
+        if (confirm("确认付款?")) {
             var url = $(this).data('url');
             window.location.href=url;
         }

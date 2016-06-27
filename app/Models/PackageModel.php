@@ -569,8 +569,8 @@ class PackageModel extends BaseModel
         $orderChannelFee = $this->calculateOrderChannelFee($order, $orderItems);
         $orderRate = ($order->amount - ($orderCosting + $this->calculateOrderChannelFee($order,
                         $orderItems) + $order->logistics_fee)) / $order->amount;
-        if ($orderRate <= 0) {
-            //利润率为负撤销
+        if ($order->status != 'CANCLE' && $orderRate <= 0) {
+            //利润率为负撤销0
             $this->OrderCancle($order, $orderItems);
         }
 

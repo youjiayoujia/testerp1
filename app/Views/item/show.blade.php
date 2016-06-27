@@ -162,28 +162,11 @@
             </div>
             <div class="col-lg-3">
                 <strong>状态</strong>: 
-                <?php 
-                    switch ($model->is_sale) {
-                        case '0':
-                            echo "待售";
-                            break;
-                        case '1':
-                            echo "在售";
-                            break;
-                        case '2':
-                            echo "卖完下架";
-                            break;
-                        case '3':
-                            echo "停产";
-                            break;
-                        case '4':
-                            echo "试销";
-                            break;
-                        case '5':
-                            echo "货源待定";
-                            break;
-                    }
-                ?>
+                {{config('item.status')[$model->status]}}
+            </div>
+            <div class="col-lg-3">
+                <strong>是否激活</strong>: 
+                {{config('item.is_available')[$model->is_available]}}
             </div>
             <div class="col-lg-3">
                 <strong>投诉比例</strong>: 

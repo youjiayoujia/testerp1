@@ -17,6 +17,7 @@ use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
 
+
 class LogisticsController extends Controller
 {
 

@@ -542,5 +542,7 @@ Route::any('data/transfer_amazon', ['uses' => 'DataController@transfer_amazon', 
 Route::any('data/transfer_wish', ['uses' => 'DataController@transfer_wish', 'as' => 'data.transfer_wish']);
 Route::any('data/transfer_smt', ['uses' => 'DataController@transfer_smt', 'as' => 'data.transfer_smt']);
 Route::any('data/transfer_lazada', ['uses' => 'DataController@transfer_lazada', 'as' => 'data.transfer_lazada']);
+Route::any('data/transfer_cd', ['uses' => 'DataController@transfer_cd', 'as' => 'data.transfer_cd']);
+Route::any('data/transfer_ebay', ['uses' => 'DataController@transfer_ebay', 'as' => 'data.transfer_ebay']);
 
 

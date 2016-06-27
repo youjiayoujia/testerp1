@@ -100,6 +100,11 @@ class LogisticsModel extends BaseModel
         return $this->belongsTo('App\Models\Logistics\TemplateModel', 'logistics_template_id', 'id');
     }
 
+    public function channelName()
+    {
+        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_channel_id', 'logistics_id', 'channel_id')->withPivot('name');
+    }
+
     public function getDockingNameAttribute()
     {
         $arr = config('logistics.docking');

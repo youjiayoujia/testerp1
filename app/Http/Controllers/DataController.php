@@ -16,10 +16,74 @@ use App\Models\Sellmore\AmazonModel as smAmazon;
 use App\Models\Sellmore\WishModel as smWish;
 use App\Models\Sellmore\SmtModel as smSmt;
 use App\Models\Sellmore\LazadaModel as smLazada;
+use App\Models\Sellmore\CdModel as smCd;
+use App\Models\Sellmore\EbayModel as smEbay;
+use App\Models\Sellmore\EbayDeveloperModel as smEbayDeveloper;
 
 
 class DataController extends Controller
 {
+    public function channel_logistics_name()
+    {
+        
+    }
+
+    public function transfer_ebay()
+    {
+        $len = 100;
+        $start = 0;
+        $smEbays = smEbay::skip($start)->take($len)->get();
+        while($smEbays->count()) {
+            $start += $len;
+            foreach($smEbays as $smEbay) {
+                $ebay = [
+                    'channel_id' => '2', 
+                    'country_id' => '0',
+                    'sync_cycle' => '0',
+                    'sync_days' => 30,
+                    'sync_pages' => 100,
+                    'ebay_developer_account' => $smEbay->developer->developer_account,
+                    'ebay_developer_devid' => $smEbay->developer->devid,
+                    'ebay_developer_appid' => $smEbay->developer->appid,
+                    'ebay_developer_certid' => $smEbay->developer->certid,
+                    'ebay_token' => $smEbay->user_token,
+                    'ebay_eub_developer' => $smEbay->eub_developer_id ? $smEbay->eub_developer_id : '',
+                    'customer_service_id' => $smEbay->sf_order,
+                ];
+                AccountModel::create($ebay);
+            }
+            $smEbays = smEbay::skip($start)->take($len)->get();
+        }
+    }
+
+    public function transfer_cd()
+    {
+        $len = 100;
+        $start = 0;
+        $smCds = smCd::skip($start)->take($len)->get();
+        while($smCds->count()) {
+            $start += $len;
+            foreach($smCds as $smCd) {
+                $cd = [
+                    'channel_id' => '2', 
+                    'country_id' => '0',
+                    'sync_cycle' => '0',
+                    'sync_days' => 30,
+                    'sync_pages' => 100,
+                    'cd_currency_type' => $smCd->currency_type,
+                    'cd_currency_type_cn' => $smCd->currency_type_cn,
+                    'cd_account' => $smCd->account,
+                    'cd_token_id' => $smCd->token_id,
+                    'cd_pw' => $smCd->pw,
+                    'cd_sales_account' => $smCd->sales_account,
+                    'cd_expires_in' => $smCd->expires_in
+                ];
+                AccountModel::create($cd);
+            }
+            $smCds = smCd::skip($start)->take($len)->get();
+        }
+    }
+
     public function transfer_lazada()
     {
         $len = 100;
@@ -41,7 +105,6 @@ class DataController extends Controller
                     'lazada_currency_type_cn' => $smLazada->currency_type_cn,
                     'lazada_api_host' => $smLazada->api_host,
                 ];
-                var_dump($lazada);exit;
                 AccountModel::create($lazada);
             }
             $smLazadas = smLazada::skip($start)->take($len)->get();

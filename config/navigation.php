@@ -362,6 +362,35 @@ return [
         'icon' => 'piggy-bank',
         'url' => 'dashboard.index',
     ],
+
+
+    [
+        'name' => ' 刊登',
+        'icon' => 'glyphicon glyphicon-send',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => 'wish草稿列表',
+                'url' => 'wish.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'wish在线数据列表',
+                'url' => 'wish.indexOnlineProduct',
+                'icon' => '',
+            ],
+            [
+                'name' => 'wish销售代码设置',
+                'url' => 'wishSellerCode.index',
+                'icon' => '',
+            ],
+
+        ],
+    ],
+
+
+
     //客户导航
 //    [
 //        'name' => '客户',
@@ -424,6 +453,7 @@ return [
                 'url' => 'paypal.index',
                 'icon' => '',
             ],
+
         ],
     ],
 ];

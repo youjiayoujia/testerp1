@@ -47,7 +47,7 @@ class ItemModel extends BaseModel
         'warehouse_id',
         'warehouse_position',
         'status',
-        'is_sale',
+        'is_available',
         'remark',
         'cost',
     ];
@@ -473,7 +473,7 @@ class ItemModel extends BaseModel
             //平均利润率
             $data['profit'] = $total_profit_num?$total_profit_rate/$total_profit_num:'0';
             
-            $data['status'] = $item->is_sale;
+            $data['status'] = $item->status;
             PurchaseCrontabsModel::create($data);
         }
     }

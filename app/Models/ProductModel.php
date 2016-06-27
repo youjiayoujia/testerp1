@@ -372,21 +372,8 @@ class ProductModel extends BaseModel
     {
         //获得variation属性集合
         $variations = $this->variationValues->toArray();
-        //$brr = [];
-        //echo '<pre>';
-
-        /*foreach ($variations as $variation) {
-            if($variation['pivot']['created_at']==$variation['pivot']['updated_at']){
-                $brr[$variation['variation_id']][] = $variation['name'];
-            }  
-        }*/
-        //按照指定格式的数组去笛卡尔及创建item
-        //$brr = array_values($brr);
-        //$result = Tool::createDikaer($brr);
         //产品model号赋值
         $model = $this->model;
-        //print_r($variations);exit;
-
         foreach ($variations as $key => $value) {
             $item = $model.($key+1);
             $product_data = $this->toArray();
@@ -395,18 +382,7 @@ class ProductModel extends BaseModel
             $this->item()->create($product_data);
         }
         
-        /*foreach ($result as $_result) {
-            $item = $model;
-            //循环拼接创建item
-            foreach ($_result as $__result) {
-                $item .= "-" . $__result;
-            }
-            $product_data = $this->toArray();
-            $product_data['sku'] = $item;
-            $product_data['product_id'] = $this->id;
-            $this->item()->create($product_data);
-        }*/
-        $this->status = 1;
+        $this->status = "selling";
         $this->save();
     }
 

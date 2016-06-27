@@ -476,6 +476,23 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('paypal', 'PaypalController');
 
 
+    //editOnlineProduct
+    Route::post('wish/editOnlineProductStore', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
+    Route::get('wish/ajaxOperateOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@ajaxOperateOnlineProduct', 'as' => 'wish.ajaxOperateOnlineProduct']);
+    Route::get('wish/ajaxEditOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@ajaxEditOnlineProduct', 'as' => 'wish.ajaxEditOnlineProduct']);
+    Route::get('wish/indexOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
+    Route::get('wish/editOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
+    Route::resource('wish','Publish\Wish\WishPublishController');
+
+
+    Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
+
+
+
+
+   // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
+
+
 });
 
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
@@ -483,4 +500,5 @@ Route::any('test', ['uses' => 'TestController@index']);
 Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
+Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 

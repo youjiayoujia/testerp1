@@ -13,6 +13,8 @@
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>{{-- BOOTSTRAP JS --}}
     <script src="{{ asset('js/uri.min.js') }}"></script>{{-- JS URI --}}
     <script src="{{ asset('js/jquery.cxcalendar.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-list-dragsort.js') }}"></script>
+    <script src="{{ asset('js/Validform_v5.2.js') }}"></script>
 @stop
 @section('init')
     <script type="text/javascript">

@@ -13,7 +13,7 @@
             <select name="logistics_id" class="form-control" id="logistics_id">
                 @foreach($logisticses as $logistics)
                     <option value="{{ $logistics->id }}" {{ Tool::isSelected('logistics_id', $logistics->id) }}>
-                        {{ $logistics->logistics_type }}
+                        {{ $logistics->name }}
                     </option>
                 @endforeach
             </select>

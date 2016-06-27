@@ -17,11 +17,11 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
-    public $searchFields = ['short_code', 'logistics_type', 'logistics_supplier_id', 'type'];
+    public $searchFields = ['code', 'name', 'logistics_supplier_id', 'type'];
 
     protected $fillable = [
-        'short_code',
-        'logistics_type',
+        'code',
+        'name',
         'warehouse_id',
         'logistics_supplier_id',
         'type',
@@ -38,8 +38,8 @@ class LogisticsModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'short_code' => 'required',
-            'logistics_type' => 'required',
+            'code' => 'required',
+            'name' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
@@ -51,8 +51,8 @@ class LogisticsModel extends BaseModel
             'is_enable' => 'required',
         ],
         'update' => [
-            'short_code' => 'required',
-            'logistics_type' => 'required',
+            'code' => 'required',
+            'name' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',

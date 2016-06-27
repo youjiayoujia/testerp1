@@ -88,32 +88,6 @@ return [
         'WHITE' => '白名单'
     ],
 
-    //币种
-    'currency' => [
-        'USD',
-        'GBP',
-        'EUR',
-        'NOK',
-        'CAD',
-        'AUD',
-        'CHF',
-        'SEK',
-        'PLN',
-        'RUB',
-        'MXN',
-        'DKK',
-        'SAR',
-        'TWD',
-        'JPY',
-        'HKD'
-    ],
-
-    //种类
-    'shipping' => [
-        'EXPRESS' => '快递',
-        'PACKET' => '小包'
-    ],
-
     //支付方式
     'payment' => ['GC', 'IDEAL', 'OC', 'PP', 'SOFORT'],
 

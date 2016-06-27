@@ -85,7 +85,7 @@
         </tr>
     @endforeach
 @stop
-
+@section('childJs')
 <script type="text/javascript">
 
     function operator(id,type,e){
@@ -115,3 +115,4 @@
     }
 
 </script>
+@stop

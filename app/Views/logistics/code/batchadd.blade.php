@@ -4,10 +4,10 @@
 @section('formBody')
     <div class="row">
         <div class="col-lg-4">
-            <strong>当前物流方式</strong>: {{ $logistics->logistics_type }}
+            <strong>当前物流方式</strong>: {{ $logistics->name }}
         </div>
         <div class="col-lg-4">
-            <strong>当前物流方式简码</strong>: {{ $logistics->short_code }}
+            <strong>当前物流方式简码</strong>: {{ $logistics->code }}
         </div>
         <br/>
         <br/>

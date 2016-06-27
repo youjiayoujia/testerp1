@@ -530,6 +530,23 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('paypal', 'PaypalController');
 
 
+    //editOnlineProduct
+    Route::post('wish/editOnlineProductStore', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
+    Route::get('wish/ajaxOperateOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@ajaxOperateOnlineProduct', 'as' => 'wish.ajaxOperateOnlineProduct']);
+    Route::get('wish/ajaxEditOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@ajaxEditOnlineProduct', 'as' => 'wish.ajaxEditOnlineProduct']);
+    Route::get('wish/indexOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
+    Route::get('wish/editOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
+    Route::resource('wish','Publish\Wish\WishPublishController');
+
+
+    Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
+
+
+
+
+   // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
+
+
 });
 
 
@@ -539,4 +556,12 @@ Route::any('data', ['uses' => 'DataController@index']);
 Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
+Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
+Route::any('data/transfer_supplier', ['uses' => 'DataController@transfer_supplier', 'as' => 'data.transfer_supplier']);
+Route::any('data/transfer_amazon', ['uses' => 'DataController@transfer_amazon', 'as' => 'data.transfer_amazon']);
+Route::any('data/transfer_wish', ['uses' => 'DataController@transfer_wish', 'as' => 'data.transfer_wish']);
+Route::any('data/transfer_smt', ['uses' => 'DataController@transfer_smt', 'as' => 'data.transfer_smt']);
+Route::any('data/transfer_lazada', ['uses' => 'DataController@transfer_lazada', 'as' => 'data.transfer_lazada']);
+
+
 

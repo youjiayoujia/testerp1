@@ -16,7 +16,7 @@
                 <select name="logistics_id" class="form-control" id="logistics_id">
                     @foreach($logistics as $logisticses)
                         <option value="{{$logisticses->id}}" {{$logisticses->id == $zone->logistics_id ? 'selected' : ''}} disabled>
-                            {{$logisticses->logistics_type}}
+                            {{$logisticses->name}}
                         </option>
                     @endforeach
                 </select>

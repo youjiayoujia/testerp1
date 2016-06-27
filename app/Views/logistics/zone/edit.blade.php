@@ -13,7 +13,7 @@
             <select name="logistics_id" class="form-control logistics" id="logistics_id">
                 @foreach($logisticses as $logistics)
                     <option value="{{ $logistics->id }}" {{ old('logistics_id') ? (old('logistics_id') == $logistics->id ? 'selected' : '') : ($model->logistics_id == $logistics->id ? 'selected' : '' )}}>
-                        {{ $logistics->logistics_type }}
+                        {{ $logistics->name }}
                     </option>
                 @endforeach
             </select>

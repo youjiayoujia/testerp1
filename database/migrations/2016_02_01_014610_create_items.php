@@ -39,7 +39,7 @@ class CreateItems extends Migration
             $table->string('carriage_limit')->nullable();
             $table->string('package_limit')->nullable();
             $table->string('status')->nullable();
-            $table->tinyInteger('is_sale')->comment('是否可售')->nullable()->default(1);
+            $table->tinyInteger('is_available')->comment('是否可用')->nullable()->default(1);
             $table->string('remark')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -21,8 +21,8 @@
         <tr>
             <td>{{ $zone->id }}</td>
             <td>{{ $zone->zone }}</td>
-            <td>{{ $zone->logistics ? $zone->logistics->logistics_type : '' }}</td>
-            <td>{{ $zone->logistics ? $zone->logistics->short_code : '' }}</td>
+            <td>{{ $zone->logistics ? $zone->logistics->name : '' }}</td>
+            <td>{{ $zone->logistics ? $zone->logistics->code : '' }}</td>
             <td>{{ $zone->type == 'first' ? '方式一' : '方式二' }}</td>
             <td>{{ $zone->fixed_weight }}</td>
             <td>{{ $zone->fixed_price }}</td>

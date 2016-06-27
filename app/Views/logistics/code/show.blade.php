@@ -7,7 +7,7 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式</strong>: {{ $model->logistics->logistics_type }}
+                <strong>物流方式</strong>: {{ $model->logistics->name }}
             </div>
             <div class="col-lg-4">
                 <strong>跟踪号</strong>: {{ $model->code }}

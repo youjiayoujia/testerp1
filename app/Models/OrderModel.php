@@ -104,14 +104,47 @@ class OrderModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['channel' => ['name'], 'country' => ['code']],
-            'filterFields' => [],
-            'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
-            'selectRelatedSearchs' => [
+            'filterFields' => [
+                'ordernum',
+                'channel_ordernum',
+                'email',
+                'currency'
+            ],
+            'filterSelects' => [
 
             ],
+            'sectionSelect' => [
+                'price' => ['amount'],
+                'time' => ['created_at']
+            ],
+            'relatedSearchFields' => [
+                'channel' => ['name'],
+                'items' => ['sku'],
+                'channelAccount' => ['alias'],
+                'country' => ['code'],
+                'userService' => ['name']
+            ],
+            'selectRelatedSearchs' => [
+                'order' => [
+                    'status' => config('order.status'),
+                    'active' => config('order.active')
+                ]
+            ]
         ];
     }
+
+//    public function getMixedSearchAttribute()
+//    {
+//        return [
+//            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
+//            'filterFields' => ['tracking_no'],
+//            'filterSelects' => ['status' => config('package')],
+//            'selectRelatedSearchs' => [
+//                'order' => ['status' => config('order.status'), 'active' => config('order.active')],
+//            ],
+//            'sectionSelect' => ['time' => ['created_at']],
+//        ];
+//    }
 
     public function items()
     {

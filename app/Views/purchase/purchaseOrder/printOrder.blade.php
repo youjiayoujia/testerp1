@@ -59,9 +59,11 @@
     <table border="0"  width="100%" cellpadding="0" cellspacing="1" bgcolor="#000">
     <thead >
         <tr bgcolor="#fff">
+            <td>序号</td>
             <td>采购条目ID</td> 
             <td>单据号</td>
-            <td>SKU</td> 
+            <td>SKU</td>
+            <td>产品描述</td> 
             <td>采购数量</td> 
             <td>入库数量</td>
             <td>不良数量</td>
@@ -72,10 +74,12 @@
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)  
         <tr bgcolor="#fff"> 
+            <td>{{$k+1}}</td>
             <td>{{$purchaseItem->id}}</td>
             
             <td>{{$purchaseItem->post_coding}}</td>
             <td>{{$purchaseItem->sku}}</td>
+            <td>{{$purchaseItem->item->c_name}}</td>
             <td>{{$purchaseItem->purchase_num}}</td>   
             
             <td>       	
@@ -93,13 +97,15 @@
         </tr>
         @endforeach 
         <tr bgcolor="#fff">
-        <td colspan="3"><strong>合计</strong></td>
+        <td colspan="4"><strong>合计</strong></td>
         <td>{{$purchase_num_sum}}</td>
         <td>{{$storage_qty_sum}}</td>
         <td>{{$purchase_num_sum - $storage_qty_sum}}</td>
         <td></td>
         <td>{{$purchaseAccount}} + YF{{$postage_sum}} = 总{{$purchaseAccount + $postage_sum}}</td>
-        
+        </tr>
+        <tr bgcolor="#fff">
+       <td colspan="9"><strong> 备注： {{$model->remark}}</strong></td>
         </tr> 
     </tbody>
     </table>

@@ -85,7 +85,7 @@
             <strong>需求渠道</strong>: {{ $model->neederName ? $model->channel->name : '' }}
         </div>
         <div class="col-lg-2">
-            <strong>需求帐号</strong>: {{ $model->channelAccount->account }}
+            <strong>需求帐号</strong>: {{ $model->channelAccount?$model->channelAccount->account : '' }}
         </div>
     </div>
 </div>

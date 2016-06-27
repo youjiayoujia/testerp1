@@ -17,7 +17,7 @@
         </div>
         <div class="form-group col-lg-3">
             <label for="in_warehouse_id" class='control-label'>调入仓库</label> 
-            <input type='text' class="form-control" id="in_warehouse_id" placeholder="调入仓库" name='in_warehouse_id' value="{{ $allotment->inwarehouse->name}}" readonly>
+            <input type='text' class="form-control" id="in_warehouse_id" data-warehouse="{{ $allotment->in_warehouse_id }}" placeholder="调入仓库" name='in_warehouse_id' value="{{ $allotment->inwarehouse->name}}" readonly>
         </div>
     </div>
     <div class="panel panel-primary">
@@ -40,7 +40,7 @@
                 <div class='row'>
                     <div class='form-group col-sm-1'>
                         <label for='sku' class='control-label'>sku</label>
-                        <input type='text' class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[item_id][{{$key}}]' value='{{ $allotmentform->item->sku }}' readonly>
+                        <input type='text' data-sku="{{$allotmentform->item_id}}" class='form-control sku' id='arr[sku][{{$key}}]' placeholder='sku' name='arr[item_id][{{$key}}]' value='{{ $allotmentform->item->sku }}' readonly>
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='quantity' class='control-label'>实发数量</label>
@@ -60,12 +60,24 @@
                     </div>
                     <div class='form-group col-sm-2'>
                         <label for='warehouse_position_id'>库位</label> <small class='text-danger glyphicon glyphicon-asterisk'></small>
-                        <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id'>
-                        <option value=''>请输入库位</option>
-                        @foreach($positions as $position)
-                            <option value="{{$position->id}}" {{$allotmentform->in_warehouse_position_id == $position->id ? 'selected' : ''}}>{{$position->name}}</option>
-                        @endforeach
-                        </select>
+                            @if($positions[$key][1] == '2')
+                            <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id'>
+                                @foreach($positions[$key][0] as $single)
+                                    <option value="{{ $single->position->id}}">{{$single->position->name}}</option>
+                                @endforeach
+                            </select>
+                            @endif
+                            @if($positions[$key][1] == '1')
+                            <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id warehouse_position_id1'>
+                                @foreach($positions[$key][0] as $single)
+                                    <option value="{{ $single->position->id}}">{{$single->position->name}}</option>
+                                @endforeach
+                            </select>
+                            @endif
+                            @if($positions[$key][1] == '0')
+                                <select name='arr[warehouse_position_id][{{$key}}]' id='arr[warehouse_position_id][{{$key}}]' class='form-control warehouse_position_id warehouse_position_id1'>
+                                </select>
+                            @endif
                     </div>
                 </div>
             @endforeach
@@ -117,6 +129,30 @@ $(document).ready(function(){
                     $(this).parent().parent().css('background', 'none');
             });
         }
+    });
+
+    $('.warehouse_position_id1').select2({
+        ajax: {
+            url: "{{ route('stock.ajaxGetByPosition') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                position: params.term, // search term
+                page: params.page,
+                warehouse_id: $('#in_warehouse_id').data('warehouse'),
+                sku: $(this).parent().parent().find('.sku').data('sku'),
+              };
+            },
+            results: function(data, page) {
+                if((data.results).length > 0) {
+                    var more = (page * 20)<data.total;
+                    return {results:data.results,more:more};
+                } else {
+                    return {results:data.results};
+                }
+            }
+        },
     });
 });
 </script>

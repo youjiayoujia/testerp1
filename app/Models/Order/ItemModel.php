@@ -18,14 +18,13 @@ class ItemModel extends BaseModel
 
     protected $guarded = [];
 
-    protected $fillable = ['order_id', 'item_id', 'sku', 'quantity', 'amount', 'is_active', 'status', 'is_gift'];
-
     public $searchFields = [
         'order_id',
         'item_id',
         'sku',
         'status',
         'ship_status',
+        'is_refund',
     ];
 
     public function item()
@@ -49,6 +48,11 @@ class ItemModel extends BaseModel
     {
         $arr = config('order.whether');
         return $arr[$this->is_gift];
+    }
+
+    public function order()
+    {
+        return $this->belongsTo('App\Models\OrderModel','order_id');
     }
 
 }

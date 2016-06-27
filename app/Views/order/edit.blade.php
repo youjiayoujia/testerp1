@@ -100,88 +100,9 @@
                 </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="ip" class='control-label'>IP地址</label>
-                <input class="form-control" id="ip" placeholder="IP地址" name='ip' value="{{ old('ip') ? old('ip') : $model->ip }}">
-            </div>
-            <div class="form-group col-lg-2" id="comment">
-                <label for="comment" class='control-label'>备用字段</label>
-                <input class="form-control" id="comment" placeholder="备用字段" name='comment' value="{{ old('comment') ? old('comment') : $model->comment }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="comment1" class='control-label'>红人/choies用</label>
-                <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') ? old('comment1') : $model->comment1 }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="remark" class='control-label'>订单备注</label>
-                <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') ? old('remark') : $model->remark }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="import_remark" class='control-label'>导单备注</label>
-                <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') ? old('import_remark') : $model->import_remark }}" readonly>
-            </div>
-            <div class="form-group col-lg-2">
                 <label for="create_time" class='control-label'>渠道创建时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="create_time" placeholder="渠道创建时间" name='create_time' value="{{ old('create_time') ? old('create_time') : $model->create_time }}" readonly>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="affair_time" class='control-label'>做账时间</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') ? old('affair_time') : $model->affair_time }}" readonly>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="affairer">做账人员</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="affairer" class="form-control" id="affairer">
-                    <option value="NULL"></option>
-                    @foreach($users as $user)
-                        <option value="{{$user->id}}" {{$user->id == $model->affairer ? 'selected' : ''}}>
-                            {{$user->name}}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="is_affair" class='control-label'>是否做账</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_affair" value="1" {{ old('is_affair') ? (old('is_affair') == "1" ? 'checked' : '') : ($model->is_affair == "1" ? 'checked' : '') }}>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_affair" value="0" {{ old('is_affair') ? (old('is_affair') == "0" ? 'checked' : '') : ($model->is_affair == "0" ? 'checked' : '') }}>否
-                    </label>
-                </div>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="is_partial" class='control-label'>是否分批发货</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_partial" value="1" {{ old('is_partial') ? (old('is_partial') == "1" ? 'checked' : '') : ($model->is_partial == "1" ? 'checked' : '') }}>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_partial" value="0" {{ old('is_partial') ? (old('is_partial') == "0" ? 'checked' : '') : ($model->is_partial == "0" ? 'checked' : '') }}>否
-                    </label>
-                </div>
-            </div>
-            <div class="form-group col-lg-2" id="hand">
-                <label for="by_hand" class='control-label'>是否手工</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="by_hand" value="1" {{ old('by_hand') ? (old('by_hand') == "1" ? 'checked' : '') : ($model->by_hand == "1" ? 'checked' : '') }}>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="by_hand" value="0" {{ old('by_hand') ? (old('by_hand') == "0" ? 'checked' : '') : ($model->by_hand == "0" ? 'checked' : '') }}>否
-                    </label>
-                </div>
             </div>
         </div>
     </div>
@@ -251,17 +172,6 @@
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
             <div class="form-group col-lg-2">
-                <label for="shipping" class='control-label'>种类</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select class="form-control" name="shipping" id="shipping">
-                    @foreach(config('order.shipping') as $shipping_key => $shipping)
-                        <option value="{{ $shipping_key }}" {{ old('shipping') ? (old('shipping') == $shipping_key ? 'selected' : '') : ($model->shipping == $shipping_key ? 'selected' : '') }}>
-                            {{ $shipping }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
                 <label for="shipping_firstname" class='control-label'>发货名字</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="shipping_firstname" placeholder="发货名字" name='shipping_firstname' value="{{ old('shipping_firstname') ? old('shipping_firstname') : $model->shipping_firstname }}">
@@ -293,7 +203,11 @@
             <div class="form-group col-lg-2">
                 <label for="shipping_country" class='control-label'>发货国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') ? old('shipping_country') : $model->shipping_country }}">
+                <select name="shipping_country" class="form-control shipping_country" id="shipping_country">
+                    @foreach($countries as $country)
+                        <option value="{{ $country->code }}" {{ $country->code == $model->shipping_country ? 'selected' : ''}}>{{ $country->code }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_zipcode" class='control-label'>发货邮编</label>
@@ -353,7 +267,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="image" class='control-label'>图片</label>
+                    <label for="channel_sku" class='control-label'>渠道sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
@@ -383,10 +297,12 @@
             @foreach($orderItems as $key => $orderItem)
                 <div class='row'>
                     <div class="form-group col-sm-2">
-                        <input type='text' class="form-control sku" id="arr[sku][{{$key}}]" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}">
+                        <select name="arr[sku][{{$key}}]" class="form-control sku" id="arr[sku][{{$key}}]">
+                            <option value="{{ $orderItem->item ? $orderItem->item->sku : '' }}">{{ $orderItem->item ? $orderItem->sku : ''}}</option>
+                        </select>
                     </div>
-                    <div class="form-group col-sm-2 image">
-                        <img src="/{{ $arr[$key] }}" width="25px" height="25px">
+                    <div class="form-group col-sm-2">
+                        <input type='text' class="form-control channel_sku" id="arr[channel_sku][{{$key}}" placeholder="渠道sku" name='arr[channel_sku][{{$key}}]' value="{{ old('arr[channel_sku][$key]') ? old('arr[channel_sku][$key]') : $orderItem->channel_sku }}">
                     </div>
                     <div class="form-group col-sm-1">
                         <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}">
@@ -438,9 +354,6 @@
         $(document).ready(function(){
             $('#create_time, #payment_date, #affair_time, #refund_time').cxCalendar();
 
-            document.getElementById('comment').style.display='none';
-            document.getElementById('hand').style.display='none';
-
             var payment = $('#payment').val();
             $('#refund').val(payment);
             var currency = $('#currency').val();
@@ -482,6 +395,27 @@
                     type: 'get',
                     success: function (result) {
                         $('#itemDiv').append(result);
+                        $('.sku').select2({
+                            ajax: {
+                                url: "{{ route('order.ajaxSku') }}",
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        sku: params.term,
+                                        page: params.page
+                                    };
+                                },
+                                results: function(data, page) {
+                                    if((data.results).length > 0) {
+                                        var more = (page * 20)<data.total;
+                                        return {results:data.results,more:more};
+                                    } else {
+                                        return {results:data.results};
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
                 current++;
@@ -525,10 +459,36 @@
                     }
                 });
             });
+
+            $('.shipping_country').select2();
+
+            $('.sku').select2({
+                ajax: {
+                    url: "{{ route('order.ajaxSku') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            sku: params.term,
+                            page: params.page
+                        };
+                    },
+                    results: function(data, page) {
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
+                    }
+                }
+            });
+
         });
 
         $(document).on('click', '.bt_right', function(){
             $(this).parent().remove();
         });
+
     </script>
 @stop

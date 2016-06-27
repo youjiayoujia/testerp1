@@ -17,7 +17,7 @@
         <tbody>
             @foreach($carryOvers as $key => $carryOver)
             <tr>
-                <td>{{ $carryOver->stock ? $carryOver->stock->items ? $carryOver->stock->items->sku : '' : '' }}</td>
+                <td>{{ $carryOver->stock ? $carryOver->stock->item ? $carryOver->stock->item->sku : '' : '' }}</td>
                 <td>{{ $carryOver->stock ? $carryOver->stock->warehouse ? $carryOver->stock->warehouse->name : '' : '' }}</td>
                 <td>{{ $carryOver->stock ? $carryOver->stock->position ? $carryOver->stock->position->name : '' : ''}}</td>
                 <td>{{ $carryOver->over_quantity }}</td>

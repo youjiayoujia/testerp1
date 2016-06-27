@@ -13,9 +13,6 @@
                 <strong>物流方式名称</strong>: {{ $model->logistics_type }}
             </div>
             <div class="col-lg-4">
-                <strong>种类</strong>: {{ $model->species == 'express' ? '快递' : '小包' }}
-            </div>
-            <div class="col-lg-4">
                 <strong>仓库</strong>: {{ $model->warehouse->name }}
             </div>
             <div class="col-lg-4">
@@ -29,6 +26,15 @@
             </div>
             <div class="col-lg-4">
                 <strong>对接方式</strong>: {{ $model->docking_name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>物流分类</strong>: {{ $model->logistics_catalog_id == '0' ? '未选择' : $model->catalog->name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>回邮模版</strong>: {{ $model->logistics_email_template_id == '0' ? '未选择' : $model->emailTemplate->customer }}
+            </div>
+            <div class="col-lg-4">
+                <strong>面单模版</strong>: {{ $model->logistics_template_id == '0' ? '未选择' : $model->template->name }}
             </div>
             <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}

@@ -7,7 +7,7 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-2">
-                <strong>sku</strong>: {{ $model->items ? $model->items->sku : '' }}
+                <strong>sku</strong>: {{ $model->item ? $model->item->sku : '' }}
             </div>
             <div class="col-lg-2">
                 <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : ''}}

@@ -3,7 +3,6 @@
     <th class="sort" data-field="id">ID</th>
     <th>物流方式简码</th>
     <th>物流方式名称</th>
-    <th>种类</th>
     <th>仓库</th>
     <th>物流商</th>
     <th>物流商物流方式</th>
@@ -22,7 +21,6 @@
             <td>{{ $logistics->id }}</td>
             <td>{{ $logistics->short_code }}</td>
             <td>{{ $logistics->logistics_type }}</td>
-            <td>{{ $logistics->species == 'express' ? '快递' : '小包' }}</td>
             <td>{{ $logistics->warehouse->name }}</td>
             <td>{{ $logistics->supplier->name }}</td>
             <td>{{ $logistics->type }}</td>

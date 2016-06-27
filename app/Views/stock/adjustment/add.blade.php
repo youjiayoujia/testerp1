@@ -6,7 +6,7 @@
         </select>
     </div>
     <div class='form-group col-sm-2'>
-        <input type='text' class='form-control sku' id='arr[sku][{{$current}}]' placeholder='sku' name='arr[sku][{{$current}}]' value='{{ old('arr[sku][$current]') }}'>
+        <select class='form-control sku sku1' name="arr[item_id][{{$current}}]"></select>
     </div>
     <div class='form-group col-sm-2 position_html'>
         <input type='text' name='arr[warehouse_position_id][{{$current}}]' class='form-control warehouse_position_id' placeholder='库位' value="{{ old('arr[warehouse_position_id][$current]') }}">

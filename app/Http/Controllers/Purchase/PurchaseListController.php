@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseOrderModel;
+use App\Models\Purchase\PurchasePostageModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
 use App\Models\Warehouse\PositionModel;
@@ -20,24 +21,25 @@ use App\Models\Warehouse\PositionModel;
 class PurchaseListController extends Controller
 {
 
-    public function __construct(PurchaseItemModel $purchaseList)
+    public function __construct(PurchasePostageModel $PurchasePostageModel)
     {	
-        $this->model = $purchaseList;
+        $this->model = $PurchasePostageModel;
         $this->mainIndex = route('purchaseList.index');
-        $this->mainTitle = '采购到货';
+        $this->mainTitle = '包裹扫描';
 		$this->viewPath = 'purchase.purchaseList.';
     }
     
 	
 	public function index()
     {
+		request()->flash();
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('status','>',0)->where('active_status',0)->orderBy('status','asc')),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
-		foreach($response['data'] as $key=>$vo){
-			$response['data'][$key]['position_num']=PositionModel::where('warehouse_id',$vo->warehouse_id)->count();			
-			}
+    
         return view($this->viewPath . 'index', $response);
     }
 	
@@ -49,13 +51,43 @@ class PurchaseListController extends Controller
 		$response['metas']['title']='查询采购运单';
         return view($this->viewPath . 'create', $response);
     }
-	
+	/**
+     * 关联运单号
+     *
+     * 
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function selectPurchaseOrder()
+    { 
+		$data=request()->all();
+		$postcodingNum=PurchasePostageModel::where('post_coding',$data['post_coding'])->count();
+		if($postcodingNum>0){
+		$res['postcoding']=PurchasePostageModel::where('post_coding',$data['post_coding'])->first();
+		$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id);
+		$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'postcodingNum' =>$postcodingNum,
+			'data' =>$res,
+			'postCoding' =>$data['post_coding'],
+        ];
+		}else{
+			$response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'postcodingNum' =>$postcodingNum,
+			'postCoding' =>$data['post_coding'],
+        ];
+			}
+		$response['metas']['title']='查询采购运单';
+        return view($this->viewPath . 'show', $response);
+    }
 	/**
      * 批量对单
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
+	//public function examinePurchaseItem($purchase_item_id,$arrival_num)
 	public function examinePurchaseItem()
 	{ 
 		$purcahse_active=explode(',',request()->get('purcahse_active'));
@@ -120,7 +152,7 @@ class PurchaseListController extends Controller
 		}
 	}
 	/**
-     * 生成条码
+     * 查看条码
      *
      * @param $id
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -131,7 +163,33 @@ class PurchaseListController extends Controller
 			'model' => $this->model->find($id),
         ];
 		 return view($this->viewPath . 'printBarCode', $response);
-		}
+	}
+
+	/**
+     * 保存到货数量
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function purchaseItemArrival(){
+		$num = request()->input("num");
+
+		echo $num;exit;
+	}
+
+	/**
+     * 删除采购单和运单关联关系
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function deletePostage(){
+		$id = request()->input("id");
+		$model = PurchasePostageModel::find($id);
+		$model->delete();
+		echo json_encode(1);
+	}
+
 	/**
      * ajax回传修改产品重量
      *
@@ -183,6 +241,57 @@ class PurchaseListController extends Controller
 			}
 		return 1;
 		}
+		
+	public function binding(){
+		$postage=request()->get('postage');
+		$purchaseOrderId=request()->get('purchaseOrderId');
+		$postCoding=request()->get('postCoding');
+		$wuliu_id = request()->input('wuliu_id');
+		$purchaseNum=PurchaseOrderModel::where('id',$purchaseOrderId)->count();
+		$data['post_coding']=$postCoding;
+		$data['postage']=$postage;
+		$data['purchase_order_id']=$purchaseOrderId;
+		$data['user_id'] = request()->user()->id;
+
+		if($purchaseNum>0){
+			$model = PurchasePostageModel::find($wuliu_id);
+			$model->update($data);
+			return 1;
+		}else{
+			return 2;
+		}
+			
+	}
+
+	public function ajaxScan(){
+        $id = request()->input('id');
+
+		$postcodingNum=PurchasePostageModel::where('post_coding',$id)->count();
+		if($postcodingNum>0){
+			$res['postcoding']=PurchasePostageModel::where('post_coding',$id)->first();
+			$res['purchaseOrder']=PurchaseOrderModel::find($res['postcoding']->purchase_order_id)?PurchaseOrderModel::find($res['postcoding']->purchase_order_id)->id:'0';
+			//print_r($res['purchaseOrder']);exit;
+			$res['purchaseItems']=$this->model->where('purchase_order_id',$res['postcoding']->purchase_order_id)->get();
+	        $response = [
+	            'metas' => $this->metas(__FUNCTION__),
+				'postcodingNum' =>$postcodingNum,
+				'data' =>$res,
+				'postCoding' =>$id,
+				'bang'=>0,
+	        ];
+		}else{
+			$model = PurchasePostageModel::create(['post_coding'=>$id]);
+			$response = [
+            'metas' => $this->metas(__FUNCTION__),
+			'postcodingNum' =>$postcodingNum,
+			'postCoding' =>$id,
+			'wuliu_id' =>$model->id,
+			'bang'=>1,
+        	];
+		}
+        return view($this->viewPath . 'ajaxScan', $response);
+    }	
+	
 }
 
 

@@ -1,8 +1,10 @@
 <div class='row'>
     <div class="form-group col-sm-2">
-        <input type='text' class="form-control sku" id="arr[sku][{{$current}}]" placeholder="sku" name='arr[sku][{{$current}}]' value="{{ old('arr[sku][$current]') }}">
+        <select class="form-control sku" id="arr[sku][{{$current}}]" name='arr[sku][{{$current}}]'></select>
     </div>
-    <div class="form-group col-sm-2 image"></div>
+    <div class="form-group col-sm-2">
+        <input type='text' class="form-control channel_sku" id="arr[channel_sku][{{$current}}]" placeholder="渠道sku" name='arr[channel_sku][{{$current}}]' value="{{ old('arr[channel_sku][$current]') }}">
+    </div>
     <div class="form-group col-sm-1">
         <input type='text' class="form-control quantity" id="arr[quantity][{{$current}}]" placeholder="数量" name='arr[quantity][{{$current}}]' value="{{ old('arr[quantity][$current]') }}">
     </div>

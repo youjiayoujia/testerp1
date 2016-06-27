@@ -16,7 +16,7 @@
     @foreach($data as $stock)
         <tr>
             <td>{{ $stock->id }}</td>
-            <td>{{ $stock->items ? $stock->items->sku : '' }}</td>
+            <td>{{ $stock->item ? $stock->item->sku : '' }}</td>
             <td>{{ $stock->warehouse ? $stock->warehouse->name : '' }}</td>
             <td>{{ $stock->position ? $stock->position->name : '' }}</td>
             <td>{{ $stock->all_quantity}}</td>
@@ -37,6 +37,13 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('tableToolRelatedSeach')
+    <div class="col-lg-3">
+        <select class="form-control relatedSelect" data-url="aaa">
+            <option>sku查询</option>
+        </select>
+    </div>
 @stop
 @section('tableToolButtons')
 <div class="btn-group" role="group">
@@ -61,4 +68,12 @@
         excel导入
     </a>
 </div>
+@stop
+
+@section('childJs')
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+    }); 
+</script>
 @stop

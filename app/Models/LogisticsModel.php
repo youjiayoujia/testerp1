@@ -22,12 +22,14 @@ class LogisticsModel extends BaseModel
     protected $fillable = [
         'short_code',
         'logistics_type',
-        'species',
         'warehouse_id',
         'logistics_supplier_id',
         'type',
         'url',
         'docking',
+        'logistics_catalog_id',
+        'logistics_email_template_id',
+        'logistics_template_id',
         'pool_quantity',
         'is_enable',
         'limit',
@@ -38,42 +40,30 @@ class LogisticsModel extends BaseModel
         'create' => [
             'short_code' => 'required',
             'logistics_type' => 'required',
-            'species' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
         'update' => [
             'short_code' => 'required',
             'logistics_type' => 'required',
-            'species' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
     ];
-
-
-    /**
-     * 批量倒入号码池
-     *
-     * @param $file 导入所需的Excel文件
-     *
-     */
-    public function batchImport($file)
-    {
-        $filePath = '' . $file;
-        Excel::load($filePath, function ($reader) {
-            $data = $reader->all();
-            dd($data);
-        });
-    }
 
     public function supplier()
     {
@@ -93,6 +83,21 @@ class LogisticsModel extends BaseModel
     public function codes()
     {
         return $this->hasMany('App\Models\Logistics\CodeModel', 'logistics_id');
+    }
+
+    public function catalog()
+    {
+        return $this->belongsTo('App\Models\Logistics\CatalogModel', 'logistics_catalog_id', 'id');
+    }
+
+    public function emailTemplate()
+    {
+        return $this->belongsTo('App\Models\Logistics\EmailTemplateModel', 'logistics_email_template_id', 'id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo('App\Models\Logistics\TemplateModel', 'logistics_template_id', 'id');
     }
 
     public function getDockingNameAttribute()

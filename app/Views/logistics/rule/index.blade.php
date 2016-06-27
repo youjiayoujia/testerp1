@@ -1,14 +1,15 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
+    <th>名称</th>
     <th class="sort" data-field="type_id">物流方式</th>
     <th>物流方式简码</th>
     <th class="sort" data-field="priority">优先级</th>
     <th class="sort" data-field="weight_from">重量从(kg)</th>
     <th class="sort" data-field="weight_to">重量至(kg)</th>
-    <th class="sort" data-field="order_amount">订单金额($)</th>
+    <th class="sort" data-field="order_amount_from">起始订单金额($)</th>
+    <th class="sort" data-field="order_amount_to">结束订单金额($)</th>
     <th>是否通关</th>
-    <th>国家</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -17,14 +18,15 @@
     @foreach($data as $rule)
         <tr>
             <td>{{ $rule->id }}</td>
+            <td>{{ $rule->name }}</td>
             <td>{{ $rule->logistics->type }}</td>
             <td>{{ $rule->logistics->short_code }}</td>
             <td>{{ $rule->priority }}</td>
             <td>{{ $rule->weight_from }}</td>
             <td>{{ $rule->weight_to }}</td>
-            <td>{{ $rule->order_amount }}</td>
+            <td>{{ $rule->order_amount_from }}</td>
+            <td>{{ $rule->order_amount_to }}</td>
             <td>{{ $rule->is_clearance == '1' ? '是' : '否' }}</td>
-            <td>{{ $rule->country($rule->country) }}</td>
             <td>{{ $rule->updated_at }}</td>
             <td>{{ $rule->created_at }}</td>
             <td>

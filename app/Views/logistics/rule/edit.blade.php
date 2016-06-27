@@ -5,40 +5,27 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="row">
-        <div class="form-group col-lg-2">
-            <label for="type_id">物流方式</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <div class="form-group col-lg-3">
+            <label for="name" class="control-label">名称</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="name" placeholder="名称" name='name' value="{{ old('name') ? old('name') : $model->name}}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="type_id">物流方式</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name="type_id" class="form-control" id="type_id">
-                @foreach($logisticses as $logisticse)
-                    <option value="{{$logisticse->id}}" {{$logisticse->id == $model->type_id ? 'selected' : ''}}>
-                        {{$logisticse->type}}
+                @foreach($logisticses as $logistics)
+                    <option value="{{$logistics->id}}" {{ $model->type_id == $logistics->id ? 'selected' : ''}}>
+                        {{$logistics->type}}
                     </option>
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label for="priority" class="control-label">优先级</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="priority" placeholder="优先级" name='priority' value="{{ old('priority') ? old('priority') : $model->priority }}">
         </div>
-        <div class="form-group col-lg-2">
-            <label for="weight_from" class="control-label">重量从(kg)</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="weight_from" placeholder="重量从" name='weight_from' value="{{ old('weight_from') ? old('weight_from') : $model->weight_from }}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="weight_to" class="control-label">重量至(kg)</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="weight_to" placeholder="重量至" name='weight_to' value="{{ old('weight_to') ? old('weight_to') : $model->weight_to }}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="order_amount" class="control-label">订单金额($)</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="order_amount" placeholder="订单金额" name='order_amount' value="{{ old('order_amount') ? old('order_amount') : $model->order_amount }}">
-        </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label for="is_clearance">是否通关</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
                 <label>
                     <input type="radio" name="is_clearance" value="1" {{old('is_clearance') ? (old('is_clearance') == '1' ? 'checked' : '') : ($model->is_clearance == '1' ? 'checked' : '')}}>是
@@ -51,73 +38,239 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="catalogs" tabindex="-1" role="dialog" 
+       aria-labelledby="myModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+          <div class="modal-content">
+             <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                       品类选择
+                    </h4>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class='form-group row'>
+                        @foreach($catalogs_outer as $catalog)
+                            <div class='col-lg-3'>
+                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='3px'>{{ $catalog->name }}</font>
+                            </div>
+                        @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="channels" tabindex="-1" role="dialog" 
+       aria-labelledby="myModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+          <div class="modal-content">
+             <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                       渠道选择
+                    </h4>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class='form-group row'>
+                        @foreach($channels_outer as $channel)
+                            <div class='col-lg-3'>
+                                <input type='checkbox' name='channels[]' value="{{ $channel->id }}" {{ $model->innerType('channel', $channel->id) ? 'checked' : '' }}><font size='3px'>{{ $channel->name }}</font>
+                            </div>
+                        @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="countrys" tabindex="-1" role="dialog" 
+       aria-labelledby="myModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+          <div class="modal-content">
+             <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                       发货国家
+                    </h4>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        @foreach($countrySorts as $countrySort)
+                        <div class='form-group'>
+                            <div class='col-lg-12'>
+                                <font size='3px' color='blue'>{{$countrySort->name}}</font>
+                                <button type='button' class='btn btn-info all_select'>全选</button>
+                                <button type='button' class='btn btn-info opposite_select'>反选</button>
+                            </div>
+                            @foreach($countrySort->countries as $country)
+                            <div class='col-lg-4'>
+                                <input type='checkbox' name='countrys[]' value="{{ $country->id }}" {{ $model->innerType('country', $country->id) ? 'checked' : '' }}><font size='3px'>{{ $country->cn_name }}</font>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="logistics_limit" tabindex="-1" role="dialog" 
+       aria-labelledby="myModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+          <div class="modal-content">
+             <div class="modal-header">
+                <button type="button" class="close" 
+                   data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                       物流限制
+                    </h4>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        @foreach($logisticsLimits_outer as $key => $logisticsLimit)
+                            <div class='form-group row'>
+                                <label>{{ $logisticsLimit->name }}:</label>
+                                <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="0" {{ $model->innerType('limit', $logisticsLimit->id, '0') ? 'checked' : '' }}>含
+                                <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="1" {{ $model->innerType('limit', $logisticsLimit->id, '1') ? 'checked' : '' }}>不含
+                                <input type='radio' name="limits[{{$logisticsLimit->id}}]" value="2" {{ $model->innerType('limit', $logisticsLimit->id, '2') ? 'checked' : '' }}>可以含
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="form-group col-lg-4" style="clear:left;">
-            <label for="country" class="control-label">已有国家</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="country" class="form-control" multiple style="height:300px;width:400px;">
-                @foreach($countries as $country)
-                    <option class="form-control" value="{{ $country->code }}" {{ old('country') ? old('country') == $country->code ? 'selected' : '' : ''}} onclick="addCountry( this )">
-                        {{ $country->name }}
-                    </option>
-                @endforeach
-            </select>
+        <div class='form-group col-lg-1'>
+            <h5>重量(kg)<input type='checkbox' class='weight_section' name='weight_section' value='1' {{ $model->weight_section ? 'checked' : '' }}></h5>
         </div>
-        <div class="form-group col-lg-4" style="clear:right;">
-            <label for="country" class="control-label">已选国家</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" id="dselectCountry" multiple style="height:300px;width:400px;">
-                @foreach($selectedCountries as $selectedCountry)
-                    <option class="form-control thecountry" value="{{ $selectedCountry->code }}" onclick="deleteCountry( this )">
-                        {{ $selectedCountry->name }}
-                    </option>
-                @endforeach
-            </select>
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 weight" id="weight_from" placeholder="重量从" name='weight_from' value="{{ old('weight_from') ? old('weight_from') : $model->weight_from }}" {{ !$model->weight_section ? 'disabled' : ''}}>
         </div>
-        <div style="display:none">
-            <textarea class="form-control" rows="3" type="hidden" id="country" placeholder="国家" name='country' readonly>{{ old('country') }}</textarea>
+        <div class='col-lg-1'>
+            <h5><=  重量区间  <=</h5>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 weight" id="weight_to" placeholder="重量至" name='weight_to' value="{{ old('weight_to') ? old('weight_to') : $model->weight_to }}" {{ !$model->weight_section ? 'disabled' : ''}}>
+        </div>
+
+        <div class='form-group col-lg-1'>
+            <h5>金额($)<input type='checkbox' class='order_amount_section' name='order_amount_section' value='1' {{ $model->order_amount_section ? 'checked' : '' }}></h5>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 order_amount" id="order_amount_from" placeholder="金额从" name='order_amount_from' value="{{ old('order_amount_from') ? old('order_amount_from') : $model->order_amount_from }}" {{ !$model->order_amount_section ? 'disabled' : ''}}>
+        </div>
+        <div class='col-lg-1'>
+            <h5><=  金额区间  <=</h5>
+        </div>
+        <div class='form-group col-lg-2'>
+            <input class="form-control col-lg-3 order_amount" id="order_amount_to" placeholder="金额至" name='order_amount_to' value="{{ old('order_amount_to') ? old('order_amount_to') : $model->order_amount_to }}" {{ !$model->order_amount_section ? 'disabled' : ''}}>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-lg-3">
+            <label for="catalogs" class="control-label">产品分类:</label>
+            <input type='checkbox' class='catalog_section' name='catalog_section' value='1' {{ $model->catalog_section ? 'checked' : ''}}>
+            <button type="button" class="btn btn-success catalog_button" data-toggle="modal" data-target="#catalogs" {{ !$model->catalog_section ? 'disabled' : ''}}>产品分类</button>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="channels" class="control-label">订单来源渠道:</label>
+            <input type='checkbox' class='channel_section' name='channel_section' value='1' {{ $model->channel_section ? 'checked' : ''}}>
+            <button type="button" class="btn btn-success channel_button" data-toggle="modal" data-target="#channels" {{ !$model->channel_section ? 'disabled' : ''}}>订单来源渠道</button>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="countrys" class="control-label">发货国家:</label>
+            <input type='checkbox' class='country_section' name='country_section' value='1' {{ $model->country_section ? 'checked' : ''}}>
+            <button type="button" class="btn btn-success country_button" data-toggle="modal" data-target="#countrys" {{ !$model->country_section ? 'disabled' : ''}}>发货国家</button>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="countrys" class="control-label">物流限制:</label>
+            <input type='checkbox' class='limit_section' name='limit_section' value='1' {{ $model->limit_section ? 'checked' : ''}}>
+            <button type="button" class="btn btn-success limit_button" data-toggle="modal" data-target="#logistics_limit" {{ !$model->limit_section ? 'disabled' : ''}}>物流限制</button>
         </div>
     </div>
 @stop
 <script type="text/javascript">
-    $(document).ready(function() {
-        getPostCountry();
+    $(document).ready(function(){
+        $(document).on('click', '.all_select', function(){
+            block = $(this).parent().parent();
+            block.find("input[type='checkbox']").prop('checked', true);
+        });
+
+        $(document).on('click', '.opposite_select', function(){
+            block = $(this).parent().parent();
+            block.find("input[type='checkbox']").prop('checked', false);
+        });
+
+        $(document).on('click', '.weight_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.weight').val('');
+                $('.weight').prop('disabled', false);
+            } else {
+                $('.weight').val('');
+                $('.weight').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.order_amount_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.order_amount').val('');
+                $('.order_amount').prop('disabled', false);
+            } else {
+                $('.order_amount').val('');
+                $('.order_amount').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.catalog_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.catalog_button').prop('disabled', false);
+            } else {
+                $('.catalog_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.channel_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.channel_button').prop('disabled', false);
+            } else {
+                $('.channel_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.country_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.country_button').prop('disabled', false);
+            } else {
+                $('.country_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.limit_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.limit_button').prop('disabled', false);
+            } else {
+                $('.limit_button').prop('disabled', true);
+            }
+        });
     });
-
-    function getPostCountry(){
-        var selectCountry = "";
-        $(".thecountry").each(function(){
-            selectCountry += $.trim($(this).attr('value')) + ",";
-        });
-        selectCountry=selectCountry.substring(0,selectCountry.length-1);
-        $("#country").html(selectCountry);
-    }
-
-    // 检测是否被选
-    function checkWhetherSelected(that) {
-        var selectCountry = [];
-        $(".thecountry").each(function () {
-            selectCountry.push($(this).val());
-        });
-
-        var status = selectCountry.indexOf($(that).val());
-        if (status >= 0) {
-            return true;
-        } else if (status < 0) {
-            return false;
-        }
-    }
-
-    function addCountry(that){
-        if(!checkWhetherSelected(that)) {
-            var countryHtml = '<option class="form-control thecountry" value="' + $(that).val() + '" onclick="deleteCountry( this )">' + $(that).html() + '</option>';
-            $("#dselectCountry").append(countryHtml);
-            getPostCountry();
-        }
-    }
-
-    function deleteCountry(that){
-        $(that).remove();
-        getPostCountry();
-    }
 </script>

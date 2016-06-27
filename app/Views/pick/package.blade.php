@@ -20,9 +20,12 @@
         <div class='form-group col-lg-2'>
             <input type='text' class='form-control searchsku' placeholder='sku'>
         </div>
-        <div class='form-group'>
+        <div class='form-group col-lg-2'>
             <button type='button' class='btn btn-info search'>确认</button>
             <button type='button' class='btn btn-warning printException'>打印异常</button>
+        </div>
+        <div class='form-group col-lg-8'>
+            <font color='red' size='7px' class='notFindSku'></font>
         </div>
     </div>
     <div class="panel panel-default">
@@ -109,12 +112,22 @@
     <div class='old2'>
     <label>未扫描</label>
     </div>
+    <div class='row'>
+        <iframe id='barcode' style='display:none'></iframe>
+    </div>
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success">包装完成</button>
     <button type="reset" class="btn btn-default">取消</button>
 @stop
 <script type='text/javascript'>
+$(document).on('keypress', function (event) {
+    if(event.keyCode == '13') {
+        $('.search').trigger("click"); 
+        return false;
+    }
+});
+
 $(document).ready(function(){
     $('.printException').click(function(){
         $.each($('.sku'), function(){
@@ -147,7 +160,10 @@ $(document).ready(function(){
 
     $(document).on('click', '.search', function(){
         val = $('.searchsku').val();
+        $('.notFindSku').text('');
         extern_flag = 0;
+        out_js = 0;
+        $('.notFindSku').text('');
         if(val) {
             $.each($('.new tr'), function(){
                 tmp = $(this);
@@ -179,17 +195,27 @@ $(document).ready(function(){
                                 }
                             });
                             if(flag) {
+                                out_js = 1;
                                 id = tmp.data('id');
                                 $("."+id).find('.status').text('已包装');
+                                $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                                $('#barcode').load(function(){
+                                    $('#barcode')[0].contentWindow.focus();
+                                    $('#barcode')[0].contentWindow.print();
+                                });
+                                return false;
                             }
                         }
-                    exit;
                     }
                 }
             });
+            if(out_js) {
+                return false;
+            }
             $.each($('.old tr'), function(){
                 tmp = $(this);
                 old_flag = 0;
+                package_id = tmp.data('id');
                 if(tmp.find('.sku').text() == val && parseInt(tmp.find('.quantity').text()) >  parseInt(tmp.find('.picked_quantity').text())) {
                     old_flag = 1;
                     tmp.find('.picked_quantity').text(parseInt(tmp.find('.picked_quantity').text()) + 1);
@@ -205,10 +231,15 @@ $(document).ready(function(){
                             }
                         });
                         if(flag) {
+                            out_js = 1;
                             tmp.find('.status').text('已包装');
+                            $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                            $('#barcode').load(function(){
+                                $('#barcode')[0].contentWindow.focus();
+                                $('#barcode')[0].contentWindow.print();
+                            });
                         }
                     }
-                    package_id = tmp.data('id');
                     sku = tmp.find('.sku').text();
                     $.ajax({
                         url:"{{ route('pickList.packageItemUpdate')}}",
@@ -238,15 +269,18 @@ $(document).ready(function(){
                         }
                     }
                     $('.new').append(str);
-                }
-                if(old_flag) {
-                    exit;
+                    out_js = 1;
                 }
             });
         }
-        if(!extern_flag) {
-            alert('sku不存在或者该对应的拣货单上sku已满');
+        if(out_js) {
+            return false;
         }
+        if(!extern_flag) {
+            $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
+        }
+        $('.searchSku').val('');
+        $('.searchSku').focus();
     });
 });
 </script>

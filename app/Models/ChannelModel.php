@@ -23,7 +23,7 @@ class ChannelModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'driver', 'brief'];
+    protected $fillable = ['name', 'driver', 'brief', 'created_at', 'flat_rate', 'rate', 'flat_rate_value', 'rate_value'];
 
     protected $searchFields = ['name'];
 

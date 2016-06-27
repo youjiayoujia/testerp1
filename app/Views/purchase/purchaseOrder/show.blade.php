@@ -1,5 +1,6 @@
 @extends('common.detail')
 @section('detailBody')
+
 <div class="panel panel-default">
         <div class="panel-heading">单头</div>
         <div class="panel-body">
@@ -87,74 +88,88 @@
         
     <table class="table table-bordered table-striped table-hover sortable">
     <thead>
-        <tr>
-            <td>采购条目ID</td> 
-            <td>model</td>
-            <td>SKU*采购数量</td> 
-            <td>供货商sku</td> 
-            <td>样图</td>
+        <tr>{{$model->arrival_day}}
+            <td>SKU</td> 
+            <td>物品名称</td>
+            <td>采购数量</td> 
+            <td>已到货数量</td> 
+            <td>入库数量</td>
+            <td>不合格数量</td>
+            <td>预计到达日期</td>
+            <td>实际到货日期</td>
             <td>状态</td>
-            <td>物流单号</td>
-            <td>采购价格</td>
-            <td>采购价格审核</td>
-            <td>购买链接</td> 
-            <td>操作</td>           
+            <td>单价</td>
+            <td>系统采购价格</td>
+            <td>小计</td> 
+            <td>入库金额</td>
+            <td>审单备注</td>            
         </tr>
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)  
         <tr> 
-            <td>{{$purchaseItem->id}}</td>
+            <td>{{$purchaseItem->sku}}</td>
             
-            <td>{{$purchaseItem->item->product->model}}</td>
-            <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
-            <td>{{$purchaseItem->item->supplier_sku}}</td>   
+            <td>{{$purchaseItem->item->c_name}}</td>
+            <td>{{$purchaseItem->purchase_num}}</td>
+            <td>{{$purchaseItem->arrival_num}}</td>   
             <td>
-            @if($purchaseItem->item->product->default_image>0) 
-            <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
-             @else
-             暂无图片
-             @endif
+           {{$purchaseItem->storage_qty}}
             </td>
             <td>       	
-             @foreach(config('purchase.purchaseItem.status') as $key=>$v)     	
-            	 @if($purchaseItem->status == $key) {{$v}} @endif
-             @endforeach
+            {{$purchaseItem->arrival_num - $purchaseItem->storage_qty}}
              </td>
             <td>
-            {{$purchaseItem->post_coding}}
+            {{$model->arrival_day}}
             </td>
             <td>
-              {{$purchaseItem->purchase_cost}}
+              {{$purchaseItem->arrival_time}}
  			</td>
+            <td>{{config('purchase.purchaseItem.status')[$purchaseItem->status]}}</td>
             <td>
-            @if($purchaseItem->costExamineStatus ==2)
-            	价格审核通过
-            @elseif($purchaseItem->costExamineStatus ==1)
-            	价格审核不通过
-            @else
-             	成本价格未审核
-            @endif
+           {{$purchaseItem->purchase_cost}}
             </td>    
           
              <td>
-            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
-            </td>  
+            	 {{$purchaseItem->item->purchase_price}}
+            </td> 
+            <td>
+           {{$purchaseItem->purchase_num * $purchaseItem->purchase_cost}}
+            </td> 
 			<td>
-            @if($purchaseItem->active ==1 )
-                @if($purchaseItem->active_status ==1 )
-                报缺
-                @elseif($purchaseItem->active_status ==2 )
-                核实报缺
-                @else
-                恢复正常
-                @endif
-             @elseif($purchaseItem->active ==0)     
-             	正常
-             @endif
+           {{$purchaseItem->storage_qty * $purchaseItem->purchase_cost}}
+            </td>
+            <td>
+           {{$purchaseItem->remark}}
             </td>
         </tr>
         @endforeach
+       <tr>
+       <td colspan="2"><strong>合计：</strong></td>
+       <td>{{$purchaseItemsNum}}</td>
+       <td>{{$purchaseItemsArrivalNum}}</td>
+       <td>{{$storage_qty_sum}}</td>
+       <td>{{$purchaseItemsArrivalNum - $storage_qty_sum}}</td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td>{{$purchaseCost}} + YF{{$postage ? $postage : 0}}={{$purchaseCost + $postage}}</td>
+       <td>{{$storageCost}} + YF{{$postage ? $postage : 0}}={{$storageCost + $postage}}</td>
+       <td></td>
+       </tr>
+        <tr>
+            <td>订单总金额：</td>
+            <td colspan="13">{{$purchaseCost + $postage}}</td>
+        </tr>
+        <tr>
+            <td>订单运费：</td>
+            <td colspan="13">{{$storageCost + $postage}}</td>
+        </tr>
+        <tr>
+            <td>采购员：</td>
+            <td colspan="13">{{$model->assigner_name}}</td>
+        </tr>
     </tbody>
     </table>
    

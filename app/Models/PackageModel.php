@@ -6,12 +6,13 @@ use App\Base\BaseModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\Logistics\ZoneModel;
 
 class PackageModel extends BaseModel
 {
     protected $table = 'packages';
 
-    public $searchFields = ['email'];
+    public $searchFields = ['tracking_no'];
 
     public $rules = [
         'create' => ['ordernum' => 'required'],
@@ -58,6 +59,19 @@ class PackageModel extends BaseModel
         'is_tonanjing',
         'is_over',
     ];
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
+            'filterFields' => ['tracking_no'],
+            'filterSelects' => ['status' => config('package')],
+            'selectRelatedSearchs' => [
+                'order' => ['status' => config('order.status'), 'active' => config('order.active')],
+            ],
+            'sectionSelect' => [],
+        ];
+    }
 
     public function assigner()
     {
@@ -109,6 +123,11 @@ class PackageModel extends BaseModel
         return $this->hasMany('App\Models\Package\LogisticModel', 'package_id', 'id');
     }
 
+    public function country()
+    {
+        return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+
     public function getStatusNameAttribute()
     {
         $arr = config('package');
@@ -119,19 +138,20 @@ class PackageModel extends BaseModel
     {
         $packageLimits = collect();
         foreach ($this->items as $packageItem) {
-            $packageLimit = $packageItem->item->product->package_limit;
+            $packageLimit = $packageItem->item->product->carriage_limit;
             if ($packageLimit) {
                 $packageLimits = $packageLimits->merge(explode(",", $packageLimit));
             }
         }
+
         return $packageLimits->unique();
     }
 
     public function getHasPickAttribute()
     {
         $items = $this->items;
-        foreach($items as $item) {
-            if($item->picked_quantity) {
+        foreach ($items as $item) {
+            if ($item->picked_quantity) {
                 return true;
             }
         }
@@ -155,60 +175,38 @@ class PackageModel extends BaseModel
         return true;
     }
 
-    public function calculateProfit()
+    public function calculateLogisticsFee()
     {
-        $orderIds = $this->where('status', 'ASSIGNED')->get()->groupBy('order_id');
-        foreach($orderIds as $orderId => $value) {
-            $order = OrderModel::find($orderId);
-            $orderAmount = $this->calculateOrderAmount($order);
-            $orderCosting = $this->calculateOrderCosting($order);
-            if($orderAmount > $orderCosting) {
-                //利润率为负撤销
-                $this->OrderCancle($order);
+        $zones = ZoneModel::where('logistics_id', $this->logistics_id)->get();
+        foreach ($zones as $zone) {
+            if ($zone->inZone($this->shipping_country)) {
+                $fee = '';
+                if ($zone->type == 'first') {
+                    if ($this->weight <= $zone->fixed_weight) {
+                        $fee = $this->fixed_price;
+                    } else {
+                        $fee = $this->fixed_price;
+                        $weight = $this->weight - $zone->fixed_weight;
+                        $fee += ceil($weight / $zone->continued_weight) * $zone->continued_price;
+                    }
+                    if ($zone->discount_weather_all) {
+                        $fee = ($fee + $zone->other_fixed_price) * $zone->discount;
+                    } else {
+                        $fee = $fee * $zone->discount + $zone->other_fixed_price;
+                    }
+                    return $fee;
+                } else {
+                    $sectionPrices = $zone->zone_section_prices;
+                    foreach ($sectionPrices as $sectionPrice) {
+                        if ($this->weight >= $sectionPrice->weight_from && $this->weight < $sectionPrice->weight_to) {
+                            return $sectionPrice->price;
+                        }
+                    }
+                }
             }
         }
-    }
 
-    public function OrderCancle($order)
-    {
-        $order->update(['status' => 'CANCLE']);
-        $orderItems = $order->orderItems;
-        foreach($orderItems as $orderItem) {
-            $orderItem->update(['is_active' => '1']);
-        }
-        $packages = $order->packages;
-        foreach($packages as $package) {
-            $package->update(['status' => 'CANCLE']);
-            foreach($package->items as $packageItem) {
-                $packageItem->update(['status' => 'CANCLE']);
-                $item = ItemModel::find($packageItem->item_id);
-                $item->in($packageItem->warehouse_position_id, $packageItem->quantity, $packageItem->quantity*$item->cost, 'PACKAGE_CANCLE', $order->ordernum.':'.$packageItem->id);
-            }
-        }
-    }
-
-    public function calculateOrderAmount($order)
-    {
-        $orderItems = $order->orderItems;
-        $sum = 0;
-        foreach($orderItems as $orderItem) {
-            $sum += $orderItem->amount;
-        }
-
-        return $sum;
-    }
-
-    public function calculateOrderCosting($order)
-    {
-        $orderItems = $order->orderItems;
-        $sum = 0;
-        foreach($orderItems as $orderItem)
-        {
-            $item = $orderItem->item;
-            $sum += round($item->cost * $orderItem->quantity, 3);
-        }
-
-        return $sum;
+        return false;
     }
 
     /**
@@ -229,24 +227,46 @@ class PackageModel extends BaseModel
                 $isClearance = 0;
             }
             $rules = RuleModel::
-            where('weight_from', '<=', $weight)
-                ->where('weight_to', '>=', $weight)
-                ->where('order_amount', '>=', $amount)
-                ->where(['is_clearance' => $isClearance])
+            where(function ($query) use ($weight) {
+                $query->where('weight_from', '<=', $weight)
+                    ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
+            })->where(function ($query) use ($amount) {
+                $query->where('order_amount_from', '<=', $amount)
+                    ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
+            })->where(['is_clearance' => $isClearance])
                 ->orderBy('priority', 'desc')
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中
-                $countries = explode(",", $rule->country);
-                if (!in_array($this->shipping_country, $countries)) {
-                    continue;
-                }
-                //是否有物流限制
-                if ($this->shipping_limits) {
-                    $limits = explode(",", $rule->logistics->limit);
-                    if ($this->shipping_limits->intersect($limits)->count() > 0) {
+                if ($rule->country_section) {
+                    $countries = $rule->rule_countries_through;
+                    $flag = 0;
+                    foreach($countries as $country) {
+                        if($country->code == $this->shipping_country) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
                         continue;
                     }
+                }
+                //是否有物流限制
+                if ($rule->limit_section && $this->shipping_limits) {
+                    $shipping_limits = $this->shipping_limits->toArray();
+                    $limits = $this->rule_limits_through;
+                    foreach ($limits as $limit) {
+                        if (in_array($limit->id, $shipping_limits)) {
+                            if ($limit->pivot->type == '3') {
+                                continue 2;
+                            }
+                        }
+                    }
+                }
+                //查看对应的物流方式是否是所属仓库
+                $warehouse = WarehouseModel::find($this->warehouse_id);
+                if(!$warehouse->logisticsIn($rule->type_id)) {
+                    continue;
                 }
                 //物流查询链接
                 $trackingUrl = $rule->logistics->url;
@@ -264,6 +284,7 @@ class PackageModel extends BaseModel
                 'logistics_assigned_at' => date('Y-m-d H:i:s')
             ]);
         }
+
         return false;
     }
 
@@ -464,7 +485,7 @@ class PackageModel extends BaseModel
                 $package->id);
             $arr[$package->logistic->logistics_supplier_id][$package->logistic_id]['quantity'] += 1;
             $arr[$package->logistic->logistics_supplier_id][$package->logistic_id]['weight'] += $package->weight;
-        }
+        } 
         $this->loadExcel($arr);
     }
 
@@ -477,40 +498,50 @@ class PackageModel extends BaseModel
      */
     public function loadExcel($arr)
     {
-        $j = 0;
-        $k = 0;
-        foreach ($arr as $key1 => $value1) {
-            $i = 0;
-            $k++;
-            foreach ($value1 as $key2 => $value2) {
-                foreach ($value2['package_id'] as $key3 => $value3) {
-                    $i++;
-                    if ($i == 1 && $k != 1) {
+        if(count($arr)) {
+            $j = 0;
+            $k = 0;
+            foreach ($arr as $key1 => $value1) {
+                $i = 0;
+                $k++;
+                foreach ($value1 as $key2 => $value2) {
+                    foreach ($value2['package_id'] as $key3 => $value3) {
+                        $i++;
+                        if ($i == 1 && $k != 1) {
+                            $rows[] = [
+                                '供货商' => '',
+                                '物流方式' => '',
+                                '发货日期' => '',
+                                '运单号' => '',
+                                '重量' => '',
+                                '总包裹数' => '',
+                                '总重量' => '',
+                            ];
+                            $j++;
+                        }
                         $rows[] = [
-                            '供货商' => '',
-                            '物流方式' => '',
-                            '发货日期' => '',
-                            '运单号' => '',
-                            '重量' => '',
-                            '总包裹数' => '',
-                            '总重量' => '',
+                            '供货商' => SupplierModel::find($key1)->name,
+                            '物流方式' => LogisticsModel::find($key2)->logistics_type,
+                            '发货日期' => iconv('utf-8', 'gb2312', PackageModel::find($value3)->shipped_at),
+                            '运单号' => PackageModel::find($value3)->tracking_no,
+                            '重量' => PackageModel::find($value3)->weight,
                         ];
+                        if ($i == 1) {
+                            $rows[$j] += ['总包裹数' => $value2['quantity']];
+                            $rows[$j] += ['总重量' => $value2['weight']];
+                        }
                         $j++;
                     }
-                    $rows[] = [
-                        '供货商' => SupplierModel::find($key1)->name,
-                        '物流方式' => LogisticsModel::find($key2)->logistics_type,
-                        '发货日期' => iconv('utf-8', 'gb2312', PackageModel::find($value3)->shipped_at),
-                        '运单号' => PackageModel::find($value3)->tracking_no,
-                        '重量' => PackageModel::find($value3)->weight,
-                    ];
-                    if ($i == 1) {
-                        $rows[$j] += ['总包裹数' => $value2['quantity']];
-                        $rows[$j] += ['总重量' => $value2['weight']];
-                    }
-                    $j++;
                 }
             }
+        } else {
+            $rows[] = [
+                    '供货商' => '',
+                    '物流方式' => '',
+                    '发货日期' => '',
+                    '运单号' => '',
+                    '重量' => '',
+                ];
         }
         $name = '发货复查';
         Excel::create($name, function ($excel) use ($rows) {
@@ -519,5 +550,97 @@ class PackageModel extends BaseModel
                 $sheet->fromArray($rows);
             });
         })->download('csv');
+        
+    }
+
+    /**
+     * 计算利润率并处理
+     *
+     * @param none
+     * @return 利润率 小数
+     *
+     */
+    public function calculateProfitProcess()
+    {
+        $order = $this->order;
+        $orderItems = $order->items;
+        $orderAmount = $order->amount;
+        $orderCosting = $order->all_item_cost;
+        $orderChannelFee = $this->calculateOrderChannelFee($order, $orderItems);
+        $orderRate = ($order->amount - ($orderCosting + $this->calculateOrderChannelFee($order,
+                        $orderItems) + $order->logistics_fee)) / $order->amount;
+        if ($order->status != 'CANCLE' && $orderRate <= 0) {
+            //利润率为负撤销0
+            $this->OrderCancle($order, $orderItems);
+        }
+
+        return $orderRate;
+    }
+
+    /**
+     *  计算平台费
+     *
+     * @param $order 订单 $orderItems 订单条目
+     * @return $sum
+     *
+     */
+    public function calculateOrderChannelFee($order, $orderItems)
+    {
+        $sum = 0;
+        $channel = $order->channel;
+        if ($channel->flat_rate == 'channel' && $channel->rate == 'channel') {
+            return ($order->amount + $order->logistics_fee) * $channel->rate_value + $channel->flat_rate_value;
+        }
+        if ($channel->flat_rate == 'channel' && $channel->rate == 'catalog') {
+            $sum += $channel->flat_rate_value;
+            foreach ($orderItems as $orderItem) {
+                $rate = $orderItem->item->catalog->channels->first()->pivot->rate;
+                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $order->logistics_fee) * $rate;
+                $sum += $tmp;
+            }
+            return $sum;
+        }
+        if ($channel->flat_rate == 'catalog' && $channel->rate == 'channel') {
+            $sum = ($order->amount + $order->logistics_fee) * $channel->rate_value;
+            foreach ($orderItems as $orderItem) {
+                $flat_rate_value = $orderItem->item->catalog->channels->first()->pivot->flat_rate_value;
+                $sum += $flat_rate_value;
+            }
+            return $sum;
+        }
+        if ($channel->flat_rate == 'catalog' && $channel->rate == 'catalog') {
+            foreach ($orderItems as $orderItem) {
+                $buf = $orderItem->item->catalog->channels->first()->pivot;
+                $flat_rate_value = $buf->flat_rate_value;
+                $rate_value = $buf->rate_value;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $order->logistics_fee) * $rate_value + $flat_rate_value;
+            }
+            return $sum;
+        }
+    }
+
+    /**
+     * 订单取消
+     *
+     * @param $order 订单 $orderItems 订单条目
+     * @return none
+     *
+     */
+    public function OrderCancle($order, $orderItems)
+    {
+        $order->update(['status' => 'CANCLE']);
+        foreach ($orderItems as $orderItem) {
+            $orderItem->update(['is_active' => '0']);
+        }
+        $packages = $order->packages;
+        foreach ($packages as $package) {
+            $package->update(['status' => 'CANCLE']);
+            foreach ($package->items as $packageItem) {
+                $item = $packageItem->item;
+                $item->in($packageItem->warehouse_position_id, $packageItem->quantity,
+                    $packageItem->quantity * $item->cost, 'PACKAGE_CANCLE', '',
+                    ('订单号:' . $order->ordernum . ' 包裹号:' . $package->id));
+            }
+        }
     }
 }

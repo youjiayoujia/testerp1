@@ -15,6 +15,7 @@ use App\Models\PackageModel;
 use App\Models\ChannelModel;
 use App\Models\LogisticsModel;
 use App\Models\Pick\PackageScoreModel;
+use Tool;
 
 class PickListController extends Controller
 {
@@ -70,6 +71,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'picklistitems' => $model->pickListItem,
+            'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);
@@ -135,14 +137,14 @@ class PickListController extends Controller
                 return $this->printPickList($model->id);
                 break;
             case 'single':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKED', 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKING', 'PICKED', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'singleMulti':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKED', 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKING', 'PICKED', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
@@ -188,7 +190,9 @@ class PickListController extends Controller
             'packages' => $model->package,
             'logistics' => LogisticsModel::all(),
         ];
-    
+        if($model->type == 'MULTI')
+            return view($this->viewPath.'packageMulti', $response);
+        
         return view($this->viewPath.'package', $response);
     }
 
@@ -256,7 +260,7 @@ class PickListController extends Controller
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
-        $obj->update(['status' => 'INBOXED', 'inbox_by' => '1', 'inbox_at' => date('Y-m-d H:i:s', time())]);
+        $obj->update(['status' => 'INBOXED', 'inbox_by' => request()->user()->id, 'inbox_at' => date('Y-m-d H:i:s', time())]);
         foreach($obj->package as $package)
         {
             $package->status = 'PICKED';
@@ -279,7 +283,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['status' => 'PACKAGED', 'pack_by' => '3', 'pack_at' => date('Y-m-d H:i:s', time())]);
+        $model->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
 
         foreach($model->package as $package)
         {

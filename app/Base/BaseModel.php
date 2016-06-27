@@ -20,6 +20,5 @@ class BaseModel extends Model
             }
         }
         return $rules;
-    }
-
+    }    
 }

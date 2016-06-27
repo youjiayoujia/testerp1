@@ -13,7 +13,7 @@ class AddOrdersTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('gross_margin')->comment('预测毛利率')->nullable()->defalut(NULL);
+            $table->string('aliexpress_loginId')->comment('aliexpress买家的账号id')->nullable()->default(null)->after('gross_margin');
         });
     }
 
@@ -25,7 +25,7 @@ class AddOrdersTable extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['gross_margin']);
+            $table->dropColumn(['aliexpress_loginId']);
         });
     }
 }

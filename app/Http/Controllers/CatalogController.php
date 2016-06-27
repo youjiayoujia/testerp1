@@ -31,7 +31,7 @@ class CatalogController extends Controller
         $channels = ChannelModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'channels' =>$channels,
+            'channels' => $channels,
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -41,7 +41,7 @@ class CatalogController extends Controller
      * 2015-12-18 14:38:20 YJ
      * @return Illuminate\Http\RedirectResponse Object
      */
-    public function store() 
+    public function store()
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
@@ -51,10 +51,9 @@ class CatalogController extends Controller
         $extra['variations'] = request()->input('variations');
         $extra['features'] = request()->input('features');
         //创建品类
-        $this->model->createCatalog($data,$extra);
+        $this->model->createCatalog($data, $extra);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
-
 
 
     /**
@@ -78,7 +77,7 @@ class CatalogController extends Controller
         $extra['variations'] = request()->input('variations');
         $extra['features'] = request()->input('features');
         //更新品类信息
-        $catalogModel->updateCatalog($data,$extra);
+        $catalogModel->updateCatalog($data, $extra);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 

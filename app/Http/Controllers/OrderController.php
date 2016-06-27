@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
+use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
 use App\Models\ItemModel;
 use App\Models\Order\RemarkModel;
@@ -19,6 +20,7 @@ use App\Models\OrderModel;
 use App\Models\product\ImageModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
+use App\Models\Order\ItemModel as orderItem;
 
 class OrderController extends Controller
 {
@@ -50,6 +52,52 @@ class OrderController extends Controller
     }
 
     /**
+     * 获取国家信息
+     */
+    public function ajaxCountry()
+    {
+        if(request()->ajax()) {
+            $country = trim(request()->input('shipping_country'));
+            $buf = CountriesModel::where('code', 'like', '%'.$country.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->code;
+                $arr[$key]['text'] = $value->code;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
+
+    /**
+     * 获取sku信息
+     */
+    public function ajaxSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $buf = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->sku;
+                $arr[$key]['text'] = $value->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
+
+    /**
      * 保存数据
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -73,6 +121,23 @@ class OrderController extends Controller
     }
 
     /**
+     * 首页
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'countries' => CountriesModel::all(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 跳转编辑页面
      *
      * @param $id
@@ -82,21 +147,19 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $arr = [];
-        foreach($model->orderItem as $orderItem)
-        {
+        foreach ($model->items as $orderItem) {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'orderItems' => $model->orderItem,
+            'orderItems' => $model->items,
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
@@ -105,6 +168,7 @@ class OrderController extends Controller
             'aliases' => $model->channel->channelAccount,
             'arr' => $arr,
             'rows' => $model->items()->count(),
+            'countries' => CountriesModel::all(),
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -120,21 +184,19 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $arr = [];
-        foreach($model->orderItem as $orderItem)
-        {
+        foreach ($model->items as $orderItem) {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'orderItems' => $model->orderItem,
+            'orderItems' => $model->items,
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
@@ -160,6 +222,22 @@ class OrderController extends Controller
         $data['order_id'] = $id;
         $this->model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 部分退款
+     */
+    public function refundAll()
+    {
+        $ids = request()->input('ids');
+        $id_arr = explode(',', $ids);
+        if (!empty($id_arr)) {
+            foreach ($id_arr as $id) {
+                $model = orderItem::find($id);
+                $model->update(['is_refund' => 1]);
+            }
+        }
+        return 1;
     }
 
     /**
@@ -218,17 +296,17 @@ class OrderController extends Controller
                 $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
             }
             $orderItems = $this->model->find($id)->items;
-            if(count($data['items']) == count($orderItems)) {
-                foreach($orderItems as $key2 => $orderItem) {
-                    if($key1 == $key2) {
+            if (count($data['items']) == count($orderItems)) {
+                foreach ($orderItems as $key2 => $orderItem) {
+                    if ($key1 == $key2) {
                         $orderItem->update($item);
                     }
                 }
-            }else{
-                foreach($orderItems as $key2 => $orderItem) {
+            } else {
+                foreach ($orderItems as $key2 => $orderItem) {
                     $orderItem->delete($item);
                 }
-                foreach($data['items'] as $value) {
+                foreach ($data['items'] as $value) {
                     $value['item_id'] = productItem::where('sku', $value['sku'])->first()->id;
                     $this->model->find($id)->items()->create($value);
                 }
@@ -248,21 +326,19 @@ class OrderController extends Controller
     {
         $model = $this->model->find($id);
         $arr = [];
-        foreach($model->orderItem as $orderItem)
-        {
+        foreach ($model->items as $orderItem) {
             $arr[] = $orderItem->sku;
         }
-        foreach($arr as $key => $value) {
-            $obj = productItem::where(['sku' => $value])->first();
-            if ($obj) {
-                $image = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
-                $arr[$key] = $image;
-            }
-        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'orderItems' => $model->orderItem,
-            'packages' => $model->package,
+            'orderItems' => $model->items,
+            'packages' => $model->packages,
             'model' => $model,
             'arr' => $arr,
         ];
@@ -279,7 +355,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach ($obj->orderItem as $val) {
+        foreach ($obj->items as $val) {
             $val->delete();
         }
         $obj->delete($id);
@@ -298,9 +374,9 @@ class OrderController extends Controller
             $sku = request()->input('sku');
             $obj = productItem::where(['sku' => $sku])->first();
             if ($obj) {
-                $result = ImageModel::where(['id' => $obj->product->default_image])->first()->src;
+                $result = $obj->product->url1;
                 return json_encode($result);
-            }else{
+            } else {
                 return json_encode(false);
             }
 
@@ -338,10 +414,29 @@ class OrderController extends Controller
         return json_encode($buf);
     }
 
+    //审核
     public function updateStatus()
     {
         $order_id = request()->input('order_id');
         $this->model->find($order_id)->update(['status' => 'PREPARED']);
+
+        return 1;
+    }
+
+    //暂停发货
+    public function updatePrepared()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'STOP']);
+
+        return 1;
+    }
+
+    //恢复正常
+    public function updateNormal()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'NORMAL']);
 
         return 1;
     }
@@ -389,14 +484,14 @@ class OrderController extends Controller
         foreach ($channelOrders as $key => $channelOrder) {
             $name = substr($url, 11, 6);
             $channels = ChannelModel::where(['name' => $name])->get();
-            foreach($channels as $channel) {
+            foreach ($channels as $channel) {
                 $orders[$key]['channel_id'] = $channel['id'];
                 $accounts = AccountModel::where(['channel_id' => $orders[$key]['channel_id']])->get();
-                foreach($accounts as $account) {
+                foreach ($accounts as $account) {
                     $orders[$key]['channel_account_id'] = $account['id'];
                     $orders[$key]['customer_service'] = $account['customer_service_id'];
                     $orders[$key]['operator'] = $account['operator_id'];
-                    $orders[$key]['affairer'] = NULL;
+                    $orders[$key]['affairer'] = null;
                 }
             }
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
@@ -407,10 +502,10 @@ class OrderController extends Controller
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
-            if($orders[$key]['remark'] != NULL && $orders[$key]['remark'] != '') {
+            if ($orders[$key]['remark'] != null && $orders[$key]['remark'] != '') {
                 $orders[$key]['status'] = 'REVIEW';
             }
-            $orders[$key]['affair_time'] = NULL;
+            $orders[$key]['affair_time'] = null;
             $orders[$key]['create_time'] = $channelOrder['date_purchased'];
             $orders[$key]['is_partial'] = 0;
             $orders[$key]['by_hand'] = 0;
@@ -421,9 +516,9 @@ class OrderController extends Controller
             $orders[$key]['amount_product'] = $channelOrder['amount_products'];
             $orders[$key]['amount_coupon'] = $channelOrder['order_insurance'];
             $orders[$key]['amount_shipping'] = $channelOrder['amount_shipping'] + $orders[$key]['amount_coupon'];
-            if(($orders[$key]['amount_shipping'] / $orders[$key]['rate']) < 10) {
+            if (($orders[$key]['amount_shipping'] / $orders[$key]['rate']) < 10) {
                 $orders[$key]['shipping'] = 'PACKET';
-            }else {
+            } else {
                 $orders[$key]['shipping'] = 'EXPRESS';
             }
             $orders[$key]['shipping_firstname'] = $channelOrder['shipping_firstname'];
@@ -457,21 +552,22 @@ class OrderController extends Controller
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
                 $arr = $channelOrder['orderitems'];
                 $len = count($arr);
-                for($i=0; $i<$len; $i++) {
+                for ($i = 0; $i < $len; $i++) {
                     $str = $arr[$i]['attributes'];
                     $array = explode(";", $str);
                     foreach ($array as $value) {
-                        if($value  == '') {
+                        if ($value == '') {
                             break;
-                        }else {
+                        } else {
                             $arr[$i]['attributes'] = $value;
-                            $orders[$key]['items'][$itemKey]['sku'] = $channelOrderItem['sku']."-".substr($arr[$i]['attributes'], 6);
+                            $orders[$key]['items'][$itemKey]['sku'] = $channelOrderItem['sku'] . "-" . substr($arr[$i]['attributes'],
+                                    6);
                         }
                     }
                 }
             }
             $obj = OrderModel::where(['ordernum' => $channelOrder['ordernum']])->get();
-            if(!count($obj)) {
+            if (!count($obj)) {
                 $this->model->createOrder($orders[$key]);
             }
         }

@@ -6,6 +6,7 @@
 //echo '<pre>';
   //          print_r($logisticsLimit);exit;
 ?>
+
     <div class="form-group">
         <label for="catalog_id">分类</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <select id="catalog_id" class="form-control" name="catalog_id">
@@ -23,6 +24,10 @@
         <div class="form-group col-md-3">
             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">产品英文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="name" placeholder="产品英文名" name='name' value="{{ old('name') }}">
         </div>
     </div>
 
@@ -91,24 +96,26 @@
             </select>
         </div>
         <div class="form-group col-md-3">
-            <label for="color">产品包装尺寸（cm）(长*宽*高)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长*宽*高)
+            <label for="color">产品包装尺寸（cm）(长*宽*高)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
         </div>
             <div class="form-group col-md-2">
             <label for="size">产品重量(kg)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') }}">
         </div>
-        <div class="form-group col-md-2">
-            <label for="color">选款人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="upload_user" placeholder="上传人" name='upload_user' value="{{ old('upload_user') }}">
-        </div>
+        
     </div>
 
     <div class="row">
-        <div class="form-group col-md-3">
-            <label for="color">采购负责人</label>
-            <input class="form-control" id="purchase_adminer" placeholder="采购负责人" name='purchase_adminer' value="{{ old('purchase_adminer') }}">
+        
+        <div class="form-group col-md-3"><label for="color">采购负责人</label>
+            <select  class="form-control" name="purchase_adminer">
+                @foreach($users as $user)
+                    <option value="{{ $user->id}}">{{$user->name}}</option>
+                @endforeach
+            </select>
         </div>
+        
         <div class="form-group col-md-3">
             <label for="color">url1</label>
             <input class="form-control" id="url1" placeholder="url" name='url1' value="{{ old('url1') }}">
@@ -135,9 +142,9 @@
         <div class="form-group col-md-12" style="padding-top:26px">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
-                    <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}'>{{$wrap_limit->name}}
-                    </label>
+                <label>
+                    <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}'>{{$wrap_limit->name}}
+                </label>
             @endforeach
         </div>
 
@@ -169,7 +176,7 @@
             for(var i = 0; i < coll.length; i++){
                 coll[i].checked = true;
             }
-            html ='<div style="margin-left:25px;margin-bottom:15px" class=image_'+model+'><label for="color">上传图片：</label>';
+            /*html ='<div style="margin-left:25px;margin-bottom:15px" class=image_'+model+'><label for="color">上传图片：</label>';
             html+="<div class='upimage'><input name='modelSet["+model+"][image][image0]' type='file'/></div>";
             html+="<div class='upimage'><input name='modelSet["+model+"][image][image1]' type='file'/></div>";
             html+="<div class='upimage'><input name='modelSet["+model+"][image][image2]' type='file'/></div>";
@@ -177,7 +184,7 @@
             html+="<div class='upimage'><input name='modelSet["+model+"][image][image4]' type='file'/></div>";
             html+="<div class='upimage'><input name='modelSet["+model+"][image][image5]' type='file'/></div>";
             html+="</div>";
-            $("."+model).after(html);
+            $("."+model).after(html);*/
         }else{
             for(var i = 0; i < coll.length; i++){
                 coll[i].checked = false;
@@ -186,6 +193,9 @@
         }
     }
 
+$(function () {
+    $('#myTab a:first').tab('show');
+  })
     $(document).on('change','#catalog_id',function(){
         var catalog_id = $("#catalog_id").val();  
         $.ajax({

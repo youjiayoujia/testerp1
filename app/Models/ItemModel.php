@@ -105,15 +105,12 @@ class ItemModel extends BaseModel
 
     public function getAllQuantityAttribute()
     {
-        $data['all_quantity'] = 0;
-        $data['available_quantity'] = 0;
-        
-        foreach ($this->stocks as $stock) {
-            $data['all_quantity'] += $stock->all_quantity;
-            $data['available_quantity'] += $stock->available_quantity;
-        }
-        $data['all_amount'] = $data['all_quantity'] * $this->cost ;
-        return $data;
+        return $this->stocks->sum('all_quantity');
+    }
+
+    public function getAvailableQuantityAttribute()
+    {
+        return $this->stocks->sum('available_quantity');
     }
 
     /**
@@ -383,9 +380,9 @@ class ItemModel extends BaseModel
             }
             $data['zaitu_num'] = $zaitu_num;
             //实库存
-            $data['all_quantity'] = $item->all_quantity['all_quantity'];
+            $data['all_quantity'] = $item->all_quantity;
             //可用库存
-            $data['available_quantity'] = $item->all_quantity['available_quantity'];
+            $data['available_quantity'] = $item->available_quantity;
             //虚库存
             $quantity = $requireModel->where('is_require',1)->where('item_id',$item->id)->get()?$requireModel->where('is_require',1)->where('item_id',$item->id)->sum('quantity'):0;
             $xu_kucun = $data['all_quantity'] - $quantity;

@@ -39,7 +39,7 @@
         <div class="panel-heading">供应商信息 :</div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>主供应商名</strong>: {{ $model->supplier->name }}
+                <strong>主供应商名</strong>: {{ $model->supplier?$model->supplier->name:'' }}
             </div>
             <div class="col-lg-3">
                 <strong>主供应商sku</strong>: {{ $model->supplier_sku }}
@@ -77,12 +77,6 @@
         <div class="panel-heading"> 库存信息:</div>
         <div class="panel-body">
             <?php 
-                $inventory = 0;
-                $amount = 0;
-                foreach($model->stocks as $stock){
-                    $inventory += $stock->all_quantity;
-                    $amount += $stock->amount;
-                }
                 $baoque="false";
                 $baodeng = "false";
                 $tuhuobuyi = "false";
@@ -105,10 +99,10 @@
                 <strong>库位</strong>: {{ $model->warehouse_position }}
             </div>
             <div class="col-lg-1">
-                <strong>库存</strong>: {{ $model->all_quantity }}
+                <strong>库存</strong>: {{ $model->all_quantity['all_quantity'] }}
             </div>
             <div class="col-lg-1">
-                <strong>库存金额（RMB）</strong>: {{ ($model->all_quantity)*($model->cost) }}
+                <strong>库存金额（RMB）</strong>: {{ $model->all_quantity['all_amount'] }}
             </div>
             <div class="col-lg-1">
                 <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天

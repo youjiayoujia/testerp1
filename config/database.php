@@ -77,6 +77,18 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+        //SELLMORE
+        'sellmore' => [
+            'driver' => 'mysql',
+            'host' => '127.0.0.1',
+            'database' => 'fangzheng',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+        ],
     ],
     /*
       |--------------------------------------------------------------------------

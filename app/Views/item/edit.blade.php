@@ -91,12 +91,12 @@
         <div class="form-group col-md-1">
             <label for="color">库存</label>
             
-            <input disabled="disabled" class="form-control" id="inventory" placeholder="库存" name='inventory' value="{{ old('inventory') ?  old('inventory') :$model->all_quantity['all_quantity'] }}">
+            <input disabled="disabled" class="form-control" id="inventory" placeholder="库存" name='inventory' value="{{ old('inventory') ?  old('inventory') :$model->all_quantity }}">
         </div>
 
         <div class="form-group col-md-1">
             <label for="size">库存总金额</label>
-            <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') :$model->all_quantity['all_amount'] }}">
+            <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') :$model->all_quantity*$model->cost }}">
         </div>
 
     </div>

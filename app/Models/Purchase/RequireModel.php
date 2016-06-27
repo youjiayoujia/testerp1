@@ -59,7 +59,7 @@ class RequireModel extends BaseModel
             }
             //实库存
             $itemModel = ItemModel::find($item['item_id']);
-            $shi_kucun = $itemModel->all_quantity['all_quantity'];
+            $shi_kucun = $itemModel->all_quantity;
             //虚库存
             $xu_kucun = $shi_kucun - $item['quantity'];
 

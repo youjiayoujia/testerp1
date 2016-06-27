@@ -12,7 +12,7 @@ use App\Base\BaseModel;
 class WishPublishProductModel extends BaseModel
 {
 
-    protected $table = 'wish_publish_prodcut';
+    protected $table = 'wish_publish_product';
 
     protected $fillable = [ 'account_id',
                             'productID',

@@ -99,10 +99,10 @@
                 <strong>库位</strong>: {{ $model->warehouse_position }}
             </div>
             <div class="col-lg-1">
-                <strong>库存</strong>: {{ $model->all_quantity['all_quantity'] }}
+                <strong>库存</strong>: {{ $model->all_quantity }}
             </div>
             <div class="col-lg-1">
-                <strong>库存金额（RMB）</strong>: {{ $model->all_quantity['all_amount'] }}
+                <strong>库存金额（RMB）</strong>: {{ $model->all_quantity*$model->cost }}
             </div>
             <div class="col-lg-1">
                 <strong>采购天数</strong>: {{ $model->product->purchase_day}} 天

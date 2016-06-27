@@ -20,7 +20,7 @@
             <td>{{ $rule->id }}</td>
             <td>{{ $rule->name }}</td>
             <td>{{ $rule->logistics->type }}</td>
-            <td>{{ $rule->logistics->short_code }}</td>
+            <td>{{ $rule->logistics->code }}</td>
             <td>{{ $rule->priority }}</td>
             <td>{{ $rule->weight_from }}</td>
             <td>{{ $rule->weight_to }}</td>

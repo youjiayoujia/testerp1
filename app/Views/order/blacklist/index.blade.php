@@ -185,9 +185,9 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['type', '=', 'CONFIRMED']) }}">确认黑名单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['type', '=', 'SUSPECTED']) }}">疑似黑名单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['type', '=', 'WHITE']) }}">白名单</a></li>
+            @foreach(config('order.blacklist_type') as $type_key => $type)
+                <li><a href="{{ DataList::filtersEncode(['type', '=', $type_key]) }}">{{ $type }}</a></li>
+            @endforeach
         </ul>
     </div>
     <div class="btn-group" role="group">

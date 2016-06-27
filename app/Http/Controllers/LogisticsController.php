@@ -113,7 +113,7 @@ class LogisticsController extends Controller
         if(!$logistics) {
             return json_encode(false);
         }
-        $str = "<option class='logis' value='".$logistics->id."'>".$logistics->logistics_type."</option>";
+        $str = "<option class='logis' value='".$logistics->id."'>".$logistics->name."</option>";
         return $str;
     }
 

@@ -51,7 +51,7 @@ class TransferProduct extends Command
 
         $len = 1000;
         $start = 0;
-        $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();
+        $smProducts = smProduct::skip($start)->take($len)->get();
         while ($smProducts->count()) {
             $start += $len;
             foreach ($smProducts as $smProduct) {
@@ -77,6 +77,11 @@ class TransferProduct extends Command
                     'declared_value' => $smProduct->products_declared_value ? $smProduct->products_declared_value : '',
                     'package_limit' => count($arr) ? implode(',', $arr) : '',
                     'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
+                    'name' => $smProduct->products_name_en ? $smProduct->products_name_en : '',
+                    'c_name' => $smProduct->products_name_cn ? $smProduct->products_name_cn : '',
+                    'supplier_id' => $smProduct->products_suppliers_id ? $smProduct->products_suppliers_id : '',
+                    'warehouse_id' => $smProduct->product_warehouse_id == 1000 ? 1 : 2,
+                    'hs_code' => $smProduct->product_hscode ? $smProduct->product_hscode : '',
                 ];
                 $tmp_product = $spu->products()->create($buf);
 

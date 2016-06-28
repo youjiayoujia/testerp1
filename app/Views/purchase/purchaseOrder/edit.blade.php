@@ -160,12 +160,12 @@
             物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
             </td>
             <td>
-            @if($model->close_status ==0)
-              <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
-              @else
-              {{$purchaseItem->purchase_cost}}
-              <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
-              @endif
+                @if($model->close_status ==0)
+                    <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+                @else
+                    {{$purchaseItem->purchase_cost}}
+                    <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+                @endif
  			</td>
             <td>
             @if($purchaseItem->costExamineStatus ==2)
@@ -176,8 +176,7 @@
              @if($purchaseItem->purchase_cost>0)
             	<a href="/purchaseItem/costExamineStatus/{{$purchaseItem->id}}/1" class="btn btn-info btn-xs"> 审核不通过
                 </a> 
-                <a href="/purchaseItem/costExamineStatus/{{$purchaseItem->id}}/2" class="btn btn-info btn-xs"> 审核通过
-                </a>
+                
               @endif
             @endif
             </td>    

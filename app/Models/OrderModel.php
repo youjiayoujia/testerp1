@@ -30,6 +30,21 @@ class OrderModel extends BaseModel
 
     public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
 
+    /**
+     * 退款rules
+     */
+    public $rules = [
+        'create' => [
+            'refund_amount' => 'required',
+            'price' => 'required',
+            'refund_currency' => 'required',
+            'refund' => 'required',
+            'type' => 'required',
+            'reason' => 'required',
+            'image' => 'required',
+        ],
+    ];
+
     public function rule($request)
     {
         $arr = [

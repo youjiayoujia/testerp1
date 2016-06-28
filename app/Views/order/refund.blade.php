@@ -34,6 +34,7 @@
                 </div>
                 <div class="form-group col-lg-2">
                     <label for="refund_amount" class='control-label'>退款金额</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input class="form-control" id="refund_amount" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') ? old('refund_amount') : $model->refund_amount }}">
                 </div>
                 <div class="form-group col-lg-2">
@@ -43,6 +44,7 @@
                 </div>
                 <div class="form-group col-lg-1">
                     <label for="refund_currency" class='control-label'>退款币种</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select class="form-control" name="refund_currency" id="refund_currency">
                         @foreach($currencys as $refund_currency)
                             <option value="{{ $refund_currency->code }}" {{ old('refund_currency') ? (old('refund_currency') == $refund_currency->code ? 'selected' : '') : ($model->refund_currency == $refund_currency->code ? 'selected' : '') }}>
@@ -53,6 +55,7 @@
                 </div>
                 <div class="form-group col-lg-2">
                     <label for="refund" class='control-label'>退款方式</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select class="form-control" name="refund" id="refund">
                         <option value="NULL">==退款方式==</option>
                         @foreach(config('order.refund') as $refund_key => $refund)
@@ -64,6 +67,7 @@
                 </div>
                 <div class="form-group col-lg-3">
                     <label for="reason" class='control-label'>退款原因</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select class="form-control" name="reason" id="reason">
                         <option value="NULL">==退款原因==</option>
                         @foreach(config('order.reason') as $reason_key => $reason)
@@ -75,6 +79,7 @@
                 </div>
                 <div class="form-group col-lg-2">
                     <label for="type" class='control-label'>退款类型</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <select class="form-control" name="type" id="type">
                         <option value="NULL">==退款类型==</option>
                         @foreach(config('order.type') as $type_key => $type)
@@ -137,6 +142,7 @@
                 <div class="form-group col-lg-12">
                     <label for="image">上传截图：</label>
                     <label>(图片最大支持上传40Kb)</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <input name='image' type='file'/>
                 </div>
             </div>

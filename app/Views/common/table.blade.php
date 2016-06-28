@@ -118,10 +118,7 @@
                                     </div>
                                 </form>
                             </div>
-                            </form>
                         </div>
-                    </form>
-                    </div>
                     @endif
                 @show{{-- 列表工具栏 --}}
                 <div class="row">
@@ -129,7 +126,7 @@
                         <table class="table table-bordered table-striped table-hover sortable">
                             <thead>
                             <tr>
-                                @section('tableHeader')@show{{-- 列表字段 --}}
+                            @section('tableHeader')@show{{-- 列表字段 --}}
                             </tr>
                             </thead>
                             <tbody>

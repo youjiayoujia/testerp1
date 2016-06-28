@@ -36,7 +36,7 @@
             <td>{{ $item->id }}</td>
             <td>{{ $item->sku }}</td>
             <td><img src="{{ asset($item->image) }}" width="100px"></td>
-            <td>{{ $item->product->catalog ? $item->product->catalog->name : ''}}</td>
+            <td>{{ $item->product and $item->product->catalog ? $item->product->catalog->name : ''}}</td>
             <td>{{ $item->name }}</td>
             <td>{{ $item->c_name }}</td>
             <td>{{ $item->supplier ? $item->supplier->name :''}}</td>

@@ -30,6 +30,21 @@ class OrderModel extends BaseModel
 
     public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
 
+    /**
+     * 退款rules
+     */
+    public $rules = [
+        'create' => [
+            'refund_amount' => 'required',
+            'price' => 'required',
+            'refund_currency' => 'required',
+            'refund' => 'required',
+            'type' => 'required',
+            'reason' => 'required',
+            'image' => 'required',
+        ],
+    ];
+
     public function rule($request)
     {
         $arr = [
@@ -111,7 +126,8 @@ class OrderModel extends BaseModel
                 'currency'
             ],
             'filterSelects' => [
-
+                'status' => config('order.status'),
+                'active' => config('order.active')
             ],
             'sectionSelect' => [
                 'price' => ['amount'],
@@ -125,10 +141,7 @@ class OrderModel extends BaseModel
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
-                'order' => [
-                    'status' => config('order.status'),
-                    'active' => config('order.active')
-                ]
+
             ]
         ];
     }

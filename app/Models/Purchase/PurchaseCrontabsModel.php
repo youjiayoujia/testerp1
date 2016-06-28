@@ -20,5 +20,8 @@ class PurchaseCrontabsModel extends BaseModel
      */
     protected $guarded  = [];
 
-
+    public function item()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'item_id');
+    }
 }

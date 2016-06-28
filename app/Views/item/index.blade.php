@@ -35,7 +35,7 @@
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
             <td>{{ $item->sku }}</td>
-            <td><img src="{{ asset($item->image) }}" width="100px"></td>
+            <td><img src="{{ asset($item->product->dimage) }}" width="100px"></td>
             <td>{{ $item->product and $item->product->catalog ? $item->product->catalog->name : ''}}</td>
             <td>{{ $item->name }}</td>
             <td>{{ $item->c_name }}</td>

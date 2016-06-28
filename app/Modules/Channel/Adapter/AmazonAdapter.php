@@ -305,15 +305,13 @@ Class AmazonAdapter implements AdapterInterface
                         $this->saveMessagePayload($service, $message->id, $messageNew->id, $messagePayload);
                         $messageNew->content = $messageNew->message_content;
                         $messageNew->save();
-                        $this->info('Message #' . $messageNew->message_id . ' Received.');
+                        echo ('Message #' . $messageNew->message_id . ' Received.');
                     }
                 }
             } while ($nextPageToken != '');
         }
         
     }
-
-
     public function getClient($account)
     {
         $client = new Google_Client();
@@ -381,5 +379,7 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
     }
+
+
 
 }

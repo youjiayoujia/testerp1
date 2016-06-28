@@ -598,7 +598,3 @@ Route::any('data', ['uses' => 'DataController@index']);
 Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
-
-
-//jiangdi test routes
-Route::resource('test1','JdTestController@index');

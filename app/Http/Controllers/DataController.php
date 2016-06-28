@@ -135,8 +135,7 @@ class DataController extends Controller
                     'id' => $smProduct->products_id,
                 ];
                 $tmp_product->item()->create($data);
-                
-            }exit;
+            }
             $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();
         }
     }

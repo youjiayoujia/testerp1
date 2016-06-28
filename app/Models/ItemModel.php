@@ -96,14 +96,6 @@ class ItemModel extends BaseModel
         return $this->hasMany('App\Models\StockModel', 'item_id');
     }
 
-    public function getImageAttribute()
-    {
-        if ($this->product and $this->product->image) {
-            return $this->product->image->path . $this->product->image->name;
-        }
-        return '/default.jpg';
-    }
-
     public function getAllQuantityAttribute()
     {
         return $this->stocks->sum('all_quantity');

@@ -81,7 +81,7 @@ return [
         'sellmore' => [
             'driver' => 'mysql',
             'host' => 'localhost',
-            'database' => 'fangzheng',
+            'database' => 'sellmore',
             'username' => 'sellmore',
             'password' => 'Z2yIqjo#fx1Nh4ZU!%12*rzh',
             'charset' => 'utf8',

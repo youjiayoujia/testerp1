@@ -170,7 +170,7 @@
             } ?>
             <td>{{ $product->name }}</td>
             <td>{{ $product->c_name }}</td>
-            <td>{{ $product->supplier->name }}</td>
+            <td>{{ $product->supplier?$product->supplier->name:'无' }}</td>
             <td>{{ $product->created_at }}</td>
             <td>
                 <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">

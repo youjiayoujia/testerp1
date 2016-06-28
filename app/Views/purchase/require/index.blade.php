@@ -51,7 +51,7 @@
             <td>{{$item->thirty_sales}}</td>
             <td>{{$item->fourteen_sales}}</td>
             <td>{{$item->seven_sales}}</td>
-            <td>{{$item->need_purchase_num>0?$item->need_purchase_num:0}}</td>
+            <td>{{$item->need_purchase_num}}</td>
             <td>@if($item->thrend == 1)
             	上涨
             @elseif($item->thrend == 2)

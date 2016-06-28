@@ -483,15 +483,21 @@ class DataController extends Controller
 
     public function transfer_stock()
     {
-        $smStocks = smStock::Where('products_id', '<', '65726')->limit(1000)->orderBy('products_id', 'desc')->get();
-        foreach ($smStocks as $smStock) {
-            if ($smStock->item) {
-                $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
-                if ($position) {
-                    $smStock->item->in($position->id, $smStock->actual_stock,
-                        $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
+        $len = 100;
+        $start = 0;
+        $smStocks = smStock::skip($start)->take($len)->get();
+        while ($smStocks->count()) {
+            $start += $len;
+            foreach ($smStocks as $smStock) {
+                if ($smStock->item) {
+                    $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
+                    if ($position) {
+                        $smStock->item->in($position->id, $smStock->actual_stock,
+                            $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
+                    }
                 }
             }
+            $smStocks = smStock::skip($start)->take($len)->get();
         }
     }
 

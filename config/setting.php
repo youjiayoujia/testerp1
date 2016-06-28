@@ -52,6 +52,7 @@ return [
         'time.created_at' => '时间',
         'price.amount' => '金额',
         'item.sku' => 'SKU',
+        'items.sku' => 'SKU',
         'ordernum' => '订单号',
         'channel_ordernum' => '渠道订单号',
         'channelAccount.alias' => '渠道账号',

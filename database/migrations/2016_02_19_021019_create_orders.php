@@ -81,7 +81,7 @@ class CreateOrders extends Migration
             $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);
             $table->enum('blacklist', ['0', '1'])->comment('黑名单订单')->nullable()->default('1');
             $table->double('platform', 15, 2)->comment('平台费')->nullable()->default(0);
-            $table->string('aliexpress_loginId')->comment('aliexpress买家的账号id')->nullable()->default(null)->after('gross_margin');
+            $table->string('aliexpress_loginId')->comment('aliexpress买家的账号id')->nullable()->default(null);
             $table->date('payment_date')->comment('支付时间');
             $table->timestamp('create_time')->comment('渠道创建时间');
             $table->timestamps();

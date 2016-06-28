@@ -112,7 +112,7 @@ class DataController extends Controller
                     }
                 }
                 $data = [
-                    'catalog_id' => 0,
+                    'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
                     'sku' => $smProduct->products_sku,
                     'name' => $smProduct->products_title,
                     'c_name' => $smProduct->products_name_cn,
@@ -298,7 +298,7 @@ class DataController extends Controller
                     'id' => $smShipment->shipmentID,
                     'code' => $smShipment->shipmentTitle,
                     'name' => $smShipment->shipmentDescription,
-                    'warehouse_id' => $smShipment->shipment_warehouse_id,
+                    'warehouse_id' => $smShipment->shipment_warehouse_id == '1025' ? '2' : '1',
                     'logistics_catalog_id' => $smShipment->shipmentCategoryID,
                 ];
                 LogisticsModel::create($shipment);

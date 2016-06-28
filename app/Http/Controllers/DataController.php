@@ -476,6 +476,7 @@ class DataController extends Controller
     public function __construct(smProduct $model)
     {
         set_time_limit(0);
+        ini_set('memory_limit', '256M');
     }
 
 

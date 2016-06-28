@@ -41,6 +41,11 @@ use App\Models\ProductModel;
 
 class DataController extends Controller
 {
+    public function __construct(smProduct $model)
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '1024M');
+    }
 
     public function index()
     {
@@ -59,16 +64,16 @@ class DataController extends Controller
             foreach ($smProducts as $smProduct) {
                 $spu = SpuModel::create(['spu' => $smProduct->products_sku]);
                 $arr = [];
-                if($smProduct->products_with_battery) {
+                if ($smProduct->products_with_battery) {
                     $arr[] = 1;
                 }
-                if($smProduct->products_with_adapter) {
+                if ($smProduct->products_with_adapter) {
                     $arr[] = 4;
                 }
-                if($smProduct->products_with_fluid) {
+                if ($smProduct->products_with_fluid) {
                     $arr[] = 5;
                 }
-                if($smProduct->products_with_powder) {
+                if ($smProduct->products_with_powder) {
                     $arr[] = 2;
                 }
                 $buf = [
@@ -108,7 +113,10 @@ class DataController extends Controller
                 if ($smProduct->products_location) {
                     $position = PositionModel::Where('name', $smProduct->products_location)->first();
                     if (!$position) {
-                        PositionModel::create(['name' => $smProduct->products_location, 'warehouse_id' => $warehouseId]);
+                        PositionModel::create([
+                            'name' => $smProduct->products_location,
+                            'warehouse_id' => $warehouseId
+                        ]);
                     }
                 }
                 $data = [
@@ -472,14 +480,6 @@ class DataController extends Controller
             $smWishes = smWish::skip($start)->take($len)->get();
         }
     }
-
-    public function __construct(smProduct $model)
-    {
-        set_time_limit(0);
-        ini_set('memory_limit', '256M');
-    }
-
-
 
     public function transfer_stock()
     {

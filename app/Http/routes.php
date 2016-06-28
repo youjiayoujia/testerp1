@@ -557,11 +557,23 @@ Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersLi
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
+Route::any('data/transfer_stock', ['uses' => 'DataController@transfer_stock', 'as' => 'data.transfer_stock']);
 Route::any('data/transfer_supplier', ['uses' => 'DataController@transfer_supplier', 'as' => 'data.transfer_supplier']);
 Route::any('data/transfer_amazon', ['uses' => 'DataController@transfer_amazon', 'as' => 'data.transfer_amazon']);
 Route::any('data/transfer_wish', ['uses' => 'DataController@transfer_wish', 'as' => 'data.transfer_wish']);
 Route::any('data/transfer_smt', ['uses' => 'DataController@transfer_smt', 'as' => 'data.transfer_smt']);
 Route::any('data/transfer_lazada', ['uses' => 'DataController@transfer_lazada', 'as' => 'data.transfer_lazada']);
+Route::any('data/transfer_cd', ['uses' => 'DataController@transfer_cd', 'as' => 'data.transfer_cd']);
+Route::any('data/transfer_ebay', ['uses' => 'DataController@transfer_ebay', 'as' => 'data.transfer_ebay']);
+Route::any('shipmentCategory', ['uses' => 'DataController@shipmentCategory', 'as' => 'shipmentCategory']);
+Route::any('shipment', ['uses' => 'DataController@shipment', 'as' => 'shipment']);
+Route::any('amaLogistics', ['uses' => 'DataController@amaLogistics', 'as' => 'amaLogistics']);
+Route::any('wishLogistics', ['uses' => 'DataController@wishLogistics', 'as' => 'wishLogistics']);
+Route::any('dhgateLogistics', ['uses' => 'DataController@dhgateLogistics', 'as' => 'dhgateLogistics']);
+Route::any('lazadaLogistics', ['uses' => 'DataController@lazadaLogistics', 'as' => 'lazadaLogistics']);
+Route::any('cdiscountLogistics', ['uses' => 'DataController@cdiscountLogistics', 'as' => 'cdiscountLogistics']);
+Route::any('aliExpressLogistics', ['uses' => 'DataController@aliExpressLogistics', 'as' => 'aliExpressLogistics']);
+Route::any('shipmentSupplier', ['uses' => 'DataController@shipmentSupplier', 'as' => 'shipmentSupplier']);
 
 
 

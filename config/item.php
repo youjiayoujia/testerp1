@@ -9,4 +9,9 @@ return [
         'trySale' => '试销',
         'unSellTemp' => '货源待定',
     ],
+    //是否激活
+    'is_available' => [
+        '0' => '非激活',
+        '1' => '激活',
+    ],
 ];

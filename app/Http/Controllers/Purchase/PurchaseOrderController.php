@@ -303,8 +303,8 @@ class PurchaseOrderController extends Controller
         $data=request()->all();
         $model=$this->model->find($id);
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
-        $Inum=ItemModel::where('sku',$data['sku'])->where('is_sale','<>',1)->count();
-        $item=ItemModel::where('sku',$data['sku'])->where('is_sale',1)->first();
+        $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
+        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if($num > 0 || $Inum > 0){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
         }

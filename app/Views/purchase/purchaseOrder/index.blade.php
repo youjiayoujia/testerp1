@@ -149,25 +149,25 @@
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
                 
-                <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs">
+                <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 @endif 
-                @if($purchaseOrder->examineStatus == 0||$purchaseOrder->examineStatus == 2)
+                @if($purchaseOrder->examineStatus == 1||$purchaseOrder->examineStatus == 2)
                     <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
                         <span class="glyphicon glyphicon-remove-sign"></span>
                     </a>
                 @endif
-                @if($purchaseOrder->close_status == 0)
+                @if($purchaseOrder->status == 1)
                 <a href="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" title="付款" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
                     <span class="glyphicon glyphicon glyphicon-usd"></span>
                 </a>
                 @endif 
-                {{--@if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)--}}
-    				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-print"></span>
-                    </a>
-                {{--@endif--}}            
+                
+				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
+                    <span class="glyphicon glyphicon-print"></span>
+                </a>
+                           
                 
             </td>
         </tr>
@@ -236,9 +236,8 @@
 </div>
 </div>
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModala" tabindex="-1" role="dialog" 
-   aria-labelledby="myModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+<div class="modal fade" id="myModala" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
+   <div class="modal-dialog" style="width:800px">
       <div class="modal-content">
          <div class="modal-header">
             <button type="button" class="close" 
@@ -249,9 +248,9 @@
                查询物流单号
             </h4>
          </div>
-         <div style="text-align: center">
-         <iframe name="kuaidi100" src="http://www.kuaidi100.com/frame/app/index2.html" width="800" height="400" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
-      </div>
+        <div style="text-align: center">
+            <iframe name="kuaidi100" src="http://www.kuaidi100.com/frame/app/index2.html" width="800" height="400" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
+        </div>
       </div>
       
 </div>
@@ -267,6 +266,14 @@
 
 	$(".hexiao").click(function(){
         if (confirm("确认核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
+
+    $(".find_shipment").click(function(){
+        if (confirm("确认待核销?")) {
             var url = $(this).data('url');
             window.location.href=url;
         }

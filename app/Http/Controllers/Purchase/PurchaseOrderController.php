@@ -178,7 +178,7 @@ class PurchaseOrderController extends Controller
                     if($item['status']>0){
                         $data['status']=1;
                     }
-                    if($item['purchase_num'] != $purchaseItem->purchase_num && $purchaseItem->examineStatus >0){
+                    if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
                         $data['examineStatus']=2;
                         }
@@ -195,7 +195,7 @@ class PurchaseOrderController extends Controller
         $num=PurchaseItemModel::where('purchase_order_id',$id)->where('costExamineStatus','<>',2)->count();
         if($num ==0){
             $data['costExamineStatus']=2;
-            }
+        }
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));     
@@ -209,7 +209,7 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseOrdersOut()
     {
-         $response = [
+        $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
         return view($this->viewPath.'excelOut',$response);  
@@ -229,6 +229,7 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data['examineStatus']=$examineStatus;
+        $data['status'] = 1;
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));
     }

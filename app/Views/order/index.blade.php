@@ -60,7 +60,7 @@
                         <div class="text-danger">
                             <label>退款ID:</label>{{ $refund->id }}
                             <label>退款金额:</label>{{ $refund->refund_amount }}
-                            <label>原因:</label>{{ $refund->reason_name }}
+                            <label>原因:</label>{{ $refund->reason ? $refund->reason_name : '' }}
                             <label>申请时间:</label>{{ $refund->created_at }}
                         </div>
                     @endforeach

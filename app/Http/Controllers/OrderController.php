@@ -218,6 +218,7 @@ class OrderController extends Controller
     public function refundUpdate($id)
     {
         request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
         $data['order_id'] = $id;
         $this->model->refundCreate($data, request()->file('image'));

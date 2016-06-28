@@ -49,7 +49,8 @@ return [
         'order.active' => '订单售后状态',
         'active' => '订单售后状态',
         'country.code' => '国家简称',
-        'item.sku' => 'sku'
+        'item.sku' => 'sku',
+        'time.created_at'=>'创建时间范围',
     ],
 ];
 

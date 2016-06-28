@@ -90,7 +90,11 @@ class ProductModel extends BaseModel
         'second_supplier_id',
         'supplier_sku',
         'second_supplier_sku',
-        'purchase_day'
+        'purchase_day',
+        'parts',
+        'declared_cn',
+        'declared_en',
+        'declared_value',
     ];
 
     public function image()

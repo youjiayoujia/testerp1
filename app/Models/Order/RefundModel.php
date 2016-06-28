@@ -31,15 +31,6 @@ class RefundModel extends BaseModel
         'image'
     ];
 
-    public $rules = [
-        'create' => [
-
-        ],
-        'update' => [
-
-        ],
-    ];
-
     public function getReasonNameAttribute()
     {
         $arr = config('order.reason');

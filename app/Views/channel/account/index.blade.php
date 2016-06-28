@@ -28,8 +28,8 @@
             <td>{{ $account->sync_cycle }}</td>
             <td>{{ $account->sync_days }}天</td>
             <td>{{ $account->sync_pages }}</td>
-            <td>{{ $account->operator->name }}</td>
-            <td>{{ $account->customer_service->name }}</td>
+            <td>{{ $account->operator?$account->operator->name:'无' }}</td>
+            <td>{{ $account->customer_service?$account->customer_service->name:'无' }}</td>
             <td>{{ $account->service_email }}</td>
             <td>{{ $account->created_at }}</td>
             <td>{{ $account->updated_at }}</td>

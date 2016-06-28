@@ -26,10 +26,10 @@ class CreateOrderItems extends Migration
             $table->enum('is_gift', [0, 1])->comment('是否赠品')->nullable()->default(0);
             $table->enum('is_refund', [0, 1])->comment('是否退款')->default(0);
             $table->integer('split_quantity')->comment('已拆单数量')->default(0);
-            $table->string('transaction_id')->comment('ebay transaction_id')->nullable()->default(NULL)->after('channel_order_id');
-            $table->string('channel_order_id')->comment('渠道对应的订单id(wish 存 order_id)')->nullable()->default(NULL)->after('orders_item_number');
-            $table->string('orders_item_number')->comment('产品的广告ID')->nullable()->default(NULL)->after('remark');
-            $table->string('remark')->comment('备注')->nullable()->default(NULL);
+            $table->string('transaction_id')->comment('ebay transaction_id')->nullable()->default(null);
+            $table->string('channel_order_id')->comment('渠道对应的订单id(wish 存 order_id)')->nullable()->default(null);
+            $table->string('orders_item_number')->comment('产品的广告ID')->nullable()->default(null);
+            $table->string('remark')->comment('备注')->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();
         });

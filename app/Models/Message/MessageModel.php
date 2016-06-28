@@ -41,9 +41,6 @@ class MessageModel extends BaseModel{
     {
         return $this->belongsTo('App\Models\UserModel', 'assign_id');
     }
-    public function test100(){
-        return $this->belongsTo('App\Models\UserModel','assign_id');
-    }
 
     public function getLabelTextAttribute()
     {
@@ -247,6 +244,22 @@ class MessageModel extends BaseModel{
             return $this->save();
         }
         return false;
+    }
+
+    /**
+     * 更多搜索
+     * @return array
+     */
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => ['time'=>['created_at']],
+
+        ];
     }
 
 }

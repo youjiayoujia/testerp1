@@ -79,6 +79,11 @@ class DataController extends Controller
                     'declared_value' => $smProduct->products_declared_value ? $smProduct->products_declared_value : '',
                     'package_limit' => count($arr) ? implode(',', $arr) : '',
                     'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
+                    'name' => $smProduct->products_name_en ? $smProduct->products_name_en : '',
+                    'c_name' => $smProduct->products_name_cn ? $smProduct->products_name_cn : '',
+                    'supplier_id' => $smProduct->products_suppliers_id ? $smProduct->products_suppliers_id : '',
+                    'warehouse_id' => $smProduct->product_warehouse_id == 1000 ? 1 : 2,
+                    'hs_code' => $smProduct->product_hscode ? $smProduct->product_hscode : '',
                 ];
                 $tmp_product = $spu->products()->create($buf);
 

@@ -111,7 +111,8 @@ class OrderModel extends BaseModel
                 'currency'
             ],
             'filterSelects' => [
-
+                'status' => config('order.status'),
+                'active' => config('order.active')
             ],
             'sectionSelect' => [
                 'price' => ['amount'],
@@ -125,10 +126,7 @@ class OrderModel extends BaseModel
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
-                'order' => [
-                    'status' => config('order.status'),
-                    'active' => config('order.active')
-                ]
+
             ]
         ];
     }

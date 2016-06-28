@@ -122,6 +122,8 @@ class AccountModel extends BaseModel
                     'SellerId' => $this->amazon_seller_id,
                     'AWSAccessKeyId' => $this->amazon_accesskey_id,
                     'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
+                    'GmailSecret' => $this->amazon_message_secret,
+                    'GmailToken' => $this->amazon_message_token,
                 ];
                 break;
             case 'aliexpress':

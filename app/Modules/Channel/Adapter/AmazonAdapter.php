@@ -23,6 +23,7 @@ Class AmazonAdapter implements AdapterInterface
     private $signatureMethod = 'HmacSHA256';
     private $version = '2013-09-01';
     private $config = [];
+    private $messageConfig = [];
 
     public function __construct($config)
     {
@@ -32,6 +33,8 @@ Class AmazonAdapter implements AdapterInterface
         $this->config['SignatureVersion'] = $this->signatureVersion;
         $this->config['SignatureMethod'] = $this->signatureMethod;
         $this->config['Version'] = $this->version;
+        $this->messageConfig['GmailSecret'] = $config['GmailSecret'];
+        $this->messageConfig['GmailToken'] = $config['GmailToken'];
     }
 
     /**

@@ -80,6 +80,29 @@ interface AdapterInterface
     /**
      * 获取平台邮件
      * @return mixed
+     *
+     * 返回数据格式:
+     * [
+     *      [
+     *          'message_id' => '', 渠道messageID
+     *          'title' => '',
+     *          'from_name' => '',
+     *          'from_email' => '',
+     *          'to_name' => '',
+     *          'to_email' => '',
+     *          'date' => '',
+     *          'content' => '',
+     *          'attanchments' =>
+     *          [
+     *              ['name','path']
+     *              ['name','path']
+     *              ['name','path']
+     *           ],
+     *      ],
+     *      [
+     *          Same As above ...
+     *      ],
+     * ]
      */
     public function getMessages();
 

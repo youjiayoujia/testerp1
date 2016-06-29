@@ -16,6 +16,7 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
+use App\Models\Stock\InModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
 use Tool;
@@ -527,12 +528,17 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'inWarehouseList', $response);
     }
 
+    /**
+    * 入库
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
     public function updateArriveLog(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");
         $data = substr($data, 0,strlen($data)-1);
         $arr = explode(',', $data);
-
+        
         foreach ($arr as $value) {
             $update_data = explode(':', $value);
             $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
@@ -554,7 +560,8 @@ class PurchaseOrderController extends Controller
                     $datas['status'] = 4;
                 }
                 //print_r($datas);
-                $purchase_item->update($datas);  
+                $purchase_item->update($datas);
+                $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
             }       
         }
         

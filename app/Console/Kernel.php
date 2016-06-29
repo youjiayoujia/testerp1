@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\TransferStock::class,
         \App\Console\Commands\TransferLogistics::class,
         \App\Console\Commands\ChannelLogistics::class,
+        \App\Console\Commands\TransferUser::class,
     ];
 
     /**

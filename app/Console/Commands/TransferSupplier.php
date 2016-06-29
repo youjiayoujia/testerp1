@@ -70,7 +70,7 @@ class TransferSupplier extends Command
                     $exist->update($supplier);
                     $updatedNum++;
                 } else {
-                    $shipmentCategory['id'] = $smSupplier->suppliers_id;
+                    $supplier['id'] = $smSupplier->suppliers_id;
                     SupplierModel::create($supplier);
                     $createdNum++;
                 }

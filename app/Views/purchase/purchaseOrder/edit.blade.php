@@ -268,7 +268,7 @@
             </td>    
             
              <td>
-            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
+            	<a href="http://{{$purchaseItem->productItem?$purchaseItem->productItem->purchase_url:''}}" text-decoration: none;>{{$purchaseItem->productItem?$purchaseItem->productItem->purchase_url:''}}</a>
             </td>  
 			
         </tr>

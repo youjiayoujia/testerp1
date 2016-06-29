@@ -80,6 +80,7 @@ class RequireController extends Controller
 			$data['type']=0;
 			$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
 			$data['sku']=$v->sku;
+			$data['item_id']=$v->id;
 			$data['purchase_cost']=$sumtrend->item->purchase_price;
 			$data['supplier_id']=$v->supplier_id ? $v->supplier_id : 0;
 			$data['purchase_num']=$sumtrend->need_purchase_num;

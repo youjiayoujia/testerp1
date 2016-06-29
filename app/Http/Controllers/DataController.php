@@ -344,12 +344,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Ebay'])->first()->id;
         $smEbays = smEbay::skip($start)->take($len)->get();
         while ($smEbays->count()) {
             $start += $len;
             foreach ($smEbays as $smEbay) {
                 $ebay = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -372,12 +373,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Cdiscount'])->first()->id;
         $smCds = smCd::skip($start)->take($len)->get();
         while ($smCds->count()) {
             $start += $len;
             foreach ($smCds as $smCd) {
                 $cd = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -400,12 +402,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Lazada'])->first()->id;
         $smLazadas = smLazada::skip($start)->take($len)->get();
         while ($smLazadas->count()) {
             $start += $len;
             foreach ($smLazadas as $smLazada) {
                 $lazada = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -428,12 +431,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'AliExpress'])->first()->id;
         $smSmts = smSmt::skip($start)->take($len)->get();
         while ($smSmts->count()) {
             $start += $len;
             foreach ($smSmts as $smSmt) {
                 $smt = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -458,12 +462,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Wish'])->first()->id;
         $smWishes = smWish::skip($start)->take($len)->get();
         while ($smWishes->count()) {
             $start += $len;
             foreach ($smWishes as $smWish) {
                 $wish = [
-                    'channel_id' => '4',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'account' => $smWish->account_name,
                     'sync_cycle' => '0',
@@ -541,13 +546,14 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Amazon'])->first()->id;
         $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         while ($smAmazons->count()) {
             $start += $len;
             foreach ($smAmazons as $smAmazon) {
-                $url = pathinfo($smAmazon->place_site);
+                $url = parse_url($smAmazon->place_site);
                 $amazon = [
-                    'channel_id' => '3',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'account' => $smAmazon->seller_account,
                     'alias' => $smAmazon->seller_account,
@@ -555,7 +561,7 @@ class DataController extends Controller
                     'sync_cycle' => '0',
                     'sync_days' => 30,
                     'sync_pages' => 100,
-                    'amazon_api_url' => $url['dirname'],
+                    'amazon_api_url' => ($url['scheme']."://".$url['host']),
                     'amazon_marketplace_id' => $smAmazon->place_id,
                     'amazon_seller_id' => $smAmazon->merchant_id,
                     'amazon_accesskey_id' => $smAmazon->access_key,

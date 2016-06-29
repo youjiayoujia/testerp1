@@ -41,12 +41,15 @@ class TransferSupplier extends Command
     {
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $smSuppliers = smSupplier::skip($start)->take($len)->get();
         while ($smSuppliers->count()) {
             $start += $len;
             foreach ($smSuppliers as $smSupplier) {
+                $originNum++;
                 $supplier = [
-                    'id' => $smSupplier->suppliers_id,
                     'name' => $smSupplier->suppliers_name,
                     'contact_name' => $smSupplier->suppliers_name,
                     'address' => $smSupplier->suppliers_address,
@@ -62,9 +65,18 @@ class TransferSupplier extends Command
                     'created_at' => $smSupplier->create_time,
                     'updated_at' => $smSupplier->modify_time,
                 ];
-                SupplierModel::create($supplier);
+                $exist = SupplierModel::where(['name' => $smSupplier->suppliers_name])->first();
+                if($exist) {
+                    $exist->update($supplier);
+                    $updatedNum++;
+                } else {
+                    $shipmentCategory['id'] = $smSupplier->suppliers_id;
+                    SupplierModel::create($supplier);
+                    $createdNum++;
+                }
             }
             $smSuppliers = smSupplier::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [Supplier]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
     }
 }

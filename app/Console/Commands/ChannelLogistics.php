@@ -49,32 +49,37 @@ class ChannelLogistics extends Command
     {
         $len = 100;
         $start = 0;
+        $originNum = 0;
         $id = ChannelModel::where(['name' => 'AliExpress'])->first()->id;
         $dhgates = smAliExpressLogistics::skip($start)->take($len)->get();
         while ($dhgates->count()) {
             $start += $len;
             foreach ($dhgates as $dhgate) {
+                $originNum++;
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
-                        LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $dhgate->logistics_key]]);
+                        LogisticsModel::find($logistics->shipmentID)->channelName()->sync([$id => ['name' => $dhgate->logistics_key]]);
                     }
                 }
             }
             $dhgates = smAliExpressLogistics::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smAliExpressLogistics]: Origin:'.$originNum);
+
 
         $len = 100;
         $start = 0;
         $id = ChannelModel::where(['name' => 'Cdiscount'])->first()->id;
-
+        $originNum = 0;
         $smShipments = smShipment::skip($start)->take($len)->get();
         while ($smShipments->count()) {
             $start += $len;
             foreach ($smShipments as $smShipment) {
+                $originNum++;
                 $model = LogisticsModel::find($smShipment->shipmentID);
                 if ($model) {
                     if ($smShipment->shipmentCdiscountCodeID) {
-                        $model->channelName()->attach([$id => ['name' => $smShipment->shipmentAMZCode]]);
+                        $model->channelName()->attach([$id => ['name' => $smShipment->shipmentCdiscountCodeID]]);
                     }
                 } else {
                     var_dump($smShipment->shipmentID);
@@ -82,14 +87,17 @@ class ChannelLogistics extends Command
             }
             $smShipments = smShipment::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smShipment-cdiscount]: Origin:'.$originNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
         $id = ChannelModel::where(['name' => 'Lazada'])->first()->id;
         $dhgates = smLazadaLogistics::skip($start)->take($len)->get();
         while ($dhgates->count()) {
             $start += $len;
             foreach ($dhgates as $dhgate) {
+                $originNum++;
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $dhgate->logistics_name]]);
@@ -98,14 +106,17 @@ class ChannelLogistics extends Command
             }
             $dhgates = smLazadaLogistics::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smLazadaLogistics]: Origin:'.$originNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
         $id = ChannelModel::where(['name' => 'Dhgate'])->first()->id;
         $dhgates = smDhgateLogistics::skip($start)->take($len)->get();
         while ($dhgates->count()) {
             $start += $len;
             foreach ($dhgates as $dhgate) {
+                $originNum++;
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $dhgate->logistics_name]]);
@@ -114,31 +125,36 @@ class ChannelLogistics extends Command
             }
             $dhgates = smDhgateLogistics::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smDhgateLogistics]: Origin:'.$originNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
         $id = ChannelModel::where(['name' => 'Wish'])->first()->id;
         $wishes = smWishLogistics::skip($start)->take($len)->get();
         while ($wishes->count()) {
             $start += $len;
             foreach ($wishes as $wish) {
+                $originNum++;
                 if ($wish->logisticses) {
                     foreach ($wish->logisticses as $logistics) {
                         LogisticsModel::find($logistics->shipmentID)->channelName()->attach([$id => ['name' => $wish->logistics_name]]);
                     }
                 }
             }
-            $wishes = smShipment::skip($start)->take($len)->get();
+            $wishes = smWishLogistics::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smWishLogistics]: Origin:'.$originNum);
 
         $len = 100;
         $start = 0;
         $id = ChannelModel::where(['name' => 'Amazon'])->first()->id;
-
+        $originNum = 0;
         $smShipments = smShipment::skip($start)->take($len)->get();
         while ($smShipments->count()) {
             $start += $len;
             foreach ($smShipments as $smShipment) {
+                $originNum++;
                 $model = LogisticsModel::find($smShipment->shipmentID);
                 if ($model) {
                     $model->channelName()->attach([$id => ['name' => $smShipment->shipmentAMZCode]]);
@@ -148,5 +164,6 @@ class ChannelLogistics extends Command
             }
             $smShipments = smShipment::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smShipment-amazon]: Origin:'.$originNum);
     }
 }

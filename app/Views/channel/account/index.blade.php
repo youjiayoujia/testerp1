@@ -7,12 +7,25 @@
         </button>
         <ul class="dropdown-menu">
             @foreach($channels as $channel)
-                <li><a href="{{ DataList::filtersEncode(['channel_id','=',$channel->id]) }}">{{ $channel->name }}</a>
+                <li>
+                    <a href="{{ DataList::filtersEncode(['channel_id','=',$channel->id]) }}">{{ $channel->name }}</a>
                 </li>
             @endforeach
         </ul>
-        @parent
     </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 启用
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="{{ DataList::filtersEncode(['is_available','=',1]) }}">启用</a>
+                <a href="{{ DataList::filtersEncode(['is_available','=',0]) }}">停用</a>
+            </li>
+        </ul>
+    </div>
+    @parent
 @stop
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>

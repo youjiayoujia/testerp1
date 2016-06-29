@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Base\BaseModel;
+use App\Models\ProductModel;
 
 class SpuModel extends BaseModel
 {
@@ -20,11 +21,14 @@ class SpuModel extends BaseModel
      */
     protected $fillable = ['id', 'spu'];
 
-
-
     public function values()
     {
         return $this->hasMany('App\Models\Product');
+    }
+
+    public function products()
+    {
+        return $this->hasMany('App\Models\ProductModel', 'spu_id', 'id');
     }
 
     /*public function productFeatureValue()

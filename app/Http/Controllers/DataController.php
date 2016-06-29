@@ -36,9 +36,123 @@ use App\Models\Channel\AccountModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\LogisticsModel;
 use App\Models\ChannelModel;
+use App\Models\SpuModel;
+use App\Models\ProductModel;
 
 class DataController extends Controller
 {
+    public function __construct(smProduct $model)
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '1024M');
+    }
+
+    public function index()
+    {
+        if (WarehouseModel::count() < 1) {
+            exit('先导入仓库信息,深圳仓ID=1,义乌仓ID=2');
+        }
+        if (SupplierModel::count() < 1) {
+            exit('先导入供货商信息');
+        }
+
+        $len = 1000;
+        $start = 0;
+        $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();
+        while ($smProducts->count()) {
+            $start += $len;
+            foreach ($smProducts as $smProduct) {
+                $spu = SpuModel::create(['spu' => $smProduct->products_sku]);
+                $arr = [];
+                if ($smProduct->products_with_battery) {
+                    $arr[] = 1;
+                }
+                if ($smProduct->products_with_adapter) {
+                    $arr[] = 4;
+                }
+                if ($smProduct->products_with_fluid) {
+                    $arr[] = 5;
+                }
+                if ($smProduct->products_with_powder) {
+                    $arr[] = 2;
+                }
+                $buf = [
+                    'model' => $smProduct->products_sku,
+                    'parts' => $smProduct->products_parts_info ? $smProduct->products_parts_info : '',
+                    'declared_cn' => $smProduct->products_declared_cn ? $smProduct->products_declared_cn : '',
+                    'declared_en' => $smProduct->products_declared_en ? $smProduct->products_declared_en : '',
+                    'declared_value' => $smProduct->products_declared_value ? $smProduct->products_declared_value : '',
+                    'package_limit' => count($arr) ? implode(',', $arr) : '',
+                    'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
+                    'name' => $smProduct->products_name_en ? $smProduct->products_name_en : '',
+                    'c_name' => $smProduct->products_name_cn ? $smProduct->products_name_cn : '',
+                    'supplier_id' => $smProduct->products_suppliers_id ? $smProduct->products_suppliers_id : '',
+                    'warehouse_id' => $smProduct->product_warehouse_id == 1000 ? 1 : 2,
+                    'hs_code' => $smProduct->product_hscode ? $smProduct->product_hscode : '',
+                ];
+                $tmp_product = $spu->products()->create($buf);
+
+                //体积
+                $volumes = ['product_size' => '', 'package_size' => ''];
+                if ($smProduct->products_volume) {
+                    $volumes = unserialize($smProduct->products_volume);
+                    $volumes['product_size'] = isset($volumes['bp']) ? $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'] : '';
+                    $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
+                }
+                //供货商
+                $supplier = SupplierModel::find($smProduct->products_suppliers_id);
+                $supplierId = $supplier ? $supplier->id : 0;
+                $secondSupplierId = 0;
+                if ($smProduct->products_suppliers_ids) {
+                    $supplierIds = explode(',', $smProduct->products_suppliers_ids);
+                    if (isset($supplierIds[0])) {
+                        if ($supplierIds[0] != $smProduct->products_suppliers_id) {
+                            $secondSupplier = SupplierModel::find($supplierIds[0]);
+                            $secondSupplierId = $secondSupplier ? $secondSupplier->id : 0;
+                        }
+                    }
+                }
+                //仓库
+                $warehouseId = $smProduct->product_warehouse_id == 1000 ? 1 : 2;
+                //库位
+                if ($smProduct->products_location) {
+                    $position = PositionModel::Where('name', $smProduct->products_location)->first();
+                    if (!$position) {
+                        PositionModel::create([
+                            'name' => $smProduct->products_location,
+                            'warehouse_id' => $warehouseId
+                        ]);
+                    }
+                }
+                $data = [
+                    'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
+                    'sku' => $smProduct->products_sku,
+                    'name' => $smProduct->products_title,
+                    'c_name' => $smProduct->products_name_cn,
+                    'weight' => $smProduct->products_weight,
+                    'warehouse_id' => $warehouseId,
+                    'warehouse_position' => $smProduct->products_location,
+                    'supplier_id' => $supplierId,
+                    'second_supplier_id' => $secondSupplierId,
+                    'purchase_url' => $smProduct->productsPhotoStandard,
+                    'purchase_price' => $smProduct->products_value,
+                    'purchase_carriage' => '',
+                    'cost' => $smProduct->products_value,
+                    'product_size' => $volumes['product_size'],
+                    'package_size' => $volumes['package_size'],
+                    'carriage_limit' => '',
+                    'package_limit' => '',
+                    'status' => $smProduct->products_status_2,
+                    'is_available' => $smProduct->productsIsActive,
+                    'remark' => $smProduct->products_warring_string,
+                    'id' => $smProduct->products_id,
+                ];
+                $tmp_product->item()->create($data);
+            }
+            $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();
+        }
+    }
+
     public function shipmentSupplier()
     {
         $len = 100;
@@ -48,6 +162,7 @@ class DataController extends Controller
             $start += $len;
             foreach ($smCds as $smCd) {
                 $cd = [
+                    'id' => $smCd->suppliers_id,
                     'name' => $smCd->suppliers_name,
                     'client_manager' => $smCd->suppliers_services ? $smCd->suppliers_services : '',
                     'manager_tel' => $smCd->suppliers_services_phoneorqq,
@@ -196,7 +311,7 @@ class DataController extends Controller
                     'id' => $smShipment->shipmentID,
                     'code' => $smShipment->shipmentTitle,
                     'name' => $smShipment->shipmentDescription,
-                    'warehouse_id' => $smShipment->shipment_warehouse_id,
+                    'warehouse_id' => $smShipment->shipment_warehouse_id == '1025' ? '2' : '1',
                     'logistics_catalog_id' => $smShipment->shipmentCategoryID,
                 ];
                 LogisticsModel::create($shipment);
@@ -229,12 +344,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Ebay'])->first()->id;
         $smEbays = smEbay::skip($start)->take($len)->get();
         while ($smEbays->count()) {
             $start += $len;
             foreach ($smEbays as $smEbay) {
                 $ebay = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -257,12 +373,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Cdiscount'])->first()->id;
         $smCds = smCd::skip($start)->take($len)->get();
         while ($smCds->count()) {
             $start += $len;
             foreach ($smCds as $smCd) {
                 $cd = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -285,12 +402,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Lazada'])->first()->id;
         $smLazadas = smLazada::skip($start)->take($len)->get();
         while ($smLazadas->count()) {
             $start += $len;
             foreach ($smLazadas as $smLazada) {
                 $lazada = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -313,12 +431,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'AliExpress'])->first()->id;
         $smSmts = smSmt::skip($start)->take($len)->get();
         while ($smSmts->count()) {
             $start += $len;
             foreach ($smSmts as $smSmt) {
                 $smt = [
-                    'channel_id' => '2',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -343,12 +462,13 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
+        $id = ChannelModel::where(['name' => 'Wish'])->first()->id;
         $smWishes = smWish::skip($start)->take($len)->get();
         while ($smWishes->count()) {
             $start += $len;
             foreach ($smWishes as $smWish) {
                 $wish = [
-                    'channel_id' => '4',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'account' => $smWish->account_name,
                     'sync_cycle' => '0',
@@ -371,95 +491,23 @@ class DataController extends Controller
         }
     }
 
-    public function __construct(smProduct $model)
+    public function transfer_stock()
     {
-        set_time_limit(0);
-    }
-
-    public function index()
-    {
-        if (WarehouseModel::count() < 1) {
-            exit('先导入仓库信息,深圳仓ID=1,义乌仓ID=2');
-        }
-        if (SupplierModel::count() < 1) {
-            exit('先导入供货商信息');
-        }
-        $smProducts = smProduct::limit(1000)->orderBy('products_id', 'desc')->get();
-
-        foreach ($smProducts as $smProduct) {
-            //体积
-            $volumes = ['product_size' => '', 'package_size' => ''];
-            if ($smProduct->products_volume) {
-                $volumes = unserialize($smProduct->products_volume);
-                $volumes['product_size'] = isset($volumes['bp']) ? $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'] : '';
-                $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
-            }
-            //供货商
-            $supplier = SupplierModel::find($smProduct->products_suppliers_id);
-            $supplierId = $supplier ? $supplier->id : 0;
-            $secondSupplierId = 0;
-            if ($smProduct->products_suppliers_ids) {
-                $supplierIds = explode(',', $smProduct->products_suppliers_ids);
-                if (isset($supplierIds[0])) {
-                    if ($supplierIds[0] != $smProduct->products_suppliers_id) {
-                        $secondSupplier = SupplierModel::find($supplierIds[0]);
-                        $secondSupplierId = $secondSupplier ? $secondSupplier->id : 0;
+        $len = 100;
+        $start = 0;
+        $smStocks = smStock::skip($start)->take($len)->get();
+        while ($smStocks->count()) {
+            $start += $len;
+            foreach ($smStocks as $smStock) {
+                if ($smStock->item) {
+                    $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
+                    if ($position) {
+                        $smStock->item->in($position->id, $smStock->actual_stock,
+                            $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
                     }
                 }
             }
-            //仓库
-            $warehouseId = $smProduct->product_warehouse_id == 1000 ? 1 : 2;
-            //库位
-            if ($smProduct->products_location) {
-                $position = PositionModel::Where('name', $smProduct->products_location)->first();
-                if (!$position) {
-                    PositionModel::create(['name' => $smProduct->products_location, 'warehouse_id' => $warehouseId]);
-                }
-            }
-            $data = [
-                'catalog_id' => 0,
-                'product_id' => 0,
-                'sku' => $smProduct->products_sku,
-                'name' => $smProduct->products_title,
-                'c_name' => $smProduct->products_name_cn,
-                'weight' => $smProduct->products_weight,
-                'warehouse_id' => $warehouseId,
-                'warehouse_position' => $smProduct->products_location,
-                'supplier_id' => $supplierId,
-                'second_supplier_id' => $secondSupplierId,
-                'purchase_url' => $smProduct->productsPhotoStandard,
-                'purchase_price' => $smProduct->products_value,
-                'purchase_carriage' => '',
-                'cost' => $smProduct->products_value,
-                'product_size' => $volumes['product_size'],
-                'package_size' => $volumes['package_size'],
-                'carriage_limit' => '',
-                'package_limit' => '',
-                'status' => $smProduct->products_status_2,
-                'is_available' => $smProduct->productsIsActive,
-                'remark' => $smProduct->products_warring_string,
-                'id' => $smProduct->products_id,
-            ];
-            $existItem = ItemModel::Where('sku', $smProduct->products_sku)->first();
-            if ($existItem) {
-                $existItem->update($data);
-            } else {
-                ItemModel::create($data);
-            }
-        }
-    }
-
-    public function transfer_stock()
-    {
-        $smStocks = smStock::Where('products_id', '<', '65726')->limit(1000)->orderBy('products_id', 'desc')->get();
-        foreach ($smStocks as $smStock) {
-            if ($smStock->item) {
-                $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
-                if ($position) {
-                    $smStock->item->in($position->id, $smStock->actual_stock,
-                        $smStock->item->cost * $smStock->actual_stock, 'MAKE_ACCOUNT');
-                }
-            }
+            $smStocks = smStock::skip($start)->take($len)->get();
         }
     }
 
@@ -498,12 +546,14 @@ class DataController extends Controller
     {
         $len = 100;
         $start = 0;
-        $smAmazons = smAmazon::skip($start)->take($len)->get();
+        $id = ChannelModel::where(['name' => 'Amazon'])->first()->id;
+        $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         while ($smAmazons->count()) {
             $start += $len;
             foreach ($smAmazons as $smAmazon) {
+                $url = parse_url($smAmazon->place_site);
                 $amazon = [
-                    'channel_id' => '3',
+                    'channel_id' => $id,
                     'country_id' => '0',
                     'account' => $smAmazon->seller_account,
                     'alias' => $smAmazon->seller_account,
@@ -511,7 +561,7 @@ class DataController extends Controller
                     'sync_cycle' => '0',
                     'sync_days' => 30,
                     'sync_pages' => 100,
-                    'amazon_api_url' => $smAmazon->place_site,
+                    'amazon_api_url' => ($url['scheme']."://".$url['host']),
                     'amazon_marketplace_id' => $smAmazon->place_id,
                     'amazon_seller_id' => $smAmazon->merchant_id,
                     'amazon_accesskey_id' => $smAmazon->access_key,
@@ -520,7 +570,7 @@ class DataController extends Controller
                 ];
                 AccountModel::create($amazon);
             }
-            $smAmazons = smAmazon::skip($start)->take($len)->get();
+            $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         }
     }
 }

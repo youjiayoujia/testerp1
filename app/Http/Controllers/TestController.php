@@ -41,7 +41,9 @@ class TestController extends Controller
 
     public function test1()
     {
-       
+       $url = 'http://baidu.com/index.php?a=1&b=3';
+       $arr = pathinfo($url);
+       var_dump($arr);exit;
         echo Tool::barcodePrint('67');
     }
 

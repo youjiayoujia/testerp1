@@ -15,6 +15,7 @@ class CreateRequires extends Migration
         Schema::create('requires', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('order_id')->comment('订单ID');
+            $table->integer('purchase_item_id')->comment('采购itemID');
             $table->integer('warehouse_id')->comment('仓库ID');
             $table->integer('item_id')->comment('ITEM ID');
             $table->integer('order_item_id')->comment('订单产品ID');

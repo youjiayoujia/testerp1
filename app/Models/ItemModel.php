@@ -98,7 +98,7 @@ class ItemModel extends BaseModel
 
     public function getImageAttribute()
     {
-        if ($this->product and $this->product->image) {
+        if ($this->product->image) {
             return $this->product->image->path . $this->product->image->name;
         }
         return '/default.jpg';
@@ -364,9 +364,18 @@ class ItemModel extends BaseModel
 
     public function createPurchaseNeedData()
     {
-        PurchaseCrontabsModel::truncate();
         $items = $this->all();
         $requireModel = new RequireModel();
+        $array = RequireModel::groupBy('item_id')
+            ->selectRaw('item_id, sum(quantity) as sum')
+            ->where('is_require', 1)
+            ->get()
+            ->toArray();
+
+        foreach ($array as $require_key => $require_val) {
+            $requireArray[$require_val['item_id']] = $require_val['sum'];
+        }
+
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
             $data['sku'] = $item->sku;
@@ -475,7 +484,17 @@ class ItemModel extends BaseModel
             $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
 
             $data['status'] = $item->status;
-            PurchaseCrontabsModel::create($data);
+            $data['require_create'] = 0;
+            $thisModel = PurchaseCrontabsModel::where("item_id", $data['item_id'])->get()->first();
+
+            if (array_key_exists($data['item_id'], $requireArray)) {
+                $data['require_create'] = 1;
+            }
+            if ($thisModel) {
+                $thisModel->update($data);
+            } else {
+                PurchaseCrontabsModel::create($data);
+            }
         }
     }
 }

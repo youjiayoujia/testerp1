@@ -71,6 +71,7 @@ class BlacklistController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
             'channels' => ChannelModel::all(),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -268,7 +269,7 @@ class BlacklistController extends Controller
             [
                 'channel_id' => '1',
                 'ordernum' => '17905581340',
-                'name' => 'ThaiDiane',
+                'name' => 'Thai Diane',
                 'email' => 'hannawysz@gmail.com',
                 'zipcode' => '210000',
                 'type' => 'SUSPECTED',

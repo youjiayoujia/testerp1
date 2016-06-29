@@ -108,7 +108,6 @@
     <thead>
         <tr>
             <td>采购条目ID</td> 
-            <td></td> 
             <td>model</td>
             <td>SKU*采购数量</td> 
             <td>供货商sku</td> 
@@ -123,98 +122,95 @@
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)
-         @if($purchaseItem->storageStatus == 0)
-        <tr> 
-            <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
-            <td>
-               
-            </td>
-            <td>{{$purchaseItem->item->product->model}}</td>
-            <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
-            <td>{{$purchaseItem->item->supplier_sku}}</td>   
-            <td>
-            @if($purchaseItem->item->product->default_image>0) 
-            <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
-             @else
-             暂无图片
-             @endif
-            </td>
-            
-            <td>
-            @if($purchaseItem->status ==0)
-           	<select name="arr[{{$k}}][status]" >
-             @foreach(config('purchase.purchaseItem.status') as $key=>$v)
-             	@if($key < 2)
-            	<option value="{{$key}}"  @if(1 == $key) selected = "selected" @endif>{{$v}}</option>
-                @endif
-             @endforeach
-            </select> 
-            @else
-            @foreach(config('purchase.purchaseItem.status') as $key=>$v)
-            	@if($purchaseItem->status == $key) {{$v}} @endif
-             @endforeach
-             <input type="hidden" name="arr[{{$k}}][status]" value="{{$purchaseItem->status}}"/>
-            @endif 
-             </td>
-            <td>
-            物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
-            </td>
-            <td>
-                @if($model->close_status ==0)
-                    <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+            @if($purchaseItem->status == 1)
+            <tr> 
+                <td>{{$purchaseItem->id}}<input type="hidden" name="arr[{{$k}}][id]" value="{{$purchaseItem->id }}"/></td>
+                <td>{{$purchaseItem->item->product->model}}</td>
+                <td>{{$purchaseItem->sku}}*<input type="text" value="{{$purchaseItem->purchase_num}}"  name="arr[{{$k}}][purchase_num]" style="width:50px"/></td>
+                <td>{{$purchaseItem->item->supplier_sku}}</td>   
+                <td>
+                @if($purchaseItem->item->product->default_image>0) 
+                <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
+                 @else
+                 暂无图片
+                 @endif
+                </td>
+
+                <td>
+                @if($purchaseItem->status ==0)
+                	<select name="arr[{{$k}}][status]" >
+                 @foreach(config('purchase.purchaseItem.status') as $key=>$v)
+                 	@if($key < 2)
+                	<option value="{{$key}}"  @if(1 == $key) selected = "selected" @endif>{{$v}}</option>
+                    @endif
+                 @endforeach
+                </select> 
                 @else
-                    {{$purchaseItem->purchase_cost}}
-                    <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
-                @endif
- 			</td>
-            <td>
-            @if($purchaseItem->costExamineStatus ==2)
-            	价格审核通过
-            @elseif($purchaseItem->costExamineStatus ==1)
-            	价格审核不通过
-            @else
-             @if($purchaseItem->purchase_cost>0)
-            	<a href="/purchaseItem/costExamineStatus/{{$purchaseItem->id}}/1" class="btn btn-info btn-xs"> 审核不通过
-                </a> 
-                
-              @endif
-            @endif
-            </td>    
-           
-             <td>
-            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
-            </td>  
-			<td>
-            @if($purchaseItem->active ==1 )
-                @if($purchaseItem->active_status ==1 )
-                报缺
-                @elseif($purchaseItem->active_status ==2 )
-                核实报缺
+                @foreach(config('purchase.purchaseItem.status') as $key=>$v)
+                	@if($purchaseItem->status == $key) {{$v}} @endif
+                 @endforeach
+                 <input type="hidden" name="arr[{{$k}}][status]" value="{{$purchaseItem->status}}"/>
+                @endif 
+                 </td>
+                <td>
+                物流单号：<input type="text" value="{{$purchaseItem->post_coding}}" class="itemPostCoding" name="arr[{{$k}}][post_coding]"/>
+                </td>
+                <td>
+                    @if($model->close_status ==0)
+                        <input type="text" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+                    @else
+                        {{$purchaseItem->purchase_cost}}
+                        <input type="hidden" value="{{$purchaseItem->purchase_cost}}"  name="arr[{{$k}}][purchase_cost]" style="width:50px"/>
+                    @endif
+                	</td>
+                <td>
+                @if($purchaseItem->costExamineStatus ==2)
+                	价格审核通过
+                @elseif($purchaseItem->costExamineStatus ==1)
+                	价格审核不通过
                 @else
-                正常
+                 @if($purchaseItem->purchase_cost>0)
+                	<a href="/purchaseItem/costExamineStatus/{{$purchaseItem->id}}/1" class="btn btn-info btn-xs"> 审核不通过
+                    </a> 
+                    
+                  @endif
                 @endif
-            <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
-            @elseif($purchaseItem->active == 2)
-             报等
-             @if($purchaseItem->wait_time)
-             {{$purchaseItem->wait_time}}
-             备注：{{$purchaseItem->wait_remark}}
-            @else
-            <a href="/purchaseOrder/updateWaitTime/{{$purchaseItem->id}}">添加报等时间</a>
+                </td>    
+
+                 <td>
+                	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
+                </td>  
+                <td>
+                @if($purchaseItem->active ==1 )
+                    @if($purchaseItem->active_status ==1 )
+                    报缺
+                    @elseif($purchaseItem->active_status ==2 )
+                    核实报缺
+                    @else
+                    正常
+                    @endif
+                <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
+                @elseif($purchaseItem->active == 2)
+                 报等
+                 @if($purchaseItem->wait_time)
+                 {{$purchaseItem->wait_time}}
+                 备注：{{$purchaseItem->wait_remark}}
+                @else
+                <a href="/purchaseOrder/updateWaitTime/{{$purchaseItem->id}}">添加报等时间</a>
+                @endif
+                <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
+                @else
+                <select name="arr[{{$k}}][active]}">
+                 @foreach(config('purchase.purchaseItem.active') as $key=>$v)
+                 	@if($key < 3)
+                	<option value="{{$key}}" >{{$v}}</option>
+                	@endif
+                 @endforeach
+                </select>
+                 @endif
+                </td>
+            </tr>
             @endif
-            <input type="hidden" name="arr[{{$k}}][active]}" value="{{$purchaseItem->active}}"/>
-            @else
-            <select name="arr[{{$k}}][active]}">
-             @foreach(config('purchase.purchaseItem.active') as $key=>$v)
-             	@if($key < 3)
-            	<option value="{{$key}}" >{{$v}}</option>
-            	@endif
-             @endforeach
-            </select>
-             @endif
-            </td>
-        </tr>
-        @endif
         @endforeach
     </tbody>
     </table>
@@ -240,10 +236,10 @@
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)
-         @if($purchaseItem->storageStatus > 0)
+        @if($purchaseItem->status == 2||$purchaseItem->status == 3||$purchaseItem->status == 4)
         <tr> 
             <td>{{$purchaseItem->id}}</td>
-           
+            <td>{{config('product.product_supplier.type')[$purchaseItem->supplier->type]}}</td>
             <td>{{$purchaseItem->sku}}</td>
             <td>
             @if($purchaseItem->item->product->default_image>0) 
@@ -253,13 +249,8 @@
              @endif
             </td>
             <td>
-           
-             @foreach(config('purchase.purchaseItem.storageStatus') as $key=>$v)
-             	@if($key < 2)
-            	 @if($purchaseItem->storageStatus == $key) {{$v}} @endif
-                @endif
-             @endforeach 
-             </td>
+            {{config('purchase.purchaseItem.status')[$purchaseItem->status]}}
+            </td>
             <td>{{$purchaseItem->storage_qty}}</td>
             <td>
             物流单号：{{$purchaseItem->post_coding}}
@@ -277,7 +268,7 @@
             </td>    
             
              <td>
-            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
+            	<a href="http://{{$purchaseItem->productItem?$purchaseItem->productItem->purchase_url:''}}" text-decoration: none;>{{$purchaseItem->productItem?$purchaseItem->productItem->purchase_url:''}}</a>
             </td>  
 			
         </tr>

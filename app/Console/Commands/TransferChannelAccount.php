@@ -73,7 +73,7 @@ class TransferChannelAccount extends Command
                     'amazon_accesskey_secret' => $smAmazon->secret_key,
                     'is_available' => $smAmazon->status,
                 ];
-                $exist = AccountModel::where(['account' => $smAmazon->seller_account])->first();
+                $exist = AccountModel::where(['amazon_accesskey_id' => $smAmazon->access_key])->first();
                 if($exist) {
                     $exist->update($amazon);
                     $updatedNum++;
@@ -116,7 +116,7 @@ class TransferChannelAccount extends Command
                     'is_available' => $smWish->status,
                 ];
 
-                $exist = AccountModel::where(['account' => $smWish->account_name])->first();
+                $exist = AccountModel::where(['wish_client_id' => $smWish->client_id])->first();
                 if($exist) {
                     $exist->update($wish);
                     $updatedNum++;

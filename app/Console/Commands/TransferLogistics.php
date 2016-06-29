@@ -57,12 +57,11 @@ class TransferLogistics extends Command
                     'id' => $smShipmentCategory->shipmentCatID,
                     'name' => $smShipmentCategory->shipmentCatName
                 ];
-                $exist = CatalogModel::where(['name' => $smShipmentCategory->shipmentCatName])->first();
+                $exist = CatalogModel::where(['id' => $smShipmentCategory->shipmentCatID])->first();
                 if($exist) {
                     $exist->update($shipmentCategory);
                     $updatedNum++;
                 } else {
-                    $shipmentCategory['id'] = $smShipmentCategory->shipmentCatID;
                     CatalogModel::create($shipmentCategory);
                     $createdNum++;
                 } 
@@ -83,18 +82,18 @@ class TransferLogistics extends Command
             foreach ($smShipments as $smShipment) {
                 $originNum++;
                 $shipment = [
+                    'id' => $smShipment->shipmentID,
                     'code' => $smShipment->shipmentTitle,
                     'name' => $smShipment->shipmentDescription,
                     'warehouse_id' => $smShipment->shipment_warehouse_id == '1025' ? '2' : '1',
                     'logistics_catalog_id' => $smShipment->shipmentCategoryID,
                     'is_enable' => '1',
                 ];
-                $exist = LogisticsModel::where(['code' => $smShipment->shipmentTitle])->first();
+                $exist = LogisticsModel::where(['id' => $smShipment->shipmentID])->first();
                 if($exist) {
                     $exist->update($shipment);
                     $updatedNum++;
                 } else {
-                    $shipment['id'] = $smShipment->shipmentID;
                     LogisticsModel::create($shipment);
                     $createdNum++;
                 } 
@@ -116,6 +115,7 @@ class TransferLogistics extends Command
             foreach ($smCds as $smCd) {
                 $originNum++;
                 $cd = [
+                    'id' => $smCd->suppliers_id,
                     'name' => $smCd->suppliers_name,
                     'client_manager' => $smCd->suppliers_services ? $smCd->suppliers_services : '',
                     'manager_tel' => $smCd->suppliers_services_phoneorqq,
@@ -125,12 +125,11 @@ class TransferLogistics extends Command
                     'bank' => $smCd->suppliers_bank,
                     'card_number' => $smCd->suppliers_card_number,
                 ];
-                $exist = originSupplier::where(['name' => $smCd->suppliers_name])->first();
+                $exist = originSupplier::where(['id' => $smCd->suppliers_id])->first();
                 if($exist) {
                     $exist->update($cd);
                     $updatedNum++;
                 } else {
-                    $cd['id'] = $smCd->suppliers_id;
                     originSupplier::create($cd);
                     $createdNum++;
                 } 

@@ -8,8 +8,8 @@
 
 return [
     'id' => 'ID',
-    'short_code' => '物流方式简码',
-    'logistics_type' => '物流方式名称',
+    'code' => '物流方式简码',
+    'name' => '物流方式名称',
     'shipping' => '种类',
     'warehouse_id' => '仓库',
     'logistics_id' => '物流商',

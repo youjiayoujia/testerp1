@@ -34,7 +34,7 @@
         </div>
         <div class='form-group col-lg-3'>
             <label>物流:</label>
-            <input type='text' class='form-control' value={{ $model->logistic ? $model->logistic->logistics_type : '混合物流' }}>
+            <input type='text' class='form-control' value={{ $model->logistic ? $model->logistic->name : '混合物流' }}>
         </div>
         <div class='form-group col-lg-3'>
             <label>建单时间:</label>

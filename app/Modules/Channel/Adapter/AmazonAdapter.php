@@ -240,12 +240,17 @@ Class AmazonAdapter implements AdapterInterface
     public function getMessages()
     {
         // TODO: Implement getMessages() method.
+        $returnArys =[];
         foreach (AccountModel::all() as $account) {
             $client = $this->getClient($account);
             $service = new Google_Service_Gmail($client);
             $user = 'me';
             $i = 0;
             $nextPageToken = null;
+
+            $returnAry = [];
+
+
             do {
                 $i += 1;
                 $messages = $service->users_messages->listUsersMessages($user,
@@ -255,66 +260,111 @@ Class AmazonAdapter implements AdapterInterface
                     ]
                 );
                 $nextPageToken = $messages->nextPageToken;
-                //save list
-                $messageList = new ListModel;
-                $messageList->account_id = $account->id;
-                $messageList->next_page_token = $messages->nextPageToken;
-                $messageList->result_size_estimate = $messages->resultSizeEstimate;
-                $messageList->count = count($messages);
-                $messageList->save();
+                foreach ($messages as $key => $message) {
 
-                foreach ($messages as $message) {
-                    $messageNew = MessageModel::firstOrNew(['message_id' => $message->id]);
-                    if ($messageNew->id == null) {
-                        $messageContent = $service->users_messages->get($user, $message->id);
-                        $messagePayload = $messageContent->getPayload();
-                        $messageHeader = $this->parseMessageHeader($messagePayload->getHeaders());
+                    //1 获取邮件信息
+                    $messageContent = $service->users_messages->get($user, $message->id);
+                    $messagePayload = $messageContent->getPayload();
+                    $messageHeader = $this->parseMessageHeader($messagePayload->getHeaders());
+                    $messageLabels = $messageContent->getLabelIds();
 
-                        $messageLabels = $messageContent->getLabelIds();
-                        $messageNew->account_id = $account->id;
-                        $messageNew->list_id = $messageList->id;
-                        $messageNew->message_id = $messageContent->getId();
-                        $messageNew->labels = serialize($messageLabels);
-                        $messageNew->label = $messageLabels[0];
-                        if (isset($messageHeader['From'])) {
-                            $messageFrom = explode(' <', $messageHeader['From']);
-                            if (count($messageFrom) > 1) {
-                                $messageNew->from = $this->clearEmail(str_replace('>', '', $messageFrom[1]));
-                                $messageNew->from_name = str_replace('"', '', $messageFrom[0]);
-                            } else {
-                                $messageNew->from = $this->clearEmail($messageHeader['From']);
-                            }
-                        }
-                        if (isset($messageHeader['To'])) {
-                            $messageTo = explode(' <', $messageHeader['To']);
-                            if (count($messageTo) > 1) {
-                                $messageNew->to = $this->clearEmail(str_replace('>', '', $messageTo[1]));
-                            } else {
-                                $messageNew->to = $this->clearEmail($messageHeader['To']);
-                            }
-                        }
-                        $messageNew->date = isset($messageHeader['Date']) ? $messageHeader['Date'] : '';
-                        $messageNew->subject = isset($messageHeader['Subject']) ? $messageHeader['Subject'] : '';
-                        /*
-                        //判断subject 是否有值
-                        if($messageHeader['Subject']){
-                            //截取两个规定字符之间的字符串
-                            preg_match_all("|Message from(.*)via|U", $messageHeader['Subject'], $out,PREG_PATTERN_ORDER);
-                        }
-                        $messageNew->title_email = isset($out[0][0]) ?  $out[0][0] : '';
-                        */
+                    $returnAry[$key]['account_id'] = $account->id;
+                    $returnAry[$key]['message_id'] = $messageContent->getId();
+                    $returnAry[$key]['labels'] = serialize($messageLabels);
+                    $returnAry[$key]['label'] = $messageLabels[0];
 
-                        $messageNew->save();
-                        $this->saveMessagePayload($service, $message->id, $messageNew->id, $messagePayload);
-                        $messageNew->content = $messageNew->message_content;
-                        $messageNew->save();
-                        echo ('Message #' . $messageNew->message_id . ' Received.');
+                    if (isset($messageHeader['From'])) {
+                        $messageFrom = explode(' <', $messageHeader['From']);
+                        if (count($messageFrom) > 1) {
+                            $returnAry[$key]['from'] = $this->clearEmail(str_replace('>', '', $messageFrom[1]));
+                            $returnAry[$key]['from_name'] = str_replace('"', '', $messageFrom[0]);
+                        } else {
+                            $returnAry[$key]['from'] = $this->clearEmail($messageHeader['From']);
+                        }
                     }
+                    if (isset($messageHeader['To'])) {
+                        $messageTo = explode(' <', $messageHeader['To']);
+                        if (count($messageTo) > 1) {
+                            $returnAry[$key]['to'] = $this->clearEmail(str_replace('>', '', $messageTo[1]));
+                        } else {
+                            $returnAry[$key]['to'] = $this->clearEmail($messageHeader['To']);
+                        }
+                    }
+                    $returnAry[$key]['date'] = isset($messageHeader['Date']) ? $messageHeader['Date'] : '';
+                    $returnAry[$key]['subject'] = isset($messageHeader['Subject']) ? $messageHeader['Subject'] : '';
+                    /**
+                     * 处理part
+                     */
+                    $mimeType = $messagePayload->getMimeType();
+                    //$returnAry[$key]['attanchments']['filename'] = $messagePayload->getFilename();
+                    $body = $messagePayload->getBody()->getData();
+                    //$returnAry[$key]['attanchments']['attachment_id'] = $messagePayload->getBody()->getAttachmentId();
+                    if ($messagePayload->getFilename()) {
+                        $attachment = $service->users_messages_attachments->get('me', $message->id, $messagePayload->getBody()->getAttachmentId());
+                        @file_put_contents(config('message.attachmentPath') . $message->id . '_' . $messagePayload->getFilename(),
+                            Tool::base64Decode($attachment->data));
+                    }
+                    /**
+                     * 获取content
+                     *
+                     */
+                    $tempPartData[] = array(
+                        'mine_type' => $messagePayload->getMimeType(),
+                        'body' => $body,
+                    );
+
+                    if ($mimeType == 'text/html') {
+                        $htmlBody = Tool::base64Decode($body);
+                        $htmlBody=preg_replace("/<(\/?body.*?)>/si","",$htmlBody);
+                    }
+                    if ($mimeType == 'text/plain') {
+                        $htmlBody .= nl2br(Tool::base64Decode($body));
+                    }
+
+                    //判断是否有附件
+                    $partBodyAry = [];
+                    $mimeType = explode('/', $mimeType);
+                    if ($mimeType[0] == 'multipart') {
+                        foreach($messagePayload->getParts() as $partKey => $partLoad){
+                            $tempPartData[] = array(
+                                'mine_type' => $partLoad->getMimeType(),
+                                'body' =>  $partLoad->getBody()->getData(),
+                            );
+
+                            $returnAry[$key]['attanchments'][$partKey]['file_name'] = $partLoad->getFilename();
+                            $returnAry[$key]['attanchments'][$partKey]['file_path'] = '';
+
+                        }
+                    }
+
+                    $plainBody = '';
+
+                    foreach ($tempPartData as $item){
+                        if($item['mine_type'] == 'text/html'){
+                            $htmlBody = Tool::base64Decode($item['body']);
+                            $htmlBody=preg_replace("/<(\/?body.*?)>/si","",$htmlBody);
+                        }
+                        if ($item['mine_type'] == 'text/plain') {
+                            $plainBody .= nl2br(Tool::base64Decode($item['body']));
+                        }
+                    }
+
+                    $returnAry[$key]['content']  = isset($htmlBody) && $htmlBody != '' ? $htmlBody : $plainBody;
+
+                    if(!empty($returnAry)){
+                        $returnArys[] = $returnAry;
+                    }
+                    var_dump($returnAry);exit;
+                        echo 'Message #' . $message->id . ' Received.';
                 }
+
             } while ($nextPageToken != '');
+
+
         }
-        
+        return $returnArys;
     }
+
     public function getClient($account)
     {
         $client = new Google_Client();

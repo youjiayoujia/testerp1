@@ -103,6 +103,10 @@ interface AdapterInterface
      *          Same As above ...
      *      ],
      * ]
+     *
+     *
+     * 无数据返回：false;
+     *
      */
     public function getMessages();
 

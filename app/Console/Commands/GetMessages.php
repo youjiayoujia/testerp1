@@ -50,6 +50,7 @@ class GetMessages extends Command
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             //获取Message列表
             $messageList = $channel->getMessages();
+            var_dump($messageList);exit;
             foreach ($messageList as $message) {
                 $message['channel_account_id'] = $account->id;
                 $message['assign_id'] = 0;

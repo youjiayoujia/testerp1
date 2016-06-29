@@ -25,6 +25,8 @@ use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
 use App\Models\WarehouseModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Channel\ChannelsModel;
+use App\Models\Message\ReplyModel;
 
 class TestController extends Controller
 {
@@ -43,6 +45,20 @@ class TestController extends Controller
 
     public function index()
     {
+
+        $accounts = AccountModel::all();
+        foreach ($accounts as $account){
+            if($account->channel->driver == 'amazon'){
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $messageList = $channel->getMessages();
+var_dump($messageList);exit;
+            }
+
+        }
+
+exit;
+        
         $orderModel = new OrderModel;
         $start = microtime(true);
         $account = AccountModel::find(1);

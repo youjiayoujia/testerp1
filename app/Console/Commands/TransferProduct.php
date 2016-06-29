@@ -65,7 +65,6 @@ class TransferProduct extends Command
             foreach ($smProducts as $smProduct) {
                 $originNum++;
                 $spu = SpuModel::where(['spu' => $smProduct->products_sku])->first();
-
                 if($spu) {
                     $updatedNum[0]++;
                     $spu->update(['spu' => $smProduct->products_sku]);
@@ -144,6 +143,7 @@ class TransferProduct extends Command
                     }
                 }
                 $data = [
+                    'id' => $smProduct->products_id,
                     'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
                     'sku' => $smProduct->products_sku,
                     'name' => $smProduct->products_title,
@@ -172,7 +172,6 @@ class TransferProduct extends Command
                     $exist->update($data);
                 } else {
                     $createdNum[2]++;
-                    $data['id'] = $smProduct->products_id;
                     ItemModel::create($data);
                 }
                 unset($data);

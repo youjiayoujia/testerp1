@@ -50,6 +50,7 @@ class TransferSupplier extends Command
             foreach ($smSuppliers as $smSupplier) {
                 $originNum++;
                 $supplier = [
+                    'id' => $smSupplier->suppliers_id,
                     'name' => $smSupplier->suppliers_name,
                     'contact_name' => $smSupplier->suppliers_name,
                     'address' => $smSupplier->suppliers_address,
@@ -65,12 +66,11 @@ class TransferSupplier extends Command
                     'created_at' => $smSupplier->create_time,
                     'updated_at' => $smSupplier->modify_time,
                 ];
-                $exist = SupplierModel::where(['name' => $smSupplier->suppliers_name])->first();
+                $exist = SupplierModel::where(['id' => $smSupplier->suppliers_id])->first();
                 if($exist) {
                     $exist->update($supplier);
                     $updatedNum++;
                 } else {
-                    $supplier['id'] = $smSupplier->suppliers_id;
                     SupplierModel::create($supplier);
                     $createdNum++;
                 }

@@ -21,8 +21,8 @@
             <td>{{ $logistics->id }}</td>
             <td>{{ $logistics->code }}</td>
             <td>{{ $logistics->name }}</td>
-            <td>{{ $logistics->warehouse->name }}</td>
-            <td>{{ $logistics->supplier->name }}</td>
+            <td>{{ $logistics->warehouse ? $logistics->warehouse->name : '' }}</td>
+            <td>{{ $logistics->supplier ? $logistics->supplier->name : '' }}</td>
             <td>{{ $logistics->type }}</td>
             <td>{{ $logistics->url }}</td>
             <td>{{ $logistics->docking_name }}</td>

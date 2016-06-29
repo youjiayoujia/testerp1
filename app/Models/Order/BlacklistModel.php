@@ -55,6 +55,30 @@ class BlacklistModel extends BaseModel
         ],
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [
+                'channel' => ['name']
+            ],
+            'filterFields' => [
+                'ordernum',
+                'name',
+                'email',
+                'zipcode'
+            ],
+            'filterSelects' => [
+                'type' => config('order.blacklist_type')
+            ],
+            'sectionSelect' => [
+                'time' => ['created_at']
+            ],
+            'selectRelatedSearchs' => [
+
+            ]
+        ];
+    }
+
     public function getTypeNameAttribute()
     {
         $arr = config('order.blacklist_type');

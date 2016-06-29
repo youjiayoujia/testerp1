@@ -289,7 +289,7 @@ class TransferChannelAccount extends Command
             }
             $smEbays = smEbay::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smEbay]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
     }
-    $this->info('Transfer [smEbay]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
-
+    
 }

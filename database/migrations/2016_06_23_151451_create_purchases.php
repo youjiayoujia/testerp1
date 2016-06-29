@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePurchaseCrontabs extends Migration
+class CreatePurchases extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreatePurchaseCrontabs extends Migration
      */
     public function up()
     {
-        Schema::create('purchase_crontabs', function (Blueprint $table) {
+        Schema::create('purchases', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('item_id')->comment('item_id')->default(0);
             $table->string('sku')->comment('sku')->default(NULL);
@@ -28,7 +28,6 @@ class CreatePurchaseCrontabs extends Migration
             $table->decimal('refund_rate',7,2)->comment('退款率')->default(0);
             $table->decimal('profit',7,2)->comment('利润率')->default(0);
             $table->string('status')->comment('状态')->default(NULL);
-            $table->string('require_create')->comment('状态')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -41,6 +40,6 @@ class CreatePurchaseCrontabs extends Migration
      */
     public function down()
     {
-        Schema::drop('purchase_crontabs');
+        Schema::drop('purchases');
     }
 }

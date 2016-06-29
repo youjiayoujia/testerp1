@@ -4,14 +4,14 @@ namespace App\Models\Purchase;
 
 use App\Base\BaseModel;
 
-class PurchaseCrontabsModel extends BaseModel
+class PurchasesModel extends BaseModel
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'purchase_crontabs';
+    protected $table = 'purchases';
 
     /**
      * The attributes that are mass assignable.
@@ -20,8 +20,5 @@ class PurchaseCrontabsModel extends BaseModel
      */
     protected $guarded  = [];
 
-    public function item()
-    {
-        return $this->belongsTo('App\Models\ItemModel', 'item_id');
-    }
+
 }

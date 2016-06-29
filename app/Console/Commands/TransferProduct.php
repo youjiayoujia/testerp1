@@ -52,6 +52,9 @@ class TransferProduct extends Command
         }
         $len = 1000;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $smProducts = smProduct::skip($start)->take($len)->get();
         while ($smProducts->count()) {
             $start += $len;

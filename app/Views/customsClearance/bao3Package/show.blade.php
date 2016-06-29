@@ -7,7 +7,7 @@
             <strong>order ID</strong>: {{ $model->id }}
         </div>
         <div class="col-lg-2">
-            <strong>shipping</strong>: {{ $model->logistics ? $model->logistics->logistics_type : '' }}
+            <strong>shipping</strong>: {{ $model->logistics ? $model->logistics->name : '' }}
         </div>
         <div class="col-lg-2">
             <strong>tracking_no</strong>: {{ $model->tracking_no }}

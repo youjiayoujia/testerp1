@@ -41,10 +41,12 @@ class TransferStock extends Command
     {
         $len = 100;
         $start = 0;
+        $originNum = 0;
         $smStocks = smStock::skip($start)->take($len)->get();
         while ($smStocks->count()) {
             $start += $len;
             foreach ($smStocks as $smStock) {
+                $originNum++;
                 if ($smStock->item) {
                     $position = PositionModel::Where('name', $smStock->item->warehouse_position)->first();
                     if ($position) {
@@ -55,5 +57,6 @@ class TransferStock extends Command
             }
             $smStocks = smStock::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [Supplier]: Origin:'.$originNum.' => Created:'.$originNum.' Updated:0');
     }
 }

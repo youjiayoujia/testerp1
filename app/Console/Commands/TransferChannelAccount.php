@@ -57,7 +57,7 @@ class TransferChannelAccount extends Command
                     'channel_id' => $id,
                     'country_id' => '0',
                     'account' => $smAmazon->seller_account,
-                    'alias' => $smAmazon->seller_account,
+                    'alias' => $smAmazon->place_name,
                     'order_prefix' => $smAmazon->seller_account,
                     'sync_cycle' => '0',
                     'sync_days' => 30,
@@ -126,6 +126,7 @@ class TransferChannelAccount extends Command
                     'aliexpress_access_token_date' => $smSmt->access_token_date,
                     'operator_id' => $smSmt->customerservice_id,
                     'customer_service_id' => $smSmt->customerservice_id,
+                    'is_available' => '1'
                 ];
                 AccountModel::create($smt);
             }
@@ -151,6 +152,7 @@ class TransferChannelAccount extends Command
                     'lazada_currency_type' => $smLazada->currency_type,
                     'lazada_currency_type_cn' => $smLazada->currency_type_cn,
                     'lazada_api_host' => $smLazada->api_host,
+                    'is_available' => '1',
                 ];
 
                 AccountModel::create($lazada);
@@ -177,7 +179,8 @@ class TransferChannelAccount extends Command
                     'cd_token_id' => $smCd->token_id,
                     'cd_pw' => $smCd->pw,
                     'cd_sales_account' => $smCd->sales_account,
-                    'cd_expires_in' => $smCd->expires_in
+                    'cd_expires_in' => $smCd->expires_in,
+                    'is_available' => '1',
                 ];
                 AccountModel::create($cd);
             }
@@ -204,6 +207,7 @@ class TransferChannelAccount extends Command
                     'ebay_token' => $smEbay->user_token,
                     'ebay_eub_developer' => $smEbay->eub_developer_id ? $smEbay->eub_developer_id : '',
                     'customer_service_id' => $smEbay->sf_order,
+                    'is_available' => '1',
                 ];
                 AccountModel::create($ebay);
             }

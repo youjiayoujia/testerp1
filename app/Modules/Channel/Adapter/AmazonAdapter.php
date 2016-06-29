@@ -159,8 +159,15 @@ Class AmazonAdapter implements AdapterInterface
      */
     public function parseOrderItem($orderItem)
     {
+        preg_match('/001\*FBA(.+?)\[/i', (string)$orderItem->SellerSKU, $result);
+        if ($result) {
+            $sku = $result[1];
+        } else {
+            preg_match('/001\*(.+?)\[/i', (string)$orderItem->SellerSKU, $result);
+            $sku = $result ? $result[1] : '';
+        }
         $result = [
-            'sku' => '',
+            'sku' => $sku,
             'channel_sku' => (string)$orderItem->SellerSKU,
             'quantity' => (int)$orderItem->QuantityOrdered,
             'price' => (float)$orderItem->ItemPrice->Amount,

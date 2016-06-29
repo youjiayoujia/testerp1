@@ -73,7 +73,7 @@
                             <div class="col-lg-3 text-primary">{{ $orderItem->sku .' [ '. $orderItem->channel_sku .' ]' }}</div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">
-                                    <strong>{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong>
+                                    <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
                                 <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
                             @else

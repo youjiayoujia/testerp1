@@ -114,6 +114,12 @@ class ItemModel extends BaseModel
         return $this->stocks->sum('available_quantity');
     }
 
+    public function getStatusNameAttribute()
+    {
+        $config = config('item.status');
+        return $config[$this->status];
+    }
+
     /**
      * 获取库存对象
      * @param $warehousePositionId 库位id

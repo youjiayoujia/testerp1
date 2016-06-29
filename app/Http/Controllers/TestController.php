@@ -51,16 +51,9 @@ class TestController extends Controller
 
     public function index()
     {
-        $channelSku = '001*FBA123456[US]';
-        preg_match('/001\*FBA(.+?)\[/i', $channelSku, $sku);
-        if($sku){
-            echo 'success';
-        }
-        Tool::show($sku[1]);
-
         $orderModel = new OrderModel;
         $start = microtime(true);
-        $account = AccountModel::find(409);
+        $account = AccountModel::find(59);
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);

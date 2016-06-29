@@ -9,6 +9,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\SpuModel;
 use App\Models\ProductModel;
+use App\Models\ItemModel;
 
 class TransferProduct extends Command
 {
@@ -140,10 +141,15 @@ class TransferProduct extends Command
                     'status' => $smProduct->products_status_2,
                     'is_available' => $smProduct->productsIsActive,
                     'remark' => $smProduct->products_warring_string,
-                    'id' => $smProduct->products_id,
                     'product_id' => $tmp_product->id,
                 ];
-                ItemModel::create($data);
+                $exist = ItemModel::where(['sku' => $smProduct->products_sku])->first();
+                if($exist) {
+                    $exist->update($data);
+                } else {
+                    $data['id'] = $smProduct->products_id;
+                    ItemModel::create($data);
+                }
                 unset($data);
             }
             $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();

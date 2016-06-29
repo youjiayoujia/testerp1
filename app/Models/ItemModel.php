@@ -5,7 +5,7 @@ use Tool;
 use App\Base\BaseModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\Purchase\RequireModel;
-use App\Models\Purchase\PurchaseCrontabsModel;
+use App\Models\Purchase\PurchasesModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use Exception;
 
@@ -22,7 +22,6 @@ class ItemModel extends BaseModel
     ];
 
     protected $fillable = [
-        'id',
         'product_id',
         'sku',
         'weight',
@@ -112,6 +111,12 @@ class ItemModel extends BaseModel
     public function getAvailableQuantityAttribute()
     {
         return $this->stocks->sum('available_quantity');
+    }
+
+    public function getStatusNameAttribute()
+    {
+        $config = config('item.status');
+        return $config[$this->status];
     }
 
     /**
@@ -485,7 +490,7 @@ class ItemModel extends BaseModel
 
             $data['status'] = $item->status;
             $data['require_create'] = 0;
-            $thisModel = PurchaseCrontabsModel::where("item_id", $data['item_id'])->get()->first();
+            $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
 
             if (array_key_exists($data['item_id'], $requireArray)) {
                 $data['require_create'] = 1;
@@ -493,7 +498,7 @@ class ItemModel extends BaseModel
             if ($thisModel) {
                 $thisModel->update($data);
             } else {
-                PurchaseCrontabsModel::create($data);
+                PurchasesModel::create($data);
             }
         }
     }

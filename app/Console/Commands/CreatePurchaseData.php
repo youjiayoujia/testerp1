@@ -38,7 +38,10 @@ class CreatePurchaseData extends Command
      */
     public function handle()
     {
+        $begin = microtime(true);
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData();
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 }

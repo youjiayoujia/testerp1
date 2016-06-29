@@ -8,6 +8,7 @@ use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\SpuModel;
+use App\Models\ProductModel;
 
 class TransferProduct extends Command
 {
@@ -48,7 +49,6 @@ class TransferProduct extends Command
         if (SupplierModel::count() < 1) {
             $this->error('先导入供货商信息');
         }
-
         $len = 1000;
         $start = 0;
         $smProducts = smProduct::skip($start)->take($len)->get();
@@ -82,8 +82,10 @@ class TransferProduct extends Command
                     'supplier_id' => $smProduct->products_suppliers_id ? $smProduct->products_suppliers_id : '',
                     'warehouse_id' => $smProduct->product_warehouse_id == 1000 ? 1 : 2,
                     'hs_code' => $smProduct->product_hscode ? $smProduct->product_hscode : '',
+                    'spu_id' => $spu->id,
                 ];
-                $tmp_product = $spu->products()->create($buf);
+                $tmp_product = ProductModel::create($buf);
+                unset($buf);
 
                 //体积
                 $volumes = ['product_size' => '', 'package_size' => ''];
@@ -139,8 +141,10 @@ class TransferProduct extends Command
                     'is_available' => $smProduct->productsIsActive,
                     'remark' => $smProduct->products_warring_string,
                     'id' => $smProduct->products_id,
+                    'product_id' => $tmp_product->id,
                 ];
-                $tmp_product->item()->create($data);
+                ItemModel::create($data);
+                unset($data);
             }
             $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();
         }

@@ -30,6 +30,7 @@ use App\Models\WarehouseModel;
 use App\Models\Warehouse\PositionModel;
 
 use DB;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -41,9 +42,10 @@ class TestController extends Controller
 
     public function test1()
     {
-       $url = 'http://baidu.com/index.php?a=1&b=3';
-       $arr = pathinfo($url);
-       var_dump($arr);exit;
+        $url = 'http://baidu.com/index.php?a=1&b=3';
+        $arr = pathinfo($url);
+        var_dump($arr);
+        exit;
         echo Tool::barcodePrint('67');
     }
 
@@ -51,10 +53,10 @@ class TestController extends Controller
     {
         $orderModel = new OrderModel;
         $start = microtime(true);
-        $account = AccountModel::find(1);
+        $account = AccountModel::find(409);
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
-            $endDate = date("Y-m-d H:i:s", time());
+            $endDate = date("Y-m-d H:i:s", time() - 300);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
             foreach ($orderList as $order) {
@@ -231,25 +233,26 @@ class TestController extends Controller
         }
     }
 
-    public function getWishProduct(){
+    public function getWishProduct()
+    {
         $accountID = request()->get('id');
         $begin = microtime(true);
         $account = AccountModel::findOrFail($accountID);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
 
-        $hasProduct =true;
+        $hasProduct = true;
         $start = 0;
 
-        while($hasProduct){
+        while ($hasProduct) {
 
-            $productList = $channel->getOnlineProduct($start,100);
-            if($productList){
-                foreach($productList as $product){
+            $productList = $channel->getOnlineProduct($start, 100);
+            if ($productList) {
+                foreach ($productList as $product) {
                     $productInfo = $product['productInfo'];
                     $variants = $product['variants'];
 
-                    foreach($variants as $key=> $variant){
-                        $productInfo['sellerID'] =$variant['sellerID']; //这个随便保存一个就好
+                    foreach ($variants as $key => $variant) {
+                        $productInfo['sellerID'] = $variant['sellerID']; //这个随便保存一个就好
                         $variants[$key]['account_id'] = $accountID;
                     }
 
@@ -294,13 +297,12 @@ class TestController extends Controller
                     }
                 }
                 $start++;
-            }else{
+            } else {
                 $hasProduct = false;
             }
 
 
         }
-
 
 
         $end = microtime(true);

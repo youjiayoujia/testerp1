@@ -139,7 +139,7 @@
                             <span class="glyphicon glyphicon-pencil"></span> 审核
                         </a>
                     @endif
-                    @if($order->status == 'PREPARED')
+                    @if($order->status == 'PREPARED' && $order->active != 'STOP')
                         <a href="javascript:" class="btn btn-primary btn-xs prepared" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 暂停发货
                         </a>

@@ -62,6 +62,7 @@ class EbayAdapter implements AdapterInterface
                     }
                     $page++;
                 }else{
+                    var_dump($response);
                     $hasOrder = false;
                 }
 

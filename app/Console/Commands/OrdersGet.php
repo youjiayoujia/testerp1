@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Tool;
 use Channel;
 use App\Jobs\InOrders;
 use App\Models\Log\CommandModel as CommandLog;
@@ -47,10 +48,9 @@ class OrdersGet extends Command
         $account = AccountModel::find($this->argument('accountID'));
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
-            $endDate = date("Y-m-d H:i:s", time());
+            $endDate = date("Y-m-d H:i:s", time() - 300);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
-//            for ($i = 1; $i < 20001; $i++) {
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
@@ -62,7 +62,6 @@ class OrdersGet extends Command
                 $job = $job->onQueue('inOrders');
                 $this->dispatch($job);
             }
-//            }
             //todo::Adapter->error()
             $result['status'] = 'success';
             $result['remark'] = 'Success.';

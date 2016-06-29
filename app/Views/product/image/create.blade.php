@@ -112,7 +112,7 @@
         
         $("#file-1").on("fileuploaded", function(event, data, previewId, index) {
             //alert(data.files);
-            console.log(data);
+            
         });
     </script>
 @stop

@@ -39,7 +39,7 @@ return [
 
     'transfer_search' => [
         'warehouse.name' => '仓库',
-        'channel.name' => '渠道',
+        'channel.name' => '渠道(平台)',
         'channelAccount.account' => '渠道帐号',
         'logistics.code' => '物流简码',
         'logistics.name' => '物流方式',
@@ -59,6 +59,9 @@ return [
         'userService.name' => '客服人员',
         'email' => '邮箱',
         'currency' => '币种',
+        'name' => '姓名',
+        'zipcode' => '邮编',
+        'type' => '类型',
     ],
 ];
 

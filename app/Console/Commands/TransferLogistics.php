@@ -94,7 +94,7 @@ class TransferLogistics extends Command
                     $exist->update($shipment);
                     $updatedNum++;
                 } else {
-                    $shipmentCategory['id'] = $smShipment->shipmentID;
+                    $shipment['id'] = $smShipment->shipmentID;
                     LogisticsModel::create($shipment);
                     $createdNum++;
                 } 
@@ -130,7 +130,7 @@ class TransferLogistics extends Command
                     $exist->update($cd);
                     $updatedNum++;
                 } else {
-                    $shipmentCategory['id'] = $smCd->suppliers_id;
+                    $cd['id'] = $smCd->suppliers_id;
                     originSupplier::create($cd);
                     $createdNum++;
                 } 

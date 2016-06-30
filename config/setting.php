@@ -44,7 +44,7 @@ return [
         'logistics.code' => '物流简码',
         'logistics.name' => '物流方式',
         'tracking_no' => '物流追踪号',
-        'status' => '订单状态',
+        'status' => '状态',
         'order.status' => '订单状态',
         'order.active' => '售后状态',
         'active' => '售后状态',
@@ -62,6 +62,10 @@ return [
         'name' => '姓名',
         'zipcode' => '邮编',
         'type' => '类型',
+        'purchaseOrder.status' => '采购单状态状态',
+        'purchaseOrder.examineStatus' => '采购单审核状态状态',
+        'supplier.name' => '供应商',
+        'purchaseUser.name' =>'操作人员'
     ],
 ];
 

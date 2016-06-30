@@ -6,6 +6,7 @@
     <th>仓库</th>
     <th>状态</th>
     <th>类型</th>
+    <th>重量(kg)</th>
     <th>物流方式</th>
     <th>物流单号</th>
     <th class="sort" data-field="logistic_assigned_at">分配物流时间</th>
@@ -27,6 +28,7 @@
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->status_name }}</td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
+            <td>{{ $package->weight }}</td>
             <td>{{ $package->logistics ? $package->logistics->short_code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->logistics_assigned_at }}</td>

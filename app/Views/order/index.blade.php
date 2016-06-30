@@ -132,7 +132,7 @@
                         <span class="glyphicon glyphicon-pencil"></span> 退款
                     </a>
                     <a href="{{ route('remark', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 补充备注
+                        <span class="glyphicon glyphicon-pencil"></span> 备注
                     </a>
                     @if($order->status == 'REVIEW')
                         <a href="javascript:" class="btn btn-primary btn-xs review" data-id="{{ $order->id }}">
@@ -158,41 +158,6 @@
     @endforeach
 @stop
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询订单状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach(config('order.status') as $status_key => $status)
-                <li><a href="{{ DataList::filtersEncode(['status', '=', $status_key]) }}">{{ $status }}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询售后状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach(config('order.active') as $active_key => $active)
-                <li><a href="{{ DataList::filtersEncode(['active', '=', $active_key]) }}">{{ $active }}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 国家
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($countries as $country)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['shipping_country', '=', $country->code]) }}">{{ $country->cn_name }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
     @parent
 @stop
 @section('childJs')

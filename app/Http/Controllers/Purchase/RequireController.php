@@ -20,18 +20,18 @@ use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\Package\ItemModel;
 use App\Models\ItemModel as ProductItemModel;
-use App\Models\Purchase\PurchaseCrontabsModel;
+use App\Models\Purchase\PurchasesModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 
 
 class RequireController extends Controller
 {
 
-    public function __construct(RequireModel $require,ProductItemModel $productItem, PurchaseCrontabsModel $purchaseCrontabs)
+    public function __construct(RequireModel $require,ProductItemModel $productItem, PurchasesModel $purchases)
     {
         $this->model = $require;
 		$this->productItem=$productItem;
-		$this->crontabs = $purchaseCrontabs;
+		$this->purchases = $purchases;
         $this->mainIndex = route('require.index');
         $this->mainTitle = '采购需求';
 		$this->viewPath = 'purchase.require.';
@@ -42,7 +42,7 @@ class RequireController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->crontabs),
+            'data' => $this->autoList($this->purchases),
         ];
         
         return view($this->viewPath . 'index', $response);
@@ -73,13 +73,14 @@ class RequireController extends Controller
 			$needPurchases=$this->productItem->get();
 		}
 		foreach($needPurchases as $key=>$v){
-			$sumtrend=PurchaseCrontabsModel::where('item_id',$v->id)->where('require_create',1)->get()->first();
+			$sumtrend=PurchasesModel::where('item_id',$v->id)->where('require_create',1)->get()->first();
 			if(!$sumtrend){
 				continue;	
 			}
 			$data['type']=0;
 			$data['warehouse_id']=$v->warehouse_id ? $v->warehouse_id : 0;
 			$data['sku']=$v->sku;
+			$data['item_id']=$v->id;
 			$data['purchase_cost']=$sumtrend->item->purchase_price;
 			$data['supplier_id']=$v->supplier_id ? $v->supplier_id : 0;
 			$data['purchase_num']=$sumtrend->need_purchase_num;

@@ -44,12 +44,7 @@
             <td>
             
             @if($purchaseOrder->supplier_id >0)
-            @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
-            	@if($purchaseOrder->close_status == $k)
-            	{{ $close_statu}}
-                @endif
-            @endforeach
-            	</br>供应商编号NO.{{ $purchaseOrder->supplier->id}}
+                {{ $purchaseOrder->supplier->name}}
             @endif
             </td>
             <td>
@@ -166,9 +161,7 @@
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
-                </a>
-                           
-                
+                </a>  
             </td>
         </tr>
     @endforeach

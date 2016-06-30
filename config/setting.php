@@ -62,6 +62,10 @@ return [
         'name' => '姓名',
         'zipcode' => '邮编',
         'type' => '类型',
+        'purchaseOrder.status' => '采购单状态状态',
+        'purchaseOrder.examineStatus' => '采购单审核状态状态',
+        'supplier.name' => '供应商',
+        'purchaseUser.name' =>'操作人员'
     ],
 ];
 

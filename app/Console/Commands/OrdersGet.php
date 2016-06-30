@@ -56,8 +56,6 @@ class OrdersGet extends Command
                 $order['channel_account_id'] = $account->id;
                 $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
                 $order['operator'] = $account->operator ? $account->operator->id : 0;
-                //todo:订单状态获取
-                $order['status'] = 'PAID';
                 $job = new InOrders($order);
                 $job = $job->onQueue('inOrders');
                 $this->dispatch($job);

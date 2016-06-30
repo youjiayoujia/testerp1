@@ -137,6 +137,7 @@ Class WishAdapter implements AdapterInterface
             $orderInfo['shipping_zipcode'] = isset($orderSingle['ShippingDetail']['zipcode']) ? $orderSingle['ShippingDetail']['zipcode'] : '';
             $orderInfo['shipping_phone'] = isset($orderSingle['ShippingDetail']['phone_number']) ? $orderSingle['ShippingDetail']['phone_number'] : '';
             $orderInfo['payment_date'] = $this->getPayTime($orderSingle['order_time']);
+            $orderInfo['status'] ='PAID';
 
             //处理一下 SKU的前后缀问题
             $erpSku = $this->filter_sku($orderSingle['sku'], $this->wish_sku_resolve); //根据账号的sku解析设定
@@ -533,6 +534,27 @@ Class WishAdapter implements AdapterInterface
             $return['info'] = isset($result['message']) ? $result['message'] : '未知错误';
         }
         return $return;
+    }
+
+    /*  $data=['id','tracking_provider','tracking_number','ship_note']
+     *  $url = https://china-merchant.wish.com/api/v2/order/modify-tracking  //更新追踪号
+     *  $url = https://china-merchant.wish.com/api/v2/order/fulfill-one // 可不传追踪号，
+     */
+    public function trackOperate($data,$url){
+        $product['access_token'] = urldecode($this->access_token);
+        $return = [];
+        $resultJson = $this->postCurlHttpsData($url, $data);
+        $result = json_decode($resultJson, true);
+        // $result['code']=0;
+        if (isset($result['code']) && $result['code'] == 0) {
+            $return['status'] = true;
+            $return['info'] = 'success';
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['message']) ? $result['message'] : '未知错误';
+        }
+        return $return;
+
     }
 
 

@@ -58,6 +58,17 @@ class RuleModel extends BaseModel
         ],
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['logistics' => ['code', 'name']],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
+
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'type_id', 'id');

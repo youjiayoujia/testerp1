@@ -17,7 +17,7 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
-    public $searchFields = ['code', 'name', 'logistics_supplier_id', 'type'];
+    public $searchFields = ['code', 'name'];
 
     protected $fillable = [
         'id',

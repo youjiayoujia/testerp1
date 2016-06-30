@@ -132,7 +132,7 @@
                         <span class="glyphicon glyphicon-pencil"></span> 退款
                     </a>
                     <a href="{{ route('remark', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 补充备注
+                        <span class="glyphicon glyphicon-pencil"></span> 备注
                     </a>
                     @if($order->status == 'REVIEW')
                         <a href="javascript:" class="btn btn-primary btn-xs review" data-id="{{ $order->id }}">

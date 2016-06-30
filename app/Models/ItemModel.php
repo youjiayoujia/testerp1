@@ -22,6 +22,7 @@ class ItemModel extends BaseModel
     ];
 
     protected $fillable = [
+        'id',
         'product_id',
         'sku',
         'weight',

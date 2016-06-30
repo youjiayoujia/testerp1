@@ -86,6 +86,7 @@ class TransferProduct extends Command
                     $arr[] = 2;
                 }
                 $buf = [
+                    'id' => $smProduct->products_id,
                     'model' => $smProduct->products_sku,
                     'parts' => $smProduct->products_parts_info ? $smProduct->products_parts_info : '',
                     'declared_cn' => $smProduct->products_declared_cn ? $smProduct->products_declared_cn : '',
@@ -100,7 +101,7 @@ class TransferProduct extends Command
                     'hs_code' => $smProduct->product_hscode ? $smProduct->product_hscode : '',
                     'spu_id' => $spu->id,
                 ];
-                $tmp_product = ProductModel::where(['model' => $smProduct->products_sku])->first();
+                $tmp_product = ProductModel::where(['id' => $smProduct->products_id])->first();
                 if($tmp_product) {
                     $updatedNum[1]++;
                     $tmp_product->update($buf);
@@ -166,7 +167,7 @@ class TransferProduct extends Command
                     'remark' => $smProduct->products_warring_string,
                     'product_id' => $tmp_product->id,
                 ];
-                $exist = ItemModel::where(['sku' => $smProduct->products_sku])->first();
+                $exist = ItemModel::where(['id' => $smProduct->products_id])->first();
                 if($exist) {
                     $updatedNum[2]++;
                     $exist->update($data);
@@ -176,7 +177,7 @@ class TransferProduct extends Command
                 }
                 unset($data);
             }
-            $smProducts = smProduct::orderBy('products_id', 'desc')->skip($start)->take($len)->get();
+            $smProducts = smProduct::skip($start)->take($len)->get();
         }
         $this->info('Transfer [Spu]: Origin:'.$originNum.' => Created:'.$createdNum[0].' Updated:'.$updatedNum[0]);
         $this->info('Transfer [Product]: Origin:'.$originNum.' => Created:'.$createdNum[1].' Updated:'.$updatedNum[1]);

@@ -154,12 +154,12 @@
                 </a>
                 @endif 
                 @if($purchaseOrder->examineStatus == 1||$purchaseOrder->examineStatus == 2)
-                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
+                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs tuihui">
                         <span class="glyphicon glyphicon-remove-sign"></span>
                     </a>
                 @endif
                 @if($purchaseOrder->status == 1)
-                <a href="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" title="付款" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
+                <a href="javascript:" title="付款" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
                     <span class="glyphicon glyphicon glyphicon-usd"></span>
                 </a>
                 @endif 
@@ -212,9 +212,6 @@
                 </div>
             </div>   
         </div>
-        <!--<div class="panel-footer">
-            <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>-->
     </div> 
          
          <div class="modal-footer">
@@ -230,7 +227,7 @@
 </div>
 </div>
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
+<div class="modal fade" id="myModala" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
    <div class="modal-dialog" style="width:800px">
       <div class="modal-content">
          <div class="modal-header">
@@ -268,8 +265,8 @@
     })
 
 
-    $(".find_shipment").click(function(){
-        if (confirm("确认待核销?")) {
+    $(".tuihui").click(function(){
+        if (confirm("确认退回?")) {
             var url = $(this).data('url');
             window.location.href=url;
         }

@@ -473,6 +473,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
 
+    Route::get('package/ajaxUpdatePackageLogistics', ['uses' => 'PackageController@ajaxUpdatePackageLogistics', 'as' => 'package.ajaxUpdatePackageLogistics']);
+    Route::get('package/ajaxReturnPackageId', ['uses' => 'PackageController@ajaxReturnPackageId', 'as' => 'package.ajaxReturnPackageId']);
     Route::get('package/multiPackage', ['uses' => 'PackageController@multiPackage', 'as' => 'package.multiPackage']);
     Route::get('package/ctrlZ', ['uses' => 'PackageController@ctrlZ', 'as' => 'package.ctrlZ']);
     Route::get('package/manualLogistics',

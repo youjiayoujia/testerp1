@@ -52,7 +52,7 @@ class TransferUser extends Command
                 $cd = [
                     'name' => $smCd->nickname,
                     'email' => $smCd->user_name.'@sellmore.com',
-                    'password' => bcrypt($smCd->user_name),
+                    'password' => bcrypt($smCd->user_name.'@sellmore.com'),
                 ];
                 $exist = UserModel::where(['email' => $smCd->user_name.'@sellmore.com'])->first();
                 if($exist) {

@@ -8,7 +8,7 @@
 @section('tableHeader')
 	
     <th>ID</th> 
-    <th>采购单信息</th> 
+    <th>采购单状态</th> 
     <th>采购单审核状态</th>
     <th>核销状态</th>
     <th>采购人</th>
@@ -19,10 +19,12 @@
     <th>操作</th>
 @stop
 @section('tableBody')
+    @if(count($data)>0)
     @foreach($data as $purchaseOrder)
+
         <tr>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
-            	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
+            	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
                 外部单号：
                 @foreach($purchaseOrder->purchasePostage as $ppostage)
                     {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
@@ -36,10 +38,7 @@
     		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
             <td>
-            
-            @if($purchaseOrder->supplier_id >0)
-                {{ $purchaseOrder->supplier->name}}
-            @endif
+                {{ $purchaseOrder->supplier?$purchaseOrder->supplier->name:''}}
             </td>
             <td>
             @if($purchaseOrder->status <4)
@@ -105,7 +104,7 @@
                 </table>
                 @endif
             </td>
-            <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
+            <td>{{ $purchaseOrder->warehouse ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
                  
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
@@ -234,7 +233,7 @@
 </div>
 </div>
 
-
+@endif
 @stop
 
 @section('childJs')

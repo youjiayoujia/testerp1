@@ -60,12 +60,10 @@ class PurchaseOrderModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
-            'filterFields' => ['tracking_no'],
-            'filterSelects' => ['status' => config('package')],
-            'selectRelatedSearchs' => [
-                'order' => ['status' => config('order.status'), 'active' => config('order.active')],
-            ],
+            'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name'], 'warehouse' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('purchase.purchaseOrder.status'),'examineStatus' => config('purchase.purchaseOrder.examineStatus'),'write_off' => config('purchase.purchaseOrder.write_off')],
+            'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];
     }

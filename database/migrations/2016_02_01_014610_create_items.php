@@ -38,7 +38,7 @@ class CreateItems extends Migration
             $table->string('package_size')->nullable();
             $table->string('carriage_limit')->nullable();
             $table->string('package_limit')->nullable();
-            $table->string('status')->nullable();
+            $table->enum('status',['selling','sellWaiting','stopping','saleOutStopping','unSellTemp','trySale'])->comment('订单状态')->nullable();
             $table->tinyInteger('is_available')->comment('是否可用')->nullable()->default(1);
             $table->string('remark')->nullable();
             $table->timestamps();

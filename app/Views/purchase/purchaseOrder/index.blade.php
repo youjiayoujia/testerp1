@@ -28,28 +28,17 @@
                     {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
                 @endforeach
             </td>
-           <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
-            	@if($purchaseOrder->status == $k)
-            	{{ $statu }}
-                @endif
-            @endforeach </td>
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
-            	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
-                @endif
-            @endforeach   
+            <td> 
+                {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
+            </td>
+            <td>{{config('purchase.purchaseOrder.status')[$purchaseOrder->examineStatus]}}</td>  
             <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
-    		<td>{{ $purchaseOrder->assigner_name }}
+    		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
             <td>
             
             @if($purchaseOrder->supplier_id >0)
-            @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
-            	@if($purchaseOrder->close_status == $k)
-            	{{ $close_statu}}
-                @endif
-            @endforeach
-            	</br>供应商编号NO.{{ $purchaseOrder->supplier->id}}
+                {{ $purchaseOrder->supplier->name}}
             @endif
             </td>
             <td>
@@ -117,7 +106,7 @@
                 @endif
             </td>
             <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
-                  
+                 
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
@@ -154,21 +143,19 @@
                 </a>
                 @endif 
                 @if($purchaseOrder->examineStatus == 1||$purchaseOrder->examineStatus == 2)
-                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
+                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs tuihui">
                         <span class="glyphicon glyphicon-remove-sign"></span>
                     </a>
                 @endif
                 @if($purchaseOrder->status == 1)
-                <a href="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" title="付款" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
+                <a href="javascript:" title="付款" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
                     <span class="glyphicon glyphicon glyphicon-usd"></span>
                 </a>
                 @endif 
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
-                </a>
-                           
-                
+                </a>  
             </td>
         </tr>
     @endforeach
@@ -190,20 +177,19 @@
          <input type="hidden" name="_token" value="{{ csrf_token() }}">
          <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
+        
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label  class='control-label'>物流号</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div> 
-                 <div class="form-group col-sm-2">
+                <div class="form-group col-sm-2">
                     <label  class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
-            </div>       
-           
-             
-              <div class='row'>
+            </div>                   
+            <div class='row'>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
@@ -211,16 +197,8 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
-                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-                </div>
-                 
-                 
-                    <input type="hidden" id="currrent" value="1">
-                     
+            </div>   
         </div>
-        <!--<div class="panel-footer">
-            <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>-->
     </div> 
          
          <div class="modal-footer">
@@ -261,7 +239,9 @@
 
 @section('childJs')
     <script type='text/javascript'>
-	
+	$("#myModal").click(function(){
+        //$("#ajaxcode").val(1234);
+    })
 	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
 
 	$(".hexiao").click(function(){
@@ -272,8 +252,8 @@
     })
 
 
-    $(".find_shipment").click(function(){
-        if (confirm("确认待核销?")) {
+    $(".tuihui").click(function(){
+        if (confirm("确认退回?")) {
             var url = $(this).data('url');
             window.location.href=url;
         }

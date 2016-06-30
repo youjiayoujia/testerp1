@@ -92,6 +92,8 @@ class InModel extends BaseModel
     {
         if($this->type == 'ADJUSTMENT')
             return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
+        if($this->type == 'PURCHASE')
+            return $this->stockPurchase ? $this->stockPurchase->id : '';
         if($this->type == 'ALLOTMENT')
             return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
         if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
@@ -120,5 +122,16 @@ class InModel extends BaseModel
     public function stockTaking()
     {
         return $this->belongsTo('App\Models\Stock\TakingModel', 'relation_id', 'id');
+    }
+
+    /**
+     * get the relation between the two Model
+     * 
+     *  @return relation
+     *
+     */
+    public function stockPurchase()
+    {
+        return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'relation_id', 'id');
     }
 }

@@ -132,6 +132,7 @@ Class CdiscountAdapter implements AdapterInterface
             'create_time' =>$paidTime,
             'fulfill_by' => "",
             'remark' =>'',
+            'status' =>'PAID',
             'items' => []
         ];
 

@@ -31,7 +31,7 @@ class AccountController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model, $this->model->orderBy('is_available', 'desc')),
+            'data' => $this->autoList($this->model),
             'channels' => ChannelModel::all(),
             'paypals' => PaypalsModel::orderBy('id', 'asc')->get(['id', 'paypal_email_address']),
         ];

@@ -46,7 +46,7 @@
         var data = ""
 		$("input[name^='goodnum_']").each(function(){
 			id = $(this).attr("name");
-            if($(this).val()!=0){
+            if($(this).val()!=0&&($(this).attr("disabled")!='disabled')){
                 id = id.substr(8);
                 data += id+":"+$(this).val();
                 data +=":"+$('#badnum_'+id).val()+",";

@@ -20,7 +20,7 @@
             <td>{{ $pickList->id }}</td>
             <td>{{ $pickList->picknum }}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
-            <td>{{ $pickList->logistic ? $pickList->logistic->logistics_type : '混合物流'}}</td>
+            <td>{{ $pickList->logistic ? $pickList->logistic->name : '混合物流'}}</td>
             <td>{{ $pickList->status_name }}</td>
             <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
             <td>{{ $pickList->pick_at }}</td>
@@ -31,7 +31,7 @@
                 <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('pickList.print', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs">
+                <a href="javascript:" class="btn btn-warning btn-xs print">
                     <span class="glyphicon glyphicon-pencil"></span> 打印拣货单
                 </a>
                 @if($pickList->type == 'MULTI' && $pickList->status == 'PICKING')
@@ -92,15 +92,23 @@ $(document).ready(function(){
 
     $('.multiPrint').click(function(){
         $.each($('.single'), function(){
-            if($(this).parent().parent().find('td:eq(5)').text() == '未处理') {
-                id = $(this).parent().next().text();
-                src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
-                $('#iframe_print').attr('src', src);
-                $('#iframe_print').load(function(){
-                    $('#iframe_print')[0].contentWindow.focus();
-                    $('#iframe_print')[0].contentWindow.print();
-                });
-            }
+            id = $(this).parent().next().text();
+            src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
+            $('#iframe_print').attr('src', src);
+            $('#iframe_print').load(function(){
+                $('#iframe_print')[0].contentWindow.focus();
+                $('#iframe_print')[0].contentWindow.print();
+            });
+        });
+    });
+
+    $(document).on('click', '.print', function () {
+        id = $(this).parent().parent().find('td:eq(1)').text();
+        src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
+        $('#iframe_print').attr('src', src);
+        $('#iframe_print').load(function () {
+            $('#iframe_print')[0].contentWindow.focus();
+            $('#iframe_print')[0].contentWindow.print();
         });
     });
 });

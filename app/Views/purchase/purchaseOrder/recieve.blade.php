@@ -66,7 +66,7 @@
 		
         $.ajax({
             url:"{{ route('updateArriveNum') }}",
-            data:{data:data,p_id:$("#p_id").val()},
+            data:{data:data,p_id:$("#ajaxp_id").val()},
             dataType:'json',
             type:'get',
             success:function(result){

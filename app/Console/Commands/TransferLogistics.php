@@ -87,6 +87,7 @@ class TransferLogistics extends Command
                     'name' => $smShipment->shipmentDescription,
                     'warehouse_id' => $smShipment->shipment_warehouse_id == '1025' ? '2' : '1',
                     'logistics_catalog_id' => $smShipment->shipmentCategoryID,
+                    'docking' => 'CODE',
                     'is_enable' => '1',
                 ];
                 $exist = LogisticsModel::where(['id' => $smShipment->shipmentID])->first();

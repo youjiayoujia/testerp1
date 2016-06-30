@@ -15,3 +15,15 @@
     </div>
 </div>
 @stop
+<script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('.re_print').click(function(){
+        package_id = $('.re_package_id').val();
+        trackno = $('.re_trackno').val();
+        if(package || trackno) {
+            
+        }
+    })
+})
+</script>

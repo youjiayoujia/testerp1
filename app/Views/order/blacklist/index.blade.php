@@ -170,28 +170,6 @@
             </div>
         </form>
     </div>
-    {{--<div class="btn-group" role="group">--}}
-        {{--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
-            {{--<i class="glyphicon glyphicon-filter"></i> 查询平台--}}
-            {{--<span class="caret"></span>--}}
-        {{--</button>--}}
-        {{--<ul class="dropdown-menu">--}}
-            {{--@foreach($channels as $channel)--}}
-                {{--<li><a href="{{ DataList::filtersEncode(['channel_id', '=', $channel['id']]) }}">{{ $channel['name'] }}</a></li>--}}
-            {{--@endforeach--}}
-        {{--</ul>--}}
-    {{--</div>--}}
-    {{--<div class="btn-group" role="group">--}}
-        {{--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">--}}
-            {{--<i class="glyphicon glyphicon-filter"></i> 查询类型--}}
-            {{--<span class="caret"></span>--}}
-        {{--</button>--}}
-        {{--<ul class="dropdown-menu">--}}
-            {{--@foreach(config('order.blacklist_type') as $type_key => $type)--}}
-                {{--<li><a href="{{ DataList::filtersEncode(['type', '=', $type_key]) }}">{{ $type }}</a></li>--}}
-            {{--@endforeach--}}
-        {{--</ul>--}}
-    {{--</div>--}}
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             批量审核

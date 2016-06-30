@@ -190,20 +190,19 @@
          <input type="hidden" name="_token" value="{{ csrf_token() }}">
          <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
+        
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label  class='control-label'>物流号</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div> 
-                 <div class="form-group col-sm-2">
+                <div class="form-group col-sm-2">
                     <label  class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
-            </div>       
-           
-             
-              <div class='row'>
+            </div>                   
+            <div class='row'>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
@@ -211,12 +210,7 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
-                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-                </div>
-                 
-                 
-                    <input type="hidden" id="currrent" value="1">
-                     
+            </div>   
         </div>
         <!--<div class="panel-footer">
             <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
@@ -236,7 +230,7 @@
 </div>
 </div>
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModala" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
    <div class="modal-dialog" style="width:800px">
       <div class="modal-content">
          <div class="modal-header">
@@ -261,7 +255,9 @@
 
 @section('childJs')
     <script type='text/javascript'>
-	
+	$("#myModal").click(function(){
+        //$("#ajaxcode").val(1234);
+    })
 	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
 
 	$(".hexiao").click(function(){

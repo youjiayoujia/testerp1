@@ -51,7 +51,6 @@ class OrdersGet extends Command
             $endDate = date("Y-m-d H:i:s", time() - 300);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
-            Tool::show($orderList);
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;

@@ -67,7 +67,4 @@
             @endforeach
         </tbody>
     </table>
-    <div clas='row'>
-        <button type="button" class="btn btn-success">打印</button>
-    </div>
 @stop

@@ -66,7 +66,6 @@ class ChannelLogistics extends Command
         }
         $this->info('Transfer [smAliExpressLogistics]: Origin:'.$originNum);
 
-
         $len = 100;
         $start = 0;
         $id = ChannelModel::where(['name' => 'Cdiscount'])->first()->id;

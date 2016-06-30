@@ -73,7 +73,7 @@ class TransferChannelAccount extends Command
                     'amazon_accesskey_secret' => $smAmazon->secret_key,
                     'is_available' => $smAmazon->status,
                 ];
-                $exist = AccountModel::where(['amazon_accesskey_id' => $smAmazon->access_key])->first();
+                $exist = AccountModel::where(['amazon_marketplace_id' => $smAmazon->place_id, 'amazon_accesskey_id' => $smAmazon->access_key])->first();
                 if($exist) {
                     $exist->update($amazon);
                     $updatedNum++;
@@ -146,6 +146,7 @@ class TransferChannelAccount extends Command
                     'sync_cycle' => '0',
                     'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smSmt->seller_account,
                     'aliexpress_member_id' => $smSmt->member_id,
                     'aliexpress_appkey' => $smSmt->appkey,
                     'aliexpress_appsecret' => $smSmt->appsecret,
@@ -188,6 +189,7 @@ class TransferChannelAccount extends Command
                     'sync_cycle' => '0',
                     'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smLazada->sales_account,
                     'lazada_access_key' => $smLazada->Key,
                     'lazada_user_id' => $smLazada->lazada_user_id,
                     'lazada_site' => $smLazada->site,
@@ -228,6 +230,7 @@ class TransferChannelAccount extends Command
                     'sync_cycle' => '0',
                     'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smCd->sales_account,
                     'cd_currency_type' => $smCd->currency_type,
                     'cd_currency_type_cn' => $smCd->currency_type_cn,
                     'cd_account' => $smCd->account,
@@ -268,6 +271,7 @@ class TransferChannelAccount extends Command
                     'sync_cycle' => '0',
                     'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smEbay->seller_account,
                     'ebay_developer_account' => $smEbay->developer->developer_account,
                     'ebay_developer_devid' => $smEbay->developer->devid,
                     'ebay_developer_appid' => $smEbay->developer->appid,
@@ -278,7 +282,7 @@ class TransferChannelAccount extends Command
                     'is_available' => '1',
                 ];
 
-                $exist = AccountModel::where(['ebay_developer_account' => $smEbay->developer->developer_account])->first();
+                $exist = AccountModel::where(['ebay_developer_account' => $smEbay->developer->developer_account, 'account' => $smEbay->seller_account])->first();
                 if($exist) {
                     $exist->update($ebay);
                     $updatedNum++;

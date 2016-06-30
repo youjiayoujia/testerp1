@@ -28,18 +28,12 @@
                     {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
                 @endforeach
             </td>
-           <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
-            	@if($purchaseOrder->status == $k)
-            	{{ $statu }}
-                @endif
-            @endforeach </td>
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
-            	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
-                @endif
-            @endforeach   
+            <td> 
+                {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
+            </td>
+            <td>{{config('purchase.purchaseOrder.status')[$purchaseOrder->examineStatus]}}</td>  
             <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
-    		<td>{{ $purchaseOrder->assigner_name }}
+    		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
             <td>
             
@@ -112,7 +106,7 @@
                 @endif
             </td>
             <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
-                  
+                 
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)

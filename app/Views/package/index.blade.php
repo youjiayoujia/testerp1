@@ -29,7 +29,7 @@
             <td>{{ $package->status_name }}</td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
-            <td>{{ $package->logistics ? $package->logistics->short_code : '' }}</td>
+            <td>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->logistics_assigned_at }}</td>
             <td>{{ $package->logistics_order_at }}</td>

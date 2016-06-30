@@ -248,6 +248,8 @@ class TestController extends Controller
             $productList = $channel->getOnlineProduct($start, 100);
             if ($productList) {
                 foreach ($productList as $product) {
+
+                    $is_add =true;
                     $productInfo = $product['productInfo'];
                     $variants = $product['variants'];
 

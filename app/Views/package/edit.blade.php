@@ -91,7 +91,7 @@
                     <select name='logistics_id' class='form-control'>
                         <option value=""></option>
                         @foreach($logisticses as $logistics)
-                            <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : ''}}>{{ $logistics->short_code }}</option>
+                            <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : ''}}>{{ $logistics->code }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -67,7 +67,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-2">
-                    <strong>物流方式</strong>: {!! $model->logistics ? $model->logistics->short_code : '<small>未分配物流</small>' !!}
+                    <strong>物流方式</strong>: {!! $model->logistics ? $model->logistics->code : '<small>未分配物流</small>' !!}
                 </div>
                 <div class="col-lg-2">
                     <strong>物流单号</strong>: {{ $model->tracking_no }}

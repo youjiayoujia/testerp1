@@ -13,6 +13,9 @@
     <div class='form-group'>
         <button type='button' class='btn btn-info re_print'>重新打印</button>
     </div>
+    <div class='row'>
+        <iframe id='barcode' style='display:none'></iframe>
+    </div>
 </div>
 @stop
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
@@ -20,10 +23,36 @@
 $(document).ready(function(){
     $('.re_print').click(function(){
         package_id = $('.re_package_id').val();
-        trackno = $('.re_trackno').val();
-        if(package || trackno) {
-            
+        if(package_id) {
+            $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+            $('#barcode').load(function(){
+                $('#barcode')[0].contentWindow.focus();
+                $('#barcode')[0].contentWindow.print();
+            });
+            return false;
         }
+        trackno = $('.re_trackno').val();
+        if(trackno) {
+            $.ajax({
+                url:"{{ route('package.ajaxReturnPackageId')}}",
+                data:{package_id:package_id, trackno:trackno},
+                dataType:'json',
+                type:'get',
+                success:function(result) {
+                    if(result == false) {
+                        alert('对应的物流追踪号无法对应包裹');
+                        return false;
+                    } else {
+                        $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                        $('#barcode').load(function(){
+                            $('#barcode')[0].contentWindow.focus();
+                            $('#barcode')[0].contentWindow.print();
+                        });
+                    }
+                }
+            })
+        }
+
     })
 })
 </script>

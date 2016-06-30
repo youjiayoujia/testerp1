@@ -268,6 +268,37 @@ class PackageController extends Controller
         return redirect($this->mainIndex);
     }
 
+    public function ajaxReturnPackageId()
+    {
+        $trackno = request('trackno');
+        if($trackno) {
+            $model = $this->model->where(['tracking_no' => $trackno])->first();
+            if($model) {
+                return json_encode($model->id);
+            }
+        }
+        return json_encode(false);
+    }
+
+    public function ajaxUpdatePackageLogistics()
+    {
+        $package_id = request('package_id');
+        $trackno = request('trackno');
+        $logistics_id = request('logistics_id');
+        $model = '';
+        if($package_id) {
+            $model = $this->model->find($package_id);
+        } else {
+            $model = $this->model->where(['tracking_no' => $trackno])->first();
+        }
+        if($model) {
+            $model->update(['logistics_id' => $logistics_id]);
+            return json_encode($model->id);
+        }
+
+        return json_encode(false);
+    }
+
     public function ajaxGetOrder()
     {
         if (request()->ajax()) {

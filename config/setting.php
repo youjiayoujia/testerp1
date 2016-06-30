@@ -65,7 +65,9 @@ return [
         'purchaseOrder.status' => '采购单状态状态',
         'purchaseOrder.examineStatus' => '采购单审核状态状态',
         'supplier.name' => '供应商',
-        'purchaseUser.name' =>'操作人员'
+        'purchaseUser.name' =>'采购人',
+        'examineStatus' => '审核字段',
+        'write_off' =>'核销状态'
     ],
 ];
 

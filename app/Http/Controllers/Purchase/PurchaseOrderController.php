@@ -53,6 +53,7 @@ class PurchaseOrderController extends Controller
                 $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
             }
         }
+        
         return view($this->viewPath . 'index', $response);
     }
     

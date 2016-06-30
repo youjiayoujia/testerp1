@@ -152,6 +152,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_state'] = $orderDetail ["receiptAddress"] ["province"];
         $orderInfo['shipping_country'] = $orderDetail ["receiptAddress"] ["country"];
         $orderInfo['shipping_zipcode'] = $orderDetail ["receiptAddress"] ["zip"];
+        $orderInfo['status'] ='PAID';
 
         $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"]) ? $orderDetail ["receiptAddress"] ["mobileNo"] : '';
         $phoneCountry = isset($orderDetail ["receiptAddress"] ["phoneCountry"]) ? $orderDetail ["receiptAddress"] ["phoneCountry"] : '';

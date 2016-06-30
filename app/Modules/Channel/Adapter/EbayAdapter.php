@@ -184,7 +184,7 @@ class EbayAdapter implements AdapterInterface
 
         if (($isOrderStatus == 'Completed' && $payMentStatus == 'NoPaymentFailure')||!empty($paidTime)) {
             //正常订单
-            $reurnOrder['status']='REVIEW';
+            $reurnOrder['status']='PAID';
         } else {
             //未付款订单
             $reurnOrder['status'] = 'UNPAID';//没有付款的

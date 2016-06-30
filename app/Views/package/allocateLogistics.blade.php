@@ -6,7 +6,7 @@
         <label>物流方式</label>
         <select name='logistics_id' class='form-control'>
         @foreach($logisticses as $logistics)
-            <option value="{{ $logistics->id }}">{{ $logistics->short_code }}</option>
+            <option value="{{ $logistics->id }}">{{ $logistics->code }}</option>
         @endforeach
         </select>
     </div>

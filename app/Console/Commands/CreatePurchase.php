@@ -3,8 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Purchase\RequireModel;
-
+use App\Models\ItemModel;
 
 class CreatePurchase extends Command
 {
@@ -39,10 +38,10 @@ class CreatePurchase extends Command
      */
     public function handle()
     {
-        //获得require表需要采购的item_id
-        $require = new RequireModel();
-        $items = $require->where('is_require',1)->get()->toArray();
-        $require->getNeedPurchaseNum($items);
-        
+        $begin = microtime(true);
+        $itemModel = new ItemModel();
+        $itemModel->createPurchaseNeedData();
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';  
     }
 }

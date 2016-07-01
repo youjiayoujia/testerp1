@@ -14,7 +14,7 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
     ID</th>
-    <th>产品ID</th>
+    <th>skuID</th>
     <th>sku</th>
     <th>中文名</th>
     <th>可用库存</th>

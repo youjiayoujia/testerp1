@@ -310,7 +310,7 @@ return [
                     'url' => 'inWarehouse',
                     'icon' => '',
                 ],
-				[
+				/*[
                     'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',
                     'icon' => '',
@@ -324,7 +324,7 @@ return [
                     'name' => '异常采购单',
                     'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '供应链' => [
                 [

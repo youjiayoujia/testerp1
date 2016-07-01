@@ -49,6 +49,11 @@ class InModel extends BaseModel
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
     }
 
+    public function item()
+    {
+        $this->belongsToMany('App\Models\ItemModel', 'App\Models\StockModel', 'item_id')
+    }
+
     /**
      * get the relationship between the two module 
      *

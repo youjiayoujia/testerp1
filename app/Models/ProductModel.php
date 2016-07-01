@@ -266,7 +266,7 @@ class ProductModel extends BaseModel
                 }
 
                 //更新产品首图
-                $product->update(['default_image' => $default_image_id]);
+                //$product->update(['default_image' => $default_image_id]);
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {

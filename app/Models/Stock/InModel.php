@@ -23,15 +23,12 @@ class InModel extends BaseModel
      */
     protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
-
-    // 用于查询
-    public $searchFields = [''];
-
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['item' => ['sku']],
-            'filterFields' => [],
+            'filterFields' => ['id'],
+            'relatedSearchFields' => [],
+            'doubleRelatedSearchFields' => ['stock' => ['item' => ['sku']]],
             'filterSelects' => [],
             'selectRelatedSearchs' => [
             ],
@@ -47,11 +44,6 @@ class InModel extends BaseModel
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
-    }
-
-    public function item()
-    {
-        $this->belongsToMany('App\Models\ItemModel', 'App\Models\StockModel', 'item_id')
     }
 
     /**

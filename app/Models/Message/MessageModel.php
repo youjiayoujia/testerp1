@@ -27,6 +27,7 @@ class MessageModel extends BaseModel{
         'start_at',
         'content',
         'title_email',
+        'label',
     ];
 
     public $searchFields = ['id','subject', 'from_name', 'from', 'to'];
@@ -35,7 +36,7 @@ class MessageModel extends BaseModel{
 
     public function account()
     {
-        return $this->belongsTo('App\Models\Message\AccountModel');
+        return $this->belongsTo('App\Models\Channel\AccountModel');
     }
     public function assigner()
     {
@@ -200,8 +201,7 @@ class MessageModel extends BaseModel{
         }
         return false;
     }
-
-
+    
     public function setRelatedOrders($numbers)
     {
         if ($numbers) {
@@ -212,8 +212,6 @@ class MessageModel extends BaseModel{
                     $this->relatedOrders()->create(['order_id' => $order->id]);
                 } else {
                     $package = PackageModel::ofTrackingNo($number)->first();
-
-                    //var_dump($package);exit;
                     if ($package) {
                         $this->relatedOrders()->create(['order_id' => $package->order_id]);
                     }
@@ -245,7 +243,21 @@ class MessageModel extends BaseModel{
         }
         return false;
     }
-
+    public function getAttachment()
+    {
+        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
+    }
+    public function getMessageAttanchmentsAttribute()
+    {
+        $attanchments = [];
+        foreach ($this->getAttachment as $key => $part) {
+            if ($part->filename) {
+                $attanchments[$key]['filename'] = $part->filename;
+                $attanchments[$key]['filepath'] = '/' . config('message.attachmentSrcPath') .$part->filepath;
+            }
+        }
+        return $attanchments;
+    }
     /**
      * 更多搜索
      * @return array

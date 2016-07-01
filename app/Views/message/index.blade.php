@@ -73,7 +73,7 @@
     @foreach($data as $message)
         <tr>
             <td>{{ $message->id }}</td>
-            <td>{{ $message->account->name }}</td>
+            <td>{{ $message->account->account }}</td>
             <td>
                 {!! $message->label_text !!}
                 @if($message->status=='UNREAD')

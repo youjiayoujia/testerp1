@@ -1,6 +1,6 @@
 <?php
 /**
- * @author 姜笛
+ * @modify jiangdi
  * @data 2016-6-20
  * @time 16:13:48
  */
@@ -62,7 +62,6 @@ class MessageController extends Controller
         }else{
             $count='';
         }
-
         
         if ($message->assign(request()->user()->id)) {
             $userarr=config('user.staff');
@@ -92,7 +91,8 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
 
-        return $model->message_content;
+        //return $model->message_content;  原来逻辑
+        return $model->content;
     }
 
     /**

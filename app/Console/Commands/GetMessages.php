@@ -5,8 +5,8 @@ namespace App\Console\Commands;
 use Channel;
 use Illuminate\Console\Command;
 use App\Models\Channel\AccountModel;
-use App\Models\Channel\ChannelsModel;
-
+use App\Models\Message\MessageModel;
+use App\Models\Message\MessageAttachment;
 use Tool;
 
 
@@ -50,33 +50,40 @@ class GetMessages extends Command
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             //获取Message列表
             $messageList = $channel->getMessages();
-            var_dump($messageList);exit;
             foreach ($messageList as $message) {
-                $message['channel_account_id'] = $account->id;
-                $message['assign_id'] = 0;
-                $message['status'] = 'UNREAD';
-                $message['related'] = 0;
-                $message['required'] = 0;
-                $message['read'] = 0;
-                //returned
-                $message['title'] = '';
-                $message['from_name'] = '';
-                $message['from_email'] = '';
-                $message['to_name'] = '';
-                $message['to_email'] = '';
-                $message['date'] = '';
-                $message['content'] = '';
-                $message['attechment'] = '';
-                //todo:Insert Message
+                $messageNew = MessageModel::firstOrNew(['message_id' => $message['message_id']]);
+                if($messageNew->id == null){
+                    $messageNew->account_id = $account->id;
+                    $messageNew->message_id = $message['message_id'];
+                    $messageNew->from_name = $message['from_name'];
+                    $messageNew->labels = $message['labels'];
+                    $messageNew->label = $message['label'];
+                    $messageNew->from = $message['from'];
+                    $messageNew->to = $message['to'];
+                    $messageNew->date = $message['date'];
+                    $messageNew->subject = $message['subject'];
+                    $messageNew->content = $message['content'];
+                    $messageNew->save();
+                    $this->info('Message #' . $messageNew->message_id . ' Received.');
+                }
+                
+                //附件写入
+                $messageInsert = MessageModel::firstOrNew(['message_id' => $message['message_id']]);
+                if($messageInsert){
+                    if($message['attachment'] !=''){
+                        foreach ($message['attachment'] as $value){
+                            if($value){
+                                $attachment = MessageAttachment::firstOrNew(['message_id' => $messageInsert->message_id]);
+                                $attachment->message_id =$messageInsert->id;
+                                $attachment->gmail_message_id =$messageInsert->message_id;
+                                $attachment->filename = $value['file_name'];
+                                $attachment->filepath = $value['file_path'];
+                                $attachment->save();
+                            }
+                        }
+                    }
+                }
             }
         }
-        /**
-         * 获取Amazon 平台邮件
-         */
-//        $channel = ChannelsModel::where('name','Amazon')->first();
-//        $account = AccountModel::find($channel->id);
-//        $platform = Channel::driver($account->channel->driver, $account->api_config);
-//        $platform->getMessages();
-
     }
 }

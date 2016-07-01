@@ -25,5 +25,6 @@ class AddChannelAccountsTable extends Migration
      */
     public function down()
     {
+
     }
 }

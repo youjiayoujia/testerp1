@@ -63,6 +63,21 @@ abstract class Controller extends BaseController
                             }
                         }
                         break;
+                    case 'doubleRelatedSearchFields':    
+                        foreach($related as $relation_ship1 => $value1) {
+                            foreach($value1 as $relation_ship2 => $value2) {
+                                foreach($value2 as $key => $name) {
+                                    if($name) {
+                                        $list = $list->whereHas($relation_ship1, function($query) use ($relation_ship2, $name, $key){
+                                            $query = $query->wherehas($relation_ship2, function($query1) use ($name, $key) {
+                                                $query1 = $query1->where($key, 'like', '%'.$name.'%');
+                                            });
+                                        });
+                                    }  
+                                }  
+                            }
+                        }
+                        break;
                     case 'filterFields':
                         foreach($related as $key => $value3) {
                             if($value3) {

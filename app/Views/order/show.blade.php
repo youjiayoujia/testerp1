@@ -168,7 +168,7 @@
             @foreach($packages as $package)
                 <div class="row">
                     <div class="col-lg-3">
-                        <strong>包裹ID</strong> : <a href="http://erp.jinjidexiaoxuesheng.com/package/{{$package->id}}">{{ $package->id }}</a>
+                        <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                     </div>
                     <div class="col-lg-3">
                         <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}

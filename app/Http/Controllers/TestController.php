@@ -27,6 +27,8 @@ use App\Models\WarehouseModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Message\ReplyModel;
+use App\Models\Message\MessageModel;
+
 
 class TestController extends Controller
 {
@@ -47,14 +49,44 @@ class TestController extends Controller
     {
 
         $accounts = AccountModel::all();
-        foreach ($accounts as $account){
-            if($account->channel->driver == 'amazon'){
+
+        foreach ($accounts as $account) {
+            if ($account->channel->driver == 'amazon') {
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
 
                 $messageList = $channel->getMessages();
-var_dump($messageList);exit;
-            }
 
+
+                foreach ($messageList as $message) {
+                    var_dump($message->id);exit;
+
+                   // $messageNew = MessageModel::where(['message_id' => $message->id])->get();
+                    var_dump($messageNew);
+                    if ($messageNew->id == null) {
+                        $messageNew->account_id = $account->id;
+                        $messageNew->message_id = $message['message_id'];
+                        $messageNew->from_name = $message['from_name'];
+/*                        $messageNew->labels = $message['labels'];*/
+                        $messageNew->label = $message['label'];
+                        $messageNew->from = $message['from'];
+                        $messageNew->to = $message['to'];
+                        $messageNew->date = $message['date'];
+                        $messageNew->subject = $message['subject'];
+                        $messageNew->content = $message['content'];
+                        /*                    $messageNew->assign_id  = 0;
+                                            $messageNew->status  = 'UNREAD';
+                                            $messageNew->related  = 0;
+                                            $messageNew->required  = 0;
+                                            $messageNew->read  = 0;*/
+                        $messageNew->save();
+                        //$this->info('Message #' . $messageNew->message_id . ' Received.');
+
+                    }
+
+
+                }
+
+            }
         }
 
 exit;

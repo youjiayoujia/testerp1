@@ -66,8 +66,10 @@ return [
         'purchaseOrder.examineStatus' => '采购单审核状态状态',
         'supplier.name' => '供应商',
         'purchaseUser.name' =>'采购人',
-        'examineStatus' => '审核字段',
-        'write_off' =>'核销状态'
+        'examineStatus' => '审核状态',
+        'write_off' =>'核销状态',
+        'catalog.name' =>'分类',
+        'examine_status'=>'产品审核状态',
     ],
 ];
 

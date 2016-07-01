@@ -97,6 +97,17 @@ class ProductModel extends BaseModel
         'declared_value',
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['examine_status' => config('product.examineStatus')],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
+
     public function image()
     {
         return $this->belongsTo('App\Models\Product\ImageModel', 'default_image');
@@ -241,9 +252,10 @@ class ProductModel extends BaseModel
                 //$data['model'] = $spuobj->spu . "-" . $model['model'];
                 $data['model'] = $spuobj->spu . $az[$aznum];
                 $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',',
-                    $data['carriage_limit_arr']);
+                $data['carriage_limit_arr']);
                 $data['package_limit'] = empty($data['package_limit_arr']) ? '' : implode(',',
-                    $data['package_limit_arr']);
+                $data['package_limit_arr']);
+                $data['examine_status'] = 'pending';
                 $product = $this->create($data);
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
@@ -253,22 +265,8 @@ class ProductModel extends BaseModel
                     $product->productMultiOption()->create($data);
                 }
 
-                //默认图片id为0
-                /*$default_image_id = 0;
-                $imageModel = new ImageModel();
-                $i=0;
-                foreach ($model['image'] as $key => $file) {     
-                    if ($file != '') {
-                        $image_id = $imageModel->singleCreate($data, $file, $key);
-                        //获得首图的product_image_id
-                        if ($i == 0) {
-                            $default_image_id = $image_id;
-                        }
-                        $i++;
-                    }
-                }
                 //更新产品首图
-                $product->update(['default_image' => $default_image_id]);*/
+                $product->update(['default_image' => $default_image_id]);
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {

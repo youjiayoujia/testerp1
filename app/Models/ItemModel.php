@@ -489,7 +489,7 @@ class ItemModel extends BaseModel
             //平均利润率
             $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
 
-            $data['status'] = $item->status;
+            $data['status'] = $item->status?$item->status:'saleOutStopping';
             $data['require_create'] = 0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
 

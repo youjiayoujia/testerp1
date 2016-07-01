@@ -38,7 +38,7 @@ class MessageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model,$this->model->where('label', 'INBOX')),
-            'mixedSearchFields' => $this->model->mixed_search,
+            //'mixedSearchFields' => $this->model->mixed_search,
             'users' => $users,
         ];
         return view($this->viewPath . 'index', $response);

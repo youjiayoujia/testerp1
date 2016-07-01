@@ -129,7 +129,6 @@ abstract class Controller extends BaseController
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
-        //dd($this->autoList($this->model));
         return view($this->viewPath . 'index', $response);
     }
 

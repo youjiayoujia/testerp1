@@ -129,6 +129,7 @@ class MessageModel extends BaseModel{
     {
         return MessageModel::where('from','=', $this->from)
             ->where('id', '<>', $this->id)
+            ->where('status','=','UNREAD')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

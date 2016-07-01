@@ -19,7 +19,8 @@ class CatalogModel extends BaseModel
     public $searchFields = ['name'];
 
     protected $fillable = [
-        'name'
+        'id',
+        'name',
     ];
 
     public $rules = [

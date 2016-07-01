@@ -47,11 +47,15 @@ class TransferChannelAccount extends Command
     {
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $id = ChannelModel::where(['name' => 'Amazon'])->first()->id;
         $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         while ($smAmazons->count()) {
             $start += $len;
             foreach ($smAmazons as $smAmazon) {
+                $originNum++;
                 $url = parse_url($smAmazon->place_site);
                 $amazon = [
                     'channel_id' => $id,
@@ -60,7 +64,7 @@ class TransferChannelAccount extends Command
                     'alias' => $smAmazon->place_name,
                     'order_prefix' => $smAmazon->seller_account,
                     'sync_cycle' => '0',
-                    'sync_days' => 30,
+                    'sync_days' => 7,
                     'sync_pages' => 100,
                     'amazon_api_url' => ($url['scheme']."://".$url['host']),
                     'amazon_marketplace_id' => $smAmazon->place_id,
@@ -69,24 +73,37 @@ class TransferChannelAccount extends Command
                     'amazon_accesskey_secret' => $smAmazon->secret_key,
                     'is_available' => $smAmazon->status,
                 ];
-                AccountModel::create($amazon);
+                $exist = AccountModel::where(['amazon_marketplace_id' => $smAmazon->place_id, 'amazon_accesskey_id' => $smAmazon->access_key])->first();
+                if($exist) {
+                    $exist->update($amazon);
+                    $updatedNum++;
+                } else {
+                    AccountModel::create($amazon);
+                    $createdNum++;
+                }
             }
             $smAmazons = smAmazon::where(['method' => 'listOrders'])->skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smAmazon]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $id = ChannelModel::where(['name' => 'Wish'])->first()->id;
         $smWishes = smWish::skip($start)->take($len)->get();
         while ($smWishes->count()) {
             $start += $len;
             foreach ($smWishes as $smWish) {
+                $originNum++;
                 $wish = [
                     'channel_id' => $id,
                     'country_id' => '0',
                     'account' => $smWish->account_name,
+                    'alias' => $smWish->account_name,
                     'sync_cycle' => '0',
-                    'sync_days' => 30,
+                    'sync_days' => 7,
                     'sync_pages' => 100,
                     'wish_publish_code' => $smWish->publish_code,
                     'wish_client_id' => $smWish->client_id,
@@ -99,24 +116,39 @@ class TransferChannelAccount extends Command
                     'wish_sku_resolve' => $smWish->sku_type,
                     'is_available' => $smWish->status,
                 ];
-                AccountModel::create($wish);
+
+                $exist = AccountModel::where(['wish_client_id' => $smWish->client_id])->first();
+                if($exist) {
+                    $exist->update($wish);
+                    $updatedNum++;
+                } else {
+                    AccountModel::create($wish);
+                    $createdNum++;
+                }
             }
             $smWishes = smWish::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smWish]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $id = ChannelModel::where(['name' => 'AliExpress'])->first()->id;
         $smSmts = smSmt::skip($start)->take($len)->get();
         while ($smSmts->count()) {
             $start += $len;
             foreach ($smSmts as $smSmt) {
+                $originNum++;
                 $smt = [
                     'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
-                    'sync_days' => 30,
+                    'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smSmt->seller_account,
+                    'alias' => $smSmt->seller_account,
                     'aliexpress_member_id' => $smSmt->member_id,
                     'aliexpress_appkey' => $smSmt->appkey,
                     'aliexpress_appsecret' => $smSmt->appsecret,
@@ -128,24 +160,39 @@ class TransferChannelAccount extends Command
                     'customer_service_id' => $smSmt->customerservice_id,
                     'is_available' => '1'
                 ];
-                AccountModel::create($smt);
+
+                $exist = AccountModel::where(['aliexpress_appkey' => $smSmt->appkey])->first();
+                if($exist) {
+                    $exist->update($smt);
+                    $updatedNum++;
+                } else {
+                    AccountModel::create($smt);
+                    $createdNum++;
+                }
             }
             $smSmts = smSmt::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smSmt]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $id = ChannelModel::where(['name' => 'Lazada'])->first()->id;
         $smLazadas = smLazada::skip($start)->take($len)->get();
         while ($smLazadas->count()) {
             $start += $len;
             foreach ($smLazadas as $smLazada) {
+                $originNum++;
                 $lazada = [
                     'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
-                    'sync_days' => 30,
+                    'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smLazada->sales_account,
+                    'alias' => $smLazada->sales_account,
                     'lazada_access_key' => $smLazada->Key,
                     'lazada_user_id' => $smLazada->lazada_user_id,
                     'lazada_site' => $smLazada->site,
@@ -155,24 +202,39 @@ class TransferChannelAccount extends Command
                     'is_available' => '1',
                 ];
 
-                AccountModel::create($lazada);
+                $exist = AccountModel::where(['lazada_access_key' => $smLazada->Key])->first();
+                if($exist) {
+                    $exist->update($lazada);
+                    $updatedNum++;
+                } else {
+                    AccountModel::create($lazada);
+                    $createdNum++;
+                }
             }
             $smLazadas = smLazada::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smLazada]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
+
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $id = ChannelModel::where(['name' => 'Cdiscount'])->first()->id;
         $smCds = smCd::skip($start)->take($len)->get();
         while ($smCds->count()) {
             $start += $len;
             foreach ($smCds as $smCd) {
+                $originNum++;
                 $cd = [
                     'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
-                    'sync_days' => 30,
+                    'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smCd->sales_account,
+                    'alias' => $smCd->sales_account,
                     'cd_currency_type' => $smCd->currency_type,
                     'cd_currency_type_cn' => $smCd->currency_type_cn,
                     'cd_account' => $smCd->account,
@@ -182,24 +244,39 @@ class TransferChannelAccount extends Command
                     'cd_expires_in' => $smCd->expires_in,
                     'is_available' => '1',
                 ];
-                AccountModel::create($cd);
+
+                $exist = AccountModel::where(['cd_account' => $smCd->account])->first();
+                if($exist) {
+                    $exist->update($cd);
+                    $updatedNum++;
+                } else {
+                    AccountModel::create($cd);
+                    $createdNum++;
+                }
             }
             $smCds = smCd::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smCd]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
 
         $len = 100;
         $start = 0;
+        $originNum = 0;
+        $createdNum = 0;
+        $updatedNum = 0;
         $id = ChannelModel::where(['name' => 'Ebay'])->first()->id;
         $smEbays = smEbay::skip($start)->take($len)->get();
         while ($smEbays->count()) {
             $start += $len;
             foreach ($smEbays as $smEbay) {
+                $originNum++;
                 $ebay = [
                     'channel_id' => $id,
                     'country_id' => '0',
                     'sync_cycle' => '0',
-                    'sync_days' => 30,
+                    'sync_days' => 7,
                     'sync_pages' => 100,
+                    'account' => $smEbay->seller_account,
+                    'alias' => $smEbay->seller_account,
                     'ebay_developer_account' => $smEbay->developer->developer_account,
                     'ebay_developer_devid' => $smEbay->developer->devid,
                     'ebay_developer_appid' => $smEbay->developer->appid,
@@ -209,9 +286,19 @@ class TransferChannelAccount extends Command
                     'customer_service_id' => $smEbay->sf_order,
                     'is_available' => '1',
                 ];
-                AccountModel::create($ebay);
+
+                $exist = AccountModel::where(['ebay_developer_account' => $smEbay->developer->developer_account, 'account' => $smEbay->seller_account])->first();
+                if($exist) {
+                    $exist->update($ebay);
+                    $updatedNum++;
+                } else {
+                    AccountModel::create($ebay);
+                    $createdNum++;
+                }
             }
             $smEbays = smEbay::skip($start)->take($len)->get();
         }
+        $this->info('Transfer [smEbay]: Origin:'.$originNum.' => Created:'.$createdNum.' Updated:'.$updatedNum);
     }
+    
 }

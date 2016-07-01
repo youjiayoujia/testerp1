@@ -42,9 +42,9 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
                     $this->dispatch($job);
                 }
             }
-            if ($this->order->status == 'NEED') {
-                $this->release(3600);
-            }
+//            if ($this->order->status == 'NEED') {
+//                $this->release(3600);
+//            }
             $this->result['status'] = 'success';
             $this->result['remark'] = 'Success.';
         } else {

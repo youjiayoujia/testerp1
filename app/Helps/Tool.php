@@ -153,6 +153,8 @@ class Tool
                 $i = count($tmpErpSku) - 1;
                 $newSku = $tmpErpSku[$i];
             }
+            $newSku =explode('#',$newSku);
+            $newSku = $newSku[0];
 
 
             $qty = 1;

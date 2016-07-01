@@ -28,8 +28,6 @@ class OrderModel extends BaseModel
 
     public $searchFields = ['ordernum', 'email'];
 
-    public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
-
     /**
      * 退款rules
      */
@@ -145,19 +143,6 @@ class OrderModel extends BaseModel
             ]
         ];
     }
-
-//    public function getMixedSearchAttribute()
-//    {
-//        return [
-//            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
-//            'filterFields' => ['tracking_no'],
-//            'filterSelects' => ['status' => config('package')],
-//            'selectRelatedSearchs' => [
-//                'order' => ['status' => config('order.status'), 'active' => config('order.active')],
-//            ],
-//            'sectionSelect' => ['time' => ['created_at']],
-//        ];
-//    }
 
     public function items()
     {
@@ -358,13 +343,23 @@ class OrderModel extends BaseModel
         $data['ordernum'] = $begin = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
-            $item = ItemModel::where('sku', $orderItem['sku'])->first();
-            if ($item) {
-                $orderItem['item_id'] = $item->id;
+            $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
+            if ($channelProduct) {
+                $orderItem['item_id'] = $channelProduct->item->id;
+                if (!$orderItem['sku']) {
+                    $orderItem['sku'] = $channelProduct->item->sku;
+                }
             } else {
-                $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
-                if ($channelProduct) {
-                    $orderItem['item_id'] = $channelProduct->item->id;
+                if ($orderItem['sku']) {
+                    $item = ItemModel::where('sku', $orderItem['sku'])->first();
+                    if ($item) {
+                        ChannelProduct::create([
+                            'channel_account_id' => $data['channel_account_id'],
+                            'item_id' => $item->id,
+                            'channel_sku' => $orderItem['channel_sku'],
+                        ]);
+                        $orderItem['item_id'] = $item->id;
+                    }
                 }
             }
             if (!isset($orderItem['item_id'])) {

@@ -301,6 +301,7 @@ Class LazadaAdapter implements AdapterInterface
             'payment_date' => $order_info['CreatedAt'],
             'create_time' => $order_info['CreatedAt'],
             'fulfill_by' => "",
+            'status'=>'PAID',
             'remark' => $order_info['Remarks']? $order_info['Remarks']:'',
             'items' => []
         ];

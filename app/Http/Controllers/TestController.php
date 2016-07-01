@@ -53,7 +53,7 @@ class TestController extends Controller
     {
         $orderModel = new OrderModel;
         $start = microtime(true);
-        $account = AccountModel::find(409);
+        $account = AccountModel::find(59);
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -248,6 +248,8 @@ class TestController extends Controller
             $productList = $channel->getOnlineProduct($start, 100);
             if ($productList) {
                 foreach ($productList as $product) {
+
+                    $is_add =true;
                     $productInfo = $product['productInfo'];
                     $variants = $product['variants'];
 

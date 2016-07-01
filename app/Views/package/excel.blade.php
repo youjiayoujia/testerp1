@@ -7,14 +7,18 @@
         <input type='file' name='excel'>
     </div>
     <a href='javascript:' class='btn btn-info download'>格式下载</a>
-    <font>( CSV字段名称: package_id,logistics_id,tracking_no )</font>
+    <input type='hidden' class='type' data-type="{{isset($type) ? $type : ''}}">
 </div>
 @stop
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}
 <script type='text/javascript'>
 $(document).ready(function(){
     $('.download').click(function(){
-        location.href="{{ route('package.downloadType')}}";
+        if($('.type').data('type')) {
+            location.href="{{ route('package.downloadFee')}}";
+        } else {
+            location.href="{{ route('package.downloadType')}}";
+        }
     });
 });
 </script>

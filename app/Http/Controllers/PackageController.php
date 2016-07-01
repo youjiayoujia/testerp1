@@ -84,6 +84,20 @@ class PackageController extends Controller
         return view($this->viewPath . 'allocateLogistics', $response);
     }
 
+    public function downloadFee()
+    {
+        $rows[] = [
+            'package_id' => '',
+            'cost' => '',
+        ];
+        $name = 'Fee';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function downloadType()
     {
         $rows[] = [
@@ -550,6 +564,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, '导入fee'),
             'action' => route('package.excelProcessFee', ['type' => request('type')]),
+            'type' => request('type') ? request('type') : '',
         ];
 
         return view($this->viewPath . 'excel', $response);

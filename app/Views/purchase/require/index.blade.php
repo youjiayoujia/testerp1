@@ -14,7 +14,7 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
     ID</th>
-    <th>产品ID</th>
+    <th>skuID</th>
     <th>sku</th>
     <th>中文名</th>
     <th>可用库存</th>
@@ -51,7 +51,7 @@
             <td>{{$item->thirty_sales}}</td>
             <td>{{$item->fourteen_sales}}</td>
             <td>{{$item->seven_sales}}</td>
-            <td>{{$item->need_purchase_num}}</td>
+            <td>{{$item->need_purchase_num>0?$item->need_purchase_num:0}}</td>
             <td>@if($item->thrend == 1)
             	上涨
             @elseif($item->thrend == 2)

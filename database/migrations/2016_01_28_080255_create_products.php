@@ -52,7 +52,7 @@ class CreateProducts extends Migration
             $table->string('url3')->comment('url3')->default(NULL);
             $table->string('status')->comment('上下架状态')->nullable()->default(0);
             $table->string('edit_status')->comment('编辑状态')->nullable()->default(NULL);
-            $table->string('examine_status')->comment('审核状态')->nullable()->default(NULL);
+            $table->enum('examine_status',['pending','pass','notpass','revocation'])->comment('审核状态')->nullable()->default(NULL);
             $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->string('image_edit_not_pass_remark')->comment('图片审核不通过备注')->nullable()->default(NULL);
             $table->string('data_edit_not_pass_remark')->comment('资料审核不通过备注')->nullable()->default(NULL);

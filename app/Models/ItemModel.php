@@ -483,7 +483,7 @@ class ItemModel extends BaseModel
                 }
 
             }
-            $refund_rate = $all_order_num ? $refund_num / $all_order_num : '100';
+            $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
             //退款率
             $data['refund_rate'] = $refund_rate;
             //平均利润率

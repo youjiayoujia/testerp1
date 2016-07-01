@@ -34,7 +34,8 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if ($this->package->assignLogistics()) {
+        $this->package->assignLogistics();
+        if ($this->package->status == 'ASSIGNED') {
             //计算订单利润率
             $orderRate = $this->package->calculateProfitProcess();
             if ($orderRate > 0) {

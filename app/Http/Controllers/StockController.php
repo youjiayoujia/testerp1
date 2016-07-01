@@ -61,8 +61,6 @@ class StockController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::where('is_available','1')->get(),
-            'uses' => UserModel::all(),
-            'skus' => ItemModel::all(),
         ];
 
         return view($this->viewPath.'create', $response);

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 系统常用配置文件
  *
@@ -31,12 +30,9 @@ return [
         'create' => '新增',
         'edit' => '编辑',
     ],
-
     //库位excel地址
     'excelPath' => './uploads/excel/',
-
     'stockExcelPath' => './uploads/stockExcel/',
-
     'transfer_search' => [
         'id' => 'ID',
         'warehouse.name' => '仓库',
@@ -50,10 +46,6 @@ return [
         'order.active' => '售后状态',
         'active' => '售后状态',
         'country.code' => '国家简称',
-<<<<<<< HEAD
-        'item.sku' => 'sku',
-        'time.created_at'=>'创建时间范围',
-=======
         'time.created_at' => '时间',
         'price.amount' => '金额',
         'item.sku' => 'SKU',
@@ -76,7 +68,7 @@ return [
         'catalog.name' =>'分类',
         'examine_status'=>'产品审核状态',
         'stock.item.sku' => 'sku',
->>>>>>> master
+        'time.created_at'=>'创建时间',
     ],
 ];
 

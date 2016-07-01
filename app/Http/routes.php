@@ -495,7 +495,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wish', 'Publish\Wish\WishPublishController');
     Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
     // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
-
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
@@ -558,6 +557,11 @@ Route::group(['middleware' => 'auth'], function () {
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
 
+    //用户路由
+    Route::resource('user', 'UserController');
+    //图片标签
+    Route::resource('label', 'LabelController');
+    Route::resource('paypal', 'PaypalController');
 });
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);
@@ -565,4 +569,3 @@ Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersLi
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
-

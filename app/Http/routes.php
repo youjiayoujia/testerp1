@@ -436,6 +436,7 @@ Route::group(['middleware' => 'auth'], function () {
         ]);
 
     //订单管理路由
+    Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
     Route::get('order/ajaxCountry', ['uses' => 'OrderController@ajaxCountry', 'as' => 'order.ajaxCountry']);
@@ -482,6 +483,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'PackageController@ajaxQuantityProcess', 'as' => 'package.ajaxQuantityProcess']);
 
     Route::get('package/downloadType', ['uses' => 'PackageController@downloadType', 'as' => 'package.downloadType']);
+    Route::get('package/downloadFee', ['uses' => 'PackageController@downloadFee', 'as' => 'package.downloadFee']);
     Route::get('package/allocateLogistics/{id}',
         ['uses' => 'PackageController@allocateLogistics', 'as' => 'package.allocateLogistics']);
     Route::post('package/storeAllocateLogistics/{id}',

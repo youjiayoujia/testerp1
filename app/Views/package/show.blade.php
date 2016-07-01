@@ -8,10 +8,10 @@
                     <strong>ID</strong>: {{ $model->id }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>渠道</strong>: {{ $model->channelAccount->alias }}
+                    <strong>渠道</strong>: {{ $model->channelAccount ? $model->channelAccount->alias : '' }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>订单号</strong>: {{ $model->order->ordernum }}
+                    <strong>订单号</strong>: {{ $model->order ? $model->order->ordernum : '' }}
                 </div>
                 <div class="col-lg-2">
                     <strong>状态</strong>: {{ $model->status_name }}
@@ -41,9 +41,9 @@
                 <tbody>
                 @foreach($model->items as $item)
                     <tr>
-                        <td><img src="{{ asset($item->item->image) }}" width="100"></td>
-                        <td>{{ $item->item->sku }}</td>
-                        <td>{{ $item->warehousePosition->name }}</td>
+                        <td><img src="{{ asset($item->item ? $item->item->image : '') }}" width="100"></td>
+                        <td>{{ $item->item ? $item->item->sku : '' }}</td>
+                        <td>{{ $item->warehousePosition ? $item->warehousePosition->name : '' }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ $item->remark }}</td>
                     </tr>
@@ -76,7 +76,7 @@
                     <strong>查询地址</strong>: {{ $model->tracking_link }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>物流成本</strong>: {{ $model->cost }} 元
+                    <strong>物流成本</strong>: {{ $model->cost + $model->cost1 }} 元
                 </div>
                 <div class="col-lg-2">
                     <strong>重量</strong>: {{ $model->weight }} Kg

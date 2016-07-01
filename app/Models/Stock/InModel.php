@@ -27,6 +27,18 @@ class InModel extends BaseModel
     // 用于查询
     public $searchFields = [''];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['item' => ['sku']],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+    
     /**
      * get the relationship between the two module 
      *

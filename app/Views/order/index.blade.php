@@ -35,7 +35,7 @@
                     <div>毛利润: {{ '' }}USD</div>
                 @endif
             </td>
-            <td>{{ $order->channelAccount->alias }}</td>
+            <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService ? $order->userService->name : '' }}</td>
             <td>{{ $order->created_at }}</td>

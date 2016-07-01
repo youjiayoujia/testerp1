@@ -38,6 +38,7 @@ return [
     'stockExcelPath' => './uploads/stockExcel/',
 
     'transfer_search' => [
+        'id' => 'ID',
         'warehouse.name' => '仓库',
         'channel.name' => '渠道(平台)',
         'channelAccount.account' => '渠道帐号',
@@ -70,6 +71,7 @@ return [
         'write_off' =>'核销状态',
         'catalog.name' =>'分类',
         'examine_status'=>'产品审核状态',
+        'stock.item.sku' => 'sku',
     ],
 ];
 

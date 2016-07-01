@@ -14,7 +14,7 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
     ID</th>
-    <th>产品ID</th>
+    <th>skuID</th>
     <th>sku</th>
     <th>中文名</th>
     <th>可用库存</th>
@@ -33,7 +33,7 @@
     @foreach($data as $item)
         <tr>
             <td>
-             @if($item->is_sale !=1)
+             @if($item->status !="selling")
                 <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="1" >
                 @else
                 <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="0" >

@@ -15,7 +15,7 @@
         <tr>
             <td>{{ $bao3package->id }}</td>
             <td>{{ $bao3package->order_id }}</td>
-            <td>{{ $bao3package->logistics ? $bao3package->logistics->logistics_type : '' }}</td>
+            <td>{{ $bao3package->logistics ? $bao3package->logistics->name : '' }}</td>
             <td>{{ $bao3package->tracking_no }}</td>
             <td>{{ $bao3package->printed_at }}</td>
             <td>{{ $bao3package->is_tonanjing ? '是' : '否' }}</td>

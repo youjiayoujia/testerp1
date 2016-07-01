@@ -16,6 +16,7 @@ use App\Models\Purchase\PurchaseItemModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
+use App\Models\Stock\InModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
 use Tool;
@@ -39,21 +40,20 @@ class PurchaseOrderController extends Controller
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
+
         foreach($response['data'] as $key=>$vo){
             $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
             $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
             $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
             foreach($response['data'][$key]['purchase_items'] as $v){
-            $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
-            $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
-            $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
-            $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
-            $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
+                $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
+                $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
+                $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
+                $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
+                $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
             }
-            /*$response['data'][$key]['sum_purchase_num']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('purchase_num');
-            $response['data'][$key]['sum_arrival_num']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('arrival_num');
-            $response['data'][$key]['sum_storage_qty']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('storage_qty');*/
-            }
+        }
+        
         return view($this->viewPath . 'index', $response);
     }
     
@@ -129,35 +129,28 @@ class PurchaseOrderController extends Controller
         if ($model->status ==5 ) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已取消.'));
         }
+
         $data=request()->all();
         if(isset($data['arr'])){
             if(isset($data['post'])){
                 $post="";
                 if($model->status <4 && $model->status >0){
-                foreach($data['arr'] as $key=>$vo){
-                    foreach($data['post'] as $k=>$value){
-                        if($value['post_coding'] == $vo['post_coding']){
-                            $purchaseItem=PurchaseItemModel::find($vo['id']);
-                            
-                            $post[$key]['purchase_order_id']=$purchaseItem->purchase_order_id;
-                            $post[$key]['post_coding']=$value['post_coding'];
-                            $post[$key]['postage']=$value['postage'];
-                            }
+                    foreach($data['post'] as $post_value){
+                        $post_array['purchase_order_id'] = $data['purchase_order_id'];
+                        $post_array['post_coding'] = $post_value['post_coding'];
+                        $post_array['postage'] = $post_value['postage'];
+                        $post_array['user_id'] = request()->user()->id;
+                        if(array_key_exists('id',$post_value)){
+                            PurchasePostageModel::where('id',$post_value['id'])->update($post_array);
+                        }else{
+                            PurchasePostageModel::create($post_array);
                         }
+                        
+                        
                     }
-                    if(!empty($post)){
-                        foreach($post as $num=>$val){
-                            $num=PurchasePostageModel::where('post_coding',$val['post_coding'])->count();
-                            if($num==0){
-                                PurchasePostageModel::create($val);
-                            }else{
-                                PurchasePostageModel::where('post_coding',$val['post_coding'])->update(['postage'=>$val['postage']]);
-                                }
-                            
-                            }   
-                        }
-                        }
                 }
+            }
+                
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
@@ -175,10 +168,10 @@ class PurchaseOrderController extends Controller
                     }else{
                         $item['costExamineStatus']=0;   
                     }
-                    if($item['status']>0){
+                    /*if($item['status']>0){
                         $data['status']=1;
-                    }
-                    if($item['purchase_num'] != $purchaseItem->purchase_num && $purchaseItem->examineStatus >0){
+                    }*/
+                    if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
                         $data['examineStatus']=2;
                         }
@@ -195,7 +188,7 @@ class PurchaseOrderController extends Controller
         $num=PurchaseItemModel::where('purchase_order_id',$id)->where('costExamineStatus','<>',2)->count();
         if($num ==0){
             $data['costExamineStatus']=2;
-            }
+        }
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));     
@@ -209,7 +202,7 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseOrdersOut()
     {
-         $response = [
+        $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
         return view($this->viewPath.'excelOut',$response);  
@@ -229,6 +222,7 @@ class PurchaseOrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data['examineStatus']=$examineStatus;
+        $data['status'] = 1;
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));
     }
@@ -303,8 +297,8 @@ class PurchaseOrderController extends Controller
         $data=request()->all();
         $model=$this->model->find($id);
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
-        $Inum=ItemModel::where('sku',$data['sku'])->where('is_sale','<>',1)->count();
-        $item=ItemModel::where('sku',$data['sku'])->where('is_sale',1)->first();
+        $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
+        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if($num > 0 || $Inum > 0){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
         }
@@ -357,6 +351,7 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'id' => $id,
             'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
             'purchase_num_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
             'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
@@ -371,13 +366,34 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-    * 打印
+    * 修改打印状态
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function changePrintStatus(){
+        $id = request()->input('id');
+        $this->model->find($id)->update(['print_status'=>1]);
+    }
+
+    /**
+    * 收货节面打印采购条目
     *
     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
     */
     public function printpo(){
         $id = request()->input('id');
         echo Tool::barcodePrint($id);
+    }
+
+    /**
+    * 收货节面打印采购条目
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function payOrder($id){
+        $model=$this->model->find($id);
+        $model->update(['close_status'=>1]);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . "已付款"));
     }
     
     
@@ -504,12 +520,17 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'inWarehouseList', $response);
     }
 
+    /**
+    * 入库
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
     public function updateArriveLog(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");
         $data = substr($data, 0,strlen($data)-1);
         $arr = explode(',', $data);
-
+        
         foreach ($arr as $value) {
             $update_data = explode(':', $value);
             $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
@@ -531,7 +552,8 @@ class PurchaseOrderController extends Controller
                     $datas['status'] = 4;
                 }
                 //print_r($datas);
-                $purchase_item->update($datas);  
+                $purchase_item->update($datas);
+                $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
             }       
         }
         

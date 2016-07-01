@@ -28,7 +28,20 @@ class OrderModel extends BaseModel
 
     public $searchFields = ['ordernum', 'email'];
 
-    public $relatedSearchFields = ['channelAccount' => 'name', 'items' => 'sku'];
+    /**
+     * 退款rules
+     */
+    public $rules = [
+        'create' => [
+            'refund_amount' => 'required',
+            'price' => 'required',
+            'refund_currency' => 'required',
+            'refund' => 'required',
+            'type' => 'required',
+            'reason' => 'required',
+            'image' => 'required',
+        ],
+    ];
 
     public function rule($request)
     {
@@ -104,12 +117,30 @@ class OrderModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['channel' => ['name'], 'country' => ['code']],
-            'filterFields' => [],
-            'filterSelects' => ['status' => config('order.status'), 'active' => config('order.active')],
+            'filterFields' => [
+                'ordernum',
+                'channel_ordernum',
+                'email',
+                'currency'
+            ],
+            'filterSelects' => [
+                'status' => config('order.status'),
+                'active' => config('order.active')
+            ],
+            'sectionSelect' => [
+                'price' => ['amount'],
+                'time' => ['created_at']
+            ],
+            'relatedSearchFields' => [
+                'channel' => ['name'],
+                'items' => ['sku'],
+                'channelAccount' => ['alias'],
+                'country' => ['code'],
+                'userService' => ['name']
+            ],
             'selectRelatedSearchs' => [
 
-            ],
+            ]
         ];
     }
 
@@ -312,13 +343,23 @@ class OrderModel extends BaseModel
         $data['ordernum'] = $begin = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
-            $item = ItemModel::where('sku', $orderItem['sku'])->first();
-            if ($item) {
-                $orderItem['item_id'] = $item->id;
+            $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
+            if ($channelProduct) {
+                $orderItem['item_id'] = $channelProduct->item->id;
+                if (!$orderItem['sku']) {
+                    $orderItem['sku'] = $channelProduct->item->sku;
+                }
             } else {
-                $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
-                if ($channelProduct) {
-                    $orderItem['item_id'] = $channelProduct->item->id;
+                if ($orderItem['sku']) {
+                    $item = ItemModel::where('sku', $orderItem['sku'])->first();
+                    if ($item) {
+                        ChannelProduct::create([
+                            'channel_account_id' => $data['channel_account_id'],
+                            'item_id' => $item->id,
+                            'channel_sku' => $orderItem['channel_sku'],
+                        ]);
+                        $orderItem['item_id'] = $item->id;
+                    }
                 }
             }
             if (!isset($orderItem['item_id'])) {

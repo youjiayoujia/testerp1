@@ -84,6 +84,20 @@ class PackageController extends Controller
         return view($this->viewPath . 'allocateLogistics', $response);
     }
 
+    public function downloadFee()
+    {
+        $rows[] = [
+            'package_id' => '',
+            'cost' => '',
+        ];
+        $name = 'Fee';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function downloadType()
     {
         $rows[] = [
@@ -266,6 +280,37 @@ class PackageController extends Controller
         }
         $model->destroy($id);
         return redirect($this->mainIndex);
+    }
+
+    public function ajaxReturnPackageId()
+    {
+        $trackno = request('trackno');
+        if($trackno) {
+            $model = $this->model->where(['tracking_no' => $trackno])->first();
+            if($model) {
+                return json_encode($model->id);
+            }
+        }
+        return json_encode(false);
+    }
+
+    public function ajaxUpdatePackageLogistics()
+    {
+        $package_id = request('package_id');
+        $trackno = request('trackno');
+        $logistics_id = request('logistics_id');
+        $model = '';
+        if($package_id) {
+            $model = $this->model->find($package_id);
+        } else {
+            $model = $this->model->where(['tracking_no' => $trackno])->first();
+        }
+        if($model) {
+            $model->update(['logistics_id' => $logistics_id]);
+            return json_encode($model->id);
+        }
+
+        return json_encode(false);
     }
 
     public function ajaxGetOrder()
@@ -519,6 +564,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, '导入fee'),
             'action' => route('package.excelProcessFee', ['type' => request('type')]),
+            'type' => request('type') ? request('type') : '',
         ];
 
         return view($this->viewPath . 'excel', $response);
@@ -550,13 +596,15 @@ class PackageController extends Controller
     public function templateMsg($id)
     {
         $model = $this->model->find($id);
-        $view = $model->logistics->template;
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-        ];
-
-        return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
+        if($model->logistics) {
+            $view = $model->logistics->template;
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'model' => $model,
+            ];
+            return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
+        }
+        return false;
     }
 
 }

@@ -57,6 +57,17 @@ class PurchaseOrderModel extends BaseModel
         'print_status'
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name'], 'warehouse' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('purchase.purchaseOrder.status'),'examineStatus' => config('purchase.purchaseOrder.examineStatus'),'write_off' => config('purchase.purchaseOrder.write_off')],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
+
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
@@ -70,6 +81,11 @@ class PurchaseOrderModel extends BaseModel
     public function supplier()
     {
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
+    }
+
+    public function purchaseUser()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id');
     }
 
     public function purchaseItem()

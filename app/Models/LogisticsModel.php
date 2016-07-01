@@ -17,11 +17,12 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
-    public $searchFields = ['short_code', 'logistics_type', 'logistics_supplier_id', 'type'];
+    public $searchFields = ['code', 'name'];
 
     protected $fillable = [
-        'short_code',
-        'logistics_type',
+        'id',
+        'code',
+        'name',
         'warehouse_id',
         'logistics_supplier_id',
         'type',
@@ -38,8 +39,8 @@ class LogisticsModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'short_code' => 'required',
-            'logistics_type' => 'required',
+            'code' => 'required',
+            'name' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
@@ -51,8 +52,8 @@ class LogisticsModel extends BaseModel
             'is_enable' => 'required',
         ],
         'update' => [
-            'short_code' => 'required',
-            'logistics_type' => 'required',
+            'code' => 'required',
+            'name' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
@@ -98,6 +99,11 @@ class LogisticsModel extends BaseModel
     public function template()
     {
         return $this->belongsTo('App\Models\Logistics\TemplateModel', 'logistics_template_id', 'id');
+    }
+
+    public function channelName()
+    {
+        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_channel_names', 'logistics_id', 'channel_id')->withPivot('name');
     }
 
     public function getDockingNameAttribute()

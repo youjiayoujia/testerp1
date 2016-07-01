@@ -54,7 +54,7 @@ return [
                     'url' => 'product.index',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '选款选中',
                     'url' => 'SelectProduct.index',
                     'icon' => '',
@@ -73,7 +73,7 @@ return [
                     'name' => '选款产品发布',
                     'url' => 'PublishProduct.index',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '通关报关' => [
                 [
@@ -310,7 +310,7 @@ return [
                     'url' => 'inWarehouse',
                     'icon' => '',
                 ],
-				[
+				/*[
                     'name' => '采购单结算',
                     'url' => 'closePurchaseOrder.index',
                     'icon' => '',
@@ -324,7 +324,7 @@ return [
                     'name' => '异常采购单',
                     'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '供应链' => [
                 [
@@ -357,11 +357,40 @@ return [
         ],
     ],
     //财务导航
-    [
+    /*[
         'name' => '财务',
         'icon' => 'piggy-bank',
         'url' => 'dashboard.index',
+    ],*/
+
+
+    [
+        'name' => ' 刊登',
+        'icon' => 'glyphicon glyphicon-send',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => 'wish草稿列表',
+                'url' => 'wish.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'wish在线数据列表',
+                'url' => 'wish.indexOnlineProduct',
+                'icon' => '',
+            ],
+            [
+                'name' => 'wish销售代码设置',
+                'url' => 'wishSellerCode.index',
+                'icon' => '',
+            ],
+
+        ],
     ],
+
+
+
     //客户导航
 //    [
 //        'name' => '客户',
@@ -424,6 +453,7 @@ return [
                 'url' => 'paypal.index',
                 'icon' => '',
             ],
+
         ],
     ],
     //财务导航

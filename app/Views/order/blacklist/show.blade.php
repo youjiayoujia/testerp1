@@ -27,10 +27,10 @@
             <div class="col-lg-2">
                 <strong>订单总数</strong>: {{ $model->total_order }}
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-2">
                 <strong>退款率</strong>: {{ $model->refund_rate }}
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-4">
                 <strong>类型</strong>: {{ $model->type_name }}
             </div>
             <div class="col-lg-12">

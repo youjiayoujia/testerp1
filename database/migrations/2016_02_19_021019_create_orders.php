@@ -41,6 +41,7 @@ class CreateOrders extends Migration
                 ])->default('NORMAL')->comment('售后状态');
             $table->double('amount', 15, 2)->comment('总金额');
             $table->string('gross_margin')->comment('预测毛利率')->nullable()->defalut(NULL);
+            $table->decimal('profit_rate', 7, 2)->comment('利润率')->nullable()->defalut(NULL);
             $table->double('amount_product', 15, 2)->comment('产品金额');
             $table->double('amount_shipping', 15, 2)->comment('运费');
             $table->double('amount_coupon', 15, 2)->comment('折扣金额');
@@ -51,6 +52,7 @@ class CreateOrders extends Migration
             $table->string('currency')->comment('币种');
             $table->double('rate', 15, 4)->comment('汇率');
             $table->enum('address_confirm', [0, 1])->comment('地址验证')->default(1);
+            $table->string('shipping')->comment('物流方式')->nullable()->default(NULL);
             $table->string('shipping_firstname')->comment('发货名字');
             $table->string('shipping_lastname')->comment('发货姓氏');
             $table->string('shipping_address')->comment('发货地址');
@@ -80,8 +82,9 @@ class CreateOrders extends Migration
             $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);
             $table->enum('blacklist', ['0', '1'])->comment('黑名单订单')->nullable()->default('1');
             $table->double('platform', 15, 2)->comment('平台费')->nullable()->default(0);
+            $table->string('aliexpress_loginId')->comment('aliexpress买家的账号id')->nullable()->default(null);
             $table->date('payment_date')->comment('支付时间');
-            $table->date('create_time')->comment('渠道创建时间');
+            $table->timestamp('create_time')->comment('渠道创建时间');
             $table->timestamps();
             $table->softDeletes();
         });

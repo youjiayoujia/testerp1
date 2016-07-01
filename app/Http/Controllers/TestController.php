@@ -16,6 +16,9 @@ use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+
+use App\Models\Publish\Wish\WishPublishProductModel;
+use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
 use App\Models\PackageModel;
@@ -30,6 +33,8 @@ use App\Models\Message\ReplyModel;
 use App\Models\Message\MessageModel;
 
 
+use DB;
+
 class TestController extends Controller
 {
     private $itemModel;
@@ -41,7 +46,10 @@ class TestController extends Controller
 
     public function test1()
     {
-       
+        $url = 'http://baidu.com/index.php?a=1&b=3';
+        $arr = pathinfo($url);
+        var_dump($arr);
+        exit;
         echo Tool::barcodePrint('67');
     }
 
@@ -93,10 +101,10 @@ exit;
         
         $orderModel = new OrderModel;
         $start = microtime(true);
-        $account = AccountModel::find(1);
+        $account = AccountModel::find(59);
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
-            $endDate = date("Y-m-d H:i:s", time());
+            $endDate = date("Y-m-d H:i:s", time() - 300);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
             foreach ($orderList as $order) {
@@ -271,5 +279,83 @@ exit;
 
 
         }
+    }
+
+    public function getWishProduct()
+    {
+        $accountID = request()->get('id');
+        $begin = microtime(true);
+        $account = AccountModel::findOrFail($accountID);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+        $hasProduct = true;
+        $start = 0;
+
+        while ($hasProduct) {
+
+            $productList = $channel->getOnlineProduct($start, 100);
+            if ($productList) {
+                foreach ($productList as $product) {
+
+                    $is_add =true;
+                    $productInfo = $product['productInfo'];
+                    $variants = $product['variants'];
+
+                    foreach ($variants as $key => $variant) {
+                        $productInfo['sellerID'] = $variant['sellerID']; //这个随便保存一个就好
+                        $variants[$key]['account_id'] = $accountID;
+                    }
+
+                    $productInfo['account_id'] = $accountID;
+                    $thisProduct = WishPublishProductModel::where('productID', $productInfo['productID'])->first();
+
+                    if ($thisProduct) {
+                        $is_add = false;
+                        $mark_id = $thisProduct->id;
+                    }
+
+                    if ($is_add) {
+                        $wish = WishPublishProductModel::create($productInfo);
+
+                        foreach ($variants as $detail) {
+                            $detail['product_id'] = $wish->id;
+                            $wishDetail = WishPublishProductDetailModel::create($detail);
+                        }
+
+                    } else {
+
+                        WishPublishProductModel::where('productID', $productInfo['productID'])->update($productInfo);
+                        foreach ($variants as $key1 => $item) {
+                            $productDetail = WishPublishProductModel::find($mark_id)->details;
+                            if (count($variants) == count($productDetail)) {
+                                foreach ($productDetail as $key2 => $productItem) {
+                                    if ($key1 == $key2) {
+                                        $productItem->update($item);
+                                    }
+                                }
+                            } else {
+                                foreach ($productDetail as $key2 => $orderItem) {
+                                    $orderItem->delete($item);
+                                }
+                                foreach ($variants as $value) {
+                                    $value['product_id'] = $mark_id;
+                                    WishPublishProductDetailModel::create($value);
+                                }
+                            }
+                        }
+
+                    }
+                }
+                $start++;
+            } else {
+                $hasProduct = false;
+            }
+
+
+        }
+
+
+        $end = microtime(true);
+        echo '耗时' . round($end - $begin, 3) . '秒';
     }
 }

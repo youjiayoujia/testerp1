@@ -83,7 +83,7 @@ Class AmazonAdapter implements AdapterInterface
             }
             $response = $this->setRequest('Orders', $request);
             if (isset($response->Error)) {
-                continue;
+                Tool::show($response);
             }
             $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
             foreach ($responseOrders->Orders->Order as $order) {
@@ -135,25 +135,25 @@ Class AmazonAdapter implements AdapterInterface
     {
         $shippingName = explode(' ', $order->ShippingAddress->Name);
         $result = [
-            'channel_ordernum' => $order->AmazonOrderId,
-            'email' => $order->BuyerEmail,
-            'amount' => $order->OrderTotal->Amount,
-            'currency' => $order->OrderTotal->CurrencyCode,
+            'channel_ordernum' => (string)$order->AmazonOrderId,
+            'email' => (string)$order->BuyerEmail,
+            'amount' => (float)$order->OrderTotal->Amount,
+            'currency' => (string)$order->OrderTotal->CurrencyCode,
             'status' => 'PAID',
-            'payment' => $order->PaymentMethod,
-            'shipping' => $order->ShipmentServiceLevelCategory,
+            'payment' => (string)$order->PaymentMethod,
+            'shipping' => (string)$order->ShipmentServiceLevelCategory,
             'shipping_firstname' => isset($shippingName[0]) ? $shippingName[0] : '',
             'shipping_lastname' => isset($shippingName[1]) ? $shippingName[1] : '',
-            'shipping_address' => $order->ShippingAddress->AddressLine1,
-            'shipping_address1' => $order->ShippingAddress->AddressLine2,
-            'shipping_city' => $order->ShippingAddress->City,
-            'shipping_state' => $order->ShippingAddress->StateOrRegion,
-            'shipping_country' => $order->ShippingAddress->CountryCode,
-            'shipping_zipcode' => $order->ShippingAddress->PostalCode,
-            'shipping_phone' => $order->ShippingAddress->Phone,
-            'payment_date' => $order->PurchaseDate,
-            'create_time' => $order->PurchaseDate,
-            'fulfill_by' => $order->FulfillmentChannel,
+            'shipping_address' => (string)$order->ShippingAddress->AddressLine1,
+            'shipping_address1' => (string)$order->ShippingAddress->AddressLine2,
+            'shipping_city' => (string)$order->ShippingAddress->City,
+            'shipping_state' => (string)$order->ShippingAddress->StateOrRegion,
+            'shipping_country' => (string)$order->ShippingAddress->CountryCode,
+            'shipping_zipcode' => (string)$order->ShippingAddress->PostalCode,
+            'shipping_phone' => (string)$order->ShippingAddress->Phone,
+            'payment_date' => (string)$order->PurchaseDate,
+            'create_time' => (string)$order->PurchaseDate,
+            'fulfill_by' => (string)$order->FulfillmentChannel,
             'items' => $orderItems
         ];
         return $result;
@@ -166,12 +166,19 @@ Class AmazonAdapter implements AdapterInterface
      */
     public function parseOrderItem($orderItem)
     {
+        preg_match('/001\*FBA(.+?)\[/i', (string)$orderItem->SellerSKU, $result);
+        if ($result) {
+            $sku = $result[1];
+        } else {
+            preg_match('/001\*(.+?)\[/i', (string)$orderItem->SellerSKU, $result);
+            $sku = $result ? $result[1] : '';
+        }
         $result = [
-            'sku' => '',
-            'channel_sku' => $orderItem->SellerSKU,
-            'quantity' => $orderItem->QuantityOrdered,
-            'price' => $orderItem->ItemPrice->Amount,
-            'currency' => $orderItem->ItemPrice->CurrencyCode,
+            'sku' => $sku,
+            'channel_sku' => (string)$orderItem->SellerSKU,
+            'quantity' => (int)$orderItem->QuantityOrdered,
+            'price' => (float)$orderItem->ItemPrice->Amount,
+            'currency' => (string)$orderItem->ItemPrice->CurrencyCode,
         ];
         return $result;
     }

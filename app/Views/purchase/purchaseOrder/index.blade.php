@@ -8,7 +8,7 @@
 @section('tableHeader')
 	
     <th>ID</th> 
-    <th>采购单信息</th> 
+    <th>采购单状态</th> 
     <th>采购单审核状态</th>
     <th>核销状态</th>
     <th>采购人</th>
@@ -19,38 +19,26 @@
     <th>操作</th>
 @stop
 @section('tableBody')
+    @if(count($data)>0)
     @foreach($data as $purchaseOrder)
+
         <tr>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
-            	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
+            	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
                 外部单号：
                 @foreach($purchaseOrder->purchasePostage as $ppostage)
                     {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
                 @endforeach
             </td>
-           <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
-            	@if($purchaseOrder->status == $k)
-            	{{ $statu }}
-                @endif
-            @endforeach </td>
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
-            	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
-                @endif
-            @endforeach   
+            <td> 
+                {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
+            </td>
+            <td>{{config('purchase.purchaseOrder.status')[$purchaseOrder->examineStatus]}}</td>  
             <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
-    		<td>{{ $purchaseOrder->assigner_name }}
+    		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
             <td>
-            
-            @if($purchaseOrder->supplier_id >0)
-            @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
-            	@if($purchaseOrder->close_status == $k)
-            	{{ $close_statu}}
-                @endif
-            @endforeach
-            	</br>供应商编号NO.{{ $purchaseOrder->supplier->id}}
-            @endif
+                {{ $purchaseOrder->supplier?$purchaseOrder->supplier->name:''}}
             </td>
             <td>
             @if($purchaseOrder->status <4)
@@ -116,19 +104,23 @@
                 </table>
                 @endif
             </td>
-            <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
-                  
+            <td>{{ $purchaseOrder->warehouse ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
+                 
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
-            	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
-                     <span class="glyphicon glyphicon-ok-sign"></span>
-                </a>
+                @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
+                	<a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="审核" class="btn btn-info btn-xs">
+                         <span class="glyphicon glyphicon-ok-sign"></span>
+                    </a>
+                @endif
                 <a href="{{ route('purchaseOrder.show', ['id'=>$purchaseOrder->id]) }}"  title="详情"  class="btn btn-info btn-xs">
                      <span class="glyphicon glyphicon-eye-open"></span>  
                 </a>
-                 <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
-                   <span class="glyphicon glyphicon-pencil"></span>
-                </a>
+                @if($purchaseOrder->status != 4 || ($purchaseOrder->close_status==1&&$purchaseOrder->status==2))
+                    <a href="{{ route('purchaseOrder.edit', ['id'=>$purchaseOrder->id]) }}" title="修改" class="btn btn-warning btn-xs">
+                       <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                @endif
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==0)
                     <a  href="javascript:"  title="待核销" class="btn btn-danger btn-xs daihexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>
@@ -140,24 +132,29 @@
                          <span class="glyphicon glyphicon-yen"></span>
                     </a>
                 @endif
-                
-               <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
+                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
+                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
-                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
-                <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs">
+                
+                <a data-toggle="modal" data-target="#myModala" title="查询物流单号" class="btn btn-primary btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 @endif 
-                 <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
-                    <span class="glyphicon glyphicon-remove-sign"></span>
-                </a>
-                @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
-    				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-print"></span>
+                @if($purchaseOrder->examineStatus == 1||$purchaseOrder->examineStatus == 2)
+                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs tuihui">
+                        <span class="glyphicon glyphicon-remove-sign"></span>
                     </a>
-                @endif                      
+                @endif
+                @if($purchaseOrder->status == 1)
+                <a href="javascript:" title="付款" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
+                    <span class="glyphicon glyphicon glyphicon-usd"></span>
+                </a>
+                @endif 
                 
+				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
+                    <span class="glyphicon glyphicon-print"></span>
+                </a>  
             </td>
         </tr>
     @endforeach
@@ -179,20 +176,19 @@
          <input type="hidden" name="_token" value="{{ csrf_token() }}">
          <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
+        
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label  class='control-label'>物流号</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div> 
-                 <div class="form-group col-sm-2">
+                <div class="form-group col-sm-2">
                     <label  class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
-            </div>       
-           
-             
-              <div class='row'>
+            </div>                   
+            <div class='row'>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
@@ -200,16 +196,8 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
-                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-                </div>
-                 
-                 
-                    <input type="hidden" id="currrent" value="1">
-                     
+            </div>   
         </div>
-        <!--<div class="panel-footer">
-            <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>-->
     </div> 
          
          <div class="modal-footer">
@@ -225,9 +213,8 @@
 </div>
 </div>
 <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModala" tabindex="-1" role="dialog" 
-   aria-labelledby="myModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+<div class="modal fade" id="myModala" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
+   <div class="modal-dialog" style="width:800px">
       <div class="modal-content">
          <div class="modal-header">
             <button type="button" class="close" 
@@ -238,20 +225,22 @@
                查询物流单号
             </h4>
          </div>
-         <div style="text-align: center">
-         <iframe name="kuaidi100" src="http://www.kuaidi100.com/frame/app/index2.html" width="800" height="400" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
-      </div>
+        <div style="text-align: center">
+            <iframe name="kuaidi100" src="http://www.kuaidi100.com/frame/app/index2.html" width="800" height="400" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
+        </div>
       </div>
       
 </div>
 </div>
 
-
+@endif
 @stop
 
 @section('childJs')
     <script type='text/javascript'>
-	
+	$("#myModal").click(function(){
+        //$("#ajaxcode").val(1234);
+    })
 	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
 
 	$(".hexiao").click(function(){
@@ -261,8 +250,23 @@
         }
     })
 
+
+    $(".tuihui").click(function(){
+        if (confirm("确认退回?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
     $(".daihexiao").click(function(){
         if (confirm("确认待核销?")) {
+            var url = $(this).data('url');
+            window.location.href=url;
+        }
+    })
+
+    $(".fukuan").click(function(){
+        if (confirm("确认付款?")) {
             var url = $(this).data('url');
             window.location.href=url;
         }

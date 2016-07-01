@@ -63,7 +63,7 @@ class PackageModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['short_code', 'logistics_type']],
+            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['code', 'name']],
             'filterFields' => ['tracking_no'],
             'filterSelects' => ['status' => config('package')],
             'selectRelatedSearchs' => [
@@ -358,11 +358,11 @@ class PackageModel extends BaseModel
             $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
             $content['logistics_id'] = iconv('gb2312', 'utf-8', trim($content['logistics_id']));
             $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
-            if (!LogisticsModel::where(['logistics_type' => $content['logistics_id']])->count()) {
+            if (!LogisticsModel::where(['name' => $content['logistics_id']])->count()) {
                 $error[] = $key;
                 continue;
             }
-            $tmp_logistics = LogisticsModel::where(['logistics_type' => $content['logistics_id']])->first();
+            $tmp_logistics = LogisticsModel::where(['name' => $content['logistics_id']])->first();
             $tmp_package = $this->where('id', $content['package_id'])->first();
             if (!$tmp_package || $tmp_package->is_auto || $tmp_package->status != 'PROCESSING') {
                 $error[] = $key;
@@ -521,7 +521,7 @@ class PackageModel extends BaseModel
                         }
                         $rows[] = [
                             '供货商' => SupplierModel::find($key1)->name,
-                            '物流方式' => LogisticsModel::find($key2)->logistics_type,
+                            '物流方式' => LogisticsModel::find($key2)->name,
                             '发货日期' => iconv('utf-8', 'gb2312', PackageModel::find($value3)->shipped_at),
                             '运单号' => PackageModel::find($value3)->tracking_no,
                             '重量' => PackageModel::find($value3)->weight,
@@ -569,8 +569,8 @@ class PackageModel extends BaseModel
         $orderChannelFee = $this->calculateOrderChannelFee($order, $orderItems);
         $orderRate = ($order->amount - ($orderCosting + $this->calculateOrderChannelFee($order,
                         $orderItems) + $order->logistics_fee)) / $order->amount;
-        if ($orderRate <= 0) {
-            //利润率为负撤销
+        if ($order->status != 'CANCLE' && $orderRate <= 0) {
+            //利润率为负撤销0
             $this->OrderCancle($order, $orderItems);
         }
 

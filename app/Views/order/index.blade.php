@@ -35,7 +35,7 @@
                     <div>毛利润: {{ '' }}USD</div>
                 @endif
             </td>
-            <td>{{ $order->channelAccount->alias }}</td>
+            <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService ? $order->userService->name : '' }}</td>
             <td>{{ $order->created_at }}</td>
@@ -60,7 +60,7 @@
                         <div class="text-danger">
                             <label>退款ID:</label>{{ $refund->id }}
                             <label>退款金额:</label>{{ $refund->refund_amount }}
-                            <label>原因:</label>{{ $refund->reason_name }}
+                            <label>原因:</label>{{ $refund->reason ? $refund->reason_name : '' }}
                             <label>申请时间:</label>{{ $refund->created_at }}
                         </div>
                     @endforeach
@@ -73,7 +73,7 @@
                             <div class="col-lg-3 text-primary">{{ $orderItem->sku .' [ '. $orderItem->channel_sku .' ]' }}</div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">
-                                    <strong>{{ $orderItem->item->is_sale == 1 ? '可售' : '不可售'}}</strong>
+                                    <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
                                 <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
                             @else
@@ -132,14 +132,14 @@
                         <span class="glyphicon glyphicon-pencil"></span> 退款
                     </a>
                     <a href="{{ route('remark', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 补充备注
+                        <span class="glyphicon glyphicon-pencil"></span> 备注
                     </a>
                     @if($order->status == 'REVIEW')
                         <a href="javascript:" class="btn btn-primary btn-xs review" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 审核
                         </a>
                     @endif
-                    @if($order->status == 'PREPARED')
+                    @if($order->status == 'PREPARED' && $order->active != 'STOP')
                         <a href="javascript:" class="btn btn-primary btn-xs prepared" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 暂停发货
                         </a>
@@ -158,49 +158,6 @@
     @endforeach
 @stop
 @section('tableToolButtons')
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询订单状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'UNPAID']) }}">未付款</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PAID']) }}">已付款</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PREPARED']) }}">准备发货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'NEED']) }}">缺货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'PACKED']) }}">打包完成</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'SHIPPED']) }}">发货完成</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'COMPLETE']) }}">订单完成</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'CANCEL']) }}">取消订单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status', '=', 'REVIEW']) }}">需审核</a></li>
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询售后状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'NORMAL']) }}">正常</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'VERIFY']) }}">验证中</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'CHARGEBACK']) }}">客户CB</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'STOP']) }}">暂停发货</a></li>
-            <li><a href="{{ DataList::filtersEncode(['active', '=', 'RESUME']) }}">恢复正常</a></li>
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 国家
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($countries as $country)
-                <li>
-                    <a href="{{ DataList::filtersEncode(['shipping_country', '=', $country->code]) }}">{{ $country->cn_name }}</a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
     @parent
 @stop
 @section('childJs')

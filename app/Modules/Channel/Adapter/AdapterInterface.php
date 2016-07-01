@@ -35,7 +35,7 @@ interface AdapterInterface
      *          'currency' => '',
      *          'status' => '',
      *          'payment' => '',
-     *          'shipping_method' => '',
+     *          'shipping' => '',
      *          'shipping_firstname' => '',
      *          'shipping_lastname' => '',
      *          'shipping_address' => '',

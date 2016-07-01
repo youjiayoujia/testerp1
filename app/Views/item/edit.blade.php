@@ -91,12 +91,12 @@
         <div class="form-group col-md-1">
             <label for="color">库存</label>
             
-            <input disabled="disabled" class="form-control" id="inventory" placeholder="库存" name='inventory' value="{{ old('inventory') ?  old('inventory') :$model->all_quantity['all_quantity'] }}">
+            <input disabled="disabled" class="form-control" id="inventory" placeholder="库存" name='inventory' value="{{ old('inventory') ?  old('inventory') :$model->all_quantity }}">
         </div>
 
         <div class="form-group col-md-1">
             <label for="size">库存总金额</label>
-            <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') :$model->all_quantity['all_amount'] }}">
+            <input disabled="disabled" class="form-control" id="amount" placeholder="库存总金额" name='amount' value="{{ old('amount') ?  old('amount') :$model->all_quantity*$model->cost }}">
         </div>
 
     </div>
@@ -138,13 +138,20 @@
         </div>
         <div class="form-group col-md-3">
             <label for="color">在售状态</label>
-            <select  class="form-control" name="is_sale">
-                <option value="1" {{ $model->is_sale == 1 ? 'selected' : '' }}>在售</option>
-                <option value="0" {{ $model->is_sale == 0 ? 'selected' : '' }}>待售</option>
-                <option value="2" {{ $model->is_sale == 2 ? 'selected' : '' }}>卖完下架</option>
-                <option value="3" {{ $model->is_sale == 3 ? 'selected' : '' }}>停产</option>
-                <option value="4" {{ $model->is_sale == 4 ? 'selected' : '' }}>试销</option>
-                <option value="5" {{ $model->is_sale == 5 ? 'selected' : '' }}>货源待定</option>
+            <select  class="form-control" name="status">
+                <option value="selling" {{ $model->status == 'selling' ? 'selected' : '' }}>在售</option>
+                <option value="sellWaiting" {{ $model->status == 'sellWaiting' ? 'selected' : '' }}>待售</option>
+                <option value="saleOutStopping" {{ $model->status == 'saleOutStopping' ? 'selected' : '' }}>卖完下架</option>
+                <option value="stopping" {{ $model->status == 'stopping' ? 'selected' : '' }}>停产</option>
+                <option value="trySale" {{ $model->status == 'trySale' ? 'selected' : '' }}>试销</option>
+                <option value="unSellTemp" {{ $model->status == 'unSellTemp' ? 'selected' : '' }}>货源待定</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">是否激活</label>
+            <select  class="form-control" name="is_available">
+                <option value="1" {{ $model->is_available == 1 ? 'selected' : '' }}>激活</option>
+                <option value="0" {{ $model->is_available == 0 ? 'selected' : '' }}>非激活</option>
             </select>
         </div>
     </div>

@@ -153,42 +153,22 @@
     @endforeach
 @stop
 @section('tableToolButtons')
-    <div class="row">
+    <div class="col-lg-11">
         <form method="POST" action="{{ route('uploadBlacklist') }}" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <div class="form-group col-lg-7">
+            <div class="form-group col-lg-2">
                 <label for="name" class='control-label'>批量导入黑名单客户:</label>
             </div>
-            <div class="form-group col-lg-3">
+            <div class="form-group col-lg-2">
                 <input type='file' name='excel'>
+            </div>
+            <div class="form-group col-lg-1">
+                <button type='submit' class='btn btn-info btn-xs' value='submit'>submit</button>
             </div>
             <div class="form-group col-lg-2">
                 <a href='javascript:' class='downloadUpdateBlacklist'>格式下载(CSV)</a>
-                <button type='submit' class='btn btn-info btn-xs' value='submit'>submit</button>
             </div>
         </form>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询平台
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            @foreach($channels as $channel)
-                <li><a href="{{ DataList::filtersEncode(['channel_id', '=', $channel['id']]) }}">{{ $channel['name'] }}</a></li>
-            @endforeach
-        </ul>
-    </div>
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询类型
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['type', '=', 'CONFIRMED']) }}">确认黑名单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['type', '=', 'SUSPECTED']) }}">疑似黑名单</a></li>
-            <li><a href="{{ DataList::filtersEncode(['type', '=', 'WHITE']) }}">白名单</a></li>
-        </ul>
     </div>
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

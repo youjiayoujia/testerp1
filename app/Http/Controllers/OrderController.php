@@ -56,19 +56,20 @@ class OrderController extends Controller
      */
     public function ajaxCountry()
     {
-        if(request()->ajax()) {
+        if (request()->ajax()) {
             $country = trim(request()->input('shipping_country'));
-            $buf = CountriesModel::where('code', 'like', '%'.$country.'%')->get();
+            $buf = CountriesModel::where('code', 'like', '%' . $country . '%')->get();
             $total = $buf->count();
             $arr = [];
-            foreach($buf as $key => $value) {
+            foreach ($buf as $key => $value) {
                 $arr[$key]['id'] = $value->code;
                 $arr[$key]['text'] = $value->code;
             }
-            if($total)
+            if ($total) {
                 return json_encode(['results' => $arr, 'total' => $total]);
-            else
+            } else {
                 return json_encode(false);
+            }
         }
 
         return json_encode(false);
@@ -79,19 +80,20 @@ class OrderController extends Controller
      */
     public function ajaxSku()
     {
-        if(request()->ajax()) {
+        if (request()->ajax()) {
             $sku = trim(request()->input('sku'));
-            $buf = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            $buf = ItemModel::where('sku', 'like', '%' . $sku . '%')->get();
             $total = $buf->count();
             $arr = [];
-            foreach($buf as $key => $value) {
+            foreach ($buf as $key => $value) {
                 $arr[$key]['id'] = $value->sku;
                 $arr[$key]['text'] = $value->sku;
             }
-            if($total)
+            if ($total) {
                 return json_encode(['results' => $arr, 'total' => $total]);
-            else
+            } else {
                 return json_encode(false);
+            }
         }
 
         return json_encode(false);
@@ -201,7 +203,6 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
-            'items' => ItemModel::all(),
             'aliases' => $model->channel->channelAccount,
             'arr' => $arr,
             'rows' => $model->items()->count(),
@@ -217,10 +218,15 @@ class OrderController extends Controller
      */
     public function refundUpdate($id)
     {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
         request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
         $data['order_id'] = $id;
-        $this->model->refundCreate($data, request()->file('image'));
+        $model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
     }
 

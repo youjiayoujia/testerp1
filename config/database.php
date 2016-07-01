@@ -80,15 +80,26 @@ return [
         //SELLMORE
         'sellmore' => [
             'driver' => 'mysql',
-            'host' => '127.0.0.1',
-            'database' => 'fangzheng',
-            'username' => 'root',
-            'password' => '',
+            'host' => 'localhost',
+            'database' => 'sellmore',
+            'username' => 'sellmore',
+            'password' => 'Z2yIqjo#fx1Nh4ZU!%12*rzh',
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',
             'strict' => false,
         ],
+       // 'sellmore' => [
+       //     'driver' => 'mysql',
+       //     'host' => '127.0.0.1',
+       //     'database' => 'fangzheng',
+       //     'username' => 'root',
+       //     'password' => '',
+       //     'charset' => 'utf8',
+       //     'collation' => 'utf8_unicode_ci',
+       //     'prefix' => '',
+       //     'strict' => false,
+       // ],
     ],
     /*
       |--------------------------------------------------------------------------

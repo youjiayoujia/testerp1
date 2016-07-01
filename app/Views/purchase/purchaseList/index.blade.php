@@ -16,7 +16,7 @@
         <tr>
             <td>{{$_result->id}}</td>
             <td>{{$_result->post_coding}}</td>
-            <td>已关联</td>
+            <td>{{$_result->purchase_order_id?'已关联'?'未关联'}}</td>
             <td><a target="_blank" href="{{ route('purchaseOrder.show', ['id'=>$_result->purchase_order_id]) }}">{{$_result->purchase_order_id}}</a></td>
             <td></td>
             <td>{{$_result->updated_at}}</td>

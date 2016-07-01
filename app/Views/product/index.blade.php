@@ -141,33 +141,7 @@
             <?php
             break;
             } ?>
-            <?php switch ($product->examine_status) {
-            case 'pass':
-            ?>
-            <td>通过</td>
-            <?php
-            break;
-
-            case 'notpass':
-            ?>
-            <td class="notremark">未通过</td>
-
-            <?php
-            break;
-
-            case '':
-            ?>
-            <td>未审核</td>
-            <?php
-            break;
-
-            case 'revocation':
-            ?>
-            <td>撤销</td>
-            <?php
-            break;
-
-            } ?>
+            <td>{{config('product.examineStatus')[$product->examine_status?$product->examine_status:'pending']}}</td>
             <td>{{ $product->name }}</td>
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->supplier?$product->supplier->name:'无' }}</td>

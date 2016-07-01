@@ -54,7 +54,7 @@ return [
                     'url' => 'product.index',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '选款选中',
                     'url' => 'SelectProduct.index',
                     'icon' => '',
@@ -73,7 +73,7 @@ return [
                     'name' => '选款产品发布',
                     'url' => 'PublishProduct.index',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '通关报关' => [
                 [
@@ -357,11 +357,11 @@ return [
         ],
     ],
     //财务导航
-    [
+    /*[
         'name' => '财务',
         'icon' => 'piggy-bank',
         'url' => 'dashboard.index',
-    ],
+    ],*/
 
 
     [

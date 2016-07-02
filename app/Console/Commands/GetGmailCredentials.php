@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Message\AccountModel;
+use App\Models\Channel\AccountModel;
 use Google_Client;
 use Google_Service_Gmail;
 
@@ -48,16 +48,16 @@ class GetGmailCredentials extends Command
                 Google_Service_Gmail::GMAIL_COMPOSE,
                 Google_Service_Gmail::GMAIL_SEND
             )));
-            $client->setAuthConfig($account->secret);
+            $client->setAuthConfig($account->message_secret);
             $client->setAccessType('offline');
 
-            if ($account->token == null) {
+            if ($account->message_token == null) {
                 $authUrl = $client->createAuthUrl();
                 $this->info("Open the following link in your browser:");
                 $this->info($authUrl);
                 $authCode = $this->ask('Enter verification code of ' . $account->account . ': ');
 
-                $account->token = $client->authenticate($authCode);
+                $account->message_token = $client->authenticate($authCode);
                 $account->save();
             }
         }

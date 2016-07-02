@@ -199,7 +199,7 @@
             delay: 250,
             data: function (params) {
               return {
-                supplier:params.term,
+                user:params.term,
               };
             },
             results: function(data, page) {

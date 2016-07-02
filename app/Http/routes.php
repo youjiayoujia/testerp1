@@ -526,6 +526,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getAliExpressOrder', ['uses' => 'OrderController@getAliExpressOrder', 'as' => 'getAliExpressOrder']);
 
     //用户路由
+    Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
     Route::resource('user', 'UserController');
     //图片标签
     Route::resource('label', 'LabelController');

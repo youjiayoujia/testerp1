@@ -28,7 +28,6 @@ class Kernel extends ConsoleKernel
             \App\Console\Commands\GetMessages::class,
             \App\Console\Commands\SendMessages::class,
             \App\Console\Commands\SetMessageRead::class,
-            \App\Console\Commands\CreatePurchaseData::class,
             \App\Console\Commands\GetGmailCredentials::class,
         ];
         /**

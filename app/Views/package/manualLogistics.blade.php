@@ -30,6 +30,7 @@
             </tbody>
         </table>
     </div>
+<?php echo $packages->render(); ?>
 @stop
 @section('formButton')@stop
 @section('pageJs')

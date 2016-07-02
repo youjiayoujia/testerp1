@@ -10,6 +10,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Job;
+use App\Jobs\DoPackage;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
@@ -96,6 +98,18 @@ class OrderController extends Controller
         }
 
         return json_encode(false);
+    }
+
+    public function putNeedQueue()
+    {
+        $orders = $this->model->where(['status' => 'NEED'])->get();
+        foreach($orders as $order) {
+            $job = new DoPackage($order);
+            $job->onQueue('doPackages');
+            $this->dispatch($job);
+        }
+
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '打包成功'));
     }
 
     /**

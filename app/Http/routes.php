@@ -386,6 +386,8 @@ Route::group(['middleware' => 'auth'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
     //订单管理路由
+    Route::get('order/putNeedQueue',
+        ['uses' => 'OrderController@putNeedQueue', 'as' => 'order.putNeedQueue']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);

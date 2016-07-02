@@ -74,6 +74,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
 
     //供货商
+    Route::get('productSupplier/ajaxSupplier', ['uses' => 'Product\SupplierController@ajaxSupplier', 'as' => 'ajaxSupplier']);
     Route::post('productSupplier/levelStore',
         ['uses' => 'Product\SupplierController@levelStore', 'as' => 'productSupplier.levelStore']);
     Route::get('productSupplier/createLevel',

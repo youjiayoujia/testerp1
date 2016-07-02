@@ -643,4 +643,9 @@ class PackageModel extends BaseModel
             }
         }
     }
+
+    public function scopeOfTrackingNo($query, $trackingNo)
+    {
+        return $query->where('tracking_no', $trackingNo);
+    }
 }

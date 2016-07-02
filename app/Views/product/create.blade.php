@@ -157,14 +157,35 @@
             <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') }}">
         </div>        
         <div class="form-group col-md-3">
-            <label for="color">描述(配件说明)</label>
-            <input class="form-control" id="description" placeholder="描述(配件说明)" name='description' value="{{ old('description') }}">
+            <label for="color">描述</label>
+            <input class="form-control" id="description" placeholder="描述" name='description' value="{{ old('description') }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
         </div>
     </div>
+
+    <div class="row">    
+        <div class="form-group col-md-3">
+            <label for="color">申报中文</label>
+            <input class="form-control" id="declared_cn" placeholder="申报中文" name='declared_cn' value="{{ old('declared_cn') }}">
+        </div>
+        
+        <div class="form-group col-md-3">
+            <label for="color">申报英文</label>
+            <input class="form-control" id="declared_en" placeholder="申报英文" name='declared_en' value="{{ old('declared_en') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">申报价格</label>
+            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">配件</label>
+            <input class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') }}">
+        </div>
+    </div>
+
 @stop
 
 @section('pageJs')

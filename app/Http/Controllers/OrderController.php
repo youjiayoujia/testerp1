@@ -47,7 +47,6 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
-            'items' => ItemModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -180,7 +179,6 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
-            'items' => ItemModel::all(),
             'aliases' => $model->channel->channelAccount,
             'arr' => $arr,
             'rows' => $model->items()->count(),

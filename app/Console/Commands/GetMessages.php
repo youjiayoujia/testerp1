@@ -66,7 +66,7 @@ class GetMessages extends Command
 
                     $messageNew->status  = 'UNREAD';
                     $messageNew->related  = 0;
-                    $messageNew->required  = 0;
+                    $messageNew->required  = 1;
                     $messageNew->read  = 0;
 
                     $messageNew->save();

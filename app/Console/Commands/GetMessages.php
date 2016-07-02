@@ -63,26 +63,37 @@ class GetMessages extends Command
                     $messageNew->date = $message['date'];
                     $messageNew->subject = $message['subject'];
                     $messageNew->content = $message['content'];
+
+                    $messageNew->status  = 'UNREAD';
+                    $messageNew->related  = 0;
+                    $messageNew->required  = 1;
+                    $messageNew->read  = 0;
+
                     $messageNew->save();
                     $this->info('Message #' . $messageNew->message_id . ' Received.');
-                }
-                
-                //附件写入
-                $messageInsert = MessageModel::firstOrNew(['message_id' => $message['message_id']]);
-                if($messageInsert){
-                    if($message['attachment'] !=''){
-                        foreach ($message['attachment'] as $value){
-                            if($value){
-                                $attachment = MessageAttachment::firstOrNew(['message_id' => $messageInsert->message_id]);
-                                $attachment->message_id =$messageInsert->id;
-                                $attachment->gmail_message_id =$messageInsert->message_id;
-                                $attachment->filename = $value['file_name'];
-                                $attachment->filepath = $value['file_path'];
-                                $attachment->save();
+
+                    //附件写入
+                    $messageInsert = MessageModel::firstOrNew(['message_id' => $message['message_id']]);
+                    if($messageInsert){
+                        if($message['attachment'] !=''){
+                            foreach ($message['attachment'] as $value){
+                                if($value){
+                                    $attachment = MessageAttachment::firstOrNew(['message_id' => $messageInsert->message_id]);
+                                    $attachment->message_id =$messageInsert->id;
+                                    $attachment->gmail_message_id =$messageInsert->message_id;
+                                    $attachment->filename = $value['file_name'];
+                                    $attachment->filepath = $value['file_path'];
+                                    $attachment->save();
+                                }
                             }
                         }
                     }
+                }else{
+                    $this->comment('Message #' . $messageNew->message_id . ' alerady exist.');
+
                 }
+                
+
             }
         }
     }

@@ -161,7 +161,7 @@
                 </div>
             </td>
         </tr>
-        @if($order->packages)
+        @if($order->packages->toArray())
             @foreach($order->packages as $package)
                 <div class="modal fade" id="myModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div class="modal-dialog" role="document">

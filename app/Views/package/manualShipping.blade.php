@@ -27,6 +27,7 @@
         </table>
     </div>
 </div>
+<?php echo $packages->render(); ?>
 @stop
 @section('formButton')
 <button href="javascript:" class="btn btn-success quantity_process">发货</button>

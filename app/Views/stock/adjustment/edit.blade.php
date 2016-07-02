@@ -136,9 +136,10 @@
         $(document).on('blur', '.quantity', function(){
             tmp = $(this);
             block = tmp.parent().parent();
+            type = tmp.find('.type').val();
             access_quantity = block.find('.access_quantity').val();
             quantity = block.find('.quantity').val();
-            if(quantity) {
+            if(quantity && type == 'OUT') {
                 if(parseInt(quantity) > parseInt(access_quantity)) {
                     alert('数量超出可用数量');
                     tmp.val('');

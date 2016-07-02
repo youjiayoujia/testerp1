@@ -1,10 +1,8 @@
 <?php
-
 namespace App\Console;
-
+use App\Models\ChannelModel;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-
 class Kernel extends ConsoleKernel
 {
     /**
@@ -17,7 +15,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\DoPackages::class,
         \App\Console\Commands\OrdersGet::class,
         \App\Console\Commands\CreatePurchase::class,
-        \App\Console\Commands\CreatePurchaseData::class,
         \App\Console\Commands\TransferProduct::class,
         \App\Console\Commands\TransferChannelAccount::class,
         \App\Console\Commands\TransferSupplier::class,
@@ -26,8 +23,12 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ChannelLogistics::class,
         \App\Console\Commands\TransferUser::class,
         \App\Console\Commands\GetWishProduct::class,
+        //邮件
+        \App\Console\Commands\GetMessages::class,
+        \App\Console\Commands\SendMessages::class,
+        \App\Console\Commands\SetMessageRead::class,
+        \App\Console\Commands\GetGmailCredentials::class,
     ];
-
     /**
      * Define the application's command schedule.
      *
@@ -38,5 +39,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')->hourly();
         $schedule->command('orders:get')->everyFiveMinutes();
+        foreach (ChannelModel::all() as $channel) {
+        }
     }
 }

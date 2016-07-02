@@ -436,7 +436,7 @@ class OrderModel extends BaseModel
                     $this->package_times += 1;
                     $this->status = 'NEED';
                     return $this->save();
-                } elseif ($this->status == 'NEED') {
+                }  elseif ($this->status == 'NEED') {
                     if (strtotime($this->created_at) < strtotime('-3 days')) {
                         $arr = $this->explodeOrder();
                         if ($arr) {
@@ -709,6 +709,17 @@ class OrderModel extends BaseModel
         }
 
         return $packageItem;
+    }
+
+    /**
+     * 根据单号取订单记录
+     * @param $query
+     * @param $ordernum
+     * @return mixed
+     */
+    public function scopeOfOrdernum($query, $ordernum)
+    {
+        return $query->where('ordernum', $ordernum);
     }
 
 }

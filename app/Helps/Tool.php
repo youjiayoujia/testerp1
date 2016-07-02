@@ -177,4 +177,17 @@ class Tool
         return $returnSku;
 
     }
+
+    public function base64Decode($content)
+    {
+        $content = strtr($content, '-_', '+/');
+        return base64_decode($content);
+    }
+
+    public function base64Encode($content)
+    {
+        //return $content;
+        return rtrim(strtr(base64_encode($content), '+/', '-_'), '=');
+    }
+    
 }

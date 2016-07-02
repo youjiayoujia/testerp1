@@ -6,8 +6,12 @@ namespace App\Modules\Channel\Adapter;
  * User: Vincent
  * Date: 16/5/17
  * Time: 下午2:54
+ * modify:jiangdi 2016-6-27 11:13:39 增加获取亚马逊平台邮件 function
  */
 
+use App\Models\Channel\AccountModel;
+use Google_Client;
+use Google_Service_Gmail;
 use Tool;
 
 Class AmazonAdapter implements AdapterInterface
@@ -17,6 +21,7 @@ Class AmazonAdapter implements AdapterInterface
     private $signatureMethod = 'HmacSHA256';
     private $version = '2013-09-01';
     private $config = [];
+    private $messageConfig = [];
 
     public function __construct($config)
     {
@@ -26,6 +31,8 @@ Class AmazonAdapter implements AdapterInterface
         $this->config['SignatureVersion'] = $this->signatureVersion;
         $this->config['SignatureMethod'] = $this->signatureMethod;
         $this->config['Version'] = $this->version;
+        $this->messageConfig['GmailSecret'] = $config['GmailSecret'];
+        $this->messageConfig['GmailToken'] = $config['GmailToken'];
     }
 
     /**
@@ -234,5 +241,169 @@ Class AmazonAdapter implements AdapterInterface
         $signature = hash_hmac("sha256", $signatureString, $this->config['AWS_SECRET_ACCESS_KEY'], true);
         $signature = urlencode(base64_encode($signature));
         return $signature;
+    }
+
+    public function getMessages()
+    {
+        // TODO: Implement getMessages() method.
+            $client = $this->getClient($this->messageConfig);
+            $service = new Google_Service_Gmail($client);
+            $user = 'me';
+            $i = 0;
+            $j = 0; //统计信息条数
+            $nextPageToken = null;
+            $returnAry = [];
+            do {
+                $i += 1;
+                $messages = $service->users_messages->listUsersMessages($user,
+                    [
+                        'labelIds' => ['INBOX', 'UNREAD'],
+                        'pageToken' => $nextPageToken
+                    ]
+                );
+                $nextPageToken = $messages->nextPageToken;
+                foreach ($messages as $key => $message) {
+                    $j += 1;
+                    //1 获取邮件信息
+                    $messageContent = $service->users_messages->get($user, $message->id);
+                    $messagePayload = $messageContent->getPayload();
+                    $messageHeader = $this->parseMessageHeader($messagePayload->getHeaders());
+                    $messageLabels = $messageContent->getLabelIds();
+
+                    $returnAry[$j]['message_id'] = $messageContent->getId();
+                    $returnAry[$j]['labels'] = serialize($messageLabels);
+                    $returnAry[$j]['label'] = $messageLabels[0];
+                    $returnAry[$j]['body'] = $messageLabels[0];
+
+                    if (isset($messageHeader['From'])) {
+                        $messageFrom = explode(' <', $messageHeader['From']);
+                        if (count($messageFrom) > 1) {
+                            $returnAry[$j]['from'] = $this->clearEmail(str_replace('>', '', $messageFrom[1]));
+                            $returnAry[$j]['from_name'] = str_replace('"', '', $messageFrom[0]);
+                        } else {
+                            $returnAry[$j]['from'] = $this->clearEmail($messageHeader['From']);
+                        }
+                    }
+                    if (isset($messageHeader['To'])) {
+                        $messageTo = explode(' <', $messageHeader['To']);
+                        if (count($messageTo) > 1) {
+                            $returnAry[$j]['to'] = $this->clearEmail(str_replace('>', '', $messageTo[1]));
+                        } else {
+                            $returnAry[$j]['to'] = $this->clearEmail($messageHeader['To']);
+                        }
+                    }
+                    $returnAry[$j]['date'] = isset($messageHeader['Date']) ? $messageHeader['Date'] : '';
+                    $returnAry[$j]['subject'] = isset($messageHeader['Subject']) ? $messageHeader['Subject'] : '';
+                    /**
+                     * 处理附件并获取content
+                     */
+                    $tempPayLoad = '';
+                    $tempAttachment = '';
+                    $this->getPayloadNew($tempPayLoad,$tempAttachment,$messagePayload,$service,$message);
+                    $returnAry[$j]['content'] = $this->getMaillContent($tempPayLoad);
+                    $returnAry[$j]['attachment'] = $tempAttachment;
+                }
+            } while ($nextPageToken != '');
+        return $returnAry;
+    }
+    /**
+     * 获取附件，上传附件
+     * @param $data
+     * @param $attachment
+     * @param $payload
+     * @param $service
+     * @param $message
+     */
+    public function getPayloadNew(&$data,&$attachment,$payload,$service,$message){
+
+        if($fileName = $payload->getFilename()){
+            $extraFile = $service->users_messages_attachments->get('me', $message->id, $payload->getBody()->getAttachmentId());
+            
+            if(!is_dir(config('message.attachmentPath') .'/'.$message->id)){
+                mkdir(config('message.attachmentPath') .'/'.$message->id,0777);
+            }
+            
+            $FileAry = explode('.',$fileName); //拆分文件名
+            $countSize = file_put_contents(config('message.attachmentPath') .$message->id . '/' . Tool::base64Encode($FileAry[0]).'.'.$FileAry[1], Tool::base64Decode($extraFile->data));
+            if($countSize > 0){
+                $attachmentInfo = [
+                    'file_name' => Tool::base64Encode($FileAry[0]).'.'.$FileAry[1],
+                    'file_path' => $message->id . '/'. Tool::base64Encode($FileAry[0]).'.'.$FileAry[1], //图片目录
+                ];
+            }
+        }else{
+            $attachmentInfo = '';
+        }
+        $data[] = [
+            'mime_type'  => $payload->getMimeType(),
+            'body'       => $payload->getBody()->getData(),
+        ];
+        if(!empty($attachmentInfo)){
+            $attachment [] = $attachmentInfo;
+        }
+        $mimeType = explode('/', $payload->getMimeType());
+        if ($mimeType[0] == 'multipart') {
+            foreach ($payload->getParts() as $part) {
+                $this->getPayloadNew($data,$attachment,$part,$service,$message);
+            }
+        }
+    }
+
+    /**
+     * 获取邮件内容
+     * @param $parts
+     * @return mixed|string
+     */
+    public function getMaillContent($parts){
+        $plainBody = '';
+        foreach ($parts as $part){
+            if($part['mime_type']== 'text/html'){
+                $htmlBody = Tool::base64Decode($part['body']);
+                $htmlBody=preg_replace("/<(\/?body.*?)>/si","",$htmlBody);
+            }
+            if ($part['mime_type'] == 'text/plain') {
+                $plainBody .= nl2br(Tool::base64Decode($part['body']));
+            }
+        }
+        $body = isset($htmlBody) && $htmlBody != '' ? $htmlBody : $plainBody;
+        return $body;
+    }
+    
+    public function getClient($account)
+    {
+        $client = new Google_Client();
+        $client->setScopes(implode(' ', array(
+            Google_Service_Gmail::GMAIL_READONLY
+        )));
+        $client->setAuthConfig($account['GmailSecret']);
+        $client->setAccessType('offline');
+        $client->setAccessToken($account['GmailToken']);
+
+        // Refresh the token if it's expired.
+        if ($client->isAccessTokenExpired()) {
+            $client->refreshToken($client->getRefreshToken());
+            $thisAccount = AccountModel::where('message_secret',$account['GmailSecret'])->first();
+            $thisAccount->message_token = $client->getAccessToken();
+            $thisAccount->save();
+        }
+        return $client;
+    }
+
+    public function parseMessageHeader($headers)
+    {
+        $result = [];
+
+        foreach ($headers as $header) {
+            $result[$header->getName()] = $header->getValue();
+        }
+
+        return $result;
+    }
+
+    public function clearEmail($email)
+    {
+        $email = str_replace('<', '', $email);
+        $email = str_replace('>', '', $email);
+        return $email;
     }
 }

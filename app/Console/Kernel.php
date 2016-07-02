@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Console;
 
 use App\Models\ChannelModel;
@@ -26,6 +25,12 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ChannelLogistics::class,
         \App\Console\Commands\TransferUser::class,
         \App\Console\Commands\GetWishProduct::class,
+
+        //邮件
+        \App\Console\Commands\GetMessages::class,
+        \App\Console\Commands\SendMessages::class,
+        \App\Console\Commands\SetMessageRead::class,
+        \App\Console\Commands\GetGmailCredentials::class,
     ];
 
     /**
@@ -39,7 +44,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('inspire')->hourly();
         $schedule->command('orders:get')->everyFiveMinutes();
         foreach (ChannelModel::all() as $channel) {
-            
+
         }
     }
 }

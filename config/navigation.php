@@ -456,5 +456,38 @@ return [
 
         ],
     ],
+    //财务导航
+    [
+        'name' => '邮件',
+        'icon' => 'envelope',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' =>  [
+            '邮件管理'=>[
+                [
+                    'name' => '信息',
+                    'url'  => 'message.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '发送队列',
+                    'url' => 'messageReply.index',
+                    'icon' => '',
+                ],
+            ],
+            '邮件模板管理'=>[
+                [
+                    'name' => '模板类型',
+                    'url'  => 'messageTemplateType.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '信息模板',
+                    'url' => 'messageTemplate.index',
+                    'icon' => '',
+                ],
+            ],
+        ]
+    ],
 ];
 

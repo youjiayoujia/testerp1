@@ -149,6 +149,12 @@
                             <span class="glyphicon glyphicon-pencil"></span> 恢复正常
                         </a>
                     @endif
+                    <button class="btn btn-primary btn-xs"
+                            data-toggle="modal"
+                            data-target="#myModal{{ $order->id }}"
+                            title="包裹">
+                        <span class="glyphicon glyphicon-link"></span> 包裹
+                    </button>
                     <a href="{{ route('order.show', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 查看
                     </a>
@@ -156,6 +162,71 @@
             </td>
         </tr>
     @endforeach
+    @if($order->packages)
+        @foreach($order->packages as $package)
+            <div class="modal fade" id="myModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
+                        </div>
+                        <div class="modal-body">
+                            @foreach($packages as $package)
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>包裹状态</strong> : {{ $package->status }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>发货时间</strong> : {{ $package->shipped_at }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>交付时间</strong> : {{ $package->delivered_at }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>备注</strong> : {{ $package->remark }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="modal fade" id="myModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 @stop
 @section('tableToolButtons')
     @parent

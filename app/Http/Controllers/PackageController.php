@@ -55,9 +55,8 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => OrderModel::where('active', 'NORMAL')
-                ->whereIn('status', ['PREPARED', 'NEED'])->count(),
-            'assignNum' => $this->model->where('status', 'NEW')->count(),
-            'placeNum' => $this->model->where('status', 'ASSIGNED')->count(),
+                ->whereIn('status', ['NEED'])->count(),
+            'manualShip' => $this->model->where(['is_auto' => '0'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
             'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status',
@@ -332,7 +331,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses' => LogisticsModel::all(),
-            'packages' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->get(),
+            'packages' => $this->model->where(['status' => 'ASSIGNED', 'is_auto' => '0'])->paginate(15),
         ];
 
         return view($this->viewPath . 'manualShipping', $response);
@@ -343,7 +342,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'logisticses' => LogisticsModel::all(),
-            'packages' => $this->model->where(['status' => 'ASSIGNFAILED', 'is_auto' => '1'])->get(),
+            'packages' => $this->model->where(['status' => 'ASSIGNFAILED', 'is_auto' => '1'])->paginate(15),
         ];
 
         return view($this->viewPath . 'manualLogistics', $response);

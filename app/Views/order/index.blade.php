@@ -85,11 +85,11 @@
                             <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
                             {{--<div class="col-lg-1">--}}
-                                {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
-                                   {{--data-id="{{ $orderItem->id }}"--}}
-                                   {{--data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">--}}
-                                    {{--<span class="glyphicon glyphicon-trash"></span> 删除--}}
-                                {{--</a>--}}
+                            {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
+                            {{--data-id="{{ $orderItem->id }}"--}}
+                            {{--data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">--}}
+                            {{--<span class="glyphicon glyphicon-trash"></span> 删除--}}
+                            {{--</a>--}}
                             {{--</div>--}}
                         </div>
                     @endforeach
@@ -134,6 +134,12 @@
                     <a href="{{ route('remark', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 备注
                     </a>
+                    <button class="btn btn-primary btn-xs"
+                            data-toggle="modal"
+                            data-target="#remark{{ $order->id }}"
+                            title="备注">
+                        <span class="glyphicon glyphicon-link"></span> 备注
+                    </button>
                     @if($order->status == 'REVIEW')
                         <a href="javascript:" class="btn btn-primary btn-xs review" data-id="{{ $order->id }}">
                             <span class="glyphicon glyphicon-pencil"></span> 审核
@@ -151,7 +157,7 @@
                     @endif
                     <button class="btn btn-primary btn-xs"
                             data-toggle="modal"
-                            data-target="#myModal{{ $order->id }}"
+                            data-target="#package{{ $order->id }}"
                             title="包裹">
                         <span class="glyphicon glyphicon-link"></span> 包裹
                     </button>
@@ -161,69 +167,96 @@
                 </div>
             </td>
         </tr>
-        @if($order->packages->toArray())
-            @foreach($order->packages as $package)
-                <div class="modal fade" id="myModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
-                            </div>
-                            <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-lg-3">
-                                            <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>包裹状态</strong> : {{ $package->status }}
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>打印面单时间</strong> : {{ $package->printed_at }}
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>发货时间</strong> : {{ $package->shipped_at }}
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>交付时间</strong> : {{ $package->delivered_at }}
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <strong>备注</strong> : {{ $package->remark }}
-                                        </div>
-                                    </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        @else
-            <div class="modal fade" id="myModal{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+        <div class="modal fade" id="remark{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('remarkUpdate', ['id' => $order->id]) }}" method="POST">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
+                            <h4 class="modal-title" id="myModalLabel">补充备注</h4>
                         </div>
                         <div class="modal-body">
+                            <label class='control-label'>历史备注</label>
 
+                            <div class="row">
+                                @if($order->remarks->toArray())
+                                    @foreach($order->remarks as $remark)
+                                        <div>
+                                            <div class="col-lg-2">{{ $remark->user?$remark->user->name:'系统创建' }}</div>
+                                            <div class="col-lg-4">{{ $remark->created_at }}</div>
+                                            <div class="col-lg-6">{{ $remark->remark }}</div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                @endif
+                                <div class="form-group col-lg-12">
+                                    <label for="remark" class='control-label'>订单备注</label>
+                                    <textarea class="form-control" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
+                                </div>
+                            </div>
                         </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="package{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">包裹信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        @if($order->packages->toArray())
+                            @foreach($order->packages as $package)
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <strong>包裹ID</strong> :
+                                        <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>物流方式</strong>
+                                        : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>追踪号</strong> :
+                                        <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>包裹状态</strong> : {{ $package->status }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>发货时间</strong> : {{ $package->shipped_at }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>交付时间</strong> : {{ $package->delivered_at }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <strong>备注</strong> : {{ $package->remark }}
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                            @endforeach
+                        @else
+                        @endif
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
     @endforeach
 @stop
 @section('tableToolButtons')

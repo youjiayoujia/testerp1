@@ -23,7 +23,16 @@ class ChannelModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'driver', 'brief', 'created_at', 'flat_rate', 'rate', 'flat_rate_value', 'rate_value'];
+    protected $fillable = [
+        'name',
+        'driver',
+        'brief',
+        'created_at',
+        'flat_rate',
+        'rate',
+        'flat_rate_value',
+        'rate_value'
+    ];
 
     protected $searchFields = ['name'];
 
@@ -32,7 +41,7 @@ class ChannelModel extends BaseModel
         'update' => ['name' => 'required|unique:channels,name,{id}', 'driver' => 'required']
     ];
 
-    public function channelAccount()
+    public function accounts()
     {
         return $this->hasMany('App\Models\Channel\AccountModel', 'channel_id', 'id');
     }

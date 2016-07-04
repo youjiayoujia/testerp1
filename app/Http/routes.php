@@ -52,6 +52,7 @@ Route::group(['middleware' => 'auth'], function () {
     //供货商评级
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
     //供货商
+    Route::get('productSupplier/ajaxSupplier', ['uses' => 'Product\SupplierController@ajaxSupplier', 'as' => 'ajaxSupplier']);
     Route::post('productSupplier/levelStore',
         ['uses' => 'Product\SupplierController@levelStore', 'as' => 'productSupplier.levelStore']);
     Route::get('productSupplier/createLevel',
@@ -552,6 +553,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('messageReply', 'Message\ReplyController');
 
     //用户路由
+    Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
     Route::resource('user', 'UserController');
     //图片标签
     Route::resource('label', 'LabelController');

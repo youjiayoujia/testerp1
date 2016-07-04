@@ -372,7 +372,7 @@ class ItemModel extends BaseModel
     {
         $items = $this->all();
         $requireModel = new RequireModel();
-        $array = RequireModel::groupBy('item_id')
+        /*$array = RequireModel::groupBy('item_id')
             ->selectRaw('item_id, sum(quantity) as sum')
             ->where('is_require', 1)
             ->get()
@@ -380,7 +380,7 @@ class ItemModel extends BaseModel
 
         foreach ($array as $require_key => $require_val) {
             $requireArray[$require_val['item_id']] = $require_val['sum'];
-        }
+        }*/
 
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
@@ -493,7 +493,7 @@ class ItemModel extends BaseModel
             $data['require_create'] = 0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
 
-            if (array_key_exists($data['item_id'], $requireArray)) {
+            if ($thisModel->need_purchase_num>0)) {
                 $data['require_create'] = 1;
             }
             if ($thisModel) {

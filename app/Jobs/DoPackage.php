@@ -52,6 +52,6 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'Fail to do package.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log(__CLASS__);
+        $this->log('DoPackage');
     }
 }

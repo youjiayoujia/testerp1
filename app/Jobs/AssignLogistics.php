@@ -53,6 +53,6 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'Fail to assign logistics.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log(__CLASS__);
+        $this->log('AssignLogistics');
     }
 }

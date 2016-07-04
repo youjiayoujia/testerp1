@@ -13,8 +13,7 @@
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
-    ID</th>
-    <th>skuID</th>
+    SKUID</th>
     <th>sku</th>
     <th>中文名</th>
     <th>可用库存</th>
@@ -34,12 +33,11 @@
         <tr>
             <td>
              @if($item->status !="selling")
-                <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="1" >
+                <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="1" >
                 @else
-                <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="0" >
+                <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="0" >
                 @endif
-            {{ $item->id }}</td>
-            <td>{{ $item->item_id}}</td>
+            {{ $item->item_id }}</td>
             <td>{{ $item->sku}}</td>   
             <td>
             {{$item->c_name}}

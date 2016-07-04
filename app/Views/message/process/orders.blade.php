@@ -76,7 +76,7 @@
                                 @foreach($relatedOrder->order->items as $item)
                                     <tr>
                                         <td>{{ $item->sku }}</td>
-                                        <td>{{ $item->qty }}</td>
+                                        <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>
                                         <td>{{ $item->status_text }}</td>
                                     </tr>
@@ -114,13 +114,13 @@
                             <div class="row form-group">
                                 <div class="col-lg-6">
                                     <strong>物流</strong>:
-                                    <a href="{{ $package->tracking_link }}" target="_blank">
-                                        {{ $package->shipping->name }}
+                                    <a href="{{ $package->shipping->url }}" target="_blank">
+                                        {{ $package->shipping->type }}
                                     </a>
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>物流网址</strong>
-                                    {{ $package->tracking_link }}
+                                    {{  $package->shipping->url }}
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>追踪号</strong>: {{ $package->tracking_no }}
@@ -128,20 +128,20 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-lg-6">
-                                    <strong>创建</strong>: {{ $package->created }}
+                                    <strong>创建</strong>: {{ $package->created_at }}
                                 </div>
                                 <div class="col-lg-6">
-                                    <strong>打印</strong>: {{ $package->print_time }}
+                                    <strong>打印</strong>: {{ $package->print_at }}
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-lg-6">
-                                    <strong>发货</strong>: {{ $package->ship_time }}
+                                    <strong>发货</strong>: {{ $package->shipped_at }}
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>妥投</strong>:
-                                    @if($package->delivery_time)
-                                        {{ $package->delivery_time }}
+                                    @if($package->delivered_at)
+                                        {{ $package->delivered_at }}
                                         ({{ $package->delivery_age }}天)
                                     @else
                                         --
@@ -180,7 +180,7 @@
                                         <div class="panel-footer">
                                             <div class="row">
                                                 <div class="col-lg-12">
-                                                    <strong>更新时间</strong>: {{ $package->delivery_search_time }}
+                                                    <strong>更新时间</strong>: {{ $package->updated_at }}
                                                 </div>
                                             </div>
                                         </div>

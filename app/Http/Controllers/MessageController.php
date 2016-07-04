@@ -58,7 +58,7 @@ class MessageController extends Controller
         }
         if(request()->input('id')){
             $model = $this->model->find(request()->input('id'));
-            $count = $this->model->where('from','=',$model->from)->where('status','=','UNREAD')->count();
+            $count = $this->model->where('from','=',$model->from)->where('status','<>','UNREAD')->count();
         }else{
             $count='';
         }

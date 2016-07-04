@@ -110,3 +110,7 @@ th:hover:not([data-sort=false]) {
     opacity: .8;
     cursor: pointer;
 }
+
+.mailcontent{
+    height: 400px;
+}

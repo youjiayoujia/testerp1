@@ -191,18 +191,18 @@
                         </div>
                         <div class="modal-body">
                             <label class='control-label'>历史备注</label>
-
+                            @if($order->remarks->toArray())
+                                @foreach($order->remarks as $remark)
+                                    <div class="row">
+                                        <div class="col-lg-2">{{ $remark->user?$remark->user->name:'系统创建' }}</div>
+                                        <div class="col-lg-4">{{ $remark->created_at }}</div>
+                                        <div class="col-lg-6">{{ $remark->remark }}</div>
+                                    </div>
+                                    <div class="divider"></div>
+                                @endforeach
+                            @else
+                            @endif
                             <div class="row">
-                                @if($order->remarks->toArray())
-                                    @foreach($order->remarks as $remark)
-                                        <div>
-                                            <div class="col-lg-2">{{ $remark->user?$remark->user->name:'系统创建' }}</div>
-                                            <div class="col-lg-4">{{ $remark->created_at }}</div>
-                                            <div class="col-lg-6">{{ $remark->remark }}</div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                @endif
                                 <div class="form-group col-lg-12">
                                     <label for="remark" class='control-label'>订单备注</label>
                                     <textarea class="form-control" rows="3" id="remark" name='remark'>{{ old('remark') }}</textarea>
@@ -231,16 +231,13 @@
                             @foreach($order->packages as $package)
                                 <div class="row">
                                     <div class="col-lg-3">
-                                        <strong>包裹ID</strong> :
-                                        <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                                        <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>物流方式</strong>
-                                        : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
+                                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>追踪号</strong> :
-                                        <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                                        <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                                     </div>
                                     <div class="col-lg-3">
                                         <strong>包裹状态</strong> : {{ $package->status }}

@@ -42,7 +42,7 @@ class RequireController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->purchases,$this->purchases->where('require_create','1')->orderBy('need_purchase_num','desc')),
+            'data' => $this->autoList($this->purchases,$this->purchases->orderBy('require_create','desc')->orderBy('need_purchase_num','desc')),
         ];
         
         return view($this->viewPath . 'index', $response);

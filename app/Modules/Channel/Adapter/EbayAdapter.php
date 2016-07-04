@@ -309,4 +309,9 @@ class EbayAdapter implements AdapterInterface
     }
 
 
+    public function getMessages(){
+
+    }
+
+
 }

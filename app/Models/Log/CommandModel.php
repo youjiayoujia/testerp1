@@ -22,6 +22,6 @@ class CommandModel extends BaseModel
     protected $guarded = [];
 
     //查询
-    public $searchFields = ['signature'];
+    public $searchFields = ['related_id', 'signature', 'description'];
 
 }

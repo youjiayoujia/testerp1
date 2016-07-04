@@ -52,7 +52,8 @@ Route::group(['middleware' => 'auth'], function () {
     //供货商评级
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
     //供货商
-    Route::get('productSupplier/ajaxSupplier', ['uses' => 'Product\SupplierController@ajaxSupplier', 'as' => 'ajaxSupplier']);
+    Route::get('productSupplier/ajaxSupplier',
+        ['uses' => 'Product\SupplierController@ajaxSupplier', 'as' => 'ajaxSupplier']);
     Route::post('productSupplier/levelStore',
         ['uses' => 'Product\SupplierController@levelStore', 'as' => 'productSupplier.levelStore']);
     Route::get('productSupplier/createLevel',
@@ -558,6 +559,10 @@ Route::group(['middleware' => 'auth'], function () {
     //图片标签
     Route::resource('label', 'LabelController');
     Route::resource('paypal', 'PaypalController');
+
+    //日志
+    Route::resource('logCommand', 'Log\CommandController');
+    Route::resource('logQueue', 'Log\QueueController');
 });
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);

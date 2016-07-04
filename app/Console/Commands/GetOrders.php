@@ -73,7 +73,7 @@ class GetOrders extends Command
             $lasting = round($end - $start, 3);
             CommandLog::create([
                 'relation_id' => $account->id,
-                'signature' => __FUNCTION__,
+                'signature' => __CLASS__,
                 'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '].',
                 'lasting' => $lasting,
                 'result' => $result['status'],

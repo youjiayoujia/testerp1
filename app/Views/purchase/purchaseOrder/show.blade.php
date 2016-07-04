@@ -6,11 +6,11 @@
         <div class="panel-body">
              <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
-                {{ $model->warehouse->name}}
+                {{ $model->warehouse?$model->warehouse->name:''}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>仓库地址</strong>:
-                {{ $model->warehouse->province}}{{ $model->warehouse->city}}{{ $model->warehouse->address}}
+                {{ $model->warehouse?$model->warehouse->province:''}}{{ $model->warehouse?$model->warehouse->city:''}}{{ $model->warehouse?$model->warehouse->address:''}}
             </div>
             
              <div class="form-group col-lg-4">
@@ -18,12 +18,14 @@
             </div>
              <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:
-                名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
+                名：{{$model->supplier?$model->supplier->name:''}}&nbsp;电话：{{$model->supplier?$model->supplier->telephone:''}} &nbsp;地址：{{$model->supplier?$model->supplier->province:''}}{{$model->supplier?$model->supplier->city:''}}{{$model->supplier?$model->supplier->address:''}}
                 &nbsp;
-                @if($model->supplier->type==1)
-                	线上采购
-                @else
-                	线下采购
+                @if($model->supplier)
+                    @if($model->supplier->type==1)
+                	   线上采购
+                    @else
+                	   线下采购
+                    @endif
                 @endif
             </div>
             <div class="form-group col-lg-4">
@@ -110,7 +112,7 @@
         <tr> 
             <td>{{$purchaseItem->sku}}</td>
             
-            <td>{{$purchaseItem->item->c_name}}</td>
+            <td>{{$purchaseItem->item?$purchaseItem->item->c_name:''}}</td>
             <td>{{$purchaseItem->purchase_num}}</td>
             <td>{{$purchaseItem->arrival_num}}</td>   
             <td>
@@ -131,7 +133,7 @@
             </td>    
           
              <td>
-            	 {{$purchaseItem->item->purchase_price}}
+            	 {{$purchaseItem->item?$purchaseItem->item->purchase_price:''}}
             </td> 
             <td>
            {{$purchaseItem->purchase_num * $purchaseItem->purchase_cost}}

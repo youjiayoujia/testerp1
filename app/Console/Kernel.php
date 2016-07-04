@@ -45,7 +45,7 @@ class Kernel extends ConsoleKernel
             switch ($channel->driver) {
                 case 'amazon':
                     foreach ($channel->accounts as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyFiveMinutes();
+                        $schedule->command('get:orders ' . $account->id)->everyTenMinutes();
                     }
                     break;
                 case 'ebay':

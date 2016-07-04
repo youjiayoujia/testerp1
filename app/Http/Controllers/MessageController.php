@@ -33,8 +33,8 @@ class MessageController extends Controller
     public function index()
     {
         request()->flash();
-        $userarr=config('user.staff');
-        $users=UserModel::whereIn('id', $userarr)->get();
+        //$userarr=config('user.staff');
+        $users=UserModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model,$this->model->where('label', 'INBOX')),
@@ -64,13 +64,13 @@ class MessageController extends Controller
         }
         
         if ($message->assign(request()->user()->id)) {
-            $userarr=config('user.staff');
+            //$userarr=config('user.staff');
             $emailarr=config('user.email');
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
                 'message' => $message,
                 'parents' => TypeModel::where('parent_id', 0)->get(),
-                'users' => UserModel::whereIn('id', $userarr)->get(),
+                'users' => UserModel::all(),
                 'emailarr' => $emailarr,
                 'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
                 //'ordernum' =>$ordernum,
@@ -286,6 +286,29 @@ class MessageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '回复成功.'));
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('danger', '回复失败.'));
+    }
+
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        //$sum=$this->model::all();
+
+        $count = $this->model->where('from','=',$model->from)->where('status','=','UNREAD')->count();
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'count' => $count,
+        ];
+        return view($this->viewPath . 'show', $response)->with('count',$count);
     }
 
 

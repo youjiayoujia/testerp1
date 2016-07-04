@@ -65,9 +65,7 @@
             </div>
             <div class="col-lg-3">
                 <strong>已选运营人员</strong>:
-                @foreach($model->operators as $operator)
-                    {{ $operator->name }},
-                @endforeach
+                {{ $model->operator ? $model->operator->name : '无' }}
             </div>
         </div>
     </div>

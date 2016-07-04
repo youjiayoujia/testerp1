@@ -75,7 +75,7 @@ interface AdapterInterface
      * 回传物流号
      *
      */
-    public function returnTrack();
+    public function returnTrack($orderId, $trackingInfomation);
 
     /**
      * 获取平台邮件

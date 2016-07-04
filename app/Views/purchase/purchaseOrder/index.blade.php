@@ -11,6 +11,7 @@
     <th>采购单状态</th> 
     <th>采购单审核状态</th>
     <th>核销状态</th>
+    <th>付款状态</th>
     <th>采购人</th>
    	<th>供应商</th>
     <th>采购物品</th>
@@ -33,8 +34,9 @@
             <td> 
                 {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
             </td>
-            <td>{{config('purchase.purchaseOrder.status')[$purchaseOrder->examineStatus]}}</td>  
-            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
+            <td>{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</td>  
+            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>
+            <td>{{config('purchase.purchaseOrder.close_status')[$purchaseOrder->close_status]}}</td>   
     		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
             <td>
@@ -146,7 +148,7 @@
                         <span class="glyphicon glyphicon-remove-sign"></span>
                     </a>
                 @endif
-                @if($purchaseOrder->status == 1)
+                @if($purchaseOrder->status == 1&&$purchaseOrder->close_status==0)
                 <a href="javascript:" title="付款" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
                     <span class="glyphicon glyphicon glyphicon-usd"></span>
                 </a>

@@ -15,7 +15,7 @@
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>分类</strong>: {{ $model->catalog->name }}
+                <strong>分类</strong>: {{ $model->catalog?$model->catalog->name:'无分类' }}
             </div>
             <div class="col-lg-3">
                 <strong>产品name</strong>: {{ $model->name }}

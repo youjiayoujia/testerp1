@@ -101,8 +101,8 @@
                             <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
                         </div>
+                        <div class="divider"></div>
                     @endforeach
-                    <div class="divider"></div>
                 </div>
                 <div class="row col-lg-12 text-center">
                     <div class="col-lg-3">物品数量: {{ $order->items->sum('quantity') }}</div>

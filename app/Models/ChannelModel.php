@@ -25,7 +25,7 @@ class ChannelModel extends BaseModel
      */
     protected $fillable = ['name', 'driver', 'brief', 'created_at', 'flat_rate', 'rate', 'flat_rate_value', 'rate_value'];
 
-    protected $searchFields = ['name'];
+    public $searchFields = ['name'];
 
     protected $rules = [
         'create' => ['name' => 'required|unique:channels,name', 'driver' => 'required'],

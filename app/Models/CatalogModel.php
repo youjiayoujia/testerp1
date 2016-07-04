@@ -14,7 +14,7 @@ class CatalogModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name','c_name','code'];
+    protected $fillable = ['id', 'name','c_name','code'];
 
     public $searchFields = ['name','c_name'];
 

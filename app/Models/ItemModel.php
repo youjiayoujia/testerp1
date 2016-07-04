@@ -490,7 +490,7 @@ class ItemModel extends BaseModel
             $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
 
             $data['status'] = $item->status?$item->status:'saleOutStopping';
-            $data['require_create'] = $needPurchaseNum?1:0;
+            $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
 
             /*if (array_key_exists($data['item_id'], $requireArray)) {

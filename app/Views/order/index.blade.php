@@ -77,9 +77,15 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-2">
-                                <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
-                            </div>
+                            @if($orderItem->item)
+                                <div class="col-lg-2">
+                                    <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
+                                </div>
+                            @else
+                                <div class="col-lg-2">
+                                    <img src="{{ asset('default.jpg') }}" width="50px">
+                                </div>
+                            @endif
                             <div class="col-lg-2 text-primary">{{ $orderItem->sku .' [ '. $orderItem->channel_sku .' ]' }}</div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">

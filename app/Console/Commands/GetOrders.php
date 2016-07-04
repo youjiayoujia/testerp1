@@ -74,7 +74,7 @@ class GetOrders extends Command
             CommandLog::create([
                 'relation_id' => $account->id,
                 'signature' => $this->signature,
-                'description' => 'get orders form ' . $account->alias . '[' . $account->id . '].',
+                'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '].',
                 'lasting' => $lasting,
                 'result' => $result['status'],
                 'remark' => $result['remark']

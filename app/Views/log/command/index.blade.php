@@ -23,3 +23,17 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 结果
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="{{ DataList::filtersEncode(['result','=','success']) }}">成功</a>
+                <a href="{{ DataList::filtersEncode(['result','=','fail']) }}">失败</a>
+            </li>
+        </ul>
+    </div>
+@stop

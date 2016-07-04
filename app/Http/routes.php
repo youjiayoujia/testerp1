@@ -9,6 +9,7 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+  Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');

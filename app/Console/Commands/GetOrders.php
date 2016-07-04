@@ -10,7 +10,7 @@ use App\Models\Channel\AccountModel;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
-class OrdersGet extends Command
+class GetOrders extends Command
 {
     use DispatchesJobs;
     /**
@@ -18,7 +18,7 @@ class OrdersGet extends Command
      *
      * @var string
      */
-    protected $signature = 'orders:get {accountIDs}';
+    protected $signature = 'get:orders {accountIDs}';
 
     /**
      * The console command description.
@@ -73,8 +73,8 @@ class OrdersGet extends Command
             $lasting = round($end - $start, 3);
             CommandLog::create([
                 'relation_id' => $account->id,
-                'signature' => $this->signature,
-                'description' => $this->description,
+                'signature' => __FUNCTION__,
+                'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '].',
                 'lasting' => $lasting,
                 'result' => $result['status'],
                 'remark' => $result['remark']

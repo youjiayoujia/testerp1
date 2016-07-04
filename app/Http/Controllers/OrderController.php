@@ -102,14 +102,23 @@ class OrderController extends Controller
 
     public function putNeedQueue()
     {
-        $orders = $this->model->where(['status' => 'NEED'])->get();
-        foreach($orders as $order) {
-            $job = new DoPackage($order);
-            $job->onQueue('doPackages');
-            $this->dispatch($job);
+        $len = 1000;
+        $start = 0;
+        $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
+        $begin = microtime(true);
+        while ($orders->count()) {
+            foreach ($orders as $order) {
+                $job = new DoPackage($order);
+                $job->onQueue('doPackages');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
         }
+        $end = microtime(true);
+        $time = round(($end - $begin) / 1000, 3);
 
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '打包成功'));
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '打包成功,时长' . $time . 's'));
     }
 
     /**
@@ -179,7 +188,7 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
-            'aliases' => $model->channel->channelAccount,
+            'aliases' => $model->channel->accounts,
             'arr' => $arr,
             'rows' => $model->items()->count(),
             'countries' => CountriesModel::all(),
@@ -215,7 +224,7 @@ class OrderController extends Controller
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
-            'aliases' => $model->channel->channelAccount,
+            'aliases' => $model->channel->accounts,
             'arr' => $arr,
             'rows' => $model->items()->count(),
         ];
@@ -428,7 +437,7 @@ class OrderController extends Controller
     public function account()
     {
         $id = request()->input('id');
-        $buf = channelModel::find($id)->channelAccount;
+        $buf = ChannelModel::find($id)->accounts;
         return json_encode($buf);
     }
 

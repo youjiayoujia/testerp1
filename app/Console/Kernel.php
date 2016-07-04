@@ -1,8 +1,10 @@
 <?php
 namespace App\Console;
+
 use App\Models\ChannelModel;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+
 class Kernel extends ConsoleKernel
 {
     /**
@@ -13,7 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\DoPackages::class,
-        \App\Console\Commands\OrdersGet::class,
+        \App\Console\Commands\GetOrders::class,
         \App\Console\Commands\CreatePurchase::class,
         \App\Console\Commands\TransferProduct::class,
         \App\Console\Commands\TransferChannelAccount::class,
@@ -29,6 +31,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetMessageRead::class,
         \App\Console\Commands\GetGmailCredentials::class,
     ];
+
     /**
      * Define the application's command schedule.
      *
@@ -38,8 +41,26 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
-        $schedule->command('orders:get')->everyFiveMinutes();
         foreach (ChannelModel::all() as $channel) {
+            switch ($channel->driver) {
+                case 'amazon':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyFiveMinutes();
+                    }
+                    break;
+                case 'ebay':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyTenMinutes();
+                    }
+                    break;
+                case 'wish':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

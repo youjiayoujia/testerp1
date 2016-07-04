@@ -67,7 +67,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="alert alert-warning">
-                            此条信息被 <strong><u>{{ $model->assigner->name }}</u></strong> 标注为无需回复
+                            此条信息被 <strong><u>{{ $model->assigner->name ? $model->assigner->name : ''}}</u></strong> 标注为无需回复
                         </div>
                     </div>
                 </div>

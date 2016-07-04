@@ -15,8 +15,8 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <a type="button" class="btn btn-primary" href="{{ route('pickList.createPick') }}">
-                    生成拣货单 <span class="badge">{{ $pickNum }}</span>
+                <a type="button" class="btn btn-warning" href="javascript:" disabled>
+                    自动分配物流 <span class="badge">{{ $assignNum }}</span>
                 </a>
             </div>
             <div class="col-lg-2 text-left">
@@ -24,9 +24,33 @@
                     手动分配物流 <span class="badge">{{ $assignFailed }}</span>
                 </a>
             </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <a type="button" class="btn btn-warning" href="javascript:" disabled>
+                    物流商下单 <span class="badge">{{ $placeNum }}</span>
+                </a>
+            </div>
             <div class="col-lg-2 text-left">
                 <a type="button" class="btn btn-default" href="{{ route('package.manualShipping') }}">
                     手工发货 <span class="badge">{{ $manualShip }}</span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <a type="button" class="btn btn-primary" href="{{ route('pickList.createPick') }}">
+                    生成拣货单 <span class="badge">{{ $pickNum }}</span>
                 </a>
             </div>
         </div>

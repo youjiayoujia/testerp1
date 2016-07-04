@@ -23,5 +23,3 @@
         </tr>
     @endforeach
 @stop
-@section('tableToolbar')
-@stop

@@ -58,9 +58,9 @@
                     <strong>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</strong><br>
                     {{ $order->shipping_address }}<br>
                     {{ $order->shipping_city . ', ' . $order->shipping_state.' '.$order->shipping_zipcode }}<br>
+                    {{ $order->country ? $order->country->name.' '.$order->country->cn_name : '' }}<br>
                     <abbr title="ZipCode">Z:</abbr> {{ $order->shipping_zipcode }}
                     <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
-                    {{ $order->country ? $order->country->name.' '.$order->country->cn_name : '' }}
                 </address>
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)

@@ -2,13 +2,15 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="ordernum">订单号</th>
+    <th class="sort" data-field="channel">渠道</th>
+    <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>邮箱</th>
     <th>物流</th>
     <th>收货人</th>
-    <th>发货国家/地区</th>
-    <th class="sort" data-field="amount">总金额<strong class="text-danger"> (运费)</strong></th>
+    <th>国家</th>
+    <th class="sort" data-field="amount">总金额</th>
+    <th class="sort" data-field="amount_shipping"><strong class="text-danger">运费</strong></th>
     <th>预测毛利率</th>
-    <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>订单状态</th>
     <th>客服人员</th>
     <th class="sort" data-field="created_at">创建时间</th>
@@ -19,13 +21,14 @@
         <tr class="{{ $order->status_color }}">
             <td>{{ $order->id }}</td>
             <td>{{ $order->ordernum }}</td>
+            <td>{{ $order->channel ? $order->channel->name : '' }}</td>
+            <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
-            <td>{{ $order->logistics_id }}</td>
+            <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
-            <td>{{ $order->currency . ' ' . $order->amount }}
-                <strong class="text-danger">({{ $order->amount_shipping }})</strong>
-            </td>
+            <td>{{ $order->currency . ' ' . $order->amount }}</td>
+            <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
                 @if($order->gross_margin)
                     <div>{{ $order->gross_margin }}</div>
@@ -35,9 +38,8 @@
                     <div>毛利润: {{ '' }}USD</div>
                 @endif
             </td>
-            <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->status_name }}</td>
-            <td>{{ $order->userService ? $order->userService->name : '' }}</td>
+            <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
             <td>{{ $order->created_at }}</td>
             <td>
                 <a class="btn btn-primary btn-xs"
@@ -51,10 +53,15 @@
             </td>
         </tr>
         <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
-            <td colspan="5">
-                <div>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</div>
-                <div>{{ $order->shipping_address . ' ' . $order->shipping_city . ' ' . $order->shipping_state }}</div>
-                <div>{{ $order->country ? $order->country->name.' '.$order->country->cn_name : '' }}</div>
+            <td colspan="3">
+                <address>
+                    <strong>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</strong><br>
+                    {{ $order->shipping_address }}<br>
+                    {{ $order->shipping_city . ', ' . $order->shipping_state.' '.$order->shipping_zipcode }}<br>
+                    <abbr title="ZipCode">Z:</abbr> {{ $order->shipping_zipcode }}
+                    <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
+                    {{ $order->country ? $order->country->name.' '.$order->country->cn_name : '' }}
+                </address>
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div class="text-danger">
@@ -67,50 +74,49 @@
                 @endif
             </td>
             <td colspan="25">
-                <div class="col-lg-12">
+                <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-3 text-primary">{{ $orderItem->sku .' [ '. $orderItem->channel_sku .' ]' }}</div>
+                            <div class="col-lg-2">
+                                <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
+                            </div>
+                            <div class="col-lg-2 text-primary">{{ $orderItem->sku .' [ '. $orderItem->channel_sku .' ]' }}</div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
-                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-4">{{ $orderItem->item->c_name }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
                                 </div>
-                                <div class="col-lg-3"></div>
+                                <div class="col-lg-2"></div>
                             @endif
-                            <div class="col-lg-2">{{ $order->currency . ' ' . $orderItem->price }}</div>
+                            <div class="col-lg-1">{{ $order->currency . ' ' . $orderItem->price }}</div>
                             <div class="col-lg-1">{{ 'X' . ' ' . $orderItem->quantity }}</div>
-                            {{--<div class="col-lg-1">--}}
-                                {{--<a href="javascript:" class="btn btn-danger btn-xs delete_item"--}}
-                                   {{--data-id="{{ $orderItem->id }}"--}}
-                                   {{--data-url="{{ route('orderItem.destroy', ['id' => $orderItem->id]) }}">--}}
-                                    {{--<span class="glyphicon glyphicon-trash"></span> 删除--}}
-                                {{--</a>--}}
-                            {{--</div>--}}
                         </div>
                     @endforeach
+                    <div class="divider"></div>
                 </div>
                 <div class="row col-lg-12 text-center">
-                    <strong>
-                        平台费: $ {{ '' }},
-                        总运费: {{ $order->packages->sum('cost') }} RMB,
-                        包裹重: {{ $order->packages->sum('weight') }} Kg,
-                        物品数量: {{ $order->items->sum('quantity') }}
-                    </strong>
+                    <div class="col-lg-3">物品数量: {{ $order->items->sum('quantity') }}</div>
+                    <div class="col-lg-3">包裹个数: {{ $order->packages->count() }}</div>
+                    <div class="col-lg-3">包裹总重: {{ $order->packages->sum('weight') }} Kg</div>
+                    <div class="col-lg-3">运费合计: {{ $order->packages->sum('cost') }} RMB</div>
                 </div>
             </td>
         </tr>
         <tr class="collapse in collapseExample{{$order->id}}">
             <td colspan="30" class="row">
                 <div class="col-lg-6">
-                    <strong>收款方式</strong> : {{ $order->payment }}
-                    <strong>交易号</strong> : {{ $order->transaction_number }}
-                    <strong>运输方式</strong> : {{ '(' . ' ' . ')' }}
-                    <strong class="text-danger">(运费 : {{ $order->currency . ' ' . $order->amount_shipping }})</strong>
+                    <div class="row">
+                        <div class="col-lg-3">
+                            收款方式 : {{ $order->payment }}
+                        </div>
+                        <div class="col-lg-9">
+                            交易号 : {{ $order->transaction_number }}
+                        </div>
+                    </div>
                 </div>
                 <div class="col-lg-6 text-right">
                     @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW' || $order->status == 'NEED')

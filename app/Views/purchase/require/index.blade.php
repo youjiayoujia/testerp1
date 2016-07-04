@@ -26,7 +26,8 @@
     <th>趋势系数</th>
     <th>平均利润率</th>
     <th>退款率</th>
-    <th>状态</th>
+    <th>SKU状态</th>
+    <th>采购状态</th>
 @stop
 @section('tableBody')
     @foreach($data as $item)
@@ -63,7 +64,7 @@
             <td>{{$item->profit*100}}%</td>
             <td>{{$item->refund_rate*100}}%</td>
             <td>{{config('item.status')[$item->status]}}</td>
-             
+            <td>{{config('purchase.require')[$item->require_create]}}</td>
         </tr>
     @endforeach
  <script type="text/javascript">		 

@@ -98,10 +98,8 @@
         </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
-                @endforeach
+            <select id="supplier_id" class="form-control supplier" name="supplier_id">
+               <option value="{{$product->supplier->id}}">{{$product->supplier->name}}</option>
             </select>
         </div> 
         <div class="form-group col-md-3">
@@ -248,4 +246,41 @@
             <input class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') ?  old('parts') : $product->parts }}">
         </div>
     </div>
+@stop
+
+@section('pageJs')
+    <script type="text/javascript">
+        $('.supplier').select2({
+                ajax: {
+                    url: "{{ route('ajaxSupplier') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        supplier:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+            });
+
+            $('.purchase_adminer').select2({
+                ajax: {
+                    url: "{{ route('ajaxUser') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        user:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+        });
+
+    </script>
 @stop

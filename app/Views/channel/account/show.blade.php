@@ -16,7 +16,7 @@
                 <strong>账号对应域名</strong>: {{ $model->domain }}
             </div>
             <div class="col-lg-3">
-                <strong>渠道类型</strong>: {{ $model->channel->name }}
+                <strong>渠道类型</strong>: {{ $model->channel ? $model->channel->name : '' }}
             </div>
             <div class="col-lg-3">
                 <strong>订单同步周期</strong>: {{ $model->sync_cycle }}
@@ -34,16 +34,16 @@
                 <strong>产品图片域名</strong>: {{ $model->image_domain }}
             </div>
             <div class="col-lg-3">
-                <strong>所在国家</strong>: {{ $model->country->cn_name }}
+                <strong>所在国家</strong>: {{ $model->country ? $model->country->cn_name : '' }}
             </div>
             <div class="col-lg-3">
-                <strong>默认运营人员</strong>: {{ $model->operator->name }}
+                <strong>默认运营人员</strong>: {{ $model->operator ? $model->operator->name : '' }}
             </div>
             <div class="col-lg-3">
-                <strong>默认客服人员</strong>: {{ $model->customer_service->name }}
+                <strong>默认客服人员</strong>: {{ $model->customer_service ? $model->customer_service->name : '' }}
             </div>
             <div class="col-lg-3">
-                <strong>默认发货仓库</strong>: {{ $model->warehouse->name }}
+                <strong>默认发货仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : '' }}
             </div>
             <div class="col-lg-3">
                 <strong>是否激活</strong>: {{ $model->available }}

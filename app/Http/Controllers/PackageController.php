@@ -56,7 +56,9 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => OrderModel::where('active', 'NORMAL')
                 ->whereIn('status', ['NEED'])->count(),
-            'manualShip' => $this->model->where(['is_auto' => '0'])->count(),
+            'assignNum' => $this->model->where(['status' => 'NEW'])->count(),
+            'placeNum' => $this->model->where(['status' => 'ASSIGNED'])->count(),
+            'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
             'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status',

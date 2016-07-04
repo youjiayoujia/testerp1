@@ -13,8 +13,8 @@ class AddChannelAccountsTable extends Migration
     public function up()
     {
         Schema::table('channel_accounts', function (Blueprint $table) {
-            $table->text('message_secret')->nullable();
-            $table->text('message_token')->nullable();
+            $table->text('message_secret')->nullable()->after('amazon_accesskey_secret');
+            $table->text('message_token')->nullable()->after('amazon_accesskey_secret');
         });
     }
 

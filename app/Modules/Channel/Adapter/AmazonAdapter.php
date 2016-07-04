@@ -246,6 +246,9 @@ Class AmazonAdapter implements AdapterInterface
     public function getMessages()
     {
         // TODO: Implement getMessages() method.
+            if(empty($this->messageConfig['GmailSecret'])){
+                return false;
+            }
             $client = $this->getClient($this->messageConfig);
             $service = new Google_Service_Gmail($client);
             $user = 'me';

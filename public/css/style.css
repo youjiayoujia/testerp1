@@ -20,7 +20,7 @@ body,
     padding: 60px 10px 10px;
 }
 
-.table tbody tr td{
+.table tbody tr td {
     vertical-align: middle;
 }
 
@@ -109,4 +109,11 @@ th:hover:not([data-sort=false]) {
     text-shadow: 0 1px 0 #fff;
     opacity: .8;
     cursor: pointer;
+}
+
+.divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
 }

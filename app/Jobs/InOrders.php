@@ -37,7 +37,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
-            if ($order) {
+            if ($order->status == 'PREPARED') {
                 $job = new DoPackage($order);
                 $job->onQueue('doPackages');
                 $this->dispatch($job);
@@ -49,8 +49,11 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = 'Fail to put order in.';
             }
+        } else {
+            $this->result['status'] = 'success';
+            $this->result['remark'] = 'Order has been exist.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log();
+        $this->log('InOrders');
     }
 }

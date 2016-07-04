@@ -54,26 +54,6 @@ return [
                     'url' => 'product.index',
                     'icon' => '',
                 ],
-                /*[
-                    'name' => '选款选中',
-                    'url' => 'SelectProduct.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '选款产品编辑',
-                    'url' => 'EditProduct.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '选款产品审核',
-                    'url' => 'ExamineProduct.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '选款产品发布',
-                    'url' => 'PublishProduct.index',
-                    'icon' => '',
-                ],*/
             ],
             '通关报关' => [
                 [
@@ -116,7 +96,7 @@ return [
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
-			[
+            [
                 'name' => '订单投诉',
                 'url' => 'orderComplaint.index',
                 'icon' => '',
@@ -285,16 +265,6 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                /*[
-                    'name' => '采购条目',
-                    'url' => 'purchaseItemList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '打印采购单',
-                    'url' => 'printPurchaseOrder.create',
-                    'icon' => '',
-                ],*/
                 [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
@@ -310,21 +280,6 @@ return [
                     'url' => 'inWarehouse',
                     'icon' => '',
                 ],
-				/*[
-                    'name' => '采购单结算',
-                    'url' => 'closePurchaseOrder.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '异常采购条目',
-                    'url' => 'purchaseAbnormal.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '异常采购单',
-                    'url' => 'purchaseOrderAbnormal.index',
-                    'icon' => '',
-                ],*/
             ],
             '供应链' => [
                 [
@@ -356,14 +311,6 @@ return [
             ]
         ],
     ],
-    //财务导航
-    /*[
-        'name' => '财务',
-        'icon' => 'piggy-bank',
-        'url' => 'dashboard.index',
-    ],*/
-
-
     [
         'name' => ' 刊登',
         'icon' => 'glyphicon glyphicon-send',
@@ -388,37 +335,17 @@ return [
 
         ],
     ],
-
-
-
-    //客户导航
-//    [
-//        'name' => '客户',
-//        'icon' => 'user',
-//        'url' => 'dashboard.index',
-//        'type' => '',
-//        'subnavigations' => [
-//            [
-//                'name' => 'CRM',
-//                'url' => 'dashboard.index',
-//                'icon' => '',
-//            ],
-//        ],
-//
-//    ],
-
-
-    //财务导航
+    //CRM导航
     [
         'name' => 'CRM',
         'icon' => 'envelope',
         'url' => '',
         'type' => 'group',
-        'subnavigations' =>  [
-            '邮件管理'=>[
+        'subnavigations' => [
+            '邮件管理' => [
                 [
                     'name' => '信息',
-                    'url'  => 'message.index',
+                    'url' => 'message.index',
                     'icon' => '',
                 ],
                 [
@@ -427,15 +354,43 @@ return [
                     'icon' => '',
                 ],
             ],
-            '邮件模板管理'=>[
+            '邮件模板管理' => [
                 [
                     'name' => '模板类型',
-                    'url'  => 'messageTemplateType.index',
+                    'url' => 'messageTemplateType.index',
                     'icon' => '',
                 ],
                 [
                     'name' => '信息模板',
                     'url' => 'messageTemplate.index',
+                    'icon' => '',
+                ],
+            ],
+        ]
+    ],
+    //监控导航
+    [
+        'name' => '监控',
+        'icon' => 'scale',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '日志' => [
+                [
+                    'name' => '定时任务日志',
+                    'url' => 'logCommand.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '队列日志',
+                    'url' => 'logQueue.index',
+                    'icon' => '',
+                ],
+            ],
+            '队列' => [
+                [
+                    'name' => '异常队列',
+                    'url' => 'jobFailed.index',
                     'icon' => '',
                 ],
             ],

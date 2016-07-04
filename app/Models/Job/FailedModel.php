@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models\Log;
+namespace App\Models\Job;
 
-use App\Base\BaseModel;
+use Illuminate\Database\Eloquent\Model;
 
-class CommandModel extends BaseModel
+class FailedModel extends Model
 {
 
     /**
@@ -12,7 +12,7 @@ class CommandModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'log_commands';
+    protected $table = 'failed_jobs';
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +22,6 @@ class CommandModel extends BaseModel
     protected $guarded = [];
 
     //查询
-    public $searchFields = ['related_id', 'signature', 'description'];
+    public $searchFields = ['queue'];
 
 }

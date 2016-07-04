@@ -136,29 +136,13 @@
             </div>
             <div class="col-lg-3">
                 <strong>物流限制</strong>: 
-                <?php 
-                    $carriage_key_arr = explode(',',$model->carriage_limit);
-                    foreach(config('product.carriage_limit') as $carriage_key=>$carriage_value){
-                        if(in_array($carriage_key, $carriage_key_arr)){
-                            echo $carriage_value.",";
-                        }
-                    }
-
-                ?>
+                
             </div>
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
                 <strong>包装限制</strong>: 
-                <?php 
-                    $package_key_arr = explode(',',$model->package_limit);
-                    foreach(config('product.package_limit') as $package_key=>$package_value){
-                        if(in_array($package_key, $package_key_arr)){
-                            echo $package_value.",";
-                        }
-                    }
-
-                ?>
+                
             </div>
             <div class="col-lg-3">
                 <strong>状态</strong>: 

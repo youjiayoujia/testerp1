@@ -391,4 +391,8 @@ Class CdiscountAdapter implements AdapterInterface
         echo "return Amazon Tracking Informations";
     }
 
+    public function getMessages(){
+
+    }
+
 }

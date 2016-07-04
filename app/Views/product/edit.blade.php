@@ -171,11 +171,9 @@
     </div>
     <div class="row">
         <div class="form-group col-md-3">
-            <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="purchase_adminer">
-                @foreach($users as $user)
-                    <option value="{{ $user->id}}" {{ $user->id == $product->purchase_adminer ? 'selected' : '' }}>{{$user->name}}</option>
-                @endforeach
+            <label for="size">采购负责人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id="purchase_adminer" class="form-control purchase_adminer" name="purchase_adminer">
+               <option value="{{$product->purchase_adminer}}">{{$product->purchaseAdminer->name}}</option>
             </select>
         </div> 
         <div class="form-group col-md-3">

@@ -133,6 +133,11 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'upload_user');
     }
 
+    public function purchaseAdminer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase_adminer');
+    }
+
     public function item()
     {
         return $this->hasMany('App\Models\ItemModel', 'product_id');

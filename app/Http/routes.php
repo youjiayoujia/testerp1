@@ -563,6 +563,9 @@ Route::group(['middleware' => 'auth'], function () {
     //日志
     Route::resource('logCommand', 'Log\CommandController');
     Route::resource('logQueue', 'Log\QueueController');
+
+    //队列
+    Route::resource('jobFailed', 'Job\FailedController');
 });
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);

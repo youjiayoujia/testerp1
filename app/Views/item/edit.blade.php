@@ -24,10 +24,8 @@
         <div class="form-group col-md-3">
             <label for="size">主供应商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $model->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
-                @endforeach
+            <select id="supplier_id" class="form-control supplier" name="supplier_id">
+               <option value="{{$model->supplier->id}}">{{$model->supplier->name}}</option>
             </select>
         </div>
         <div class="form-group col-md-3">
@@ -35,11 +33,8 @@
             <input class="form-control" id="supplier_sku" placeholder="主供应商sku" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $model->supplier_sku }}">
         </div>
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select class="form-control" name="second_supplier_id">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $model->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
+            <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
+               <option value="{{$model->secondSupplier?$model->secondSupplier->id:0}}">{{$model->secondSupplier?$model->secondSupplier->name:''}}</option>
             </select>
         </div>
         <div class="form-group col-md-3">
@@ -103,7 +98,7 @@
 
 
     <div class="row">
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
@@ -111,7 +106,7 @@
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                     <label>
@@ -155,4 +150,41 @@
             </select>
         </div>
     </div>
+@stop
+
+@section('pageJs')
+    <script type="text/javascript">
+        $('.supplier').select2({
+                ajax: {
+                    url: "{{ route('ajaxSupplier') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        supplier:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+            });
+
+            $('.purchase_adminer').select2({
+                ajax: {
+                    url: "{{ route('ajaxUser') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        user:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+        });
+
+    </script>
 @stop

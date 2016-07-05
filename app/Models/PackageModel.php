@@ -63,7 +63,12 @@ class PackageModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
-            'relatedSearchFields' => ['warehouse' => ['name'], 'channel' => ['name'], 'channelAccount' => ['account'], 'logistics' => ['code', 'name']],
+            'relatedSearchFields' => [
+                'warehouse' => ['name'],
+                'channel' => ['name'],
+                'channelAccount' => ['account'],
+                'logistics' => ['code', 'name']
+            ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => ['status' => config('package')],
             'selectRelatedSearchs' => [
@@ -241,8 +246,8 @@ class PackageModel extends BaseModel
                 if ($rule->country_section) {
                     $countries = $rule->rule_countries_through;
                     $flag = 0;
-                    foreach($countries as $country) {
-                        if($country->code == $this->shipping_country) {
+                    foreach ($countries as $country) {
+                        if ($country->code == $this->shipping_country) {
                             $flag = 1;
                             break;
                         }
@@ -265,7 +270,7 @@ class PackageModel extends BaseModel
                 }
                 //查看对应的物流方式是否是所属仓库
                 $warehouse = WarehouseModel::find($this->warehouse_id);
-                if(!$warehouse->logisticsIn($rule->type_id)) {
+                if (!$warehouse->logisticsIn($rule->type_id)) {
                     continue;
                 }
                 //物流查询链接
@@ -485,7 +490,7 @@ class PackageModel extends BaseModel
                 $package->id);
             $arr[$package->logistic->logistics_supplier_id][$package->logistic_id]['quantity'] += 1;
             $arr[$package->logistic->logistics_supplier_id][$package->logistic_id]['weight'] += $package->weight;
-        } 
+        }
         $this->loadExcel($arr);
     }
 
@@ -498,7 +503,7 @@ class PackageModel extends BaseModel
      */
     public function loadExcel($arr)
     {
-        if(count($arr)) {
+        if (count($arr)) {
             $j = 0;
             $k = 0;
             foreach ($arr as $key1 => $value1) {
@@ -536,12 +541,12 @@ class PackageModel extends BaseModel
             }
         } else {
             $rows[] = [
-                    '供货商' => '',
-                    '物流方式' => '',
-                    '发货日期' => '',
-                    '运单号' => '',
-                    '重量' => '',
-                ];
+                '供货商' => '',
+                '物流方式' => '',
+                '发货日期' => '',
+                '运单号' => '',
+                '重量' => '',
+            ];
         }
         $name = '发货复查';
         Excel::create($name, function ($excel) use ($rows) {
@@ -550,7 +555,7 @@ class PackageModel extends BaseModel
                 $sheet->fromArray($rows);
             });
         })->download('csv');
-        
+
     }
 
     public function scopeOfTrackingNo($query, $trackingNo)
@@ -565,6 +570,6 @@ class PackageModel extends BaseModel
 
     public function shipping()
     {
-        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id','id');
+        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
     }
 }

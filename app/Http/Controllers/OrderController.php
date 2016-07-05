@@ -114,7 +114,7 @@ class OrderController extends Controller
             $start += $len;
             $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
         }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至[DO PACKAGE]队列成功'));
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
     }
 
     /**

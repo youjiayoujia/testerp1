@@ -18,6 +18,7 @@ use App\Models\LogisticsModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\PickListModel;
 use App\Jobs\PlaceLogistics;
+use App\Jobs\AssignLogistics;
 
 class PackageController extends Controller
 {
@@ -146,55 +147,6 @@ class PackageController extends Controller
         return redirect($this->mainIndex);
     }
 
-    public function doPackage()
-    {
-        set_time_limit(0);
-        $len = 1000;
-        $start = 0;
-        $orders = OrderModel::where('active', 'NORMAL')
-            ->whereIn('status', ['PREPARED', 'NEED'])
-            ->orderBy('package_times', 'desc')->skip($start)->take($len)
-            ->get();
-        $begin = microtime(true);
-        while (count($orders)) {
-            foreach ($orders as $order) {
-                echo $order->id . '<br>';
-                $order->createPackage();
-            }
-            $start += $len;
-            $orders = OrderModel::where('active', 'NORMAL')
-                ->whereIn('status', ['PREPARED', 'NEED'])
-                ->orderBy('package_times', 'desc')->skip($start)->take($len)
-                ->get();
-        }
-        $end = microtime(true);
-        echo '耗时' . round($end - $begin, 3) . '秒';
-    }
-
-    public function assignLogistics()
-    {
-        set_time_limit(0);
-        $len = 1000;
-        $start = 0;
-        $packages = PackageModel::where('status', 'NEW')
-            ->where('is_auto', '1')->skip($start)->take($len)
-            ->get();
-        $begin = microtime(true);
-        while (count($packages)) {
-            foreach ($packages as $package) {
-                echo $package->id . '<br>';
-                $package->assignLogistics();
-                $package->calculateProfitProcess();
-            }
-            $start += $len;
-            $packages = PackageModel::where('status', 'NEW')
-                ->where('is_auto', '1')->skip($start)->take($len)
-                ->get();
-        }
-        $end = microtime(true);
-        echo '耗时' . round($end - $begin, 3) . '秒';
-    }
-
     public function ajaxQuantityProcess()
     {
         $buf = request()->input('buf');
@@ -206,11 +158,45 @@ class PackageController extends Controller
         return json_encode(true);
     }
 
+    /**
+     * 添加未处理包裹至分配物流方式队列
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function assignLogistics()
+    {
+        $len = 1000;
+        $start = 0;
+        $packages = $this->model
+            ->where('status', 'NEW')
+            ->where('is_auto', '1')
+            ->skip($start)->take($len)->get();
+        while ($packages->count()) {
+            foreach ($packages as $package) {
+                $job = new AssignLogistics($package);
+                $job = $job->onQueue('assignLogistics');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            $packages = $this->model
+                ->where('status', 'NEW')
+                ->where('is_auto', '1')
+                ->skip($start)->take($len)->get();
+        }
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [ASSIGN LOGISTICS] 队列成功'));
+    }
+
+    /**
+     * 添加已分配物流方式包裹至物流下单队列
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function placeLogistics()
     {
         $len = 1000;
         $start = 0;
-        $packages = $this->model->where('status', 'ASSIGNED')->where('is_auto', '1')->get();
+        $packages = $this->model
+            ->where('status', 'ASSIGNED')
+            ->where('is_auto', '1')
+            ->skip($start)->take($len)->get();
         while ($packages->count()) {
             foreach ($packages as $package) {
                 $orderRate = $package->order->calculateProfitProcess();
@@ -221,9 +207,12 @@ class PackageController extends Controller
                 }
             }
             $start += $len;
-            $packages = $this->model->where('status', 'ASSIGNED')->skip($start)->take($len)->get();
+            $packages = $this->model
+                ->where('status', 'ASSIGNED')
+                ->where('is_auto', '1')
+                ->skip($start)->take($len)->get();
         }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至[PLACE LOGISTICS]队列成功'));
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [PLACE LOGISTICS] 队列成功'));
     }
 
     public function create()

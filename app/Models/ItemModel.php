@@ -68,6 +68,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
+    public function secondSupplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'second_supplier_id');
+    }
+
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');

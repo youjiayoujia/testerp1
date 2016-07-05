@@ -117,7 +117,7 @@
     </div>
 
     <div class='row'>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>  
                 @foreach($logisticsLimit as $carriage_limit)
                     <label>
@@ -125,7 +125,7 @@
                     </label>
                 @endforeach   
         </div>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                 <label>

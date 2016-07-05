@@ -3,20 +3,23 @@
 namespace App\Jobs;
 
 use App\Jobs\Job;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendMessage extends Job implements SelfHandling
+class SendMessage extends Job implements SelfHandling, ShouldQueue
 {
-    protected $reply;
+    use InteractsWithQueue, SerializesModels;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($reply)
+    public function __construct()
     {
-        $this->reply = $reply;
+        //
     }
 
     /**
@@ -26,7 +29,6 @@ class SendMessage extends Job implements SelfHandling
      */
     public function handle()
     {
-        $this->reply->status = 'SENT';
-        $this->reply->save();
+        //
     }
 }

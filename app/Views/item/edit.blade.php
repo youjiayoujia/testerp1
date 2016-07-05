@@ -116,16 +116,18 @@
         </div>
         <div class="form-group col-md-3">
             <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select  class="form-control" name="warehouse_id">
+            <select  class="form-control warehouse_id" name="warehouse_id" >
                 <option value="0"></option>
                 @foreach($warehouses as $warehouse)
                     <option value="{{ $warehouse->id }}" {{ $model->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-md-3">
+        <div class=" warehouse_position form-group col-md-3">
             <label for="color">库位</label>
-            <input class="form-control" id="warehouse_position" placeholder="备注" name='warehouse_position' value="{{ old('warehouse_position') ?  old('warehouse_position') : $model->warehouse_position }}">
+            <select id="warehouse_position" class="form-control" name="warehouse_position">
+                <option value="{{$model->warehousePosition?$model->warehousePosition->id:0}}">{{$model->warehousePosition?$model->warehousePosition->name:''}}</option>
+            </select>
         </div>
         <div class="form-group col-md-3">
             <label for="color">备注</label>
@@ -155,35 +157,88 @@
 @section('pageJs')
     <script type="text/javascript">
         $('.supplier').select2({
+            ajax: {
+                url: "{{ route('ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    supplier:params.term,
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
+        });
+
+        $('.purchase_adminer').select2({
+            ajax: {
+                url: "{{ route('ajaxUser') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    user:params.term,
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
+        });
+
+        $('#warehouse_position').select2({
+            ajax: {
+                url: "{{ route('itemAjaxWarehousePosition') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    warehouse_position:params.term,
+                    'item_id':"{{$model->id}}",
+                    'warehouse_id':$('.warehouse_id').val(),
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            },
+        });
+
+        $(document).on('change', '.warehouse_id', function(){
+            var warehouse_id = $('.warehouse_id').val();
+            var item_id = "{{$model->id}}"; 
+            html='<label for="color">库位</label><select class="form-control" id="warehouse_position" name="warehouse_position"></select>';
+            $(".warehouse_position").html(html);
+            $('#warehouse_position').select2({
                 ajax: {
-                    url: "{{ route('ajaxSupplier') }}",
+                    url: "{{ route('itemAjaxWarehousePosition') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
                       return {
-                        supplier:params.term,
+                        warehouse_position:params.term,
+                        'item_id':item_id,
+                        'warehouse_id':warehouse_id,
                       };
                     },
                     results: function(data, page) {
-                        
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
                     }
                 },
             });
 
-            $('.purchase_adminer').select2({
-                ajax: {
-                    url: "{{ route('ajaxUser') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                      return {
-                        user:params.term,
-                      };
-                    },
-                    results: function(data, page) {
-                        
-                    }
-                },
         });
 
     </script>

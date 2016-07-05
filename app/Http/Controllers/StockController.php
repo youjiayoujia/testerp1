@@ -430,4 +430,63 @@ class StockController extends Controller
             return view($this->viewPath.'excelResult', $response);
         }
     }
+
+    /**
+     * item编辑页面库位查询
+     *
+     * @param none
+     *
+     */
+    public function ajaxWarehousePosition()
+    {   
+        $item_id = request()->input('item_id');
+        $warehouse_id = request()->input('warehouse_id');
+        $position_name = trim(request()->input('warehouse_position'));   
+        $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
+        
+        if($obj1->toArray()) {
+            if(count($obj1->toArray())==2){
+                foreach ($obj1 as $value) {
+                    $position_id[]=$value->warehouse_position_id;
+                }
+                
+                $buf = PositionModel::where('warehouse_id',$warehouse_id)->whereIn('id',$position_id)->get();
+                $total = $buf->count();
+                $arr = [];
+                foreach($buf as $key => $value) {
+                    $arr[$key]['id'] = $value->id;
+                    $arr[$key]['text'] = $value->name;
+                }
+                if($total)
+                    return json_encode(['results' => $arr, 'total' => 2]);
+                else
+                    return json_encode(false);
+            }else{
+                $buf = PositionModel::where('warehouse_id',$warehouse_id)->where('name','like', '%'.$position_name.'%')->get();
+                $total = $buf->count();
+                $arr = [];
+                foreach($buf as $key => $value) {
+                    $arr[$key]['id'] = $value->id;
+                    $arr[$key]['text'] = $value->name;
+                }
+                if($total)
+                    return json_encode(['results' => $arr, 'total' => $total]);
+                else
+                    return json_encode(false);
+            }
+        }else{
+            $buf = PositionModel::where('warehouse_id',$warehouse_id)->where('name','like', '%'.$position_name.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+        
+    }
 }

@@ -23,9 +23,7 @@
             <td>
                 {{ $order->ordernum }}
                 @if($order->fulfill_by == 'AFN')
-                    <span class="label label-success">{{ $order->fulfill_by }}</span>
-                @elseif($order->fulfill_by == 'MFN')
-                    <span class="label label-warning">{{ $order->fulfill_by }}</span>
+                    <span class="label label-danger">亚马逊配送</span>
                 @endif
             </td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>

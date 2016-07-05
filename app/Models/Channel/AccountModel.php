@@ -183,4 +183,10 @@ class AccountModel extends BaseModel
         }
         return $config;
     }
+
+    public function replies()
+    {
+        return $this->hasManyThrough('App\Models\Message\ReplyModel', 'App\Models\Message\MessageModel',
+            'account_id', 'message_id');
+    }
 }

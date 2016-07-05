@@ -87,7 +87,7 @@
             @endif
             <div class="row form-group">
                 <div class="col-lg-12">
-                    <input type="text" class="form-control" name="numbers" placeholder="填写订单号或追踪号,多个用英文逗号分隔"/>
+                    <input type="text" class="form-control" name="numbers" placeholder="填写订单号,多个用英文逗号分隔"/>
                 </div>
             </div>
             <div class="row form-group">

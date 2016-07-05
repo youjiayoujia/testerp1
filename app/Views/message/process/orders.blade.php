@@ -2,8 +2,8 @@
     <ul class="nav nav-tabs" role="tablist">
         @foreach($message->relatedOrders as $key => $relatedOrder)
             <li role="presentation" class="{{ $key == 0 ? 'active' : '' }}">
-                <a href="#{{ $relatedOrder->order->ordernum }}"
-                   aria-controls="{{ $relatedOrder->order->ordernum }}"
+                <a href="#{{ str_replace('.','_',$relatedOrder->order->ordernum) }}"
+                   aria-controls="{{ str_replace('.','_',$relatedOrder->order->ordernum) }}"
                    role="tab"
                    data-toggle="tab">
                     {{ $relatedOrder->order->ordernum }}
@@ -14,7 +14,7 @@
 @endif
 <div class="tab-content">
     @foreach($message->relatedOrders as $key => $relatedOrder)
-        <div class="tab-pane {{ $key == 0 ? 'active' : '' }}" role="tabpanel" id="{{ $relatedOrder->order->ordernum }}">
+        <div class="tab-pane {{ $key == 0 ? 'active' : '' }}" role="tabpanel" id="{{ str_replace('.','_',$relatedOrder->order->ordernum) }}">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     订单:

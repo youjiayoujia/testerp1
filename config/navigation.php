@@ -87,18 +87,8 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '订单利润率',
-                'url' => 'dashboard.index',
-                'icon' => '',
-            ],
-            [
                 'name' => '黑名单',
                 'url' => 'orderBlacklist.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '订单投诉',
-                'url' => 'orderComplaint.index',
                 'icon' => '',
             ],
         ],

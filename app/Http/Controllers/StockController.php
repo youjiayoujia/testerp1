@@ -443,7 +443,6 @@ class StockController extends Controller
         $warehouse_id = request()->input('warehouse_id');
         $position_name = trim(request()->input('warehouse_position'));   
         $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
-        
         if($obj1->toArray()) {
             if(count($obj1->toArray())==2){
                 foreach ($obj1 as $value) {

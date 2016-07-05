@@ -721,8 +721,7 @@ class OrderModel extends BaseModel
     {
         return $query->where('ordernum', $ordernum);
     }
-
-
+    
     /**
      * 计算利润率并处理
      *
@@ -813,4 +812,15 @@ class OrderModel extends BaseModel
             }
         }
     }
+
+    public function getStatusTextAttribute()
+    {
+        return config('order.status.' . $this->status);
+    }
+
+    public function getActiveTextAttribute()
+    {
+        return config('order.active.' . $this->active);
+    }
+
 }

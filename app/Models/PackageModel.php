@@ -557,4 +557,14 @@ class PackageModel extends BaseModel
     {
         return $query->where('tracking_no', $trackingNo);
     }
+
+    public function getStatusTextAttribute()
+    {
+        return config('package.' . $this->status);
+    }
+
+    public function shipping()
+    {
+        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id','id');
+    }
 }

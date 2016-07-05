@@ -90,7 +90,7 @@ class AccountModel extends BaseModel
         $status = [];
         switch ($this->channel->driver) {
             case 'amazon':
-                $status = ['Unshipped', 'PartiallyShipped'];
+                $status = ['Shipped', 'Unshipped', 'PartiallyShipped'];
                 break;
             case 'aliexpress':
                 $status = ['WAIT_SELLER_SEND_GOODS'];

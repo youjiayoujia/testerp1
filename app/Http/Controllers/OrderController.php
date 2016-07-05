@@ -268,22 +268,6 @@ class OrderController extends Controller
     }
 
     /**
-     * 跳转更新备注页面
-     */
-    public function remark($id)
-    {
-        $model = $this->model->find($id);
-
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'remarks' => $model->remarks,
-        ];
-
-        return view($this->viewPath . 'remark', $response);
-    }
-
-    /**
      * 更新备注
      */
     public function remarkUpdate($id)

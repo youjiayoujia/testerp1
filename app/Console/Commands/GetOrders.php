@@ -48,6 +48,16 @@ class GetOrders extends Command
         $accountIds = explode(',', $this->argument('accountIDs'));
         foreach ($accountIds as $accountId) {
             $account = AccountModel::find($accountId);
+            $commandLog = CommandLog::create([
+                'relation_id' => $account->id,
+                'signature' => __CLASS__,
+                'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '].',
+                'lasting' => 0,
+                'total' => 0,
+                'result' => 'init',
+                'remark' => 'init',
+            ]);
+            $total = 0;
             if ($account) {
                 $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
                 $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -61,6 +71,7 @@ class GetOrders extends Command
                     $job = new InOrders($order);
                     $job = $job->onQueue('inOrders');
                     $this->dispatch($job);
+                    $total++;
                 }
                 //todo::Adapter->error()
                 $result['status'] = 'success';
@@ -71,14 +82,11 @@ class GetOrders extends Command
             }
             $end = microtime(true);
             $lasting = round($end - $start, 3);
-            CommandLog::create([
-                'relation_id' => $account->id,
-                'signature' => __CLASS__,
-                'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '].',
-                'lasting' => $lasting,
-                'result' => $result['status'],
-                'remark' => $result['remark']
-            ]);
+            $commandLog->lasting = $lasting;
+            $commandLog->total = $total;
+            $commandLog->result = $result['status'];
+            $commandLog->remark = $result['remark'];
+            $commandLog->save();
             $this->info($account->alias . ':' . $account->id . ' 耗时' . $lasting . '秒');
         }
     }

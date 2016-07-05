@@ -24,4 +24,17 @@ class CommandModel extends BaseModel
     //查询
     public $searchFields = ['related_id', 'signature', 'description'];
 
+    public function getColorAttribute()
+    {
+        if ($this->result == 'fail') {
+            return 'danger';
+        }
+        if ($this->result == 'init') {
+            return 'warning';
+        }
+        if ($this->result == 'success') {
+            return 'success';
+        }
+    }
+
 }

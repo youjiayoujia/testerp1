@@ -17,7 +17,7 @@
             <td>{{ $log->queue }}</td>
             <td>{{ $log->description }}</td>
             <td>{{ $log->lasting }}秒</td>
-            <td>{{ $log->result }}</td>
+            <td class="bg-{{ $log->color }}">{{ $log->result }}</td>
             <td>{{ $log->remark }}</td>
             <td>{{ $log->created_at }}</td>
         </tr>

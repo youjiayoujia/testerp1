@@ -50,14 +50,14 @@ class Kernel extends ConsoleKernel
                     break;
                 case 'ebay':
                     foreach ($channel->accounts as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyTenMinutes();
-                    }
-                    break;
-                case 'wish':
-                    foreach ($channel->accounts as $account) {
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
+//                case 'wish':
+//                    foreach ($channel->accounts as $account) {
+//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+//                    }
+//                    break;
                 default:
                     break;
             }

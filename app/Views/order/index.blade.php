@@ -143,9 +143,6 @@
                     <a href="{{ route('refund', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-pencil"></span> 退款
                     </a>
-                    <a href="{{ route('remark', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 备注
-                    </a>
                     <button class="btn btn-primary btn-xs"
                             data-toggle="modal"
                             data-target="#remark{{ $order->id }}"

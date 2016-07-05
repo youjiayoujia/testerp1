@@ -39,7 +39,7 @@
                         </div>
                     </div>
                     <div class="col-lg-2" id="loadingDiv">
-                        <img src="{{ asset('loading.gif') }}" width="30"/>
+                        <img src="{{ asset('loading.gif') }}" width="30" />
                     </div>
                 </div>
                 <div class="row">
@@ -132,6 +132,8 @@
         </div>
         <script type="text/javascript">
             window.onload = function () {
+                $('#loadingDiv').hide();
+
                 // 加载页面时判断是否有数据并加载\localStorage["a"]
                 var kai = $("#editor").val();
                 var content1 = localStorage["http_crm_jinjidexiaoxuesheng_com_message_processeditor-drafts-data"];

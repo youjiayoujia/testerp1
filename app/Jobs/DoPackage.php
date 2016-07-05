@@ -41,12 +41,13 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
                     $job = $job->onQueue('assignLogistics');
                     $this->dispatch($job);
                 }
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'Success to do package.';
             }
-//            if ($this->order->status == 'NEED') {
-//                $this->release(3600);
-//            }
-            $this->result['status'] = 'success';
-            $this->result['remark'] = 'Success.';
+            if ($this->order->status == 'NEED') {
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'Out of stock.';
+            }
         } else {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'Fail to do package.';

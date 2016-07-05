@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="ordernum">订单号</th>
+    <th class="sort" data-field="channel_ordernum">渠道订单号</th>
     <th class="sort" data-field="channel">渠道</th>
     <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>邮箱</th>
@@ -20,12 +21,11 @@
     @foreach($data as $order)
         <tr class="{{ $order->status_color }}">
             <td>{{ $order->id }}</td>
+            <td>{{ $order->ordernum }}</td>
             <td>
-                {{ $order->ordernum }}
+                {{ $order->channel_ordernum }}
                 @if($order->fulfill_by == 'AFN')
-                    <span class="label label-success">{{ $order->fulfill_by }}</span>
-                @elseif($order->fulfill_by == 'MFN')
-                    <span class="label label-warning">{{ $order->fulfill_by }}</span>
+                    <span class="label label-danger">亚马逊配送</span>
                 @endif
             </td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>

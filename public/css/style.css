@@ -116,4 +116,8 @@ th:hover:not([data-sort=false]) {
     margin: 9px 0;
     overflow: hidden;
     background-color: #e5e5e5;
+
+}
+.mailcontent {
+    height: 400px;
 }

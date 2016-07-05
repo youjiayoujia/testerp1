@@ -5,6 +5,7 @@
     <th>名称</th>
     <th>描述</th>
     <th>执行时间</th>
+    <th>成功数</th>
     <th>执行结果</th>
     <th>备注</th>
     <th class="sort" data-field="created_at">创建时间</th>
@@ -17,7 +18,8 @@
             <td>{{ $log->signature }}</td>
             <td>{{ $log->description }}</td>
             <td>{{ $log->lasting }}秒</td>
-            <td>{{ $log->result }}</td>
+            <td>{{ $log->total }}</td>
+            <td class="bg-{{ $log->color }}">{{ $log->result }}</td>
             <td>{{ $log->remark }}</td>
             <td>{{ $log->created_at }}</td>
         </tr>
@@ -31,6 +33,7 @@
         </button>
         <ul class="dropdown-menu">
             <li>
+                <a href="{{ DataList::filtersEncode(['result','=','init']) }}">初始化</a>
                 <a href="{{ DataList::filtersEncode(['result','=','success']) }}">成功</a>
                 <a href="{{ DataList::filtersEncode(['result','=','fail']) }}">失败</a>
             </li>

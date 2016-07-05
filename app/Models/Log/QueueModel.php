@@ -24,4 +24,17 @@ class QueueModel extends BaseModel
     //查询
     public $searchFields = ['queue'];
 
+    public function getColorAttribute()
+    {
+        if ($this->result == 'fail') {
+            return 'danger';
+        }
+        if ($this->result == 'init') {
+            return 'warning';
+        }
+        if ($this->result == 'success') {
+            return 'success';
+        }
+    }
+
 }

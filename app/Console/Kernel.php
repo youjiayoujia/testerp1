@@ -41,16 +41,17 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
+        //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {
                 case 'amazon':
                     foreach ($channel->accounts as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyFiveMinutes();
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
-                case 'ebay':
+                case 'aliexpress':
                     foreach ($channel->accounts as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyTenMinutes();
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
                 case 'wish':
@@ -58,7 +59,20 @@ class Kernel extends ConsoleKernel
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
-                default:
+                case 'ebay':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                case 'lazada':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                case 'cdiscount':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
                     break;
             }
         }

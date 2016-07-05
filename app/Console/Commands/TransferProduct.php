@@ -4,12 +4,15 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Sellmore\ProductModel as smProduct;
+use App\Models\Sellmore\CatalogModel as smCatalog;
 use App\Models\WarehouseModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\SpuModel;
 use App\Models\ProductModel;
 use App\Models\ItemModel;
+use App\Models\StockModel;
+use App\Models\CatalogModel;
 
 class TransferProduct extends Command
 {
@@ -45,10 +48,10 @@ class TransferProduct extends Command
     public function handle()
     {
         if (WarehouseModel::count() < 1) {
-            $this->error('ÂÖàÂØºÂÖ•‰ªìÂ∫ì‰ø°ÊÅØ,Ê∑±Âú≥‰ªìID=1,‰πâ‰πå‰ªìID=2');
+            $this->error('œ»µº»Î≤÷ø‚–≈œ¢,…Ó€⁄≤÷ID=1,“ÂŒ⁄≤÷ID=2');
         }
         if (SupplierModel::count() < 1) {
-            $this->error('ÂÖàÂØºÂÖ•‰æõË¥ßÂïÜ‰ø°ÊÅØ');
+            $this->error('œ»µº»Îπ©ªı…Ã–≈œ¢');
         }
         $len = 1000;
         $start = 0;
@@ -59,6 +62,34 @@ class TransferProduct extends Command
         $originNum = 0;
         $createdNum[2] = 0;
         $updatedNum[2] = 0;
+        $createdNum[3] = 0;
+        $updatedNum[3] = 0;
+        $catalogNum = 0;
+        $len = 100;
+        $start = 0;
+        $smCatelogs = smCatalog::skip($start)->take($len)->get();
+        while ($smCatelogs->count()) {
+            $start += $len;
+            foreach ($smCatelogs as $smCatelog) {
+                $catalogNum++;
+                $supplier = [
+                    'id' => $smCatelog->category_id,
+                    'name' => $smCatelog->category_name_en,
+                    'c_name' => $smCatelog->category_name,
+                ];
+                $exist = CatalogModel::where(['id' => $smCatelog->category_id])->first();
+                if($exist) {
+                    $exist->update($supplier);
+                    $updatedNum[3]++;
+                } else {
+                    CatalogModel::create($supplier);
+                    $createdNum[3]++;
+                }
+            }
+            $smCatelogs = smCatalog::skip($start)->take($len)->get();
+        }
+        $this->info('Transfer [catalog]: Origin:'.$catalogNum.' => Created:'.$createdNum[3].' Updated:'.$updatedNum[3]);
+
         $smProducts = smProduct::skip($start)->take($len)->get();
         while ($smProducts->count()) {
             $start += $len;
@@ -86,7 +117,6 @@ class TransferProduct extends Command
                     $arr[] = 2;
                 }
                 $buf = [
-                    'id' => $smProduct->products_id,
                     'model' => $smProduct->products_sku,
                     'parts' => $smProduct->products_parts_info ? $smProduct->products_parts_info : '',
                     'declared_cn' => $smProduct->products_declared_cn ? $smProduct->products_declared_cn : '',
@@ -101,7 +131,7 @@ class TransferProduct extends Command
                     'hs_code' => $smProduct->product_hscode ? $smProduct->product_hscode : '',
                     'spu_id' => $spu->id,
                 ];
-                $tmp_product = ProductModel::where(['id' => $smProduct->products_id])->first();
+                $tmp_product = ProductModel::where(['model' => $smProduct->products_sku])->first();
                 if($tmp_product) {
                     $updatedNum[1]++;
                     $tmp_product->update($buf);
@@ -110,15 +140,14 @@ class TransferProduct extends Command
                     $tmp_product = ProductModel::create($buf);
                 }
                 unset($buf);
-
-                //‰ΩìÁßØ
+                //ÃÂª˝
                 $volumes = ['product_size' => '', 'package_size' => ''];
                 if ($smProduct->products_volume) {
                     $volumes = unserialize($smProduct->products_volume);
                     $volumes['product_size'] = isset($volumes['bp']) ? $volumes['bp']['length'] . '*' . $volumes['bp']['width'] . '*' . $volumes['bp']['height'] : '';
                     $volumes['package_size'] = isset($volumes['ap']) ? $volumes['ap']['length'] . '*' . $volumes['ap']['width'] . '*' . $volumes['ap']['height'] : '';
                 }
-                //‰æõË¥ßÂïÜ
+                //π©ªı…Ã
                 $supplier = SupplierModel::find($smProduct->products_suppliers_id);
                 $supplierId = $supplier ? $supplier->id : 0;
                 $secondSupplierId = 0;
@@ -131,27 +160,32 @@ class TransferProduct extends Command
                         }
                     }
                 }
-                //‰ªìÂ∫ì
+                //≤÷ø‚
                 $warehouseId = $smProduct->product_warehouse_id == 1000 ? 1 : 2;
-                //Â∫ì‰Ωç
+                $defaultPosition = '';
+                //ø‚Œª
                 if ($smProduct->products_location) {
-                    $position = PositionModel::Where('name', $smProduct->products_location)->first();
-                    if (!$position) {
-                        PositionModel::create([
-                            'name' => $smProduct->products_location,
-                            'warehouse_id' => $warehouseId
-                        ]);
-                    }
+                    foreach(explode(',', $smProduct->products_location) as $key => $value) {
+                        if($key == 0) {
+                            $defaultPosition = $value;
+                        }
+                        $position = PositionModel::Where('name', $value)->first();
+                        if (!$position) {
+                            $position = PositionModel::create([
+                                'name' => $value,
+                                'warehouse_id' => $warehouseId
+                            ]);
+                        }
+                    } 
                 }
                 $data = [
-                    'id' => $smProduct->products_id,
                     'catalog_id' => $smProduct->products_sort ? $smProduct->products_sort : '',
                     'sku' => $smProduct->products_sku,
                     'name' => $smProduct->products_title,
                     'c_name' => $smProduct->products_name_cn,
                     'weight' => $smProduct->products_weight,
                     'warehouse_id' => $warehouseId,
-                    'warehouse_position' => $smProduct->products_location,
+                    'warehouse_position' => $defaultPosition,
                     'supplier_id' => $supplierId,
                     'second_supplier_id' => $secondSupplierId,
                     'purchase_url' => $smProduct->productsPhotoStandard,
@@ -167,13 +201,22 @@ class TransferProduct extends Command
                     'remark' => $smProduct->products_warring_string,
                     'product_id' => $tmp_product->id,
                 ];
-                $exist = ItemModel::where(['id' => $smProduct->products_id])->first();
+                $exist = ItemModel::where(['sku' => $smProduct->products_sku])->first();
                 if($exist) {
                     $updatedNum[2]++;
                     $exist->update($data);
                 } else {
                     $createdNum[2]++;
-                    ItemModel::create($data);
+                    $exist = ItemModel::create($data);
+                }
+                if ($smProduct->products_location) {
+                    foreach(explode(',', $smProduct->products_location) as $key => $value) {
+                        $position = PositionModel::where('name', $value)->first();
+                        $stock = StockModel::where(['item_id' => $exist->id, 'warehouse_position_id' => $position->id])->first();
+                        if(!$stock) {
+                            StockModel::create(['item_id' => $exist->id, 'warehouse_id' => $warehouseId, 'warehouse_position_id' => $position->id]);
+                        }
+                    } 
                 }
                 unset($data);
             }

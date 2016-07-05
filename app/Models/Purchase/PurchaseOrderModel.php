@@ -95,7 +95,7 @@ class PurchaseOrderModel extends BaseModel
 
     public function getAssignerNameAttribute()
     {
-        return UserModel::find($this->assigner)->name;
+        return UserModel::find($this->assigner)?UserModel::find($this->assigner)->name:'';
     }
 
     public function getUsersAttribute()

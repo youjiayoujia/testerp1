@@ -72,7 +72,7 @@ interface AdapterInterface
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10);
 
     /**
-     * 回传物流号
+     * 回传物流信息
      *
      */
     public function returnTrack();

@@ -19,7 +19,7 @@ class CreateMessageRepliesTable extends Migration
             $table->string('to_email');
             $table->string('title')->nullable()->default(NULL);
             $table->text('content');
-            $table->enum('status',['NEW','SENT','FAIL'])->defalut('NEW')->nullable();
+            $table->enum('status',['NEW','SENT','FAIL'])->defalut('NEW');
             $table->string('updatefile')->nullable()->defalut(NULL);
             $table->timestamps();
             $table->softDeletes();

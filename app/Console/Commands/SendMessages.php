@@ -82,7 +82,7 @@ class SendMessages extends Command
     {
         foreach (AccountModel::all() as $account) {
 
-            if($account->channel->driver == 'amazon'){
+            if($account->channel->driver == 'amazon' && $account->message_secret !=''){ //亚马逊渠道邮件
 
                 $client = $this->getClient($account);
                 $service = new Google_Service_Gmail($client);

@@ -140,7 +140,7 @@ Class AmazonAdapter implements AdapterInterface
             'email' => (string)$order->BuyerEmail,
             'amount' => (float)$order->OrderTotal->Amount,
             'currency' => (string)$order->OrderTotal->CurrencyCode,
-            'status' => 'PAID',
+            'status' => (string)$order->OrderStatus == 'Shipped' ? 'COMPLETE' : 'PAID',
             'payment' => (string)$order->PaymentMethod,
             'shipping' => (string)$order->ShipmentServiceLevelCategory,
             'shipping_firstname' => isset($shippingName[0]) ? $shippingName[0] : '',

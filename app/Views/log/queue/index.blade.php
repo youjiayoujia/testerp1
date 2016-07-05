@@ -44,6 +44,7 @@
         </button>
         <ul class="dropdown-menu">
             <li>
+                <a href="{{ DataList::filtersEncode(['result','=','init']) }}">初始化</a>
                 <a href="{{ DataList::filtersEncode(['result','=','success']) }}">成功</a>
                 <a href="{{ DataList::filtersEncode(['result','=','fail']) }}">失败</a>
             </li>

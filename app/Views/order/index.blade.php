@@ -2,6 +2,7 @@
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="ordernum">订单号</th>
+    <th class="sort" data-field="channel_ordernum">渠道订单号</th>
     <th class="sort" data-field="channel">渠道</th>
     <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>邮箱</th>
@@ -26,6 +27,7 @@
                     <span class="label label-danger">亚马逊配送</span>
                 @endif
             </td>
+            <td>{{ $order->channel_ordernum }}</td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>

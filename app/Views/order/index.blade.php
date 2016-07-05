@@ -21,13 +21,13 @@
     @foreach($data as $order)
         <tr class="{{ $order->status_color }}">
             <td>{{ $order->id }}</td>
+            <td>{{ $order->ordernum }}</td>
             <td>
-                {{ $order->ordernum }}
+                {{ $order->channel_ordernum }}
                 @if($order->fulfill_by == 'AFN')
                     <span class="label label-danger">亚马逊配送</span>
                 @endif
             </td>
-            <td>{{ $order->channel_ordernum }}</td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>

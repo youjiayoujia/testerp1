@@ -20,7 +20,14 @@
     @foreach($data as $order)
         <tr class="{{ $order->status_color }}">
             <td>{{ $order->id }}</td>
-            <td>{{ $order->ordernum }}</td>
+            <td>
+                {{ $order->ordernum }}
+                @if($order->fulfill_by == 'AFN')
+                    <span class="label label-success">{{ $order->fulfill_by }}</span>
+                @elseif($order->fulfill_by == 'MFN')
+                    <span class="label label-warning">{{ $order->fulfill_by }}</span>
+                @endif
+            </td>
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>

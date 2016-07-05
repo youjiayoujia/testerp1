@@ -37,12 +37,13 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                @if($order->gross_margin)
-                    <div>{{ $order->gross_margin }}</div>
+                @if($order->status == 'PACKED')
+                    <div>{{ $order->calculateProfitProcess() }}</div>
                     <div>产品成本: {{ $order->all_item_cost }} RMB</div>
                     <div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>
                     <div>平台费: {{ '' }}USD</div>
                     <div>毛利润: {{ '' }}USD</div>
+                @else
                 @endif
             </td>
             <td>{{ $order->status_name }}</td>

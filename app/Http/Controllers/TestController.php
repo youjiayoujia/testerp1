@@ -21,7 +21,9 @@ use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
+use App\Jobs\Job;
 use App\Jobs\DoPackage;
+use App\Jobs\SendMessage;
 use DNS1D;
 use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
@@ -53,6 +55,11 @@ class TestController extends Controller
 
     public function index()
     {
+        $reply = ReplyModel::find(1);
+        $job = new SendMessage($reply);
+        $job = $job->onQueue('sendMessage');
+        $this->dispatch($job);
+        exit;
         $package = PackageModel::find(request()->input('id'));
         $package->assignLogistics();
         $job = new PlaceLogistics($package);

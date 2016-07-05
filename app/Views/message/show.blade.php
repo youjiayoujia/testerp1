@@ -5,10 +5,10 @@
         <div class="col-lg-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-				
+
                     {!! $model->label_text !!}
                     <strong>{{ $model->subject }}</strong><br/>
-					
+
                     <small>
                         {{ $model->date }} by <strong><u>{{ $model->from_name }}</u></strong>
                         from {{ '<'.$model->from.'>' }}
@@ -18,10 +18,10 @@
                     <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
                         <small class="glyphicon glyphicon-list"></small>
                     </a>
-					<span class="" style="color:red;float:right;margin-right: 10px;font-size: 15px;">{{$count}}</span>
+					<span class="" style="color:red;float:right;margin-right: 10px;font-size: 15px;"></span>
                 </div>
-				
-                <div class="panel-body">
+
+                <div class="panel-body mailcontent">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="embed-responsive embed-responsive-16by9">
@@ -97,10 +97,10 @@
 											@endif
 										</strong>
 										<br/>
-										
+
                                     </div>
 									<div>
-									
+
 									</div>
                                     <div class="panel-body">
                                         <div class="panel panel-primary">

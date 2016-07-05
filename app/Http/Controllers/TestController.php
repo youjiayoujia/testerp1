@@ -15,12 +15,12 @@ use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+use App\Models\PackageModel;
 
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
-use App\Models\PackageModel;
 use App\Jobs\DoPackage;
 use DNS1D;
 use App\Http\Controllers\Controller;
@@ -53,6 +53,12 @@ class TestController extends Controller
 
     public function index()
     {
+        $package = PackageModel::find(request()->input('id'));
+        $package->assignLogistics();
+        $job = new PlaceLogistics($package);
+        $job = $job->onQueue('placeLogistics');
+        $this->dispatch($job);
+        exit;
         $orderModel = new OrderModel;
         $start = microtime(true);
         $account = AccountModel::find(request()->input('id'));

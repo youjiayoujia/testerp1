@@ -721,20 +721,7 @@ class OrderModel extends BaseModel
     {
         return $query->where('ordernum', $ordernum);
     }
-
-
-<<<<<<< HEAD
-    public function getStatusTextAttribute()
-    {
-        return config('order.status.' . $this->status);
-    }
-
-    public function getActiveTextAttribute()
-    {
-        return config('order.active.' . $this->active);
-    }
-
-=======
+    
     /**
      * 计算利润率并处理
      *
@@ -825,5 +812,15 @@ class OrderModel extends BaseModel
             }
         }
     }
->>>>>>> master
+
+    public function getStatusTextAttribute()
+    {
+        return config('order.status.' . $this->status);
+    }
+
+    public function getActiveTextAttribute()
+    {
+        return config('order.active.' . $this->active);
+    }
+
 }

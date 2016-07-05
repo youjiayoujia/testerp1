@@ -131,7 +131,7 @@
                                     <strong>创建</strong>: {{ $package->created_at }}
                                 </div>
                                 <div class="col-lg-6">
-                                    <strong>打印</strong>: {{ $package->print_at }}
+                                    <strong>打印</strong>: {{ $package->printed_at }}
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -142,7 +142,7 @@
                                     <strong>妥投</strong>:
                                     @if($package->delivered_at)
                                         {{ $package->delivered_at }}
-                                        ({{ $package->delivery_age }}天)
+                                        {{--({{ $package->delivery_age }}天)--}}
                                     @else
                                         --
                                     @endif
@@ -160,7 +160,7 @@
                                         @foreach($package->items as $item)
                                             <tr>
                                                 <td>{{ $item->item->sku }}</td>
-                                                <td>{{ $item->qty }}</td>
+                                                <td>{{ $item->quantity }}</td>
                                             </tr>
                                         @endforeach
                                     </table>

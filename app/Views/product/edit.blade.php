@@ -110,11 +110,8 @@
 
     <div class='row'>  
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
+            <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
+               <option value="{{$product->second_supplier?$product->second_supplier->id:0}}">{{$product->second_supplier?$product->second_supplier->name:''}}</option>
             </select>
         </div>
         <div class="form-group col-md-3">
@@ -190,7 +187,7 @@
         </div>
     </div>
     <div class='row'>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
@@ -198,7 +195,7 @@
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                     <label>

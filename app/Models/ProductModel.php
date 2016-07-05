@@ -128,6 +128,11 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
+    public function secondSupplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'second_supplier_id');
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\UserModel', 'upload_user');

@@ -542,6 +542,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
+    Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
+    Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
+    Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
+    Route::resource('ebayDetail','Publish\Ebay\EbayDetailController');
+
 
 
    // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
@@ -549,7 +554,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 });
 
-
+//getEbayInfo
+Route::any('getEbayInfo', ['uses' => 'TestController@getEbayInfo']);
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);
 Route::any('data', ['uses' => 'DataController@index']);

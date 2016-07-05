@@ -385,6 +385,11 @@ return [
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
+            [
+                'name' => 'ebay站点信息',
+                'url' => 'ebayDetail.index',
+                'icon' => '',
+            ],
 
         ],
     ],

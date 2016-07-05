@@ -135,12 +135,21 @@ Class AmazonAdapter implements AdapterInterface
     public function parseOrder($order, $orderItems)
     {
         $shippingName = explode(' ', $order->ShippingAddress->Name);
+        if ((string)$order->FulfillmentChannel == 'AFN') {
+            $status = 'COMPLETE';
+        } else {
+            if ((string)$order->OrderStatus == 'Shipped') {
+                $status = 'COMPLETE';
+            } else {
+                $status = 'PAID';
+            }
+        }
         $result = [
             'channel_ordernum' => (string)$order->AmazonOrderId,
             'email' => (string)$order->BuyerEmail,
             'amount' => (float)$order->OrderTotal->Amount,
             'currency' => (string)$order->OrderTotal->CurrencyCode,
-            'status' => (string)$order->OrderStatus == 'Shipped' ? 'COMPLETE' : 'PAID',
+            'status' => $status,
             'payment' => (string)$order->PaymentMethod,
             'shipping' => (string)$order->ShipmentServiceLevelCategory,
             'shipping_firstname' => isset($shippingName[0]) ? $shippingName[0] : '',

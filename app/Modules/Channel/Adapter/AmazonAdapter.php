@@ -184,7 +184,7 @@ Class AmazonAdapter implements AdapterInterface
         return $result;
     }
 
-    public function returnTrack($orderId, $trackingInfomation)
+    public function returnTrack()
     {
         // TODO: Implement returnTrack() method.
         echo "return Amazon Tracking Informations";

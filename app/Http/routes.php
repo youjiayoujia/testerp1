@@ -9,6 +9,7 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+  Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -563,6 +564,9 @@ Route::group(['middleware' => 'auth'], function () {
     //日志
     Route::resource('logCommand', 'Log\CommandController');
     Route::resource('logQueue', 'Log\QueueController');
+
+    //队列
+    Route::resource('jobFailed', 'Job\FailedController');
 });
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);

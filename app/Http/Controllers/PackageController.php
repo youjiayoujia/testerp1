@@ -17,6 +17,7 @@ use App\Models\ItemModel;
 use App\Models\LogisticsModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\PickListModel;
+use App\Jobs\PlaceLogistics;
 
 class PackageController extends Controller
 {
@@ -46,7 +47,7 @@ class PackageController extends Controller
             'logisticses' => LogisticsModel::all(),
             'status' => config('package'),
         ];
-        
+
         return view($this->viewPath . 'edit', $response);
     }
 
@@ -92,8 +93,8 @@ class PackageController extends Controller
             'cost' => '',
         ];
         $name = 'Fee';
-        Excel::create($name, function($excel) use ($rows){
-            $excel->sheet('', function($sheet) use ($rows){
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
                 $sheet->fromArray($rows);
             });
         })->download('csv');
@@ -107,8 +108,8 @@ class PackageController extends Controller
             'tracking_no' => '',
         ];
         $name = 'returnTrack';
-        Excel::create($name, function($excel) use ($rows){
-            $excel->sheet('', function($sheet) use ($rows){
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
                 $sheet->fromArray($rows);
             });
         })->download('csv');
@@ -118,15 +119,15 @@ class PackageController extends Controller
     {
         $package_id = trim(request('package_id'));
         $package = $this->model->find($package_id);
-        if(!$package) {
+        if (!$package) {
             return json_encode(false);
         }
         $items = $package->items;
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $item->update(['picked_quantity' => $item->quantity]);
         }
         $package->update(['status' => 'PACKED']);
-        
+
         return json_encode(true);
     }
 
@@ -207,14 +208,22 @@ class PackageController extends Controller
 
     public function placeLogistics()
     {
-        $begin = microtime(true);
-        $packages = PackageModel::where('status', 'ASSIGNED')->where('is_auto', '1')->get();
-        foreach ($packages as $package) {
-            echo $package->id . '<br>';
-            $package->placeLogistics();
+        $len = 1000;
+        $start = 0;
+        $packages = $this->model->where('status', 'ASSIGNED')->where('is_auto', '1')->get();
+        while ($packages->count()) {
+            foreach ($packages as $package) {
+                $orderRate = $package->order->calculateProfitProcess();
+                if ($orderRate > 0) {
+                    $job = new PlaceLogistics($package);
+                    $job = $job->onQueue('placeLogistics');
+                    $this->dispatch($job);
+                }
+            }
+            $start += $len;
+            $packages = $this->model->where('status', 'ASSIGNED')->skip($start)->take($len)->get();
         }
-        $end = microtime(true);
-        echo '耗时' . round($end - $begin, 3) . '秒';
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至[PLACE LOGISTICS]队列成功'));
     }
 
     public function create()
@@ -286,9 +295,9 @@ class PackageController extends Controller
     public function ajaxReturnPackageId()
     {
         $trackno = request('trackno');
-        if($trackno) {
+        if ($trackno) {
             $model = $this->model->where(['tracking_no' => $trackno])->first();
-            if($model) {
+            if ($model) {
                 return json_encode($model->id);
             }
         }
@@ -301,12 +310,12 @@ class PackageController extends Controller
         $trackno = request('trackno');
         $logistics_id = request('logistics_id');
         $model = '';
-        if($package_id) {
+        if ($package_id) {
             $model = $this->model->find($package_id);
         } else {
             $model = $this->model->where(['tracking_no' => $trackno])->first();
         }
-        if($model) {
+        if ($model) {
             $model->update(['logistics_id' => $logistics_id]);
             return json_encode($model->id);
         }
@@ -597,7 +606,7 @@ class PackageController extends Controller
     public function templateMsg($id)
     {
         $model = $this->model->find($id);
-        if($model->logistics) {
+        if ($model->logistics) {
             $view = $model->logistics->template;
             $response = [
                 'metas' => $this->metas(__FUNCTION__),

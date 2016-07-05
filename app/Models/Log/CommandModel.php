@@ -22,7 +22,7 @@ class CommandModel extends BaseModel
     protected $guarded = [];
 
     //查询
-    public $searchFields = ['related_id', 'signature', 'description'];
+    public $searchFields = ['relation_id', 'signature', 'description', 'remark'];
 
     public function getColorAttribute()
     {

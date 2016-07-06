@@ -27,9 +27,7 @@
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
                 外部单号：
-                @foreach($purchaseOrder->purchasePostage as $ppostage)
-                    {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
-                @endforeach
+                {{$purchaseOrder->post_coding }}
             </td>
             <td> 
                 {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}

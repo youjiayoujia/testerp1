@@ -218,11 +218,11 @@
     </tbody>
     </table>
    
-  <input type="hidden" value="{{ $model->id }}" name="purchase_order_id">
+    <input type="hidden" value="{{ $model->id }}" name="purchase_order_id">
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">产品信息</div>
+        <div class="panel-heading">添加物流单号</div>
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
@@ -257,6 +257,21 @@
         <div class="panel-footer">
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
         </div>
+    </div> 
+    <div class="panel panel-default">
+        <div class="panel-heading">添加外部单号</div>
+        <div class="panel-body" id="">
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <div class="form-group">
+                        <label for="name">外部单号</label>
+                        <input class="form-control" id="name" placeholder="外部单号" name='post_coding' value="{{$model->post_coding}}">
+                    </div>
+                </div>            
+            </div>       
+             
+        </div>
+        
     </div> 
 @stop
 @section('pageJs')

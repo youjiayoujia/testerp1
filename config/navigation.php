@@ -379,7 +379,7 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '异常队列',
+                    'name' => '失败队列',
                     'url' => 'jobFailed.index',
                     'icon' => '',
                 ],

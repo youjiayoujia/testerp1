@@ -475,7 +475,7 @@ class PurchaseOrderController extends Controller
                 if($purchase_item->arrival_num!=$purchase_item->purchase_num){
                     $filed['purchase_item_id'] = $purchase_item['id'];
                     $filed['sku'] = $purchase_item['sku'];
-                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>10?10:$purchase_item['arrival_num']+$update_data[1];
+                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>$purchase_item['purchase_num']?$purchase_item['purchase_num']:$purchase_item['arrival_num']+$update_data[1];
                     $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num']<0?0:$purchase_item['purchase_num']-$filed['arrival_num'];
                     $filed['arrival_time'] = date('Y-m-d H:i:s',time());
                     $filed['status'] = 2;

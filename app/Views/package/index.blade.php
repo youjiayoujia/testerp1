@@ -43,9 +43,9 @@
                 <a href="{{ route('package.show', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
+<!--                 <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
+                </a> -->
                 <!-- @if($package->status == 'ASSIGNFAILED')
                 <a href="{{ route('package.allocateLogistics', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
                     分配物流方式

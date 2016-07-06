@@ -33,7 +33,7 @@
     @foreach($data as $item)
         <tr>
             <td>
-             @if($item->status !="selling")
+             @if($item->require_create !="1")
                 <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="1" >
                 @else
                 <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="0" >

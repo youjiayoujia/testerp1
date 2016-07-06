@@ -9,7 +9,7 @@
   | and give it the controller to call when that URI is requested.
   |
  */
-  Route::get('test1', 'TestController@test1');
+Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -136,6 +136,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::any('itemAjaxWarehousePosition', ['uses' => 'StockController@ajaxWarehousePosition', 'as' => 'itemAjaxWarehousePosition']);
     Route::get('stock/getSinglePosition',
         ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
     Route::get('stock/getSingleSku', ['uses' => 'StockController@getSingleSku', 'as' => 'stock.getSingleSku']);
@@ -247,6 +248,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
     Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
     Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
+
     //品类路由
     Route::resource('catalog', 'CatalogController');
     //item路由
@@ -457,8 +459,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('package/ajaxPackageSend',
         ['uses' => 'PackageController@ajaxPackageSend', 'as' => 'package.ajaxPackageSend']);
     Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);
-    Route::get('package/doPackage',
-        ['uses' => 'PackageController@doPackage', 'as' => 'package.doPackage']);
     Route::get('package/assignLogistics',
         ['uses' => 'PackageController@assignLogistics', 'as' => 'package.assignLogistics']);
     Route::get('package/placeLogistics',

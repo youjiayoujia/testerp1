@@ -12,6 +12,7 @@
         </div> 
     </div>  
 <input type="hidden" value="" id="ajaxp_id"> 
+<input type="hidden" value="" id="ajaxp_id_forever"> 
 @stop
 
 @section('pageJs')
@@ -24,7 +25,7 @@
                 if(p_id==''){
                     p_id = $("#ajaxp_id").val();
                 }
-                
+
     	    	$.ajax({
                     url: "{{ route('ajaxRecieve') }}",
                     data: {id: p_id},
@@ -32,12 +33,14 @@
                     type: 'get',
                     success: function (result) {
                         $(".purchase").html(result);
-                        //if($("#ajaxp_id").val()==''){
+                        if($("#p_id").val()!=''){
                             $("#ajaxp_id").val($("#p_id").val());
-                        //}
+
+                        }
                         $("#p_id").val("");
                     }
                 });
+                
     	    }
     	});
     })
@@ -69,13 +72,14 @@
             data:{data:data,p_id:$("#ajaxp_id").val()},
             dataType:'json',
             type:'get',
+            async:true,
             success:function(result){
-                
                 javascript:document.getElementById("p_id").focus();
                 var e = jQuery.Event("keydown");//模拟一个键盘事件
                 e.keyCode =13;//keyCode=13是回车
                 $("#p_id").trigger(e);
                 javascript:document.getElementById("p_id").focus();
+                javascript:document.getElementById('ajaxp_id').value = result;
             }
         });                         
 	});

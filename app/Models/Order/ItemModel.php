@@ -55,4 +55,9 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\OrderModel','order_id');
     }
 
+    public function getStatusTextAttribute()
+    {
+        return config('order.item_status.' . $this->status);
+    }
+
 }

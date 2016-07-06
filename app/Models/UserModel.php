@@ -54,4 +54,14 @@ class UserModel extends BaseModel implements AuthenticatableContract,
     {
         return $this->belongsToMany('App\Models\UserModel', 'channel_account_user', 'channel_account_id', 'user_id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany('App\Models\message\MessageModel', 'assign_id');
+    }
+
+    public function getProcessMessagesAttribute()
+    {
+        return $this->messages()->where('status', 'PROCESS')->count();
+    }
 }

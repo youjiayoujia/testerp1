@@ -41,11 +41,22 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('inspire')->hourly();
+        //抓单定时任务规则
         foreach (ChannelModel::all() as $channel) {
             switch ($channel->driver) {
                 case 'amazon':
                     foreach ($channel->accounts as $account) {
-                        $schedule->command('get:orders ' . $account->id)->everyTenMinutes();
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                case 'aliexpress':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                case 'wish':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
                 case 'ebay':
@@ -53,12 +64,15 @@ class Kernel extends ConsoleKernel
                         $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
                     }
                     break;
-//                case 'wish':
-//                    foreach ($channel->accounts as $account) {
-//                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
-//                    }
-//                    break;
-                default:
+                case 'lazada':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
+                    break;
+                case 'cdiscount':
+                    foreach ($channel->accounts as $account) {
+                        $schedule->command('get:orders ' . $account->id)->everyThirtyMinutes();
+                    }
                     break;
             }
         }

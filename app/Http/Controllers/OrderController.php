@@ -105,7 +105,6 @@ class OrderController extends Controller
         $len = 1000;
         $start = 0;
         $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
-        $begin = microtime(true);
         while ($orders->count()) {
             foreach ($orders as $order) {
                 $job = new DoPackage($order);
@@ -115,10 +114,7 @@ class OrderController extends Controller
             $start += $len;
             $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
         }
-        $end = microtime(true);
-        $time = round(($end - $begin) / 1000, 3);
-
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '打包成功,时长' . $time . 's'));
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
     }
 
     /**
@@ -265,22 +261,6 @@ class OrderController extends Controller
             }
         }
         return 1;
-    }
-
-    /**
-     * 跳转更新备注页面
-     */
-    public function remark($id)
-    {
-        $model = $this->model->find($id);
-
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'remarks' => $model->remarks,
-        ];
-
-        return view($this->viewPath . 'remark', $response);
     }
 
     /**

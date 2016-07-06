@@ -169,7 +169,7 @@ class SupplierController extends Controller
             $total = $buf->count();
             $arr = [];
             foreach($buf as $key => $value) {
-                $arr[$key]['id'] = $value->name;
+                $arr[$key]['id'] = $value->id;
                 $arr[$key]['text'] = $value->name;
             }
             if($total)

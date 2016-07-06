@@ -90,7 +90,7 @@ class AccountModel extends BaseModel
         $status = [];
         switch ($this->channel->driver) {
             case 'amazon':
-                $status = ['Unshipped', 'PartiallyShipped'];
+                $status = ['Shipped', 'Unshipped', 'PartiallyShipped'];
                 break;
             case 'aliexpress':
                 $status = ['WAIT_SELLER_SEND_GOODS'];
@@ -182,5 +182,11 @@ class AccountModel extends BaseModel
                 break;
         }
         return $config;
+    }
+
+    public function replies()
+    {
+        return $this->hasManyThrough('App\Models\Message\ReplyModel', 'App\Models\Message\MessageModel',
+            'account_id', 'message_id');
     }
 }

@@ -17,7 +17,7 @@
             <td>{{ $log->queue }}</td>
             <td>{{ $log->description }}</td>
             <td>{{ $log->lasting }}秒</td>
-            <td>{{ $log->result }}</td>
+            <td class="bg-{{ $log->color }}">{{ $log->result }}</td>
             <td>{{ $log->remark }}</td>
             <td>{{ $log->created_at }}</td>
         </tr>
@@ -44,6 +44,7 @@
         </button>
         <ul class="dropdown-menu">
             <li>
+                <a href="{{ DataList::filtersEncode(['result','=','init']) }}">初始化</a>
                 <a href="{{ DataList::filtersEncode(['result','=','success']) }}">成功</a>
                 <a href="{{ DataList::filtersEncode(['result','=','fail']) }}">失败</a>
             </li>

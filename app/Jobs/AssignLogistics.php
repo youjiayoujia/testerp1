@@ -37,7 +37,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
         $this->package->assignLogistics();
         if ($this->package->status == 'ASSIGNED') {
             //计算订单利润率
-            $orderRate = $this->package->calculateProfitProcess();
+            $orderRate = $this->package->order->calculateProfitProcess();
             if ($orderRate > 0) {
                 $job = new PlaceLogistics($this->package);
                 $job = $job->onQueue('placeLogistics');

@@ -18,6 +18,7 @@ class CreateLogCommands extends Migration
             $table->string('signature')->comment('命令');
             $table->string('description')->comment('描述');
             $table->string('lasting')->comment('执行时间');
+            $table->integer('total')->comment('计数');
             $table->string('result')->comment('结果');
             $table->string('remark')->comment('备注');
             $table->timestamps();

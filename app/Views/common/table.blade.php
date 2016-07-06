@@ -167,6 +167,7 @@
                         'sorts' => request()->input('sorts'),
                         'filters' => request()->input('filters'),
                         'filterClear' => request()->input('filterClear'),
+                        'mixedSearchFields' => request()->input('filterClear'),
                         ])
                         ->render()
                         !!}

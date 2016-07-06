@@ -67,7 +67,8 @@ class PackageModel extends BaseModel
                 'warehouse' => ['name'],
                 'channel' => ['name'],
                 'channelAccount' => ['account'],
-                'logistics' => ['code', 'name']
+                'logistics' => ['code', 'name'],
+                'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => ['status' => config('package')],

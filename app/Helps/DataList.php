@@ -67,5 +67,4 @@ class DataList
         }
         return $filters;
     }
-
 }

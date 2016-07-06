@@ -420,7 +420,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
     Route::get('downloadUpdateBlacklist',
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
-    Route::any('refundAll', ['uses' => 'OrderController@refundAll', 'as' => 'refundAll']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由

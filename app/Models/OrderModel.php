@@ -323,6 +323,12 @@ class OrderModel extends BaseModel
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
+            if ($data['type'] == 'PARTIAL') {
+                foreach ($data['tribute_id'] as $id) {
+                    $orderItem = $this->items->find($id);
+                    $orderItem->update(['is_refund' => 1]);
+                }
+            }
             return RefundModel::create($data);
         }
         return 1;

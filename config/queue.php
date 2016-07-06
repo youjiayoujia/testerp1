@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => 'database',
+    'default' => 'redis',
 
     /*
     |--------------------------------------------------------------------------
@@ -90,5 +90,12 @@ return [
         'database' => 'mysql',
         'table' => 'failed_jobs',
     ],
+
+    'queues' => [
+        'inOrders' => '存储订单',
+        'doPackage' => '打包',
+        'assignLogistics' => '分配物流',
+        'placeLogistics' => '物流下单',
+    ]
 
 ];

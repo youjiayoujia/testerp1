@@ -72,9 +72,42 @@ interface AdapterInterface
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10);
 
     /**
-     * 回传物流号
+     * 回传物流信息
      *
      */
     public function returnTrack();
+
+    /**
+     * 获取平台邮件
+     * @return mixed
+     *
+     * 返回数据格式:
+     * [
+     *      [
+     *          'message_id' => '', 渠道messageID
+     *          'title' => '',
+     *          'from_name' => '',
+     *          'from_email' => '',
+     *          'to_name' => '',
+     *          'to_email' => '',
+     *          'date' => '',
+     *          'content' => '',
+     *          'attanchments' =>
+     *          [
+     *              ['name','path']
+     *              ['name','path']
+     *              ['name','path']
+     *           ],
+     *      ],
+     *      [
+     *          Same As above ...
+     *      ],
+     * ]
+     *
+     *
+     * 无数据返回：false;
+     *
+     */
+    public function getMessages();
 
 }

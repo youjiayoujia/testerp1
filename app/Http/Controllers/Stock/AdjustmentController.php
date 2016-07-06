@@ -151,9 +151,7 @@ class AdjustmentController extends Controller
             'model' => $model,
             'adjustments' => $model->adjustments,
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
-            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
             'access_quantity' => $access_quantity,
-            'users' => UserModel::all(),
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -259,7 +257,6 @@ class AdjustmentController extends Controller
             'model' => $model,
             'adjustments' => $model->adjustments,
             'warehouses' => WarehouseModel::where('is_available', '1')->get(),
-            'positions' =>PositionModel::where(['warehouse_id' => $model->warehouse_id, 'is_available' => '1'])->get()->toArray(),
         ];
 
         return view($this->viewPath.'check', $response);

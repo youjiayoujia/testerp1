@@ -112,6 +112,15 @@ class LogisticsModel extends BaseModel
         return $arr[$this->docking];
     }
 
+    public function hasLimits($id) 
+    {
+        $arr = explode(',', $this->limit);
+        if(in_array($id, $arr)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 物流商下单
      * todo:分方式下单

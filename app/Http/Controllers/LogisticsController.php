@@ -49,6 +49,21 @@ class LogisticsController extends Controller
     }
 
     /**
+     * 存储
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $model = $this->model->create(request()->all());
+        $str = implode(',', request('logistics_limits'));
+        $model->update(['limit' => $str]);
+        return redirect($this->mainIndex);
+    }
+
+    /**
      * 编辑
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
@@ -74,6 +89,26 @@ class LogisticsController extends Controller
         ];
         return view($this->viewPath . 'edit', $response);
 
+    }
+
+    /**
+     * 更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $buf = request()->all();
+        $buf['limit'] = implode(',', request('logistics_limits'));
+        $model->update($buf);
+        return redirect($this->mainIndex);
     }
 
     /**

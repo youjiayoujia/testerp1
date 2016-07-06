@@ -477,6 +477,25 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('label', 'LabelController');
     Route::resource('paypal', 'PaypalController');
     //editOnlineProduct
+
+    Route::post('wish/editOnlineProductStore', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
+    Route::get('wish/ajaxOperateOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@ajaxOperateOnlineProduct', 'as' => 'wish.ajaxOperateOnlineProduct']);
+    Route::get('wish/ajaxEditOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@ajaxEditOnlineProduct', 'as' => 'wish.ajaxEditOnlineProduct']);
+    Route::get('wish/indexOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@indexOnlineProduct', 'as' => 'wish.indexOnlineProduct']);
+    Route::get('wish/editOnlineProduct', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProduct', 'as' => 'wish.editOnlineProduct']);
+    Route::resource('wish','Publish\Wish\WishPublishController');
+
+
+    Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
+
+
+    Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
+    Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
+    Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
+    Route::resource('ebayDetail','Publish\Ebay\EbayDetailController');
+
+
+
     Route::post('wish/editOnlineProductStore',
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
     Route::get('wish/ajaxOperateOnlineProduct', [
@@ -554,6 +573,7 @@ Route::group(['middleware' => 'auth'], function () {
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
 
+
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
     Route::resource('user', 'UserController');
@@ -568,6 +588,11 @@ Route::group(['middleware' => 'auth'], function () {
     //队列
     Route::resource('jobFailed', 'Job\FailedController');
 });
+
+
+//getEbayInfo
+Route::any('getEbayInfo', ['uses' => 'TestController@getEbayInfo']);
+
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);
 Route::any('test', ['uses' => 'TestController@index']);
 Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersList']);

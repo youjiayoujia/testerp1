@@ -667,4 +667,8 @@ Class WishAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
+    
+    public function getMessages(){
+
+    }
 }

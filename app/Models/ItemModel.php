@@ -177,10 +177,12 @@ class ItemModel extends BaseModel
             if ($flag && $this->cost && ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3)) {
                 throw new Exception('入库单价不在原单价0.6-1.3范围内');
             }
-            $this->update([
-                'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
-            ]);
-            return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+            if($this->all_quantity + $quantity) {
+                $this->update([
+                    'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
+                ]);
+                return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+            }
         }
         return false;
     }
@@ -372,7 +374,7 @@ class ItemModel extends BaseModel
     {
         $items = $this->all();
         $requireModel = new RequireModel();
-        $array = RequireModel::groupBy('item_id')
+        /*$array = RequireModel::groupBy('item_id')
             ->selectRaw('item_id, sum(quantity) as sum')
             ->where('is_require', 1)
             ->get()
@@ -380,7 +382,7 @@ class ItemModel extends BaseModel
 
         foreach ($array as $require_key => $require_val) {
             $requireArray[$require_val['item_id']] = $require_val['sum'];
-        }
+        }*/
 
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
@@ -483,19 +485,19 @@ class ItemModel extends BaseModel
                 }
 
             }
-            $refund_rate = $all_order_num ? $refund_num / $all_order_num : '100';
+            $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
             //退款率
             $data['refund_rate'] = $refund_rate;
             //平均利润率
             $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
 
-            $data['status'] = $item->status;
-            $data['require_create'] = 0;
+            $data['status'] = $item->status?$item->status:'saleOutStopping';
+            $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
 
-            if (array_key_exists($data['item_id'], $requireArray)) {
+            /*if (array_key_exists($data['item_id'], $requireArray)) {
                 $data['require_create'] = 1;
-            }
+            }*/
             if ($thisModel) {
                 $thisModel->update($data);
             } else {

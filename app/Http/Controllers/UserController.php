@@ -79,4 +79,27 @@ class UserController extends Controller
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 
+    /**
+     * 获取供应商信息
+     */
+    public function ajaxUser()
+    {
+        if(request()->ajax()) {
+            $user = trim(request()->input('user'));
+            $buf = UserModel::where('name', 'like', '%'.$user.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->name;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
+
 }

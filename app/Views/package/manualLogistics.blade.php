@@ -21,7 +21,7 @@
               <select name='logistics' class='form-control logistics'>
               <option value=''></option>
               @foreach($logisticses as $logistics)
-              <option value="{{ $logistics->id }}">{{$logistics->short_code}}</option>
+              <option value="{{ $logistics->id }}">{{$logistics->code}}</option>
               @endforeach
               </select>
               </td>
@@ -30,6 +30,7 @@
             </tbody>
         </table>
     </div>
+<?php echo $packages->render(); ?>
 @stop
 @section('formButton')@stop
 @section('pageJs')

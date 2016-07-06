@@ -34,24 +34,14 @@
     <div class='row'>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                <option value=""></option>
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == old('supplier_id') ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
-            </select>
+            <select class='form-control supplier' name="supplier_id"></select>
         </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商货号</label>
             <input class="form-control" id="supplier_sku" placeholder="供应商货号" name='supplier_sku' value="{{ old('supplier_sku') }}">
         </div>
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id}}">{{$supplier->name}}</option>
-                @endforeach
-            </select>
+            <select class='form-control supplier' name="second_supplier_id"></select>
         </div>
         <div class="form-group col-md-3">
             <label for="size">辅供应商货号</label>
@@ -109,11 +99,7 @@
     <div class="row">
         
         <div class="form-group col-md-3"><label for="color">采购负责人</label>
-            <select  class="form-control" name="purchase_adminer">
-                @foreach($users as $user)
-                    <option value="{{ $user->id}}">{{$user->name}}</option>
-                @endforeach
-            </select>
+            <select class='form-control purchase_adminer' name="purchase_adminer"></select>
         </div>
         
         <div class="form-group col-md-3">
@@ -157,18 +143,72 @@
             <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') }}">
         </div>        
         <div class="form-group col-md-3">
-            <label for="color">描述(配件说明)</label>
-            <input class="form-control" id="description" placeholder="描述(配件说明)" name='description' value="{{ old('description') }}">
+            <label for="color">描述</label>
+            <input class="form-control" id="description" placeholder="描述" name='description' value="{{ old('description') }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
         </div>
     </div>
+
+    <div class="row">    
+        <div class="form-group col-md-3">
+            <label for="color">申报中文</label>
+            <input class="form-control" id="declared_cn" placeholder="申报中文" name='declared_cn' value="{{ old('declared_cn') }}">
+        </div>
+        
+        <div class="form-group col-md-3">
+            <label for="color">申报英文</label>
+            <input class="form-control" id="declared_en" placeholder="申报英文" name='declared_en' value="{{ old('declared_en') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">申报价格</label>
+            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">配件</label>
+            <input class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') }}">
+        </div>
+    </div>
+
 @stop
 
 @section('pageJs')
 <script type="text/javascript">
+    $('.supplier').select2({
+        ajax: {
+            url: "{{ route('ajaxSupplier') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                supplier:params.term,
+              };
+            },
+            results: function(data, page) {
+                
+            }
+        },
+    });
+
+    $('.purchase_adminer').select2({
+        ajax: {
+            url: "{{ route('ajaxUser') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                user:params.term,
+              };
+            },
+            results: function(data, page) {
+                
+            }
+        },
+    });
+
+
     function quanxuan(model){
         var collid = document.getElementById(model);
         var coll = $("input[class^="+model+"quanxuan]"); 

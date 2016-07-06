@@ -19,8 +19,8 @@
         <tr>
             <td>{{ $rule->id }}</td>
             <td>{{ $rule->name }}</td>
-            <td>{{ $rule->logistics->type }}</td>
-            <td>{{ $rule->logistics->code }}</td>
+            <td>{{ $rule->logistics ? $rule->logistics->name : '' }}</td>
+            <td>{{ $rule->logistics ? $rule->logistics->code : '' }}</td>
             <td>{{ $rule->priority }}</td>
             <td>{{ $rule->weight_from }}</td>
             <td>{{ $rule->weight_to }}</td>

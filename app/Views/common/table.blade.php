@@ -45,6 +45,17 @@
                                 <form action="" method="get">
                                     <div class="well row">
                                         @foreach($mixedSearchFields as $type => $value)
+                                            @if($type == 'doubleRelatedSearchFields')
+                                                @foreach($value as $relation_ship1 => $value1)
+                                                    @foreach($value1 as $relation_ship2 => $value2)
+                                                        @foreach($value2 as $key => $name)
+                                                            <div class="col-lg-2">
+                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" value="{{ old('mixedSearchFields[$type][$relation_ship1][$relation_ship2][$name]') }}" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
+                                                            </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endforeach
+                                            @endif
                                             @if($type == 'relatedSearchFields')
                                                 @if(count($value))
                                                     @foreach($value as $relation_ship => $name_arr)

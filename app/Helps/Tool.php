@@ -127,9 +127,24 @@ class Tool
     }
 
 
+
+
     // 1 处理捆绑的情况   A+B
     // 2 去除前后缀    $type = 2 的时候 sku前缀是  S*001KU[TEST]  这样存在的
     // 3 处理SKU（10）  处理打包的情况
+    /*
+     * 返回数据格式:
+     * [
+     *      'skuNum'=>'', //sku 总数量
+     *      [
+     *          'erpSku'=>'', //erpsku
+     *          'qty'=>'',  //数量
+     *      ]
+     *
+     * ]
+     *
+     *
+     */
     public function filter_sku($channel_sku, $type = 1)
     {
 
@@ -177,4 +192,17 @@ class Tool
         return $returnSku;
 
     }
+
+    public function base64Decode($content)
+    {
+        $content = strtr($content, '-_', '+/');
+        return base64_decode($content);
+    }
+
+    public function base64Encode($content)
+    {
+        //return $content;
+        return rtrim(strtr(base64_encode($content), '+/', '-_'), '=');
+    }
+    
 }

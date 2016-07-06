@@ -20,7 +20,13 @@ class CreateLogisticses extends Migration
             $table->integer('logistics_supplier_id')->comment('物流商')->default(NULL);
             $table->string('type')->comment('物流商物流方式')->default(NULL);
             $table->string('url')->comment('物流追踪网址')->default(NULL);
-            $table->string('docking')->comment('对接方式')->default(NULL);
+            $table->enum('docking',
+                [
+                    'MANUAL',
+                    'SELFAPI',
+                    'API',
+                    'CODE'
+                ])->default('CODE')->comment('对接方式');
             $table->integer('logistics_catalog_id')->comment('物流分类')->nullable()->default(0);
             $table->integer('logistics_email_template_id')->comment('回邮模版')->nullable()->default(0);
             $table->integer('logistics_template_id')->comment('面单模版')->nullable()->default(0);

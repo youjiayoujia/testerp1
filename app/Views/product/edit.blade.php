@@ -30,7 +30,7 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="form-group" style="margin-left:25px">
+                <!-- <div class="form-group" style="margin-left:25px">
                     <label>编辑默认图片:</label><br>
                     <?php if($product->default_image!=0){ ?>
                     <img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="120px">
@@ -56,7 +56,7 @@
                                 <div class='upimage'><input name='image<?php echo $j ?>' type='file'/></div>
                             <?php $j++;} ?>
                     </div>
-                <?php } ?>  
+                <?php } ?>   -->
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>
@@ -98,10 +98,8 @@
         </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
-                @endforeach
+            <select id="supplier_id" class="form-control supplier" name="supplier_id">
+               <option value="{{$product->supplier->id}}">{{$product->supplier->name}}</option>
             </select>
         </div> 
         <div class="form-group col-md-3">
@@ -228,4 +226,61 @@
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $product->remark }}">
         </div>
     </div>
+
+    <div class="row">    
+        <div class="form-group col-md-3">
+            <label for="color">申报中文</label>
+            <input class="form-control" id="declared_cn" placeholder="申报中文" name='declared_cn' value="{{ old('declared_cn') ?  old('declared_cn') : $product->declared_cn }}">
+        </div>
+        
+        <div class="form-group col-md-3">
+            <label for="color">申报英文</label>
+            <input class="form-control" id="declared_en" placeholder="申报中文" name='declared_en' value="{{ old('declared_en') ?  old('declared_en') : $product->declared_en }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">申报价格</label>
+            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') ?  old('declared_value') : $product->declared_value }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">配件</label>
+            <input class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') ?  old('parts') : $product->parts }}">
+        </div>
+    </div>
+@stop
+
+@section('pageJs')
+    <script type="text/javascript">
+        $('.supplier').select2({
+                ajax: {
+                    url: "{{ route('ajaxSupplier') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        supplier:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+            });
+
+            $('.purchase_adminer').select2({
+                ajax: {
+                    url: "{{ route('ajaxUser') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        user:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+        });
+
+    </script>
 @stop

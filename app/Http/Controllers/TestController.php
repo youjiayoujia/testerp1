@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers;
 
-
 use Test;
 
 use App\Models\Purchase\PurchaseOrderModel;
@@ -28,6 +27,10 @@ use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
 use App\Models\WarehouseModel;
 use App\Models\Warehouse\PositionModel;
+use App\Models\Channel\ChannelsModel;
+use App\Models\Message\ReplyModel;
+use App\Models\Message\MessageModel;
+
 
 use DB;
 
@@ -42,18 +45,18 @@ class TestController extends Controller
 
     public function test1()
     {
-        $url = 'http://baidu.com/index.php?a=1&b=3';
-        $arr = pathinfo($url);
-        var_dump($arr);
+        $order = OrderModel::find(4);
+        $rate = $order->calculateProfitProcess();
+        var_dump($rate);
         exit;
-        echo Tool::barcodePrint('67');
     }
 
     public function index()
     {
         $orderModel = new OrderModel;
         $start = microtime(true);
-        $account = AccountModel::find(9);
+        $account = AccountModel::find(request()->input('id'));
+
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -62,19 +65,17 @@ class TestController extends Controller
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
-                $order['customer_service'] = $account->customer_service->id;
-                $order['operator'] = $account->operator->id;
-                //todo:订单状态获取
-                $order['status'] = 'PAID';
+                $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
+                $order['operator'] = $account->operator ? $account->operator->id : 0;
                 $oldOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
                 if (!$oldOrder) {
                     $orderModel->createOrder($order);
                 }
             }
-            $end = microtime(true);
-            $lasting = round($end - $start, 3);
-            echo $account->alias . ' 耗时' . $lasting . '秒';
         }
+        $end = microtime(true);
+        $lasting = round($end - $start, 3);
+        echo $account->alias . ':' . $account->id . ' 耗时' . $lasting . '秒';
     }
 
 
@@ -249,7 +250,7 @@ class TestController extends Controller
             if ($productList) {
                 foreach ($productList as $product) {
 
-                    $is_add =true;
+                    $is_add = true;
                     $productInfo = $product['productInfo'];
                     $variants = $product['variants'];
 

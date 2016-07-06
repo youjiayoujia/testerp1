@@ -13,8 +13,7 @@
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
-    ID</th>
-    <th>产品ID</th>
+    SKUID</th>
     <th>sku</th>
     <th>中文名</th>
     <th>可用库存</th>
@@ -27,19 +26,19 @@
     <th>趋势系数</th>
     <th>平均利润率</th>
     <th>退款率</th>
-    <th>状态</th>
+    <th>SKU状态</th>
+    <th>采购状态</th>
 @stop
 @section('tableBody')
     @foreach($data as $item)
         <tr>
             <td>
              @if($item->status !="selling")
-                <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="1" >
+                <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="1" >
                 @else
-                <input type="checkbox" name="requireItem_id"  value="{{$item->id}}" isexamine="0" >
+                <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="0" >
                 @endif
-            {{ $item->id }}</td>
-            <td>{{ $item->item_id}}</td>
+            {{ $item->item_id }}</td>
             <td>{{ $item->sku}}</td>   
             <td>
             {{$item->c_name}}
@@ -51,7 +50,7 @@
             <td>{{$item->thirty_sales}}</td>
             <td>{{$item->fourteen_sales}}</td>
             <td>{{$item->seven_sales}}</td>
-            <td>{{$item->need_purchase_num}}</td>
+            <td>{{$item->need_purchase_num>0?$item->need_purchase_num:0}}</td>
             <td>@if($item->thrend == 1)
             	上涨
             @elseif($item->thrend == 2)
@@ -65,7 +64,7 @@
             <td>{{$item->profit*100}}%</td>
             <td>{{$item->refund_rate*100}}%</td>
             <td>{{config('item.status')[$item->status]}}</td>
-             
+            <td>{{config('purchase.require')[$item->require_create]}}</td>
         </tr>
     @endforeach
  <script type="text/javascript">		 

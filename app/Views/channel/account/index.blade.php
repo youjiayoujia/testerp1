@@ -49,16 +49,16 @@
     @foreach($data as $account)
         <tr>
             <td>{{ $account->id }}</td>
-            <td>{{ $account->channel->name }}</td>
+            <td>{{ $account->channel ? $account->channel->name : '' }}</td>
             <td>{{ $account->account }}</td>
             <td>{{ $account->alias }}</td>
-            <td>{{ $account->country?$account->country->cn_name:'全球' }}</td>
+            <td>{{ $account->country ? $account->country->cn_name:'全球' }}</td>
             <td>{{ $account->order_prefix }}</td>
             <td>{{ $account->sync_cycle }}</td>
             <td>{{ $account->sync_days }}天</td>
             <td>{{ $account->sync_pages }}</td>
-            <td>{{ $account->operator?$account->operator->name:'无' }}</td>
-            <td>{{ $account->customer_service?$account->customer_service->name:'无' }}</td>
+            <td>{{ $account->operator ? $account->operator->name : '无' }}</td>
+            <td>{{ $account->customer_service ? $account->customer_service->name : '无' }}</td>
             <td>{{ $account->service_email }}</td>
             <td>{{ $account->is_available?'启用':'停用' }}</td>
             <td>{{ $account->created_at }}</td>

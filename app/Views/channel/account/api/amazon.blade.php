@@ -44,6 +44,24 @@
                             <input type='text' class="form-control" id="account" name='amazon_accesskey_secret' value="{{ $account->amazon_accesskey_secret }}">
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="account" class='control-label'>G-MAIL MESSAGE_SECRET</label>
+                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                            <input type='text' class="form-control" id="account" name='message_secret' value="{{ $account->message_secret }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-lg-12">
+                            <label for="account" class='control-label'>G-MAIL MESSAGE_TOKEN</label>
+                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                            <input type='text' class="form-control" id="account" name='message_token' value="{{ $account->message_token }}">
+                        </div>
+                    </div>
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

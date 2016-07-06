@@ -121,6 +121,7 @@ Class LazadaAdapter implements AdapterInterface
 
         } while (true);
 
+
         return $result_orders;
     }
 
@@ -170,6 +171,7 @@ Class LazadaAdapter implements AdapterInterface
 
         $xml_orders = $this->setRequest($url);
         $orders = $this->XmlToArray($xml_orders);
+
 
         return $orders;
         //echo 'orders:<pre>';print_r($orders);exit;
@@ -310,10 +312,10 @@ Class LazadaAdapter implements AdapterInterface
 
             $items[] = [
                 'sku' => $v['orders_sku'],
-                //'channel_sku' => $orderItem->SellerSKU,
+                'channel_sku' => $v['channel_sku'],
                 'quantity' => $v['item_count'],
                 'price' => $v['item_price'],
-                //'currency' => $orderItem->ItemPrice->CurrencyCode,
+                'currency' => $lazada_currency_type,
             ];
         }
 
@@ -360,6 +362,7 @@ Class LazadaAdapter implements AdapterInterface
                     $sku_data[$v['sku']]['item_count'] = $v['count'];
                     $sku_data[$v['sku']]['item_price'] = $v['price'];
                     $sku_data[$v['sku']]['orders_sku'] = $v['sku'];
+                    $sku_data[$v['sku']]['channel_sku'] = $v['channel_sku'];
                 }
             }
         }
@@ -385,7 +388,7 @@ Class LazadaAdapter implements AdapterInterface
                     $data = $row;
                     $data['sku'] = $tmpSku; //SKU信息暂时已变更，重新赋值下就行
                     $data['price'] = round($data['price'] / $tmpCount, 2); //组合SKU的单价平均处理
-
+                    $data['channel_sku'] = $row['sku'];
                     //2.再去掉‘*’,可以直接取星号之后的部分
                     $tmp = explode('*', $tmpSku);
                     $tmpSku = trim(array_pop($tmp));

@@ -322,6 +322,11 @@ return [
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
+            [
+                'name' => 'ebay站点信息',
+                'url' => 'ebayDetail.index',
+                'icon' => '',
+            ],
 
         ],
     ],
@@ -367,19 +372,19 @@ return [
         'subnavigations' => [
             '定时任务' => [
                 [
-                    'name' => '日志',
+                    'name' => '任务日志',
                     'url' => 'logCommand.index',
                     'icon' => '',
                 ],
             ],
             '队列' => [
                 [
-                    'name' => '日志',
+                    'name' => '队列日志',
                     'url' => 'logQueue.index',
                     'icon' => '',
                 ],
                 [
-                    'name' => '异常队列',
+                    'name' => '失败队列',
                     'url' => 'jobFailed.index',
                     'icon' => '',
                 ],

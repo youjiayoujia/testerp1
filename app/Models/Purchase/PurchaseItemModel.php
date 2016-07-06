@@ -21,7 +21,7 @@ class PurchaseItemModel extends BaseModel
     protected $table = 'purchase_items';
     public $rules = [
         'create' => [
-            
+            'purchase_num'=> 'required|numeric',
         ],
         'update' => [
  			

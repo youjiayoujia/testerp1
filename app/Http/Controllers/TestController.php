@@ -62,6 +62,7 @@ class TestController extends Controller
         $orderModel = new OrderModel;
         $start = microtime(true);
         $account = AccountModel::find(request()->input('id'));
+
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -315,5 +316,14 @@ class TestController extends Controller
 
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+
+    public function getEbayInfo(){
+        $accountID = request()->get('id');
+        $begin = microtime(true);
+        $account = AccountModel::findOrFail($accountID);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $result = $channel->getEbaySite();
     }
 }

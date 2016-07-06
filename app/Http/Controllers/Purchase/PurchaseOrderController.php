@@ -24,9 +24,10 @@ use Tool;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder)
+    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem)
     {
         $this->model = $purchaseOrder;
+        $this->purchaseItem = $purchaseItem;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
         $this->viewPath = 'purchase.purchaseOrder.';
@@ -295,10 +296,14 @@ class PurchaseOrderController extends Controller
      */
     public function createItem($id){
         $data=request()->all();
+        $this->validate(request(), $this->purchaseItem->rules('create'));
+        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
+        if (!$item) {
+            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在.'));
+        }
         $model=$this->model->find($id);
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
         $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
-        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if($num > 0 || $Inum > 0){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
         }
@@ -475,7 +480,7 @@ class PurchaseOrderController extends Controller
                 if($purchase_item->arrival_num!=$purchase_item->purchase_num){
                     $filed['purchase_item_id'] = $purchase_item['id'];
                     $filed['sku'] = $purchase_item['sku'];
-                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>10?10:$purchase_item['arrival_num']+$update_data[1];
+                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>$purchase_item['purchase_num']?$purchase_item['purchase_num']:$purchase_item['arrival_num']+$update_data[1];
                     $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num']<0?0:$purchase_item['purchase_num']-$filed['arrival_num'];
                     $filed['arrival_time'] = date('Y-m-d H:i:s',time());
                     $filed['status'] = 2;

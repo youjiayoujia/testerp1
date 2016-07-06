@@ -67,7 +67,8 @@ class PackageModel extends BaseModel
                 'warehouse' => ['name'],
                 'channel' => ['name'],
                 'channelAccount' => ['account'],
-                'logistics' => ['code', 'name']
+                'logistics' => ['code', 'name'],
+                'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
             'filterSelects' => ['status' => config('package')],
@@ -259,7 +260,7 @@ class PackageModel extends BaseModel
                 //是否有物流限制
                 if ($rule->limit_section && $this->shipping_limits) {
                     $shipping_limits = $this->shipping_limits->toArray();
-                    $limits = $this->rule_limits_through;
+                    $limits = $rule->rule_limits_through;
                     foreach ($limits as $limit) {
                         if (in_array($limit->id, $shipping_limits)) {
                             if ($limit->pivot->type == '3') {

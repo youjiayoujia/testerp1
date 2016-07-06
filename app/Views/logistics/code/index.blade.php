@@ -37,3 +37,12 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolButtons')
+    <a href="/batchAddTrCode/{{ $code->logistics_id }}" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus"></span> 导入-号码池
+    </a>
+    <a href="/scanAddTrCode/{{ $code->logistics_id }}" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus"></span> 扫描-号码池
+    </a>
+    @parent
+@stop

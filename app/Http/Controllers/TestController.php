@@ -23,7 +23,7 @@ use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
 use App\Jobs\Job;
 use App\Jobs\DoPackage;
-use App\Jobs\SendMessage;
+use App\Jobs\SendMessages;
 use DNS1D;
 use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
@@ -55,11 +55,19 @@ class TestController extends Controller
 
     public function index()
     {
-        $reply = ReplyModel::find(1);
-        $job = new SendMessage($reply);
-        $job = $job->onQueue('sendMessage');
+        $reply = ReplyModel::find(28544);
+
+       var_dump($reply->channelAccount());
+
+        $job = new SendMessages($reply);
+        $job = $job->onQueue('SendMessages');
         $this->dispatch($job);
+echo 555;
         exit;
+
+
+
+
         $package = PackageModel::find(request()->input('id'));
         $package->assignLogistics();
         $job = new PlaceLogistics($package);

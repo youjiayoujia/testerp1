@@ -473,5 +473,8 @@ Class LazadaAdapter implements AdapterInterface
     {
 
     }
+    public function sendMessages(){
+        
+    }
 
 }

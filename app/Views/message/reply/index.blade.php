@@ -25,6 +25,7 @@
     <th>操作</th>
 @stop
 @section('tableBody')
+    @if($data)
     @foreach($data as $reply)
         <tr>
             <td>{{ $reply->id }}</td>
@@ -41,4 +42,5 @@
             </td>
         </tr>
     @endforeach
+    @endif
 @stop

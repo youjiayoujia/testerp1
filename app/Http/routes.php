@@ -304,6 +304,8 @@ Route::group(['middleware' => 'auth'], function () {
     //物流限制
     Route::resource('logisticsLimits', 'Logistics\LimitsController');
     //物流路由
+    Route::get('logisticsCode/one/{id}',
+        ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::resource('logistics', 'LogisticsController');
@@ -418,7 +420,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
     Route::get('downloadUpdateBlacklist',
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
-    Route::any('refundAll', ['uses' => 'OrderController@refundAll', 'as' => 'refundAll']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由

@@ -136,6 +136,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::any('itemAjaxWarehousePosition', ['uses' => 'StockController@ajaxWarehousePosition', 'as' => 'itemAjaxWarehousePosition']);
     Route::get('stock/getSinglePosition',
         ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
     Route::get('stock/getSingleSku', ['uses' => 'StockController@getSingleSku', 'as' => 'stock.getSingleSku']);
@@ -247,20 +248,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/purchaseItemList/reductionUpdate', 'Purchase\PurchaseItemListController@reductionUpdate');
     Route::any('/purchaseItemList/itemReductionUpdate/{id}', 'Purchase\PurchaseItemListController@itemReductionUpdate');
     Route::resource('purchaseItemList', 'Purchase\PurchaseItemListController');
-
-    /**
-     * stock controller route
-     */
-    Route::any('itemAjaxWarehousePosition', ['uses' => 'StockController@ajaxWarehousePosition', 'as' => 'itemAjaxWarehousePosition']);
-    Route::get('allotsku', ['uses' => 'StockController@ajaxAllotSku', 'as' => 'allotsku']);
-    Route::get('allotoutwarehouse', ['uses' => 'StockController@ajaxAllotOutWarehouse', 'as' => 'allotoutwarehouse']);
-    Route::get('stock/ajaxGetByPosition', ['uses' => 'StockController@ajaxGetByPosition', 'as' => 'stock.ajaxGetByPosition']);
-    Route::get('getmessage', ['uses' => 'StockController@ajaxGetMessage', 'as' => 'getmessage']);
-    Route::get('allotposition', ['uses' => 'StockController@ajaxAllotPosition', 'as' => 'allotposition']);
-    Route::get('stock/ajaxGetOnlyPosition', ['uses' => 'StockController@ajaxGetOnlyPosition', 'as' => 'stock.ajaxGetOnlyPosition']);
-    Route::resource('stock', 'StockController');
-
-
 
     //品类路由
     Route::resource('catalog', 'CatalogController');

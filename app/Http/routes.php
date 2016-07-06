@@ -303,7 +303,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockTaking', 'Stock\TakingController');
     //物流限制
     Route::resource('logisticsLimits', 'Logistics\LimitsController');
+    
+    //物流渠道路由
+    Route::resource('logisticsChannelName', 'Logistics\ChannelNameController');
     //物流路由
+
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::resource('logistics', 'LogisticsController');
@@ -422,8 +426,6 @@ Route::group(['middleware' => 'auth'], function () {
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
-    Route::get('package/returnUrl',
-        ['uses' => 'PackageController@returnUrl', 'as' => 'package.returnUrl']);
     Route::get('package/ajaxUpdatePackageLogistics',
         ['uses' => 'PackageController@ajaxUpdatePackageLogistics', 'as' => 'package.ajaxUpdatePackageLogistics']);
     Route::get('package/ajaxReturnPackageId',

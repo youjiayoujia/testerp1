@@ -302,6 +302,8 @@ Route::group(['middleware' => 'auth'], function () {
     //物流限制
     Route::resource('logisticsLimits', 'Logistics\LimitsController');
     //物流路由
+    Route::get('logisticsCode/one/{id}',
+        ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::resource('logistics', 'LogisticsController');

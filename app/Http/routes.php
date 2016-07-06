@@ -9,7 +9,7 @@
   | and give it the controller to call when that URI is requested.
   |
  */
-  Route::get('test1', 'TestController@test1');
+Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -457,8 +457,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('package/ajaxPackageSend',
         ['uses' => 'PackageController@ajaxPackageSend', 'as' => 'package.ajaxPackageSend']);
     Route::any('package/ajaxGetOrder', ['uses' => 'PackageController@ajaxGetOrder', 'as' => 'package.ajaxGetOrder']);
-    Route::get('package/doPackage',
-        ['uses' => 'PackageController@doPackage', 'as' => 'package.doPackage']);
     Route::get('package/assignLogistics',
         ['uses' => 'PackageController@assignLogistics', 'as' => 'package.assignLogistics']);
     Route::get('package/placeLogistics',

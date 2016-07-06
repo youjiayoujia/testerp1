@@ -2,8 +2,8 @@
     <ul class="nav nav-tabs" role="tablist">
         @foreach($message->relatedOrders as $key => $relatedOrder)
             <li role="presentation" class="{{ $key == 0 ? 'active' : '' }}">
-                <a href="#{{ $relatedOrder->order->ordernum }}"
-                   aria-controls="{{ $relatedOrder->order->ordernum }}"
+                <a href="#{{ str_replace('.','_',$relatedOrder->order->ordernum) }}"
+                   aria-controls="{{ str_replace('.','_',$relatedOrder->order->ordernum) }}"
                    role="tab"
                    data-toggle="tab">
                     {{ $relatedOrder->order->ordernum }}
@@ -14,7 +14,7 @@
 @endif
 <div class="tab-content">
     @foreach($message->relatedOrders as $key => $relatedOrder)
-        <div class="tab-pane {{ $key == 0 ? 'active' : '' }}" role="tabpanel" id="{{ $relatedOrder->order->ordernum }}">
+        <div class="tab-pane {{ $key == 0 ? 'active' : '' }}" role="tabpanel" id="{{ str_replace('.','_',$relatedOrder->order->ordernum) }}">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     订单:
@@ -76,7 +76,7 @@
                                 @foreach($relatedOrder->order->items as $item)
                                     <tr>
                                         <td>{{ $item->sku }}</td>
-                                        <td>{{ $item->qty }}</td>
+                                        <td>{{ $item->quantity }}</td>
                                         <td>{{ $item->price }}</td>
                                         <td>{{ $item->status_text }}</td>
                                     </tr>
@@ -114,13 +114,13 @@
                             <div class="row form-group">
                                 <div class="col-lg-6">
                                     <strong>物流</strong>:
-                                    <a href="{{ $package->tracking_link }}" target="_blank">
-                                        {{ $package->shipping->name }}
+                                    <a href="{{ $package->shipping->url }}" target="_blank">
+                                        {{ $package->shipping->type }}
                                     </a>
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>物流网址</strong>
-                                    {{ $package->tracking_link }}
+                                    {{  $package->shipping->url }}
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>追踪号</strong>: {{ $package->tracking_no }}
@@ -128,21 +128,21 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-lg-6">
-                                    <strong>创建</strong>: {{ $package->created }}
+                                    <strong>创建</strong>: {{ $package->created_at }}
                                 </div>
                                 <div class="col-lg-6">
-                                    <strong>打印</strong>: {{ $package->print_time }}
+                                    <strong>打印</strong>: {{ $package->printed_at }}
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-lg-6">
-                                    <strong>发货</strong>: {{ $package->ship_time }}
+                                    <strong>发货</strong>: {{ $package->shipped_at }}
                                 </div>
                                 <div class="col-lg-6">
                                     <strong>妥投</strong>:
-                                    @if($package->delivery_time)
-                                        {{ $package->delivery_time }}
-                                        ({{ $package->delivery_age }}天)
+                                    @if($package->delivered_at)
+                                        {{ $package->delivered_at }}
+                                        {{--({{ $package->delivery_age }}天)--}}
                                     @else
                                         --
                                     @endif
@@ -160,7 +160,7 @@
                                         @foreach($package->items as $item)
                                             <tr>
                                                 <td>{{ $item->item->sku }}</td>
-                                                <td>{{ $item->qty }}</td>
+                                                <td>{{ $item->quantity }}</td>
                                             </tr>
                                         @endforeach
                                     </table>
@@ -180,7 +180,7 @@
                                         <div class="panel-footer">
                                             <div class="row">
                                                 <div class="col-lg-12">
-                                                    <strong>更新时间</strong>: {{ $package->delivery_search_time }}
+                                                    <strong>更新时间</strong>: {{ $package->updated_at }}
                                                 </div>
                                             </div>
                                         </div>

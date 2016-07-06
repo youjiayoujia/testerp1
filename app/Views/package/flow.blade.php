@@ -15,7 +15,7 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <a type="button" class="btn btn-warning" href="javascript:" disabled>
+                <a type="button" class="btn btn-warning" href="{{ route('package.assignLogistics') }}">
                     自动分配物流 <span class="badge">{{ $assignNum }}</span>
                 </a>
             </div>
@@ -32,7 +32,7 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <a type="button" class="btn btn-warning" href="javascript:" disabled>
+                <a type="button" class="btn btn-warning" href="{{ route('package.placeLogistics') }}">
                     物流商下单 <span class="badge">{{ $placeNum }}</span>
                 </a>
             </div>

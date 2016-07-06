@@ -87,18 +87,8 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '订单利润率',
-                'url' => 'dashboard.index',
-                'icon' => '',
-            ],
-            [
                 'name' => '黑名单',
                 'url' => 'orderBlacklist.index',
-                'icon' => '',
-            ],
-            [
-                'name' => '订单投诉',
-                'url' => 'orderComplaint.index',
                 'icon' => '',
             ],
         ],
@@ -375,19 +365,19 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
-            '日志' => [
+            '定时任务' => [
                 [
-                    'name' => '定时任务日志',
+                    'name' => '日志',
                     'url' => 'logCommand.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '队列日志',
-                    'url' => 'logQueue.index',
                     'icon' => '',
                 ],
             ],
             '队列' => [
+                [
+                    'name' => '日志',
+                    'url' => 'logQueue.index',
+                    'icon' => '',
+                ],
                 [
                     'name' => '异常队列',
                     'url' => 'jobFailed.index',

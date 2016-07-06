@@ -8,7 +8,6 @@
 
 namespace App\Http\Controllers;
 
-
 use Test;
 
 use App\Models\Purchase\PurchaseOrderModel;
@@ -16,12 +15,12 @@ use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+use App\Models\PackageModel;
 
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
-use App\Models\PackageModel;
 use App\Jobs\DoPackage;
 use DNS1D;
 use App\Http\Controllers\Controller;
@@ -48,58 +47,21 @@ class TestController extends Controller
     {
         $order = OrderModel::find(4);
         $rate = $order->calculateProfitProcess();
-        var_dump($rate);exit;
+        var_dump($rate);
+        exit;
     }
 
     public function index()
     {
-
-        $accounts = AccountModel::all();
-
-        foreach ($accounts as $account) {
-            if ($account->channel->driver == 'amazon') {
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-
-                $messageList = $channel->getMessages();
-
-
-                foreach ($messageList as $message) {
-                    var_dump($message->id);exit;
-
-                   // $messageNew = MessageModel::where(['message_id' => $message->id])->get();
-                    var_dump($messageNew);
-                    if ($messageNew->id == null) {
-                        $messageNew->account_id = $account->id;
-                        $messageNew->message_id = $message['message_id'];
-                        $messageNew->from_name = $message['from_name'];
-/*                        $messageNew->labels = $message['labels'];*/
-                        $messageNew->label = $message['label'];
-                        $messageNew->from = $message['from'];
-                        $messageNew->to = $message['to'];
-                        $messageNew->date = $message['date'];
-                        $messageNew->subject = $message['subject'];
-                        $messageNew->content = $message['content'];
-                        /*                    $messageNew->assign_id  = 0;
-                                            $messageNew->status  = 'UNREAD';
-                                            $messageNew->related  = 0;
-                                            $messageNew->required  = 0;
-                                            $messageNew->read  = 0;*/
-                        $messageNew->save();
-                        //$this->info('Message #' . $messageNew->message_id . ' Received.');
-
-                    }
-
-
-                }
-
-            }
-        }
-
-exit;
-        
+        $package = PackageModel::find(request()->input('id'));
+        $package->assignLogistics();
+        $job = new PlaceLogistics($package);
+        $job = $job->onQueue('placeLogistics');
+        $this->dispatch($job);
+        exit;
         $orderModel = new OrderModel;
         $start = microtime(true);
-        $account = AccountModel::find(59);
+        $account = AccountModel::find(request()->input('id'));
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -108,19 +70,17 @@ exit;
             foreach ($orderList as $order) {
                 $order['channel_id'] = $account->channel->id;
                 $order['channel_account_id'] = $account->id;
-                $order['customer_service'] = $account->customer_service->id;
-                $order['operator'] = $account->operator->id;
-                //todo:订单状态获取
-                $order['status'] = 'PAID';
+                $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
+                $order['operator'] = $account->operator ? $account->operator->id : 0;
                 $oldOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
                 if (!$oldOrder) {
                     $orderModel->createOrder($order);
                 }
             }
-            $end = microtime(true);
-            $lasting = round($end - $start, 3);
-            echo $account->alias . ' 耗时' . $lasting . '秒';
         }
+        $end = microtime(true);
+        $lasting = round($end - $start, 3);
+        echo $account->alias . ':' . $account->id . ' 耗时' . $lasting . '秒';
     }
 
 
@@ -295,7 +255,7 @@ exit;
             if ($productList) {
                 foreach ($productList as $product) {
 
-                    $is_add =true;
+                    $is_add = true;
                     $productInfo = $product['productInfo'];
                     $variants = $product['variants'];
 

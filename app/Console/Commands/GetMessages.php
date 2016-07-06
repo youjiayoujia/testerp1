@@ -48,7 +48,7 @@ class GetMessages extends Command
         foreach (AccountModel::all() as $account) {
             //实例化渠道驱动
 
-            if($account->channel->driver = 'amazon'){
+            if($account->channel->driver == 'amazon'){
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 //获取Message列表
                 $messageList = $channel->getMessages();

@@ -40,6 +40,19 @@ class CodeController extends Controller
     }
 
     /**
+     * 某个物流方式追踪号首页
+     */
+    public function one($id)
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model->where('logistics_id', $id)),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 编辑
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View

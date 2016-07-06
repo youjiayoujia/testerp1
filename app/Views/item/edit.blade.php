@@ -101,17 +101,17 @@
         <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
-                    <label>
-                        <input type='checkbox' disabled="disabled" name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$model->product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
-                    </label>
+                <label>
+                    <input type='checkbox' disabled="disabled" name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >{{$carriage_limit->name}}
+                </label>
             @endforeach
         </div>
         <div class="form-group col-md-12" style="">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
-                    <label>
-                        <input type='checkbox' disabled="disabled" name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$model->product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
-                    </label>
+                <label>
+                    <input type='checkbox' disabled="disabled" name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, $wrapLimit_arr)? 'checked' : '' }} >{{$wrap_limit->name}}
+                </label>
             @endforeach
         </div>
         <div class="form-group col-md-3">

@@ -49,25 +49,7 @@
       </div>
     </div>
 
-    <div class="btn-group tags">
-        <button class="btn btn-xs photoBtn btn-success active" data-tag="photo"
-        title="实拍图">
-            <span class="glyphicon glyphicon-picture">
-            </span>
-        </button>
-        <button class="btn btn-xs linkBtn btn-default" data-tag="link" title="链接图">
-            <span class="glyphicon glyphicon-link">
-            </span>
-        </button>
-        <button class="btn btn-xs shapeBtn btn-default" data-tag="shape" title="外观图">
-            <span class="glyphicon glyphicon-tree-deciduous">
-            </span>
-        </button>
-        <button class="btn btn-xs frontBtn btn-default" data-tag="front" title="正面图">
-            <span class="glyphicon glyphicon-home">
-            </span>
-        </button>
-    </div>
+    
 
     
 @stop

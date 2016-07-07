@@ -46,4 +46,9 @@ class ChannelModel extends BaseModel
         return $this->hasMany('App\Models\Channel\AccountModel', 'channel_id', 'id');
     }
 
+    public function logisticsChannelName()
+    {
+        return $this->hasMany('App\Models\Logistics\ChannelNameModel', 'channel_id', 'id');
+    }
+
 }

@@ -32,7 +32,7 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Message\ReplyModel;
 use App\Models\Message\MessageModel;
-
+use App\Models\Sellmore\ShipmentModel;
 
 use DB;
 
@@ -47,10 +47,9 @@ class TestController extends Controller
 
     public function test1()
     {
-        $order = OrderModel::find(4);
-        $rate = $order->calculateProfitProcess();
-        var_dump($rate);
-        exit;
+        $shipment = ShipmentModel::where('shipmentID', '2')->first();
+        var_dump($shipment->shipmentCarrierInfo);
+        var_dump(unserialize($shipment->shipmentCarrierInfo));
     }
 
     public function index()

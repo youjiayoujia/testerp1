@@ -16,6 +16,7 @@ use App\Base\BaseModel;
 use App\Models\ItemModel;
 use App\Models\Order\RefundModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
+use App\Models\Order\BlacklistModel;
 use Illuminate\Support\Facades\DB;
 
 class OrderModel extends BaseModel
@@ -334,11 +335,18 @@ class OrderModel extends BaseModel
         return 1;
     }
 
-    //todo:黑名单逻辑
     public function checkBlack()
     {
-        $isBlack = '';
-        if ($isBlack == 'confirm') {
+        $channel = $this->channel->find($this['channel_id']);
+        if($channel['driver'] == 'wish') {
+            $name = $this['shipping_lastname'] . ' ' . $this['shipping_firstname'];
+            $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
+        }else {
+            $blacklist = BlacklistModel::where('email', $this['email']);
+
+        }
+        if(count($blacklist) > 0) {
+            $this->update(['blacklist' => '0']);
             return true;
         }
         return false;
@@ -375,7 +383,7 @@ class OrderModel extends BaseModel
             }
             $order->items()->create($orderItem);
         }
-        if ($this->checkBlack()) {
+        if ($order->checkBlack()) {
             $order->update(['status' => 'REVIEW']);
             $order->remark('黑名单订单.');
         }

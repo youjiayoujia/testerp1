@@ -21,7 +21,7 @@
 
     <div class="btn-group" role="group">
         <div class="form-group" style="margin-bottom:0px">
-            <select id="ms" multiple="multiple" style="width:200px" name="select_channel">
+            <select id="ms" class="js-example-basic-multiple" multiple="multiple" name="select_channel" style="width:200px">
                 <option value="1" class='aa'>Amazon</option>
                 <option value="2" class='aa'>EBay</option>
                 <option value="3" class='aa'>速卖通</option>
@@ -183,7 +183,8 @@
     <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script type="text/javascript">
 
-        $('#ms').multipleSelect();
+        //$('#ms').multipleSelect();
+        $(".js-example-basic-multiple").select2();
         //批量选中
         $('.choseShop').click(function () {
             var channel_ids = "";

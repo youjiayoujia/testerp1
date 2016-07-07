@@ -39,9 +39,14 @@
             <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-4">
                 <strong>物流限制</strong>: {{ $model->limit($model->limit) }}
             </div>
+            @foreach($channelNames as $channelName)
+            <div class="col-lg-4">
+                <strong>{{$channelName->channel ? $channelName->channel->name : ''}}承运商</strong>: {{ $channelName->name }}
+            </div>
+            @endforeach
         </div>
     </div>
     <div class="panel panel-default">

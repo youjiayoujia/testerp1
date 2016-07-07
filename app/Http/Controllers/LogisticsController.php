@@ -16,6 +16,8 @@ use App\Models\Logistics\TemplateModel;
 use App\Models\LogisticsModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\ChannelModel;
+use App\Models\Logistics\ChannelNameModel;
 
 
 class LogisticsController extends Controller
@@ -43,8 +45,16 @@ class LogisticsController extends Controller
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
-            'mixedSearchFields' => $this->model->mixed_search,
+            'amazons' => ChannelModel::where('name', 'Amazon')->first()->logisticsChannelName,
+            'wishes' => ChannelModel::where('name', 'Wish')->first()->logisticsChannelName,
+            'aliExpresses' => ChannelModel::where('name', 'AliExpress')->first()->logisticsChannelName,
+            'lazadas' => ChannelModel::where('name', 'Lazada')->first()->logisticsChannelName,
+            'ebays' => ChannelModel::where('name', 'Ebay')->first()->logisticsChannelName,
+            'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
+            'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
+            'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
         ];
+
         return view($this->viewPath . 'create', $response);
     }
 
@@ -58,9 +68,41 @@ class LogisticsController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
-        $str = implode(',', request('logistics_limits'));
+        if(request()->has('logistics_limits')) {
+            $str = implode(',', request('logistics_limits'));
+        }
         $model->update(['limit' => $str]);
+        $buf = [];
+        foreach(request('merchant') as $key => $value) {
+            $arr = explode(',', $value);
+            $channelName = ChannelNameModel::where(['channel_id' => $arr[0], 'name' => $arr[1]])->first();
+            if(!$channelName) {
+                continue;
+            }
+            $buf[$key] = $channelName->id;
+        }
+        $model->channelName()->sync($buf);
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'channelNames' => $model->channelName,
+        ];
+        return view($this->viewPath . 'show', $response);
     }
 
     /**
@@ -86,9 +128,16 @@ class LogisticsController extends Controller
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
+            'amazons' => ChannelModel::where('name', 'Amazon')->first()->logisticsChannelName,
+            'wishes' => ChannelModel::where('name', 'Wish')->first()->logisticsChannelName,
+            'aliExpresses' => ChannelModel::where('name', 'AliExpress')->first()->logisticsChannelName,
+            'lazadas' => ChannelModel::where('name', 'Lazada')->first()->logisticsChannelName,
+            'ebays' => ChannelModel::where('name', 'Ebay')->first()->logisticsChannelName,
+            'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
+            'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
+            'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
         ];
         return view($this->viewPath . 'edit', $response);
-
     }
 
     /**
@@ -106,8 +155,20 @@ class LogisticsController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $buf = request()->all();
-        $buf['limit'] = implode(',', request('logistics_limits'));
+        if(request()->has('logistics_limits')) {
+            $buf['limit'] = implode(',', request('logistics_limits'));
+        }
         $model->update($buf);
+        $buf = [];
+        foreach(request('merchant') as $key => $value) {
+            $arr = explode(',', $value);
+            $channelName = ChannelNameModel::where(['channel_id' => $arr[0], 'name' => $arr[1]])->first();
+            if(!$channelName) {
+                continue;
+            }
+            $buf[] = $channelName->id;
+        }
+        $model->channelName()->sync($buf);
         return redirect($this->mainIndex);
     }
 

@@ -103,7 +103,7 @@ class LogisticsModel extends BaseModel
 
     public function channelName()
     {
-        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_channel_names', 'logistics_id', 'channel_id')->withPivot('name');
+        return $this->belongsToMany('App\Models\Logistics\ChannelNameModel', 'logistics_belongstos', 'logistics_id', 'logistics_channel_id');
     }
 
     public function getDockingNameAttribute()
@@ -117,6 +117,17 @@ class LogisticsModel extends BaseModel
         $arr = explode(',', $this->limit);
         if(in_array($id, $arr)) {
             return true;
+        }
+        return false;
+    }
+
+    public function inType($id)
+    {
+        $multi = $this->channelName;
+        foreach($multi as $single) {
+            if($single->id == $id) {
+                return true;
+            }
         }
         return false;
     }

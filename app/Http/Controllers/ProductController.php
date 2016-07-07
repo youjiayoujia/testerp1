@@ -59,6 +59,10 @@ class ProductController extends Controller
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
+        if(!array_key_exists('modelSet',request()->all())){
+            return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
+        }
+        
         $this->model->createProduct(request()->all(),request()->files);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));

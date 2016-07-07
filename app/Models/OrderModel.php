@@ -22,7 +22,7 @@ class OrderModel extends BaseModel
 {
     protected $table = 'orders';
 
-    protected $guarded = ['items'];
+    protected $guarded = ['items', 'remark'];
 
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
@@ -436,7 +436,7 @@ class OrderModel extends BaseModel
                     $this->package_times += 1;
                     $this->status = 'NEED';
                     return $this->save();
-                }  elseif ($this->status == 'NEED') {
+                } elseif ($this->status == 'NEED') {
                     if (strtotime($this->created_at) < strtotime('-3 days')) {
                         $arr = $this->explodeOrder();
                         if ($arr) {
@@ -721,7 +721,7 @@ class OrderModel extends BaseModel
     {
         return $query->where('ordernum', $ordernum);
     }
-    
+
     /**
      * 计算利润率并处理
      *

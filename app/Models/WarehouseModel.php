@@ -19,7 +19,17 @@ class WarehouseModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'province', 'city', 'address', 'contact_by', 'telephone', 'type', 'volumn', 'is_available'];
+    protected $fillable = [
+        'name',
+        'province',
+        'city',
+        'address',
+        'contact_by',
+        'telephone',
+        'type',
+        'volumn',
+        'is_available'
+    ];
 
     // 规则验证
     public $rules = [
@@ -36,26 +46,29 @@ class WarehouseModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name'];
+    public $searchFields = ['name'];
 
     /**
      * get the relationship
-     * 
-     *  @return
+     *
+     * @return
      *
      */
     public function positions()
     {
-        return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouse_id' ,'id');
+        return $this->hasMany('App\Models\Warehouse\PositionModel', 'warehouse_id', 'id');
     }
-	//获取仓库地址
-	public function getWarehouseAddressAttribute(){
-		return $this->province.$this->city.$this->address;
-	}
+
+    //获取仓库地址
+    public function getWarehouseAddressAttribute()
+    {
+        return $this->province . $this->city . $this->address;
+    }
+
     /**
      * get the relationship
-     * 
-     *  @return
+     *
+     * @return
      *
      */
     public function contactByName()
@@ -68,11 +81,11 @@ class WarehouseModel extends BaseModel
         return $this->hasMany('App\Models\LogisticsModel', 'warehouse_id', 'id');
     }
 
-    public function logisticsIn($id) 
+    public function logisticsIn($id)
     {
         $logisticses = $this->logistics;
-        foreach($logisticses as $logistics) {
-            if($logistics->id == $id) {
+        foreach ($logisticses as $logistics) {
+            if ($logistics->id == $id) {
                 return true;
             }
         }

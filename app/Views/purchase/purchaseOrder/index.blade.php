@@ -133,7 +133,7 @@
                     </a>
                 @endif
                 @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
-                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
+                <a data-toggle="modal" data-target="#myModal_{{$purchaseOrder->id}}" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
                 
@@ -157,9 +157,8 @@
                 </a>  
             </td>
         </tr>
-    @endforeach
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+        <!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal_{{$purchaseOrder->id}}" tabindex="-1" role="dialog" 
    aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
@@ -212,6 +211,8 @@
       </div>
 </div>
 </div>
+    @endforeach
+
 <!-- 模态框（Modal） -->
 <div class="modal fade" id="myModala" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
    <div class="modal-dialog" style="width:800px">

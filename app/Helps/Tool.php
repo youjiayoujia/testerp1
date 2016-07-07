@@ -204,5 +204,27 @@ class Tool
         //return $content;
         return rtrim(strtr(base64_encode($content), '+/', '-_'), '=');
     }
+
+    /**
+     * 生成随机字符串
+     *
+     * @access public
+     * @param integer $length 字符串长度
+     * @param string $specialChars 是否有特殊字符
+     * @return string
+     */
+    public function randString($length, $specialChars = false) {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        if ($specialChars) {
+            $chars .= '!@#$%^&*()';
+        }
+
+        $result = '';
+        $max = strlen($chars) - 1;
+        for ($i = 0; $i < $length; $i++) {
+            $result .= $chars[rand(0, $max)];
+        }
+        return $result;
+    }
     
 }

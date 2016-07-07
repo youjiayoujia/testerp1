@@ -40,7 +40,7 @@ class SupplierModel extends BaseModel
         'bank_code',
         'pay_type',
         'qualifications',
-        'examine_status'
+        'examine_status',
     ];
 
     //查询
@@ -105,12 +105,13 @@ class SupplierModel extends BaseModel
      */
     public function supplierCreate($data, $file = null)
     {
-        if ($data['type'] == 0) {
-            $path = 'uploadSupplier/';
+        if ($data['type'] == 0 && $file != null) {
+
+            $path = config('product.product_supplier.file_path');
             if ($file->getClientOriginalName()) {
                 $originalExtension = $file->getClientOriginalExtension();
-                if ($originalExtension == 'jpg' || $originalExtension == 'png' || $originalExtension == 'jpeg') {
-                    $data['qualifications'] = $path . time() . '.' . $file->getClientOriginalExtension();
+                if ($originalExtension != 'php'){
+                    $data['qualifications'] = Tool::randString(16,false) . '.' . $file->getClientOriginalExtension();
                     $file->move($path, $data['qualifications']);
                 } else {
                     return 'imageError';
@@ -127,17 +128,26 @@ class SupplierModel extends BaseModel
      */
     public function updateSupplier($id, $data, $file = null)
     {
-        if ($data['type'] == 0) {
-            $path = 'uploadSupplier/';
-            if ($file->getClientOriginalName()) {
-                $originalExtension = $file->getClientOriginalExtension();
-                if ($originalExtension == 'jpg' || $originalExtension == 'png' || $originalExtension == 'jpeg') {
-                    $data['qualifications'] = $path . time() . '.' . $file->getClientOriginalExtension();
-                    $file->move($path, $data['qualifications']);
-                } else {
-                    return 'imageError';
+
+        if ($data['type'] == 0 && $file != null) { //线下类型
+            $path = config('product.product_supplier.file_path');
+                if ($file->getClientOriginalName()) {
+                    $itemInfo = $this->where('id',$id)->first();
+                    $originPath = $itemInfo['qualifications']; //原来文件路径
+                    $originalExtension = $file->getClientOriginalExtension();
+                    if ($originalExtension != 'php') {
+                        $data['qualifications'] = Tool::randString(16,false) . '.' . $file->getClientOriginalExtension();
+                        if($file->move($path, $data['qualifications']) && $originPath != ''){
+                            if(file_exists('./'.$path.$originPath)){
+                                unlink('./'.$path.$originPath); //删除原来的文件
+                            }
+                        }
+                    } else {
+                        return 'imageError';
+                    }
                 }
-            }
+        }else{
+            $data['qualifications'] = '';
         }
         return $this->find($id)->update($data);
     }

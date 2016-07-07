@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLogisticsChannelNames extends Migration
+class CreateLogisticsBelongsTos extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,10 @@ class CreateLogisticsChannelNames extends Migration
      */
     public function up()
     {
-        Schema::create('logistics_channel_names', function (Blueprint $table) {
+        Schema::create('logistics_belongsTos', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('channel_id')->comment('渠道id')->default(0);
-            $table->string('name')->comment('渠道对应的物流名')->default(NULL);
+            $table->integer('logistics_id')->comment('物流id')->default(0);
+            $table->integer('logistics_channel_id')->comment('渠道物流名id')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +28,6 @@ class CreateLogisticsChannelNames extends Migration
      */
     public function down()
     {
-        Schema::drop('channel_logistics_names');
+        Schema::drop('logistics_belongsTos');
     }
 }

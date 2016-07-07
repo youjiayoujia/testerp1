@@ -126,9 +126,105 @@
             </div>
         </div>
     </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>Amazon承运商</label>
+            <select name='merchant[amazon_merchant]' class='form-control amazon_merchant'>
+                <option value=''></option>
+                @foreach($amazons as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>ebay承运商</label>
+            <select name='merchant[ebay_merchant]' class='form-control ebay_merchant'>
+                <option value=''></option>
+                @foreach($ebays as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>wish承运商</label>
+            <select name='merchant[wish_merchant]' class='form-control wish_merchant'>
+                <option value=''></option>
+                @foreach($wishes as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>lazada承运商</label>
+            <select name='merchant[lazada_merchant]' class='form-control lazada_merchant'>
+                <option value=''></option>
+                @foreach($lazadas as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>dhgate承运商</label>
+            <select name='merchant[dhgate_merchant]' class='form-control dhgate_merchant'>
+                <option value=''></option>
+                @foreach($dhgates as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>cdiscount承运商</label>
+            <select name='merchant[cdiscount_merchant]' class='form-control cdiscount_merchant'>
+                <option value=''></option>
+                @foreach($cdiscounts as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>速卖通承运商</label>
+            <select name='merchant[aliExpress_merchant]' class='form-control aliExpress_merchant'>
+                <option value=''></option>
+                @foreach($aliExpresses as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-lg-3'>
+            <label>joom承运商</label>
+            <select name='merchant[joom_merchant]' class='form-control joom_merchant'>
+                <option value=''></option>
+                @foreach($jooms as $key => $single)
+                    <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
 @stop
 <script type="text/javascript">
     $(document).ready(function() {
+        $('.ebay_merchant').select2();
+        $('.cdiscount_merchant').select2();
+        $('.aliExpress_merchant').select2();
+        $('.joom_merchant').select2();
+        $('.dhgate_merchant').select2();
+        $('.lazada_merchant').select2();
+        $('.wish_merchant').select2();
+        $('.amazon_merchant').select2();
         $('.logistics_limits').select2();
     });
 </script>

@@ -169,9 +169,6 @@ class PurchaseOrderController extends Controller
                     }else{
                         $item['costExamineStatus']=0;   
                     }
-                    /*if($item['status']>0){
-                        $data['status']=1;
-                    }*/
                     if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
                         $data['examineStatus']=2;
@@ -190,6 +187,7 @@ class PurchaseOrderController extends Controller
         if($num ==0){
             $data['costExamineStatus']=2;
         }
+        
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));     

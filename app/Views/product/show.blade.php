@@ -109,7 +109,26 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">其他信息:</div>
-        
+        <div class="panel-body">
+            <div class="col-lg-12">
+                <strong>物流限制</strong>：
+            </div>
+            @foreach($logisticsLimit_arr as $key=>$logistics_limit)
+                <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
+                    {{$key+1}}. {{$logistics_limit}}
+                </div>
+            @endforeach
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-12">
+                <strong>包装限制</strong>：
+            </div>
+            @foreach($wrapLimit_arr as $key=>$wrap_limit)
+                <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
+                    {{$key+1}}. {{$wrap_limit}}
+                </div>
+            @endforeach
+        </div>
         <div class="panel-body">
             <div class="col-lg-3">
                 <strong>采购负责人</strong>: {{ $model->purchase_adminer }}

@@ -234,6 +234,11 @@ return [
                     'url' => 'logisticsRule.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流渠道名',
+                    'url' => 'logisticsChannelName.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],

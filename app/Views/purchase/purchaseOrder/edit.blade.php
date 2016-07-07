@@ -6,7 +6,7 @@
  <input type="hidden" name="total_purchase_cost" value="0"/>
         <div class="row">
          <div class="form-group col-lg-4">
-                <strong>标题: 萨拉摩尔公司向 {{$model->supplier->name}} 采购单</strong>
+                <strong>标题: 萨拉摩尔公司向 {{$model->supplier?$model->supplier->name:''}} 采购单</strong>
             </div>
             <div class="form-group col-lg-4">
                 <strong>采购单ID</strong>: {{ $model->id }}
@@ -20,21 +20,25 @@
            <div class="row">
            <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
-                {{ $model->warehouse->name}}
+                {{ $model->warehouse?$model->warehouse->name:''}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>仓库地址</strong>:
-                {{ $model->warehouse->province}}{{ $model->warehouse->city}}{{ $model->warehouse->address}}
+                {{ $model->warehouse?$model->warehouse->province:''}}{{ $model->warehouse?$model->warehouse->city:''}}{{ $model->warehouse?$model->warehouse->address:''}}
             </div>
              
              <div class="form-group col-lg-4">
                 <strong>供应商信息</strong>:
-                名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
+                名：{{$model->supplier?$model->supplier->name:''}}&nbsp;电话：{{$model->supplier?$model->supplier->telephone:''}} &nbsp;地址：{{$model->supplier?$model->supplier->province:''}}{{$model->supplier?$model->supplier->city:''}}{{$model->supplier?$model->supplier->address:''}}
                 &nbsp;
-                @if($model->supplier->type==1)
-                    线上采购
+                @if($model->supplier->toArray())
+                    @if($model->supplier->type==1)
+                        线上采购
+                    @else
+                        线下采购
+                    @endif
                 @else
-                    线下采购
+                    无供货商
                 @endif
             </div>
            
@@ -218,11 +222,11 @@
     </tbody>
     </table>
    
-  <input type="hidden" value="{{ $model->id }}" name="purchase_order_id">
+    <input type="hidden" value="{{ $model->id }}" name="purchase_order_id">
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">产品信息</div>
+        <div class="panel-heading">添加物流单号</div>
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
@@ -257,6 +261,21 @@
         <div class="panel-footer">
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
         </div>
+    </div> 
+    <div class="panel panel-default">
+        <div class="panel-heading">添加外部单号</div>
+        <div class="panel-body" id="">
+            <div class='row'>
+                <div class="form-group col-sm-2">
+                    <div class="form-group">
+                        <label for="name">外部单号</label>
+                        <input class="form-control" id="name" placeholder="外部单号" name='post_coding' value="{{$model->post_coding}}">
+                    </div>
+                </div>            
+            </div>       
+             
+        </div>
+        
     </div> 
 @stop
 @section('pageJs')

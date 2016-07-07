@@ -159,11 +159,11 @@ Class CdiscountAdapter implements AdapterInterface
 
             $items[] = [
                 'sku' => $sku,
-                //'channel_sku' => $orderItem->SellerSKU,
+                'channel_sku' => $skuCode,
                 'quantity' =>$quantity,
                 'price' => number_format($totalPrice/$quantity,3),
                 'orders_item_number' => (string)$OrderLine->ProductId,
-                //'currency' => $orderItem->ItemPrice->CurrencyCode,
+                'currency' =>$currency_type ,
             ];
         }
 
@@ -393,6 +393,9 @@ Class CdiscountAdapter implements AdapterInterface
 
     public function getMessages(){
 
+    }
+    public function sendMessages(){
+        
     }
 
 }

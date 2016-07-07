@@ -17,7 +17,7 @@ class ChannelNameModel extends BaseModel
     protected $table = 'logistics_channel_names';
 
     protected $fillable = [
-        'channel_id', 'logistics_id', 'name'
+        'channel_id', 'name'
     ];
 
     public $searchFields = ['name'];
@@ -28,4 +28,29 @@ class ChannelNameModel extends BaseModel
         'update' => [
         ],
     ];
+
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
+    }
+
+    public function logistics()
+    {
+        return $this->belongsToMany('App\Models\LogisticsModel', 'logistics_belongstos', 'logistics_channel_id', 'logistics_id');
+    }
+
+    public function logisticsCdiscount()
+    {
+        return $this->hasMany('App\Models\Sellmore\ShipmentModel', 'shipmentCdiscountCodeID', 'name');
+    }
+
+    public function logisticsAma()
+    {
+        return $this->hasMany('App\Models\Sellmore\ShipmentModel', 'shipmentAMZCode', 'name');
+    }
+
+    public function logisticsEbay()
+    {
+        return $this->hasMany('App\Models\Sellmore\ShipmentModel', 'shipmentCarrierInfo', 'name');
+    }
 }

@@ -51,7 +51,9 @@ class SupplierModel extends BaseModel
         'create' => [
             'name' => 'required|max:128|unique:product_suppliers,name',
             'purchase_id' => 'required|integer',
-            'telephone' => 'required|max:256|digits_between:8,11'
+            'telephone' => 'required|max:256|digits_between:8,11',
+            'purchase_time' => 'required|integer',
+            'bank_account' => 'required|string',
         ],
         'update' => [
             'name' => 'required|max:128|unique:product_suppliers,name, {id}',

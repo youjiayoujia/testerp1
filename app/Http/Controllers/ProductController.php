@@ -91,6 +91,15 @@ class ProductController extends Controller
                 $features_value_id_arr[$key] = $arr['pivot']['feature_value_id'];
             }    
         }
+        $logisticsLimit_arr = [];
+        foreach($product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['pivot']['logistics_limits_id'];              
+        }
+        $wrapLimit_arr = [];
+        foreach($product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['pivot']['wrap_limits_id'];               
+        }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -103,6 +112,8 @@ class ProductController extends Controller
             'wrapLimit' => $this->wrapLimit->all(),
             'users' => UserModel::all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
+            'wrapLimit_arr' => $wrapLimit_arr,
+            'logisticsLimit_arr' => $logisticsLimit_arr,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -249,10 +260,21 @@ class ProductController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $logisticsLimit_arr = [];
+        foreach($model->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['name'];              
+        }
+        
+        $wrapLimit_arr = [];
+        foreach($model->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['name'];               
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouse' => $this->warehouse->find($model->warehouse_id),
+            'logisticsLimit_arr' => $logisticsLimit_arr,
+            'wrapLimit_arr' => $wrapLimit_arr,
         ];
         return view($this->viewPath . 'show', $response);
     }

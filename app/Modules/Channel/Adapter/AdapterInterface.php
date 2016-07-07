@@ -110,4 +110,7 @@ interface AdapterInterface
      */
     public function getMessages();
 
+    public function sendMessages();
+
+
 }

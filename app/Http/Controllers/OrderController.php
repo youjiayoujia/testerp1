@@ -215,7 +215,7 @@ class OrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'orderItems' => $model->items,
+            'orderItems' => $model->items->where('is_refund', '0'),
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
@@ -245,22 +245,6 @@ class OrderController extends Controller
         $data['order_id'] = $id;
         $model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
-    }
-
-    /**
-     * 部分退款
-     */
-    public function refundAll()
-    {
-        $ids = request()->input('ids');
-        $id_arr = explode(',', $ids);
-        if (!empty($id_arr)) {
-            foreach ($id_arr as $id) {
-                $model = orderItem::find($id);
-                $model->update(['is_refund' => 1]);
-            }
-        }
-        return 1;
     }
 
     /**

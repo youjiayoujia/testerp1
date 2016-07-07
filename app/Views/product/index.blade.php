@@ -21,7 +21,7 @@
 
     <div class="btn-group" role="group">
         <div class="form-group" style="margin-bottom:0px">
-            <select id="ms" multiple="multiple" style="width:200px" name="select_channel">
+            <select id="ms" class="js-example-basic-multiple" multiple="multiple" name="select_channel" style="width:200px">
                 <option value="1" class='aa'>Amazon</option>
                 <option value="2" class='aa'>EBay</option>
                 <option value="3" class='aa'>速卖通</option>
@@ -160,16 +160,15 @@
                 <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
                 </a>
-                <?php } if(($product->edit_status == "data_edited" || $product->edit_status == "image_edited") && $product->examine_status != 'pass'){ ?>
-                <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                <?php } ?>
+                <a href="{{ route('createImage', ['model'=>$product->model]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
-                <?php } ?>
-                <?php if($product->edit_status == "image_unedited" || $product->edit_status == "image_edited"){ ?>
+                <?php //if($product->edit_status == "image_unedited" || $product->edit_status == "image_edited"){ ?>
                 <a href="{{ route('ExamineProduct.edit', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 查看并审核
                 </a>
-                <?php } ?>
+                <?php //} ?>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">
@@ -184,7 +183,8 @@
     <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script type="text/javascript">
 
-        $('#ms').multipleSelect();
+        //$('#ms').multipleSelect();
+        $(".js-example-basic-multiple").select2();
         //批量选中
         $('.choseShop').click(function () {
             var channel_ids = "";

@@ -78,6 +78,11 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
     }
 
+    public function warehousePosition()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel','warehouse_position');
+    }
+
     public function purchase()
     {
         return $this->hasMany('App\Models\Purchase\PurchaseItemModel', 'sku', 'sku');
@@ -510,4 +515,6 @@ class ItemModel extends BaseModel
             }
         }
     }
+
+    
 }

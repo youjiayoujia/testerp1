@@ -30,33 +30,6 @@
                         </div>
                     @endforeach
                 </div>
-                <!-- <div class="form-group" style="margin-left:25px">
-                    <label>编辑默认图片:</label><br>
-                    <?php if($product->default_image!=0){ ?>
-                    <img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
-                        <br>
-                        <?php }else{ ?>
-                            <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
-                        <?php } ?>
-                    <?php $key=0; ?>
-                    @foreach($product->imageAll as $key=>$image)
-                        <?php if($product->default_image==$image->id){continue;}else{ ?>
-                            <label>编辑图片:</label><br>
-                        <?php } ?> 
-                        <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $image->id ?>' type='file'/></div>
-                        <br>
-                    @endforeach
-                </div>
-                <?php if($key<5){ ?>
-                    <div style="margin-left:25px;margin-bottom:15px">
-                            <label for="color">上传图片：</label>
-                            <?php $j=0;for($i=$key;$i<5;$i++){ ?>
-                                <div class='upimage'><input name='image<?php echo $j ?>' type='file'/></div>
-                            <?php $j++;} ?>
-                    </div>
-                <?php } ?>   -->
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>
@@ -170,7 +143,7 @@
         <div class="form-group col-md-3">
             <label for="size">采购负责人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select id="purchase_adminer" class="form-control purchase_adminer" name="purchase_adminer">
-               <option value="{{$product->purchase_adminer}}">{{$product->purchaseAdminer->name}}</option>
+               <option value="{{$product->purchaseAdminer?$product->purchase_adminer:0}}">{{$product->purchaseAdminer?$product->purchaseAdminer->name:''}}</option>
             </select>
         </div> 
         <div class="form-group col-md-3">
@@ -186,12 +159,13 @@
             <input class="form-control" id="url3" placeholder="url" name='url3' value="{{ old('url3') ?  old('url3') : $product->url3 }}">
         </div>
     </div>
+
     <div class='row'>
         <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >{{$carriage_limit->name}}
                     </label>
             @endforeach
         </div>
@@ -199,7 +173,7 @@
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, $wrapLimit_arr)? 'checked' : '' }} >{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>

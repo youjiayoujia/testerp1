@@ -21,7 +21,9 @@ use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\ItemModel;
 use App\Modules\Channel\ChannelModule;
+use App\Jobs\Job;
 use App\Jobs\DoPackage;
+use App\Jobs\SendMessages;
 use DNS1D;
 use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
@@ -53,6 +55,19 @@ class TestController extends Controller
 
     public function index()
     {
+        $reply = ReplyModel::find(28544);
+
+       var_dump($reply->channelAccount());
+
+        $job = new SendMessages($reply);
+        $job = $job->onQueue('SendMessages');
+        $this->dispatch($job);
+echo 555;
+        exit;
+
+
+
+
         $package = PackageModel::find(request()->input('id'));
         $package->assignLogistics();
         $job = new PlaceLogistics($package);
@@ -62,6 +77,7 @@ class TestController extends Controller
         $orderModel = new OrderModel;
         $start = microtime(true);
         $account = AccountModel::find(request()->input('id'));
+
         if ($account) {
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -315,5 +331,14 @@ class TestController extends Controller
 
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
+    }
+
+
+    public function getEbayInfo(){
+        $accountID = request()->get('id');
+        $begin = microtime(true);
+        $account = AccountModel::findOrFail($accountID);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $result = $channel->getEbaySite();
     }
 }

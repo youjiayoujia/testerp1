@@ -43,25 +43,25 @@ class EbayAdapter implements AdapterInterface
         $returnOrders = [];
         $this->siteID = 0;
         $this->verb = 'GetOrders';
-        $page=1;
-        $hasOrder= true;
+        $page = 1;
+        $hasOrder = true;
         foreach ($status as $OrderStatus) {
             while ($hasOrder) {
-                $requestXmlBody = $this->getListOrdersXml($startDate,$endDate,$OrderStatus,$page);
+                $requestXmlBody = $this->getListOrdersXml($startDate, $endDate, $OrderStatus, $page);
                 $result = $this->sendHttpRequest($requestXmlBody);
                 $response = simplexml_load_string($result);
                 if (isset($response->OrderArray->Order) && !empty($response->OrderArray->Order)) {
                     $orders = $response->OrderArray->Order;
                     foreach ($orders as $order) {
 
-                        $reurnOrder =     $this->parseOrder($order);
-                        if($reurnOrder){
+                        $reurnOrder = $this->parseOrder($order);
+                        if ($reurnOrder) {
                             $returnOrders[] = $reurnOrder;
                         }
 
                     }
                     $page++;
-                }else{
+                } else {
                     var_dump($response);
                     $hasOrder = false;
                 }
@@ -73,7 +73,8 @@ class EbayAdapter implements AdapterInterface
     }
 
 
-    public function getListOrdersXml($startDate,$endDate,$OrderStatus,$page){
+    public function getListOrdersXml($startDate, $endDate, $OrderStatus, $page)
+    {
         $returnMustBe = 'OrderArray.Order.OrderID,';
         $returnMustBe .= 'OrderArray.Order.ShippingAddress.Name,';
         $returnMustBe .= 'OrderArray.Order.ShippingAddress.Street1,';
@@ -134,7 +135,7 @@ class EbayAdapter implements AdapterInterface
         $requestXmlBody .= '<OrderStatus>' . $OrderStatus . '</OrderStatus>';
         $requestXmlBody .= '<Pagination>';
         $requestXmlBody .= '<EntriesPerPage>100</EntriesPerPage>';
-        $requestXmlBody .= '<PageNumber>'.$page.'</PageNumber>';
+        $requestXmlBody .= '<PageNumber>' . $page . '</PageNumber>';
         $requestXmlBody .= '</Pagination>';
         $requestXmlBody .= '</GetOrdersRequest>';
         return $requestXmlBody;
@@ -161,30 +162,30 @@ class EbayAdapter implements AdapterInterface
         $payMentStatus = $order->CheckoutStatus->eBayPaymentStatus;
         $paidTime = (string)$order->PaidTime;
         $ShippedTime = (string)$order->ShippedTime;
-        if(!empty($ShippedTime)){
+        if (!empty($ShippedTime)) {
             return false; //这个已经发货了吧
         }
-        if(empty($paidTime)){
-            $paidTime='';
-        }else{
-            $paidTime =date('Y-m-d H:i:s',strtotime($paidTime));
+        if (empty($paidTime)) {
+            $paidTime = '';
+        } else {
+            $paidTime = date('Y-m-d H:i:s', strtotime($paidTime));
         }
 
 
         //121864765676-1639850594002
-        $thisOrder = orderModel::where(['channel_ordernum'=>(string)$order->OrderID])->where('status','!=','UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
+        $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
 
         if ($thisOrder) {
             return false;
         }
-      /*  if((string)$order->OrderID=='121864765676-1639850594002'){
-            $paidTime ='2016-06-02 09:00:00';
-            echo '121864765676-1639850594002';
-        }*/
+        /*  if((string)$order->OrderID=='121864765676-1639850594002'){
+              $paidTime ='2016-06-02 09:00:00';
+              echo '121864765676-1639850594002';
+          }*/
 
-        if (($isOrderStatus == 'Completed' && $payMentStatus == 'NoPaymentFailure')||!empty($paidTime)) {
+        if (($isOrderStatus == 'Completed' && $payMentStatus == 'NoPaymentFailure') || !empty($paidTime)) {
             //正常订单
-            $reurnOrder['status']='PAID';
+            $reurnOrder['status'] = 'PAID';
         } else {
             //未付款订单
             $reurnOrder['status'] = 'UNPAID';//没有付款的
@@ -208,25 +209,26 @@ class EbayAdapter implements AdapterInterface
         $reurnOrder['shipping_zipcode'] = (string)$order->ShippingAddress->PostalCode;
         $reurnOrder['shipping_phone'] = (string)$order->ShippingAddress->Phone;
         $reurnOrder['transaction_number'] = (string)$order->ExternalTransaction->ExternalTransactionID;
-        $reurnOrder['payment_date'] =$paidTime;//支付时间
+        $reurnOrder['payment_date'] = $paidTime;//支付时间
         $reurnOrder['aliexpress_loginId'] = (string)$order->BuyerUserID;
+        $reurnOrder['remark'] = isset($order->BuyerCheckoutMessage)?(string)$order->BuyerCheckoutMessage:'';
         if (isset($order->TransactionArray->Transaction[0])) {
             foreach ($order->TransactionArray->Transaction as $sku) {
-                $reurnOrder['email'] = (string)$sku->Buyer->Email=='Invalid Request'?'':(string)$sku->Buyer->Email;
-                $items= $this->parseItem($sku,$reurnOrder['currency'],$reurnOrder['channel_ordernum']);
-                foreach($items as $item){
+                $reurnOrder['email'] = (string)$sku->Buyer->Email == 'Invalid Request' ? '' : (string)$sku->Buyer->Email;
+                $items = $this->parseItem($sku, $reurnOrder['currency'], $reurnOrder['channel_ordernum']);
+                foreach ($items as $item) {
                     $item['currency'] = $reurnOrder['currency'];
-                    $item['channel_order_id'] =$reurnOrder['channel_ordernum'];
+                    $item['channel_order_id'] = $reurnOrder['channel_ordernum'];
                     $reurnOrder['items'][] = $item;
                 }
 
             }
         } else {
-            $reurnOrder['email'] = (string)$order->TransactionArray->Transaction->Buyer->Email=='Invalid Request'?'':(string)$order->TransactionArray->Transaction->Buyer->Email;
-            $items =$this->parseItem($order->TransactionArray->Transaction,$reurnOrder['currency'],$reurnOrder['channel_ordernum']);
-            foreach($items as $item){
+            $reurnOrder['email'] = (string)$order->TransactionArray->Transaction->Buyer->Email == 'Invalid Request' ? '' : (string)$order->TransactionArray->Transaction->Buyer->Email;
+            $items = $this->parseItem($order->TransactionArray->Transaction, $reurnOrder['currency'], $reurnOrder['channel_ordernum']);
+            foreach ($items as $item) {
                 $item['currency'] = $reurnOrder['currency'];
-                $item['channel_order_id'] =$reurnOrder['channel_ordernum'];
+                $item['channel_order_id'] = $reurnOrder['channel_ordernum'];
                 $reurnOrder['items'][] = $item;
             }
 
@@ -237,7 +239,7 @@ class EbayAdapter implements AdapterInterface
 
     public function parseItem($Transaction)
     {
-        $items=[];
+        $items = [];
         $remark = '';
         if (isset($Transaction->Variation->SKU)) {
             $channel_sku = $Transaction->Variation->SKU;
@@ -248,30 +250,154 @@ class EbayAdapter implements AdapterInterface
                     $remark = $NameValueList->Name . ':' . $NameValueList->Value . ' |' . $remark;
                 }
             } else {
-                $remark = $Transaction->Variation->VariationSpecifics->NameValueList->Name . ':'.$Transaction->Variation->VariationSpecifics->NameValueList->Value;
+                $remark = $Transaction->Variation->VariationSpecifics->NameValueList->Name . ':' . $Transaction->Variation->VariationSpecifics->NameValueList->Value;
             }
         } else {
             $channel_sku = $Transaction->Item->SKU;
         }
-        $erpSku =    Tool::filter_sku((string)$channel_sku,1); //根据账号的sku解析设定
+        $erpSku = Tool::filter_sku((string)$channel_sku, 1); //根据账号的sku解析设定
         $allSkuNum = $erpSku['skuNum'];
         unset($erpSku['skuNum']);
-        foreach($erpSku as $sku){
+        foreach ($erpSku as $sku) {
             $skuArray = [];
             $skuArray['channel_sku'] = (string)$channel_sku;
             $skuArray['sku'] = $sku['erpSku'];
-            $skuArray['price'] = floatval($Transaction->TransactionPrice)/$allSkuNum;
-            $skuArray['quantity'] = intval($Transaction->QuantityPurchased)*$sku['qty'];
+            $skuArray['price'] = floatval($Transaction->TransactionPrice) / $allSkuNum;
+            $skuArray['quantity'] = intval($Transaction->QuantityPurchased) * $sku['qty'];
             $skuArray['orders_item_number'] = (string)$Transaction->Item->ItemID;
-            $skuArray['transaction_id']=(string)$Transaction->TransactionID;
+            $skuArray['transaction_id'] = (string)$Transaction->TransactionID;
             $skuArray['remark'] = (string)$remark;
             $items[] = $skuArray;
         }
         return $items;
 
 
+    }
+
+    /**获取Ebay可用站点
+     * @return array|bool
+     */
+    public function getEbaySite()
+    {
+        $return = [];
+        $xml = '<DetailName>SiteDetails</DetailName>';
+        $response = (array)$this->buildEbayBody($xml, 'GeteBayDetails', 0);
+        if (isset($response['SiteDetails'])) {
+            foreach ($response['SiteDetails'] as $key => $Site) {
+                $return[$key]['site'] = (string)$Site->Site;
+                $return[$key]['site_id'] = (int)$Site->SiteID;
+                $return[$key]['detail_version'] = (int)$Site->DetailVersion;
+            }
+
+        } else {
+            return false;
+        }
+        return $return;
 
     }
+
+    /** 获取ebay站点的退货政策
+     * @param $site 站点
+     * @return array|bool
+     */
+    public function getEbayReturnPolicy($site)
+    {
+        $return = [];
+        $xml = '<DetailName>ReturnPolicyDetails</DetailName>';
+        $response = $this->buildEbayBody($xml, 'GeteBayDetails', $site);
+        if ($response->Ack == 'Success') {
+            if (isset($response->ReturnPolicyDetails->ReturnsWithin)) {
+                $returnwishin_arr=[];
+                foreach ($response->ReturnPolicyDetails->ReturnsWithin as $key=> $returnwishin) {
+                    $returnwishin_arr[] = (string)$returnwishin->ReturnsWithinOption;
+                }
+                $return['returns_with_in'] = json_encode($returnwishin_arr);
+            }
+            if (isset($response->ReturnPolicyDetails->ReturnsAccepted)) {
+                $returnaccept_arr=[];
+                foreach ($response->ReturnPolicyDetails->ReturnsAccepted as $key=>$returnaccept) {
+                    $returnaccept_arr[] = (string)$returnaccept->ReturnsAcceptedOption;
+                }
+                $return['returns_accepted'] = json_encode($returnaccept_arr);
+            }
+
+
+            if (isset($response->ReturnPolicyDetails->ShippingCostPaidBy)) {
+                $shipcost_arr=[];
+                foreach ($response->ReturnPolicyDetails->ShippingCostPaidBy as  $shipcost) {
+                    $shipcost_arr[] = (string)$shipcost->ShippingCostPaidByOption;
+                }
+                $return['shipping_costpaid_by'] = json_encode($shipcost_arr);
+            }
+
+            if (isset($response->ReturnPolicyDetails->Refund)) {
+                $refund_arr=[];
+                foreach ($response->ReturnPolicyDetails->Refund as  $refund) {
+                    $refund_arr[]=(string)$refund->RefundOption;
+                }
+                $return['refund'] = json_encode($refund_arr);
+            }
+
+           return $return;
+
+
+        } else {
+            return false;
+        }
+
+    }
+
+    /**获取ebay对应站点国内国际运输方式
+     * @param $site
+     * @return array
+     */
+    public function getEbayShipping($site){
+        $return = [];
+        $xml = '<DetailName>ShippingServiceDetails</DetailName>';
+        $response = $this->buildEbayBody($xml, 'GeteBayDetails', $site);
+        if ($response->Ack == 'Success') {
+            $i=0;
+            foreach($response->ShippingServiceDetails as $shipping){
+                $return[$i]['description']=(string)$shipping->Description;
+                $return[$i]['international_service']=((string)$shipping->InternationalService=='true')?1:2; //1为国际 2为国内
+                $return[$i]['shipping_service']=(string)$shipping->ShippingService;
+                $return[$i]['shipping_service_id']=(int)$shipping->ShippingServiceID;
+                $return[$i]['shipping_time_max']=(int)$shipping->ShippingTimeMax;
+                $return[$i]['shipping_time_min']=(int)$shipping->ShippingTimeMin;
+                $return[$i]['valid_for_selling_flow']=((string)$shipping->ValidForSellingFlow=='true')?1:2; //1 api可以使用 2 api不可使用
+                $return[$i]['shipping_category']=(string)$shipping->ShippingCategory;
+                $return[$i]['shipping_carrier']=isset($shipping->ShippingCarrier)?(string)$shipping->ShippingCarrier:'';
+                $i++;
+            }
+        }else{
+            return false;
+        }
+
+        return $return;
+
+    }
+
+
+
+
+
+
+
+
+
+    public function  buildEbayBody($xml, $call, $site = 0)
+    {
+        $this->siteID = $site;
+        $this->verb = $call;
+        $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="urn:ebay:apis:eBLBaseComponents">';
+        $requestXmlBody .= $xml;
+        $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
+        $result = $this->sendHttpRequest($requestXmlBody);
+        $response = simplexml_load_string($result);
+        return $response;
+
+    }
+
 
     private function buildEbayHeaders()
     {
@@ -311,6 +437,9 @@ class EbayAdapter implements AdapterInterface
 
     public function getMessages(){
 
+    }
+    public function sendMessages(){
+        
     }
 
 

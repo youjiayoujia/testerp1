@@ -75,7 +75,7 @@
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     if(checkbox[i].getAttribute('isexamine')==1){
-                        alert("id为"+checkbox[i].value+"的条目已经生成采购单了");
+                        alert("id为"+checkbox[i].value+"的条目无需生成采购单");
                         return;
                     }
                     purchase_ids += checkbox[i].value+",";

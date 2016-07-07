@@ -97,6 +97,9 @@ Class WishAdapter implements AdapterInterface
 
     public function returnTrack()
     {
+
+
+
         return 'returnTrack';
     }
 
@@ -670,5 +673,8 @@ Class WishAdapter implements AdapterInterface
     
     public function getMessages(){
 
+    }
+    public function sendMessages(){
+        
     }
 }

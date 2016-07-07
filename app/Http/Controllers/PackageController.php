@@ -52,6 +52,11 @@ class PackageController extends Controller
         return view($this->viewPath . 'edit', $response);
     }
 
+    public function returnUrl()
+    {
+        var_dump(urldecode(request()->getQueryString()));exit;
+    }
+
     public function flow()
     {
         $response = [

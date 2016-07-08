@@ -25,9 +25,7 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
     {
         //
         $this->reply = $reply;
-
     }
-
     /**
      * Execute the job.
      *
@@ -35,7 +33,6 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        //
         //遍历账号
         foreach (AccountModel::all() as $account) {
 
@@ -43,10 +40,7 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
 
                 $channel->sendMessages($account);//发送渠道message
-
             }
-
         }
-
     }
 }

@@ -11,7 +11,7 @@
                         <form action="" method="get">
                             <div class="col-lg-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="{{ isset($data) ? $data->first()->showSearch() : '' }}"/>
+                                    <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="{{ isset($data) ? (count($data) ? $data->first()->showSearch() : '') : '' }}"/>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">
                                             <i class="glyphicon glyphicon-search"></i>
@@ -50,7 +50,7 @@
                                                     @foreach($value1 as $relation_ship2 => $value2)
                                                         @foreach($value2 as $key => $name)
                                                             <div class="col-lg-2">
-                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" value="{{ old('mixedSearchFields[$type][$relation_ship1][$relation_ship2][$name]') }}" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
+                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship1 }}][{{ $relation_ship2 }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship1.'.'.$relation_ship2.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
                                                     @endforeach
@@ -61,7 +61,7 @@
                                                     @foreach($value as $relation_ship => $name_arr)
                                                         @foreach($name_arr as $name)
                                                             <div class="col-lg-2">
-                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" value="{{ old('keywords') }}" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
+                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
                                                     @endforeach
@@ -70,7 +70,7 @@
                                             @if($type == 'filterFields')
                                                 @foreach($value as $name)
                                                     <div class="col-lg-2">
-                                                        <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" value="{{ old('mixedSearchFields[$type][$name]') }}" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
+                                                        <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
                                                     </div>
                                                 @endforeach
                                             @endif
@@ -80,7 +80,7 @@
                                                         <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
-                                                                <option value="{{ $k}}">{{$v}}</option>
+                                                                <option value="{{ $k }}">{{$v}}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>

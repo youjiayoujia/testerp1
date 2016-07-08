@@ -21,4 +21,21 @@
             <input type='password' class="form-control" id="password" placeholder="用户密码" name='password' value="{{ $model->password }}">
         </div>
     </div>
+
+    <div class="row">
+        <div class="form-group col-lg-12">
+            <label for="role_name" class='control-label'>选择用户对应的角色</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-12">
+            @foreach($roles as $role)
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="role" value="{{$role->id}}" name="user_role[]" {{ in_array($role->id, $select_role)? 'checked' : '' }}> {{$role->role_name}}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+
 @stop

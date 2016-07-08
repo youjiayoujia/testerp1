@@ -414,6 +414,26 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '角色列表',
+                'url' => 'role.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加角色',
+                'url' => 'role.create',
+                'icon' => '',
+            ],
+            [
+                'name' => '权限列表',
+                'url' => 'permission.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加权限',
+                'url' => 'permission.create',
+                'icon' => '',
+            ],
+            [
                 'name' => '汇率',
                 'url' => 'currency.index',
                 'icon' => '',

@@ -48,6 +48,7 @@ class CodeController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('logistics_id', $id)),
+            'id' => $id,
         ];
         return view($this->viewPath . 'index', $response);
     }

@@ -16,7 +16,13 @@ class EmailTemplateModel extends BaseModel
 {
     protected $table = 'logistics_email_templates';
 
-    public $searchFields = ['customer', 'zipcode', 'phone', 'unit', 'sender'];
+    public $searchFields = [
+        'customer' => '协议客户',
+        'zipcode' => '邮编',
+        'phone' => '电话',
+        'unit' => '退件单位',
+        'sender' => '寄件人'
+    ];
 
     protected $fillable = [
         'customer',

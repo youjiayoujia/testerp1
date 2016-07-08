@@ -16,7 +16,7 @@ class SupplierModel extends BaseModel
 {
     protected $table = 'logistics_suppliers';
 
-    public $searchFields = ['name', 'customer_id'];
+    public $searchFields = ['name' => '物流商名称', 'customer_id' => '客户ID'];
 
     protected $fillable = [
         'id',

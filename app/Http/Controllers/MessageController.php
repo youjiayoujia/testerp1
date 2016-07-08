@@ -11,6 +11,7 @@ use App\Models\Message\Template\TypeModel;
 use App\Models\Message\AccountModel;
 use App\Models\Message\Message_logModel;
 use App\Models\Message\ReplyModel;
+use App\Jobs\SendMessages;
 
 
 class MessageController extends Controller
@@ -278,6 +279,14 @@ class MessageController extends Controller
         $this->validate(request(), $reply->rules('create')); //
         
         if ($message->reply(request()->all())) {
+            /*
+             * 写入队列
+             */
+            $reply = ReplyModel::find($id);
+            $job = new SendMessages($reply);
+            $job = $job->onQueue('SendMessages');
+            $this->dispatch($job);
+
             if ($this->workflow == 'keeping') {
                 return redirect(route('message.process'))
                     ->with('alert', $this->alert('success', '上条信息已成功回复.'));

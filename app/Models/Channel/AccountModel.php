@@ -124,6 +124,7 @@ class AccountModel extends BaseModel
                     'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
                     'GmailSecret' => $this->message_secret,
                     'GmailToken' => $this->message_token,
+                    'account_id' => $this->id
                 ];
                 break;
             case 'aliexpress':

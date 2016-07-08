@@ -108,11 +108,12 @@ class SupplierController extends Controller
             ]);
         }
         $res=$this->model->updateSupplier($id,$data,request()->file('qualifications'));
-		if($res =='imageError'){
-			return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '图片格式不正确.'));
-			}else{
-       		 return redirect($this->mainIndex);
-		}
+		if($res == true){
+            return redirect($this->mainIndex);
+        }else{
+            return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '文件上传失败.'));
+
+        }
     }
 
     /**

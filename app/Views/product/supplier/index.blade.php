@@ -5,6 +5,7 @@
             审核
             <span class="caret"></span>
         </button>
+
         <ul class="dropdown-menu">
             <li><a href="javascript:" class="examine" data-channel="0" data-name="待审核">待审核</a></li>
             <li><a href="javascript:" class="examine" data-channel="1" data-name="待复审 ">待复审</a></li>
@@ -12,11 +13,13 @@
             <li><a href="javascript:" class="examine" data-channel="3" data-name="审核不通过">审核不通过</a></li>
         </ul>
         <div class="btn-group">
+            &nbsp;
             <a class="btn btn-success" href="{{ route('supplierChangeHistory.index') }}">
                 采购员变更历史
             </a>
         </div>
         <div class="btn-group">
+            &nbsp;
             <a class="btn btn-success" href="{{ route('supplierLevel.index') }}">
                 <i class="glyphicon glyphicon-plus"></i> 供货商评级
             </a>

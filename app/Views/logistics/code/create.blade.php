@@ -50,7 +50,6 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         $('#used_at').cxCalendar();
-        
         document.getElementById('package_id').style.display='none';
         document.getElementById('used_at').style.display='none';
         document.getElementById('status').style.display='none';

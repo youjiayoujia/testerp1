@@ -261,6 +261,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '采购收货',
                     'url' => 'recieve',
                     'icon' => '',

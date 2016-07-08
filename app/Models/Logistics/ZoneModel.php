@@ -31,7 +31,7 @@ class ZoneModel extends BaseModel
         'discount_weather_all',
     ];
 
-    public $searchFields = ['zone', 'logistics_id', 'country_id', 'shipping_id'];
+    public $searchFields = ['zone' => '物流分区', 'logistics_id' => '物流方式'];
 
     public $rules = [
         'create' => [

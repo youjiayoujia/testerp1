@@ -18,7 +18,7 @@ class BlacklistModel extends BaseModel
 {
     protected $table = 'order_blacklists';
 
-    public $searchFields = ['name', 'email', 'zipcode'];
+    public $searchFields = ['ordernum' => '订单号', 'name' => '姓名', 'email' => '邮箱', 'zipcode' => '邮编'];
 
     protected $fillable = [
         'channel_id',

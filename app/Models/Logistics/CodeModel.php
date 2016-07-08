@@ -24,7 +24,7 @@ class CodeModel extends BaseModel
         'status',
     ];
 
-    public $searchFields = ['logistics_id', 'code', 'status', 'package_id'];
+    public $searchFields = ['logistics_id' => '物流方式', 'code' => '跟踪号', 'package_id' => '包裹ID'];
 
     public $rules = [
         'create' => [

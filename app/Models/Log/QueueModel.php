@@ -22,7 +22,7 @@ class QueueModel extends BaseModel
     protected $guarded = [];
 
     //查询
-    public $searchFields = ['relation_id', 'queue', 'description', 'remark'];
+    public $searchFields = ['relation_id' => '关联ID', 'queue' => '队列', 'description' => '描述', 'remark' => '备注'];
 
     public function getColorAttribute()
     {

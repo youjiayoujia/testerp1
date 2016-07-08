@@ -16,6 +16,7 @@ class CreateLogCommands extends Migration
             $table->increments('id');
             $table->string('relation_id')->comment('关联ID');
             $table->string('signature')->comment('命令');
+            $table->string('data')->comment('数据');
             $table->string('description')->comment('描述');
             $table->string('lasting')->comment('执行时间');
             $table->integer('total')->comment('计数');

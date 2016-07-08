@@ -104,11 +104,6 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-3" id="pool_quantity">
-            <label for="pool_quantity" class="control-label">号码池数量</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="pool_quantity" placeholder="号码池数量" name='pool_quantity' value="{{ old('pool_quantity') }}">
-        </div>
         <div class="form-group col-lg-3">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>

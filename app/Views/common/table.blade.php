@@ -11,7 +11,7 @@
                         <form action="" method="get">
                             <div class="col-lg-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="查找..."/>
+                                    <input type="text" class="form-control" name="keywords" value="{{ old('keywords') }}" placeholder="{{ isset($data) ? $data->first()->showSearch() : '' }}"/>
                                     <div class="input-group-btn">
                                         <button class="btn btn-default" type="submit">
                                             <i class="glyphicon glyphicon-search"></i>
@@ -105,18 +105,18 @@
                                                     @foreach($contents as $content)
                                                         @if($kind == 'time')
                                                             <div class='col-lg-2'>
-                                                                <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                             <div class='col-lg-2'>
-                                                                <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
                                                         @if($kind == 'price')
                                                             <div class='col-lg-2'>
-                                                                <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                             <div class='col-lg-2'>
-                                                                <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
                                                     @endforeach

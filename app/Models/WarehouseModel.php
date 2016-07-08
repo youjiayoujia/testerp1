@@ -46,7 +46,7 @@ class WarehouseModel extends BaseModel
     ];
 
     //查询
-    public $searchFields = ['name'];
+    public $searchFields=['name' => '仓库名'];
 
     /**
      * get the relationship

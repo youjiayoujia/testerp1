@@ -23,6 +23,9 @@ class InModel extends BaseModel
      */
     protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
+    // 用于查询
+    public $searchFields = ['id' => 'ID'];
+    
     public function getMixedSearchAttribute()
     {
         return [

@@ -30,7 +30,7 @@ class CountriesSortModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name'];
+    public $searchFields=['name' => '地区名'];
 
     public function countries()
     {

@@ -26,7 +26,7 @@ class AllotmentModel extends BaseModel
      *
      *  @return
      */
-    public $searchFields = ['allotment_id'];
+    public $searchFields = ['allotment_id' => '调拨单号'];
 
     /**
      * get the relationship between the two module 

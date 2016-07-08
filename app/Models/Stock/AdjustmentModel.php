@@ -22,7 +22,7 @@ class AdjustmentModel extends BaseModel
     protected $fillable = ['adjust_form_id', 'warehouse_id', 'adjust_by', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
 
     // 用于查询
-    public $searchFields = ['adjust_form_id'];
+    public $searchFields = ['adjust_form_id' => '调整单号'];
 
     /**
      * get the relationship between the two module 

@@ -34,7 +34,7 @@ class ChannelModel extends BaseModel
         'rate_value'
     ];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['name' => '名称'];
 
     protected $rules = [
         'create' => ['name' => 'required|unique:channels,name', 'driver' => 'required'],

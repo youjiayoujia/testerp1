@@ -12,7 +12,7 @@ class PackageModel extends BaseModel
 {
     protected $table = 'packages';
 
-    public $searchFields = ['tracking_no'];
+    public $searchFields = ['tracking_no' => '追踪号'];
 
     public $rules = [
         'create' => ['ordernum' => 'required'],

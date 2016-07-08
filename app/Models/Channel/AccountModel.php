@@ -25,7 +25,7 @@ class AccountModel extends BaseModel
      */
     protected $guarded = [];
 
-    public $searchFields = ['account', 'alias'];
+    public $searchFields = ['account' => '渠道帐号', 'alias' => '帐号别名'];
 
     protected $rules = [
         'create' => [

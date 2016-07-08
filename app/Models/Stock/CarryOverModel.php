@@ -23,7 +23,7 @@ class CarryOverModel extends BaseModel
 
 
     //查询
-    public $searchFields = ['date'];
+    public $searchFields = ['date' => '月结时间'];
 
     public function warehouse()
     {

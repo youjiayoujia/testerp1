@@ -30,7 +30,7 @@ class wrapLimitsModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['name'];
+    public $searchFields=['name' => '包装限制名称'];
 
     public function getRate($code)
     {

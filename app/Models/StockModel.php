@@ -39,7 +39,7 @@ class StockModel extends BaseModel
     ];
 
     // 用于查询
-    protected $searchFields = ['sku'];
+    public $searchFields = ['id' => 'ID'];
 
     // 规则验证
     public $rules = [

@@ -43,8 +43,8 @@ abstract class Controller extends BaseController
             $keywords = request()->input('keywords');
             $searchFields = $model->searchFields;
             $list = $list->where(function ($query) use ($keywords, $searchFields) {
-                foreach ($searchFields as $searchField) {
-                    $query = $query->orWhere($searchField, 'like', '%' . trim($keywords) . '%');
+                foreach ($searchFields as $key => $searchField) {
+                    $query = $query->orWhere($key, 'like', '%' . trim($keywords) . '%');
                 }
             });
         }

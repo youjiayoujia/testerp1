@@ -17,17 +17,20 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
-    public $searchFields = ['short_code', 'logistics_type', 'logistics_supplier_id', 'type'];
+    public $searchFields = ['code', 'name'];
 
     protected $fillable = [
-        'short_code',
-        'logistics_type',
-        'species',
+        'id',
+        'code',
+        'name',
         'warehouse_id',
         'logistics_supplier_id',
         'type',
         'url',
         'docking',
+        'logistics_catalog_id',
+        'logistics_email_template_id',
+        'logistics_template_id',
         'pool_quantity',
         'is_enable',
         'limit',
@@ -36,44 +39,32 @@ class LogisticsModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'short_code' => 'required',
-            'logistics_type' => 'required',
-            'species' => 'required',
+            'code' => 'required',
+            'name' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
         'update' => [
-            'short_code' => 'required',
-            'logistics_type' => 'required',
-            'species' => 'required',
+            'code' => 'required',
+            'name' => 'required',
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
             'url' => 'required',
             'docking' => 'required',
+            'logistics_catalog_id' => 'required',
+            'logistics_email_template_id' => 'required',
+            'logistics_template_id' => 'required',
             'is_enable' => 'required',
         ],
     ];
-
-
-    /**
-     * 批量倒入号码池
-     *
-     * @param $file 导入所需的Excel文件
-     *
-     */
-    public function batchImport($file)
-    {
-        $filePath = '' . $file;
-        Excel::load($filePath, function ($reader) {
-            $data = $reader->all();
-            dd($data);
-        });
-    }
 
     public function supplier()
     {
@@ -93,6 +84,52 @@ class LogisticsModel extends BaseModel
     public function codes()
     {
         return $this->hasMany('App\Models\Logistics\CodeModel', 'logistics_id');
+    }
+
+    public function catalog()
+    {
+        return $this->belongsTo('App\Models\Logistics\CatalogModel', 'logistics_catalog_id', 'id');
+    }
+
+    public function emailTemplate()
+    {
+        return $this->belongsTo('App\Models\Logistics\EmailTemplateModel', 'logistics_email_template_id', 'id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo('App\Models\Logistics\TemplateModel', 'logistics_template_id', 'id');
+    }
+
+    public function channelName()
+    {
+        return $this->belongsToMany('App\Models\Logistics\ChannelNameModel', 'logistics_belongstos', 'logistics_id', 'logistics_channel_id');
+    }
+
+    public function getDockingNameAttribute()
+    {
+        $arr = config('logistics.docking');
+        return $arr[$this->docking];
+    }
+
+    public function hasLimits($id) 
+    {
+        $arr = explode(',', $this->limit);
+        if(in_array($id, $arr)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function inType($id)
+    {
+        $multi = $this->channelName;
+        foreach($multi as $single) {
+            if($single->id == $id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

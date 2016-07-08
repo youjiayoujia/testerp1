@@ -27,7 +27,7 @@ class ItemController extends Controller
         $this->logisticsLimit = $limitsModel;
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('item.index');
-        $this->mainTitle = '产品Item';
+        $this->mainTitle = '产品SKU';
         $this->viewPath  = 'item.';
     }
 
@@ -43,6 +43,14 @@ class ItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $logisticsLimit_arr = [];
+        foreach($model->product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['pivot']['logistics_limits_id'];              
+        }
+        $wrapLimit_arr = [];
+        foreach($model->product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['pivot']['wrap_limits_id'];               
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -50,6 +58,8 @@ class ItemController extends Controller
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'wrapLimit' => $this->wrapLimit->all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
+            'wrapLimit_arr' => $wrapLimit_arr,
+            'logisticsLimit_arr' => $logisticsLimit_arr,
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -72,4 +82,96 @@ class ItemController extends Controller
         return redirect($this->mainIndex);
     }
 
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $logisticsLimit_arr = [];
+        foreach($model->product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['name'];              
+        }
+        
+        $wrapLimit_arr = [];
+        foreach($model->product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['name'];               
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'warehouse' => $this->warehouse->find($model->warehouse_id),
+            'logisticsLimit_arr' => $logisticsLimit_arr,
+            'wrapLimit_arr' => $wrapLimit_arr,
+        ];
+        return view($this->viewPath . 'show', $response);
+    }
+
+    /**
+     * 批量更新界面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function batchEdit()
+    {
+        $item_ids = request()->input("item_ids");
+        $arr = explode(',', $item_ids);
+        $param = request()->input('param');
+        
+        $skus = $this->model->whereIn("id",$arr)->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'skus' => $skus,
+            'item_ids'=>$item_ids,
+            'param'  =>$param,
+        ];
+        return view($this->viewPath . 'batchEdit', $response);
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function batchUpdate()
+    {
+        $item_ids = request()->input("item_ids");
+        $arr = explode(',', $item_ids);
+        $skus = $this->model->whereIn("id",$arr)->get();
+        $data = request()->all();
+        foreach($skus as $itemModel){
+            $itemModel->update($data);
+        }       
+        return redirect($this->mainIndex);
+    }
+
+
+    public function getImage()
+    {
+        $item = $this->model->where('sku',trim(request('sku')))->first();
+        if(!$item) {
+            return json_encode(false);
+        }
+        $image = $item->product->image->path;
+        $name = $item->product->image->name;
+        if($image)
+            return ('/'.$image.'/'.$name);
+        else 
+            return json_encode(false);
+    }
+
+    public function getModel()
+    {
+        $sku = trim(request('sku'));
+        $model = $this->model->where('sku', $sku)->first();
+        return json_encode($model);
+    }
 }

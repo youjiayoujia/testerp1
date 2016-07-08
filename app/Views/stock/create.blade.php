@@ -4,7 +4,7 @@
     <div class='row'>
         <div class="form-group col-lg-4">
             <label for="sku" class='control-label'>sku</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control sku" placeholder="sku" name='sku' value="{{ old('sku') }}">
+            <select name='item_id' class='form-control sku'></select>
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -17,7 +17,7 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_position_id">库位</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control warehouse_position_id" placeholder="库位" name='warehouse_position_id' value="{{ old('warehouse_position_id') }}">
+            <select name='warehouse_position_id' class='form-control warehouse_position_id'></select>
         </div>
     </div>
     <div class='row'>
@@ -25,51 +25,54 @@
             <label for="all_quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control all_quantity" id="all_quantity" placeholder="总数量" name='all_quantity' value="{{ old('all_quantity') }}">
         </div>
-        <div class="form-group col-sm-3">
-            <label for="unit_cost" class='control-label'>单价(￥)</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control unit_cost" id="unit_cost" placeholder="单价" name='unit_cost' value="{{ old('unit_cost') }}">
-        </div>
     </div>
 @stop
 @section('pageJs')
 <script type='text/javascript'>
     $(document).ready(function(){
-        $('.sku').blur(function(){
-            tmp = $(this);
-            sku = $(this).val();
-            if(sku) {
-                $.ajax({
-                    url:"{{ route('stock.ajaxSku') }}",
-                    data:{sku:sku},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result) {
-                        if(result == 'false') {
-                            alert('sku不存在');
-                            tmp.val('');
-                        }
+        $('.sku').select2({
+            ajax: {
+                url: "{{ route('stock.ajaxSku') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    sku: params.term, // search term
+                    page: params.page,
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
                     }
-                })
-            }
+                }
+            },
         });
 
-        $('.warehouse_position_id').blur(function(){
-            tmp = $(this);
-            position = $(this).val();
-            if(position) {
-                $.ajax({
-                    url:"{{ route('position.ajaxCheckPosition') }}",
-                    data:{position:position},
-                    dataType:'json',
-                    type:'get',
-                    success:function(result) {
-                        if(result == false) {
-                            alert('库位不存在');
-                            tmp.val('');
-                        }
+        $('.warehouse_position_id').select2({
+            ajax: {
+                url: "{{ route('position.ajaxCheckPosition') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    position: params.term, // search term
+                    page: params.page,
+                    warehouse_id: $('#warehouse_id').val(),
+                  };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
                     }
-                })
-            }
+                }
+            },
         });
     });
 </script>

@@ -23,10 +23,22 @@ class InModel extends BaseModel
      */
     protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
-
     // 用于查询
-    public $searchFields = [''];
-
+    public $searchFields = ['id' => 'ID'];
+    
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => ['id'],
+            'relatedSearchFields' => [],
+            'doubleRelatedSearchFields' => ['stock' => ['item' => ['sku']]],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+    
     /**
      * get the relationship between the two module 
      *
@@ -92,6 +104,8 @@ class InModel extends BaseModel
     {
         if($this->type == 'ADJUSTMENT')
             return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
+        if($this->type == 'PURCHASE')
+            return $this->stockPurchase ? $this->stockPurchase->id : '';
         if($this->type == 'ALLOTMENT')
             return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
         if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
@@ -120,5 +134,16 @@ class InModel extends BaseModel
     public function stockTaking()
     {
         return $this->belongsTo('App\Models\Stock\TakingModel', 'relation_id', 'id');
+    }
+
+    /**
+     * get the relation between the two Model
+     * 
+     *  @return relation
+     *
+     */
+    public function stockPurchase()
+    {
+        return $this->belongsTo('App\Models\Purchase\PurchaseOrderModel', 'relation_id', 'id');
     }
 }

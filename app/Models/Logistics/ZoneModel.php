@@ -11,7 +11,8 @@
 namespace App\Models\Logistics;
 
 use App\Base\BaseModel;
-use App\Models\CountryModel;
+use App\Models\CountriesModel;
+use App\Models\Logistics\Zone\CountriesModel as ZoneCountriesModel;
 
 class ZoneModel extends BaseModel
 {
@@ -20,39 +21,43 @@ class ZoneModel extends BaseModel
     protected $fillable = [
         'zone',
         'logistics_id',
-        'country_id',
-        'shipping_id',
-        'price',
-        'other_price',
+        'type',
         'fixed_weight',
         'fixed_price',
         'continued_weight',
         'continued_price',
         'other_fixed_price',
-        'other_scale_price',
         'discount',
+        'discount_weather_all',
     ];
 
     public $searchFields = ['zone', 'logistics_id', 'country_id', 'shipping_id'];
 
     public $rules = [
         'create' => [
-            'zone' => 'required',
-            'logistics_id' => 'required',
-            'country_id' => 'required',
-            'shipping_id' => 'required',
         ],
         'update' => [
-            'zone' => 'required',
-            'logistics_id' => 'required',
-            'country_id' => 'required',
-            'shipping_id' => 'required',
         ],
     ];
 
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+    }
+
+    public function logistics_zone_countries()
+    {
+        return $this->belongsToMany('App\Models\CountriesModel', 'logistics_zone_countries', 'logistics_zone_id', 'country_id');
+    }
+
+    public function zone_section_prices()
+    {
+        return $this->hasmany('App\Models\Logistics\Zone\SectionPriceModel', 'logistics_zone_id', 'id');
+    }
+
+    public function zone_countries()
+    {
+        return $this->hasMany('App\Models\Logistics\Zone\CountriesModel', 'logistics_zone_id', 'id');
     }
 
     /**
@@ -62,13 +67,88 @@ class ZoneModel extends BaseModel
     {
         $str = '';
         foreach(explode(",", $country) as $value) {
-            $countries = CountryModel::where(['abbreviation' => $value])->get();
+            $countries = CountriesModel::where(['code' => $value])->get();
             foreach($countries as $country) {
                 $val = $country['name'];
                 $str = $str.$val.',';
             }
         }
+
         return substr($str, 0, -1);
+    }
+
+    public function inZone($id)
+    {
+        $countries = $this->logistics_zone_countries;
+        foreach($countries as $country) {
+            if($country->id == $id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function weatherAvailable($id)
+    {
+        $logistics_id = $this->logistics_id;
+        $models = $this->where('logistics_id', $logistics_id)->get();
+        foreach($models as $model) {
+            $countries = $model->logistics_zone_countries;
+            foreach($countries as $country) {
+                if($country->id == $id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function createData($arr)
+    {
+        $model = $this->create($arr);
+        if(array_key_exists('countrys', $arr)) {
+            $model->logistics_zone_countries()->attach($arr['countrys']);
+        }
+        if($arr['type'] == 'second') {
+            $tmp = $arr['arr'];
+            $len = count($arr['arr']['weight_from']);
+            for($i = 0; $i < $len; $i++) {
+                $list = [];
+                foreach($tmp as $key => $value) {
+                    $value = array_values($value);
+                    $list[$key] = $value[$i];
+                } 
+                $model->zone_section_prices()->create($list);
+            }    
+        }
+    }
+
+    public function updateData($arr)
+    {
+        $this->update($arr);
+        $countries = $this->zone_countries;
+        foreach($countries as $country) {
+            $country->forceDelete();
+        }
+        if(array_key_exists('countrys', $arr)) {
+            $this->logistics_zone_countries()->attach($arr['countrys']);
+        }
+        if($arr['type'] == 'second') {
+            $sectionPrices = $this->zone_section_prices;
+            foreach($sectionPrices as $sectionPrice) {
+                $sectionPrice->forceDelete();
+            }
+            $tmp = $arr['arr'];
+            $len = count($arr['arr']['weight_from']);
+            for($i = 0; $i < $len; $i++) {
+                $list = [];
+                foreach($tmp as $key => $value) {
+                    $value = array_values($value);
+                    $list[$key] = $value[$i];
+                } 
+                $this->zone_section_prices()->create($list);
+            }    
+        }
     }
 
 }

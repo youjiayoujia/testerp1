@@ -10,12 +10,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Job;
+use App\Jobs\DoPackage;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
+use App\Models\CountriesModel;
 use App\Models\CurrencyModel;
+use App\Models\ItemModel;
+use App\Models\Order\RemarkModel;
 use App\Models\OrderModel;
+use App\Models\product\ImageModel;
 use App\Models\UserModel;
 use App\Models\ItemModel as productItem;
+use App\Models\Order\ItemModel as orderItem;
 
 class OrderController extends Controller
 {
@@ -46,6 +53,71 @@ class OrderController extends Controller
     }
 
     /**
+     * 获取国家信息
+     */
+    public function ajaxCountry()
+    {
+        if (request()->ajax()) {
+            $country = trim(request()->input('shipping_country'));
+            $buf = CountriesModel::where('code', 'like', '%' . $country . '%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach ($buf as $key => $value) {
+                $arr[$key]['id'] = $value->code;
+                $arr[$key]['text'] = $value->code;
+            }
+            if ($total) {
+                return json_encode(['results' => $arr, 'total' => $total]);
+            } else {
+                return json_encode(false);
+            }
+        }
+
+        return json_encode(false);
+    }
+
+    /**
+     * 获取sku信息
+     */
+    public function ajaxSku()
+    {
+        if (request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $buf = ItemModel::where('sku', 'like', '%' . $sku . '%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach ($buf as $key => $value) {
+                $arr[$key]['id'] = $value->sku;
+                $arr[$key]['text'] = $value->sku;
+            }
+            if ($total) {
+                return json_encode(['results' => $arr, 'total' => $total]);
+            } else {
+                return json_encode(false);
+            }
+        }
+
+        return json_encode(false);
+    }
+
+    public function putNeedQueue()
+    {
+        $len = 1000;
+        $start = 0;
+        $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
+        while ($orders->count()) {
+            foreach ($orders as $order) {
+                $job = new DoPackage($order);
+                $job->onQueue('doPackages');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
+        }
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
+    }
+
+    /**
      * 保存数据
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -55,13 +127,6 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $data = request()->all();
-        if($data['refund_account'] == null) {
-            $data['refund'] = '';
-            $data['refund_currency'] = '';
-            $data['refund_account'] = '';
-            $data['refund_amount'] = '';
-            $data['refund_time'] = '';
-        }
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
@@ -76,6 +141,23 @@ class OrderController extends Controller
     }
 
     /**
+     * 首页
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'countries' => CountriesModel::all(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 跳转编辑页面
      *
      * @param $id
@@ -84,18 +166,97 @@ class OrderController extends Controller
     public function edit($id)
     {
         $model = $this->model->find($id);
+        $arr = [];
+        foreach ($model->items as $orderItem) {
+            $arr[] = $orderItem->sku;
+        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'orderItems' => $model->orderItem,
+            'orderItems' => $model->items,
             'channels' => ChannelModel::all(),
             'accounts' => AccountModel::all(),
             'users' => UserModel::all(),
             'currencys' => CurrencyModel::all(),
-            'aliases' => $model->channel->channelAccount,
+            'aliases' => $model->channel->accounts,
+            'arr' => $arr,
+            'rows' => $model->items()->count(),
+            'countries' => CountriesModel::all(),
         ];
 
         return view($this->viewPath . 'edit', $response);
+    }
+
+    /**
+     * 跳转退款页面
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function refund($id)
+    {
+        $model = $this->model->find($id);
+        $arr = [];
+        foreach ($model->items as $orderItem) {
+            $arr[] = $orderItem->sku;
+        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'orderItems' => $model->items->where('is_refund', '0'),
+            'channels' => ChannelModel::all(),
+            'accounts' => AccountModel::all(),
+            'users' => UserModel::all(),
+            'currencys' => CurrencyModel::all(),
+            'aliases' => $model->channel->accounts,
+            'arr' => $arr,
+            'rows' => $model->items()->count(),
+        ];
+
+        return view($this->viewPath . 'refund', $response);
+    }
+
+    /**
+     * 保存退款信息
+     *
+     * @param $id
+     */
+    public function refundUpdate($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $data = request()->all();
+        $data['order_id'] = $id;
+        $model->refundCreate($data, request()->file('image'));
+        return redirect($this->mainIndex);
+    }
+
+    /**
+     * 更新备注
+     */
+    public function remarkUpdate($id)
+    {
+        request()->flash();
+        $data = request()->all();
+        $data['user_id'] = request()->user()->id;
+        $this->model->find($id)->remarks()->create($data);
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -109,13 +270,7 @@ class OrderController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rule(request()));
         $data = request()->all();
-        if($data['refund_account'] == null) {
-            $data['refund'] = '';
-            $data['refund_currency'] = '';
-            $data['refund_account'] = '';
-            $data['refund_amount'] = '';
-            $data['refund_time'] = '';
-        }
+        $data['status'] = 'REVIEW';
         foreach ($data['arr'] as $key => $item) {
             foreach ($item as $k => $v) {
                 $data['items'][$k][$key] = $v;
@@ -123,7 +278,7 @@ class OrderController extends Controller
         }
         unset($data['arr']);
         $this->model->find($id)->update($data);
-        foreach ($data['items'] as $item) {
+        foreach ($data['items'] as $key1 => $item) {
             $obj = productItem::where('sku', $item['sku'])->get();
             if (!count($obj)) {
                 $item['item_id'] = 0;
@@ -132,16 +287,22 @@ class OrderController extends Controller
                 $item['item_id'] = productItem::where('sku', $item['sku'])->first()->id;
             }
             $orderItems = $this->model->find($id)->items;
-            foreach($orderItems as $orderItem) {
-                $orderItem->update($item);
+            if (count($data['items']) == count($orderItems)) {
+                foreach ($orderItems as $key2 => $orderItem) {
+                    if ($key1 == $key2) {
+                        $orderItem->update($item);
+                    }
+                }
+            } else {
+                foreach ($orderItems as $key2 => $orderItem) {
+                    $orderItem->delete($item);
+                }
+                foreach ($data['items'] as $value) {
+                    $value['item_id'] = productItem::where('sku', $value['sku'])->first()->id;
+                    $this->model->find($id)->items()->create($value);
+                }
             }
         }
-
-//        $orderItem[$i]->update($data);
-//        while ($i != $orderItem_len) {
-//            $orderItem[$i]->delete();
-//            $i++;
-//        }
 
         return redirect($this->mainIndex);
     }
@@ -155,10 +316,22 @@ class OrderController extends Controller
     public function show($id)
     {
         $model = $this->model->find($id);
+        $arr = [];
+        foreach ($model->items as $orderItem) {
+            $arr[] = $orderItem->sku;
+        }
+//        foreach($arr as $key => $value) {
+//            $obj = productItem::where(['sku' => $value])->first();
+//            if ($obj->product && $obj->product->url1 != '') {
+//                $arr[$key] = $obj->product->url1;
+//            }
+//        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'orderItems' => $model->orderItem,
+            'orderItems' => $model->items,
+            'packages' => $model->packages,
             'model' => $model,
+            'arr' => $arr,
         ];
 
         return view($this->viewPath . 'show', $response);
@@ -173,7 +346,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $obj = $this->model->find($id);
-        foreach ($obj->orderItem as $val) {
+        foreach ($obj->items as $val) {
             $val->delete();
         }
         $obj->delete($id);
@@ -190,13 +363,16 @@ class OrderController extends Controller
     {
         if (request()->ajax()) {
             $sku = request()->input('sku');
-            $obj = productItem::where(['sku' => $sku])->get();
-            if (count($obj)) {
-                return json_encode('sku');
+            $obj = productItem::where(['sku' => $sku])->first();
+            if ($obj) {
+                $result = $obj->product->url1;
+                return json_encode($result);
+            } else {
+                return json_encode(false);
             }
-        }
 
-        return json_encode('false');
+        }
+        return json_encode(false);
     }
 
     /**
@@ -225,8 +401,56 @@ class OrderController extends Controller
     public function account()
     {
         $id = request()->input('id');
-        $buf = channelModel::find($id)->channelAccount;
+        $buf = ChannelModel::find($id)->accounts;
         return json_encode($buf);
+    }
+
+    //审核
+    public function updateStatus()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['status' => 'PREPARED']);
+
+        return 1;
+    }
+
+    //暂停发货
+    public function updatePrepared()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'STOP']);
+
+        return 1;
+    }
+
+    //恢复正常
+    public function updateNormal()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['active' => 'NORMAL']);
+
+        return 1;
+    }
+
+    public function withdrawUpdate($id)
+    {
+        request()->flash();
+        $data = request()->all();
+        $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw' => $data['withdraw']]);
+
+        return redirect($this->mainIndex);
+    }
+
+    public function withdraw($id)
+    {
+        $model = $this->model->find($id);
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+
+        return view($this->viewPath . 'withdraw', $response);
     }
 
     /**
@@ -251,25 +475,28 @@ class OrderController extends Controller
         foreach ($channelOrders as $key => $channelOrder) {
             $name = substr($url, 11, 6);
             $channels = ChannelModel::where(['name' => $name])->get();
-            foreach($channels as $channel) {
+            foreach ($channels as $channel) {
                 $orders[$key]['channel_id'] = $channel['id'];
                 $accounts = AccountModel::where(['channel_id' => $orders[$key]['channel_id']])->get();
-                foreach($accounts as $account) {
+                foreach ($accounts as $account) {
                     $orders[$key]['channel_account_id'] = $account['id'];
                     $orders[$key]['customer_service'] = $account['customer_service_id'];
                     $orders[$key]['operator'] = $account['operator_id'];
-                    $orders[$key]['affairer'] = NULL;
+                    $orders[$key]['affairer'] = null;
                 }
             }
             $orders[$key]['ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['channel_ordernum'] = $channelOrder['ordernum'];
             $orders[$key]['email'] = $channelOrder['email'];
-            $orders[$key]['status'] = 'NEW';
+            $orders[$key]['status'] = 'PAID';
             $orders[$key]['active'] = 'NORMAL';
             $orders[$key]['ip'] = $channelOrder['ip_address'];
             $orders[$key]['address_confirm'] = 1;
             $orders[$key]['remark'] = $channelOrder['remark'];
-            $orders[$key]['affair_time'] = NULL;
+            if ($orders[$key]['remark'] != null && $orders[$key]['remark'] != '') {
+                $orders[$key]['status'] = 'REVIEW';
+            }
+            $orders[$key]['affair_time'] = null;
             $orders[$key]['create_time'] = $channelOrder['date_purchased'];
             $orders[$key]['is_partial'] = 0;
             $orders[$key]['by_hand'] = 0;
@@ -280,9 +507,9 @@ class OrderController extends Controller
             $orders[$key]['amount_product'] = $channelOrder['amount_products'];
             $orders[$key]['amount_coupon'] = $channelOrder['order_insurance'];
             $orders[$key]['amount_shipping'] = $channelOrder['amount_shipping'] + $orders[$key]['amount_coupon'];
-            if(($orders[$key]['amount_shipping'] / $orders[$key]['rate']) < 10) {
+            if (($orders[$key]['amount_shipping'] / $orders[$key]['rate']) < 10) {
                 $orders[$key]['shipping'] = 'PACKET';
-            }else {
+            } else {
                 $orders[$key]['shipping'] = 'EXPRESS';
             }
             $orders[$key]['shipping_firstname'] = $channelOrder['shipping_firstname'];
@@ -303,11 +530,6 @@ class OrderController extends Controller
             $orders[$key]['billing_zipcode'] = $channelOrder['billing_zip'];
             $orders[$key]['billing_phone'] = $channelOrder['billing_phone'];
             $orders[$key]['payment_date'] = $channelOrder['payment_date'];
-            $orders[$key]['refund'] = NULL;
-            $orders[$key]['refund_currency'] = NULL;
-            $orders[$key]['refund_account'] = NULL;
-            $orders[$key]['refund_amount'] = NULL;
-            $orders[$key]['refund_time'] = NULL;
             $orders[$key]['transaction_number'] = $channelOrder['trans_id'];
             $orders[$key]['cele_admin'] = $channelOrder['cele_admin'];
             $orders[$key]['priority'] = 0;
@@ -321,21 +543,22 @@ class OrderController extends Controller
                 $orders[$key]['items'][$itemKey]['is_gift'] = $channelOrderItem['is_gift'];
                 $arr = $channelOrder['orderitems'];
                 $len = count($arr);
-                for($i=0; $i<$len; $i++) {
+                for ($i = 0; $i < $len; $i++) {
                     $str = $arr[$i]['attributes'];
                     $array = explode(";", $str);
                     foreach ($array as $value) {
-                        if($value  == '') {
+                        if ($value == '') {
                             break;
-                        }else {
+                        } else {
                             $arr[$i]['attributes'] = $value;
-                            $orders[$key]['items'][$itemKey]['sku'] = $channelOrderItem['sku']."-".substr($arr[$i]['attributes'], 6);
+                            $orders[$key]['items'][$itemKey]['sku'] = $channelOrderItem['sku'] . "-" . substr($arr[$i]['attributes'],
+                                    6);
                         }
                     }
                 }
             }
             $obj = OrderModel::where(['ordernum' => $channelOrder['ordernum']])->get();
-            if(!count($obj)) {
+            if (!count($obj)) {
                 $this->model->createOrder($orders[$key]);
             }
         }

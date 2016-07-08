@@ -39,7 +39,7 @@ class StockModel extends BaseModel
     ];
 
     // 用于查询
-    protected $searchFields = ['sku'];
+    public $searchFields = ['id' => 'ID'];
 
     // 规则验证
     public $rules = [
@@ -47,9 +47,20 @@ class StockModel extends BaseModel
             'warehouse_id' => 'required|integer',
             'warehouse_position_id' => 'required',
             'all_quantity' => 'required|integer',
-            'unit_cost' => 'required|numeric',
         ]
     ];
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['item' => ['sku']],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
 
     /**
      * get the relationship between the two model
@@ -123,7 +134,7 @@ class StockModel extends BaseModel
      * @return relation
      *
      */
-    public function items()
+    public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
@@ -170,7 +181,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function in($quantity, $amount, $type, $relation_id, $remark)
+    public function in($quantity, $amount, $type = '', $relation_id = '', $remark = '')
     {
         $this->all_quantity += $quantity;
         $this->available_quantity += $quantity;
@@ -192,7 +203,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function hold($quantity, $type, $relation_id, $remark)
+    public function hold($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $this->available_quantity -= $quantity;
         if ($this->available_quantity < 0) {
@@ -216,12 +227,16 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function holdout($quantity, $type, $relation_id, $remark)
+    public function holdout($quantity, $type = '', $relation_id = '', $remark = '')
     {
+        $price = $this->unit_cost;
+        if($this->unit_cost <= 0) {
+            echo "<script>alert('单价不是正数，出错');</script>";
+        }
         $this->hold_quantity -= $quantity;
         $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
-            throw new Exception('unhold时，hold数量为负了');
+            echo "<script>alert('unhold时，hold数量为负了');</script>";
         }
         $this->save();
         $this->stockUnhold()->create([
@@ -232,6 +247,7 @@ class StockModel extends BaseModel
             ]);
         $this->stockOut()->create([
             'quantity' => $quantity,
+            'amount' => $quantity * $price,
             'type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
@@ -246,7 +262,7 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function unhold($quantity, $type, $relation_id, $remark)
+    public function unhold($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $this->hold_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
@@ -273,10 +289,10 @@ class StockModel extends BaseModel
      * @return none
      *
      */
-    public function out($quantity, $type, $relation_id, $remark)
+    public function out($quantity, $type = '', $relation_id = '', $remark = '')
     {
         $price = $this->unit_cost;
-        if($this->unit_cost <= 0) {
+        if($price <= 0) {
             throw new Exception('单价不是正数，出错');
         }
         $this->all_quantity -= $quantity;
@@ -351,7 +367,7 @@ class StockModel extends BaseModel
             }
             DB::beginTransaction();
             try {
-            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $stock['unit_cost'],
+            $tmp_item->in($tmp_position->id, $stock['all_quantity'], $stock['all_quantity'] * $tmp_item->purchase_price,
                 'MAKE_ACCOUNT');
             } catch(Exception $e) {
                 DB::rollback();

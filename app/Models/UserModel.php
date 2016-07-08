@@ -28,7 +28,7 @@ class UserModel extends BaseModel implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['id', 'name', 'email', 'password'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -66,5 +66,14 @@ class UserModel extends BaseModel implements AuthenticatableContract,
         }
         return !!$role->intersect($this->roles)->count();
     }
-}
 
+    public function messages()
+    {
+        return $this->hasMany('App\Models\message\MessageModel', 'assign_id');
+    }
+
+    public function getProcessMessagesAttribute()
+    {
+        return $this->messages()->where('status', 'PROCESS')->count();
+    }
+}

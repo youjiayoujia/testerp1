@@ -25,9 +25,9 @@
                                         <li class="disabled"><a href="#">{{ $key }}</a></li>
                                         @foreach($subnavigations as $subnavigation)
                                             <li>
-                                            
+
                                                 <a href="{{ route($subnavigation['url']) }}">
-                                              
+
                                                     <span class="glyphicon glyphicon-{{ $subnavigation['icon'] }}"></span>
                                                     {{ $subnavigation['name'] }}
                                                 </a>
@@ -95,7 +95,7 @@
                         </ul>
                     @endif
                 </li>
-                
+
             </ul>
         </div>
     </div>

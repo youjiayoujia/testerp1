@@ -1,13 +1,31 @@
 /*
  * Main content
  */
+body,
+.btn,
+.form-control,
+.dropdown-menu {
+    font-size: 10px;
+}
+
+.form-control {
+    height: 31px;
+}
+
+.breadcrumb {
+    margin-bottom: 10px;
+}
 
 .main {
-    padding: 70px 10px 10px;
+    padding: 60px 10px 10px;
+}
+
+.table tbody tr td {
+    vertical-align: middle;
 }
 
 .tr_bgcolor {
-    background: red ;
+    background: red;
 }
 
 .pagination {
@@ -16,6 +34,18 @@
 
 .toolbar {
     margin-bottom: 5px;
+}
+
+.inboxNum {
+    width: 500px;
+    height: 500px;
+    background: #ddd;
+    left: 15px;
+}
+
+.inboxImage {
+    width: 500px;
+    height: 500px;
 }
 
 span.sign {
@@ -79,4 +109,15 @@ th:hover:not([data-sort=false]) {
     text-shadow: 0 1px 0 #fff;
     opacity: .8;
     cursor: pointer;
+}
+
+.divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+
+}
+.mailcontent {
+    height: 400px;
 }

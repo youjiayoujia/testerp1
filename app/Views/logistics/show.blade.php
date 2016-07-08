@@ -7,13 +7,10 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式简码</strong>: {{ $model->short_code }}
+                <strong>物流方式简码</strong>: {{ $model->code }}
             </div>
             <div class="col-lg-4">
-                <strong>物流方式名称</strong>: {{ $model->logistics_type }}
-            </div>
-            <div class="col-lg-4">
-                <strong>种类</strong>: {{ $model->species == 'express' ? '快递' : '小包' }}
+                <strong>物流方式名称</strong>: {{ $model->name }}
             </div>
             <div class="col-lg-4">
                 <strong>仓库</strong>: {{ $model->warehouse->name }}
@@ -28,14 +25,28 @@
                 <strong>物流追踪网址</strong>: {{ $model->url }}
             </div>
             <div class="col-lg-4">
-                <strong>对接方式</strong>: {{ $model->docking }}
+                <strong>对接方式</strong>: {{ $model->docking_name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>物流分类</strong>: {{ $model->logistics_catalog_id == '0' ? '未选择' : $model->catalog->name }}
+            </div>
+            <div class="col-lg-4">
+                <strong>回邮模版</strong>: {{ $model->logistics_email_template_id == '0' ? '未选择' : $model->emailTemplate->customer }}
+            </div>
+            <div class="col-lg-4">
+                <strong>面单模版</strong>: {{ $model->logistics_template_id == '0' ? '未选择' : $model->template->name }}
             </div>
             <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
-            <div class="col-lg-12">
+            <div class="col-lg-4">
                 <strong>物流限制</strong>: {{ $model->limit($model->limit) }}
             </div>
+            @foreach($channelNames as $channelName)
+            <div class="col-lg-4">
+                <strong>{{$channelName->channel ? $channelName->channel->name : ''}}承运商</strong>: {{ $channelName->name }}
+            </div>
+            @endforeach
         </div>
     </div>
     <div class="panel panel-default">

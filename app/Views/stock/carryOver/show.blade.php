@@ -23,7 +23,7 @@
         <tbody>
             @foreach($forms as $form)
             <tr>
-                <td>{{ $form->stock ? $form->stock->items ? $form->stock->items->sku : '' : '' }}</td>
+                <td>{{ $form->stock ? $form->stock->item ? $form->stock->item->sku : '' : '' }}</td>
                 <td>{{ $form->stock ? $form->stock->warehouse ? $form->stock->warehouse->name : '' : '' }}</td>
                 <td>{{ $form->stock ? $form->stock->position ? $form->stock->position->name : '' : ''}}</td>
                 <td>{{ $form->begin_quantity }}</td>

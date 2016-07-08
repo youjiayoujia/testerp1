@@ -20,6 +20,9 @@ class CreateProductRequire extends Migration
             $table->text('img4')->comment('图片4')->nullable()->default(NULL);
             $table->text('img5')->comment('图片5')->nullable()->default(NULL);
             $table->text('img6')->comment('图片6')->nullable()->default(NULL);
+            $table->text('url1')->comment('url1')->nullable()->default(NULL);
+            $table->text('url2')->comment('url2')->nullable()->default(NULL);
+            $table->text('url3')->comment('url3')->nullable()->default(NULL);
             $table->string('color')->comment('颜色')->default(NULL);
             $table->string('material')->comment('材料')->default(NULL);
             $table->string('technique')->comment('工艺')->default(NULL);

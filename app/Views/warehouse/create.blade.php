@@ -25,7 +25,12 @@
         </div>
         <div class='form-group col-lg-3'> 
             <label for='city'>联系人</label> 
-            <input type='text' class="form-control" name="contact_by" placeholder="联系人" value="{{ old('contact_by') }}">
+            <select name='contact_by' class='form-control contact_by'>
+                <option value=''></option>
+                @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </select>
         </div>
         <div class='form-group col-lg-3'> 
             <label for='city'>联系电话</label> 
@@ -62,16 +67,12 @@
                 </label>
             </div>    
         </div>
-        <div class="form-group col-lg-4">
-            <label for="is_default">是否是默认仓库</label>
-            <div class='radio'>
-                <label>
-                    <input type='radio' name='is_default' value='1' {{ $count ? 'disabled' : (old('is_default') ? (old('is_default') == '1' ? 'checked' : '') : '') }}>默认仓库
-                </label>   
-                <label>
-                    <input type='radio' name='is_default' value='0' {{ old('is_default') ? (old('is_default') == '0' ? 'checked' : '') : 'checked' }}>非默认仓库
-                </label>
-            </div>    
-        </div>
     </div>
+@stop
+@section('pageJs')
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('.contact_by').select2();
+});
+</script>
 @stop

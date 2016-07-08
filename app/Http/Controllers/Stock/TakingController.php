@@ -104,7 +104,7 @@ class TakingController extends Controller
         $takings = request()->all();
         $arr = $takings['arr'];
         $len = count($arr['id']);
-        $this->model->find($id)->update(['stock_taking_by'=>'1', 'stock_taking_time'=>date('Y-m-d h:m:s',time())]);
+        $this->model->find($id)->update(['stock_taking_by'=>request()->user()->id, 'stock_taking_time'=>date('Y-m-d h:m:s',time())]);
         $flag = 1;
         for($i=0;$i<$len;$i++)
         {
@@ -135,7 +135,7 @@ class TakingController extends Controller
             }
         }
         $flag ? $this->model->find($id)->update(['create_taking_adjustment' => '1']) : $this->model->find($id)->update(['create_taking_adjustment' => '0']);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
     /**
@@ -173,7 +173,7 @@ class TakingController extends Controller
         if(request()->ajax()) {
             $id = request()->input('id');
             $model = $this->model->find($id);
-            $model->update(['create_status' => '1', 'adjustment_by'=>'3', 'adjustment_time'=>date('Y-m-d h:m:s', time())]);
+            $model->update(['create_status' => '1', 'adjustment_by'=>request()->user()->id, 'adjustment_time'=>date('Y-m-d h:m:s', time())]);
             return json_encode('11');
         }
         
@@ -236,12 +236,13 @@ class TakingController extends Controller
                     $item->out($warehousePositionId, $quantity, $type, $relation_id);
                 }
             }
-            $model->update(['check_by'=>4, 'check_status'=>'2', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            $model->update(['check_by'=>request()->user()->id, 'check_status'=>'2', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            Cache::store('file')->forever('stockIOStatus', '1');
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '审核已通过'));
         } else {
-            $model->update(['check_by'=>4, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            $model->update(['check_by'=>request()->user()->id, 'check_status'=>'1', 'check_time'=>date('Y-m-d h:m:s', time())]);
+            Cache::store('file')->forever('stockIOStatus', '1');
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '审核未通过'));
         }
-        
-        Cache::store('file')->forever('stockIOStatus', '1');
-        return redirect($this->mainIndex);
     }
 }

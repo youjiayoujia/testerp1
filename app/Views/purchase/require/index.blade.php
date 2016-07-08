@@ -13,32 +13,58 @@
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选-
-    ID</th>
+    SKUID</th>
     <th>sku</th>
-    <th>产品图片</th>
-    <th>供应商</th>
-    <th>采购去向</th>
-    <th>订单需求/库存数量/正采购数目</th>
-    <th>仍需采购</th>
-    <th>备注</th>
+    <th>中文名</th>
+    <th>可用库存</th>
+    <th>实库存</th>
+    <th>在途</th>
+    <th>近30天销量</th>
+    <th>近14天销量</th>
+    <th>近7天销量</th>
+    <th>建议采购数量</th>
+    <th>趋势系数</th>
+    <th>平均利润率</th>
+    <th>退款率</th>
+    <th>SKU状态</th>
+    <th>采购状态</th>
 @stop
 @section('tableBody')
-    @foreach($data as $requireItem)
+    @foreach($data as $item)
         <tr>
             <td>
-             @if($requireItem->purchase_order_id >0)
-                <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="1" >
+             @if($item->require_create !="1")
+                <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="1" >
                 @else
-                <input type="checkbox" name="requireItem_id"  value="{{$requireItem->id}}" isexamine="0" >
+                <input type="checkbox" name="requireItem_id"  value="{{$item->item_id}}" isexamine="0" >
                 @endif
-            {{ $requireItem->id }}</td>
-            <td>{{ $requireItem->sku}}</td>   
-            <td> <img src="{{ $requireItem->item->product->image->src}}" height="50px"/></td>
-            <td>{{$requireItem->item->supplier->name}}</td>
-            <td>{{ $requireItem->warehouse->name}}</td>
-            <td>{{ $requireItem->order_need_num}}/{{$requireItem->all_quantity}}/{{$requireItem->purchaseing_quantity}}</td>
-            <td>{{$requireItem->order_need_num - $requireItem->all_quantity -$requireItem->purchaseing_quantity}}</td>
-            <td>{{ $requireItem->remark}}</td> 
+            {{ $item->item_id }}</td>
+            <td>{{ $item->sku}}</td>   
+            <td>
+            {{$item->c_name}}
+            </td>
+            
+            <td>{{$item->available_quantity}}</td>
+            <td>{{$item->all_quantity}}</td>
+            <td>{{$item->zaitu_num}}</td>
+            <td>{{$item->thirty_sales}}</td>
+            <td>{{$item->fourteen_sales}}</td>
+            <td>{{$item->seven_sales}}</td>
+            <td>{{$item->need_purchase_num>0?$item->need_purchase_num:0}}</td>
+            <td>@if($item->thrend == 1)
+            	上涨
+            @elseif($item->thrend == 2)
+            	下跌
+            @elseif($item->thrend == 3)
+            	无销量
+            @elseif($item->thrend == 4)
+            	持平
+            @endif
+            </td>
+            <td>{{$item->profit*100}}%</td>
+            <td>{{$item->refund_rate*100}}%</td>
+            <td>{{config('item.status')[$item->status]}}</td>
+            <td>{{config('purchase.require')[$item->require_create]}}</td>
         </tr>
     @endforeach
  <script type="text/javascript">		 
@@ -49,7 +75,7 @@
                 for (var i = 0; i < checkbox.length; i++) {
                     if(!checkbox[i].checked)continue;
                     if(checkbox[i].getAttribute('isexamine')==1){
-                        alert("id为"+checkbox[i].value+"的条目已经生成采购单了");
+                        alert("id为"+checkbox[i].value+"的条目无需生成采购单");
                         return;
                     }
                     purchase_ids += checkbox[i].value+",";

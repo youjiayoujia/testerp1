@@ -11,7 +11,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Bao3packageModel;
+use App\Models\Bao3PackageModel;
 
 class Bao3PackageController extends Controller
 {
@@ -30,11 +30,13 @@ class Bao3PackageController extends Controller
      */
     public function index()
     {
-        request()->flash();
+        request()->flash(); 
         $response = [
             'metas' => $this->metas(__FUNCTION__, '3宝package'),
             'data' => $this->autoList($this->model->where('is_tonanjing', '1')),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
+        
         return view($this->viewPath . 'index', $response);
     }
 }

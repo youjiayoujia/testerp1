@@ -24,7 +24,7 @@ class PrintPurchaseOrderController extends Controller
     {
         $this->model = $purchaseOrder;
 		$this->purchaseItem=$purchaseItem;
-        $this->mainIndex = route('printPurchaseOrder.index');
+        $this->mainIndex = route('printPurchaseOrder.create');
         $this->mainTitle = '采购单';
 		$this->viewPath = 'purchase.printPurchaseOrder.';
     }
@@ -32,7 +32,8 @@ class PrintPurchaseOrderController extends Controller
 	
 	public function index()
     {
-		$purchaseOrders=$this->model->select('id')->where('assigner',12)->get()->toArray();
+		$user=request()->user()->id;
+		$purchaseOrders=$this->model->select('id')->where('assigner',$user)->get()->toArray();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->purchaseItem->whereIn('purchase_order_id',$purchaseOrders)),//->where('assigner',12)
@@ -42,9 +43,10 @@ class PrintPurchaseOrderController extends Controller
 	
 	
 	public function create(){
+		$user=request()->user()->id;
 		$response = [
             'metas' => $this->metas(__FUNCTION__),
-            'warehouses' =>$this->model->select('warehouse_id')->where('assigner',12)->groupBy('warehouse_id')->get(),
+            'warehouses' =>$this->model->select('warehouse_id')->where('assigner',$user)->groupBy('warehouse_id')->get(),
 			'assigner'=>12,
         ];
 		$response['metas']['mainTitle']='打印采购单';
@@ -58,8 +60,9 @@ class PrintPurchaseOrderController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
 	public function checkWarehouse(){
+		$user=request()->user()->id;
 		$warehouseId=request()->get('warehouseId');
-		$purchaseOrderIds=$this->model->select('id')->where('warehouse_id',$warehouseId)->where('assigner',12)->get()->toArray();
+		$purchaseOrderIds=$this->model->select('id')->where('warehouse_id',$warehouseId)->where('assigner',$user)->get()->toArray();
 		$purchaseItemSkus=$this->purchaseItem->select('sku','id')->whereIn('purchase_order_id',$purchaseOrderIds)->where('status',0)->get()->toArray();
 		$spus='';
 		$spu='';

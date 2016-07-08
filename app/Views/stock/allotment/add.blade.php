@@ -1,6 +1,6 @@
 <div class='row'>
     <div class="form-group col-sm-2">
-        <input type='text' class="form-control sku" placeholder="sku" name='arr[sku][{{$current}}]' value="{{ old('arr[sku][$current]') }}">
+        <select name='arr[item_id][{{$current}}]' class='form-control sku sku1'></select>
     </div>
     <div class="form-group col-sm-2 position_html">
         <input type='text' class="form-control warehouse_position_id" placeholder="库位" name='arr[warehouse_position_id][{{$current}}]' value="{{ old('arr[warehouse_position_id][$current]') }}">

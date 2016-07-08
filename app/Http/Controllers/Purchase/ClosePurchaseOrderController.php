@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
+use App\Models\Purchase\PurchasePostageModel;
 
 class ClosePurchaseOrderController extends Controller
 {
@@ -32,6 +33,9 @@ class ClosePurchaseOrderController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('status','>',0)),
         ];
+		foreach($response['data'] as $key=>$v ){
+			$response['data'][$key]['sumPostage']=PurchasePostageModel::where('purchase_order_id',$v->id)->sum('postage');
+			}
         return view($this->viewPath . 'index', $response);
     }
 	
@@ -50,13 +54,14 @@ class ClosePurchaseOrderController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-		if ($model->examineStatus !=2) {
+		if ($model->costExamineStatus !=2) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '成本未审核通过的采购单.'));
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
 			'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
+			'sumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
         ];
         return view($this->viewPath . 'edit', $response);	
 	}
@@ -72,14 +77,14 @@ class ClosePurchaseOrderController extends Controller
 	public function update($id)
 	{
 		$model=$this->model->find($id);
-		if ($model->examineStatus !=2) {
+		if ($model->examineStatus !=1 ) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未审核通过的采购单.'));
         }
 		$data=request()->all();
 		$items=PurchaseItemModel::where('purchase_order_id',$id)->get();
 		foreach($items as $key=>$v){
-		if($v->status !=2){
-			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未对单采购条目不能结算.'));
+		if($v->status ==0 || $v->status ==5){
+			return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '未开始的或已取消的采购单不能结算.'));
 			}
 		}
 		$model->update($data);

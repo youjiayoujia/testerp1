@@ -44,6 +44,7 @@ class ErrorListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
 
         return view($this->viewPath . 'index', $response);
@@ -83,7 +84,7 @@ class ErrorListController extends Controller
             return json_encode('false');
         }
         $package->update(['status' => 'SHIPPED']);
-        $model->update(['status' => '1', 'process_by' => '2', 'process_time' => date('Y-m-d h:m:s', time())]);
+        $model->update(['status' => '1', 'process_by' => request()->user()->id, 'process_time' => date('Y-m-d h:m:s', time())]);
         return json_encode('true');
     }
 }

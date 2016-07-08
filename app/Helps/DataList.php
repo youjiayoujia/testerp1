@@ -51,16 +51,20 @@ class DataList
         return $clear == true ? $url . '&filterClear=yes' : $url;
     }
 
-    public function filtersDecode($filtersQuery)
+    public function filtersDecode($filtersQuery, $key = '')
     {
         $filters = [];
-        foreach (explode(',', $filtersQuery) as $filter) {
-            $filter = explode('.', $filter);
-            $filters[$filter[0]]['field'] = $filter[0];
-            $filters[$filter[0]]['oprator'] = urldecode($filter[1]);
-            $filters[$filter[0]]['value'] = urldecode($filter[2]);
+        if ($filtersQuery) {
+            foreach (explode(',', $filtersQuery) as $filter) {
+                $filter = explode('.', $filter);
+                $filters[$filter[0]]['field'] = $filter[0];
+                $filters[$filter[0]]['oprator'] = urldecode($filter[1]);
+                $filters[$filter[0]]['value'] = urldecode($filter[2]);
+            }
+            if ($key) {
+                return $filters[$key]['value'];
+            }
         }
         return $filters;
     }
-
 }

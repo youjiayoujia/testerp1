@@ -15,6 +15,7 @@ use App\Models\PackageModel;
 use App\Models\ChannelModel;
 use App\Models\LogisticsModel;
 use App\Models\Pick\PackageScoreModel;
+use Tool;
 
 class PickListController extends Controller
 {
@@ -70,9 +71,101 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'picklistitems' => $model->pickListItem,
+            'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);
+    }
+
+    public function performanceStatistics()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '效能统计'),
+        ];
+
+        return view($this->viewPath.'statistics', $response);
+    }
+
+    public function statisticsProcess()
+    {
+        $start_time = request('start_time');
+        $end_time = request('end_time');
+        $pick = $this->model->whereBetween('pick_at', [$start_time, $end_time])->get();
+        $inbox = $this->model->whereBetween('inbox_at', [$start_time, $end_time])->get();
+        $pack = $this->model->whereBetween('pack_at', [$start_time, $end_time])->get();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '效能统计'),
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'pick' => $pick->groupBy('pick_by'),
+            'pickNum' => $pick->count(),
+            'skuNum' => $pick->sum('sku_num'),
+            'goodsNum' => $pick->sum('goods_quantity'),
+            'inbox' => $inbox->groupBy('inbox_by'),
+            'inboxPickNum' => $inbox->count(),
+            'inboxSkuNum' => $inbox->sum('sku_num'),
+            'inboxGoodsNum' => $inbox->sum('goods_quantity'),
+            'pack' => $pack->groupBy('pack_by'),
+            'packPickNum' => $pack->count(),
+            'packSkuNum' => $pack->sum('sku_num'),
+            'packGoodsNum' => $pack->sum('goods_quantity'),
+        ];
+
+        return view($this->viewPath.'statisticsProcess', $response);
+    }
+
+    public function indexPrintPickList($content)
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'content' => $content,
+        ];
+
+        return view($this->viewPath.'choosePickList', $response);
+    }
+
+    public function processBase()
+    {
+        $flag = request('flag');
+        $picknum = request('picknum');
+        switch($flag) {
+            case 'print':
+                $model = $this->model->where('picknum', $picknum)->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->printPickList($model->id);
+                break;
+            case 'single':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKING', 'PICKED', 'PACKAGEING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->pickListPackage($model->id);
+                break;
+            case 'singleMulti':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKING', 'PICKED', 'PACKAGEING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->pickListPackage($model->id);
+                break;
+            case 'inbox':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI'])->whereIn('status', ['PICKED', 'PICKING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->inbox($model->id);
+                break;
+            case 'multi':
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI'])->whereIn('status', ['INBOXED', 'PACKAGEING'])->first();
+                if(!$model) {
+                    return $this->indexPrintPickList($flag);
+                }
+                return $this->pickListPackage($model->id);
+                break;
+        }
+        
     }
 
     /**
@@ -97,8 +190,29 @@ class PickListController extends Controller
             'packages' => $model->package,
             'logistics' => LogisticsModel::all(),
         ];
-    
+        if($model->type == 'MULTI')
+            return view($this->viewPath.'packageMulti', $response);
+        
         return view($this->viewPath.'package', $response);
+    }
+
+    public function oldPrint()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+
+        return view($this->viewPath.'oldPrint', $response);
+    }
+
+    public function updatePrint()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath.'updatePrint', $response);
     }
 
     /**
@@ -146,8 +260,7 @@ class PickListController extends Controller
     public function inboxStore($id)
     {
         $obj = $this->model->find($id);
-        $obj->status = 'INBOXED';
-        $obj->save();
+        $obj->update(['status' => 'INBOXED', 'inbox_by' => request()->user()->id, 'inbox_at' => date('Y-m-d H:i:s', time())]);
         foreach($obj->package as $package)
         {
             $package->status = 'PICKED';
@@ -170,8 +283,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->status = 'PACKAGED';
-        $model->save();
+        $model->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
 
         foreach($model->package as $package)
         {
@@ -306,6 +418,6 @@ class PickListController extends Controller
             }
         }
 
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已生成'));
     }
 }

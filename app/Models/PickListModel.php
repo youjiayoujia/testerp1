@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -62,6 +62,31 @@ class PickListModel extends BaseModel
     public function pickByName()
     {
         return $this->belongsTo('App\Models\UserModel', 'pick_by', 'id');
+    }
+
+    public function inboxByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'inbox_by', 'id');
+    }
+
+    public function packByName()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'pack_by', 'id');
+    }
+
+    public function getPackageNumAttribute()
+    {
+        return $this->package->count();
+    }
+
+    public function getSkuNumAttribute()
+    {
+        return $this->pickListItem->count();
+    }
+
+    public function getGoodsQuantityAttribute()
+    {
+        return $this->pickListItem->sum('quantity');
     }
 
     /**
@@ -120,14 +145,14 @@ class PickListModel extends BaseModel
         foreach($package->items as $packageitem)
         {
             $name = PositionModel::find($packageitem->warehouse_position_id)->name;
-            $tmp = substr($name,1,1);
-            $buf[] = $tmp;
+            $tmp = substr($name,4,2);
+            $buf[] = (int)$tmp;
         }
         $buf = array_unique($buf);
         $num = 0;
         foreach($buf as $value)
         {
-            $num += pow(2,abs(ord($value)-ord('A')));
+            $num += pow(2,floor($value/2));
         }
         
         return $num;
@@ -148,7 +173,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>$logistic_id]);
                 $obj->update(['picknum' => 'P'.'1'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -166,7 +191,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>$logistic_id]);
                 $obj->update(['picknum' => 'P'.'2'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -184,7 +209,7 @@ class PickListModel extends BaseModel
         if($query->count()) {            
             $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
-                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>$logistic_id]);
                 $obj->update(['picknum' => 'P'.'3'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($packageScore as $score)
                 {
@@ -216,7 +241,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>'0']);
                 $obj->update(['picknum' => 'P'.'1'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -234,7 +259,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                $obj = $this->create(['type'=>'SINGLEMULTI', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>'0']);
                 $obj->update(['picknum' => 'P'.'2'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;
@@ -252,7 +277,7 @@ class PickListModel extends BaseModel
         if($query->count()) {            
             $packageScores = $query->orderBy('package_score')->get()->chunk($multiQuantity);
             foreach($packageScores as $packageScore) {
-                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>'1', 'logistic_id'=>'0']);
+                $obj = $this->create(['type'=>'MULTI', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>'0']);
                 $obj->update(['picknum' => 'P'.'3'.'1'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($packageScore as $score)
                 {
@@ -294,7 +319,7 @@ class PickListModel extends BaseModel
      */
     public function getStatusNameAttribute()
     {
-        $arr = config('pick.pick');
+        $arr = config('pick');
         return $arr[$this->status];
     }
 }

@@ -15,7 +15,7 @@
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>分类</strong>: {{ $model->catalog->name }}
+                <strong>分类</strong>: {{ $model->catalog?$model->catalog->name:'无分类' }}
             </div>
             <div class="col-lg-3">
                 <strong>产品name</strong>: {{ $model->name }}
@@ -30,10 +30,10 @@
                 <strong>尺寸类型</strong>: {{ $model->product_size }}
             </div>
             <div class="col-lg-3">
-                <strong>产品包装尺寸</strong>: {{ $model->package_size }}
+                <strong>产品包装尺寸（cm）(长*宽*高)</strong>: {{ $model->package_size }}
             </div>
             <div class="col-lg-3">
-                <strong>产品重量</strong>: {{ $model->weight }}
+                <strong>产品重量（kg）</strong>: {{ $model->weight }}
             </div>
         </div>       
     </div>
@@ -62,18 +62,29 @@
                 <strong>采购链接</strong>: <a href="http://{{ $model->purchase_url }}" target="_blank">{{ $model->purchase_url }}</a>
             </div>
             <div class="col-lg-3">
-                <strong>采购价</strong>: {{ $model->purchase_price }}
+                <strong>采购价（RMB）</strong>: {{ $model->purchase_price }}
             </div>
         </div>
         <div class="panel-body">
-        <div class="col-lg-3">
-            <strong>采购物流费</strong>: {{ $model->purchase_carriage }}
-        </div>
-        <div class="col-lg-3">
+            <div class="col-lg-3">
+                <strong>采购物流费（RMB）</strong>: {{ $model->purchase_carriage }}
+            </div>
+            <div class="col-lg-3">
+                <strong>采购天数</strong>: {{ $model->purchase_day }} 天
+            </div>
+            <div class="col-lg-3">
                 <strong>主供应商sku</strong>: {{ $model->supplier_sku }}
             </div>
             <div class="col-lg-3">
                 <strong>辅供应商</strong>: <?php if($model->second_supplier_id==0){echo "无辅供应商";}else{echo $model->supplier->where('id',$model->second_supplier_id)->get()->first()->name;} ?>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>辅供应商sku</strong>:{{ $model->second_supplier_sku }}
+            </div>
+            <div class="col-lg-3">
+                <strong>仓库</strong>: {{ $warehouse->name }}
             </div>
         </div>
     </div>
@@ -99,37 +110,45 @@
     <div class="panel panel-default">
         <div class="panel-heading">其他信息:</div>
         <div class="panel-body">
-            <div class="col-lg-3">
-                <strong>物流限制</strong>: 
-                <?php 
-                    $carriage_key_arr = explode(',',$model->carriage_limit);
-                    foreach(config('product.carriage_limit') as $carriage_key=>$carriage_value){
-                        if(in_array($carriage_key, $carriage_key_arr)){
-                            echo $carriage_value.",";
-                        }
-                    }
-
-                ?>
+            <div class="col-lg-12">
+                <strong>物流限制</strong>：
             </div>
-            <div class="col-lg-3">
-                <strong>包装限制</strong>: 
-                <?php 
-                    $package_key_arr = explode(',',$model->package_limit);
-                    foreach(config('product.package_limit') as $package_key=>$package_value){
-                        if(in_array($package_key, $package_key_arr)){
-                            echo $package_value.",";
-                        }
-                    }
-
-                ?>
-            </div>
+            @foreach($logisticsLimit_arr as $key=>$logistics_limit)
+                <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
+                    {{$key+1}}. {{$logistics_limit}}
+                </div>
+            @endforeach
         </div>
         <div class="panel-body">
+            <div class="col-lg-12">
+                <strong>包装限制</strong>：
+            </div>
+            @foreach($wrapLimit_arr as $key=>$wrap_limit)
+                <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
+                    {{$key+1}}. {{$wrap_limit}}
+                </div>
+            @endforeach
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>采购负责人</strong>: {{ $model->purchase_adminer }}
+            </div>
             <div class="col-lg-3">
                 <strong>上传人</strong>: {{ $model->upload_user }}
             </div>
             <div class="col-lg-3">
                 <strong>备注</strong>: {{ $model->remark }}
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>url1</strong>: {{ $model->url1 }}
+            </div>
+            <div class="col-lg-3">
+                <strong>url2</strong>: {{ $model->url2 }}
+            </div>
+            <div class="col-lg-3">
+                <strong>url3</strong>: {{ $model->url3 }}
             </div>
         </div>
     </div>

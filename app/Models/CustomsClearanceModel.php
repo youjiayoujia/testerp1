@@ -102,7 +102,7 @@ class CustomsClearanceModel extends BaseModel
                     $rows[$model->id] = [
                         '原始订单号' =>  $order->id,
                         '进出口标志' => 'E',
-                        '物流企业代码' => $logistics->short_code == $name ? $logistics->id : '!该对应的package对应的物流不是'.$name,
+                        '物流企业代码' => $logistics->code == $name ? $logistics->id : '!该对应的package对应的物流不是'.$name,
                         '物流企业运单号' => $package->tracking_no,
                         '订单商品货款' => $order->amount,
                         '商品订单运费' => $order->amount_shipping,
@@ -166,7 +166,7 @@ class CustomsClearanceModel extends BaseModel
                 throw new Exception('package ID为'.$id.'不存在');
             }
             $logistics = $package->logistics;
-            if(!$logistics || $logistics->short_code != 'EUB') {
+            if(!$logistics || $logistics->code != 'EUB') {
                 throw new Exception('package ID为'.$id.'对应的物流有误');
             }
             $rows[] = [
@@ -213,7 +213,7 @@ class CustomsClearanceModel extends BaseModel
                 continue;
             }
             $logistics = $package->logistics;
-            if(!$logistics || $logistics->short_code != $short_code) {
+            if(!$logistics || $logistics->code != $short_code) {
                 throw new Exception('package ID为'.$id.'对应的物流有误');
             }
             $order = $package->order;
@@ -531,7 +531,7 @@ class CustomsClearanceModel extends BaseModel
             $clearance['hs_code'] = iconv('gb2312','utf-8',$clearance['hs_code']);
             $clearance['unit'] = iconv('gb2312','utf-8',str_replace('^', '', $clearance['unit']));
             $clearance['f_model'] = iconv('gb2312','utf-8',$clearance['f_model']);
-            if(!ProductModel::where(['model' => $clearance['model']])->count()) {
+            if(!ProductModel::where(['model' => $clearance['model'], 'examine_status' => 'pass'])->count()) {
                 $error[] = $key;
                 continue;
             }

@@ -35,7 +35,7 @@
 <table class="table table-bordered">
     <tbody>
         <tr>
-            <td>MODEL:{{$model->model}}</td>
+            <td style="font-size:14px;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif">MODEL:{{$model->model}}</td>
             <td></td>
         </tr>
         <tr>
@@ -45,7 +45,7 @@
         <tr>
         <td>备注:{{$model->remark}}</td>
          <td>
-            <label style="width:80px">主表:英文名: </label>
+            <label style="width:80px">产品英文名: </label>
             <textarea class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> style="width:300px;" id="name"  name="name">{{ old('name') ?  old('name') : $name }}</textarea>
             <br><label style="width:80px"></label>
             <span class="msg">0 characters</span>
@@ -119,7 +119,7 @@
         </tr>
         
         <tr>
-            <td>
+            <td colspan="2">
                 @foreach($model->featureTextValues as $featureModel)
                     <div class="col-lg-3">
                         <strong>{{$featureModel->featureName->name}}</strong>: {{$featureModel->feature_value}}
@@ -127,8 +127,6 @@
                     <br>
                 @endforeach
             </td>
-
-            <td></td>
         </tr>
         <tr>
             <td>配件说明:{{$model->description}}
@@ -142,7 +140,7 @@
         <tr>
             <td><label>净重: </label>{{$model->weight}} kg</td>
             <td>
-                <label>主表:重量: </label>
+                <label>主表:重量（kg）: </label>
                 <input type="text" class="form-control form55" <?php if($model->examine_status=='pass'){ ?> disabled="disabled" <?php } ?> id="weight" name="weight" value="{{ old('weight') ?  old('weight') : $weight }}">
             </td>
         </tr>

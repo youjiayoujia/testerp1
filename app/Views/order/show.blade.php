@@ -27,47 +27,20 @@
             <div class="col-lg-2">
                 <strong>售后状态</strong>: {{ $model->active_name }}
             </div>
-            <div class="col-lg-2">
-                <strong>客服人员</strong>: {{ $model->userService->name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>运营人员</strong>: {{ $model->userOperator->name }}
-            </div>
+            {{--<div class="col-lg-2">--}}
+                {{--<strong>客服人员</strong>: {{ $model->userService->name }}--}}
+            {{--</div>--}}
+            {{--<div class="col-lg-2">--}}
+                {{--<strong>运营人员</strong>: {{ $model->userOperator->name }}--}}
+            {{--</div>--}}
             <div class="col-lg-2">
                 <strong>地址验证</strong>: {{ $model->address_confirm_name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>IP地址</strong>: {{ $model->ip }}
-            </div>
-            <div class="col-lg-2">
-                <strong>备用字段</strong>: {{ $model->comment }}
-            </div>
-            <div class="col-lg-2">
-                <strong>红人/choies用</strong>: {{ $model->comment1 }}
-            </div>
-            <div class="col-lg-2">
-                <strong>订单备注</strong>: {{ $model->remark }}
-            </div>
-            <div class="col-lg-2">
-                <strong>导单备注</strong>: {{ $model->import_remark }}
             </div>
             <div class="col-lg-2">
                 <strong>渠道创建时间</strong>: {{ $model->create_time }}
             </div>
             <div class="col-lg-2">
-                <strong>做账时间</strong>: {{ $model->affair_time == '0000-00-00' ? '' : $model->affair_time }}
-            </div>
-            <div class="col-lg-2">
-                <strong>做账人员</strong>: {{ $model->userAffairer ? $model->userAffairer->name : '' }}
-            </div>
-            <div class="col-lg-2">
-                <strong>是否做账</strong>: {{ $model->is_affair_name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>是否分批发货</strong>: {{ $model->is_partial_name }}
-            </div>
-            <div class="col-lg-2">
-                <strong>是否手工</strong>: {{ $model->by_hand_name }}
+                <strong>黑名单订单</strong>: {{ $model->blacklist == '1' ? '否' : '是' }}
             </div>
         </div>
     </div>
@@ -106,9 +79,6 @@
     <div class="panel panel-default">
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>种类</strong>: {{ $model->shipping == 'PACKET' ? '小包' : '快递' }}
-            </div>
             <div class="col-lg-2">
                 <strong>发货名字</strong>: {{ $model->shipping_firstname }}
             </div>
@@ -168,53 +138,61 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">退款信息</div>
+        <div class="panel-heading">产品信息</div>
         <div class="panel-body">
-            <div class="col-lg-2">
-                <strong>退款方式</strong>: {{ $model->refund }}
+            <div class="row">
+                <div class="col-lg-2"><strong>sku</strong></div>
+                <div class="col-lg-1"><strong>数量</strong></div>
+                <div class="col-lg-1"><strong>单价</strong></div>
+                <div class="col-lg-1"><strong>是否有效</strong></div>
+                <div class="col-lg-1"><strong>是否赠品</strong></div>
+                <div class="col-lg-2"><strong>备注</strong></div>
+                <div class="col-lg-2"><strong>发货状态</strong></div>
             </div>
-            <div class="col-lg-2">
-                <strong>退款币种</strong>: {{ $model->refund_currency }}
-            </div>
-            <div class="col-lg-2">
-                <strong>客户账户</strong>: {{ $model->refund_account }}
-            </div>
-            <div class="col-lg-2">
-                <strong>退款金额</strong>: {{ $model->refund_amount }}
-            </div>
-            <div class="col-lg-2">
-                <strong>退款时间</strong>: {{ $model->refund_time == '0000-00-00' ? '' : $model->refund_time }}
-            </div>
+            @foreach($orderItems as $key => $orderItem)
+                <div class="row">
+                    <div class="col-lg-2">{{ $orderItem->sku }}</div>
+                    <div class="col-lg-1">{{ $orderItem->quantity }}</div>
+                    <div class="col-lg-1">{{ $orderItem->price }}</div>
+                    <div class="col-lg-1">{{ $orderItem->is_active_name }}</div>
+                    <div class="col-lg-1">{{ $orderItem->is_gift_name }}</div>
+                    <div class="col-lg-2">{{ $orderItem->remark }}</div>
+                    <div class="col-lg-2">{{ $orderItem->status_name }}</div>
+                </div>
+            @endforeach
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">产品信息</div>
+        <div class="panel-heading">包裹信息</div>
         <div class="panel-body">
-            @foreach($orderItems as $orderItem)
+            @foreach($packages as $package)
                 <div class="row">
-                    <div class="col-lg-2">
-                        <strong>sku</strong> : {{ $orderItem->sku }}
+                    <div class="col-lg-3">
+                        <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
                     </div>
-                    <div class="col-lg-1">
-                        <strong>图片</strong> : {{ $orderItem->image }}
+                    <div class="col-lg-3">
+                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
                     </div>
-                    <div class="col-lg-1">
-                        <strong>数量</strong> : {{ $orderItem->quantity }}
+                    <div class="col-lg-3">
+                        <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                     </div>
-                    <div class="col-lg-1">
-                        <strong>单价</strong> : {{ $orderItem->price }}
+                    <div class="col-lg-3">
+                        <strong>包裹状态</strong> : {{ $package->status }}
                     </div>
-                    <div class="col-lg-2">
-                        <strong>是否有效</strong> : {{ $orderItem->is_active_name }}
+                    <div class="col-lg-3">
+                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
                     </div>
-                    <div class="col-lg-2">
-                        <strong>是否赠品</strong> : {{ $orderItem->is_gift_name }}
+                    <div class="col-lg-3">
+                        <strong>发货时间</strong> : {{ $package->shipped_at }}
                     </div>
-                    <div class="col-lg-1">
-                        <strong>备注</strong> : {{ $orderItem->remark }}
+                    <div class="col-lg-3">
+                        <strong>交付时间</strong> : {{ $package->delivered_at }}
                     </div>
-                    <div class="col-lg-2">
-                        <strong>发货状态</strong> : {{ $orderItem->status_name }}
+                    <div class="col-lg-3">
+                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
+                    </div>
+                    <div class="col-lg-3">
+                        <strong>备注</strong> : {{ $package->remark }}
                     </div>
                 </div>
             @endforeach

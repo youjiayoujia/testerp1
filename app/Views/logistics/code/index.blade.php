@@ -14,7 +14,7 @@
     @foreach($data as $code)
         <tr>
             <td>{{ $code->id }}</td>
-            <td>{{ $code->logistics->logistics_type}}</td>
+            <td>{{ $code->logistics->name}}</td>
             <td>{{ $code->code }}</td>
             <td>{{ $code->package_id }}</td>
             <td>{{ $code->status == '1' ? '启用' : '未启用'}}</td>
@@ -36,4 +36,13 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('tableToolButtons')
+    <a href="/batchAddTrCode/{{ $code->logistics_id }}" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus"></span> 导入-号码池
+    </a>
+    <a href="/scanAddTrCode/{{ $code->logistics_id }}" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus"></span> 扫描-号码池
+    </a>
+    @parent
 @stop

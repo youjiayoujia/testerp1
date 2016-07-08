@@ -16,7 +16,7 @@
     @foreach($data as $stock)
         <tr>
             <td>{{ $stock->id }}</td>
-            <td>{{ $stock->items ? $stock->items->sku : '' }}</td>
+            <td>{{ $stock->item ? $stock->item->sku : '' }}</td>
             <td>{{ $stock->warehouse ? $stock->warehouse->name : '' }}</td>
             <td>{{ $stock->position ? $stock->position->name : '' }}</td>
             <td>{{ $stock->all_quantity}}</td>
@@ -38,7 +38,25 @@
         </tr>
     @endforeach
 @stop
+@section('tableToolRelatedSeach')
+    <div class="col-lg-3">
+        <select class="form-control relatedSelect" data-url="aaa">
+            <option>sku查询</option>
+        </select>
+    </div>
+@stop
 @section('tableToolButtons')
+<div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 仓库查询
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach($warehouses as $warehouse)
+            <li><a href="{{ DataList::filtersEncode(['warehouse_id','=', $warehouse->id]) }}">{{ $warehouse->name }}</a></li>
+            @endforeach
+        </ul>
+</div>
 @parent
 <div class="btn-group">
     <a class="btn btn-info" href="{{ route('stock.getExcel') }}">
@@ -50,4 +68,12 @@
         excel导入
     </a>
 </div>
+@stop
+
+@section('childJs')
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+    }); 
+</script>
 @stop

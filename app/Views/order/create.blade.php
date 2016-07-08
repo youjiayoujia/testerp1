@@ -1,5 +1,6 @@
 @extends('common.form')
 @section('formAction') {{ route('order.store') }} @stop
+@section('formAttributes') name='creator'@stop
 @section('formBody')
     <div class="panel panel-default">
         <div class="panel-heading">基础信息</div>
@@ -18,7 +19,7 @@
             <div class="form-group col-lg-2">
                 <label for="channel_account_id">渠道账号</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select name="channel_account_id" class="form-control channel_account_id" id="channel_account_id">
+                <select name="channel_account_id" class="form-control channel_account_id">
                     @foreach($accounts as $account)
                         <option value="{{$account->id}}" {{$account->id == old('$account->account->id') ? 'selected' : ''}}>
                             {{$account->alias}}
@@ -45,11 +46,7 @@
                 <label for="status" class='control-label'>订单状态</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select class="form-control" name="status" id="status">
-                    @foreach(config('order.status') as $status_key => $status)
-                        <option value="{{ $status_key }}" {{ old('status') == $status_key ? 'selected' : '' }}>
-                            {{ $status }}
-                        </option>
-                    @endforeach
+                    <option value="REVIEW" {{ old('status') == 'REVIEW' ? 'selected' : '' }}>需审核</option>
                 </select>
             </div>
             <div class="form-group col-lg-2">
@@ -97,86 +94,9 @@
                 </select>
             </div>
             <div class="form-group col-lg-2">
-                <label for="ip" class='control-label'>IP地址</label>
-                <input class="form-control" id="ip" placeholder="IP地址" name='ip' value="{{ old('ip') }}">
-            </div>
-            <div class="form-group col-lg-2" id="comment">
-                <label for="comment" class='control-label'>备用字段</label>
-                <input class="form-control" id="comment" placeholder="备用字段" name='comment' value="{{ old('comment') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="comment1" class='control-label'>红人/choies用</label>
-                <input class="form-control" id="comment1" placeholder="红人/choies用" name='comment1' value="{{ old('comment1') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="remark" class='control-label'>订单备注</label>
-                <input class="form-control" id="remark" placeholder="订单备注" name='remark' value="{{ old('remark') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="import_remark" class='control-label'>导单备注</label>
-                <input class="form-control" id="import_remark" placeholder="导单备注" name='import_remark' value="{{ old('import_remark') }}">
-            </div>
-            <div class="form-group col-lg-2">
                 <label for="create_time" class='control-label'>渠道创建时间</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="create_time" placeholder="渠道创建时间" name='create_time' value="{{ old('create_time') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="affair_time" class='control-label'>做账时间</label>
-                <input class="form-control" id="affair_time" placeholder="做账时间" name='affair_time' value="{{ old('affair_time') }}" disabled>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="affairer">做账人员</label>
-                <select name="affairer" class="form-control" id="affairer" disabled>
-                    <option value="NULL"></option>
-                    @foreach($users as $user)
-                        <option value="{{$user->id}}" {{ Tool::isSelected('affairer', $user->id) }}>
-                            {{$user->name}}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="is_affair" class='control-label'>是否做账</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_affair" value="1" {{ old('is_affair') ? (old('is_affair') == "1" ? 'checked' : '') : '' }} disabled>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_affair" value="0" {{ old('is_affair') ? (old('is_affair') == "0" ? 'checked' : '') : 'checked' }}>否
-                    </label>
-                </div>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="is_partial" class='control-label'>是否分批发货</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_partial" value="1" {{ old('is_partial') ? (old('is_partial') == "1" ? 'checked' : '') : '' }} disabled>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="is_partial" value="0" {{ old('is_partial') ? (old('is_partial') == "0" ? 'checked' : '') : 'checked' }}>否
-                    </label>
-                </div>
-            </div>
-            <div class="form-group col-lg-2" id="hand">
-                <label for="by_hand" class='control-label'>是否手工</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="by_hand" value="1" checked>是
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="by_hand" value="0" disabled>否
-                    </label>
-                </div>
             </div>
         </div>
     </div>
@@ -246,17 +166,6 @@
         <div class="panel-heading">物流信息</div>
         <div class="panel-body">
             <div class="form-group col-lg-2">
-                <label for="shipping" class='control-label'>种类</label>
-                <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <select class="form-control" name="shipping" id="shipping">
-                    @foreach(config('order.shipping') as $shipping_key => $shipping)
-                        <option value="{{ $shipping_key }}" {{ old('shipping') == $shipping_key ? 'selected' : '' }}>
-                            {{ $shipping }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
                 <label for="shipping_firstname" class='control-label'>发货名字</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <input class="form-control" id="shipping_firstname" placeholder="发货名字" name='shipping_firstname' value="{{ old('shipping_firstname') }}">
@@ -288,7 +197,7 @@
             <div class="form-group col-lg-2">
                 <label for="shipping_country" class='control-label'>发货国家/地区</label>
                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                <input class="form-control" id="shipping_country" placeholder="发货国家/地区" name='shipping_country' value="{{ old('shipping_country') }}">
+                <select class="form-control shipping_country" id="shipping_country" name='shipping_country'></select>
             </div>
             <div class="form-group col-lg-2">
                 <label for="shipping_zipcode" class='control-label'>发货邮编</label>
@@ -339,43 +248,6 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-default">
-        <div class="panel-heading">退款信息</div>
-        <div class="panel-body">
-            <div class="form-group col-lg-2">
-                <label for="refund" class='control-label'>退款方式</label>
-                <select class="form-control" name="refund" id="refund">
-                    @foreach(config('order.payment') as $refund)
-                        <option value="{{ $refund }}" {{ old('refund') == $refund ? 'selected' : '' }}>
-                            {{ $refund }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_currency" class='control-label'>退款币种</label>
-                <select class="form-control" name="refund_currency" id="refund_currency">
-                    @foreach($currencys as $refund_currency)
-                        <option value="{{ $refund_currency->code }}" {{ old('refund_currency') == $refund_currency->code ? 'selected' : '' }}>
-                            {{ $refund_currency->code }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_account" class='control-label'>客户账户</label>
-                <input class="form-control" id="refund_account" placeholder="客户账户" name='refund_account' value="{{ old('refund_account') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_amount" class='control-label'>退款金额</label>
-                <input class="form-control" id="refund_amount" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
-            </div>
-            <div class="form-group col-lg-2">
-                <label for="refund_time" class='control-label'>退款时间</label>
-                <input class="form-control" id="refund_time" placeholder="退款时间" name='refund_time' value="{{ old('refund_time') }}" readonly>
-            </div>
-        </div>
-    </div>
     <div class="panel panel-primary">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body" id="itemDiv">
@@ -385,7 +257,7 @@
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
-                    <label for="image" class='control-label'>图片</label>
+                    <label for="channel_sku" class='control-label'>渠道sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
@@ -414,10 +286,10 @@
             </div>
             <div class='row'>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control sku" id="arr[sku][0]" placeholder="sku" name='arr[sku][0]' value="{{ old('arr[sku][0]') }}">
+                    <select class="form-control sku" id="arr[sku][0]" name='arr[sku][0]'></select>
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type='text' class="form-control image" id="arr[image][0]" placeholder="图片" name='arr[image][0]' value="{{ old('arr[image][0]') }}">
+                    <input type='text' class="form-control channel_sku" id="arr[channel_sku][0]" placeholder="渠道sku" name='arr[channel_sku][0]' value="{{ old('arr[channel_sku][0]') }}">
                 </div>
                 <div class="form-group col-sm-1">
                     <input type='text' class="form-control quantity" id="arr[quantity][0]" placeholder="数量" name='arr[quantity][0]' value="{{ old('arr[quantity][0]') }}">
@@ -463,14 +335,18 @@
         </div>
     </div>
 @stop
+@section('formButton')
+    <button type="submit" class="btn btn-success sub" id="tj">提交</button>
+    <button type="reset" class="btn btn-default" id="qx">取消</button>
+@show
 @section('pageJs')
     <script type='text/javascript'>
         $(document).ready(function () {
             $('#create_time, #payment_date, #affair_time, #refund_time').cxCalendar();
 
             //隐藏
-            document.getElementById('hand').style.display='none';
-            document.getElementById('comment').style.display='none';
+            document.getElementById('tj').style.display='none';
+            document.getElementById('qx').style.display='none';
 
             $('#payment').click(function() {
                 var payment = $('#payment').val();
@@ -481,8 +357,6 @@
                 $('#refund_currency').val(currency);
             });
 
-            $('#ip').val('0.0.0.0');
-
             var current = 1;
             $('#addItem').click(function () {
                 $.ajax({
@@ -492,6 +366,27 @@
                     type: 'get',
                     success: function (result) {
                         $('#itemDiv').append(result);
+                        $('.sku').select2({
+                            ajax: {
+                                url: "{{ route('order.ajaxSku') }}",
+                                dataType: 'json',
+                                delay: 250,
+                                data: function (params) {
+                                    return {
+                                        sku: params.term,
+                                        page: params.page
+                                    };
+                                },
+                                results: function(data, page) {
+                                    if((data.results).length > 0) {
+                                        var more = (page * 20)<data.total;
+                                        return {results:data.results,more:more};
+                                    } else {
+                                        return {results:data.results};
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
                 current++;
@@ -541,10 +436,11 @@
                     dataType : 'json',
                     type : 'get',
                     success : function(result) {
-                        if(result != 'sku') {
+                        if(result != false) {
+                            tmp.parent().parent().find('.image').html("<img src='/"+result+"' width='25px' height='25px'>");
+                        }else{
                             alert('sku有误');
                             tmp.val('');
-                            return;
                         }
                     }
                 });
@@ -558,10 +454,51 @@
                     alert('请输入sku');
                 }
             });
+
+            $('.shipping_country').select2({
+                ajax: {
+                    url: "{{ route('order.ajaxCountry') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            shipping_country: params.term,
+                            page: params.page
+                        };
+                    },
+                    results: function(data, page) {
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
+                    }
+                }
+            });
+
+            $('.sku').select2({
+                ajax: {
+                    url: "{{ route('order.ajaxSku') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            sku: params.term,
+                            page: params.page
+                        };
+                    },
+                    results: function(data, page) {
+                        if((data.results).length > 0) {
+                            var more = (page * 20)<data.total;
+                            return {results:data.results,more:more};
+                        } else {
+                            return {results:data.results};
+                        }
+                    }
+                }
+            });
+
         });
     </script>
 @stop
-@section('formButton')
-    <button type="submit" class="btn btn-success sub">提交</button>
-    <button type="reset" class="btn btn-default">取消</button>
-@show

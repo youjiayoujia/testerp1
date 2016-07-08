@@ -23,7 +23,20 @@ class OutModel extends BaseModel
     protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
 
     // 用于查询
-    public $searchFields = ['quantity'];
+    public $searchFields = ['id' => 'ID'];
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => ['id'],
+            'relatedSearchFields' => [],
+            'doubleRelatedSearchFields' => ['stock' => ['item' => ['sku']]],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
 
     /**
      *  get the relationship between the two module
@@ -57,7 +70,7 @@ class OutModel extends BaseModel
                 return $this->stockTaking ? $this->stockTaking->taking_id : '';
                 break;
             case 'PACKAGE':
-                return $this->packageItem ? $this->packageItem->package->order->ordernum . ' : ' . $this->packageItem->package->id : '';
+                return $this->packageItem ? (($this->packageItem->package ? ($this->packageItem->package->order ? $this->packageItem->package->order->ordernum : '') : ''). ' : ' . ($this->packageItem->package ? $this->packageItem->package->id : '')) : '';
                 break;
         }
     }

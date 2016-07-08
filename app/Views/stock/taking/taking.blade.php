@@ -31,7 +31,7 @@
                 <input type='text' name='arr[id][{{$key}}]' class='form-control' value="{{ $taking->id }}" readonly>
             </div>
             <div class="form-group col-lg-2">
-                <input type='text' name='arr[sku][{{$key}}]' class='form-control' value="{{ $taking->stock ? $taking->stock->items ? $taking->stock->items->sku : '' : '' }}" >
+                <input type='text' name='arr[sku][{{$key}}]' class='form-control' value="{{ $taking->stock ? $taking->stock->item ? $taking->stock->item->sku : '' : '' }}" >
             </div>
             <div class="form-group col-lg-2">
                 <input type='text' name='arr[warehouse_id][{{$key}}]' class='form-control' value="{{ $taking->stock ? $taking->stock->warehouse ? $taking->stock->warehouse->name : '' : '' }}" >

@@ -10,6 +10,9 @@
                 <strong>品类名称</strong>: {{ $model->all_name }}
             </div>
             <div class="col-lg-3">
+                <strong>品类前缀</strong>: {{ $model->code }}
+            </div>
+            <div class="col-lg-3">
                 <strong>创建时间</strong>: {{ $model->created_at }}
             </div>
         </div>
@@ -49,6 +52,18 @@
                     @foreach($feature->values as $featurevalue)
                         <div class="col-lg-1">{{ $featurevalue->name }}</div>
                     @endforeach
+                </div>
+            @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">平台费率 :</div>
+        <div class="panel-body">
+            @foreach($model->channels as $channel)
+                <div class="col-lg-12">
+                    <div class="col-lg-1"><strong>{{ $channel->name }}</strong>：</div>
+                    <div class="col-lg-1">固定费：<strong>{{ $channel->pivot->flat_rate }}</strong></div>
+                    <div class="col-lg-1">费率：<strong>{{ $channel->pivot->rate }}</strong></div>
                 </div>
             @endforeach
         </div>

@@ -6,6 +6,7 @@ use App\Base\BaseModel;
 use App\Models\Product\ImageModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\ChannelModel;
 use Illuminate\Support\Facades\DB;
 use Tool;
 
@@ -26,7 +27,6 @@ class ProductModel extends BaseModel
             'supplier_id' => 'required',
             'product_size' => 'required',
             'weight' => 'required|numeric',
-            'upload_user' => 'required',
             'catalog_id' => 'required',
         ],
         'update' => [
@@ -35,7 +35,6 @@ class ProductModel extends BaseModel
             'purchase_carriage' => 'required|numeric',
             'product_size' => 'required',
             'weight' => 'required|numeric',
-            'upload_user' => 'required',
         ]
     ];
 
@@ -57,12 +56,16 @@ class ProductModel extends BaseModel
         'supplier_id',
         'supplier_info',
         'purchase_url',
+        'url1',
+        'url2',
+        'url3',
         'product_sale_url',
         'purchase_price',
         'purchase_carriage',
         'product_size',
         'package_size',
         'weight',
+        'warehouse_id',
         'size_description',
         'description',
         'upload_user',
@@ -70,6 +73,7 @@ class ProductModel extends BaseModel
         'edit_image_user',
         'examine_user',
         'revocation_user',
+        'purchase_adminer',
         'default_image',
         'carriage_limit',
         'carriage_limit_1',
@@ -78,13 +82,31 @@ class ProductModel extends BaseModel
         'status',
         'edit_status',
         'examine_status',
+        'quality_standard',
         'remark',
         'image_edit_not_pass_remark',
         'data_edit_not_pass_remark',
         'spu_id',
         'second_supplier_id',
-        'supplier_sku'
+        'supplier_sku',
+        'second_supplier_sku',
+        'purchase_day',
+        'parts',
+        'declared_cn',
+        'declared_en',
+        'declared_value',
     ];
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['examine_status' => config('product.examineStatus')],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
 
     public function image()
     {
@@ -106,9 +128,19 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
+    public function secondSupplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'second_supplier_id');
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\UserModel', 'upload_user');
+    }
+
+    public function purchaseAdminer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase_adminer');
     }
 
     public function item()
@@ -116,9 +148,20 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\ItemModel', 'product_id');
     }
 
+    public function logisticsLimit()
+    {
+        return $this->belongsToMany('App\Models\Logistics\LimitsModel','product_logistics_limits','product_id','logistics_limits_id')->withTimestamps();
+    }
+
+    public function wrapLimit()
+    {
+        return $this->belongsToMany('App\Models\WrapLimitsModel','product_wrap_limits','product_id','wrap_limits_id')->withTimestamps();
+    }
+
     public function variationValues()
     {
-        return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id', 'variation_value_id')->withTimestamps();
+        return $this->belongsToMany('App\Models\Catalog\VariationValueModel', 'product_variation_values', 'product_id',
+            'variation_value_id')->withTimestamps();
     }
 
     public function clearance()
@@ -128,37 +171,38 @@ class ProductModel extends BaseModel
 
     public function featureValues()
     {
-        return $this->belongsToMany('App\Models\Catalog\FeatureValueModel', 'product_feature_values', 'product_id', 'feature_value_id')->withTimestamps();
+        return $this->belongsToMany('App\Models\Catalog\FeatureValueModel', 'product_feature_values', 'product_id',
+            'feature_value_id')->withTimestamps();
     }
 
     public function featureTextValues()
     {
-        return $this->hasMany('App\Models\Product\ProductFeatureValueModel','product_id');
+        return $this->hasMany('App\Models\Product\ProductFeatureValueModel', 'product_id');
     }
 
     public function amazonProduct()
     {
-        return $this->hasOne('App\Models\Product\channel\amazonProductModel','product_id');
+        return $this->hasOne('App\Models\Product\channel\amazonProductModel', 'product_id');
     }
 
     public function ebayProduct()
     {
-        return $this->hasOne('App\Models\Product\channel\ebayProductModel','product_id');
+        return $this->hasOne('App\Models\Product\channel\ebayProductModel', 'product_id');
     }
 
     public function aliexpressProduct()
     {
-        return $this->hasOne('App\Models\Product\channel\aliexpressProductModel','product_id');
+        return $this->hasOne('App\Models\Product\channel\aliexpressProductModel', 'product_id');
     }
 
     public function b2cProduct()
     {
-        return $this->hasOne('App\Models\Product\channel\b2cProductModel','product_id');
+        return $this->hasOne('App\Models\Product\channel\b2cProductModel', 'product_id');
     }
 
     public function productEnglishValue()
     {
-        return $this->hasOne('App\Models\Product\ProductEnglishValueModel','product_id');
+        return $this->hasOne('App\Models\Product\ProductEnglishValueModel', 'product_id');
     }
 
     public function imageAll()
@@ -166,8 +210,18 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\Product\ImageModel', 'product_id');
     }
 
+    public function productMultiOption()
+    {
+        return $this->hasMany('App\Models\Product\ProductMultiOptionModel', 'product_id');
+    }
 
-
+    public function getDimageAttribute()
+    {
+        if ($this->image) {
+            return $this->image->path . $this->image->name;
+        }
+        return '/default.jpg';
+    }
 
     /**
      * 创建产品
@@ -175,48 +229,89 @@ class ProductModel extends BaseModel
      * @param array $data ,$files obj
      */
     public function createProduct($data = '', $files = '')
-    {   
+    {
         DB::beginTransaction();
         try {
-            //创建spu，,并插入数据
-            $spuobj = SpuModel::create(['spu'=>Tool::createSku()]);
-            $data['spu_id'] = $spuobj->id;
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
+            $code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
+            
+            //创建spu，,并插入数据
+            $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
+            $data['spu_id'] = $spuobj->id;
+            $az = array(
+                'A',
+                'B',
+                'C',
+                'D',
+                'E',
+                'F',
+                'G',
+                'H',
+                'I',
+                'J',
+                'K',
+                'L',
+                'M',
+                'N',
+                'O',
+                'P',
+                'Q',
+                'R',
+                'S',
+                'T',
+                'U',
+                'V',
+                'W',
+                'X',
+                'Y',
+                'Z'
+            );
+            $aznum = 0;
             foreach ($data['modelSet'] as $model) {
                 //拼接model号
-                $data['model'] = $spuobj->spu . "-" . $model['model'];
-                $data['carriage_limit'] = empty($data['carriage_limit_arr'])?'':implode(',', $data['carriage_limit_arr']);
-                $data['package_limit'] = empty($data['package_limit_arr'])?'':implode(',', $data['package_limit_arr']);
+                $data['model'] = $spuobj->spu . $az[$aznum];
+                $data['examine_status'] = 'pending';
                 $product = $this->create($data);
-                //获得productID,插入产品图片
-                $data['product_id'] = $product->id;
-                //默认图片id为0
-                $default_image_id = 0;
-                $imageModel = new ImageModel();
-                $i=0;
-                foreach ($model['image'] as $key => $file) {     
-                    if ($file != '') {
-                        $image_id = $imageModel->singleCreate($data, $file, $key);
-                        //获得首图的product_image_id
-                        if ($i == 0) {
-                            $default_image_id = $image_id;
-                        }
-                        $i++;
+                if(array_key_exists('carriage_limit_arr', $data)){
+                    foreach($data['carriage_limit_arr'] as $logistics_limit_id){
+                        $arr['logistics_limits_id'] = $logistics_limit_id;
+                        $product->logisticsLimit()->attach($arr);
                     }
                 }
+
+                if(array_key_exists('package_limit_arr', $data)){
+                    foreach($data['package_limit_arr'] as $wrap_limits_id){
+                        $brr['wrap_limits_id'] = $wrap_limits_id;
+                        $product->wrapLimit()->attach($brr);
+                    }
+                }
+                
+                //获得productID,插入产品图片
+                $data['product_id'] = $product->id;
+                $channels = ChannelModel::all();
+                foreach ($channels as $channel) {
+                    $data['channel_id'] = $channel->id;
+                    $product->productMultiOption()->create($data);
+                }
+
                 //更新产品首图
-                $product->update(['default_image' => $default_image_id]);
+                //$product->update(['default_image' => $default_image_id]);
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
                         //获得此产品的品类所对应的variation属性
                         $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
-                        foreach ($variationValues as $value_id=>$variationValue) {
+                        foreach ($variationValues as $value_id => $variationValue) {
                             //获得variation属性对应的属性值
                             $variationValueModel = $variationModel->values()->find($value_id);
                             //多对多插入的attach数组
-                            $variation_value_arr = [$variationValueModel->id=>['variation_value'=>$variationValueModel->name,'variation_id'=>$variationModel->id]];
+                            $variation_value_arr = [
+                                $variationValueModel->id => [
+                                    'variation_value' => $variationValueModel->name,
+                                    'variation_id' => $variationModel->id
+                                ]
+                            ];
                             $product->variationValues()->attach($variation_value_arr);
                         }
                     }
@@ -231,20 +326,33 @@ class ProductModel extends BaseModel
                                 foreach ($feature_value as $value) {
                                     $featureModel = $catalog->features()->find($feature_id);
                                     //找到featureValue对应的ID
-                                    $featureValueModel = $featureModel->values()->where('name',$value)->get()->first()->toArray();
+                                    $featureValueModel = $featureModel->values()->where('name',
+                                        $value)->get()->first()->toArray();
                                     //多对多插入的attach数组
-                                    $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$value,'feature_id'=>$feature_id]];
-                                    $product->featureValues()->attach($feature_value_arr);               
+                                    $feature_value_arr = [
+                                        $featureValueModel['id'] => [
+                                            'feature_value' => $value,
+                                            'feature_id' => $feature_id
+                                        ]
+                                    ];
+                                    $product->featureValues()->attach($feature_value_arr);
                                 }
                             } else {//input框插入
-                                $feature_value_arr = [$value_id[0]['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id,'feature_value_id'=>0]];
+                                $feature_value_arr = [
+                                    $value_id[0]['id'] => [
+                                        'feature_value' => $feature_value,
+                                        'feature_id' => $feature_id,
+                                        'feature_value_id' => 0
+                                    ]
+                                ];
                                 $product->featureValues()->attach($feature_value_arr);
                             }
                         }
                     }
                 }
+                $aznum++;
             }
-            
+
         } catch (Exception $e) {
             DB::rollBack();
         }
@@ -260,6 +368,19 @@ class ProductModel extends BaseModel
     {
         $spu_id = $this->spu_id;
         DB::beginTransaction();
+        
+        if(array_key_exists('package_limit_arr', $data)){
+            foreach($data['package_limit_arr'] as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $this->wrapLimit()->sync($arr);
+        }
+        if(array_key_exists('carriage_limit_arr', $data)){
+            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $this->logisticsLimit()->sync($brr);
+        }
         try {
             //更新产品variation属性
             if (array_key_exists('variations', $data)) {
@@ -267,8 +388,13 @@ class ProductModel extends BaseModel
                 //先删除对应的variation属性,再添加
                 $variations = $ProductVariationValueModel->where('product_id', $this->id)->forceDelete();
                 foreach ($data['variations'] as $variation_id => $variation_values) {
-                    foreach ($variation_values as $variation_value_id=>$variation_value) {
-                        $variation_value_arr = [$variation_value_id=>['variation_value'=>$variation_value,'variation_id'=>$variation_id]];
+                    foreach ($variation_values as $variation_value_id => $variation_value) {
+                        $variation_value_arr = [
+                            $variation_value_id => [
+                                'variation_value' => $variation_value,
+                                'variation_id' => $variation_id
+                            ]
+                        ];
                         $this->variationValues()->attach($variation_value_arr);
                     }
                 }
@@ -282,19 +408,36 @@ class ProductModel extends BaseModel
                         foreach ($feature_values as $feature_value) {
                             $featureModel = $this->catalog->features()->find($feature_id);
                             //找到featureValue对应的ID
-                            $featureValueModel = $featureModel->values()->where('name',$feature_value)->get()->first()->toArray();
-                            $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$feature_value,'feature_id'=>$feature_id]];
-                            $this->featureValues()->attach($feature_value_arr);  
+                            $featureValueModel = $featureModel->values()->where('name',
+                                $feature_value)->get()->first()->toArray();
+                            $feature_value_arr = [
+                                $featureValueModel['id'] => [
+                                    'feature_value' => $feature_value,
+                                    'feature_id' => $feature_id
+                                ]
+                            ];
+                            $this->featureValues()->attach($feature_value_arr);
                         }
                     } else {//feature为单选框
-                        $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$feature_values,'feature_id'=>$feature_id]];
+                        $feature_value_arr = [
+                            $featureValueModel['id'] => [
+                                'feature_value' => $feature_values,
+                                'feature_id' => $feature_id
+                            ]
+                        ];
                         $this->featureValues()->attach($feature_value_arr);
                     }
 
                 }
                 //feature为input框
                 foreach ($data['featureinput'] as $featureInputKey => $featureInputValue) {
-                    $feature_value_arr = [$featureValueModel['id']=>['feature_value'=>$featureInputValue,'feature_id'=>$featureInputKey,'feature_value_id'=>0]];
+                    $feature_value_arr = [
+                        $featureValueModel['id'] => [
+                            'feature_value' => $featureInputValue,
+                            'feature_id' => $featureInputKey,
+                            'feature_value_id' => 0
+                        ]
+                    ];
                     $this->featureValues()->attach($feature_value_arr);
                 }
             }
@@ -306,22 +449,19 @@ class ProductModel extends BaseModel
             $imageModel = new ImageModel();
             foreach ($files as $key => $file) {
                 if ($file != '') {
-                    if(substr($key,0,5)=='image'){
-                        $image_id = $imageModel->singleCreate($data, $file, $key);                       
-                    }else{
-                        $product_image_id = substr($key,14);
+                    if (substr($key, 0, 5) == 'image') {
+                        $image_id = $imageModel->singleCreate($data, $file, $key);
+                    } else {
+                        $product_image_id = substr($key, 14);
                         $imageModel->destroy($product_image_id);
                         $image_id = $imageModel->singleCreate($data, $file, $key);
-                        if($this->default_image==$product_image_id){
+                        if ($this->default_image == $product_image_id) {
                             $data['default_image'] = $image_id;
                         }
                     }
-                    
+
                 }
             }
-            
-            $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '':implode(',', $data['carriage_limit_arr']);
-            $data['package_limit'] = empty($data['package_limit_arr']) ? '':implode(',', $data['package_limit_arr']);
             //更新基础信息
             $this->update($data);
         } catch (Exception $e) {
@@ -352,30 +492,17 @@ class ProductModel extends BaseModel
     {
         //获得variation属性集合
         $variations = $this->variationValues->toArray();
-        $brr = [];
-        
-        foreach ($variations as $variation) {
-            if($variation['pivot']['created_at']==$variation['pivot']['updated_at']){
-                $brr[$variation['variation_id']][] = $variation['name'];
-            }  
-        }
-        //按照指定格式的数组去笛卡尔及创建item
-        $brr = array_values($brr);
-        $result = Tool::createDikaer($brr);
         //产品model号赋值
         $model = $this->model;
-        foreach ($result as $_result) {
-            $item = $model;
-            //循环拼接创建item
-            foreach ($_result as $__result) {
-                $item .= "-" . $__result;
-            }
+        foreach ($variations as $key => $value) {
+            $item = $model . ($key + 1);
             $product_data = $this->toArray();
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
             $this->item()->create($product_data);
         }
-        $this->status = 1;
+
+        $this->status = "selling";
         $this->save();
     }
 
@@ -391,7 +518,7 @@ class ProductModel extends BaseModel
         $this->delete();
     }
 
-    public function updateEditProduct($model,$data)
+    public function updateEditProduct($model, $data)
     {
         $model->update($data);
     }
@@ -401,16 +528,16 @@ class ProductModel extends BaseModel
      * 2016-3-11 14:00:41 YJ
      * @param array $data ,$files 图片
      */
-    public function updateProductImage($data,$files = null)
-    {   
+    public function updateProductImage($data, $files = null)
+    {
         DB::beginTransaction();
         $imageModel = new ImageModel();
         foreach ($files as $key => $file) {
             if ($file != '') {
-                if(substr($key,0,5)=='image'){
-                    $image_id = $imageModel->singleCreate($data, $file, $key);                       
-                }else{
-                    $type_array=explode('_',$key);
+                if (substr($key, 0, 5) == 'image') {
+                    $image_id = $imageModel->singleCreate($data, $file, $key);
+                } else {
+                    $type_array = explode('_', $key);
                     $type = $type_array[0];
                     switch ($type) {
                         case 'ebay':
@@ -433,13 +560,13 @@ class ProductModel extends BaseModel
                     $imageModel->destroy($product_image_id);
                     $image_id = $imageModel->singleCreate($data, $file, $key);
                 }
-                
+
             }
         }
 
         $data['edit_status'] = $data['edit_status'];
         $this->update($data);
-        
+
         DB::commit();
     }
 
@@ -449,9 +576,27 @@ class ProductModel extends BaseModel
      * @param int $status 审核状态
      */
     public function examineProduct($status)
-    {   
+    {
         $data['edit_status'] = $status;
         $this->update($data);
+    }
+
+    /**
+     * 更新多渠道多语言信息
+     * 2016年6月3日10:43:18 YJ
+     * @param array data 修改的信息
+     */
+    public function updateMulti($data)
+    {
+        foreach ($data['info'] as $channel_id => $language) {
+            foreach ($language as $prefix => $value) {
+                $arr[$prefix . '_name'] = $value[$prefix . '_name'];
+                $arr[$prefix . '_description'] = $value[$prefix . '_description'];
+                $arr[$prefix . '_keywords'] = $value[$prefix . '_keywords'];
+            }
+            $model = $this->productMultiOption->where("channel_id", $channel_id)->first();
+            $model->update($arr);
+        }
     }
 
 }

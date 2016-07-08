@@ -50,7 +50,7 @@ class UserController extends Controller
         $userModel = $this->model->create($data);
         //多对多插入
         $userModel->role()->attach($data['user_role']);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
     /**
@@ -101,7 +101,30 @@ class UserController extends Controller
             $data['password'] = bcrypt($data['password']);
         }
         $model->update($data);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
+    }
+
+    /**
+     * 获取供应商信息
+     */
+    public function ajaxUser()
+    {
+        if(request()->ajax()) {
+            $user = trim(request()->input('user'));
+            $buf = UserModel::where('name', 'like', '%'.$user.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
     }
 
     public function per()

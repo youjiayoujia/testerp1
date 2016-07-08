@@ -36,17 +36,84 @@ abstract class Controller extends BaseController
         return view('common.alert', $response)->render();
     }
 
-    public function autoList($model,$list=null, $fields = ['*'], $pageSize = null)
+    public function autoList($model, $list = null, $fields = ['*'], $pageSize = null)
     {
         $list = $list ? $list : $model;
         if (request()->has('keywords')) {
             $keywords = request()->input('keywords');
             $searchFields = $model->searchFields;
             $list = $list->where(function ($query) use ($keywords, $searchFields) {
-                foreach ($searchFields as $searchField) {
-                    $query = $query->orWhere($searchField, 'like', '%' . trim($keywords) . '%');
+                foreach ($searchFields as $key => $searchField) {
+                    $query = $query->orWhere($key, 'like', '%' . trim($keywords) . '%');
                 }
             });
+        }
+        if (request()->has('mixedSearchFields')) {
+            $relateds = request()->input('mixedSearchFields');
+            foreach ($relateds as $type => $related) {
+                switch ($type) {
+                    case 'relatedSearchFields':
+                        foreach ($related as $relation_ship => $name_arr) {
+                            foreach ($name_arr as $k => $name) {
+                                if ($name) {
+                                    $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
+                                        $query = $query->where($k, 'like', '%' . $name . '%');
+                                    });
+                                }
+                            }
+                        }
+                        break;
+                    case 'doubleRelatedSearchFields':
+                        foreach ($related as $relation_ship1 => $value1) {
+                            foreach ($value1 as $relation_ship2 => $value2) {
+                                foreach ($value2 as $key => $name) {
+                                    if ($name) {
+                                        $list = $list->whereHas($relation_ship1,
+                                            function ($query) use ($relation_ship2, $name, $key) {
+                                                $query = $query->wherehas($relation_ship2,
+                                                    function ($query1) use ($name, $key) {
+                                                        $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                    });
+                                            });
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'filterFields':
+                        foreach ($related as $key => $value3) {
+                            if ($value3) {
+                                $list = $list->where($key, 'like', '%' . $value3 . '%');
+                            }
+                        }
+                        break;
+                    case 'filterSelects':
+                        foreach ($related as $key => $value2) {
+                            if ($value2) {
+                                $list = $list->where($key, $value2);
+                            }
+                        }
+                        break;
+                    case 'selectRelatedSearchs':
+                        foreach ($related as $relation_ship => $contents) {
+                            foreach ($contents as $name => $single) {
+                                if ($single) {
+                                    $list = $list->whereHas($relation_ship, function ($query) use ($name, $single) {
+                                        $query = $query->where($name, $single);
+                                    });
+                                }
+                            }
+                        }
+                        break;
+                    case 'sectionSelect':
+                        foreach ($related as $kind => $content) {
+                            if ($content['begin'] && $content['end']) {
+                                $list = $list->whereBetween($kind, [$content['begin'], $content['end']]);
+                            }
+                        }
+                        break;
+                }
+            }
         }
         if (request()->has('filters')) {
             foreach (DataList::filtersDecode(request()->input('filters')) as $filter) {
@@ -77,6 +144,7 @@ abstract class Controller extends BaseController
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
     }

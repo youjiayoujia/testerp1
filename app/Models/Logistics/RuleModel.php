@@ -11,64 +11,259 @@
 namespace App\Models\Logistics;
 
 use App\Base\BaseModel;
-use App\Models\CountryModel;
+use App\Models\CountriesModel;
+use App\Models\ChannelModel;
+use App\Models\CatalogModel;
+use App\Models\Logistics\Rule\CatalogModel as RuleCatalogModel;
+use App\Models\Logistics\Rule\ChannelModel as RuleChannelModel;
+use App\Models\Logistics\Rule\CountryModel as RuleCountryModel;
+use App\Models\Logistics\Rule\LimitModel as RuleLimitModel;
+use App\Models\Logistics\LimitsModel;
 
 class RuleModel extends BaseModel
 {
     protected $table = 'logistics_rules';
 
-    public $searchFields = ['country', 'weight_from', 'weight_to', 'order_amount', 'is_clearance', 'priority', 'type_id'];
+    public $searchFields = [];
 
     protected $fillable = [
-        'country',
+        'name',
         'weight_from',
         'weight_to',
-        'order_amount',
+        'order_amount_from',
+        'order_amount_to',
         'is_clearance',
         'priority',
         'type_id',
+        'weight_section', 
+        'order_amount_section', 
+        'catalog_section', 
+        'channel_section', 
+        'country_section', 
+        'limit_section'
     ];
 
     public $rules = [
         'create' => [
-            'country' => 'required',
-            'weight_from' => 'required',
-            'weight_to' => 'required',
-            'order_amount' => 'required',
             'is_clearance' => 'required',
             'priority' => 'required',
             'type_id' => 'required',
+            'name' => 'required',
         ],
         'update' => [
-            'country' => 'required',
-            'weight_from' => 'required',
-            'weight_to' => 'required',
-            'order_amount' => 'required',
             'is_clearance' => 'required',
             'priority' => 'required',
             'type_id' => 'required',
+            'name' => 'required',
         ],
     ];
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['logistics' => ['code', 'name']],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
 
     public function logistics()
     {
         return $this->belongsTo('App\Models\LogisticsModel', 'type_id', 'id');
     }
 
-    /**
-     * 遍历国家
-     */
-    public function country($country)
+    public function rule_catalogs()
     {
-        $str = '';
-        foreach(explode(",", $country) as $value) {
-            $countries = CountryModel::where(['abbreviation' => $value])->get();
-            foreach($countries as $country) {
-                $val = $country['name'];
-                $str = $str.$val.',';
-            }
-        }
-        return substr($str, 0, -1);
+        return $this->hasMany('App\Models\Logistics\Rule\CatalogModel', 'logistics_rule_id', 'id');
     }
 
+    public function rule_catalogs_through()
+    {
+        return $this->belongsToMany('App\Models\CatalogModel', 'logistics_rule_catalogs', 'logistics_rule_id', 'catalog_id');
+    }
+
+    public function rule_channels()
+    {
+        return $this->hasMany('App\Models\Logistics\Rule\ChannelModel', 'logistics_rule_id', 'id');
+    }
+
+    public function rule_channels_through()
+    {
+        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_rule_channels', 'logistics_rule_id', 'channel_id');
+    }
+
+    public function rule_countries()
+    {
+        return $this->hasMany('App\Models\Logistics\Rule\CountryModel', 'logistics_rule_id', 'id');
+    }
+
+    public function rule_countries_through()
+    {
+        return $this->belongsToMany('App\Models\CountriesModel', 'logistics_rule_countries', 'logistics_rule_id', 'country_id');
+    }
+
+    public function rule_limits()
+    {
+        return $this->hasMany('App\Models\Logistics\Rule\LimitModel', 'logistics_rule_id', 'id');
+    }
+
+    public function rule_limits_through()
+    {
+        return $this->belongsToMany('App\Models\Logistics\LimitsModel', 'logistics_rule_limits', 'logistics_rule_id', 'logistics_limit_id')->withPivot('type');
+    }
+
+    public function getCountrysNameAttribute()
+    {
+        $countrys = $this->countrys;
+        $arr = explode(',', $countrys);
+        $str = '';
+        foreach($arr as $key => $value) {
+            $country = CountriesModel::find($value);
+            if($key == 0) {
+                $str = $country->cn_name;
+                continue;
+            }
+            $str .=','.$country->cn_name;
+        }
+
+        return $str;
+    }
+
+    public function getChannelsNameAttribute()
+    {
+        $channels = $this->channels;
+        $arr = explode(',', $channels);
+        $str = '';
+        foreach($arr as $key => $value) {
+            $channel = ChannelModel::find($value);
+            if($key == 0) {
+                $str = $channel->name;
+                continue;
+            }
+            $str .=','.$channel->name;
+        }
+
+        return $str;
+    }
+
+    public function getCatalogsNameAttribute()
+    {
+        $catalogs = $this->catalogs;
+        $arr = explode(',', $catalogs);
+        $str = '';
+        foreach($arr as $key => $value) {
+            $catalog = CatalogModel::find($value);
+            if($key == 0) {
+                $str = $catalog->name;
+                continue;
+            }
+            $str .=','.$catalog->name;
+        }
+
+        return $str;
+    }
+
+    public function createAll($arr)
+    {
+        if(array_key_exists('catalog_section', $arr) && array_key_exists('catalogs', $arr)) {
+            $this->rule_catalogs_through()->attach($arr['catalogs']);
+        }
+        if(array_key_exists('channel_section', $arr) && array_key_exists('channels', $arr)) {
+            $this->rule_channels_through()->attach($arr['channels']);
+        }
+        if(array_key_exists('country_section', $arr) && array_key_exists('countrys', $arr)) {
+            $this->rule_countries_through()->attach($arr['countrys']);
+        }
+        if(array_key_exists('limit_section', $arr) && array_key_exists('limits', $arr)) {
+            foreach($arr['limits'] as $key => $value) {
+                $this->rule_limits_through()->attach([$key => ['type' => $value]]);
+            }
+        }
+    }
+
+    public function innerType($type1, $id, $type = NULL)
+    {
+        switch($type1) {
+            case 'catalog':
+                $catalogs = $this->rule_catalogs_through;
+                foreach($catalogs as $catalog) {
+                    if($catalog->pivot->catalog_id == $id) {
+                        return true;
+                    }
+                }
+                return false;
+                break;
+
+            case 'channel':
+                $channels = $this->rule_channels_through;
+                foreach($channels as $channel) {
+                    if($channel->pivot->channel_id == $id) {
+                        return true;
+                    }
+                }
+                return false;
+                break;
+
+            case 'country':
+                $countries = $this->rule_countries_through;
+                foreach($countries as $country) {
+                    if($country->pivot->country_id == $id) {
+                        return true;
+                    }
+                }
+                return false;
+                break;
+
+            case 'limit':
+                $limits = $this->rule_limits_through;
+                foreach($limits as $limit) {
+                    if($limit->pivot->logistics_limit_id == $id && $limit->pivot->type == $type) {
+                        return true;
+                    }
+                }
+                return false;
+                break;
+        }
+    }
+
+    public function updateAll($arr)
+    {
+        $this->update($arr);
+        if(!array_key_exists('weight_section', $arr)) {
+            $this->update(['weight_section' => '0', 'weight_from' => '0', 'weight_to' => '0']);
+        }
+        if(!array_key_exists('order_amount_section', $arr)) {
+            $this->update(['order_amount_section' => '0', 'order_amount_section' => '0', 'order_amount_to' => '0']);
+        }
+        if(array_key_exists('catalog_section', $arr) && array_key_exists('catalogs', $arr)) {
+            $this->rule_catalogs_through()->sync($arr['catalogs']);
+        } else {
+            $this->update(['catalog_section' => '0']);
+            $this->rule_catalogs_through()->sync([]);
+        }
+        if(array_key_exists('channel_section', $arr) && array_key_exists('channels', $arr)) {
+            $this->rule_channels_through()->sync($arr['channels']);
+        } else {
+            $this->update(['channel_section' => '0']);
+            $this->rule_channels_through()->sync([]);
+        }
+        if(array_key_exists('country_section', $arr) && array_key_exists('countrys', $arr)) {
+            $this->rule_countries_through()->sync($arr['countrys']);
+        } else {
+            $this->update(['country_section' => '0']);
+            $this->rule_countries_through()->sync([]);
+        }
+        if(array_key_exists('limit_section', $arr) && array_key_exists('limits', $arr)) {
+            $tmp = [];
+            foreach($arr['limits'] as $key => $value) {
+                $tmp[$key] = ['type' => $value]; 
+            }
+            $this->rule_limits_through()->sync($tmp);
+        } else {
+            $this->update(['limit_section' => '0']);
+            $this->rule_limits_through()->sync([]);
+        }
+    }
 }

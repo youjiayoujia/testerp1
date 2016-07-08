@@ -30,33 +30,6 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="form-group" style="margin-left:25px">
-                    <label>编辑默认图片:</label><br>
-                    <?php if($product->default_image!=0){ ?>
-                    <img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
-                        <br>
-                        <?php }else{ ?>
-                            <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
-                        <?php } ?>
-                    <?php $key=0; ?>
-                    @foreach($product->imageAll as $key=>$image)
-                        <?php if($product->default_image==$image->id){continue;}else{ ?>
-                            <label>编辑图片:</label><br>
-                        <?php } ?> 
-                        <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $image->id ?>' type='file'/></div>
-                        <br>
-                    @endforeach
-                </div>
-                <?php if($key<5){ ?>
-                    <div style="margin-left:25px;margin-bottom:15px">
-                            <label for="color">上传图片：</label>
-                            <?php $j=0;for($i=$key;$i<5;$i++){ ?>
-                                <div class='upimage'><input name='image<?php echo $j ?>' type='file'/></div>
-                            <?php $j++;} ?>
-                    </div>
-                <?php } ?>  
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>
@@ -66,7 +39,7 @@
                         
                         @if($getfeature->type==1)
                             <div class="featurestyle" style="padding-bottom:10px">                           
-                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
+                                    {{$getfeature->name}} : <input type="text" style="margin-left:15px" id="featuretext{{$getfeature->id}}" value="<?php if(count($features_input)>0)echo $features_input[$i]['feature_value'];$i++; ?>" name='featureinput[{{$getfeature->id}}]' />
                             </div>
                             
                         @elseif($getfeature->type==2)
@@ -98,22 +71,25 @@
         </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
-                @endforeach
+            <select id="supplier_id" class="form-control supplier" name="supplier_id">
+               <option value="{{$product->supplier->id}}">{{$product->supplier->name}}</option>
             </select>
         </div> 
+        <div class="form-group col-md-3">
+            <label for="color">主供应商货号</label>
+            <input class="form-control" id="supplier_sku" placeholder="主供应商货号" name='supplier_sku' value="{{ old('supplier_sku') ?  old('supplier_sku') : $product->supplier_sku }}">
+        </div>
     </div>
 
     <div class='row'>  
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
+            <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
+               <option value="{{$product->second_supplier?$product->second_supplier->id:0}}">{{$product->second_supplier?$product->second_supplier->name:''}}</option>
             </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">辅供应商货号</label>
+            <input class="form-control" id="second_supplier_sku" placeholder="主供应商货号" name='second_supplier_sku' value="{{ old('second_supplier_sku') ?  old('second_supplier_sku') : $product->second_supplier_sku }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">采购链接</label>
@@ -127,12 +103,31 @@
             <label for="color">采购物流费(RMB)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="purchase_carriage" placeholder="采购物流费" name='purchase_carriage' value="{{ old('purchase_carriage') ?  old('purchase_carriage') : $product->purchase_carriage }}">
         </div>
-        <div class="form-group col-md-1">
-            <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="product_size" placeholder="尺寸类型" name='product_size' value="{{ old('product_size') ?  old('product_size') : $product->product_size }}">
+        <div class="form-group col-md-3">
+            <label for="color">采购天数</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="purchase_day" placeholder="采购天数" name='purchase_day' value="{{ old('purchase_day') ?  old('purchase_day') : $product->purchase_day }}">
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-md-3">
+            <label for="size">仓库</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select  class="form-control" name="warehouse_id">
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ $product->warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
+                @endforeach
+            </select>
         </div>
         <div class="form-group col-md-1">
-            <label for="color">产品包装尺寸(cm)</label>
+            <label for="size">尺寸类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+
+            <select id="supplier_id" class="form-control" name="product_size">     
+                <option value="大" {{ $product->product_size == '大' ? 'selected' : '' }}>大</option>
+                <option value="中" {{ $product->product_size == '中' ? 'selected' : '' }}>中</option>
+                <option value="小" {{ $product->product_size == '小' ? 'selected' : '' }}>小</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="color">产品包装尺寸（cm）(长*宽*高)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>(长*宽*高)
             <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') ?  old('package_size') : $product->package_size }}">
         </div>
         <div class="form-group col-md-1">
@@ -144,24 +139,49 @@
             <input class="form-control" id="upload_user" placeholder="上传人" name='upload_user' value="{{ old('upload_user') ?  old('upload_user') : $product->upload_user }}">
         </div>
     </div>
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="size">采购负责人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id="purchase_adminer" class="form-control purchase_adminer" name="purchase_adminer">
+               <option value="{{$product->purchaseAdminer?$product->purchase_adminer:0}}">{{$product->purchaseAdminer?$product->purchaseAdminer->name:''}}</option>
+            </select>
+        </div> 
+        <div class="form-group col-md-3">
+            <label for="color">url1</label>
+            <input class="form-control" id="url1" placeholder="url" name='url1' value="{{ old('url1') ?  old('url1') : $product->url1 }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="size">url2</label>
+            <input class="form-control" id="url2" placeholder="url" name='url2' value="{{old('url2') ?  old('url2') : $product->url2 }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">url3</label>
+            <input class="form-control" id="url3" placeholder="url" name='url3' value="{{ old('url3') ?  old('url3') : $product->url3 }}">
+        </div>
+    </div>
+
     <div class='row'>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >{{$carriage_limit->name}}
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, $wrapLimit_arr)? 'checked' : '' }} >{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>
         
+        <div class="form-group col-md-3">
+            <label for="color">质检标准</label>
+            <input class="form-control" id="quality_standard" placeholder="质检标准" name='quality_standard' value="{{ old('quality_standard') ?  old('quality_standard') : $product->quality_standard }}">
+        </div>
         <div class="form-group col-md-3">
             <label for="color">尺寸描述</label>
             <input class="form-control" id="size_description" placeholder="尺寸描述" name='size_description' value="{{ old('size_description') ?  old('size_description') : $product->size_description }}">
@@ -175,4 +195,61 @@
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $product->remark }}">
         </div>
     </div>
+
+    <div class="row">    
+        <div class="form-group col-md-3">
+            <label for="color">申报中文</label>
+            <input class="form-control" id="declared_cn" placeholder="申报中文" name='declared_cn' value="{{ old('declared_cn') ?  old('declared_cn') : $product->declared_cn }}">
+        </div>
+        
+        <div class="form-group col-md-3">
+            <label for="color">申报英文</label>
+            <input class="form-control" id="declared_en" placeholder="申报中文" name='declared_en' value="{{ old('declared_en') ?  old('declared_en') : $product->declared_en }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">申报价格</label>
+            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') ?  old('declared_value') : $product->declared_value }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">配件</label>
+            <input class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') ?  old('parts') : $product->parts }}">
+        </div>
+    </div>
+@stop
+
+@section('pageJs')
+    <script type="text/javascript">
+        $('.supplier').select2({
+                ajax: {
+                    url: "{{ route('ajaxSupplier') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        supplier:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+            });
+
+            $('.purchase_adminer').select2({
+                ajax: {
+                    url: "{{ route('ajaxUser') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        user:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+        });
+
+    </script>
 @stop

@@ -40,7 +40,7 @@
             </tr>
             @foreach($logisticses as $logistics)
             <tr>
-                <td><input type='checkbox' name='logistics[]' class='logistics' value="{{$logistics->id}}" checked='true'>{{$logistics->logistics_type}}</td>
+                <td><input type='checkbox' name='logistics[]' class='logistics' value="{{$logistics->id}}" checked='true'>{{$logistics->code}}</td>
             </tr>
             @endforeach
         </table>

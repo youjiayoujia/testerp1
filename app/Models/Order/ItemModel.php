@@ -24,6 +24,7 @@ class ItemModel extends BaseModel
         'sku',
         'status',
         'ship_status',
+        'is_refund',
     ];
 
     public function item()
@@ -47,6 +48,16 @@ class ItemModel extends BaseModel
     {
         $arr = config('order.whether');
         return $arr[$this->is_gift];
+    }
+
+    public function order()
+    {
+        return $this->belongsTo('App\Models\OrderModel','order_id');
+    }
+
+    public function getStatusTextAttribute()
+    {
+        return config('order.item_status.' . $this->status);
     }
 
 }

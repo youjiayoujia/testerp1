@@ -17,6 +17,7 @@ class CreatePurchaseItemTable extends Migration
 			$table->integer('type')->comment('采购类型')->nullable()->default(NULL);
 			$table->integer('status')->comment('采购条目的状态')->default(0);
 			$table->integer('storageStatus')->comment('入库状态')->default(0);
+            $table->integer('item_id')->comment('item表id')->default(0);
 			$table->integer('costExamineStatus')->comment('采购成本审核状态')->default(0);
             $table->integer('order_item_id')->comment('订单itemID')->nullable()->default(NULL);
 			$table->string('sku')->comment('sku')->default(NULL);
@@ -33,6 +34,7 @@ class CreatePurchaseItemTable extends Migration
 			$table->integer('active_status')->comment('异常处理状态')->default(0);
 			$table->string('remark')->comment('异常备注')->default(NULL);
 			$table->date('arrival_time')->comment('到货时间')->default(NULL);
+            $table->integer('unqualified_qty')->comment('不合格数量')->default(NULL);
 			$table->integer('user_id')->comment('创建该采购条目者')->default(NULL);
 			$table->integer('update_userid')->comment('处理者ID')->default(NULL);
             $table->timestamps();

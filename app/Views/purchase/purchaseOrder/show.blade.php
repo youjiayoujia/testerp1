@@ -1,19 +1,16 @@
 @extends('common.detail')
 @section('detailBody')
+
 <div class="panel panel-default">
         <div class="panel-heading">单头</div>
         <div class="panel-body">
-         <div class="form-group col-lg-4">
-                <strong>标题: choies公司向 {{$model->supplier->name}} 采购单</strong>
-            </div>
-           
              <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
-                {{ $model->warehouse->name}}
+                {{ $model->warehouse?$model->warehouse->name:''}}
             </div>
             <div class="form-group col-lg-4">
                 <strong>仓库地址</strong>:
-                {{ $model->warehouse->province}}{{ $model->warehouse->city}}{{ $model->warehouse->address}}
+                {{ $model->warehouse?$model->warehouse->province:''}}{{ $model->warehouse?$model->warehouse->city:''}}{{ $model->warehouse?$model->warehouse->address:''}}
             </div>
             
              <div class="form-group col-lg-4">
@@ -21,12 +18,14 @@
             </div>
              <div class="form-group col-lg-4">
             	<strong>供应商信息</strong>:
-                名：{{$model->supplier->name}}&nbsp;电话：{{$model->supplier->telephone}} &nbsp;地址：{{$model->supplier->province}}{{$model->supplier->city}}{{$model->supplier->address}}
+                名：{{$model->supplier?$model->supplier->name:''}}&nbsp;电话：{{$model->supplier?$model->supplier->telephone:''}} &nbsp;地址：{{$model->supplier?$model->supplier->province:''}}{{$model->supplier?$model->supplier->city:''}}{{$model->supplier?$model->supplier->address:''}}
                 &nbsp;
-                @if($model->supplier->type==1)
-                	线上采购
-                @else
-                	线下采购
+                @if($model->supplier)
+                    @if($model->supplier->type==1)
+                	   线上采购
+                    @else
+                	   线下采购
+                    @endif
                 @endif
             </div>
             <div class="form-group col-lg-4">
@@ -62,27 +61,17 @@
                 @endif
                 
             </div>  
-           <!-- <div class="form-group col-lg-4">
-            	<strong>导出该订单</strong>:
-                @if($model->supplier->type==1)
-                	<a href="/purchaseOrder/excelOut/{{$model->id}}" class="btn btn-info btn-xs"> 导出该订单
-                </a>
-                @else
-                <a href="{{ route('purchaseOrder.show', ['id'=>$model->id]) }}" class="btn btn-info btn-xs"> 打印该订单
-                </a>
-                @endif     
-            </div> -->
+          
             <div class="form-group col-lg-4">
                 <strong>采购单审核状态</strong>:     
             	@if($model->examineStatus == 0)
-                    <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/1" class="btn btn-info btn-xs"> 审核不通过
-                </a> 
-                <a href="/purchaseOrder/changeExamineStatus/{{$model->id}}/2" class="btn btn-info btn-xs"> 审核通过
-                </a>
+                    未审核
                  @elseif($model->examineStatus == 1)
-                 审核不通过
-                 @else
                  审核通过
+                 @elseif($model->examineStatus == 2)
+                 待复审
+                 @else
+                 审核不通过
                 @endif
             </div>   
             <div class="form-group col-lg-4">
@@ -98,97 +87,91 @@
      <div class="panel panel-default">
         <div class="panel-heading">单身</div>
         <div class="panel-body">
-        <div class="row">
-         <div class="form-group col-lg-4">
-                <strong>未入库条目</strong>:
-            </div>
-            </div>
+        
     <table class="table table-bordered table-striped table-hover sortable">
     <thead>
-        <tr>
-            <td>采购条目ID</td> 
-            <td>采购类型</td> 
-            <td>model</td>
-            <td>SKU*采购数量</td> 
-            <td>供货商sku</td> 
-            <td>样图</td>
+        <tr>{{$model->arrival_day}}
+            <td>SKU</td> 
+            <td>物品名称</td>
+            <td>采购数量</td> 
+            <td>已到货数量</td> 
+            <td>入库数量</td>
+            <td>不合格数量</td>
+            <td>预计到达日期</td>
+            <td>实际到货日期</td>
             <td>状态</td>
-            <td>物流单号+物流费</td>
-            <td>采购价格</td>
-            <td>采购价格审核</td>
-            <td>所属平台</td>
-            <td>购买链接</td> 
-            <td>操作</td>           
+            <td>单价</td>
+            <td>系统采购价格</td>
+            <td>小计</td> 
+            <td>入库金额</td>
+            <td>审单备注</td>            
         </tr>
     </thead>
     <tbody>
         @foreach($purchaseItems as $k=>$purchaseItem)  
         <tr> 
-            <td>{{$purchaseItem->id}}</td>
+            <td>{{$purchaseItem->sku}}</td>
+            
+            <td>{{$purchaseItem->item?$purchaseItem->item->c_name:''}}</td>
+            <td>{{$purchaseItem->purchase_num}}</td>
+            <td>{{$purchaseItem->arrival_num}}</td>   
             <td>
-                @foreach(config('purchase.purchaseItem.type') as $key=>$v)
-
-                    @if($purchaseItem->type == $key)
-                        {{$v}}
-                    @endif
-                @endforeach
-            </td>
-            <td>{{$purchaseItem->item->product->model}}</td>
-            <td>{{$purchaseItem->sku}}*{{$purchaseItem->purchase_num}}</td>
-            <td>{{$purchaseItem->item->supplier_sku}}</td>   
-            <td>
-            @if($purchaseItem->item->product->default_image>0) 
-            <img src="{{ asset($purchaseItem->item->product->image->src) }}" width="50px">
-             @else
-             暂无图片
-             @endif
+           {{$purchaseItem->storage_qty}}
             </td>
             <td>       	
-             @foreach(config('purchase.purchaseItem.status') as $key=>$v)     	
-            	 @if($purchaseItem->status == $key) {{$v}} @endif
-             @endforeach
+            {{$purchaseItem->arrival_num - $purchaseItem->storage_qty}}
              </td>
             <td>
-            物流单号：{{$purchaseItem->post_coding}}
-            物流费：{{$purchaseItem->postage}}
+            {{$model->arrival_day}}
             </td>
             <td>
-              {{$purchaseItem->purchase_cost}}
+              {{$purchaseItem->arrival_time}}
  			</td>
+            <td>{{config('purchase.purchaseItem.status')[$purchaseItem->status]}}</td>
             <td>
-            @if($purchaseItem->costExamineStatus ==2)
-            	价格审核通过
-            @elseif($purchaseItem->costExamineStatus ==1)
-            	价格审核不通过
-            @else
-             	成本价格未审核
-            @endif
+           {{$purchaseItem->purchase_cost}}
             </td>    
-            <td>
-                @foreach(config('purchase.purchaseItem.channels') as $key=>$vo)
-                    @if($purchaseItem->platform_id == $key)
-                        {{$vo}}
-                    @endif
-                @endforeach
-            </td>
+          
              <td>
-            	<a href="http://{{$purchaseItem->item->purchase_url}}" text-decoration: none;>{{$purchaseItem->item->purchase_url}}</a>
-            </td>  
+            	 {{$purchaseItem->item?$purchaseItem->item->purchase_price:''}}
+            </td> 
+            <td>
+           {{$purchaseItem->purchase_num * $purchaseItem->purchase_cost}}
+            </td> 
 			<td>
-            @if($purchaseItem->active ==1 )
-                @if($purchaseItem->active_status ==1 )
-                报缺
-                @elseif($purchaseItem->active_status ==2 )
-                核实报缺
-                @else
-                恢复正常
-                @endif
-             @elseif($purchaseItem->active ==0)     
-             	正常
-             @endif
+           {{$purchaseItem->storage_qty * $purchaseItem->purchase_cost}}
+            </td>
+            <td>
+           {{$purchaseItem->remark}}
             </td>
         </tr>
         @endforeach
+       <tr>
+       <td colspan="2"><strong>合计：</strong></td>
+       <td>{{$purchaseItemsNum}}</td>
+       <td>{{$purchaseItemsArrivalNum}}</td>
+       <td>{{$storage_qty_sum}}</td>
+       <td>{{$purchaseItemsArrivalNum - $storage_qty_sum}}</td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td></td>
+       <td>{{$purchaseCost}} + YF{{$postage ? $postage : 0}}={{$purchaseCost + $postage}}</td>
+       <td>{{$storageCost}} + YF{{$postage ? $postage : 0}}={{$storageCost + $postage}}</td>
+       <td></td>
+       </tr>
+        <tr>
+            <td>订单总金额：</td>
+            <td colspan="13">{{$purchaseCost + $postage}}</td>
+        </tr>
+        <tr>
+            <td>订单运费：</td>
+            <td colspan="13">{{$storageCost + $postage}}</td>
+        </tr>
+        <tr>
+            <td>采购员：</td>
+            <td colspan="13">{{$model->assigner_name}}</td>
+        </tr>
     </tbody>
     </table>
    
@@ -199,7 +182,7 @@
         <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购日期</strong>:
-                
+                 <input type="button" value="打印" onclick="window.print();"/> 
             </div>
             <div class="form-group col-lg-4">
                 <strong>打印日期</strong>:

@@ -282,7 +282,7 @@ class MessageController extends Controller
             /*
              * 写入队列
              */
-            $reply = ReplyModel::find($id);
+            $reply = ReplyModel::where('message_id',$id)->get()->first();
             $job = new SendMessages($reply);
             $job = $job->onQueue('SendMessages');
             $this->dispatch($job);

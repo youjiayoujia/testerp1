@@ -54,14 +54,16 @@ class TestController extends Controller
 
     public function index()
     {
-        $reply = ReplyModel::find(28544);
 
-       var_dump($reply->channelAccount());
+        $reply = ReplyModel::find(28546);
+
+/*        $dataaaa = $reply->message->account->toArray();
+        var_dump($dataaaa);exit;*/
 
         $job = new SendMessages($reply);
         $job = $job->onQueue('SendMessages');
         $this->dispatch($job);
-echo 555;
+
         exit;
 
 

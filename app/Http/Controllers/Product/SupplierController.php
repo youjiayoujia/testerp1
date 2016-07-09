@@ -99,6 +99,7 @@ class SupplierController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data=request()->all();
+        $this->validate(request(), $this->model->rules('update'));
         if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
                 'supplier_id' => $id,

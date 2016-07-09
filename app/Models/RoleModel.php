@@ -24,6 +24,7 @@ class RoleModel extends BaseModel
         ]
     ];
 
+    public $searchFields = ['name', 'id'];
     /**
      * The attributes that are mass assignable.
      *

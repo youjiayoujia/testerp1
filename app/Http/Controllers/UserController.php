@@ -65,8 +65,7 @@ class UserController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        //echo '<pre>';
-        //print_r($model->role->toArray());exit;
+
         $select_role = [];
         foreach($model->role as $role){
             $select_role[] = $role->pivot->role_id;

@@ -23,6 +23,7 @@ class PermissionModel extends BaseModel
             'action_name' => 'required|unique:permissions,action_name,{id}',
         ]
     ];
+    public $searchFields = ['name', 'id'];
     /**
      * The attributes that are mass assignable.
      *

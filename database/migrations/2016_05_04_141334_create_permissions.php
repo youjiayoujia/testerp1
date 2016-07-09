@@ -14,7 +14,8 @@ class CreatePermissions extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('action')->comment('权限');
+            $table->string('action')->comment('权限中文');
+            $table->string('action_name')->comment('权限英文');
             $table->timestamps();
             $table->softDeletes();
         });

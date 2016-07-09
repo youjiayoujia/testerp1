@@ -94,6 +94,8 @@ class UserController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $data = request()->all();
+
+        $model->role()->sync($data['user_role']);
         if(strlen($data['password'])>=30){
             $data['password'] = $data['password'];
         }else{

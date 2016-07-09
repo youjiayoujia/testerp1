@@ -151,25 +151,30 @@
             </tr>
         @endif
     @endforeach
+    <div class="panel panel-default">
+        <div class="panel-heading"><strong>批量导入操作</strong></div>
+        <div class="panel-body">
+            <div class='row'>
+                <form method="POST" action="{{ route('uploadBlacklist') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <div class="form-group col-lg-2">
+                        <label for="name" class='control-label'>批量导入黑名单客户:</label>
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <input type='file' name='excel'>
+                    </div>
+                    <div class="form-group col-lg-1">
+                        <button type='submit' class='btn btn-info btn-xs' value='submit'>submit</button>
+                    </div>
+                    <div class="form-group col-lg-2">
+                        <a href='javascript:' class='downloadUpdateBlacklist'>格式下载(CSV)</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @stop
 @section('tableToolButtons')
-    <div class="col-lg-11">
-        <form method="POST" action="{{ route('uploadBlacklist') }}" enctype="multipart/form-data">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <div class="form-group col-lg-2">
-                <label for="name" class='control-label'>批量导入黑名单客户:</label>
-            </div>
-            <div class="form-group col-lg-2">
-                <input type='file' name='excel'>
-            </div>
-            <div class="form-group col-lg-1">
-                <button type='submit' class='btn btn-info btn-xs' value='submit'>submit</button>
-            </div>
-            <div class="form-group col-lg-2">
-                <a href='javascript:' class='downloadUpdateBlacklist'>格式下载(CSV)</a>
-            </div>
-        </form>
-    </div>
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             批量审核

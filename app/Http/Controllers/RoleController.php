@@ -64,4 +64,25 @@ class RoleController extends Controller
 
         return redirect($this->mainIndex);
     }
+
+    /**
+     * 更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $data = request()->all();
+
+        $model->permission()->sync($data['role_permission']);
+        $model->update($data);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
+    }
 }

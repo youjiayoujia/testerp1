@@ -61,26 +61,15 @@ class ImageController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
-        //echo '<pre>';
-        //print_r($data);exit;
-        //if (!array_key_exists('image0', $data)) {
-        //    return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '请添加图片.'));
-        //}
         $productModel = ProductModel::where("model",$data['model'])->first();
-        //if (!$productModel) {
-        //    return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
-        //}
+        
         $data['product_id'] = $productModel->id;
         $data['spu_id'] = $productModel->spu->id;
         $data['is_link'] = $data['is_link'];
         $data['tag'] = explode(',', substr($data['image_type'],0, strlen($data['image_type'])-1));
         $data['uploadType'] = 'image';
-        $path = $this->model->imageCreate($data, request()->files);
-        //echo $this->model->id;exit;
-        
-        
+        $path = $this->model->imageCreate($data, request()->files);    
         echo json_encode($path);
-        //return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
     /**
@@ -142,10 +131,16 @@ class ImageController extends Controller
         if (!$productModel) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
         }
+        $image = $productModel->imageAll;
+        foreach ($image as $value) {
+            $url[] = asset($value->path)."/".$value->name;
+        }
+        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model'=> $model,
             'labels'=> LabelModel::all(),
+            'image' => $image,
         ];
         return view($this->viewPath . 'create', $response);
     }

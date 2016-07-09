@@ -58,7 +58,9 @@ class UserController extends Controller
 
         $userModel = $this->model->create($data);
         //多对多插入
-        $userModel->role()->attach($data['user_role']);
+        if(array_key_exists('user_role', $data)){
+            $userModel->role()->attach($data['user_role']);
+        }
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
@@ -109,8 +111,10 @@ class UserController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $data = request()->all();
-
-        $model->role()->sync($data['user_role']);
+        if(array_key_exists('user_role', $data)){
+            $model->role()->sync($data['user_role']);
+        }
+        
         if(strlen($data['password'])>=30){
             $data['password'] = $data['password'];
         }else{

@@ -3,14 +3,14 @@
 @section('formBody')
     <div class="row">
         <div class="form-group col-lg-6">
-            <label for="role" class='control-label'>角色</label>
+            <label for="role_name" class='control-label'>角色</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="role" placeholder="角色" name='role' value="{{ old('role') }}">
+            <input type='text' class="form-control" id="role_name" placeholder="角色" name='role_name' value="{{ old('role_name') }}">
         </div>
         <div class="form-group col-lg-6">
-            <label for="role_name" class='control-label'>role_name</label>
+            <label for="role" class='control-label'>role</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="role_name" placeholder="role_name" name='role_name' value="{{ old('role_name') }}">
+            <input type='text' class="form-control" id="role" placeholder="role" name='role' value="{{ old('role') }}">
         </div>
     </div>
 

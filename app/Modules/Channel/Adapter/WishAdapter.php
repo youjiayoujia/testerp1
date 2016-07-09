@@ -674,7 +674,12 @@ Class WishAdapter implements AdapterInterface
     public function getMessages(){
 
     }
-    public function sendMessages(){
+
+    /**
+     * 发送邮件
+     * @param $replyMessage 回复记录
+     */
+    public function sendMessages($replyMessage){
         
     }
 }

@@ -31,7 +31,7 @@ class OutModel extends BaseModel
             'filterFields' => ['id'],
             'relatedSearchFields' => [],
             'doubleRelatedSearchFields' => ['stock' => ['item' => ['sku']]],
-            'filterSelects' => [],
+            'filterSelects' => ['type' => config('out')],
             'selectRelatedSearchs' => [
             ],
             'sectionSelect' => [],

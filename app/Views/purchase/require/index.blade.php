@@ -16,16 +16,16 @@
     SKUID</th>
     <th>sku</th>
     <th>中文名</th>
-    <th>可用库存</th>
-    <th>实库存</th>
-    <th>在途</th>
-    <th>近30天销量</th>
-    <th>近14天销量</th>
-    <th>近7天销量</th>
-    <th>建议采购数量</th>
+    <th class="sort" data-field="available_quantity">可用库存</th>
+    <th class="sort" data-field="all_quantity">实库存</th>
+    <th class="sort" data-field="zaitu_num">在途</th>
+    <th class="sort" data-field="thirty_sales">近30天销量</th>
+    <th class="sort" data-field="fourteen_sales">近14天销量</th>
+    <th class="sort" data-field="seven_sales">近7天销量</th>
+    <th class="sort" data-field="need_purchase_num">建议采购数量</th>
     <th>趋势系数</th>
     <th>平均利润率</th>
-    <th>退款率</th>
+    <th class="sort" data-field="refund_rate">退款率</th>
     <th>SKU状态</th>
     <th>采购状态</th>
 @stop

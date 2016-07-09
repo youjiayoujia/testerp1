@@ -9,6 +9,12 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+/**
+ * 
+ * Route::get('a/b', ['uses' => 'dddController@b', 'as' => 'a.b']);   路由规范
+ * 注意a/b  b  a.b 这三部分的样式就OK了
+ *
+ */
 Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -24,7 +30,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('countries', 'CountriesController');
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
-    Route::resource('countries', 'CountriesController');
+
+    Route::resource('eventChild', 'EventChildController');
     //3宝package
     Route::resource('bao3Package', 'Bao3PackageController');
     //产品图片路由
@@ -136,6 +143,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::get('stock/changePosition', ['uses' => 'StockController@changePosition', 'as' => 'stock.changePosition']);
     Route::any('itemAjaxWarehousePosition', ['uses' => 'StockController@ajaxWarehousePosition', 'as' => 'itemAjaxWarehousePosition']);
     Route::get('stock/getSinglePosition',
         ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);

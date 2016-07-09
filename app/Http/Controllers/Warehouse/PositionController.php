@@ -71,6 +71,7 @@ class PositionController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
+        $from = serialize($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -86,7 +87,8 @@ class PositionController extends Controller
                 }
             }
         }
-
+        $to = serialize($model);
+        $this->eventLog(request()->user()->id, '库位信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 

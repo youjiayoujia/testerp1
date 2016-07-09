@@ -30,16 +30,21 @@
        </div>
       </div>
       <ul class="dowebok">
+        <?php $i=0; ?>
         @foreach($labels as $label)
           @if($label->group_id==1)
-            <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
+            <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{ $i==0? 'checked' : '' }}></li>
+            <?php $i++; ?>
           @endif  
+          
         @endforeach
       </ul>
       <ul class="dowebok">
+        <?php $j=0; ?>
         @foreach($labels as $label)
             @if($label->group_id==2)
-                <li><input type="checkbox" name="image_type" data-labelauty="{{$label->name}}" value="{{$label->id}}"></li>
+                <li><input type="checkbox" name="image_type" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{$j==0?'checked':''}}></li>
+                <?php $j++; ?>
             @endif
               
         @endforeach
@@ -47,11 +52,7 @@
       <div class="form-group">
         <input id="file-1" class="file" type="file" multiple data-preview-file-type="any" data-sku="ssdf" input-name="dlo">
       </div>
-    </div>
-
-    
-
-    
+    </div>   
 @stop
 
 @section('pageJs')
@@ -62,8 +63,24 @@
     <script type="text/javascript">
 
         $("#file-1").fileinput({   
-            //uploadAsync: false,   
+            //uploadAsync: false,  
             uploadUrl: "{{route('productImage.store')}}",
+            uploadAsync: true,
+            overwriteInitial: false,
+            //initialPreviewShowDelete: true,
+            /*initialPreview: [
+                "http://www.youjia1.com/uploads/product/763/765/2/1467876193file_data.jpg",
+                "http://www.youjia1.com/uploads/product/763/765/2/1467876128file_data.jpg",
+            ],*/
+            initialPreviewAsData: true, // identify if you are sending preview data only and not the raw markup
+            initialPreviewFileType: 'image', // image is the default and can be overridden in config below
+            /*layoutTemplates: {
+                
+                actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' +
+        'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
+                actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' +
+        '{uploadIcon}</button>',
+            },*/
             uploadExtraData: function() {
                 var str=document.getElementsByName("image_type");
                 var chestr="";

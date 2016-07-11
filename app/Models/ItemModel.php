@@ -504,10 +504,8 @@ class ItemModel extends BaseModel
             $data['status'] = $item->status?$item->status:'saleOutStopping';
             $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
-
-            /*if (array_key_exists($data['item_id'], $requireArray)) {
-                $data['require_create'] = 1;
-            }*/
+            $data['user_id'] = $item->product->purchase_adminer;
+            
             if ($thisModel) {
                 $thisModel->update($data);
             } else {

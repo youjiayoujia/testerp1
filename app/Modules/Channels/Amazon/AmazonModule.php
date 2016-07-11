@@ -53,6 +53,10 @@ class AmazonModule extends BaseChannelModule
         $this->visitUrl($url);
     }
 /*************************************************************************************/
+/**
+ * $model = new AmazonModule();
+ *       $model->returnTracking();
+ */
     public function returnTracking()
     {
         $this->_config['Action'] = 'SubmitFeed';
@@ -64,18 +68,21 @@ class AmazonModule extends BaseChannelModule
         var_dump($sign);
         $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
         $signature = urlencode(base64_encode($signature));
-        $this->_config['Content-Type'] = 'text/html';
         $this->_config['Signature'] = $signature;
-        $this->_config['User-Agent'] = 'php-amazon-mws/0.0.1 (Language=php)';
-        $this->_config['Host'] = 'mws.amazonservices.com';
-        var_dump($this->_config);
         $url = [];
         foreach($this->_config as $key => $value) {
             $url[] = "{$key}={$value}";
         }
         sort($url);
-        var_dump($url);
         $string = implode('&', $url);
+        
+        $this->_config['Content-Type'] = 'text/xml';
+        $this->_config['User-Agent'] = 'php-amazon-mws/0.0.1 (Language=php)';
+        $this->_config['Host'] = 'mws.amazonservices.com';
+        var_dump($this->_config);exit;
+        
+        var_dump($url);
+        
         var_dump($string);
         $tmp = base64_encode(md5($string));
         $this->_config['Content-MD5'] = $tmp;

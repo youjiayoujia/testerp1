@@ -20,8 +20,6 @@ class TestController extends Controller
     public function test()
     {
         $model = new AmazonModule();
-        echo "<pre>";
-        var_dump($model->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32'));
-        echo "</pre>";
+        $model->returnTracking();
     }
 }

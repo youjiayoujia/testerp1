@@ -149,7 +149,6 @@ return [
          * Coffee Providers
          */
         App\Providers\HelpServiceProvider::class,
-        Chumper\Zipper\ZipperServiceProvider::class,
 
         /*
          * Debugbar

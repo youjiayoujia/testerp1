@@ -43,6 +43,7 @@ class RequireController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->purchases,$this->purchases->orderBy('require_create','desc')->orderBy('need_purchase_num','desc')),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         
         return view($this->viewPath . 'index', $response);

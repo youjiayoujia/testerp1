@@ -29,6 +29,7 @@ class CreatePurchases extends Migration
             $table->decimal('profit',7,2)->comment('利润率')->default(0);
             $table->string('status')->comment('状态')->default(NULL);
             $table->enum('require_create',['0','1'])->comment('是否需要创建采购单')->default('0');
+            $table->integer('user_id')->comment('采购人')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

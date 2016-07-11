@@ -66,7 +66,7 @@
             <td>{{$item->refund_rate*100}}%</td>
             <td>{{config('item.status')[$item->status]}}</td>
             <td>{{config('purchase.require')[$item->require_create]}}</td>
-            <td>{{$item->item->product->purchaseAdminer?$item->item->product->purchaseAdminer->name:''}}</td>
+            <td>{{$item->user?$item->user->name:''}}</td>
         </tr>
     @endforeach
  <script type="text/javascript">		 

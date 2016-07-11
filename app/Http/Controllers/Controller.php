@@ -7,6 +7,8 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use DataList;
+use App\Models\Event\CategoryModel;
+use App\Models\Event\ChildModel;
 
 abstract class Controller extends BaseController
 {
@@ -28,6 +30,18 @@ abstract class Controller extends BaseController
             'title' => $title ? $title : $this->mainTitle . config('setting.titles.' . $action),
         ];
         return $metas;
+    }
+
+    public function eventLog($user_id, $content = '', $to = '', $from = '')
+    {
+        $modelName = $this->model->table;
+        if($modelName) {
+            $category = CategoryModel::where('model_name', $modelName)->first();
+            if(!$category) {
+                $category = CategoryModel::create(['model_name' => $modelName]);
+            }
+            $category->child()->create(['type_id' => ($to ? unserialize($to)->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user_id]);
+        }
     }
 
     public function alert($type, $content)
@@ -190,7 +204,8 @@ abstract class Controller extends BaseController
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $this->model->create(request()->all());
+        $model = $this->model->create(request()->all());
+        $this->eventLog(request()->user()->id, '数据新增', serialize($model));
         return redirect($this->mainIndex);
     }
 
@@ -222,12 +237,15 @@ abstract class Controller extends BaseController
     public function update($id)
     {
         $model = $this->model->find($id);
+        $from = serialize($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
+        $to = serialize($model);
+        $this->eventLog(request()->user()->id, '数据更新', $to, $from);
         return redirect($this->mainIndex);
     }
 

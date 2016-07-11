@@ -64,20 +64,17 @@ class AuthServiceProvider extends ServiceProvider
         //去找权限
         $gate->define('check', function ($user, $post){
 
-            $post_array = explode('|', $post);//print_r($post_array);
-            $role_array = explode(',', $post_array[0]);
-            //print_r($role_array);exit;  
+            $post_array = explode('|', $post);
+            $role_array = explode(',', $post_array[0]); 
             foreach($user->role as $role){
                 if(in_array($role->role, $role_array)){
-                    //echo '<pre>';
-                    //print_r($role);
-                    foreach($role->permission as $permission){//echo $permission->action;
-                        if(in_array($permission->action, $post_array)){//echo 111;exit;
+                    foreach($role->permission as $permission){
+                        if(in_array($permission->action, $post_array)){
                             return true;
                         }
                     }
                 }
-            }//exit;
+            }
         });
 
 

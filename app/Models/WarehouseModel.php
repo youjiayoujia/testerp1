@@ -12,8 +12,7 @@ class WarehouseModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'warehouses';
-
+    public $table = 'warehouses';
     /**
      * The attributes that are mass assignable.
      *

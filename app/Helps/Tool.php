@@ -2,7 +2,6 @@
 namespace App\Helps;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use DNS1D;
 
 class Tool
 {

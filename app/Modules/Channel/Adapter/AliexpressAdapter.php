@@ -110,9 +110,26 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
-        echo 'returnTrack';
+        $return = [];
+        $action = 'api.sellerShipment';
+        $app_url = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        $result = json_decode($result,true);
+        if (isset($result['success'])&&($result['success']=='true')) {
+            $return['status'] =true;
+            $return['info'] ='Success';
+
+        }else{
+            $return['status'] =false;
+            $return['info'] =isset($result['error_message']) ? $result['error_message'] : "error";
+        }
+
+
     }
 
 
@@ -310,6 +327,45 @@ Class AliexpressAdapter implements AdapterInterface
         //加密
         //if ( $this->debug ) echo $sign_str. "\n";
         $code_sign = strtoupper(bin2hex(hash_hmac("sha1", $sign_str, $this->_appsecret, true)));
+        return $code_sign;
+    }
+    /**
+     * 计算签名
+     * @param $apiInfo
+     * @param $parameter_arr
+     * @return string
+     */
+    public function getApiSignature($apiInfo, $parameter_arr){
+        ksort($parameter_arr);
+        $sign_str = '';
+        if (array_key_exists('domesticLogisticsCompanyId', $parameter_arr) && array_key_exists('domesticLogisticsCompany', $parameter_arr)){
+            $domesticLogisticsCompanyIdIndex = 0; //在数组中的位置
+            $domesticLogisticsCompanyIndex = 0; //该元素在数组中的位置
+            $domesticLogisticsCompanyIdStr = $domesticLogisticsCompanyStr = ''; //中间变量
+            $i = 0;
+            $temp = array(); //中间变量
+            foreach ($parameter_arr as $key => $val) {
+                $temp[$i] = $key . $val;
+                if (in_array($key, array('domesticLogisticsCompanyId', 'domesticLogisticsCompany'))){
+                    $index = $key.'Index';
+                    $str = $key.'Str';
+                    $$index = $i;
+                    $$str = $key . $val;
+                }
+                $i++;
+            }
+            //实现位置进行替换
+            $temp[$domesticLogisticsCompanyIdIndex] = $domesticLogisticsCompanyStr;
+            $temp[$domesticLogisticsCompanyIndex] = $domesticLogisticsCompanyIdStr;
+            $sign_str = implode('', $temp);
+            unset($temp);
+        }else {
+            foreach ($parameter_arr as $key => $val) {
+                $sign_str .= $key . $val;
+            }
+        }
+        $sign_str = $apiInfo . $sign_str;
+        $code_sign = strtoupper ( bin2hex ( hash_hmac ( "sha1", $sign_str, $this->_appsecret, true ) ) );
         return $code_sign;
     }
 

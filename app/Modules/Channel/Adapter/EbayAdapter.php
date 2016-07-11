@@ -146,9 +146,43 @@ class EbayAdapter implements AdapterInterface
         return $orderID;
     }
 
-    public function returnTrack()
+    /**
+     * @param $tracking_info =[
+     *              'IsUploadTrackingNumber' =>'' //true or false
+     *              'ShipmentTrackingNumber'=>'' //追踪号
+     *              'ShippingCarrierUsed'=>''//承运商
+     *              'ShippedTime' =>'' //发货时间 date('Y-m-d\TH:i:s\Z')
+     *              'ItemID' =>'' //商品id
+     *              'TransactionID' =>'交易号'，
+     * ]
+     *
+     * @return string
+     */
+    public function returnTrack($tracking_info)
     {
-        return '1';
+        $return =[];
+        $xml ='';
+        if($tracking_info['IsUploadTrackingNumber']){ //需要上传追踪号
+            $xml.= '<Shipment>';
+            $xml.= '<ShipmentTrackingDetails>';
+            $xml.= '<ShipmentTrackingNumber>'.$tracking_info['ShipmentTrackingNumber'].'</ShipmentTrackingNumber>';
+            $xml.= '<ShippingCarrierUsed>'.$tracking_info['ShippingCarrierUsed']. '</ShippingCarrierUsed>';
+            $xml.= '</ShipmentTrackingDetails>';
+            $xml.= '<ShippedTime>'.$tracking_info['ShippedTime'].'</ShippedTime>';
+            $xml.= '</Shipment>';
+        }
+        $xml.= '<ItemID>'.$tracking_info['ItemID'].'</ItemID>';
+        $xml.= '<Shipped>true</Shipped>';
+        $xml.= '<TransactionID>'.$tracking_info['TransactionID'].'</TransactionID>';
+        $result =  $this->buildEbayBody($xml,'CompleteSale');
+        if((string)$result->Ack=='Success'){
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($result->LongMessage)?(string)$result->LongMessage:'error';
+        }
+        return $return;
     }
 
 

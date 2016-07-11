@@ -95,12 +95,26 @@ Class WishAdapter implements AdapterInterface
     }
 
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
+        $return = [];
+        $tracking_info['access_token'] = urldecode($this->access_token);
+        array_filter($tracking_info);
+        $url = 'https://china-merchant.wish.com/api/v2/order/fulfill-one';
+       // $resultJson = $this->postCurlHttpsData($url, $tracking_info);
+       // $result = json_decode($resultJson, true);
+        $result['code'] = 0;
+        if (isset($result['code'])&&($result['code']==0)) {
+            $return['status'] = true;
+            $return['info'] = isset($result['message'])?$result['message']:'Success';
+
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['message']) ? $result['message'] : '未知错误';
+        }
+        return $return;
 
 
-
-        return 'returnTrack';
     }
 
     public function parseOrder($order, $transaction_number)

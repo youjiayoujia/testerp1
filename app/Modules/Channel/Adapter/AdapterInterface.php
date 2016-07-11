@@ -74,8 +74,15 @@ interface AdapterInterface
     /**
      * 回传物流信息
      *
+     * $tracking_info =[
+     * 'id' => '',//wish 使用
+     * 'tracking_number' =>'',  //wish 使用
+     * 'tracking_provider' =>'', //wish 使用
+     * 'ship_note' =>'' //wish 使用
+     * ]
+     *
      */
-    public function returnTrack();
+    public function returnTrack($tracking_info);
 
     /**
      * 获取平台邮件

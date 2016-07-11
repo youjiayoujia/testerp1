@@ -591,6 +591,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 //getEbayInfo
+Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);
 Route::any('getEbayInfo', ['uses' => 'TestController@getEbayInfo']);
 
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);

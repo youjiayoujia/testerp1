@@ -16,17 +16,18 @@ use App\Base\BaseModel;
 use App\Models\ItemModel;
 use App\Models\Order\RefundModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
+use App\Models\Order\BlacklistModel;
 use Illuminate\Support\Facades\DB;
 
 class OrderModel extends BaseModel
 {
     protected $table = 'orders';
 
-    protected $guarded = ['items'];
+    protected $guarded = ['items', 'remark'];
 
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
-    public $searchFields = ['ordernum', 'email'];
+    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱'];
 
     /**
      * 退款rules
@@ -323,16 +324,29 @@ class OrderModel extends BaseModel
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
+            if ($data['type'] == 'PARTIAL') {
+                foreach ($data['tribute_id'] as $id) {
+                    $orderItem = $this->items->find($id);
+                    $orderItem->update(['is_refund' => 1]);
+                }
+            }
             return RefundModel::create($data);
         }
         return 1;
     }
 
-    //todo:黑名单逻辑
     public function checkBlack()
     {
-        $isBlack = '';
-        if ($isBlack == 'confirm') {
+        $channel = $this->channel->find($this['channel_id']);
+        if($channel['driver'] == 'wish') {
+            $name = $this['shipping_lastname'] . ' ' . $this['shipping_firstname'];
+            $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
+        }else {
+            $blacklist = BlacklistModel::where('email', $this['email']);
+
+        }
+        if(count($blacklist) > 0) {
+            $this->update(['blacklist' => '0']);
             return true;
         }
         return false;
@@ -369,7 +383,7 @@ class OrderModel extends BaseModel
             }
             $order->items()->create($orderItem);
         }
-        if ($this->checkBlack()) {
+        if ($order->checkBlack()) {
             $order->update(['status' => 'REVIEW']);
             $order->remark('黑名单订单.');
         }
@@ -436,7 +450,7 @@ class OrderModel extends BaseModel
                     $this->package_times += 1;
                     $this->status = 'NEED';
                     return $this->save();
-                }  elseif ($this->status == 'NEED') {
+                } elseif ($this->status == 'NEED') {
                     if (strtotime($this->created_at) < strtotime('-3 days')) {
                         $arr = $this->explodeOrder();
                         if ($arr) {
@@ -721,7 +735,7 @@ class OrderModel extends BaseModel
     {
         return $query->where('ordernum', $ordernum);
     }
-    
+
     /**
      * 计算利润率并处理
      *

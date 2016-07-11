@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => 'redis',
+    'default' => 'database',
 
     /*
     |--------------------------------------------------------------------------
@@ -92,10 +92,11 @@ return [
     ],
 
     'queues' => [
-        'inOrders' => '存储订单',
-        'doPackage' => '打包',
-        'assignLogistics' => '分配物流',
-        'placeLogistics' => '物流下单',
+        'InOrders' => '存储订单',
+        'DoPackage' => '打包',
+        'AssignLogistics' => '分配物流',
+        'PlaceLogistics' => '物流下单',
+        'SendMessages' => '发送邮件',
     ]
 
 ];

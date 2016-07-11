@@ -234,6 +234,11 @@ return [
                     'url' => 'logisticsRule.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流渠道名',
+                    'url' => 'logisticsChannelName.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],
@@ -258,6 +263,11 @@ return [
                 [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
                     'icon' => '',
                 ],
                 [
@@ -389,6 +399,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            '事件历史' => [
+                [
+                    'name' => '历史记录',
+                    'url' => 'eventChild.index',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //系统导航
@@ -406,6 +423,26 @@ return [
             [
                 'name' => '添加用户',
                 'url' => 'user.create',
+                'icon' => '',
+            ],
+            [
+                'name' => '角色列表',
+                'url' => 'role.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加角色',
+                'url' => 'role.create',
+                'icon' => '',
+            ],
+            [
+                'name' => '权限列表',
+                'url' => 'permission.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加权限',
+                'url' => 'permission.create',
                 'icon' => '',
             ],
             [

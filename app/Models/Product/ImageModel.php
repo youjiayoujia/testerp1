@@ -96,11 +96,6 @@ class ImageModel extends BaseModel
      */
     public function imageCreate($data, $files = null)
     {
-        /*if ($data['type'] != 'public') {
-            $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['type'] . '/';
-        } else {
-            $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['type'] . '/';
-        }*/
         $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' . $data['is_link'] . '/';
         $disk = Storage::disk('product');
         switch ($data['uploadType']) {
@@ -113,7 +108,10 @@ class ImageModel extends BaseModel
                         $arr[] = $data['is_link'];
 
                         $imageModel->labels()->attach($arr);
-                        $imageModel->labels()->attach($data['tag']);
+                        if($data['tag']!=''){
+                            $imageModel->labels()->attach($data['tag']);
+                        }
+                        
                     }
                 }
                 break;
@@ -148,26 +146,6 @@ class ImageModel extends BaseModel
     public function updateImage($id, $file,$data)
     {
         $image = $this->findOrFail($id);
-        //if (is_file($image->src)) {
-        //    unlink($image->src);
-        //}
-        //foreach($data['image_type'] as $type){
-         //   $imageModel->labels()->attach($data['image']);
-        //}
-        //echo '<pre>';
-        //$tag_arr = [];
-        //$active['is_active']
-        //foreach($image->labels as $labels){
-        //    $tag_arr[] = $labels->pivot->label_id;
-        //    $labels->update()
-        //}
-        
-        //print_r($tag_arr);exit;
-        //print_r($image->labels->toArray());exit;
-        
-        //$arr['is_link'] = $data['is_link'];
-        //$arr['active'] = 1;
-        //$image->labels()->attach($arr['is_link'],['is_active'=>1]);
         $arr[] = $data['is_link'];
         foreach($data['image_type'] as $data){
             $arr[] = $data;

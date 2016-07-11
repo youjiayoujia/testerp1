@@ -9,6 +9,12 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+/**
+ * 
+ * Route::get('a/b', ['uses' => 'dddController@b', 'as' => 'a.b']);   路由规范
+ * 注意a/b  b  a.b 这三部分的样式就OK了
+ *
+ */
 Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -24,7 +30,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('countries', 'CountriesController');
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
-    Route::resource('countries', 'CountriesController');
+
+    Route::resource('eventChild', 'EventChildController');
     //3宝package
     Route::resource('bao3Package', 'Bao3PackageController');
     //产品图片路由
@@ -136,6 +143,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::get('stock/changePosition', ['uses' => 'StockController@changePosition', 'as' => 'stock.changePosition']);
     Route::any('itemAjaxWarehousePosition', ['uses' => 'StockController@ajaxWarehousePosition', 'as' => 'itemAjaxWarehousePosition']);
     Route::get('stock/getSinglePosition',
         ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
@@ -303,7 +311,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockTaking', 'Stock\TakingController');
     //物流限制
     Route::resource('logisticsLimits', 'Logistics\LimitsController');
+    
+    //物流渠道路由
+    Route::resource('logisticsChannelName', 'Logistics\ChannelNameController');
     //物流路由
+    Route::get('logisticsCode/one/{id}',
+        ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::resource('logistics', 'LogisticsController');
@@ -418,7 +431,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
     Route::get('downloadUpdateBlacklist',
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
-    Route::any('refundAll', ['uses' => 'OrderController@refundAll', 'as' => 'refundAll']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
     //包裹管理路由
@@ -576,7 +588,10 @@ Route::group(['middleware' => 'auth'], function () {
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
+    Route::any('user/role',['uses' => 'UserController@per', 'as' => 'role']);
     Route::resource('user', 'UserController');
+    Route::resource('role', 'RoleController');
+    Route::resource('permission', 'PermissionController');
     //图片标签
     Route::resource('label', 'LabelController');
     Route::resource('paypal', 'PaypalController');

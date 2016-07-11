@@ -17,6 +17,7 @@ use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use Gate;
 
 class ProductController extends Controller
 {
@@ -32,10 +33,20 @@ class ProductController extends Controller
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
         $this->viewPath = 'product.';
+        /*if (Gate::denies('check','product_admin,product_staff|show')) {
+            echo "没有权限";exit;
+        }*/
+
+        /*if (Gate::denies('product_admin','product|show')) {
+            echo "没有权限";exit;
+        }*/
     }
 
     public function create()
     {
+        /*if (Gate::denies('check','product_admin,product_staff|add')) {
+            echo "没有权限";exit;
+        }*/
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -57,8 +68,15 @@ class ProductController extends Controller
      */
     public function store()
     {
+        /*if (Gate::denies('check','product_admin,product_staff|add')) {
+            echo "没有权限";exit;
+        }*/
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
+        if(!array_key_exists('modelSet',request()->all())){
+            return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
+        }
+        
         $this->model->createProduct(request()->all(),request()->files);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
@@ -72,6 +90,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
+        /*if (Gate::denies('check','product_admin,product_staff|edit')) {
+            echo "没有权限";exit;
+        }*/
         $variation_value_id_arr = [];
         $features_value_id_arr  = [];
         $features_input = [];
@@ -91,6 +112,15 @@ class ProductController extends Controller
                 $features_value_id_arr[$key] = $arr['pivot']['feature_value_id'];
             }    
         }
+        $logisticsLimit_arr = [];
+        foreach($product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['pivot']['logistics_limits_id'];              
+        }
+        $wrapLimit_arr = [];
+        foreach($product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['pivot']['wrap_limits_id'];               
+        }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -103,6 +133,8 @@ class ProductController extends Controller
             'wrapLimit' => $this->wrapLimit->all(),
             'users' => UserModel::all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
+            'wrapLimit_arr' => $wrapLimit_arr,
+            'logisticsLimit_arr' => $logisticsLimit_arr,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -117,6 +149,9 @@ class ProductController extends Controller
      */
     public function update($id)
     {
+        /*if (Gate::denies('check','product_admin,product_staff|edit')) {
+            echo "没有权限";exit;
+        }*/
         request()->flash();
         $this->validate(request(), $this->model->rules('update',$id));
         $productModel = $this->model->find($id);
@@ -133,6 +168,9 @@ class ProductController extends Controller
      */
     public function destroy($id) 
     {
+        /*if (Gate::denies('check','product_admin,product_staff|delete')) {
+            echo "没有权限";exit;
+        }*/
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -249,10 +287,21 @@ class ProductController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $logisticsLimit_arr = [];
+        foreach($model->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['name'];              
+        }
+        
+        $wrapLimit_arr = [];
+        foreach($model->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['name'];               
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouse' => $this->warehouse->find($model->warehouse_id),
+            'logisticsLimit_arr' => $logisticsLimit_arr,
+            'wrapLimit_arr' => $wrapLimit_arr,
         ];
         return view($this->viewPath . 'show', $response);
     }

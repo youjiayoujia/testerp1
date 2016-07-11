@@ -17,7 +17,7 @@ class LogisticsModel extends BaseModel
 {
     protected $table = 'logisticses';
 
-    public $searchFields = ['code', 'name'];
+    public $searchFields = ['code' => '物流方式简码', 'name' => '物流方式名称'];
 
     protected $fillable = [
         'id',
@@ -103,13 +103,33 @@ class LogisticsModel extends BaseModel
 
     public function channelName()
     {
-        return $this->belongsToMany('App\Models\ChannelModel', 'logistics_channel_names', 'logistics_id', 'channel_id')->withPivot('name');
+        return $this->belongsToMany('App\Models\Logistics\ChannelNameModel', 'logistics_belongstos', 'logistics_id', 'logistics_channel_id');
     }
 
     public function getDockingNameAttribute()
     {
         $arr = config('logistics.docking');
         return $arr[$this->docking];
+    }
+
+    public function hasLimits($id) 
+    {
+        $arr = explode(',', $this->limit);
+        if(in_array($id, $arr)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function inType($id)
+    {
+        $multi = $this->channelName;
+        foreach($multi as $single) {
+            if($single->id == $id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

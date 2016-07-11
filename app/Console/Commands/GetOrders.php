@@ -58,6 +58,7 @@ class GetOrders extends Command
                 'remark' => 'init',
             ]);
             $total = 0;
+            $response = '';
             if ($account) {
                 $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
                 $endDate = date("Y-m-d H:i:s", time() - 300);
@@ -73,6 +74,7 @@ class GetOrders extends Command
                     $this->dispatch($job);
                     $total++;
                 }
+                $response = json_encode($orderList);
                 //todo::Adapter->error()
                 $result['status'] = 'success';
                 $result['remark'] = 'Success.';
@@ -82,6 +84,7 @@ class GetOrders extends Command
             }
             $end = microtime(true);
             $lasting = round($end - $start, 3);
+            $commandLog->data = $response;
             $commandLog->lasting = $lasting;
             $commandLog->total = $total;
             $commandLog->result = $result['status'];

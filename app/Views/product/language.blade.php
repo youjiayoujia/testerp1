@@ -56,8 +56,6 @@
     @endforeach
 </div>
 
-
-
 <input type="hidden" value="{{$id}}" name="product_id">
 
 @stop
@@ -82,4 +80,6 @@
 .dowebok li { display: inline-block;}
 .dowebok li { margin: 10px 0;}
 input.labelauty + label { font: 12px "Microsoft Yahei";}
+.edui-container {width:1850px !important;z-index: 999}
+.edui-body-container {width:1850px !important;z-index: 999}
 </style>

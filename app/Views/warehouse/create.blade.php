@@ -26,10 +26,10 @@
         <div class='form-group col-lg-3'> 
             <label for='city'>联系人</label> 
             <select name='contact_by' class='form-control contact_by'>
-            <option value=''></option>
-            @foreach($users as $user)
-            <option value="{{ $user->id }}">{{ $user->name }}</option>
-            @endforeach
+                <option value=''></option>
+                @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
             </select>
         </div>
         <div class='form-group col-lg-3'> 

@@ -10,9 +10,12 @@ namespace App\Modules\Channel\Adapter;
  */
 
 use App\Models\Channel\AccountModel;
+use App\Models\Message\ReplyModel;
+use Google_Service_Gmail_Message;
 use Google_Client;
 use Google_Service_Gmail;
 use Tool;
+use Google_Service_Gmail_ModifyMessageRequest;
 
 Class AmazonAdapter implements AdapterInterface
 {
@@ -22,6 +25,7 @@ Class AmazonAdapter implements AdapterInterface
     private $version = '2013-09-01';
     private $config = [];
     private $messageConfig = [];
+    private $accountInfo = [];
 
     public function __construct($config)
     {
@@ -33,6 +37,7 @@ Class AmazonAdapter implements AdapterInterface
         $this->config['Version'] = $this->version;
         $this->messageConfig['GmailSecret'] = $config['GmailSecret'];
         $this->messageConfig['GmailToken'] = $config['GmailToken'];
+        $this->messageConfig['account_id'] = $config['account_id'];
     }
 
     /**
@@ -282,6 +287,11 @@ Class AmazonAdapter implements AdapterInterface
                 $messageHeader = $this->parseMessageHeader($messagePayload->getHeaders());
                 $messageLabels = $messageContent->getLabelIds();
 
+                //2修改邮件账户的此邮件为已读状态
+                $modify = new Google_Service_Gmail_ModifyMessageRequest();
+                $modify->setRemoveLabelIds(['UNREAD']);
+                $service->users_messages->modify($user, $message->id, $modify);
+
                 $returnAry[$j]['message_id'] = $messageContent->getId();
                 $returnAry[$j]['labels'] = serialize($messageLabels);
                 $returnAry[$j]['label'] = $messageLabels[0];
@@ -423,4 +433,65 @@ Class AmazonAdapter implements AdapterInterface
         $email = str_replace('>', '', $email);
         return $email;
     }
+
+    public function sendMessages($replyMessage)
+    {
+        // TODO: Implement sendMessages() method.
+
+        $account = AccountModel::find($this->messageConfig['account_id'])->first();
+        $client = $this->getSendClient($account);
+        $service = new Google_Service_Gmail($client);
+        $user = 'me';
+        $from = $account->name;
+        $fromEmail = $account->account;
+        $to = $replyMessage->to ? $replyMessage->to : $replyMessage->message->from_name;
+        $toEmail = $replyMessage->to_email ? $replyMessage->to_email : $replyMessage->message->from;
+        $subject = $replyMessage->title;
+        $content = nl2br($replyMessage->content);
+        $message = new Google_Service_Gmail_Message();
+        $message->setRaw($this->message($from, $fromEmail, $to, $toEmail, $subject, $content));
+        $result = $service->users_messages->send($user, $message);
+        $replyMessage->status = $result->id ? 'SENT' : 'FAIL';
+        $replyMessage->save();
+        if($result->id){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public function message($from, $fromEmail, $to, $toEmail, $subject, $content)
+    {
+        $message = 'From: =?utf-8?B?' . base64_encode($from) . '?= <' . $fromEmail . ">\r\n";
+        $message .= 'To: =?utf-8?B?' . base64_encode($to) . '?= <' . $toEmail . ">\r\n";
+        $message .= 'Subject: =?utf-8?B?' . base64_encode($subject) . "?=\r\n";
+        $message .= "MIME-Version: 1.0\r\n";
+        $message .= "Content-Type: text/html; charset=utf-8\r\n";
+        $message .= 'Content-Transfer-Encoding: quoted-printable' . "\r\n\r\n";
+        //$content=htmlspecialchars($content);
+        $message .= $content . "\r\n";
+        echo $message ."\r\n";
+        return Tool::base64Encode($message);
+    }
+
+    public function getSendClient($account)
+    {
+        $client = new Google_Client();
+        $client->setScopes(implode(' ', array(
+            Google_Service_Gmail::GMAIL_MODIFY,
+            Google_Service_Gmail::GMAIL_COMPOSE,
+            Google_Service_Gmail::GMAIL_SEND
+        )));
+        $client->setAuthConfig($account['message_secret']);
+        $client->setAccessType('offline');
+        $client->setAccessToken($account['message_token']);
+
+        // Refresh the token if it's expired.
+        if ($client->isAccessTokenExpired()) {
+            $client->refreshToken($client->getRefreshToken());
+            $account->message_token = $client->getAccessToken();
+            $account->save();
+        }
+        return $client;
+    }
+
 }

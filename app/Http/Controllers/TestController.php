@@ -22,7 +22,9 @@ use App\Models\Order\ItemModel;
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Modules\Channel\ChannelModule;
+use App\Jobs\Job;
 use App\Jobs\DoPackage;
+use App\Jobs\SendMessages;
 use DNS1D;
 use App\Http\Controllers\Controller;
 use App\Models\CurrencyModel;
@@ -31,7 +33,7 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Message\ReplyModel;
 use App\Models\Message\MessageModel;
-
+use App\Models\Sellmore\ShipmentModel;
 
 use DB;
 
@@ -46,14 +48,28 @@ class TestController extends Controller
 
     public function test1()
     {
-        $order = OrderModel::find(4);
-        $rate = $order->calculateProfitProcess();
-        var_dump($rate);
-        exit;
+        $shipment = ShipmentModel::where('shipmentID', '2')->first();
+        var_dump($shipment->shipmentCarrierInfo);
+        var_dump(unserialize($shipment->shipmentCarrierInfo));
     }
 
     public function index()
     {
+
+        $reply = ReplyModel::find(28546);
+
+/*        $dataaaa = $reply->message->account->toArray();
+        var_dump($dataaaa);exit;*/
+
+        $job = new SendMessages($reply);
+        $job = $job->onQueue('SendMessages');
+        $this->dispatch($job);
+
+        exit;
+
+
+
+
         $package = PackageModel::find(request()->input('id'));
         $package->assignLogistics();
         $job = new PlaceLogistics($package);

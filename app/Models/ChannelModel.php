@@ -34,7 +34,7 @@ class ChannelModel extends BaseModel
         'rate_value'
     ];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['name' => '名称'];
 
     protected $rules = [
         'create' => ['name' => 'required|unique:channels,name', 'driver' => 'required'],
@@ -44,6 +44,11 @@ class ChannelModel extends BaseModel
     public function accounts()
     {
         return $this->hasMany('App\Models\Channel\AccountModel', 'channel_id', 'id');
+    }
+
+    public function logisticsChannelName()
+    {
+        return $this->hasMany('App\Models\Logistics\ChannelNameModel', 'channel_id', 'id');
     }
 
 }

@@ -14,7 +14,6 @@ class CreateLogisticsChannelNames extends Migration
     {
         Schema::create('logistics_channel_names', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('logistics_id')->comment('物流id')->default(0);
             $table->integer('channel_id')->comment('渠道id')->default(0);
             $table->string('name')->comment('渠道对应的物流名')->default(NULL);
             $table->timestamps();

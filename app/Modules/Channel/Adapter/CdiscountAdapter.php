@@ -477,5 +477,8 @@ Class CdiscountAdapter implements AdapterInterface
     public function getMessages(){
 
     }
+    public function sendMessages($replyMessage){
+        
+    }
 
 }

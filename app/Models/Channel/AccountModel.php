@@ -25,7 +25,7 @@ class AccountModel extends BaseModel
      */
     protected $guarded = [];
 
-    public $searchFields = ['account', 'alias'];
+    public $searchFields = ['account' => '渠道帐号', 'alias' => '帐号别名'];
 
     protected $rules = [
         'create' => [
@@ -124,6 +124,8 @@ class AccountModel extends BaseModel
                     'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
                     'GmailSecret' => $this->message_secret,
                     'GmailToken' => $this->message_token,
+                    'account_id' => $this->id,
+                    'account_email' => $this->account,
                 ];
                 break;
             case 'aliexpress':

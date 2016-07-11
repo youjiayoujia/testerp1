@@ -16,7 +16,7 @@ class CatalogModel extends BaseModel
 {
     protected $table = 'logistics_catalogs';
 
-    public $searchFields = ['name'];
+    public $searchFields = ['name' => '物流分类名称'];
 
     protected $fillable = [
         'id',

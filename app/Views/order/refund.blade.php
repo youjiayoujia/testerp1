@@ -110,7 +110,7 @@
             @foreach($orderItems as $key => $orderItem)
                 <div class='row'>
                     <div class="form-group col-sm-1">
-                        <input type="checkbox" name="tribute_id" placeholder="全选" value="{{$orderItem->id}}">
+                        <input type="checkbox" name="tribute_id[]" placeholder="全选" value="{{$orderItem->id}}">
                     </div>
                     <div class="form-group col-sm-2">
                         <input type='text' class="id" id="arr[id][{{$key}}]" style="border: 0" placeholder="id" name='arr[id][{{$key}}]' value="{{ old('arr[id][$key]') ? old('arr[id][$key]') : $orderItem->id }}" readonly>
@@ -149,10 +149,6 @@
         </div>
     </div>
 @stop
-@section('formButton')
-    <button type="submit" class="btn btn-success sub" id="tj">提交</button>
-    <button type="reset" class="btn btn-default" id="qx">取消</button>
-@show
 @section('pageJs')
     <script type='text/javascript'>
         $(document).ready(function(){
@@ -172,34 +168,11 @@
             $(this).parent().remove();
         });
 
-        //批量退款
-        $('.sub').click(function () {
-            if ($('#type').val() == 'PARTIAL') {
-                var checkbox = document.getElementsByName("tribute_id");
-                var ids = "";
-
-                for (var i = 0; i < checkbox.length; i++) {
-                    if(!checkbox[i].checked)continue;
-                    ids += checkbox[i].value+",";
-                }
-                ids = ids.substr(0,(ids.length)-1);
-                $.ajax({
-                    url : "{{route('refundAll')}}",
-                    data : {ids:ids},
-                    dataType : 'json',
-                    type : 'get',
-                    success:function(result){
-                        window.location.reload();
-                    }
-                })
-            }
-        });
-
         //全选
         function quanxuan()
         {
             var collid = document.getElementById("checkall");
-            var coll = document.getElementsByName("tribute_id");
+            var coll = document.getElementsByName("tribute_id[]");
             if (collid.checked){
                 for(var i = 0; i < coll.length; i++)
                     coll[i].checked = true;

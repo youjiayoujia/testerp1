@@ -24,9 +24,10 @@ use Tool;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder)
+    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem)
     {
         $this->model = $purchaseOrder;
+        $this->purchaseItem = $purchaseItem;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
         $this->viewPath = 'purchase.purchaseOrder.';
@@ -168,9 +169,6 @@ class PurchaseOrderController extends Controller
                     }else{
                         $item['costExamineStatus']=0;   
                     }
-                    /*if($item['status']>0){
-                        $data['status']=1;
-                    }*/
                     if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
                         $data['examineStatus']=2;
@@ -189,6 +187,7 @@ class PurchaseOrderController extends Controller
         if($num ==0){
             $data['costExamineStatus']=2;
         }
+        
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));     
@@ -295,10 +294,14 @@ class PurchaseOrderController extends Controller
      */
     public function createItem($id){
         $data=request()->all();
+        $this->validate(request(), $this->purchaseItem->rules('create'));
+        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
+        if (!$item) {
+            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在.'));
+        }
         $model=$this->model->find($id);
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
         $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
-        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if($num > 0 || $Inum > 0){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
         }

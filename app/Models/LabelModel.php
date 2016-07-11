@@ -25,5 +25,7 @@ class LabelModel extends BaseModel
 	            'group_id' => 'required',
 	        ]
 	    ];
+	    
+	public $searchFields = ['name', 'id'];
 
 }

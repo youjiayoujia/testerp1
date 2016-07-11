@@ -14,7 +14,7 @@ class PositionModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'warehouse_positions';
+    public $table = 'warehouse_positions';
 
     /**
      * The attributes that are mass assignable.
@@ -44,7 +44,7 @@ class PositionModel extends BaseModel
     ];
 
     //查询
-    public $searchFields = ['name'];
+    public $searchFields = ['name' => '库位名'];
     
     //仓库关联关系
     public function warehouse()

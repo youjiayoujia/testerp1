@@ -25,6 +25,11 @@
                             <label for="color">产品中文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
                             <input class="form-control" id="c_name" placeholder="产品中文名" name='c_name' value="{{ old('c_name') }}">
                         </div>
+
+                        <div class="form-group col-md-3">
+                            <label for="color">产品英文名</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+                            <input class="form-control" id="name" placeholder="产品英文名" name='name' value="{{ old('name') }}">
+                        </div>
                     
                 <?php 
                     break;

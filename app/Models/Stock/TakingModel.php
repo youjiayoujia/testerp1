@@ -23,7 +23,7 @@ class TakingModel extends BaseModel
 
 
     // 用于查询
-    public $searchFields = ['taking_id'];
+    public $searchFields = ['taking_id' => '盘点表id'];
 
     /**
      * get the relationship between the two module 

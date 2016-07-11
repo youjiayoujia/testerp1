@@ -232,5 +232,4 @@ class CatalogModel extends BaseModel
         $result = $this->where("name",$catalog_name)->get();
         return count($result);
     }
-
 }

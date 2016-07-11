@@ -476,7 +476,7 @@ class ItemModel extends BaseModel
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
-            $data['need_purchase_num'] = $needPurchaseNum;
+            $data['need_purchase_num'] = ceil($needPurchaseNum);
             //退款订单数
             $refund_num = $item->orderItem->where('is_refund', '1')->count();
             $all_order_num = 0;

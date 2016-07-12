@@ -45,13 +45,14 @@
                 <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
-                <th >sku</th>
+                <th>sku</th>
+                <th>状态</th>
                 <th>名称</th>
                 <th>采购数量</th>
                 <th>已到货数量</th>
                 <th>入库数量</th>
                 <th>不合格</th>
-                <th>预计到货日期</th>
+                
                 <th>实际到货日期</th>
                 <th>状态</th>
                 <th>单价</th>
@@ -65,12 +66,13 @@
                 @foreach($purchaseOrder->purchase_items as $purchase_item)
                 <tr>
                     <td>{{$purchase_item->sku}}</td>
+                    <td>{{config('item.status')[$purchase_item->productItem?$purchase_item->productItem->status:'notFound']}}</td>
                     <td>{{$purchase_item->item?$purchase_item->item->c_name:''}}</td>
                     <td>{{$purchase_item->purchase_num}}</td>
                     <td>{{$purchase_item->arrival_num}}</td>
                     <td>{{$purchase_item->storage_qty}}</td>
                     <td>{{$purchase_item->active_num}}</td>
-                    <td>{{$purchase_item->start_buying_time}}</td>
+                    
                     <td>{{$purchase_item->arrival_time}}</td>
                     <td>
                         @foreach(config('purchase.purchaseItem.status') as $key=>$status)

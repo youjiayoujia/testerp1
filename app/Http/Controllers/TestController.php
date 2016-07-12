@@ -19,6 +19,7 @@ use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
+use App\Models\CatalogModel;
 
 use DB;
 
@@ -40,6 +41,28 @@ class TestController extends Controller
 
     public function index()
     {
+        $data = CatalogModel::all()->channels;
+
+        dd($data);
+        exit;
+        /*        $dataaaa = $reply->message->account->toArray();
+                var_dump($dataaaa);exit;*/
+
+        /*        $job = new SendMessages($reply);
+                $job = $job->onQueue('SendMessages');
+                $this->dispatch($job);
+
+                exit;*/
+
+
+        $package = PackageModel::find(request()->input('id'));
+        $package->assignLogistics();
+        $job = new PlaceLogistics($package);
+        $job = $job->onQueue('placeLogistics');
+        $this->dispatch($job);
+        exit;
+        $orderModel = new OrderModel;
+        $start = microtime(true);
         $account = AccountModel::find(request()->input('id'));
         if ($account) {
             $i = 1;

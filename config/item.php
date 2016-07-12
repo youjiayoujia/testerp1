@@ -8,6 +8,7 @@ return [
         'stopping' => '停产',
         'trySale' => '试销',
         'unSellTemp' => '货源待定',
+        'notFound' => '未找到',
     ],
     //是否激活
     'is_available' => [

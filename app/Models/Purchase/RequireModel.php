@@ -27,7 +27,7 @@ class RequireModel extends BaseModel
  			 
         ]
     ];
-    public $searchFields = ['id','sku'];
+    public $searchFields = ['id'=>'id','sku'=>'sku'];
     /**
      * The attributes that are mass assignable.
      *
@@ -42,6 +42,22 @@ class RequireModel extends BaseModel
      public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id');
+    }
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['user' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('purchase.require'),'thrend' => config('purchase.thrend')],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
     }
 	
     //计算建议采购数量

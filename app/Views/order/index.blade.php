@@ -148,9 +148,9 @@
                             <span class="glyphicon glyphicon-pencil"></span> 删除
                         </a>
                     @endif
-                    <a href="{{ route('refund', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 退款
-                    </a>
+                    {{--<a href="{{ route('refund', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">--}}
+                        {{--<span class="glyphicon glyphicon-pencil"></span> 退款--}}
+                    {{--</a>--}}
                     <button class="btn btn-primary btn-xs"
                             data-toggle="modal"
                             data-target="#refund{{ $order->id }}"
@@ -193,7 +193,7 @@
         <div class="modal fade" id="refund{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST">
+                    <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -306,7 +306,7 @@
                             @if($order->items->toArray())
                                 <div class='row'>
                                     <div class="form-group col-sm-2">
-                                        <input type="checkbox" isCheck="true" id="checkall" placeholder="" onclick="quanxuan('{{ $order->id }}')">全选
+                                        <input type="checkbox" isCheck="true" id="checkall{{ $order->id }}" placeholder="" onclick="quanxuan('{{ $order->id }}')">全选
                                     </div>
                                     <div class="form-group col-sm-2">
                                         <label for="id" class='control-label'>ID</label>
@@ -325,7 +325,7 @@
                                     @if($orderItem->is_refund == 0)
                                         <div class='row'>
                                             <div class="form-group col-sm-2">
-                                                <input type="checkbox" name="tribute_id_{{ $order->id }}[]" value="{{$orderItem->id}}">
+                                                <input type="checkbox" name="tribute_id[]" value="{{$orderItem->id}}">
                                             </div>
                                             <div class="form-group col-sm-2">
                                                 <input type='text' class="id" id="arr[id][{{$key}}]" style="border: 0" placeholder="id" name='arr[id][{{$key}}]' value="{{ old('arr[id][$key]') ? old('arr[id][$key]') : $orderItem->id }}" readonly>
@@ -516,26 +516,13 @@
                     });
                 }
             });
-
-            $('#refund_time').cxCalendar();
-
-            document.getElementById('payment').style.display='none';
-
-            var nowTime = new Date().getTime();
-            var payTime = new Date($('#payment_date').val()).getTime();
-            var time = (nowTime - payTime) / (1000 * 60 * 60 * 24);
-            $('#time').val(time.toFixed(2));
-        });
-
-        $(document).on('click', '.bt_right', function(){
-            $(this).parent().remove();
         });
 
         //全选
         function quanxuan(id)
         {
-            var collid = document.getElementById("checkall");
-            var coll = document.getElementsByName("tribute_id_38[]");
+            var collid = document.getElementById("checkall"+id);
+            var coll = document.getElementsByName("tribute_id[]");
             if (collid.checked){
                 for(var i = 0; i < coll.length; i++)
                     coll[i].checked = true;

@@ -80,6 +80,7 @@ class PurchaseOrderController extends Controller
             'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
             'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
             'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
+            'warehouses' =>WarehouseModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);   
     }

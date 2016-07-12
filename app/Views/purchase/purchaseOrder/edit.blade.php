@@ -20,7 +20,13 @@
            <div class="row">
            <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
-                {{ $model->warehouse?$model->warehouse->name:''}}
+                <select name="warehouse_id">
+                    <?php $warehouse_id = $model->warehouse?$model->warehouse->id:'0'; ?>
+                    @foreach($warehouses as $warehouse)
+                        <option value="{{$warehouse->id}}" {{$warehouse->id ==  $warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                    @endforeach
+                </select>
+                
             </div>
             <div class="form-group col-lg-4">
                 <strong>仓库地址</strong>:

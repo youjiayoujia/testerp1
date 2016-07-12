@@ -148,15 +148,16 @@
                             <span class="glyphicon glyphicon-pencil"></span> 删除
                         </a>
                     @endif
-                    {{--<a href="{{ route('refund', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">--}}
-                        {{--<span class="glyphicon glyphicon-pencil"></span> 退款--}}
-                    {{--</a>--}}
-                    <button class="btn btn-primary btn-xs"
-                            data-toggle="modal"
-                            data-target="#refund{{ $order->id }}"
-                            title="退款">
-                        <span class="glyphicon glyphicon-link"></span> 退款
-                    </button>
+                    @foreach($order->items as $item)
+                        @if($item->is_refund == 0)
+                            <button class="btn btn-primary btn-xs"
+                                    data-toggle="modal"
+                                    data-target="#refund{{ $order->id }}"
+                                    title="退款">
+                                <span class="glyphicon glyphicon-link"></span> 退款
+                            </button>
+                        @endif
+                    @endforeach
                     <button class="btn btn-primary btn-xs"
                             data-toggle="modal"
                             data-target="#remark{{ $order->id }}"

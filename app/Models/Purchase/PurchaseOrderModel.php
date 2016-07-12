@@ -31,7 +31,7 @@ class PurchaseOrderModel extends BaseModel
             /*'status' => 'required',*/
         ]
     ];
-    public $searchFields = ['id', 'supplier_id', 'warehouse_id', 'user_id'];
+    public $searchFields = ['id'=>'采购单号','post_coding'=>'外部单号'];
 
 
     protected $fillable = [

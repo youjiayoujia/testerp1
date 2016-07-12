@@ -61,33 +61,27 @@ class AmazonModule extends BaseChannelModule
     {
         $this->_config['Action'] = 'SubmitFeed';
         $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
+        $this->_config['FeedContent'] = $this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32');
         $this->_config['Version'] = '2009-01-01';
-        var_dump($this->_config);
-        $sign  = 'POST' . "\n";
-        $sign .= $this->signArrToString();
-        var_dump($sign);
-        $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
-        $signature = urlencode(base64_encode($signature));
-        $this->_config['Signature'] = $signature;
+        $tmp_url = "https://mai.amazon.cn/ap/signin";
         $url = [];
         foreach($this->_config as $key => $value) {
             $url[] = "{$key}={$value}";
         }
         sort($url);
         $string = implode('&', $url);
-        
-        $this->_config['Content-Type'] = 'text/xml';
-        $this->_config['User-Agent'] = 'php-amazon-mws/0.0.1 (Language=php)';
-        $this->_config['Host'] = 'mws.amazonservices.com';
-        var_dump($this->_config);exit;
-        
-        var_dump($url);
-        
-        var_dump($string);
-        $tmp = base64_encode(md5($string));
-        $this->_config['Content-MD5'] = $tmp;
-        $lasturl = $this->signArrToString();
-        var_dump($lasturl);exit;
+        $test = $this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32');
+        $tmp_header = ["Content-Type: text/xml", "User-Agent:php-amazon-mws/0.0.1 (Language=php)", "Host:mws.amazonservices.com", "Content-MD5:".base64_encode(md5($this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32')))];
+        $ch = curl_init($tmp_url);
+        curl_setopt($ch,CURLOPT_HEADER,1);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,0);
+        curl_setopt($ch,CURLOPT_POST,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$string);
+        curl_setopt($ch,CURLOPT_HTTPHEADER, $tmp_header);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+        curl_exec($ch);
+        curl_close($ch);
     }
 
 //A3THBIK7QYKUUV account id  marchant_id就是account_id
@@ -129,7 +123,6 @@ class AmazonModule extends BaseChannelModule
         }
         $str .= "</OrderFulfillment>
             </Message>";
-
         return $str;
     }
     /******************************************************************************************/

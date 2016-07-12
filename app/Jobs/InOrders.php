@@ -59,6 +59,6 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'Order has been exist.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('InOrders', json_encode($this->order));
+        $this->log('InOrders', serialize($this->order));
     }
 }

@@ -8,31 +8,17 @@
 
 namespace App\Http\Controllers;
 
-use Test;
-
-use App\Models\Purchase\PurchaseOrderModel;
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
-use App\Models\PackageModel;
-
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Models\ItemModel;
-use App\Modules\Channel\ChannelModule;
-use App\Jobs\Job;
-use App\Jobs\DoPackage;
-use App\Jobs\SendMessages;
 use DNS1D;
-use App\Http\Controllers\Controller;
-use App\Models\CurrencyModel;
-use App\Models\WarehouseModel;
-use App\Models\Warehouse\PositionModel;
 use App\Models\Channel\ChannelsModel;
-use App\Models\Message\ReplyModel;
-use App\Models\Message\MessageModel;
 use App\Models\Sellmore\ShipmentModel;
+use App\Models\Log\CommandModel as CommandLog;
 
 use DB;
 
@@ -54,50 +40,58 @@ class TestController extends Controller
 
     public function index()
     {
-
-        $reply = ReplyModel::find(28546);
-
-/*        $dataaaa = $reply->message->account->toArray();
-        var_dump($dataaaa);exit;*/
-
-        $job = new SendMessages($reply);
-        $job = $job->onQueue('SendMessages');
-        $this->dispatch($job);
-
-        exit;
-
-
-
-
-        $package = PackageModel::find(request()->input('id'));
-        $package->assignLogistics();
-        $job = new PlaceLogistics($package);
-        $job = $job->onQueue('placeLogistics');
-        $this->dispatch($job);
-        exit;
-        $orderModel = new OrderModel;
-        $start = microtime(true);
         $account = AccountModel::find(request()->input('id'));
-
         if ($account) {
+            $i = 1;
             $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
             $endDate = date("Y-m-d H:i:s", time() - 300);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $orderList = $channel->listOrders($startDate, $endDate, $account->api_status, $account->sync_pages);
-            foreach ($orderList as $order) {
-                $order['channel_id'] = $account->channel->id;
-                $order['channel_account_id'] = $account->id;
-                $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
-                $order['operator'] = $account->operator ? $account->operator->id : 0;
-                $oldOrder = $orderModel->where('channel_ordernum', $order['channel_ordernum'])->first();
-                if (!$oldOrder) {
-                    $orderModel->createOrder($order);
+            $nextToken = '';
+            do {
+                $start = microtime(true);
+                $total = 0;
+                $commandLog = CommandLog::create([
+                    'relation_id' => $account->id,
+                    'signature' => __CLASS__,
+                    'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '] - ' . $i . '.',
+                    'lasting' => 0,
+                    'total' => 0,
+                    'result' => 'init',
+                    'remark' => 'init',
+                ]);
+                $orderList = $channel->listOrders(
+                    $startDate, //开始日期
+                    $endDate, //截止日期
+                    $account->api_status, //订单状态
+                    $account->sync_pages, //每页数量
+                    $nextToken //下一页TOKEN
+                );
+                foreach ($orderList['orders'] as $order) {
+                    $order['channel_id'] = $account->channel->id;
+                    $order['channel_account_id'] = $account->id;
+                    $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
+                    $order['operator'] = $account->operator ? $account->operator->id : 0;
+                    $job = new InOrders($order);
+                    $job = $job->onQueue('inOrders');
+                    $this->dispatch($job);
+                    $total++;
                 }
-            }
+                $nextToken = $orderList['nextToken'];
+                //todo::Adapter->error()
+                $result['status'] = 'success';
+                $result['remark'] = 'Success.';
+                $end = microtime(true);
+                $lasting = round($end - $start, 3);
+                $commandLog->update([
+                    'data' => serialize($orderList['orders']),
+                    'lasting' => $lasting,
+                    'total' => $total,
+                    'result' => $result['status'],
+                    'remark' => $result['remark'],
+                ]);
+                echo $account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页, 耗时 ' . $lasting . ' 秒' . '<br>';
+            } while ($nextToken);
         }
-        $end = microtime(true);
-        $lasting = round($end - $start, 3);
-        echo $account->alias . ':' . $account->id . ' 耗时' . $lasting . '秒';
     }
 
 
@@ -335,7 +329,8 @@ class TestController extends Controller
     }
 
 
-    public function getEbayInfo(){
+    public function getEbayInfo()
+    {
         $accountID = request()->get('id');
         $begin = microtime(true);
         $account = AccountModel::findOrFail($accountID);

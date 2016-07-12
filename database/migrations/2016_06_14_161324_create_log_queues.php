@@ -14,11 +14,11 @@ class CreateLogQueues extends Migration
     {
         Schema::create('log_queues', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('relation_id')->comment('关联ID');
+            $table->integer('relation_id')->comment('关联ID');
             $table->string('queue')->comment('队列');
-            $table->text('data')->comment('数据');
+            $table->longText('data')->comment('数据');
             $table->string('description')->comment('描述');
-            $table->string('lasting')->comment('执行时间');
+            $table->float('lasting')->comment('执行时间');
             $table->string('result')->comment('结果');
             $table->string('remark')->comment('备注');
             $table->timestamps();

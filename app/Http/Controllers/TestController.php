@@ -33,6 +33,7 @@ use App\Models\Channel\ChannelsModel;
 use App\Models\Message\ReplyModel;
 use App\Models\Message\MessageModel;
 use App\Models\Sellmore\ShipmentModel;
+use App\Models\CatalogModel;
 
 use DB;
 
@@ -54,17 +55,17 @@ class TestController extends Controller
 
     public function index()
     {
+       $data =  CatalogModel::all()->channels;
 
-        $reply = ReplyModel::find(28546);
-
+dd($data);exit;
 /*        $dataaaa = $reply->message->account->toArray();
         var_dump($dataaaa);exit;*/
 
-        $job = new SendMessages($reply);
+/*        $job = new SendMessages($reply);
         $job = $job->onQueue('SendMessages');
         $this->dispatch($job);
 
-        exit;
+        exit;*/
 
 
 

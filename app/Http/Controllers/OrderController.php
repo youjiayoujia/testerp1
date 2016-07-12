@@ -153,6 +153,7 @@ class OrderController extends Controller
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
+            'currencys' => CurrencyModel::all(),
         ];
         return view($this->viewPath . 'index', $response);
     }

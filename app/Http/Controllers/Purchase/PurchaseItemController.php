@@ -71,6 +71,23 @@ class PurchaseItemController extends Controller
 			return redirect( route('purchaseOrderAbnormal.edit', $purchaseOrderId));
 		}
 	}
+
+	/**
+     * 去除采购单中异常条目
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+	public function deletePurchaseItem()
+	{
+		$id = request()->input("p_item_id");
+		$model = $this->model->find($id);
+		if (!$model) {
+            return 0;
+        }
+        $model->destroy($id);
+        return 1;
+	}
 	
 
 }

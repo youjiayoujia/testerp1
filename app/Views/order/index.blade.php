@@ -139,9 +139,12 @@
                         </a>
                     @endif
                     @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
-                        <a href="{{ route('withdraw', ['id'=>$order->id]) }}" class="btn btn-danger btn-xs">
-                            <span class="glyphicon glyphicon-pencil"></span> 撤单
-                        </a>
+                        <button class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#withdraw{{ $order->id }}"
+                                title="撤单">
+                            <span class="glyphicon glyphicon-link"></span> 撤单
+                        </button>
                         <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                            data-id="{{ $order->id }}"
                            data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
@@ -191,6 +194,41 @@
                 </div>
             </td>
         </tr>
+        <div class="modal fade" id="withdraw{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                        {!! csrf_field() !!}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">撤单</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-lg-6">
+                                    <label for="withdraw" class='control-label'>撤单原因</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select class="form-control" name="withdraw" id="withdraw">
+                                        <option value="NULL">==选择原因==</option>
+                                        @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
+                                            <option value="{{ $withdraw_key }}" {{ old('withdraw') == $withdraw_key ? 'selected' : '' }}>
+                                                {{ $withdraw }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="refund{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

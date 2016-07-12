@@ -260,6 +260,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     //品类路由
     Route::resource('catalog', 'CatalogController');
+    Route::get('catalog/exportCatalogRates/{str}',
+        ['uses' => 'CatalogController@exportCatalogRates', 'as' => 'catalog.exportCatalogRates']);
+    Route::get('catalog/editCatalogRates/{str}',
+        ['uses' => 'CatalogController@editCatalogRates', 'as' => 'catalog.editCatalogRates']);
+    Route::any('updateCatalogRates', ['uses' => 'CatalogController@updateCatalogRates', 'as' => 'updateCatalogRates']);
+
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);

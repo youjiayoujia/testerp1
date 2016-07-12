@@ -33,9 +33,9 @@ class ProductController extends Controller
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
         $this->viewPath = 'product.';
-        if (Gate::denies('check','product_admin,product_staff|show')) {
+        /*if (Gate::denies('check','product_admin,product_staff|show')) {
             echo "没有权限";exit;
-        }
+        }*/
 
         /*if (Gate::denies('product_admin','product|show')) {
             echo "没有权限";exit;
@@ -44,9 +44,9 @@ class ProductController extends Controller
 
     public function create()
     {
-        if (Gate::denies('check','product_admin,product_staff|add')) {
+        /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
-        }
+        }*/
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -68,9 +68,9 @@ class ProductController extends Controller
      */
     public function store()
     {
-        if (Gate::denies('check','product_admin,product_staff|add')) {
+        /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
-        }
+        }*/
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         if(!array_key_exists('modelSet',request()->all())){
@@ -90,9 +90,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        if (Gate::denies('check','product_admin,product_staff|edit')) {
+        /*if (Gate::denies('check','product_admin,product_staff|edit')) {
             echo "没有权限";exit;
-        }
+        }*/
         $variation_value_id_arr = [];
         $features_value_id_arr  = [];
         $features_input = [];
@@ -149,9 +149,9 @@ class ProductController extends Controller
      */
     public function update($id)
     {
-        if (Gate::denies('check','product_admin,product_staff|edit')) {
+        /*if (Gate::denies('check','product_admin,product_staff|edit')) {
             echo "没有权限";exit;
-        }
+        }*/
         request()->flash();
         $this->validate(request(), $this->model->rules('update',$id));
         $productModel = $this->model->find($id);
@@ -168,9 +168,9 @@ class ProductController extends Controller
      */
     public function destroy($id) 
     {
-        if (Gate::denies('check','product_admin,product_staff|delete')) {
+        /*if (Gate::denies('check','product_admin,product_staff|delete')) {
             echo "没有权限";exit;
-        }
+        }*/
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));

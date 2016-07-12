@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\UserModel;
 use App\Models\RoleModel;
 use App\Models\PermissionModel;
+use Gate;
 
 class UserController extends Controller
 {
@@ -22,11 +23,16 @@ class UserController extends Controller
         $this->mainIndex = route('user.index');
         $this->mainTitle = '用户';
         $this->viewPath = 'user.';
-        
+        if (Gate::denies('check','user_admin,user_staff|show')) {
+            echo "没有权限";exit;
+        }
     }
 
     public function create()
     {
+        if (Gate::denies('check','user_admin|create')) {
+            echo "没有权限";exit;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'roles' => RoleModel::all(),
@@ -42,6 +48,9 @@ class UserController extends Controller
      */
     public function store()
     {
+        if (Gate::denies('check','user_admin|create')) {
+            echo "没有权限";exit;
+        }
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
@@ -49,7 +58,9 @@ class UserController extends Controller
 
         $userModel = $this->model->create($data);
         //多对多插入
-        $userModel->role()->attach($data['user_role']);
+        if(array_key_exists('user_role', $data)){
+            $userModel->role()->attach($data['user_role']);
+        }
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
     }
 
@@ -61,12 +72,14 @@ class UserController extends Controller
      */
     public function edit($id)
     {
+        if (Gate::denies('check','user_admin|edit')) {
+            echo "没有权限";exit;
+        }
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        //echo '<pre>';
-        //print_r($model->role->toArray());exit;
+
         $select_role = [];
         foreach($model->role as $role){
             $select_role[] = $role->pivot->role_id;
@@ -88,6 +101,9 @@ class UserController extends Controller
      */
     public function update($id)
     {
+        if (Gate::denies('check','user_admin|create')) {
+            echo "没有权限";exit;
+        }
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -95,6 +111,10 @@ class UserController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $data = request()->all();
+        if(array_key_exists('user_role', $data)){
+            $model->role()->sync($data['user_role']);
+        }
+        
         if(strlen($data['password'])>=30){
             $data['password'] = $data['password'];
         }else{

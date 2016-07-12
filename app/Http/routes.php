@@ -9,6 +9,12 @@
   | and give it the controller to call when that URI is requested.
   |
  */
+/**
+ * 
+ * Route::get('a/b', ['uses' => 'dddController@b', 'as' => 'a.b']);   路由规范
+ * 注意a/b  b  a.b 这三部分的样式就OK了
+ *
+ */
 Route::get('test1', 'TestController@test1');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -24,7 +30,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('countries', 'CountriesController');
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
-    Route::resource('countries', 'CountriesController');
+
+    Route::resource('eventChild', 'EventChildController');
     //3宝package
     Route::resource('bao3Package', 'Bao3PackageController');
     //产品图片路由
@@ -136,6 +143,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::get('stock/changePosition', ['uses' => 'StockController@changePosition', 'as' => 'stock.changePosition']);
     Route::any('itemAjaxWarehousePosition', ['uses' => 'StockController@ajaxWarehousePosition', 'as' => 'itemAjaxWarehousePosition']);
     Route::get('stock/getSinglePosition',
         ['uses' => 'StockController@getSinglePosition', 'as' => 'stock.getSinglePosition']);
@@ -159,6 +167,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stock', 'StockController');
     //采购条目
     Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
+    Route::any('purchaseItem/deletePurchaseItem', ['uses' => 'Purchase\PurchaseItemController@deletePurchaseItem', 'as' => 'deletePurchaseItem']);
     Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}',
         'Purchase\PurchaseItemController@costExamineStatus');
     Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
@@ -251,6 +260,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     //品类路由
     Route::resource('catalog', 'CatalogController');
+    Route::get('catalog/exportCatalogRates/{str}',
+        ['uses' => 'CatalogController@exportCatalogRates', 'as' => 'catalog.exportCatalogRates']);
+    Route::get('catalog/editCatalogRates/{str}',
+        ['uses' => 'CatalogController@editCatalogRates', 'as' => 'catalog.editCatalogRates']);
+    Route::any('updateCatalogRates', ['uses' => 'CatalogController@updateCatalogRates', 'as' => 'updateCatalogRates']);
+
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);

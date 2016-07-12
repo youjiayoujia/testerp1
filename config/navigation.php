@@ -266,6 +266,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '采购收货',
                     'url' => 'recieve',
                     'icon' => '',
@@ -391,6 +396,13 @@ return [
                 [
                     'name' => '失败队列',
                     'url' => 'jobFailed.index',
+                    'icon' => '',
+                ],
+            ],
+            '事件历史' => [
+                [
+                    'name' => '历史记录',
+                    'url' => 'eventChild.index',
                     'icon' => '',
                 ],
             ],

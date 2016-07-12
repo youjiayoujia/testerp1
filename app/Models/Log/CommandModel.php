@@ -24,6 +24,11 @@ class CommandModel extends BaseModel
     //查询
     public $searchFields = ['relation_id' => '关联ID', 'signature' => '命令', 'description' => '描述', 'remark' => '备注'];
 
+    public function items()
+    {
+        return $this->hasMany('App\Models\Log\Command\ItemModel', 'log_command_id', 'id');
+    }
+
     public function getColorAttribute()
     {
         if ($this->result == 'fail') {

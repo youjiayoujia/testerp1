@@ -38,8 +38,6 @@ class RoleController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        //echo '<pre>';
-        //print_r($model->role->toArray());exit;
         $select_permission = [];
         foreach($model->permission as $permission){
             $select_permission[] = $permission->pivot->permission_id;
@@ -60,8 +58,31 @@ class RoleController extends Controller
         $data = request()->all();
         $roleModel = $this->model->create($data);
         //多对多插入role_permissons表
-        $roleModel->permission()->attach($data['role_permission']);
-
+        if(array_key_exists('role_permission', $data)){
+            $roleModel->permission()->attach($data['role_permission']);
+        }
         return redirect($this->mainIndex);
+    }
+
+    /**
+     * 更新
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        request()->flash();
+        $this->validate(request(), $this->model->rules('update', $id));
+        $data = request()->all();
+        if(array_key_exists('role_permission', $data)){
+            $model->permission()->sync($data['role_permission']);
+        } 
+        $model->update($data);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '更新成功.'));
     }
 }

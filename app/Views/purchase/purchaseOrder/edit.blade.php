@@ -20,7 +20,13 @@
            <div class="row">
            <div class="form-group col-lg-4">
                 <strong>采购仓库</strong>:
-                {{ $model->warehouse?$model->warehouse->name:''}}
+                <select name="warehouse_id">
+                    <?php $warehouse_id = $model->warehouse?$model->warehouse->id:'0'; ?>
+                    @foreach($warehouses as $warehouse)
+                        <option value="{{$warehouse->id}}" {{$warehouse->id ==  $warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                    @endforeach
+                </select>
+                
             </div>
             <div class="form-group col-lg-4">
                 <strong>仓库地址</strong>:
@@ -123,7 +129,8 @@
             <td>采购价格</td>
             <td>采购价格审核</td>
             <td>购买链接</td> 
-            <td>操作</td>           
+            <td>操作</td>
+            <td>删除</td>         
         </tr>
     </thead>
     <tbody>
@@ -216,6 +223,13 @@
                 </select>
                  @endif
                 </td>
+                <td>
+                    <a href="javascript:" class="btn btn-danger btn-xs p_item_delete"
+                   data-id="{{ $purchaseItem->id }}"
+                   data-url="{{ route('product.destroy', ['id' => $purchaseItem->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span> 删除
+                    </a>
+                </td>
             </tr>
             
         @endforeach
@@ -285,6 +299,25 @@
          var batch_post_coding=$('#batch_post_coding').val(); 
             $(".itemPostCoding").val(batch_post_coding);
         }
+
+    $(".p_item_delete").click(function(){
+        if (confirm("确认删除?")) {
+            var p_item_id = $(this).data('id');
+                $.ajax({
+                    url: "{{ route('deletePurchaseItem') }}",
+                    data: {p_item_id: p_item_id},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        if(result==0){
+                            alert("删除失败");
+                        }else{
+                            window.location.reload();
+                        }
+                    }
+            });
+        }
+    })
         //新增物流号对应物流费
         $(document).ready(function () {
             var current = $('#currrent').val();

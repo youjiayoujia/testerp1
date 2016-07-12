@@ -476,7 +476,7 @@ Class LazadaAdapter implements AdapterInterface
     {
 
     }
-    public function sendMessages(){
+    public function sendMessages($replyMessage){
         
     }
 

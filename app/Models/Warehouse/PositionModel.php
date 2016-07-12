@@ -14,7 +14,7 @@ class PositionModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'warehouse_positions';
+    public $table = 'warehouse_positions';
 
     /**
      * The attributes that are mass assignable.

@@ -32,7 +32,7 @@ class InModel extends BaseModel
             'filterFields' => ['id'],
             'relatedSearchFields' => [],
             'doubleRelatedSearchFields' => ['stock' => ['item' => ['sku']]],
-            'filterSelects' => [],
+            'filterSelects' => ['type' => config('in.in')],
             'selectRelatedSearchs' => [
             ],
             'sectionSelect' => [],

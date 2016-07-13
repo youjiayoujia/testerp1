@@ -182,12 +182,14 @@
                             <span class="glyphicon glyphicon-pencil"></span> 恢复正常
                         </a>
                     @endif
-                    <button class="btn btn-primary btn-xs"
-                            data-toggle="modal"
-                            data-target="#package{{ $order->id }}"
-                            title="包裹">
-                        <span class="glyphicon glyphicon-link"></span> 包裹
-                    </button>
+                    @if(count($order->packages) > 0)
+                        <button class="btn btn-primary btn-xs"
+                                data-toggle="modal"
+                                data-target="#package{{ $order->id }}"
+                                title="包裹">
+                            <span class="glyphicon glyphicon-link"></span> 包裹
+                        </button>
+                    @endif
                     <a href="{{ route('order.show', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 查看
                     </a>

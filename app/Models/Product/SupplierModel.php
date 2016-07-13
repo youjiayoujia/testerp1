@@ -41,6 +41,8 @@ class SupplierModel extends BaseModel
         'pay_type',
         'qualifications',
         'examine_status',
+        'qq',
+        'wangwang'
     ];
 
     //查询
@@ -61,6 +63,7 @@ class SupplierModel extends BaseModel
             'telephone' => 'required|max:256|digits_between:8,11',
             'purchase_time' => 'required|integer',
             'bank_account' => 'required|string',
+
         ]
     ];
 
@@ -130,7 +133,6 @@ class SupplierModel extends BaseModel
      */
     public function updateSupplier($id, $data, $file = null)
     {
-
         if ($data['type'] == 0 && $file != null) { //线下类型
             $path = config('product.product_supplier.file_path');
                 if ($file->getClientOriginalName()) {

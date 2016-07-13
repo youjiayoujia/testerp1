@@ -78,6 +78,7 @@
     <th>ID</th>
     <th class="sort" data-field="model">MODEL</th>
     <th>图片</th>
+    <th>产品名称</th>
     <th>分类</th>
     <th>状态</th>
     <th>选中shop</th>
@@ -102,6 +103,7 @@
             <td>{{ $product->id }}</td>
             <td>{{ $product->model }}</td>
             <td><img src="{{ asset($product->dimage) }}" width="100px"></td>
+            <td>{{ $product->c_name }}<br>分类：{{ $product->catalog?$product->catalog->all_name:'' }}<br>开发时间：{{ $product->created_at }}<br></td>
             <td>{{ $product->catalog?$product->catalog->all_name:'' }}</td>
             <td><?php if ($product->edit_status == "") echo "新品上传";if ($product->edit_status == "picked") echo "被选中";if ($product->edit_status == "canceled") echo "取消"; ?></td>
             <td><?php if ($product->amazonProduct) echo "amazon,";if ($product->ebayProduct) echo "ebay,";if ($product->aliexpressProduct) echo "aliexpress,";if ($product->b2cProduct) echo "B2C,"; ?></td>

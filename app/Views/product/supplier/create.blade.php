@@ -3,18 +3,18 @@
 @section('formAttributes') name='creator' @stop
 @section('formBody')
     <div class="row">
-        <div class="form-group col-lg-2">
+{{--        <div class="form-group col-lg-2">
             <label for="name" class='control-label'>名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="供货商名字" name='name' value="{{ old('name') }}">
-        </div>
-        <div class="form-group col-lg-1">
+        </div>--}}
+{{--        <div class="form-group col-lg-1">
             <label for='province'>省份</label> 
             <select name="province" onChange = "select()" class='form-control'></select>
         </div>　
         <div class="form-group col-lg-1">
             <label for='city'>城市</label> 
             <select name="city" onChange = "select()" class='form-control'></select>
-        </div>
+        </div>--}}
         <div class="form-group col-lg-2">
             <label for="company">公司</label>
             <input type='text' class="form-control" id="company" placeholder="公司" name='company' value="{{ old('company') }}">
@@ -40,13 +40,16 @@
                     <input type='radio' name='type' value='2' {{ old('type') ? (old('type') == '2' ? 'checked' : '') : '' }}>做货
                 </label>
             </div>
-        </div>	
-    </div>
-    <div class="row">
+        </div>
+
         <div class="form-group col-lg-3">
             <label for="name" class='control-label'>采购周期</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="purchase_time" placeholder="采购周期" name='purchase_time' value="{{ old('purchase_time') }}">
         </div>
+
+    </div>
+    <div class="row">
+
        <div class="form-group col-lg-3">
             <label for="name" class='control-label'>开户行</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="bank_account" placeholder="开户行" name='bank_account' value="{{ old('bank_account') }}">
@@ -63,16 +66,19 @@
             @endforeach
             </select>
         </div>
-    </div>　
-    <div class="row">
-   		<div class="form-group col-lg-3" id="update_examine" > 
+
+        <div class="form-group col-lg-3" id="update_examine" >
             <label for="url">上传审核资料</label>
             <input type='file' class=" file" id="qualifications" placeholder="上传审核资料" name='qualifications' >
         </div>
-        <div class="form-group col-lg-3">
+
+    </div>　
+    <div class="row">
+
+{{--        <div class="form-group col-lg-3">
             <label for="url">供货商网址</label>
             <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') }}" {{ old('type') ? old('type') != '1' ? 'readonly' : '' : 'readonly' }}>
-        </div>
+        </div>--}}
         <div class="form-group col-lg-3">
             <label for="contact_name">联系人</label>
             <input class="form-control" id="contact_name" placeholder="联系人" name='contact_name' value="{{ old('contact_name') }}">
@@ -82,8 +88,12 @@
             <input class="form-control" id="telephone" placeholder="电话" name='telephone' value="{{ old('telephone') }}">
         </div>
         <div class="form-group col-lg-3">
-            <label for="email">email</label>
-            <input class="form-control" id="email" placeholder="email" name='email' value="{{ old('email') }}">
+            <label for="wangwang">旺旺</label>
+            <input class="form-control" id="email" placeholder="旺旺" name='wangwang' value="{{ old('email') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="qq">QQ</label>
+            <input class="form-control" id="email" placeholder="QQ" name='qq' value="{{ old('qq') }}">
         </div>
     </div>
     <div class="row">

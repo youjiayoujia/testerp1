@@ -17,8 +17,8 @@
             <select name="city" onChange = "select()" class='form-control'></select>
         </div>--}}
         <div class="form-group col-lg-2">
-            <label for="company">公司</label>
-            <input type='text' class="form-control" id="company" placeholder="公司" name='company' value="{{ old('company') ?  old('company') : $model->company }}">
+            <label for="company">公司名称</label>
+            <input type='text' class="form-control" id="company" placeholder="公司名称" name='company' value="{{ old('company') ?  old('company') : $model->company }}">
         </div>
         <div class="form-group col-lg-2">
             <label for="official_url">供货商官网</label>

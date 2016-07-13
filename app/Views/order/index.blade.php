@@ -270,7 +270,7 @@
                                 <div class="divider"></div>
                             @endif
                             <div class='row'>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-lg-4">
                                     <label for="ordernum" class='control-label'>订单号</label>
                                     <label class="text-danger">(已付款时长: {{ '' }} 天)</label>
                                     <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $order->ordernum }}" readonly>
@@ -305,7 +305,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-lg-4">
                                     <label for="refund" class='control-label'>退款方式</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="refund" id="refund">
@@ -317,7 +317,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-lg-4">
                                     <label for="reason" class='control-label'>退款原因</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="reason" id="reason">
@@ -329,7 +329,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group col-lg-3">
+                                <div class="form-group col-lg-4">
                                     <label for="type" class='control-label'>退款类型</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                                     <select class="form-control" name="type" id="type">

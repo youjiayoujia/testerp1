@@ -4,7 +4,7 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class="row">
-        <div class="form-group col-lg-2">
+{{--        <div class="form-group col-lg-2">
             <label for="name">名称</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input type='text' class="form-control" id="name" placeholder="供货商名" name='name' value="{{ old('name') ?  old('name') : $model->name }}">
         </div>
@@ -15,10 +15,10 @@
         <div class='form-group col-lg-1'>
             <label for='city'>城市</label>
             <select name="city" onChange = "select()" class='form-control'></select>
-        </div>
+        </div>--}}
         <div class="form-group col-lg-2">
-            <label for="company">公司</label>
-            <input type='text' class="form-control" id="company" placeholder="公司" name='company' value="{{ old('company') ?  old('company') : $model->company }}">
+            <label for="company">公司名称</label>
+            <input type='text' class="form-control" id="company" placeholder="公司名称" name='company' value="{{ old('company') ?  old('company') : $model->company }}">
         </div>
         <div class="form-group col-lg-2">
             <label for="official_url">供货商官网</label>
@@ -82,10 +82,10 @@
                 @endif
 
         </div>
-        <div class="form-group col-lg-3">
+{{--        <div class="form-group col-lg-3">
             <label for="url">供货商网址</label>
             <input type='text' class="form-control url" id="url" placeholder="供货商url" name='url' value="{{ old('url') ?  old('url') : $model->url }}" {{ old('type') ? old('type') != '1' ? 'readonly' : '' :$model->type != '1' ? 'readonly' : ''}}>
-        </div>
+        </div>--}}
         <div class="form-group col-lg-3">
             <label for="contact_name">联系人</label>
             <input class="form-control" id="contact_name" placeholder="联系人" name='contact_name' value="{{ old('contact_name') ? old('contact_name') : $model->contact_name }}">
@@ -95,8 +95,12 @@
             <input class="form-control" id="telephone" placeholder="电话" name='telephone' value="{{ old('telephone') ? old('telephone') : $model->telephone }}">
         </div>
         <div class="form-group col-lg-3">
-            <label for="email">email</label>
-            <input class="form-control" id="email" placeholder="email" name='email' value="{{ old('email') ? old('email') : $model->email }}">
+            <label for="wangwang">旺旺</label>
+            <input class="form-control" id="wangwang" placeholder="旺旺" name='wangwang' value="{{ old('wangwang') ? old('wangwang') : $model->wangwang }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="qq">QQ</label>
+            <input class="form-control" id="qq" placeholder="QQ" name='qq' value="{{ old('qq') ? old('qq') : $model->qq }}">
         </div>
     </div>
     <div class="row">

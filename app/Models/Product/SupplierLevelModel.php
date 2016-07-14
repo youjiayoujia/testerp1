@@ -21,5 +21,5 @@ class SupplierLevelModel extends BaseModel
         ]
     ];
     //查询
-    public $searchFields = ['name', 'description'];
+    public $searchFields = ['name'=>'名称', 'description'=>'描述'];
 }

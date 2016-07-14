@@ -66,39 +66,37 @@ Class AmazonAdapter implements AdapterInterface
      * @param int $perPage
      * @return array
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = null)
     {
         $orders = [];
-        $nextToken = null;
-        do {
-            $request = [];
-            if ($nextToken) {
-                $request['Action'] = 'ListOrdersByNextToken';
-                $request['NextToken'] = $nextToken;
-            } else {
-                $request['Action'] = 'ListOrders';
-                foreach ($status as $key => $value) {
-                    $request['OrderStatus.Status.' . ($key + 1)] = $value;
-                }
-                $request['MaxResultsPerPage'] = $perPage;
-                $request['LastUpdatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
-                if ($endDate) {
-                    $request['LastUpdatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
-                }
+        $request = [];
+        if ($nextToken) {
+            $request['Action'] = 'ListOrdersByNextToken';
+            $request['NextToken'] = $nextToken;
+        } else {
+            $request['Action'] = 'ListOrders';
+            foreach ($status as $key => $value) {
+                $request['OrderStatus.Status.' . ($key + 1)] = $value;
             }
-            $response = $this->setRequest('Orders', $request);
-            if (isset($response->Error)) {
-                Tool::show($response, false);
-                continue;
+            $request['MaxResultsPerPage'] = $perPage;
+            $request['LastUpdatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($startDate));
+            if ($endDate) {
+                $request['LastUpdatedBefore'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", strtotime($endDate));
             }
-            $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
-            foreach ($responseOrders->Orders->Order as $order) {
-                $orderItems = $this->getOrderItems($order->AmazonOrderId);
-                $orders[] = $this->parseOrder($order, $orderItems);
-            }
-            $nextToken = $responseOrders->NextToken;
-        } while ($nextToken);
-        return $orders;
+        }
+        $response = $this->setRequest('Orders', $request);
+        Tool::show($response, false);
+        //TODO:return ERRORS
+        if (isset($response->Error)) {
+            Tool::show($response, false);
+        }
+        $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
+        foreach ($responseOrders->Orders->Order as $order) {
+            $orderItems = $this->getOrderItems($order->AmazonOrderId); //抓取订单行
+            $orders[] = $this->parseOrder($order, $orderItems);
+        }
+        $nextToken = $responseOrders->NextToken;
+        return ['orders' => $orders, 'nextToken' => $nextToken];
     }
 
     /**
@@ -453,12 +451,13 @@ Class AmazonAdapter implements AdapterInterface
         $result = $service->users_messages->send($user, $message);
         $replyMessage->status = $result->id ? 'SENT' : 'FAIL';
         $replyMessage->save();
-        if($result->id){
+        if ($result->id) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
+
     public function message($from, $fromEmail, $to, $toEmail, $subject, $content)
     {
         $message = 'From: =?utf-8?B?' . base64_encode($from) . '?= <' . $fromEmail . ">\r\n";
@@ -469,7 +468,7 @@ Class AmazonAdapter implements AdapterInterface
         $message .= 'Content-Transfer-Encoding: quoted-printable' . "\r\n\r\n";
         //$content=htmlspecialchars($content);
         $message .= $content . "\r\n";
-        echo $message ."\r\n";
+        echo $message . "\r\n";
         return Tool::base64Encode($message);
     }
 

@@ -44,7 +44,7 @@ class ReplyModel extends BaseModel
             'content' => 'required',
         ]
     ];
-    public $searchFields = ['id','message_id', 'to_email'];
+    public $searchFields = ['id'=> 'ID', 'to_email'=>'收件邮箱'];
 
     public function message()
     {

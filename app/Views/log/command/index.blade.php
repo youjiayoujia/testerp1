@@ -9,6 +9,7 @@
     <th>执行结果</th>
     <th>备注</th>
     <th class="sort" data-field="created_at">创建时间</th>
+    <th>操作</th>
 @stop
 @section('tableBody')
     @foreach($data as $log)
@@ -22,6 +23,33 @@
             <td class="bg-{{ $log->color }}">{{ $log->result }}</td>
             <td>{{ $log->remark }}</td>
             <td>{{ $log->created_at }}</td>
+            <td>
+                <a class="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample{{ $log->id }}" aria-expanded="false" aria-controls="collapseExample">数据详情</a>
+            </td>
+        </tr>
+        <tr class="collapse" id="collapseExample{{ $log->id }}">
+            <td colspan="10">
+                @if($log->data)
+                    @foreach(unserialize($log->data) as $item)
+                        @foreach($item as $key => $value)
+                            @if(is_array($value))
+                                <dl class="dl-horizontal">
+                                    <dt>{{ $key }}</dt>
+                                    <dd>
+                                        <pre>{{ var_dump($value) }}</pre>
+                                    </dd>
+                                </dl>
+                            @else
+                                <dl class="dl-horizontal">
+                                    <dt>{{ $key }}</dt>
+                                    <dd>{{ $value }}</dd>
+                                </dl>
+                            @endif
+                        @endforeach
+                        <div class="divider"></div>
+                    @endforeach
+                @endif
+            </td>
         </tr>
     @endforeach
 @stop

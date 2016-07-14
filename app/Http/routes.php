@@ -167,6 +167,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stock', 'StockController');
     //采购条目
     Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
+    Route::any('purchaseItem/deletePurchaseItem', ['uses' => 'Purchase\PurchaseItemController@deletePurchaseItem', 'as' => 'deletePurchaseItem']);
     Route::any('/purchaseItem/costExamineStatus/{id}/{costExamineStatus}',
         'Purchase\PurchaseItemController@costExamineStatus');
     Route::resource('purchaseItem', 'Purchase\PurchaseItemController');
@@ -259,6 +260,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     //品类路由
     Route::resource('catalog', 'CatalogController');
+    Route::get('catalog/exportCatalogRates/{str}',
+        ['uses' => 'CatalogController@exportCatalogRates', 'as' => 'catalog.exportCatalogRates']);
+    Route::get('catalog/editCatalogRates/{str}',
+        ['uses' => 'CatalogController@editCatalogRates', 'as' => 'catalog.editCatalogRates']);
+    Route::any('updateCatalogRates', ['uses' => 'CatalogController@updateCatalogRates', 'as' => 'updateCatalogRates']);
+
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
@@ -375,6 +382,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('pickList/type', ['uses' => 'PickListController@ajaxType', 'as' => 'pickList.type']);
     Route::resource('pickList', 'PickListController');
     //产品管理路由
+    Route::any('productInfo', ['uses' => 'ProductController@productInfo', 'as' => 'productInfo']);
     Route::any('productBatchEdit', ['uses' => 'ProductController@productBatchEdit', 'as' => 'productBatchEdit']);
     Route::any('productBatchUpdate', ['uses' => 'ProductController@productBatchUpdate', 'as' => 'productBatchUpdate']);
     Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');

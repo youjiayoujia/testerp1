@@ -225,5 +225,9 @@ class Tool
         }
         return $result;
     }
+
+    public function getPercent($num){
+        return $num.'%';
+     }
     
 }

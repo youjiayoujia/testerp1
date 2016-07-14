@@ -16,7 +16,7 @@ class CatalogModel extends BaseModel
      */
     protected $fillable = ['id', 'name','c_name','code'];
 
-    public $searchFields = ['name','c_name'];
+    public $searchFields = ['id'=>'ID','c_name'=>'名称'];
 
     public $rules = [
         'create' => ['name' => 'required|unique:catalogs,name',
@@ -232,5 +232,4 @@ class CatalogModel extends BaseModel
         $result = $this->where("name",$catalog_name)->get();
         return count($result);
     }
-
 }

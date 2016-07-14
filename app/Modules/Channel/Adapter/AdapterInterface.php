@@ -22,7 +22,7 @@ interface AdapterInterface
      *
      * @param $startDate
      * @param $endDate
-     * @param array $status
+     * @param array $status呵da
      * @param int $perPage
      * @return $orderArray
      *
@@ -69,7 +69,7 @@ interface AdapterInterface
      *      ],
      * ]
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 10);
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = null);
 
     /**
      * 回传物流信息

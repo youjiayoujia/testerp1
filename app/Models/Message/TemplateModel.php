@@ -29,7 +29,7 @@ class TemplateModel extends BaseModel
         'content',
     ];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['id'=>'ID','name'=>'名称'];
 
     protected $rules = [
         'create' => [

@@ -109,8 +109,8 @@
                         -
                         <strong>{{ $package->status_text }}</strong>
                     </div>
-                    @if($package->shipping)
                         <div class="panel-body">
+                            @if($package->shipping)
                             <div class="row form-group">
                                 <div class="col-lg-6">
                                     <strong>物流</strong>:
@@ -126,7 +126,8 @@
                                     <strong>追踪号</strong>: {{ $package->tracking_no }}
                                 </div>
                             </div>
-                            <div class="row form-group">
+                            @endif
+                                <div class="row form-group">
                                 <div class="col-lg-6">
                                     <strong>创建</strong>: {{ $package->created_at }}
                                 </div>

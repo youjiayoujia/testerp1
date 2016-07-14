@@ -338,14 +338,14 @@ class OrderModel extends BaseModel
     public function checkBlack()
     {
         $channel = $this->channel->find($this['channel_id']);
-        if($channel['driver'] == 'wish') {
+        if ($channel['driver'] == 'wish') {
             $name = $this['shipping_lastname'] . ' ' . $this['shipping_firstname'];
             $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
-        }else {
+        } else {
             $blacklist = BlacklistModel::where('email', $this['email']);
 
         }
-        if(count($blacklist) > 0) {
+        if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
             return true;
         }
@@ -357,25 +357,25 @@ class OrderModel extends BaseModel
         $data['ordernum'] = $begin = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
-            $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
-            if ($channelProduct) {
-                $orderItem['item_id'] = $channelProduct->item->id;
-                if (!$orderItem['sku']) {
-                    $orderItem['sku'] = $channelProduct->item->sku;
-                }
-            } else {
-                if ($orderItem['sku']) {
-                    $item = ItemModel::where('sku', $orderItem['sku'])->first();
-                    if ($item) {
-                        ChannelProduct::create([
-                            'channel_account_id' => $data['channel_account_id'],
-                            'item_id' => $item->id,
-                            'channel_sku' => $orderItem['channel_sku'],
-                        ]);
-                        $orderItem['item_id'] = $item->id;
-                    }
+//            $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
+//            if ($channelProduct) {
+//                $orderItem['item_id'] = $channelProduct->item->id;
+//                if (!$orderItem['sku']) {
+//                    $orderItem['sku'] = $channelProduct->item->sku;
+//                }
+//            } else {
+            if ($orderItem['sku']) {
+                $item = ItemModel::where('sku', $orderItem['sku'])->first();
+                if ($item) {
+//                    ChannelProduct::create([
+//                        'channel_account_id' => $data['channel_account_id'],
+//                        'item_id' => $item->id,
+//                        'channel_sku' => $orderItem['channel_sku'],
+//                    ]);
+                    $orderItem['item_id'] = $item->id;
                 }
             }
+//            }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
                 $order->update(['status' => 'REVIEW']);

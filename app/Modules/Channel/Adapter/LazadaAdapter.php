@@ -56,47 +56,23 @@ Class LazadaAdapter implements AdapterInterface
      * @param int $perPage
      * @return array
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 0)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 0, $nextToken = '')
     {
         $result_orders = [];
-        $nextToken = null;
-
-        $step = 0;
-
-        if ($perPage) {
-            $this->perPage = $perPage;
+        if (empty($nextToken)) {
+            $nextToken = 1;
         }
 
-        do {
-
-            $step++;
-
-            $offset = ($step - 1) * $this->perPage;
-
-            $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
+        $offset = ((int)$nextToken - 1) * $perPage;
 
 
-            if (isset($orders_data['Head']['ErrorMessage'])) {
-                if ($orders_data['Head']['ErrorMessage'] == 'Too many API requests') {
-                    //need to write log info
+        $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
 
-                    break;
-                } else {
-                    //不是请求频繁，保存下错误原因
-                    $op = "获取订单失败，信息为 " . $orders_data['Head']['ErrorMessage'];
-                    //need to write log info
+        if (!isset($orders_data['Body']['Orders']['Order']) || empty($orders_data['Body']['Orders']['Order'])) {
+            $nextToken = '';
+            var_dump($orders_data);
 
-
-                    break;
-                }
-            }
-
-            if (!isset($orders_data['Body']['Orders']['Order'])) {
-                //need to write log info
-
-                break;
-            }
-
+        } else {
             //单订单情况
             if (!isset($orders_data['Body']['Orders']['Order'][0])) {
                 $orders = [$orders_data['Body']['Orders']['Order']];
@@ -115,14 +91,13 @@ Class LazadaAdapter implements AdapterInterface
                 $tmp_order = $this->parseOrder($order_info, $items);
 
                 $result_orders[] = $tmp_order;
-
             }
+            $nextToken++;
+        }
 
 
-        } while (true);
+        return ['orders' => $result_orders, 'nextToken' => $nextToken];
 
-
-        return $result_orders;
     }
 
 
@@ -227,6 +202,7 @@ Class LazadaAdapter implements AdapterInterface
             }
         }
 
+
         $items = $itemarr['Body']['OrderItems']['OrderItem'];
         if (isset($items['OrderItemId'])) {
             $temp = $items;
@@ -278,7 +254,7 @@ Class LazadaAdapter implements AdapterInterface
 
 
         $result = [
-            'channel_ordernum' => $order_info['OrderId'],
+            'channel_ordernum' => $order_info['OrderNumber'],
             //'email' => $order->BuyerEmail,
             'amount' => $total,
             'amount_shipping' => $orders_ship_fee,
@@ -316,6 +292,8 @@ Class LazadaAdapter implements AdapterInterface
                 'quantity' => $v['item_count'],
                 'price' => $v['item_price'],
                 'currency' => $lazada_currency_type,
+                'channel_order_id' => $result['channel_ordernum'],
+                'transaction_id' => $v['comment_text']
             ];
         }
 
@@ -341,7 +319,7 @@ Class LazadaAdapter implements AdapterInterface
                 0 => array(
                     'sku' => $item['Sku'],
                     'count' => 1,
-                    'price' => $item['ItemPrice']
+                    'price' => $item['ItemPrice'],
                 )
             );
 
@@ -352,6 +330,7 @@ Class LazadaAdapter implements AdapterInterface
                 $total += $item['ItemPrice'];
 
                 $orders_ship_fee += $item['ShippingAmount'];
+
 
                 if (isset($sku_data[$v['sku']])) {
                     $sku_data[$v['sku']]['item_count'] += 1;
@@ -364,6 +343,8 @@ Class LazadaAdapter implements AdapterInterface
                     $sku_data[$v['sku']]['orders_sku'] = $v['sku'];
                     $sku_data[$v['sku']]['channel_sku'] = $v['channel_sku'];
                 }
+
+
             }
         }
         $sku_data['total'] = $total;
@@ -371,6 +352,8 @@ Class LazadaAdapter implements AdapterInterface
 
         $sku_data['orders_ship_fee'] = 0;    //lazada不需要运费
 
+
+        //  var_dump($sku_data);exit;
         return $sku_data;
     }
 
@@ -466,18 +449,73 @@ Class LazadaAdapter implements AdapterInterface
         return simplexml_load_string(Tool::curl($requestUrl));
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
-        // TODO: Implement returnTrack() method.
-        echo "return Amazon Tracking Informations";
+        $return = [];
+
+        $now = new \DateTime();
+        $api_key = $this->config['lazada_access_key'];
+        $lazada_api_host = $this->config['lazada_api_host'];
+        $lazada_user_id = $this->config['lazada_user_id'];
+
+        $parameters = array(
+            'UserID' => $lazada_user_id,
+            'Action' => 'SetStatusToReadyToShip',
+            'OrderItemIds' => '[' . $tracking_info['OrderItemIds'] . ']',
+            'DeliveryType' => 'dropship',
+            'ShippingProvider' => $tracking_info['ShippingProvider'],
+            'TrackingNumber' => $tracking_info['TrackingNumber'],
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+            'Version' => '1.0',
+
+        );
+
+        ksort($parameters);
+        $params = array();
+
+        foreach ($parameters as $name => $value) {
+
+            $params[] = rawurlencode($name) . '=' . rawurlencode($value);
+
+        }
+        $strToSign = implode('&', $params);
+
+        $parameters['Signature'] = rawurlencode(hash_hmac('sha256', $strToSign, $api_key, false));
+
+        $request = http_build_query($parameters);
+
+        //$info =$this->setRequest($lazada_api_host.'/?'.$request);
+
+        //$result  = $this->XmlToArray($info);
+
+        $rand_id = rand(1, 10);
+        if ($rand_id > 5) {
+            $result['Body']['OrderItems']['OrderItem'] = 1;
+
+        } else {
+
+        }
+        if (isset($result['Body']['OrderItems']['OrderItem'])) {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['Head']['ErrorMessage']) ? $result['Head']['ErrorMessage'] : 'Error';
+        }
+
+
+        return $return;
     }
 
     public function getMessages()
     {
 
     }
-    public function sendMessages($replyMessage){
-        
+
+    public function sendMessages($replyMessage)
+    {
+
     }
 
 }

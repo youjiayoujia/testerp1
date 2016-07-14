@@ -31,7 +31,7 @@ abstract class Job
         QueueLog::create([
             'relation_id' => $this->relation_id,
             'queue' => $queue,
-         //   'data' => $data,
+            'data' => $data,
             'description' => $this->description,
             'lasting' => $this->lasting,
             'result' => $this->result['status'],

@@ -171,6 +171,12 @@ class Tool
             $newSku = $newSku[0];
 
 
+            if (strpos($newSku, 'FBA') !== false) {
+
+                $newSku =explode('FBA',$newSku);
+                $newSku =$newSku[1];
+            }
+
             $qty = 1;
             if (strpos($newSku, '(') !== false) {
                 $matches = array();

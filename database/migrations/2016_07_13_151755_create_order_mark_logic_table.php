@@ -23,7 +23,8 @@ class CreateOrderMarkLogicTable extends Migration
             $table->enum('is_upload', ['1','2'])->comment('  1 按物流渠道设置  2  标记发货但不上传跟踪号 ')->default('1');
             $table->integer('user_id')->comment('设置人员');
             $table->integer('priority')->comment('规则优先级');
-            $table->enum('is_use', ['1','2'])->comment('  1 启用  2 不启用 ')->default('1');
+            $table->enum('wish_upload_tracking_num', ['0','1'])->comment('  0 否  1 是 ')->default('0');
+            $table->enum('is_use', ['0','1'])->comment('  1 启用  0 不启用 ')->default('1');
             $table->timestamps();
             $table->softDeletes();
         });

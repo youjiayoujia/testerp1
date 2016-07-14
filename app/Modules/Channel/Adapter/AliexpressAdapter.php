@@ -39,53 +39,48 @@ Class AliexpressAdapter implements AdapterInterface
     }
 
 
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
+        if (empty($nextToken)) {
+            $nextToken = 1;
+        }
         $orders = [];
-        foreach ($status as $orderStatus) {
-            $pageTotalNum = 1;
-            for ($i = 1; $i <= $pageTotalNum; $i++) {
-                $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
-                    strtotime($startDate));
-                $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
-                    strtotime($endDate));
-                $param = "page=" . $i . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
-                $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
-                $orderList = json_decode($orderjson, true);
-                unset($orderjson);
-                if (isset($orderList['orderList'])) {
-                    if ($i == 1) {
-                        $pageTotalNum = ceil($orderList['totalItem'] / $perPage); //重新生成总页数
+        $orderStatus = $status[0];
+        $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
+            strtotime($startDate));
+        $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
+            strtotime($endDate));
+        $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
+        $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
+        $orderList = json_decode($orderjson, true);
+        unset($orderjson);
+        if (isset($orderList['orderList'])) {
+            foreach ($orderList['orderList'] as $list) {
+                $thisOrder = orderModel::where('channel_ordernum',
+                    $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
+                if ($thisOrder) {
+                    continue;
+                }
+                $param = "orderId=" . $list['orderId'];
+                $orderjson = $this->getJsonData('api.findOrderById', $param);
+                $orderDetail = json_decode($orderjson, true);
+                if ($orderDetail) {
+                    $order = $this->parseOrder($list, $orderDetail);
+                    if ($order) {
+                        $orders[] = $order;
                     }
-                    foreach ($orderList['orderList'] as $list) {
-                        $thisOrder = orderModel::where('channel_ordernum',
-                            $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
-                        if ($thisOrder) {
-                            continue;
-                        }
-                        $param = "orderId=" . $list['orderId'];
-                        $orderjson = $this->getJsonData('api.findOrderById', $param);
-                        $orderDetail = json_decode($orderjson, true);
-                        if ($orderDetail) {
-                            $order = $this->parseOrder($list, $orderDetail);
-                            if ($order) {
-                                $orders[] = $order;
-                            }
-                        } else {
-                            continue;
-                        }
-                    }
-
                 } else {
-                    break;
+                    continue;
                 }
             }
-
-            // if ($createDateStart && $createDateEnd) $param .= "&createDateStart=" . rawurlencode($createDateStart) . "&createDateEnd=" . rawurlencode($createDateEnd);
-
+            $nextToken++;
+        } else {
+            var_dump($orderList);
+            $nextToken ='';
         }
 
-        return $orders;
+        return ['orders' => $orders, 'nextToken' => $nextToken];
+
     }
 
     public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
@@ -120,21 +115,21 @@ Class AliexpressAdapter implements AdapterInterface
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
         //$result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         //$result = json_decode($result,true);
-        $rand_id= rand(1,10);
-        if($rand_id>3){
-            $result['success'] ='Falie';
+        $rand_id = rand(1, 10);
+        if ($rand_id > 3) {
+            $result['success'] = 'Falie';
 
-        }else{
-            $result['success'] ='true';
+        } else {
+            $result['success'] = 'true';
 
         }
-        if (isset($result['success'])&&($result['success']=='true')) {
-            $return['status'] =true;
-            $return['info'] ='Success';
+        if (isset($result['success']) && ($result['success'] == 'true')) {
+            $return['status'] = true;
+            $return['info'] = 'Success';
 
-        }else{
-            $return['status'] =false;
-            $return['info'] =isset($result['error_message']) ? $result['error_message'] : "error";
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['error_message']) ? $result['error_message'] : "error";
         }
         return $return;
 
@@ -178,7 +173,7 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['shipping_state'] = $orderDetail ["receiptAddress"] ["province"];
         $orderInfo['shipping_country'] = $orderDetail ["receiptAddress"] ["country"];
         $orderInfo['shipping_zipcode'] = $orderDetail ["receiptAddress"] ["zip"];
-        $orderInfo['status'] ='PAID';
+        $orderInfo['status'] = 'PAID';
 
         $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"]) ? $orderDetail ["receiptAddress"] ["mobileNo"] : '';
         $phoneCountry = isset($orderDetail ["receiptAddress"] ["phoneCountry"]) ? $orderDetail ["receiptAddress"] ["phoneCountry"] : '';
@@ -338,16 +333,18 @@ Class AliexpressAdapter implements AdapterInterface
         $code_sign = strtoupper(bin2hex(hash_hmac("sha1", $sign_str, $this->_appsecret, true)));
         return $code_sign;
     }
+
     /**
      * 计算签名
      * @param $apiInfo
      * @param $parameter_arr
      * @return string
      */
-    public function getApiSignature($apiInfo, $parameter_arr){
+    public function getApiSignature($apiInfo, $parameter_arr)
+    {
         ksort($parameter_arr);
         $sign_str = '';
-        if (array_key_exists('domesticLogisticsCompanyId', $parameter_arr) && array_key_exists('domesticLogisticsCompany', $parameter_arr)){
+        if (array_key_exists('domesticLogisticsCompanyId', $parameter_arr) && array_key_exists('domesticLogisticsCompany', $parameter_arr)) {
             $domesticLogisticsCompanyIdIndex = 0; //在数组中的位置
             $domesticLogisticsCompanyIndex = 0; //该元素在数组中的位置
             $domesticLogisticsCompanyIdStr = $domesticLogisticsCompanyStr = ''; //中间变量
@@ -355,9 +352,9 @@ Class AliexpressAdapter implements AdapterInterface
             $temp = array(); //中间变量
             foreach ($parameter_arr as $key => $val) {
                 $temp[$i] = $key . $val;
-                if (in_array($key, array('domesticLogisticsCompanyId', 'domesticLogisticsCompany'))){
-                    $index = $key.'Index';
-                    $str = $key.'Str';
+                if (in_array($key, array('domesticLogisticsCompanyId', 'domesticLogisticsCompany'))) {
+                    $index = $key . 'Index';
+                    $str = $key . 'Str';
                     $$index = $i;
                     $$str = $key . $val;
                 }
@@ -368,13 +365,13 @@ Class AliexpressAdapter implements AdapterInterface
             $temp[$domesticLogisticsCompanyIndex] = $domesticLogisticsCompanyIdStr;
             $sign_str = implode('', $temp);
             unset($temp);
-        }else {
+        } else {
             foreach ($parameter_arr as $key => $val) {
                 $sign_str .= $key . $val;
             }
         }
         $sign_str = $apiInfo . $sign_str;
-        $code_sign = strtoupper ( bin2hex ( hash_hmac ( "sha1", $sign_str, $this->_appsecret, true ) ) );
+        $code_sign = strtoupper(bin2hex(hash_hmac("sha1", $sign_str, $this->_appsecret, true)));
         return $code_sign;
     }
 
@@ -440,12 +437,15 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-   
-    public function getMessages(){
-        
+
+    public function getMessages()
+    {
+
     }
-    public function sendMessages($replyMessage){
-        
+
+    public function sendMessages($replyMessage)
+    {
+
     }
 
 

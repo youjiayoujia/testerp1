@@ -56,10 +56,9 @@ Class CdiscountAdapter implements AdapterInterface
      * @param int $perPage
      * @return array
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 0)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 0,$nextToken='')
     {
         $result_orders = [];
-        $nextToken = null;
 
         $OrderList = $this->getPlatformOrder($startDate, $endDate, $status);
 
@@ -79,9 +78,7 @@ Class CdiscountAdapter implements AdapterInterface
             }
         }
 
-
-
-        return $result_orders;
+        return ['orders' => $result_orders, 'nextToken' => $nextToken];
     }
 
 

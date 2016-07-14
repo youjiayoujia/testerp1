@@ -56,47 +56,23 @@ Class LazadaAdapter implements AdapterInterface
      * @param int $perPage
      * @return array
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 0)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 0, $nextToken = '')
     {
         $result_orders = [];
-        $nextToken = null;
-
-        $step = 0;
-
-        if ($perPage) {
-            $this->perPage = $perPage;
+        if (empty($nextToken)) {
+            $nextToken = 1;
         }
 
-        do {
-
-            $step++;
-
-            $offset = ($step - 1) * $this->perPage;
-
-            $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
+        $offset = ((int)$nextToken - 1) * $perPage;
 
 
-            if (isset($orders_data['Head']['ErrorMessage'])) {
-                if ($orders_data['Head']['ErrorMessage'] == 'Too many API requests') {
-                    //need to write log info
+        $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
 
-                    break;
-                } else {
-                    //不是请求频繁，保存下错误原因
-                    $op = "获取订单失败，信息为 " . $orders_data['Head']['ErrorMessage'];
-                    //need to write log info
+        if (!isset($orders_data['Body']['Orders']['Order']) || empty($orders_data['Body']['Orders']['Order'])) {
+            $nextToken = '';
+            var_dump($orders_data);
 
-
-                    break;
-                }
-            }
-
-            if (!isset($orders_data['Body']['Orders']['Order'])) {
-                //need to write log info
-
-                break;
-            }
-
+        } else {
             //单订单情况
             if (!isset($orders_data['Body']['Orders']['Order'][0])) {
                 $orders = [$orders_data['Body']['Orders']['Order']];
@@ -115,14 +91,13 @@ Class LazadaAdapter implements AdapterInterface
                 $tmp_order = $this->parseOrder($order_info, $items);
 
                 $result_orders[] = $tmp_order;
-
             }
+            $nextToken++;
+        }
 
 
-        } while (true);
+        return ['orders' => $result_orders, 'nextToken' => $nextToken];
 
-
-        return $result_orders;
     }
 
 
@@ -317,8 +292,8 @@ Class LazadaAdapter implements AdapterInterface
                 'quantity' => $v['item_count'],
                 'price' => $v['item_price'],
                 'currency' => $lazada_currency_type,
-                'channel_order_id' =>$result['channel_ordernum'],
-                'transaction_id'=>$v['comment_text']
+                'channel_order_id' => $result['channel_ordernum'],
+                'transaction_id' => $v['comment_text']
             ];
         }
 
@@ -378,7 +353,7 @@ Class LazadaAdapter implements AdapterInterface
         $sku_data['orders_ship_fee'] = 0;    //lazada不需要运费
 
 
-      //  var_dump($sku_data);exit;
+        //  var_dump($sku_data);exit;
         return $sku_data;
     }
 
@@ -476,7 +451,7 @@ Class LazadaAdapter implements AdapterInterface
 
     public function returnTrack($tracking_info)
     {
-        $return=[];
+        $return = [];
 
         $now = new \DateTime();
         $api_key = $this->config['lazada_access_key'];
@@ -486,9 +461,9 @@ Class LazadaAdapter implements AdapterInterface
         $parameters = array(
             'UserID' => $lazada_user_id,
             'Action' => 'SetStatusToReadyToShip',
-            'OrderItemIds'=>'['.$tracking_info['OrderItemIds'].']',
+            'OrderItemIds' => '[' . $tracking_info['OrderItemIds'] . ']',
             'DeliveryType' => 'dropship',
-            'ShippingProvider' =>$tracking_info['ShippingProvider'] ,
+            'ShippingProvider' => $tracking_info['ShippingProvider'],
             'TrackingNumber' => $tracking_info['TrackingNumber'],
             'Timestamp' => $now->format(\DateTime::ISO8601),
             'Version' => '1.0',
@@ -513,20 +488,20 @@ Class LazadaAdapter implements AdapterInterface
 
         //$result  = $this->XmlToArray($info);
 
-        $rand_id= rand(1,10);
-        if($rand_id>5){
-            $result['Body']['OrderItems']['OrderItem'] =1;
+        $rand_id = rand(1, 10);
+        if ($rand_id > 5) {
+            $result['Body']['OrderItems']['OrderItem'] = 1;
 
-        }else{
+        } else {
 
         }
         if (isset($result['Body']['OrderItems']['OrderItem'])) {
-            $return['status']=true;
-            $return['info'] ='Success';
+            $return['status'] = true;
+            $return['info'] = 'Success';
 
         } else {
-            $return['status']=false;
-            $return['info'] =isset($result['Head']['ErrorMessage'])?$result['Head']['ErrorMessage']:'Error';
+            $return['status'] = false;
+            $return['info'] = isset($result['Head']['ErrorMessage']) ? $result['Head']['ErrorMessage'] : 'Error';
         }
 
 
@@ -537,8 +512,10 @@ Class LazadaAdapter implements AdapterInterface
     {
 
     }
-    public function sendMessages($replyMessage){
-        
+
+    public function sendMessages($replyMessage)
+    {
+
     }
 
 }

@@ -346,9 +346,13 @@ class OrderModel extends BaseModel
             $blacklist = BlacklistModel::where('email', $this['email']);
 
         }
-        if(count($blacklist) > 0) {
+        if($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
-            return true;
+            foreach($blacklist->get() as $value) {
+                if($value['type'] == 'CONFIRMED') {
+                    return true;
+                }
+            }
         }
         return false;
     }

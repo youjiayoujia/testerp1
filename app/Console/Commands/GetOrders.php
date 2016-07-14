@@ -81,7 +81,6 @@ class GetOrders extends Command
                         $job = new InOrders($order);
                         $job = $job->onQueue('inOrders');
                         $this->dispatch($job);
-//                        $commandLog->items()->create([]);
                         $total++;
                     }
                     $nextToken = $orderList['nextToken'];

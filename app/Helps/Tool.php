@@ -167,7 +167,7 @@ class Tool
                 $i = count($tmpErpSku) - 1;
                 $newSku = $tmpErpSku[$i];
             }
-            $newSku =explode('#',$newSku);
+            $newSku = explode('#', $newSku);
             $newSku = $newSku[0];
 
 
@@ -218,7 +218,8 @@ class Tool
      * @param string $specialChars 是否有特殊字符
      * @return string
      */
-    public function randString($length, $specialChars = false) {
+    public function randString($length, $specialChars = false)
+    {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         if ($specialChars) {
             $chars .= '!@#$%^&*()';
@@ -232,8 +233,9 @@ class Tool
         return $result;
     }
 
-    public function getPercent($num){
-        return $num.'%';
-     }
-    
+    public function getPercent($num)
+    {
+        return $num . '%';
+    }
+
 }

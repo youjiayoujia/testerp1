@@ -61,40 +61,43 @@
     <script src="{{ asset('js/fileinput.js') }}"></script>
     <script src="{{ asset('js/jquery-labelauty.js') }}"></script>
     <script type="text/javascript">
+        $(document).ready(function() { 
+            var img = "<img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' >";
+            $(".file-drop-zone-title").html(img);
+        }); 
 
-        $("#file-1").fileinput({   
+        $("#file-1").fileinput({
             //uploadAsync: false,  
             uploadUrl: "{{route('productImage.store')}}",
             uploadAsync: true,
             overwriteInitial: false,
+            initialCaption: "请选择产品图（支持多选）",
+            dropZoneTitle: '',
             //initialPreviewShowDelete: true,
             /*initialPreview: [
-                "http://www.youjia1.com/uploads/product/763/765/2/1467876193file_data.jpg",
-                "http://www.youjia1.com/uploads/product/763/765/2/1467876128file_data.jpg",
-            ],*/
-            initialPreviewAsData: true, // identify if you are sending preview data only and not the raw markup
-            initialPreviewFileType: 'image', // image is the default and can be overridden in config below
-            /*layoutTemplates: {
-                
-                actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' +
-        'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
-                actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' +
-        '{uploadIcon}</button>',
-            },*/
+                        "http://www.youjia1.com/uploads/product/763/765/2/1467876193file_data.jpg",
+                        "http://www.youjia1.com/uploads/product/763/765/2/1467876128file_data.jpg",
+                    ],*/
+            initialPreviewAsData: true,
+            // identify if you are sending preview data only and not the raw markup
+            initialPreviewFileType: 'image',
+            // image is the default and can be overridden in config below
+            layoutTemplates: {
+                actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' + 'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
+                actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' + '{uploadIcon}</button>',
+            },
             uploadExtraData: function() {
-                var str=document.getElementsByName("image_type");
-                var chestr="";
-                for (i=0;i<str.length;i++)
-                {
-                  if(str[i].checked == true)
-                  {
-                    chestr+=str[i].value+",";
-                  }
+                var str = document.getElementsByName("image_type");
+                var chestr = "";
+                for (i = 0; i < str.length; i++) {
+                    if (str[i].checked == true) {
+                        chestr += str[i].value + ",";
+                    }
                 }
                 return {
-                  is_link:$('input[name="is_link"]:checked').val(),
-                  image_type:chestr,
-                  model:$("#model").val(),
+                    is_link: $('input[name="is_link"]:checked').val(),
+                    image_type: chestr,
+                    model: $("#model").val(),
                 };
             }
             //key: 100,
@@ -106,13 +109,13 @@
             //    };
             //}
         });
-      
-        $(':input').labelauty();
-        
-        $("#file-1").on("fileuploaded", function(event, data, previewId, index) {
-            //alert(data.files);
-            
-        });
+
+$(':input').labelauty();
+
+$("#file-1").on("fileuploaded",
+function(event, data, previewId, index) {
+    //alert(data.files);
+});
     </script>
 @stop
  

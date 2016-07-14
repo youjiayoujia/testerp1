@@ -85,6 +85,7 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $response = $this->setRequest('Orders', $request);
+
         //TODO:return ERRORS
         if (isset($response->Error)) {
             Tool::show($response, false);
@@ -194,7 +195,7 @@ Class AmazonAdapter implements AdapterInterface
         return $items;
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
         // TODO: Implement returnTrack() method.
         echo "return Amazon Tracking Informations";

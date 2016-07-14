@@ -18,6 +18,8 @@ use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Models\PackageModel;
 use App\Models\Order\ItemModel;
+use App\Models\LogisticsModel;
+use App\Models\Logistics\ChannelNameModel;
 
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
@@ -259,6 +261,8 @@ class TestController extends Controller
 
     public function getWishProduct()
     {
+
+
         $accountID = request()->get('id');
         $begin = microtime(true);
         $account = AccountModel::findOrFail($accountID);
@@ -269,7 +273,7 @@ class TestController extends Controller
 
         while ($hasProduct) {
 
-            $productList = $channel->getOnlineProduct($start, 100);
+            $productList = $channel->getOnlineProduct($start, 500);
             if ($productList) {
                 foreach ($productList as $product) {
 
@@ -460,24 +464,27 @@ class TestController extends Controller
                 //var_dump($package);
             }
         }elseif($driver=='ebay'){
-            $packages = PackageModel::where('is_mark', 0 )->where('order_id',2633)->whereHas('order', function ($query)  {
-                $query = $query->where('orders.create_time','>=', '2016-07-03' );
+            $packages = PackageModel::where(['channel_id'=>$channel_id,'is_mark'=>'0'])->where('tracking_no','!=','' )->whereHas('order', function ($query)  {
+                $query = $query->where('orders.created_at','>=', '2016-07-03' );
             })->get();
             foreach($packages as $package) {
                 $package_items = $package->items;
                 $remark ='';
                 $is_success = true;
+                $logistics_channel_name = ChannelNameModel::where('channel_id',$package->channel_id)->whereHas('logistics', function ($query) use($package)  {
+                    $query = $query->where('logistics_id',$package->logistics_id);
+                })->first()->name;
+
                 foreach($package_items as $item){
                     $order_item = ItemModel::where('id',$item->order_item_id)->first();
                     $tracking_info =[
                     'IsUploadTrackingNumber' =>true, //true or false
                     'ShipmentTrackingNumber'=>$package->tracking_no, //追踪号
-                    'ShippingCarrierUsed'=>'USPS',//承运商
+                    'ShippingCarrierUsed'=>$logistics_channel_name,//承运商
                     'ShippedTime' =>date('Y-m-d\TH:i:s\Z',time()), //发货时间 date('Y-m-d\TH:i:s\Z')
                     'ItemID' =>$order_item->orders_item_number, //商品id
-                    'TransactionID' =>empty($order_item->transaction_id)?$order_item->transaction_id:'0'
+                    'TransactionID' =>!empty($order_item->transaction_id)?$order_item->transaction_id:0
                     ];
-
                     $account = AccountModel::findOrFail($package->channel_account_id);
                     $channel = Channel::driver($account->channel->driver, $account->api_config);
                     $result = $channel->returnTrack($tracking_info);
@@ -493,6 +500,7 @@ class TestController extends Controller
                         'is_mark' =>1
                     ));
                 }
+
             }
 
             exit;
@@ -554,16 +562,18 @@ class TestController extends Controller
                 $tracking_info['TrackingUrl']    = '';
                 $tracking_info['CarrierName']    = '';
                 $tracking_info['products_info']  = $productsArr;
+
+                $account = AccountModel::findOrFail($package->channel_account_id);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $result = $channel->returnTrack($tracking_info);
+                if($result['status']){
+                    PackageModel::where('id',$package->id)->update(array(
+                        'is_mark' =>1
+                    ));
+                }
             }
 
-            $account = AccountModel::findOrFail($package->channel_account_id);
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $result = $channel->returnTrack($tracking_info);
-            if($result['status']){
-                PackageModel::where('id',$package->id)->update(array(
-                    'is_mark' =>1
-                ));
-            }
+
         }else{
             echo '输入参数错误';
             exit;

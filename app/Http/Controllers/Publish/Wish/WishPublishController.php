@@ -33,6 +33,7 @@ class WishPublishController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('product_type_status','!=',2)),
+
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -44,6 +45,8 @@ class WishPublishController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model->where('product_type_status',2)),
+            'mixedSearchFields' => $this->model->mixed_search,
+
         ];
         return view($this->viewPath . 'index', $response);
     }

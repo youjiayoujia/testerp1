@@ -118,8 +118,16 @@ Class AliexpressAdapter implements AdapterInterface
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
         $parameter['access_token'] = $this->_access_token;
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
-        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
-        $result = json_decode($result,true);
+        //$result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        //$result = json_decode($result,true);
+        $rand_id= rand(1,10);
+        if($rand_id>3){
+            $result['success'] ='Falie';
+
+        }else{
+            $result['success'] ='true';
+
+        }
         if (isset($result['success'])&&($result['success']=='true')) {
             $return['status'] =true;
             $return['info'] ='Success';
@@ -128,6 +136,7 @@ Class AliexpressAdapter implements AdapterInterface
             $return['status'] =false;
             $return['info'] =isset($result['error_message']) ? $result['error_message'] : "error";
         }
+        return $return;
 
 
     }

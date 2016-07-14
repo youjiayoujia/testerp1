@@ -174,13 +174,28 @@ class EbayAdapter implements AdapterInterface
         $xml.= '<ItemID>'.$tracking_info['ItemID'].'</ItemID>';
         $xml.= '<Shipped>true</Shipped>';
         $xml.= '<TransactionID>'.$tracking_info['TransactionID'].'</TransactionID>';
-        $result =  $this->buildEbayBody($xml,'CompleteSale');
-        if((string)$result->Ack=='Success'){
+
+
+     //   $result =  $this->buildEbayBody($xml,'CompleteSale');
+
+
+        $rand_id= rand(1,10);
+        if($rand_id>7){
+            $result['test'] ='Falie';
+
+        }else{
+            $result['test'] ='Success';
+
+        }
+        if($result['test']=='Success'){
+        //if((string)$result->Ack=='Success'){
             $return['status'] = true;
             $return['info'] = 'Success';
         }else{
             $return['status'] = false;
-            $return['info'] = isset($result->LongMessage)?(string)$result->LongMessage:'error';
+            //$return['info'] = isset($result->LongMessage)?(string)$result->LongMessage:'error';
+            $return['info'] = '模拟标记失败';
+
         }
         return $return;
     }

@@ -468,7 +468,7 @@
                 <label class="col-sm-2 control-label">描述信息：</label>
 
                 <div class="col-sm-10">
-                    <textarea id="container" name="content">
+                    <textarea id="content" name="content">
                         <?php  if (isset($product_description)) echo $product_description; ?>
                     </textarea>
                 </div>
@@ -490,14 +490,18 @@
 
 @section('pageJs')
 
-    <script src="{{ asset('plugins/UEditor/ueditor.config.js') }}"></script>
-    <script src="{{ asset('plugins/UEditor/ueditor.all.js') }}"></script>
-
+    {{--<script src="{{ asset('plugins/UEditor/ueditor.config.js') }}"></script>
+    <script src="{{ asset('plugins/UEditor/ueditor.all.js') }}"></script>--}}
+    <script src="{{ asset('plugins/Ueditor/umeditor.config.js') }}"></script>
+    <script src="{{ asset('plugins/Ueditor/umeditor.min.js') }}"></script>
+    <script src="{{ asset('plugins/Ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+    <link href="{{ asset('plugins/Ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <script type='text/javascript'>
 
 
-        var ue = UE.getEditor('container', {
-            initialFrameHeight: 500
+        var ue = UM.getEditor('content', {
+            initialFrameHeight: 500,
+            initialFrameWidth:1200
         });
         /* ue.ready(function() {
          ue.setContent('<p>hello!</p>'); //ture 追加内容

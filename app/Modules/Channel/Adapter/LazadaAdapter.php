@@ -509,10 +509,17 @@ Class LazadaAdapter implements AdapterInterface
 
         $request = http_build_query($parameters);
 
-        $info =$this->setRequest($lazada_api_host.'/?'.$request);
+        //$info =$this->setRequest($lazada_api_host.'/?'.$request);
 
-        $result  = $this->XmlToArray($info);
+        //$result  = $this->XmlToArray($info);
 
+        $rand_id= rand(1,10);
+        if($rand_id>5){
+            $result['Body']['OrderItems']['OrderItem'] =1;
+
+        }else{
+
+        }
         if (isset($result['Body']['OrderItems']['OrderItem'])) {
             $return['status']=true;
             $return['info'] ='Success';

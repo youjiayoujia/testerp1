@@ -103,7 +103,16 @@ Class WishAdapter implements AdapterInterface
         $url = 'https://china-merchant.wish.com/api/v2/order/fulfill-one';
        // $resultJson = $this->postCurlHttpsData($url, $tracking_info);
        // $result = json_decode($resultJson, true);
-        $result['code'] = 0;
+      //  $result['code'] = 0;
+
+        $rand_id= rand(1,10);
+        if($rand_id>5){
+            $result['code'] =1;
+
+        }else{
+            $result['code'] =0;
+
+        }
         if (isset($result['code'])&&($result['code']==0)) {
             $return['status'] = true;
             $return['info'] = isset($result['message'])?$result['message']:'Success';
@@ -268,6 +277,7 @@ Class WishAdapter implements AdapterInterface
         $productList = json_decode($productjson, true);
         if (isset($productList['code']) && ($productList['code'] == 0) && !empty($productList['data'])) {
             foreach ($productList['data'] as $num => $product) {
+
                 $productInfo = [];
                 //$productInfo['original_image_url'] = $product['Product']['original_image_url'];
                 //  $productInfo['main_image'] = $product['Product']['main_image'];
@@ -290,6 +300,13 @@ Class WishAdapter implements AdapterInterface
                 $productInfo['parent_sku'] = isset($product['Product']['parent_sku']) ? $product['Product']['parent_sku'] : '';
                 $productInfo['productID'] = $product['Product']['id'];
                 $productInfo['product_type_status'] = 2;
+
+                if(isset($product['Product']['date_uploaded'])){
+                    $publishedTime = $product['Product']['date_uploaded'];
+                    $publishedTime =explode('-',$publishedTime);
+                    $publishedTime = $publishedTime[2].'-'.$publishedTime[0].'-'.$publishedTime[1];
+                    $productInfo['publishedTime'] = date('Y-m-d H:i:s',strtotime($publishedTime));
+                }
                 // $publishedTime = isset($product['Product']['date_uploaded'])?strtotime($product['Product']['date_uploaded']):'';
                 // $productInfo['publishedTime'] = !empty($publishedTime)?date('Y-m-d H:i:s',$publishedTime):'';
                 $productInfo['product_description'] = $product['Product']['description'];
@@ -662,7 +679,7 @@ Class WishAdapter implements AdapterInterface
         curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+       // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
 

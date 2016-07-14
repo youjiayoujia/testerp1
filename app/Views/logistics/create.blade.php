@@ -134,27 +134,6 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">平台信息</div>
-        <div class="panel-body">
-            @foreach($channels as $channel)
-                <div class="form-group col-lg-2">
-                    <label for="channel_id" class="control-label">{{ $channel->name }}平台</label>
-                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="channel_id" value="1">{{ $channel->driver }}上传
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="channel_id" value="0">{{ $channel->driver }}不上传
-                        </label>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-    <div class="panel panel-default">
         <div class="panel-heading">承运商信息</div>
         <div class="panel-body">
             <div class='form-group col-lg-3'>
@@ -229,6 +208,27 @@
                     @endforeach
                 </select>
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">平台信息</div>
+        <div class="panel-body">
+            @foreach($channels as $channel)
+                <div class="form-group col-lg-2">
+                    <label for="channel_id" class="control-label">{{ $channel->name }}平台</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="channel_id" value="1">{{ $channel->driver }}上传
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="channel_id" value="0">{{ $channel->driver }}不上传
+                        </label>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 @stop

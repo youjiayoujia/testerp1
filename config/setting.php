@@ -71,7 +71,8 @@ return [
         'time.created_at'=>'创建时间',
         'order.ordernum' => '订单号',
         'thrend' => '趋势',
-        'user.name' =>'姓名'
+        'user.name' =>'姓名',
+        'require_create' => '是否需要采购',
     ],
 ];
 

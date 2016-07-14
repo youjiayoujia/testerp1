@@ -54,7 +54,7 @@ class RequireModel extends BaseModel
         return [
             'relatedSearchFields' => ['user' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['status' => config('purchase.require'),'thrend' => config('purchase.thrend')],
+            'filterSelects' => ['require_create' => config('purchase.require'),'thrend' => config('purchase.thrend')],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];

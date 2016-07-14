@@ -134,6 +134,7 @@ class CatalogController extends Controller
         $cvsArray = [];
         $i = 1;
         $cvsArray[0] = '';
+        $th = false;
         foreach ($this->model->whereIn('id',$catalogIds)->get() as $itemCatalog){
             $channelsData = $this->model->find($itemCatalog->id)->channels;
             //$cvsArray [$i][$itemCatalog->name] = $itemCatalog->name;
@@ -149,6 +150,10 @@ class CatalogController extends Controller
                 }
             }
             $i++;
+        }
+
+        if($th == false){
+            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', '包含没有添加税率的分类记录，请先编辑，再导出!'));
         }
 
         $cvsArray[0] = array_merge(['序号','分类名'],$th);
@@ -194,17 +199,46 @@ class CatalogController extends Controller
         $filtersArray = explode('|',$filters);
         $catalogIds = explode(',',$filtersArray[0]);
         $channelIds = explode(',',$filtersArray[1]);
-
         foreach ($catalogIds as $catalogId){
             foreach ($channelIds as $channelId){
                 $CatalogChannel = CatalogChannelsModel::where('catalog_id','=',$catalogId)->where('channel_id','=',$channelId)->first();
-                if(isset($requestArray[$channelId])){
+                if(isset($requestArray[$channelId]) && !empty($CatalogChannel)){
                     $CatalogChannel->rate = $requestArray[$channelId];
                     $CatalogChannel->save();
+                }else{
+                    $obj = new CatalogChannelsModel;
+                    $obj->rate = $requestArray[$channelId];
+                    $obj->catalog_id = $catalogId;
+                    $obj->channel_id = $channelId;
+                    $obj->save();
                 }
             }
         }
-        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '操作成功!'));
 
+        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '操作成功!'));
+    }
+
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $channels = ChannelModel::all();
+        foreach ($channels as $channel){
+            $channels_all[$channel->id] = $channel;
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'channels_all' => $channels_all,
+        ];
+        return view($this->viewPath . 'edit', $response);
     }
 }

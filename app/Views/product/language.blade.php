@@ -7,8 +7,8 @@
 <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
 <ul class="nav nav-tabs" id="myTab">
     @foreach($channels as $channel)
-        <li>
-            <a href="#{{$channel->name}}">
+        <li name="{{$channel->id}}" class="mychannel">
+            <a href="#{{$channel->name}}" class>
                 {{$channel->name}}
             </a>
         </li>
@@ -23,31 +23,23 @@
         <div>请选择编辑的语言</div>
             <ul class="dowebok">
                 @foreach($languages as $la_name=>$language)
-                    <li><input type="radio" name="info[{{$channel->id}}][language]" data-labelauty="{{$language}}" value="{{$la_name}}" {{$la_name=='de'?'checked':''}}></li>
+                    <li><input type="radio" name="info[{{$channel->id}}][language]" class="change_language" data-labelauty="{{$language}}" value="{{$la_name}}" {{$la_name=='de'?'checked':''}}></li>
                 @endforeach    
             </ul>
         <div class="row">
-            <?php 
-                //$temp=$de_name."_name";
-                //$multiOption = $model->productMultiOption->where("channel_id",$channel->id)->first();
-            ?>
             <div class="form-group col-lg-12">
-                <input type='text' class="form-control" id="" placeholder="标题" name='info[{{$channel->id}}][name]' value="">
+                <input type='text' class="form-control {{$channel->id}}_myname" id="" placeholder="标题" name='info[{{$channel->id}}][name]' value="{{$default['de_name']}}">
             </div>
-            <?php //$temp=$name."_description" ?>
-            <!--<div class="form-group  col-lg-12">  
-                <textarea cols="50" rows="10" id="" name="info[{{$channel->id}}][description]"></textarea>
-            </div>-->
-            <?php //$temp=$name."_keywords" ?>
+        
             <div class="form-group  col-lg-12">    
-                <input type='text' class="form-control" id="" placeholder="关键词" name='info[{{$channel->id}}][keywords]' value="">
+                <input type='text' class="form-control {{$channel->id}}_mykeywords" id="" placeholder="关键词" name='info[{{$channel->id}}][keywords]' value="{{$default['de_keywords']}}">
             </div>
         </div> 
         <div class="row">
             <div class="col-lg-12" id="templateContent_{{$key}}">
                 <label for="" >描述：</label>
                 <div class="form-group">
-                    <textarea class="form-control" id="editor_{{$key}}" rows="16" placeholder="标题" name="info[{{$channel->id}}][description]" style="width:100%;height:400px;">{{ old('content') }}</textarea>
+                    <textarea class="form-control {{$channel->id}}_mydescription" id="editor_{{$key}}" rows="16" placeholder="标题" name="info[{{$channel->id}}][description]" style="width:100%;height:400px;">{{ $default['de_description']}}</textarea>
                 </div>
             </div>
         </div>
@@ -67,12 +59,45 @@
     $(':input').labelauty();
     $(function () { 
         $('#myTab a:first').tab('show');//初始化显示哪个tab 
-      
         $('#myTab a').click(function (e) { 
           e.preventDefault();//阻止a链接的跳转行为 
           $(this).tab('show');//显示当前选中的链接及关联的content 
         }) 
       })
+
+    $(".change_language").click(function(){
+        var language = $(this).val();
+        var channel_id = $("#myTab li.active").attr("name");
+        $.ajax({
+            url: "{{ route('productInfo') }}",
+            data: {language:language,channel_id:channel_id,product_id:{{$id}}},
+            dataType: 'json',
+            type: 'get',
+            success: function (result) {
+                //alert(channel_id);
+                $("."+channel_id+"_myname").val(result['name']);
+                $("."+channel_id+"_mykeywords").val(result['keywords']);
+                $("."+channel_id+"_mydescription").text(result['description']);
+            }
+        });
+    })
+
+    $(".mychannel").click(function(){
+        var language = $(".tab-pane.active").find(".change_language:checked").val();
+        var channel_id = $(this).attr('name');
+        $.ajax({
+            url: "{{ route('productInfo') }}",
+            data: {language:language,channel_id:channel_id,product_id:{{$id}}},
+            dataType: 'json',
+            type: 'get',
+            success: function (result) {
+                $("."+channel_id+"_myname").val(result['name']);
+                $("."+channel_id+"_mykeywords").val(result['keywords']);
+                $("."+channel_id+"_mydescription").text(result['description']);
+            }
+        });
+    })
+
 </script>
 @stop
 <style>

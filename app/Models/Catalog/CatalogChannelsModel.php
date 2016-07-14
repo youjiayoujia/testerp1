@@ -19,4 +19,6 @@ class CatalogChannelsModel extends BaseModel
      * @var array
      */
     protected $fillable = ['rate'];
+
+    protected  $guarded =[];
 }

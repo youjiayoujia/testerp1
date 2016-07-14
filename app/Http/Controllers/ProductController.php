@@ -245,14 +245,19 @@ class ProductController extends Controller
      */
     public function productMultiEdit()
     {
+        
         $data = request()->all();
         $language = config('product.multi_language');
+        $model = $this->model->find($data['id']);
+        $default = $model->productMultiOption->where("channel_id",ChannelModel::all()->first()->id)->first()->toArray();
+        //print_r($default);exit;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' =>$this->model->find($data['id']),
             'languages' => config('product.multi_language'),
             'channels' => ChannelModel::all(),
             'id' => $data['id'],
+            'default' =>$default,
         ];
 
         return view($this->viewPath . 'language', $response);
@@ -268,6 +273,8 @@ class ProductController extends Controller
     public function productMultiUpdate()
     {
         $data = request()->all();
+        //echo '<pre>';
+        //print_r($data);exit;
         $productModel = $this->model->find($data['product_id']);
         $productModel->updateMulti($data);
 
@@ -348,6 +355,24 @@ class ProductController extends Controller
         return redirect($this->mainIndex);
     }
 
-    
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function productInfo()
+    {
+        $channel_id = request()->input("channel_id");
+        $language = request()->input("language");
+        $product_id = request()->input("product_id");
+        $model = $this->model->find($product_id);
+        $info = $model->productMultiOption->where("channel_id",(int)$channel_id)->first()->toArray();
+        $result['name'] = $info[$language."_name"];
+        $result['description'] = $info[$language."_description"];
+        $result['keywords'] = $info[$language."_keywords"];
+
+        return $result;
+    }
 
 }

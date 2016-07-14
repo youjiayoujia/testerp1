@@ -25,7 +25,7 @@ class TypeModel extends BaseModel
      */
     protected $fillable = ['parent_id', 'name'];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['id'=>'ID','name'=>'模板名称'];
 
     protected $rules = [
         'create' => ['name' => 'required|unique:message_template_types,name'],

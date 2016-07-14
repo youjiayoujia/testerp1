@@ -382,6 +382,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('pickList/type', ['uses' => 'PickListController@ajaxType', 'as' => 'pickList.type']);
     Route::resource('pickList', 'PickListController');
     //产品管理路由
+    Route::any('productInfo', ['uses' => 'ProductController@productInfo', 'as' => 'productInfo']);
     Route::any('productBatchEdit', ['uses' => 'ProductController@productBatchEdit', 'as' => 'productBatchEdit']);
     Route::any('productBatchUpdate', ['uses' => 'ProductController@productBatchUpdate', 'as' => 'productBatchUpdate']);
     Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');

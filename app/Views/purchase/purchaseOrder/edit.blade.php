@@ -74,11 +74,12 @@
            <div class="row">
             <div class="form-group col-lg-4">
                 <strong>采购人</strong>:
-                <select name="assigner">
-                @foreach($model->users as $k=>$user)
-                <option value="{{$user->id}}" {{$model->assigner == $k ? 'selected' : ''}}>{{$user->name}}</option>
-                @endforeach
-                </select>       
+                {{$model->assigner_name}}
+                <!-- <select name="assigner" disabled>
+                      @foreach($model->users as $k=>$user)
+                      <option value="{{$user->id}}" {{$model->assigner == $k ? 'selected' : ''}}>{{$user->name}}</option>
+                      @endforeach
+                      </select>  -->      
             </div>
             
             <div class="form-group col-lg-4">
@@ -315,7 +316,7 @@
                             window.location.reload();
                         }
                     }
-            });
+                });
         }
     })
         //新增物流号对应物流费

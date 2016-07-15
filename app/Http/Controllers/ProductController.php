@@ -17,6 +17,10 @@ use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\Logistics\CatalogModel as LogisticsCatalog;
+use App\Models\LogisticsModel;
+use App\Models\Logistics\ZoneModel;
+
 use Gate;
 
 class ProductController extends Controller
@@ -373,6 +377,68 @@ class ProductController extends Controller
         $result['keywords'] = $info[$language."_keywords"];
 
         return $result;
+    }
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'Compute_logistics_catalog'=> LogisticsCatalog::all(),
+            'Compute_logistics'=> LogisticsModel::all(),
+            'Compute_channels' => ChannelModel::all(),
+
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    public function ajaxReturnLogistics(){
+        if(request()->ajax()){
+            $id = request()->input('id');
+            switch (request()->input('type')){
+                case 'catalog':
+                    $data = LogisticsModel::where('logistics_catalog_id','=',$id)->get()->toJson();
+                    break;
+                case 'logistics':
+                    $data = ZoneModel::where('logistics_id','=',$id)->get()->toJson();
+                    break;
+                default :
+                    return;
+            }
+            return $data;
+        }else{
+            return config('ajax.fail');
+        }
+    }
+
+
+    /**
+     * ajax获取物流分类
+     */
+    public function ajaxReutrnCatalogs()
+    {
+        if(request()->ajax()) {
+            $name = trim(request()->input('name'));
+            $buf = LogisticsCatalog::where('name', 'like', '%'.$name.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+        return json_encode(false);
     }
 
 }

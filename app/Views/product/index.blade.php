@@ -88,6 +88,7 @@
     <th class="sort" data-field="c_name">中文名称</th>
     <th>供应商</th>
     <th class="sort" data-field="created_at">创建时间</th>
+    <th>售价</th>
     <th>操作</th>
 @stop
 @section('tableBody')
@@ -149,6 +150,106 @@
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->supplier?$product->supplier->name:'无' }}</td>
             <td>{{ $product->created_at }}</td>
+            <td>{{--<button class ="btn btn-success" >计算</button>--}}
+                <a href="javascript:" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModal_{{$product->id}}">
+                    计算
+                </a>
+                <div class="modal fade" id="myModal_{{$product->id}}" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document" style="width:710px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">计算售价</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-group form-inline sets" id="setkey_0">
+                                        <table class="table">
+                                            <tr>
+                                                <td>当前分类：</td>
+                                                <td colspan="2">{{ $product->catalog?$product->catalog->all_name:'' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>产品：</td>
+                                                <td>{{ $product->c_name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>重量：{{$product->weight}}&nbsp; Kg</td>
+                                                <td>打包：</td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" style="width: 60px;">
+                                                        <span class="input-group-addon">个</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    物流分类：
+                                                    <select class="form-control logistics-catalog-{{$product->id}}" style="width: 150px;" name="logistics-catalog-{{$product->id}}" id="logistics-catalog-{{$product->id}}" onchange="changeSelectVlaue($(this),'catalog',{{$product->id}})">
+                                                        <option>请选择</option>
+                                                    </select>
+                                                      <script>
+                                                          $('#logistics-catalog-{{$product->id}}').select2({
+                                                              ajax: {
+                                                                  url: "{{ route('ajaxReutrnCatalogs') }}",
+                                                                  dataType: 'json',
+                                                                  delay: 250,
+                                                                  data: function (params) {
+                                                                      return {
+                                                                          name:params.term,
+                                                                      };
+                                                                  },
+                                                                  results: function(data, page) {
+                                                                  }
+                                                              },
+                                                          });
+                                                      </script>
+                                                </td>
+                                                <td>
+                                                    物流：
+                                                    <select class="form-control" onchange="changeSelectVlaue($(this),'logistics',{{$product->id}})" id="logistics-{{$product->id}}" style="width: 150px;">
+                                                        <option>请选择</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    物流分区：
+                                                    <select class="form-control" id="zones-{{$product->id}}" style="width: 150px;">
+                                                        <option>请选择</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    渠道:
+                                                    <select class="form-control">
+                                                        <option>请选择</option>
+                                                    @foreach($Compute_channels as $item)
+                                                        <option value="{{$item->id}}">{{$item->name}}</option>
+                                                    @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    利润率：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:50px">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </td>
+                                                <td>汇率：XXXX</td>
+                                            </tr>
+                                        </table>
+                                        <div class=" text-right">
+                                            <input type="button" name="查询" class="form-control btn-primary" placeholder="属性名" value="查 询">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
             <td>
                 <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
@@ -190,6 +291,59 @@
     <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script type="text/javascript">
 
+
+
+        function getCatalogOption() {
+
+        }
+        $('.logistics-catalog').select2({
+            ajax: {
+                url: "{{ route('ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        supplier:params.term,
+                    };
+                },
+                results: function(data, page) {
+
+                }
+            },
+        });
+
+        function changeSelectVlaue(selected,type,productId){
+            var id = selected.val();
+            if(id){
+                $.ajax({
+                    url: "{{route('product.ajaxReturnLogistics')}}",
+                    data: {id: id,type:type},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function ($returnInfo) {
+                        if($returnInfo != {{config('status.ajax.fail')}}){
+                            switch(type){
+                                case 'catalog':
+                                    $('#logistics-'+productId).html('');
+                                    $('#logistics-'+productId).append('<option > 请选择 </option>');
+                                    $.each($returnInfo,function (index,item) {
+                                        $('#logistics-'+productId).append('<option value="' + item.id + '">' + item.logistics_type + '</option>');
+                                    });
+                                case 'logistics':
+                                    $('#zones-'+productId).html('');
+                                    $('#zones-'+productId).append('<option > 请选择 </option>');
+                                    $.each($returnInfo,function (index,item) {
+                                        $('#zones-'+productId).append('<option value="' + item.id + '">' + item.zone + '</option>');
+                                    });
+                                default:
+                                    return false;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         //$('#ms').multipleSelect();
         $(".js-example-basic-multiple").select2();
         //批量选中
@@ -220,7 +374,6 @@
                     }
                 })
             }
-
         });
 
         $('.batchedit').click(function () {
@@ -259,9 +412,7 @@
                     }
                 })
             }
-
         });
-
         //全选
         function quanxuan() {
             var collid = document.getElementById("checkall");

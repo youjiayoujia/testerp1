@@ -73,6 +73,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('productRequire/ajaxProcess',
         ['uses' => 'Product\RequireController@ajaxProcess', 'as' => 'productRequire.ajaxProcess']);
     Route::resource('productRequire', 'Product\RequireController');
+    Route::any('ajaxReturnLogistics',
+        ['as' => 'product.ajaxReturnLogistics', 'uses' => 'ProductController@ajaxReturnLogistics']);
+    Route::any('ajaxReutrnCatalogs',
+        ['uses' => 'ProductController@ajaxReutrnCatalogs', 'as' => 'ajaxReutrnCatalogs']);
     //通关报关
     Route::post('customsClearance/exportProduct',
         ['uses' => 'CustomsClearanceController@exportProduct', 'as' => 'customsClearance.exportProduct']);

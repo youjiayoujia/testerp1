@@ -189,7 +189,6 @@
                                 </div>
                             </div>
                         </div>
-                    @endif
                 </div>
             @endforeach
         </div>

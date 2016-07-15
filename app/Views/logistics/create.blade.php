@@ -134,10 +134,10 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">承运商信息</div>
+        <div class="panel-heading">渠道对应物流</div>
         <div class="panel-body">
             <div class='form-group col-lg-3'>
-                <label>Amazon承运商</label>
+                <label>Amazon</label>
                 <select name='merchant[amazon_merchant]' class='form-control amazon_merchant'>
                     <option value=''></option>
                     @foreach($amazons as $key => $single)
@@ -146,7 +146,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>ebay承运商</label>
+                <label>ebay</label>
                 <select name='merchant[ebay_merchant]' class='form-control ebay_merchant'>
                     <option value=''></option>
                     @foreach($ebays as $key => $single)
@@ -155,7 +155,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>wish承运商</label>
+                <label>wish</label>
                 <select name='merchant[wish_merchant]' class='form-control wish_merchant'>
                     <option value=''></option>
                     @foreach($wishes as $key => $single)
@@ -164,7 +164,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>lazada承运商</label>
+                <label>lazada</label>
                 <select name='merchant[lazada_merchant]' class='form-control lazada_merchant'>
                     <option value=''></option>
                     @foreach($lazadas as $key => $single)
@@ -173,7 +173,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>dhgate承运商</label>
+                <label>dhgate</label>
                 <select name='merchant[dhgate_merchant]' class='form-control dhgate_merchant'>
                     <option value=''></option>
                     @foreach($dhgates as $key => $single)
@@ -182,7 +182,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>cdiscount承运商</label>
+                <label>cdiscount</label>
                 <select name='merchant[cdiscount_merchant]' class='form-control cdiscount_merchant'>
                     <option value=''></option>
                     @foreach($cdiscounts as $key => $single)
@@ -191,7 +191,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>速卖通承运商</label>
+                <label>速卖通</label>
                 <select name='merchant[aliExpress_merchant]' class='form-control aliExpress_merchant'>
                     <option value=''></option>
                     @foreach($aliExpresses as $key => $single)
@@ -200,7 +200,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>joom承运商</label>
+                <label>joom</label>
                 <select name='merchant[joom_merchant]' class='form-control joom_merchant'>
                     <option value=''></option>
                     @foreach($jooms as $key => $single)
@@ -211,7 +211,7 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">平台信息</div>
+        <div class="panel-heading">渠道是否回传</div>
         <div class="panel-body">
             @foreach($channels as $channel)
                 <div class="form-group col-lg-2">

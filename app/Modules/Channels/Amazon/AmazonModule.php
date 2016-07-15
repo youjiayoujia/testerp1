@@ -61,9 +61,17 @@ class AmazonModule extends BaseChannelModule
     {
         $this->_config['Action'] = 'SubmitFeed';
         $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
-        $this->_config['FeedContent'] = $this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32');
         $this->_config['Version'] = '2009-01-01';
-        $tmp_url = "https://mai.amazon.cn/ap/signin";
+        unset($this->_config['MarketplaceId.Id.1']);
+        $this->_config['MarketplaceIdList.Id.1'] = 'ATVPDKIKX0DER';
+        $tmp_url = "mws.amazonservices.ca";
+        $sign  = 'POST' . "\n";
+        $sign .= $tmp_url . "\n";
+        $sign .= "/" . "\n";
+        $sign .= $this->signArrToString();
+        $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
+        $signature = urlencode(base64_encode($signature));
+        $this->_config['Signature'] = $signature;
         $url = [];
         foreach($this->_config as $key => $value) {
             $url[] = "{$key}={$value}";
@@ -71,7 +79,7 @@ class AmazonModule extends BaseChannelModule
         sort($url);
         $string = implode('&', $url);
         $test = $this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32');
-        $tmp_header = ["Content-Type: text/xml", "User-Agent:php-amazon-mws/0.0.1 (Language=php)", "Host:mws.amazonservices.com", "Content-MD5:".base64_encode(md5($this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32')))];
+        $tmp_header = ["Content-Type: text/xml", "User-Agent:php-amazon-mws/0.0.1 (Language=php)", "Host:mws.amazonservices.ca", "Content-MD5:".base64_encode(md5($test))];
         $ch = curl_init($tmp_url);
         curl_setopt($ch,CURLOPT_HEADER,1);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,0);
@@ -79,9 +87,10 @@ class AmazonModule extends BaseChannelModule
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
         curl_setopt($ch,CURLOPT_POSTFIELDS,$string);
         curl_setopt($ch,CURLOPT_HTTPHEADER, $tmp_header);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
-        curl_exec($ch);
+        $res = curl_exec($ch);
+        var_dump(curl_error($ch));
         curl_close($ch);
+        var_dump($res);
     }
 
 //A3THBIK7QYKUUV account id  marchant_id就是account_id

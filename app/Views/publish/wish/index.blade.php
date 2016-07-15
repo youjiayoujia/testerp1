@@ -35,7 +35,7 @@
                     <a target="_blank" href="{{$onePic}}"><img style="width:50px;height:50px;" src="{{$onePic}}"></a>
                 @endif
             </td>
-            <td>{{  $wishProduct->account_id }}</td>
+            <td>{{  $wishProduct->channelAccount->account }}</td>
             <td>{{  $wishProduct->productID }}</td>
             <td><?php
                 foreach ($wishProduct->details as $detail) {

@@ -56,10 +56,9 @@ Class CdiscountAdapter implements AdapterInterface
      * @param int $perPage
      * @return array
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 0)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 0,$nextToken='')
     {
         $result_orders = [];
-        $nextToken = null;
 
         $OrderList = $this->getPlatformOrder($startDate, $endDate, $status);
 
@@ -79,9 +78,7 @@ Class CdiscountAdapter implements AdapterInterface
             }
         }
 
-
-
-        return $result_orders;
+        return ['orders' => $result_orders, 'nextToken' => $nextToken];
     }
 
 
@@ -385,10 +382,93 @@ Class CdiscountAdapter implements AdapterInterface
         return $xml->xpath('s:Body');;
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
-        // TODO: Implement returnTrack() method.
-        echo "return Amazon Tracking Informations";
+        $return=[];
+
+        $cd_token_id = $this->config['cd_token_id'];
+        $data = '<?xml version="1.0" encoding="UTF-8"?>';
+        $data .= '<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">';
+        $data .='<s:Body>';
+        $data .='<ValidateOrderList xmlns="http://www.cdiscount.com">';
+        $data .='<headerMessage xmlns:a="http://schemas.datacontract.org/2004/07/Cdiscount.Framework.Core.Communication.Messages" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">';
+
+        $data .='<a:Context>';
+        $data .='<a:CatalogID>1</a:CatalogID>';
+        $data .='<a:CustomerPoolID>1</a:CustomerPoolID>';
+        $data .='<a:SiteID>100</a:SiteID>';
+        $data .='</a:Context>';
+
+        $data .='<a:Localization>';
+        $data .='<a:Country>Fr</a:Country>';
+        $data .='<a:Currency>Eur</a:Currency>';
+        $data .='<a:DecimalPosition>2</a:DecimalPosition>';
+        $data .='<a:Language>Fr</a:Language>';
+        $data .='</a:Localization>';
+
+        $data .='<a:Security>';
+        $data .='<a:DomainRightsList i:nil="true" />';
+        $data .='<a:IssuerID i:nil="true" />';
+        $data .='<a:SessionID i:nil="true" />';
+        $data .='<a:SubjectLocality i:nil="true" />';
+        $data .='<a:TokenId>'.$cd_token_id. '</a:TokenId>';
+        $data .='<a:UserName i:nil="true" />';
+        $data .='</a:Security>';
+
+        $data .='<a:Version>1.0</a:Version>';
+        $data .='</headerMessage>';
+
+        $data .='<validateOrderListMessage xmlns:i="http://www.w3.org/2001/XMLSchema-instance">';
+        $data .='<OrderList>';
+        $data .='<ValidateOrder>';
+        $data .='<CarrierName>' . $tracking_info['CarrierName'] . '</CarrierName>';
+        $data .='<OrderLineList>';
+        foreach ($tracking_info['products_info'] as $val) {
+            $data .='<ValidateOrderLine>';
+            $data .='<AcceptationState>ShippedBySeller</AcceptationState>';
+            $data .='<ProductCondition>New</ProductCondition>';
+            $data .='<SellerProductId>'.$val.'</SellerProductId>';
+            $data .='</ValidateOrderLine>';
+        }
+        $data .='</OrderLineList>';
+        $data .='<OrderNumber>' . $tracking_info['OrderNumber'] . '</OrderNumber>';
+        $data .='<OrderState>Shipped</OrderState>';
+        $data .='<TrackingNumber>' . $tracking_info['TrackingNumber'] . '</TrackingNumber>';
+        $data .='<TrackingUrl>' . $tracking_info['TrackingUrl'] . '</TrackingUrl>';
+        $data .='</ValidateOrder>';
+        $data .='</OrderList>';
+        $data .='</validateOrderListMessage>';
+
+        $data .='</ValidateOrderList>';
+        $data .='</s:Body>';
+        $data .='</s:Envelope>';
+        $callHeaderHttp = array('Content-Type: text/xml;charset=UTF-8', 'SOAPAction: ' . '"http://www.cdiscount.com/IMarketplaceAPIService/ValidateOrderList"');
+        $tuCurl = curl_init();
+        curl_setopt($tuCurl, CURLOPT_URL, "https://wsvc.cdiscount.com/MarketplaceAPIService.svc");
+        curl_setopt($tuCurl, CURLOPT_VERBOSE, false);
+        curl_setopt($tuCurl, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($tuCurl, CURLOPT_HEADER, false);
+        curl_setopt($tuCurl, CURLOPT_POST, true);
+        curl_setopt($tuCurl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($tuCurl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($tuCurl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($tuCurl, CURLOPT_HTTPHEADER, $callHeaderHttp);
+        $tuData = curl_exec($tuCurl);
+        curl_close($tuCurl);
+        $xml = simplexml_load_string($tuData);
+        $flag = 'false';
+        if ($xml !=null ) {
+            $body = $xml->xpath('s:Body');
+            $flag = $body[0]->ValidateOrderListResponse->ValidateOrderListResult->ValidateOrderResults->ValidateOrderResult->Validated;
+        }
+        if((string) $flag){
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = 'Error';
+        }
+        return $return;
     }
 
     public function getMessages(){

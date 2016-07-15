@@ -34,13 +34,48 @@ class WishPublishProductModel extends BaseModel
         'number_sold'
     ];
 
-    protected $searchFields = [];
+    public $searchFields = [];
+
 
     protected $rules = [];
+
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => [
+                'productID',
+            ],
+            'filterSelects' => [
+                /* 'status' => config('order.status'),
+                 'active' => config('order.active')*/
+            ],
+            'sectionSelect' => [
+                /*'price' => ['amount'],
+                'time' => ['created_at']*/
+            ],
+            'relatedSearchFields' => [
+                'details'=>['erp_sku']
+                /*'channel' => ['name'],
+                'items' => ['sku'],
+                'channelAccount' => ['alias'],
+                'country' => ['code'],
+                'userService' => ['name']*/
+            ],
+            'selectRelatedSearchs' => [
+
+            ]
+        ];
+    }
 
     public function details()
     {
         return $this->hasMany('App\Models\Publish\Wish\WishPublishProductDetailModel', 'product_id', 'id');
+    }
+
+    public function channelAccount()
+    {
+        return $this->belongsTo('App\Models\Channel\AccountModel', 'account_id', 'id');
     }
 
     public function operator()

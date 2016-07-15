@@ -91,6 +91,11 @@ return [
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
+            [
+                'name' => '标记发货规则设置',
+                'url' => 'orderMarkLogic.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航

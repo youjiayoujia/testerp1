@@ -610,10 +610,13 @@ Route::group(['middleware' => 'auth'], function () {
 
     //队列
     Route::resource('jobFailed', 'Job\FailedController');
+    //标记发货规则设置
+    Route::resource('orderMarkLogic', 'Order\OrderMarkLogicController');
 });
 
 
 //getEbayInfo
+Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);
 Route::any('getEbayInfo', ['uses' => 'TestController@getEbayInfo']);
 
 Route::any('testtest', ['uses' => 'TestController@test', 'as' => 'test1']);

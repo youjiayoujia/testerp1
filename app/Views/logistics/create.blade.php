@@ -46,7 +46,7 @@
         </div>
     </div>
     <div class='row'>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
             <label for="docking" class="control-label">对接方式</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="docking" id="docking">
@@ -57,7 +57,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
             <label for="logistics_catalog_id" class="control-label">物流分类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
@@ -69,7 +69,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
             <label for="logistics_email_template_id" class="control-label">回邮模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
@@ -81,18 +81,7 @@
                 @endforeach
             </select>
         </div>
-    </div>
-    <div class="row">
-        <div class='form-group col-lg-3'>
-            <label for="logistics_limits">物流限制</label>
-            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
-                <option value=''></option>
-                @foreach($limits as $limit)
-                    <option value="{{ $limit->id }}">{{$limit->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
             <label for="logistics_template_id" class="control-label">面单模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_template_id" id="logistics_template_id">
@@ -104,12 +93,18 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-3" id="pool_quantity">
-            <label for="pool_quantity" class="control-label">号码池数量</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="pool_quantity" placeholder="号码池数量" name='pool_quantity' value="{{ old('pool_quantity') }}">
+        <div class='form-group col-lg-4'>
+            <label for="logistics_limits">物流限制</label>
+            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
+                <option value=''></option>
+                @foreach($limits as $limit)
+                    <option value="{{ $limit->id }}">{{$limit->name}}</option>
+                @endforeach
+            </select>
         </div>
-        <div class="form-group col-lg-3">
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-2">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
@@ -120,6 +115,20 @@
             <div class="radio">
                 <label>
                     <input type="radio" name="is_enable" value="0" checked>否
+                </label>
+            </div>
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="is_track" class="control-label">平邮or挂号</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="is_track" value="1">平邮
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="is_track" value="0" checked>挂号
                 </label>
             </div>
         </div>
@@ -199,6 +208,27 @@
                     @endforeach
                 </select>
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">平台信息</div>
+        <div class="panel-body">
+            @foreach($channels as $channel)
+                <div class="form-group col-lg-2">
+                    <label for="channel_id_{{ $channel->id }}" class="control-label">{{ $channel->name }}平台</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="channel_id_{{ $channel->id }}" value="1">{{ $channel->driver }}上传
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="channel_id_{{ $channel->id }}" value="0" checked>{{ $channel->driver }}不上传
+                        </label>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 @stop

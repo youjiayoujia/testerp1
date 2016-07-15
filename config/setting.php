@@ -70,8 +70,13 @@ return [
         'stock.item.sku' => 'sku',
         'time.created_at'=>'创建时间',
         'order.ordernum' => '订单号',
+
+        'productID'=>'Wish产品ID',
+        'details.erp_sku'=>'erpSKU',
+
         'thrend' => '趋势',
-        'user.name' =>'姓名'
+        'user.name' =>'姓名',
+        'require_create' => '是否需要采购',
     ],
 ];
 

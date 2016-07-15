@@ -85,7 +85,7 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $response = $this->setRequest('Orders', $request);
-        Tool::show($response, false);
+
         //TODO:return ERRORS
         if (isset($response->Error)) {
             Tool::show($response, false);
@@ -118,11 +118,11 @@ Class AmazonAdapter implements AdapterInterface
             }
             $response = $this->setRequest('Orders', $request);
             if (isset($response->Error)) {
-                break;
+                Tool::show($response);
             }
             $responseOrderItems = $nextToken ? $response->ListOrderItemsByNextTokenResult : $response->ListOrderItemsResult;
             foreach ($responseOrderItems->OrderItems->OrderItem as $orderItem) {
-                $items[] = $this->parseOrderItem($orderItem);
+                $items = array_merge($items, $this->parseOrderItem($orderItem));
             }
             $nextToken = $responseOrderItems->NextToken;
         } while ($nextToken);
@@ -179,24 +179,23 @@ Class AmazonAdapter implements AdapterInterface
      */
     public function parseOrderItem($orderItem)
     {
-        preg_match('/\*FBA(.+?)\[/i', (string)$orderItem->SellerSKU, $result);
-        if ($result) {
-            $sku = $result[1];
-        } else {
-            preg_match('/\*(.+?)\[/i', (string)$orderItem->SellerSKU, $result);
-            $sku = $result ? $result[1] : '';
+        $items = [];
+        $skus = Tool::filter_sku((string)$orderItem->SellerSKU); //根据账号的sku解析设定
+        $total = $skus['skuNum'];
+        unset($skus['skuNum']);
+        foreach ($skus as $sku) {
+            $item = [];
+            $item['sku'] = $sku['erpSku'];
+            $item['channel_sku'] = (string)$orderItem->SellerSKU;
+            $item['price'] = (float)$orderItem->ItemPrice->Amount / $total;
+            $item['quantity'] = (int)$orderItem->QuantityOrdered * $sku['qty'];
+            $item['currency'] = (string)$orderItem->ItemPrice->CurrencyCode;
+            $items[] = $item;
         }
-        $result = [
-            'sku' => $sku,
-            'channel_sku' => (string)$orderItem->SellerSKU,
-            'quantity' => (int)$orderItem->QuantityOrdered,
-            'price' => (float)$orderItem->ItemPrice->Amount,
-            'currency' => (string)$orderItem->ItemPrice->CurrencyCode,
-        ];
-        return $result;
+        return $items;
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
         // TODO: Implement returnTrack() method.
         echo "return Amazon Tracking Informations";

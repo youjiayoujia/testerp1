@@ -53,6 +53,7 @@ class LogisticsController extends Controller
             'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
             'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
             'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
+            'channels' => ChannelModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);

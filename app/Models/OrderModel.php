@@ -118,6 +118,9 @@ class OrderModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        foreach(ChannelModel::all() as $channel) {
+            $arr[] = $channel->name;
+        }
         return [
             'filterFields' => [
                 'ordernum',
@@ -134,14 +137,13 @@ class OrderModel extends BaseModel
                 'time' => ['created_at']
             ],
             'relatedSearchFields' => [
-                'channel' => ['name'],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
                 'country' => ['code'],
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
-
+                'channel' => ['name' => $arr],
             ]
         ];
     }

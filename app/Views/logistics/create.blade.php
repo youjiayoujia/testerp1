@@ -215,16 +215,16 @@
         <div class="panel-body">
             @foreach($channels as $channel)
                 <div class="form-group col-lg-2">
-                    <label for="channel_id" class="control-label">{{ $channel->name }}平台</label>
+                    <label for="channel_id_{{ $channel->id }}" class="control-label">{{ $channel->name }}平台</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="channel_id" value="1">{{ $channel->driver }}上传
+                            <input type="radio" name="channel_id_{{ $channel->id }}" value="1">{{ $channel->driver }}上传
                         </label>
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="channel_id" value="0">{{ $channel->driver }}不上传
+                            <input type="radio" name="channel_id_{{ $channel->id }}" value="0" checked>{{ $channel->driver }}不上传
                         </label>
                     </div>
                 </div>

@@ -132,6 +132,7 @@ class ImageController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'MODEL不存在.'));
         }
         $image = $productModel->imageAll;
+        
         foreach ($image as $value) {
             $url[] = asset($value->path)."/".$value->name;
         }
@@ -140,9 +141,20 @@ class ImageController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model'=> $model,
             'labels'=> LabelModel::all(),
-            'image' => $image,
+            'images' => $image,
         ];
         return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function imagelable()
+    {
+        echo 111;exit;
     }
 
 

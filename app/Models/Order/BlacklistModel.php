@@ -57,9 +57,12 @@ class BlacklistModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        foreach(ChannelModel::all() as $channel) {
+            $arr[$channel->name] = $channel->name;
+        }
         return [
             'relatedSearchFields' => [
-                'channel' => ['name']
+                
             ],
             'filterFields' => [
                 'ordernum',
@@ -74,7 +77,7 @@ class BlacklistModel extends BaseModel
                 'time' => ['created_at']
             ],
             'selectRelatedSearchs' => [
-
+                'channel' => ['name' => $arr],
             ]
         ];
     }

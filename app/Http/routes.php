@@ -28,6 +28,7 @@ Route::group(['middleware' => 'auth'], function () {
     //3宝package
     Route::resource('bao3Package', 'Bao3PackageController');
     //产品图片路由
+    Route::any('productImage/imageLable', ['uses' => 'Product\ImageController@imageLable', 'as' => 'imageLable']);
     Route::any('productImage/createImage', ['uses' => 'Product\ImageController@createImage', 'as' => 'createImage']);
     Route::resource('productImage', 'Product\ImageController');
     //reported smissing  reportedMissingCreate

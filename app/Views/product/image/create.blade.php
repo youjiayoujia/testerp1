@@ -52,7 +52,26 @@
       <div class="form-group">
         <input id="file-1" class="file" type="file" multiple data-preview-file-type="any" data-sku="ssdf" input-name="dlo">
       </div>
-    </div>   
+    </div>  
+<div class="panel panel-default">
+    @foreach($images as $image)
+        <div class="panel-body preview-panel">
+            <div class="file-preview-frame cover-container ui-droppable" name="{{$image->id}}">
+                <img class="file-preview-image ui-draggable ui-draggable-handle" src="{{ asset($image->path) }}/{{$image->name}}" title="{{$image->name}}" alt="{{$image->name}}">
+                <input type="hidden" class="fileId" value="5742cf661ce0ac104f064c68">
+                <div class="btn-group tags tags_{{$image->id}}">
+                    <button type="button" class="btn btn-xs photoBtn btn-default active" data-tag="photo" data-id="{{$image->id}}" title="默认图"><span class="glyphicon glyphicon-eye-open"></span></button>
+                    <button type="button" class="btn btn-xs photoBtn btn-success active" data-tag="photo" title="实拍图"><span class="glyphicon glyphicon-picture"></span></button>
+                    <button type="button" class="btn btn-xs linkBtn btn-default" data-tag="link" title="链接图"><span class="glyphicon glyphicon-link"></span></button>
+                    <button type="button" class="btn btn-xs shapeBtn btn-success active" data-tag="shape" title="外观图"><span class="glyphicon glyphicon-tree-deciduous"></span></button>
+                    <button type="button" class="btn btn-xs frontBtn btn-success active" data-tag="front" title="正面图"><span class="glyphicon glyphicon-home"></span></button>
+                </div>
+                <div class="btn-group operations operations_{{$image->id}}"><button class="btn btn-xs btn-danger delBtn" title="删除"><span class="glyphicon glyphicon-trash"></span></button>
+                </div>
+            </div>
+        </div> 
+    @endforeach
+</div>
 @stop
 
 @section('pageJs')
@@ -62,10 +81,40 @@
     <script src="{{ asset('js/jquery-labelauty.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() { 
-            var img = "<img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' ><img height='160px' width='160px' src='http://www.youjia1.com/uploads/product/765/766/1/1468488038file_data.jpg' >";
-            $(".file-drop-zone-title").html(img);
+            
         }); 
 
+        
+        $(".photoBtn").click(function(){
+            var id = $(this).data("id");
+            $.ajax({
+                url: "{{ route('imageLable') }}",
+                data:{id:id},
+                dataType: "html",
+                type:'get',
+                success:function(result){
+                    if(result==0){
+                        $(".ajaxinsert").html('');
+                    }else{
+                        $(".ajaxinsert").html(result);  
+                    }
+                    
+                }
+            });  
+        })
+
+        $(".file-preview-frame").mouseover(function(){
+            var id = $(this).attr('name');
+            $(".cover-container .tags_"+id).css("display","inline");
+            $(".cover-container .operations_"+id).css("display","inline");
+        })
+
+        $(".file-preview-frame").mouseleave(function(){
+            var id = $(this).attr('name');
+            $(".cover-container .tags_"+id).css("display","none");
+            $(".cover-container .operations_"+id).css("display","none");
+        })
+        
         $("#file-1").fileinput({
             //uploadAsync: false,  
             uploadUrl: "{{route('productImage.store')}}",
@@ -73,6 +122,7 @@
             overwriteInitial: false,
             initialCaption: "请选择产品图（支持多选）",
             dropZoneTitle: '',
+            //showPreview: false,
             //initialPreviewShowDelete: true,
             /*initialPreview: [
                         "http://www.youjia1.com/uploads/product/763/765/2/1467876193file_data.jpg",
@@ -124,6 +174,40 @@ function(event, data, previewId, index) {
 .dowebok li { display: inline-block;}
 .dowebok li { margin: 10px 0;}
 input.labelauty + label { font: 12px "Microsoft Yahei";}
+.file-preview-frame {
+    border: 1px solid #ddd;
+    box-shadow: 1px 1px 5px 0 #a2958a;
+    display: table;
+    float: left;
+    height: 160px;
+    margin: 8px;
+    padding: 6px;
+    text-align: center;
+    vertical-align: middle;
+}
+.file-preview-image {
+    height: 160px;
+}
+.cover-container {
+    position: relative;
+}
+.cover-container .tags {
+    display: none;
+    position: absolute;
+    left: 6px;
+    top: 6px;
+}
+.cover-container .operations {
+    display: none;
+    position: absolute;
+    right: 6px;
+    top: 6px;
+}
+.panel-default {
+    border-color: #ddd;
+    margin: 0 18px 0 18px;
+}
+
 </style>
 
  

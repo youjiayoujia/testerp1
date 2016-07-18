@@ -59,48 +59,60 @@ class AmazonModule extends BaseChannelModule
  */
     public function returnTracking()
     {
+        $tmp_ddd = $this->testXML();
+        // $fd = fopen('d:/test.xml', 'w+');
+        // fwrite($fd, $tmp_ddd);
+        // rewind($fd);
         $this->_config['Action'] = 'SubmitFeed';
         $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
         $this->_config['Version'] = '2009-01-01';
-        unset($this->_config['MarketplaceId.Id.1']);
         $this->_config['MarketplaceIdList.Id.1'] = 'ATVPDKIKX0DER';
-        $tmp_url = "mws.amazonservices.ca";
+        $this->_config['PurgeAndReplace'] = 'false';
+        $this->_config['Merchant'] = 'A3THBIK7QYKUUV';
+        unset($this->_config['SellerId']);
+        unset($this->_config['MarketplaceId.Id.1']);
+        //rewind($fd);
+        $tmp_url = "https://mws.amazonservices.com";
+        $tmp_arr = parse_url($tmp_url);
         $sign  = 'POST' . "\n";
-        $sign .= $tmp_url . "\n";
+        $sign .= $tmp_arr['host'] . "\n";
         $sign .= "/" . "\n";
-        $sign .= $this->signArrToString();
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
         $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
         $signature = urlencode(base64_encode($signature));
-        $this->_config['Signature'] = $signature;
-        $url = [];
-        foreach($this->_config as $key => $value) {
-            $url[] = "{$key}={$value}";
-        }
-        sort($url);
-        $string = implode('&', $url);
-        $test = $this->getXML([['2', '3', '4', '5', '6', ['item1'=>'12']]],'32');
-        $tmp_header = ["Content-Type: text/xml", "User-Agent:php-amazon-mws/0.0.1 (Language=php)", "Host:mws.amazonservices.ca", "Content-MD5:".base64_encode(md5($test))];
-        $ch = curl_init($tmp_url);
-        curl_setopt($ch,CURLOPT_HEADER,1);
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER,0);
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $tmp_header = ["Content-Type: text/xml", "Host: mws.amazonservices.com", "Content-MD5:".base64_encode(md5($this->testXML(), true))];
+        $string1 = $tmp_url."/?".$string;
+
+
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,true);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch,CURLOPT_POST,1);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
-        curl_setopt($ch,CURLOPT_POSTFIELDS,$string);
+        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false); 
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$tmp_ddd);
         curl_setopt($ch,CURLOPT_HTTPHEADER, $tmp_header);
         $res = curl_exec($ch);
-        var_dump(curl_error($ch));
         curl_close($ch);
+        print_r($res);
+        echo "========================================================";
         var_dump($res);
     }
 
+    public function testXML()
+    {
+        return "<?xml version='1.0' encoding='UTF-8'?><AmazonEnvelope xsi:noNamespaceSchemaLocation='amzn-envelope.xsd'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'><Header><DocumentVersion>1.01</DocumentVersion><MerchantIdentifier>A3THBIK7QYKUUV</MerchantIdentifier></Header><MessageType>OrderFulfillment</MessageType><Message><MessageID>1</MessageID><OrderFulfillment><AmazonOrderID>116-6770178-1261059</AmazonOrderID><FulfillmentDate>2016-03-10T07:59:59+00:00</FulfillmentDate><FulfillmentData><CarrierName>China Post</CarrierName><ShippingMethod>e-packet</ShippingMethod><ShipperTrackingNumber>LS598110942CN</ShipperTrackingNumber></FulfillmentData><Item><AmazonOrderItemCode>06285235305074</AmazonOrderItemCode><Quantity>1</Quantity></Item></OrderFulfillment></Message></AmazonEnvelope>";
+    }
+
 //A3THBIK7QYKUUV account id  marchant_id就是account_id
-    public function getXML($arr, $marchant)
+    public function getXML($arr)
     {
         $str = "<?xml version='1.0' encoding='UTF-8'?>
     <AmazonEnvelope xsi:noNamespaceSchemaLocation='amzn-envelope.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
         <Header>
             <DocumentVersion>1.01</DocumentVersion>
-            <MerchantIdentifier>".$marchant."</MerchantIdentifier>
+            <MerchantIdentifier>A3THBIK7QYKUUV</MerchantIdentifier>
         </Header>
         <MessageType>OrderFulfillment</MessageType>";
         foreach($arr as $key => $value)

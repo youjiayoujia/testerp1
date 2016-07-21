@@ -21,6 +21,7 @@ class ErrorListModel extends BaseModel
      */
     protected $fillable = ['picklist_id', 'package_id', 'status', 'process_by', 'process_time', 'created_at'];
 
+    public $searchFields = [];
     // 规则验证
     public $rules = [
         'create' => [

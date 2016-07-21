@@ -43,4 +43,20 @@ class ErrorListModel extends BaseModel
     {
         return $this->belongsTo('App\Models\UserModel', 'process_by', 'id');
     }
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => [
+            ],
+            'filterSelects' => [
+            ],
+            'sectionSelect' => [
+            ],
+            'relatedSearchFields' => [
+            ],
+            'selectRelatedSearchs' => [
+            ]
+        ];
+    }
 }

@@ -149,13 +149,8 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '入库',
-                    'url' => 'stockIn.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '出库',
-                    'url' => 'stockOut.index',
+                    'name' => '出入库',
+                    'url' => 'stockInOut.index',
                     'icon' => '',
                 ],
                 [

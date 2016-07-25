@@ -38,7 +38,7 @@ class PickListModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['picknum'];
+    public $searchFields=['picknum' => '拣货单号'];
 
     //拣货单item关联关系
     public function pickListItem()

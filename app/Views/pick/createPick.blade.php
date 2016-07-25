@@ -26,37 +26,12 @@
             </td>
         </tr>
     </table>
-    <div class='row'>
-        <div class='col-lg-3'>
-        <table class='table'>
-            <tr>
-                <td>邮递方式</td>
-            </tr>
-            <tr>
-                <td><input type='checkbox' class='logistics_all' checked='true'>全部</td>
-            </tr>
-            <tr>
-                <td><input type='checkbox' class='mixed'>混合物流</td>
-            </tr>
-            @foreach($logisticses as $logistics)
-            <tr>
-                <td><input type='checkbox' name='logistics[]' class='logistics' value="{{$logistics->id}}" checked='true'>{{$logistics->code}}</td>
-            </tr>
-            @endforeach
-        </table>
-        </div>
-        <div class='col-lg-9'>
+    <div>
         <table class='table table-bordered table-striped'>
             <tr>
                 <td>包裹数</td>
-                <td></td>
+                <td>{{ $count }}</td>
             </tr>
-            <tr>
-                <td>订单数</td>
-                <td></td>
-            </tr>
-        </table>
-        <table class='table table-bordered table-striped'>
             <tr>
                 <td>单单/单多拣货数：</td>
                 <td><input type='text' name='singletext' class='form-control' value='25'></td>
@@ -66,6 +41,28 @@
                 <td><input type='text' name='multitext' class='form-control' value='20'></td>
             </tr>
         </table>
+    </div>
+    <div class='form-group'>
+        <label for='logistics'>邮递方式</label>
+        <div class='checkbox'>
+            <label>
+                <input type='checkbox' class='logistics_all' checked='true'>全部
+            </label>
+            <label>
+                <input type='checkbox' class='logistics_opposite'>反选
+            </label>
+            <label>
+                <input type='checkbox' class='mixed' name='mixed'>混合物流
+            </label>
+        </div>
+    </div>
+    <div class='form-group'>
+        <div class='checkbox'>
+            @foreach($logisticses as $logistics)
+            <label class='col-lg-3'>
+                <input type='checkbox' name='logistics[]' class='logistics' value="{{$logistics->id}}" checked='true'>{{$logistics->code}}
+            </label>
+        @endforeach
         </div>
     </div>
 @stop
@@ -75,20 +72,6 @@
 @section('pageJs')
 <script type='text/javascript'>
 $(document).ready(function(){
-    $('.mixed').click(function(){
-        if($(this).prop('checked') == true) {
-            $('.logistics').prop('checked', false);
-            $('.logistics').prop('disabled', true);
-            $('.logistics_all').prop('checked', false);
-            $('.logistics_all').prop('disabled', true);
-        } else {
-            $('.logistics').prop('checked', false);
-            $('.logistics').prop('disabled', false);
-            $('.logistics_all').prop('checked', false);
-            $('.logistics_all').prop('disabled', false);
-        }
-    });
-
     $('.channel_all').click(function(){
         if($(this).prop('checked') == true)
             $('.channel').prop('checked', true);
@@ -108,6 +91,15 @@ $(document).ready(function(){
             $('.logistics').prop('checked', true);
         else
             $('.logistics').prop('checked', false);
+    });
+
+    $('.logistics_opposite').click(function(){
+        $('.logistics').each(function(){
+            if($(this).prop('checked') == true)
+                $(this).prop('checked', false);
+            else
+                $(this).prop('checked', true);
+        })
     });
 });
 </script>

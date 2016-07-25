@@ -153,6 +153,7 @@ class OrderController extends Controller
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
+            'currencys' => CurrencyModel::all(),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -240,7 +241,6 @@ class OrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
-        $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
         $data['order_id'] = $id;
         $model->refundCreate($data, request()->file('image'));

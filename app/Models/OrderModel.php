@@ -12,6 +12,7 @@ namespace App\Models;
 
 use Tool;
 use Exception;
+use Storage;
 use App\Base\BaseModel;
 use App\Models\ItemModel;
 use App\Models\Order\RefundModel;
@@ -117,6 +118,9 @@ class OrderModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        foreach(ChannelModel::all() as $channel) {
+            $arr[$channel->name] = $channel->name;
+        }
         return [
             'filterFields' => [
                 'ordernum',
@@ -133,14 +137,13 @@ class OrderModel extends BaseModel
                 'time' => ['created_at']
             ],
             'relatedSearchFields' => [
-                'channel' => ['name'],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
                 'country' => ['code'],
                 'userService' => ['name']
             ],
             'selectRelatedSearchs' => [
-
+                'channel' => ['name' => $arr],
             ]
         ];
     }
@@ -315,9 +318,9 @@ class OrderModel extends BaseModel
     public function refundCreate($data, $file = null)
     {
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
-        if ($file->getClientOriginalName()) {
+        if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
-            $file->move($path, time() . '.' . $file->getClientOriginalExtension());
+            Storage::disk('product')->put($data['image'],file_get_contents($file->getRealPath()));
             if ($data['type'] == 'FULL') {
                 foreach ($data['arr']['id'] as $id) {
                     $orderItem = $this->items->find($id);
@@ -347,7 +350,11 @@ class OrderModel extends BaseModel
         }
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
-            return true;
+            foreach($blacklist->get() as $value) {
+                if($value['type'] == 'CONFIRMED') {
+                    return true;
+                }
+            }
         }
         return false;
     }

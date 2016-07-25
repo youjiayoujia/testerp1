@@ -140,25 +140,21 @@
     <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
         <div class="panel-body">
-            <div class="row">
-                <div class="col-lg-2"><strong>sku</strong></div>
-                <div class="col-lg-1"><strong>数量</strong></div>
-                <div class="col-lg-1"><strong>单价</strong></div>
-                <div class="col-lg-1"><strong>是否有效</strong></div>
-                <div class="col-lg-1"><strong>是否赠品</strong></div>
-                <div class="col-lg-2"><strong>备注</strong></div>
-                <div class="col-lg-2"><strong>发货状态</strong></div>
-            </div>
+            <div class="col-lg-2"><strong>sku</strong></div>
+            <div class="col-lg-1"><strong>数量</strong></div>
+            <div class="col-lg-1"><strong>单价</strong></div>
+            <div class="col-lg-2"><strong>是否有效</strong></div>
+            <div class="col-lg-2"><strong>是否赠品</strong></div>
+            <div class="col-lg-2"><strong>备注</strong></div>
+            <div class="col-lg-2"><strong>发货状态</strong></div>
             @foreach($orderItems as $key => $orderItem)
-                <div class="row">
-                    <div class="col-lg-2">{{ $orderItem->sku }}</div>
-                    <div class="col-lg-1">{{ $orderItem->quantity }}</div>
-                    <div class="col-lg-1">{{ $orderItem->price }}</div>
-                    <div class="col-lg-1">{{ $orderItem->is_active_name }}</div>
-                    <div class="col-lg-1">{{ $orderItem->is_gift_name }}</div>
-                    <div class="col-lg-2">{{ $orderItem->remark }}</div>
-                    <div class="col-lg-2">{{ $orderItem->status_name }}</div>
-                </div>
+                <div class="col-lg-2">{{ $orderItem->sku }}</div>
+                <div class="col-lg-1">{{ $orderItem->quantity }}</div>
+                <div class="col-lg-1">{{ $orderItem->price }}</div>
+                <div class="col-lg-2">{{ $orderItem->is_active_name }}</div>
+                <div class="col-lg-2">{{ $orderItem->is_gift_name }}</div>
+                <div class="col-lg-2">{{ $orderItem->remark }}</div>
+                <div class="col-lg-2">{{ $orderItem->status_name }}</div>
             @endforeach
         </div>
     </div>
@@ -166,34 +162,32 @@
         <div class="panel-heading">包裹信息</div>
         <div class="panel-body">
             @foreach($packages as $package)
-                <div class="row">
-                    <div class="col-lg-3">
-                        <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>包裹状态</strong> : {{ $package->status }}
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>打印面单时间</strong> : {{ $package->printed_at }}
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>发货时间</strong> : {{ $package->shipped_at }}
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>交付时间</strong> : {{ $package->delivered_at }}
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
-                    </div>
-                    <div class="col-lg-3">
-                        <strong>备注</strong> : {{ $package->remark }}
-                    </div>
+                <div class="col-lg-3">
+                    <strong>包裹ID</strong> : <a href="{{ route('package.show', ['id'=>$package->id]) }}">{{ $package->id }}</a>
+                </div>
+                <div class="col-lg-3">
+                    <strong>物流方式</strong> : {{ $package->logistics ? $package->logistics->logistics_type : '' }}
+                </div>
+                <div class="col-lg-3">
+                    <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
+                </div>
+                <div class="col-lg-3">
+                    <strong>包裹状态</strong> : {{ $package->status }}
+                </div>
+                <div class="col-lg-3">
+                    <strong>打印面单时间</strong> : {{ $package->printed_at }}
+                </div>
+                <div class="col-lg-3">
+                    <strong>发货时间</strong> : {{ $package->shipped_at }}
+                </div>
+                <div class="col-lg-3">
+                    <strong>交付时间</strong> : {{ $package->delivered_at }}
+                </div>
+                <div class="col-lg-3">
+                    <strong>妥投时效</strong> : {{ ($package->shipped_at) - ($package->delivered_at) }}
+                </div>
+                <div class="col-lg-12">
+                    <strong>备注</strong> : {{ $package->remark }}
                 </div>
             @endforeach
         </div>

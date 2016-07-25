@@ -13,6 +13,7 @@ class ProductMultiOptionModel extends BaseModel
         'de_name', 'de_description', 'de_keywords', 
         'fr_name', 'fr_description', 'fr_keywords',
         'zh_name', 'zh_description', 'zh_keywords',
+        'en_name', 'en_description', 'en_keywords',
         'product_id','channel_id',
     ];
 

@@ -338,6 +338,12 @@ return [
                 'icon' => '',
             ],
             [
+
+                'name' => 'SMT待发布产品列表',
+                'url' => 'smt.draftSearch',
+                'icon' => '',
+            ],
+            [
                 'name' => 'ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',

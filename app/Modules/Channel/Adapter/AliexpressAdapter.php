@@ -10,6 +10,8 @@ namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Channel\AccountModel;
+use App\models\Publish\Smt\smtCategoryAttribute;
 
 set_time_limit(1800);
 
@@ -437,16 +439,744 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-
-    public function getMessages()
-    {
-
+   
+    public function getMessages(){
+        
     }
+    
 
-    public function sendMessages($replyMessage)
-    {
-
+    /**
+     * API交互，POST方式
+     * @param  [type] $api [description]
+     * @param  [type] $arr [description]
+     * @return [type]      [description]
+     */
+    public function getJsonDataUsePostMethod($action, $parameter){
+        //接口URL
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        //apiinfo	aliexpress.open
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
+        $parameter['access_token'] = $this->_access_token;
+    
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+    
+        //参数
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+    
+        return $result;
     }
+    
+
+    
+    /**
+     * 同步分类在线产品属性2:新API，
+     * 缺点：目前只获取了主要属性，不知道属性是否有子属性，需要再判断
+     * @param $token_id
+     * @param $category_id
+     * @param string $parentAttrValueList
+     * @return bool
+     */
+    public function getChildAttributesResultByPostCateIdAndPath($token_id, $category_id, $parentAttrValueList=''){        
+        if ($token_id && $category_id){
+            //获取账号的信息
+            $tokenInfo = AccountModel::where('id',$token_id)->get();
+            if ($tokenInfo) {
+                $api    = 'getChildAttributesResultByPostCateIdAndPath';
+                $result = $this->getJsonData($api, 'cateId=' . $category_id.(!empty($parentAttrValueList) ? '&parentAttrValueList='.$parentAttrValueList : ''));                
+                $rs = json_decode($result, true);           
+                if (array_key_exists('success', $rs) && $rs['success']) { //返回成功了
+                    //判断分类ID是否存在，不存在就插入，存在就UPdate
+                    $options = array(
+                        'category_id'      => $category_id,
+                        'attribute'        => serialize($rs['attributes']),
+                        'last_update_time' => date('Y-m-d H:i:s')
+                    );
+                    $id = smtCategoryAttribute::where('category_id',$category_id)->get(array('category_id'));
+                    $smtCategoryAttribute = new smtCategoryAttribute;
+                    if ($id) {
+                        $options['id'] = $id;
+                        $smtCategoryAttribute->update($options);
+                    } else {
+                        $smtCategoryAttribute->add($options);
+                    }
+                    return $rs['attributes'];
+                }else {
+                    return false;
+                }
+            }else {
+                return false;
+            }
+        }else {
+            return false;
+        }
+    }
+    
+    /**
+     * 过滤输出速卖通刊登的数据,排除Notice错误
+     * @param $key
+     * @param $data
+     * @param $returnArray:是否返回数组
+     * @return string
+     */
+    public function filterData($key, $data, $returnArray=false){
+        return $data && array_key_exists($key, $data) ? $data[$key] : ($returnArray ? array() : '');
+    }
+    
+    /**
+     * 解析属性并返回 --这礼现在不解析SKU属性
+     * $array:属性数组
+     * @param $att:属性数值，循环后的一维数组
+     * @param $pid:父属性ID
+     * @param bool $isSku:是否SKU属性
+     * @param array $array
+     * @param array $array2
+     * @return string
+     */
+    public function parseAttribute($att, $pid, $isSku=false, $array=array(), $array2=array()){
+        $child_string      = ''; //属性值的子属性
+        $customized_string = ''; //自定义属性
+        $product_attribute = '';
+        $required          = $att['required'] ? true : false; //必要？
+        $required_string   = $att['required'] ? '<span class="red">*</span>' : '';        //必要属性
+        $key_string        = $att['keyAttribute'] ? '<span class="green">！</span>' : '';  //关键属性
+        $attribute_string  = ''; //属性显示方式
+        $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
+        $other_string      = '';//其他属性
+         
+        $inputType         = $att['inputType']; //属性值的类型
+        $units             = array_key_exists('units', $att) ? $att['units'] : array(); //单位
+         
+        switch ($att['attributeShowTypeValue']){
+            case 'check_box': //复选框
+                $attribute_string = '<div class="col-sm-10">';
+                $attribute_string .= '<ul class="list-inline">';
+                foreach ($att['values'] as $item):
+                $checked = false;
+                if (!empty($array)){
+                    foreach ($array as $row){ //判断是否存在这个属性ID和值ID
+                        if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
+                        if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                    }
+                }
+                 
+                $attribute_string .= '<li>';
+                $attribute_string .= '<label class="checkbox-inline">';
+                $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].'][]').'" '.($checked ? 'checked' : '').'/>'.$item['names']['zh'];
+                $attribute_string .= '</label>';
+                $attribute_string .= '</li>';
+                endforeach;
+                $attribute_string .= '</ul>';
+                $attribute_string .= '</div>';
+                break;
+            case 'list_box': //下拉列表
+                $attribute_string = '<div class="col-sm-10">';
+                $attribute_string .= '<select name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id']).']" class="form-control" '.($required ? 'datatype="*"' : '').' attr_id="'.$att['id'].'">';
+                $attribute_string .= '<option value="">---请选择---</option>';
+                foreach ($att['values'] as $item):
+                $checked = false;
+                if (!empty($array)){
+                    foreach ($array as $row){
+                        if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
+                        if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                    }
+                }
+                 
+                //lang=0,说明没有子属性了
+                $attribute_string .= '<option value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" lang="'.(!empty($item['attributes']) ? 0 : 1).'" attr_value_id="'.$item['id'].'" '.($checked ? 'selected="selected"' : '').'>'.$item['names']['zh'].'('.$item['names']['en'].')'.'</option>';
+                if (!empty($item['attributes'])){ //值还有子属性
+                    foreach ($item['attributes'] as $i){
+                        $child_string .= $this->parseAttribute($i, $item['id'], $isSku, $array);
+                    }
+                }
+                $customized_string .= '<tr class="hide tr-p-'.$att['id'].'-'.$item['id'].'"><td>'.$item['names']['zh'].'</td>'.($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" /></td>' : '').($att['customizedPic'] ? '<td><a href="javascript: void(0);" class="btn btn-defaut btn-xs">选择图片</a><a href="" class="view-custom-image"></a><a href="" class="del-custom-image">删除</a><input type="hidden" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="" /></td>' : '').'</tr>';
+                endforeach;
+                $attribute_string .= '</select>';
+                $attribute_string .= '</div>';
+                if (array_key_exists($att['id'], $array2) && $array2[$att['id']]){
+                    $other_string .= '<div class="form-group">';
+                    $other_string .= '<div class="col-sm-10 col-sm-offset-2">';
+                    $other_string .= '<input type="text" name="otherAttributeTxt['.$att['id'].']" class="form-control" value="'.$array2[$att['id']]['attrValue'].'"/>';
+                    $other_string .= '</div>';
+                    $other_string .= '</div>';
+                }
+                break;
+            case 'group_table': //复选框 再有子复选框 --待扩展
+                $attribute_string = '<div class="col-sm-10">';
+                $attribute_string .= '<ul class="list-inline">';
+                foreach ($att['values'] as $item):
+                $attribute_string .= '<li class="col-sm-4 no-padding-left groupTab">';
+                $attribute_string .= '<label class="checkbox-inline">';
+                $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].']').'"/>'.$item['names']['zh'];
+                $attribute_string .= '</label>';
+                $attribute_string .= '</li>';
+                endforeach;
+                $attribute_string .= '</ul>';
+                $attribute_string .= '</div>';
+                break;
+            case 'input':
+            default:
+                //验证信息类型及错误信息
+                if ($inputType == 'NUMBER') {
+                    $dataType = 'num';
+                } else {
+                    $dataType = '*';
+                }
+                //看看是否有单位
+                $inputValue = $this->filterData($att['id'], $array2) ? $array2[$att['id']]['attrValue'] : '';
+                if ($units) {
+                    $input = '';
+                    $u = '';
+                    if ($inputValue){
+                        list($input, $u) = explode(' ', $inputValue);
+                    }
+                     
+                    $attribute_string = '<div class="col-sm-8">';
+                    $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="'.$input.'" />';
+                    $attribute_string .= '</div>';
+                     
+                    //单位处理
+                    $attribute_string .= '<div class="col-sm-2">';
+                    $attribute_string .= '<select name="sysAttrIdAndUnit['.$att['id'].']" class="form-control">';
+                    foreach ($units as $unit){
+                        $attribute_string .= '<option value="'.$unit['unitName'].'" '.($u == $unit['unitName'] ? 'selected="selected"' : '').'>'.$unit['unitName'].'</option>';
+                    }
+                    $attribute_string .= '</select>';
+                    $attribute_string .= '</div>';
+                } else {
+                    $attribute_string = '<div class="col-sm-10">';
+                    $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="' .$inputValue. '" />';
+                    $attribute_string .= '</div>';
+                }
+                break;
+        }
+        $product_attribute .= '<div class="form-group p-'.$pid.' '.($pid > 0 && !$this->filterData($att['id'], $array) ? 'hide' : '').' '.($isSku ? 's_attr' : 'p_attr').'" attr_id="'.$att['id'].'" custome="'.(($att['customizedName'] || $att['customizedPic']) ? '1' : '0').'">';
+        $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
+        $product_attribute .= $attribute_string;
+        $product_attribute .= '</div>';
+         
+        //还要添加些内容，比如自定义属性的设置
+        if($customized_flag){ //自定义名称或者图片
+            $product_attribute .= '<div class="form-group hide">';
+            $product_attribute .= '<div class="col-sm-offset-2 col-sm-10">';
+            $product_attribute .= '<table class="table table-bordered table-vcenter" id="custome-'.$att['id'].'">';
+            $product_attribute .= '<thead><tr><th>'.$att['names']['zh'].'</th>'.($att['customizedName'] ? '<th>自定义名称</th>' : '').($att['customizedName'] ? '<th>图片（无图片可以不填）</th>' : '').'</tr></thead>';
+            $product_attribute .= '<tbody>'.$customized_string.'</tbody>';
+            $product_attribute .= '</table>';
+            $product_attribute .= '</div>';
+            $product_attribute .= '</div>';
+        }
+         
+        return $product_attribute.$other_string.$child_string;
+    }
+    
+    /**
+     * 解析SKU属性 --应该都是check_box这个类型的
+     * @param $att   属性数组
+     * @param $array 多属性的值列表
+     * @param $token_id 账号
+     * @return string
+     */
+    function parseSkuAttribute($att, $array, $token_id){
+        $child_string      = ''; //属性值的子属性
+        $customized_string = ''; //自定义属性
+        $product_attribute = '';
+        $required          = $att['required'] ? true : false; //必要？
+        $required_string   = $att['required'] ? '<span class="red">*</span>' : '';         //必要属性
+        $key_string        = $att['keyAttribute'] ? '<span class="green">！</span>' : '';  //关键属性
+        $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
+    
+        $attribute_string = '<div class="col-sm-10">';
+        $attribute_string .= '<ul class="list-inline">';
+        foreach ($att['values'] as $k => $item):
+        $attribute_string .= '<li>';
+        $attribute_string .= '<label class="checkbox-inline">';
+        $attribute_string .= '<input type="checkbox" name="'.$att['id'].'" value="'.$item['id'].'" '.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ?  'checked' : '').(($required && $k == 0) ? ' datatype="*" nullmsg="'.$att['names']['zh'].'不能为空"' : '').' />'.$item['names']['zh'];
+        $attribute_string .= '</label>';
+        $attribute_string .= '</li>';
+        //自定义名称或图片
+        $customized_string .= '<tr class="'.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ? '' : 'hide').' tr-p-'.$att['id'].'-'.$item['id'].'">'
+            .'<td>'.$item['names']['zh'].'</td>'
+                .($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" value="'.($this->filterData($att['id'], $array, true) && $this->filterData($item['id'], $array[$att['id']]) ? $array[$att['id']][$item['id']]['propertyValueDefinitionName'] : '').'" /></td>' : '')
+                .'<td><span class="customize-pic pull-right">'
+                    .(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? '<img src="'.$array[$att['id']][$item['id']]['skuImage'].'" width="30" height="30" /><a href="javascript: void(0);" class="del-custom-image">删除</a>' : '').'</span>'
+                        .'<a href="javascript: void(0);" class="btn btn-default btn-xs add-custom-image pull-left" lang="'.$att['id'].'_'.$item['id'].'">选择图片</a>'
+                            .'<a href="javascript: void(0);" class="btn btn-default btn-xs copyToCust" >详情图片</a>'
+                                .'<input type="hidden" class="customized-pic-input customizedPic-'.$att['id'].'_'.$item['id'].'" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="'.(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? $array[$att['id']][$item['id']]['skuImage'] : '').'" /></td>'
+                                    .'</tr>';
+        endforeach;
+        $attribute_string .= '</ul>';
+        $attribute_string .= '</div>';
+    
+        $product_attribute .= '<div class="form-group  s_attr" attr_id="'.$att['id'].'" custome="'.(($att['customizedName'] || $att['customizedPic']) ? '1' : '0').'">';
+        $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
+        $product_attribute .= $attribute_string;
+        $product_attribute .= '</div>';
+    
+        //还要添加些内容，比如自定义属性的设置
+        if($customized_flag){ //自定义名称或者图片
+            $product_attribute .= '<div class="form-group '.($this->filterData($att['id'], $array) ? '' : 'hide').'">';
+            $product_attribute .= '<div class="col-sm-offset-2 col-sm-10">';
+            $product_attribute .= '<table class="table table-bordered table-vcenter" id="custome-'.$att['id'].'">';
+            $product_attribute .= '<thead><tr><th>'.$att['names']['zh'].'</th>'.($att['customizedName'] ? '<th>自定义名称</th>' : '').($att['customizedName'] ? '<th>图片（无图片可以不填）</th>' : '').'</tr></thead>';
+            $product_attribute .= '<tbody>'.$customized_string.'</tbody>';
+            $product_attribute .= '</table>';
+            $product_attribute .= '</div>';
+            $product_attribute .= '</div>';
+        }
+    
+        return $product_attribute.$child_string;
+    }
+    
+    function accounterFormat($string) {
+        $string = trim($string);
+        $newString = $string;
+        if ($string == '速卖通' || $string == '线下交易' || $string == '网站' || $string == 'ebay补货' || strlen($string) <= 4 || substr_count($string, '@') > 0) {
+            //
+        } else {
+            $newString = substr($string, 0, 4) . '****' . substr($string, strlen($string) - 1, 1);
+            if ( $string == 'happy-store2013' )  $newString = 'h***st***3';
+            if($string=='happyfish2012')$newString='happ**fish**2';
+            if($string=='happycow2012')$newString='happ**cow**2';
+            if($string=='happywill2013')$newString='happ**will**3';
+            if($string=='pandamotos2012')$newString='pand**tos**2';
+            if($string=='pandacars2012')$newString='pand**car**2';
+    
+        }
+        return $newString;
+    }
+    
+    /**
+     * SKU列表显示排序
+     * @param $skus
+     * @param $sortAtt
+     * @param $attVal
+     * @return array
+     */
+    function sortSkuAttr($skus, $sortAtt, $attVal){
+        $newSkus = array();
+        $sKarr = array(); //所有键值
+        foreach ($skus as $sku){
+            $aeopSKUProperty = unserialize($sku['aeopSKUProperty']);
+            $trClassArr = array();
+            foreach ($sortAtt as $k1 => $sa){
+                $matchFlag = false;
+                $saVal = '';
+                if($aeopSKUProperty){
+                    foreach ($aeopSKUProperty as $Property){
+                        if ($sa == $Property['skuPropertyId']){ //分类信息
+                            $saVal = $Property['propertyValueId'];
+                    
+                            foreach ($attVal[$sa] as $k2 => $av){
+                                if ($av == $saVal){
+                                    $sKarr[$k1][$k2] = $saVal;
+                                    break;
+                                }
+                            }
+                            $matchFlag = true;
+                            break;
+                        }
+                    }    
+                    $trClassArr[] = $saVal;
+                    
+                    if (!$matchFlag) $sKarr[$k1] = array();
+                    ksort($sKarr[$k1]);
+                }                              
+            }
+            $skus[implode('_', $trClassArr)] = $sku;
+        }
+        
+        $newTrSortArr = $this->combineDika($sKarr); //行显示的排序数组
+  
+        foreach ($newTrSortArr as $ns){
+            if (array_key_exists($ns, $skus->toArray())){                
+                $newSkus[] = $skus[$ns];
+            }
+        }
+        return $newSkus; //返回排序后的新的SKU列表
+    }
+    
+    /**
+     * 对SMTSKU进行去前后缀处理
+     * @param $smtSkuCode
+     * @param $erpFlag:是否解析成ERPSKU
+     * @return string
+     */
+    public function rebuildSmtSku($smtSkuCode, $erpFlag=false){
+        // 去掉SKU的销售代码
+        $n = strpos($smtSkuCode, '*');
+        $sku_new = $n !== false ? substr($smtSkuCode, $n+1) : $smtSkuCode;
+    
+        // 去除sku的帐户代码
+        $m = strpos($sku_new, '#');
+        $sku_new = $m !== false ? substr($sku_new, 0, $m) : $sku_new;
+        if ($erpFlag) {
+            $sku_new = str_ireplace('{YY}', '', $sku_new);
+        }
+        return trim($sku_new);
+    }
+    
+    /**
+     * 多个数组的笛卡儿积
+     * @param $data
+     * @return array
+     */
+    public function combineDika($data)
+    {
+        $cnt    = count($data);
+        $result = array();
+        if ($cnt == 0) return $result;
+        $result = $data[0];
+        for ($i = 1; $i < $cnt; $i++) {
+            $result = $this->combineArray($result, $data[$i]);
+        }
+        return $result;
+    }
+    
+    /**
+     * 两个数组的笛卡尔积
+     * @param $arr1
+     * @param $arr2
+     * @return array
+     */
+    public function combineArray($arr1,$arr2) {
+        $result = array();
+        if (!empty($arr1)) {
+            foreach ($arr1 as $item1) {
+                if (!empty($arr2)) {
+                    foreach ($arr2 as $item2) {
+                        $result[] = $item1 . '_' . $item2;
+                    }
+                } else {
+                    $result[] = $item1 . '_';
+                }
+            }
+        } else {
+            if (!empty($arr2)) {
+                foreach ($arr2 as $item2) {
+                    $result[] = '_' . $item2;
+                }
+            } else {
+                $result[] = '_';
+            }
+        }
+    
+        return $result;
+    }
+    
+    /**
+    * 把SMT的module替换成图片，这样才能显示成图片的占位符
+    * @param $detail
+    * @return mixed
+    */
+    public function replaceSmtModuleToImg($detail){
+        preg_match_all('/<kse:widget.*><\/kse:widget>/i', $detail, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $m) {
+                $pic    = '<img class="kse-widget" data="' . rawurlencode($m) . '" src="http://style.aliexpress.com/js/5v/lib/kseditor/plugins/widget/images/widget1.png"/>';
+                $detail = str_replace($m, $pic, $detail);
+                unset($pic);
+            }
+        }
+        return $detail;
+    }
+    /**
+     * 替换SMT描述的特殊图片成module:   ske:widget
+     * @param $str
+     * @return mixed
+     */
+    public function replaceSmtImgToModule($str){
+        $detail = $str;
+        preg_match_all('/<img\s*[^>]*class=\s*\"\s*kse-widget\s*\"[^>]*\/>/i', $str, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $match) {
+                //匹配出属性的值
+                preg_match('/data\s*=\s*"([^>^"]*)"/i', $match, $data);
+                $widget = rawurldecode($data[1]);
+                $detail = str_replace($match, $widget, $detail);
+                unset($data);
+            }
+            unset($matches);
+        }
+        return $detail;
+    }
+    
+    
+
+    public function sendMessages($replyMessage){
+        
+    }
+    
+    /**
+     * 速卖通上传图片到图片银行或临时目录专用
+     * @param  [type] $action     api名称
+     * @param  [type] $fileName   若为数组格式array('srcFileName' => $filename),字符串格式则为srcFileName=$filename
+     * @param  [type] $fileStream 图片流,二进制文件
+     * @return [type]             [description]
+     */
+   /*  public function uploadBankImage($action, $file, $fileName=''){
+        //接口URL
+        $app_url  = 'http://'.self::GWURL.'/fileapi/param2/'.$this->_version.'/aliexpress.open/'.$action.'/'.$this->_appkey.'?access_token='.$this->_access_token;
+        $param    = '';
+        
+        $parameter_arr['_access_token'] = $this->_access_token;
+        $_aop_signature = $this->getApiSignature($app_url,$parameter_arr);
+        $fileName = ($fileName ? $fileName : time()).'.jpg';
+        if ($action == 'api.uploadImage') {
+            $param = '&fileName='.$fileName.'&_aop_signature='.$_aop_signature;
+        }elseif ($action == 'api.uploadTempImage') {
+            $param = '&srcFileName='.$fileName;
+        }
+        $data = file_get_contents($file);
+        $ch   = curl_init ();
+        curl_setopt($ch, CURLOPT_URL, $app_url.$param);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-from-urlencoded'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $result = curl_exec($ch);
+        if (curl_error($ch)) {
+            //$this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error ( $ch )); //异常错误
+        }
+        curl_close($ch);
+        //$this->setCurlErrorLog($result);
+        return json_decode($result, true);
+    } */
+    
+    public function uploadBankImage($action, $file, $fileName=''){
+        //接口URL
+        $app_url = "http://" . self::GWURL . "/fileapi/";
+        //apiinfo	aliexpress.open
+        $apiInfo = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
+        $parameter= '';
+        $fileName = ($fileName ? rawurlencode($fileName) : time().rand(1000, 9999)).'.jpg';
+        if ($action == 'api.uploadImage') {
+            $param = 'fileName='.$fileName;
+        }elseif ($action == 'api.uploadTempImage') {
+            $param = 'srcFileName='.$fileName;
+        }
+        //参数
+        $app_parameter_url = $param."&access_token=" . $this->_access_token;
+    
+        $sign_url = '';
+    
+        //获取对应URL的签名
+        $sign     = $this->getApiSign ( $apiInfo, $app_parameter_url );
+        $sign_url = "&_aop_signature=$sign"; //签名参数
+    
+        //组装URL
+        $get_url = $app_url . $apiInfo . '?' . $app_parameter_url . $sign_url;
+    
+        $data = file_get_contents($file);
+        $ch   = curl_init ();
+        curl_setopt($ch, CURLOPT_URL, $get_url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-from-urlencoded'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $result = curl_exec($ch);
+        if (curl_error($ch)) {
+            $this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error ( $ch )); //异常错误
+        }
+        curl_close($ch);
+        return json_decode($result, true);
+    }
+    
+        /**
+     * 获取定义的平台信息
+     * @param string $platType
+     * @return array
+     */
+    public function getDefinedPlatInfo($platType = 'SMT'){
+        $platArray = $this->defineProductPublishPlatArray();
+        foreach ($platArray as $plat){
+            if (strtoupper($plat['platType']) == strtoupper($platType)){
+                return $plat;
+            }
+        }
+        return array();
+    }
+    
+    public function defineProductPublishPlatArray( )
+    {
+        $array = array(
+            array(
+                'platID' => '101',
+                'platTitle' => 'eBay.us',
+                'platType' => 'USD',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '102',
+                'platTitle' => 'eBay.au',
+                'platType' => 'AUD',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '103',
+                'platTitle' => 'eBay.uk',
+                'platType' => 'GBP',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '104',
+                'platTitle' => 'eBay.de',
+                'platType' => 'EUR',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '105',
+                'platTitle' => 'eBay.fr',
+                'platType' => 'EUR',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '106',
+                'platTitle' => 'eBay.ca',
+                'platType' => 'C',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '199',
+                'platTitle' => 'eBay.other',
+                'platType' => 'ebay.other',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '201',
+                'platTitle' => 'Amazon.de',
+                'platType' => 'Amazon.de',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '202',
+                'platTitle' => 'Amazon.uk',
+                'platType' => 'Amazon.uk',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '203',
+                'platTitle' => 'Amazon.us',
+                'platType' => 'Amazon.us',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '204',
+                'platTitle' => 'Amazon.ca',
+                'platType' => 'Amazon.ca',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '205',
+                'platTitle' => 'Amazon.fr',
+                'platType' => 'Amazon.fr',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '299',
+                'platTitle' => 'Amazon.other',
+                'platType' => 'Amazon.other',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '301',
+                'platTitle' => 'Aliexpress',
+                'platType' => 'SMT',
+                'platTypeID' => '6'
+            ),
+            array(
+                'platID' => '401',
+                'platTitle' => 'DHgate',
+                'platType' => 'DHgate',
+                'platTypeID' => '4'
+            ),
+            array(
+                'platID' => '501',
+                'platTitle' => '网站',
+                'platType' => 'B2C',
+                'platTypeID' => '5'
+            )
+        );
+        return $array;
+    }
+    
+    /**
+     * 对速卖通的SKU属性进行排序处理 --基本属性不进行处理
+     * @param $attribute
+     * @return mixed
+     */
+    public function sortAttribute($attribute){
+        if ($attribute) {
+            $spec = array();
+            $temp = array();
+            foreach ($attribute as $key => $row) {
+                if ($row['sku']){ //是SKU属性
+                    $spec[$key] = $row['spec']; //用来排序的数组
+                    $temp[$key] = $row;
+                    unset($attribute[$key]);
+                }
+            }
+            array_multisort($spec, SORT_ASC, $temp); //对SKU属性数组进行排序
+            $attribute = array_merge($attribute, $temp); //合并排序后的信息
+        }
+        return $attribute;
+    }
+    
+    
+    /**
+     * 解析SKU成ERP内的SKU
+     * @param $skuCode
+     * @param $erpFlag:解析成ERP SKu(主要是去掉海外仓的标识)
+     * @return array
+     */
+    public function buildSysSku($skuCode, $erpFlag=false){
+        // 处理带销售代码的SKU：B702B#Y6 及海外仓标识
+        $skus = $this->rebuildSmtSku($skuCode, $erpFlag);
+    
+        $sku_list = explode('+', $skus); // 处理组合的SKU：DA0090+DA0170+DA0137
+        $sku_arr  = array();
+        foreach ($sku_list as $value) {
+            $len       = strpos($value, '('); // 处理有捆绑的SKU：MHM330(12)
+            $sku_new   = $len ? substr($value, 0, $len) : $value;
+            $sku_arr[] = $sku_new;
+        }
+        return !empty($sku_arr) ? $sku_arr : array();
+    }
+    
+    /**
+     * 获取SKU属性中的海外仓发货属性ID,没有就返回0
+     * @param $aeopSKUProperty
+     * @return int
+     */
+    public function checkProductSkuAttrIsOverSea($aeopSKUProperty){
+        $valId = 0;
+        if (!empty($aeopSKUProperty)){
+             
+            foreach ($aeopSKUProperty as $property){
+                if ($property['skuPropertyId'] == 200007763){ //发货地的属性ID
+                    $valId = $property['propertyValueId'];
+                    break;
+                }
+            }
+        }
+        return $valId;
+    }
+    
+    /**
+     * 标点过滤函数 --主要是针对关键字
+     * @param unknown $str
+     * @return unknown
+     */
+    function filterForSmtProduct($str){
+        $str = str_replace(';', ' ', $str);
+        $str = str_replace(',', ' ', $str);
+        return trim($str);
+    }
+    
+   
 
 
 }

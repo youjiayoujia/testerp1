@@ -532,6 +532,28 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wish', 'Publish\Wish\WishPublishController');
     Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
     // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
+   
+    Route::get('smt/draftSearch',
+        ['uses' => 'Publish\Smt\SmtController@draftSearch', 'as' => 'smt.draftSearch']);
+    Route::get('smt/showChildCategory',
+        ['uses' => 'Publish\Smt\SmtController@showChildCategory', 'as' => 'smt.showChildCategory']);
+    Route::post('smt/doAction',
+        ['uses' => 'Publish\Smt\SmtController@doAction', 'as' => 'smt.doAction']);
+    Route::post('smt/create',
+        ['uses' => 'Publish\Smt\SmtController@addProduct', 'as' => 'smt.addProduct']);
+    Route::post('smt/batchPost',
+        ['uses' => 'Publish\Smt\SmtController@batchPost', 'as' => 'smt.batchPost']);   
+    Route::post('smt/recommendProductList',
+        ['uses' => 'Publish\Smt\SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
+    Route::post('smt/batchDel',
+        ['uses' => 'Publish\Smt\SmtController@batchDel', 'as' => 'smt.batchDel']);
+    
+    Route::resource('smt', 'Publish\Smt\SmtController');
+    
+    Route::any('upload',
+         ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
+ 
+
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);

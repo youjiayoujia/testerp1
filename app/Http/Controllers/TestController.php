@@ -629,4 +629,45 @@ class TestController extends Controller
       exit;
 
     }
+
+    public function testLazada(){
+        $packages = PackageModel::where('order_id',12914)->get();
+
+        foreach($packages as $package){
+            $OrderItemIds = [];
+            foreach ($package->items as $item) {
+                $temp = $item->orderItem->transaction_id;
+                $temp = explode(',', $temp);
+                foreach ($temp as $v) {
+                    $v_temp = explode('@', $v);
+                    $OrderItemIds[] = $v_temp[0];
+                }
+
+            }
+            $OrderItemIds=[
+                9047009,9047011
+            ];
+            $channel_listnum[] =5473365;//$package->order->channel_listnum;
+            $account = AccountModel::findOrFail($package->channel_account_id);
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $result = $channel->getPackageId(implode(',',$channel_listnum));
+            if($result){
+                if(isset($result[$OrderItemIds[0]])){ // 获取到了 最踪号 和 PackageId
+
+                }else{ //特殊情况数据记录
+
+                }
+            }else{ //api调用失败
+
+            }
+
+            var_dump($OrderItemIds);
+
+            var_dump($result);
+
+        }
+
+
+        exit;
+    }
 }

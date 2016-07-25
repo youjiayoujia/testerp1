@@ -12,11 +12,11 @@
     <th>渠道</th>
     <th>订单状态</th>
     <th>订单创建后N小时</th>
-    <th>订单支付N小时</th>
+    <th>订单支付后N小时</th>
     <th>承运商</th>
     <th>追踪号上传方式</th>
     <th>设置人员</th>
-    <th>优先级</th>
+    <th title="数字越大越先执行">优先级</th>
     <th>是否启用</th>
     <th>操作</th>
 @stop
@@ -24,26 +24,37 @@
     @foreach($data as $mark)
         <tr>
             <td>{{ $mark->id }}</td>
-            <td>{{ $mark->channel_id }}</td>
-            <td>{{ $mark->order_status }}</td>
+            <td>{{ $mark->channel->name }}</td>
+            <td>
+                <?php   $orderStatus = json_decode($mark->order_status);?>
+                @foreach($orderStatus as $st)
+               {{-- {{ $status[$mark->order_status] }}--}}
+                    {{$order_status[$st]}}
+                    @endforeach
+            </td>
             <td>{{ $mark->order_create }}</td>
             <td>{{ $mark->order_pay }}</td>
-            <td>{{ $mark->assign_shipping_logistics }}</td>
-            <td>{{ $mark->is_upload }}</td>
-            <td>{{ $mark->user_id }}</td>
+            <td>{{ $mark->AssignShipping }}
+                    @if($mark->assign_shipping_logistics==2)
+                        <br/>
+                {{($mark->shipping_logistics_name)}}
+                    @endif
+            </td>
+            <td>{{ $mark->IsUploaded }}</td>
+            <td>{{ $mark->userOperator->name }}</td>
             <td>{{ $mark->priority }}</td>
-            <td>{{ $mark->is_use }}</td>
+            <td>{{ $mark->IsUsed }}</td>
 
             <td>
-                <a href="{{ route('paypal.show', ['id'=>$mark->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('orderMarkLogic.show', ['id'=>$mark->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('paypal.edit', ['id'=>$mark->id]) }}" class="btn btn-warning btn-xs">
+                <a href="{{ route('orderMarkLogic.edit', ['id'=>$mark->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $mark->id }}"
-                   data-url="{{ route('paypal.destroy', ['id' => $mark->id]) }}">
+                   data-url="{{ route('orderMarkLogic.destroy', ['id' => $mark->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
             </td>

@@ -255,6 +255,7 @@ Class LazadaAdapter implements AdapterInterface
 
         $result = [
             'channel_ordernum' => $order_info['OrderNumber'],
+            'channel_listnum' =>$order_info['OrderId'],
             //'email' => $order->BuyerEmail,
             'amount' => $total,
             'amount_shipping' => $orders_ship_fee,
@@ -449,27 +450,14 @@ Class LazadaAdapter implements AdapterInterface
         return simplexml_load_string(Tool::curl($requestUrl));
     }
 
-    public function returnTrack($tracking_info)
-    {
-        $return = [];
+    /** api 共用
+     * @param $parameters  api参数
+     * @return array api返回结果
+     */
+    public function commonLazada($parameters){
 
-        $now = new \DateTime();
         $api_key = $this->config['lazada_access_key'];
         $lazada_api_host = $this->config['lazada_api_host'];
-        $lazada_user_id = $this->config['lazada_user_id'];
-
-        $parameters = array(
-            'UserID' => $lazada_user_id,
-            'Action' => 'SetStatusToReadyToShip',
-            'OrderItemIds' => '[' . $tracking_info['OrderItemIds'] . ']',
-            'DeliveryType' => 'dropship',
-            'ShippingProvider' => $tracking_info['ShippingProvider'],
-            'TrackingNumber' => $tracking_info['TrackingNumber'],
-            'Timestamp' => $now->format(\DateTime::ISO8601),
-            'Version' => '1.0',
-
-        );
-
         ksort($parameters);
         $params = array();
 
@@ -484,21 +472,36 @@ Class LazadaAdapter implements AdapterInterface
 
         $request = http_build_query($parameters);
 
-        //$info =$this->setRequest($lazada_api_host.'/?'.$request);
+        $info =$this->setRequest($lazada_api_host.'/?'.$request);
 
-        //$result  = $this->XmlToArray($info);
+        $result  = $this->XmlToArray($info);
+        return $result;
+    }
 
-        $rand_id = rand(1, 10);
-        if ($rand_id > 5) {
-            $result['Body']['OrderItems']['OrderItem'] = 1;
+    /** 标记发货
+     * @param $tracking_info
+     * @return array
+     */
+    public function returnTrack($tracking_info)
+    {
+        $return = [];
+        $now = new \DateTime();
+        $parameters = array(
+            'UserID' => $this->config['lazada_user_id'],
+            'Action' => 'SetStatusToReadyToShip',
+            'OrderItemIds' => '[' . $tracking_info['OrderItemIds'] . ']',
+            'DeliveryType' => 'dropship',
+            'ShippingProvider' => $tracking_info['ShippingProvider'],
+            'TrackingNumber' => $tracking_info['TrackingNumber'],
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+            'Version' => '1.0',
 
-        } else {
+        );
+        $result = $this->commonLazada($parameters);
 
-        }
         if (isset($result['Body']['OrderItems']['OrderItem'])) {
             $return['status'] = true;
             $return['info'] = 'Success';
-
         } else {
             $return['status'] = false;
             $return['info'] = isset($result['Head']['ErrorMessage']) ? $result['Head']['ErrorMessage'] : 'Error';
@@ -507,6 +510,46 @@ Class LazadaAdapter implements AdapterInterface
 
         return $return;
     }
+
+    public function getPackageId($OrderIdList){
+        $return=[];
+        $now = new \DateTime();
+        $parameters = array(
+            'UserID' => $this->config['lazada_user_id'],
+            'Action' => 'GetMultipleOrderItems',
+            'OrderIdList'=>'['.$OrderIdList.']',
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+            'Version' => '1.0',
+        );
+        $result = $this->commonLazada($parameters);
+        if (isset($result['Body']['Orders']['Order'])) {
+            if(isset($result['Body']['Orders']['Order']['OrderItems']['OrderItem'][0])){
+                foreach($result['Body']['Orders']['Order']['OrderItems']['OrderItem'] as $item){
+                    $return[$item['OrderItemId']]['PackageId'] = $item['PackageId'];
+                    $return[$item['OrderItemId']]['TrackingCode'] = $item['TrackingCode'];
+                }
+            }else{
+                $return[$result['Body']['Orders']['Order']['OrderItems']['OrderItem']['OrderItemId']]['PackageId'] = $result['Body']['Orders']['Order']['OrderItems']['OrderItem']['PackageId'];
+                $return[$result['Body']['Orders']['Order']['OrderItems']['OrderItem']['OrderItemId']]['TrackingCode'] = $result['Body']['Orders']['Order']['OrderItems']['OrderItem']['TrackingCode'];
+            }
+            return $return;
+
+        }else{
+            return false;
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
 
     public function getMessages()
     {

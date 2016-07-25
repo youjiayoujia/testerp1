@@ -390,7 +390,7 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $body = isset($htmlBody) && $htmlBody != '' ? $htmlBody : $plainBody;
-        return $body;
+        return serialize(['amazon' => $body]);
     }
 
     public function getClient($account)

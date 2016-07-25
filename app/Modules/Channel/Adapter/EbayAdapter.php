@@ -474,7 +474,7 @@ class EbayAdapter implements AdapterInterface
 
     public function getMessages()
     {
-
+        return false;
     }
 
     public function sendMessages($replyMessage)

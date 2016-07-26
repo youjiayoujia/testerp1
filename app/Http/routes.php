@@ -269,6 +269,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
+    Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::resource('item', 'ItemController');
     //渠道路由

@@ -18,6 +18,7 @@ Class LazadaAdapter implements AdapterInterface
     private $version = '2013-09-01';
     private $config = [];
     private $perPage = 10;
+    public $apiResponse;
 
 
     public function __construct($config)
@@ -522,6 +523,7 @@ Class LazadaAdapter implements AdapterInterface
             'Version' => '1.0',
         );
         $result = $this->commonLazada($parameters);
+        $this->apiResponse = $result;
         if (isset($result['Body']['Orders']['Order'])) {
             if(isset($result['Body']['Orders']['Order']['OrderItems']['OrderItem'][0])){
                 foreach($result['Body']['Orders']['Order']['OrderItems']['OrderItem'] as $item){

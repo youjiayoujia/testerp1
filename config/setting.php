@@ -73,6 +73,10 @@ return [
 
         'productID'=>'Wish产品ID',
         'details.erp_sku'=>'erpSKU',
+        'account_id' =>'账号',
+        'sellerID' =>'销售人员',
+        'price.number_sold' =>'产品销量',
+        'time.publishedTime'=>'产品刊登时间',
 
         'thrend' => '趋势',
         'user.name' =>'姓名',

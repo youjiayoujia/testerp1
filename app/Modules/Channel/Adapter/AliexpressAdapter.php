@@ -10,6 +10,7 @@ namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Message\MessageModel;
 
 set_time_limit(1800);
 
@@ -501,11 +502,41 @@ Class AliexpressAdapter implements AdapterInterface
     public function sendMessages($replyMessage)
     {
         // TODO: Implement sendMessages() method.
-        echo $this->_access_token;
+        //echo $this->_access_token;
+        $message_obj = $replyMessage->message;
 
-        $method='api.updateMsgRead';
+        if(!empty($message_obj)){
 
+             // step1:发信息
 
+            $send_param = [];
+            $send_param['channelId'] = $message_obj->message_id;
+            $send_param['buyerId'] = $message_obj->from;
+            $send_param['msgSources'] = $message_obj->'消息类型';
+            $send_param['content'] = $replyMessage->content;
+
+            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $api_return_array = json_decode($api_return,true);
+            if(isset($api_return_array['result']["isSuccess"])){
+                if($api_return_array['result']["isSuccess"]){
+
+                    //step2: 更新消息为已读
+                    $update_param = [];
+                    $update_param['channelId'] = $message_obj->message_id;
+                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
+
+                    $replyMessage->status = 'SENT';
+                }else{
+                    $replyMessage->status = 'FAIL';
+                }
+            }
+        }else{
+            $replyMessage->status = 'FAIL';
+        }
+        $replyMessage->save();
+
+        return $replyMessage->status== 'SENT' ? true : false;
     }
 
 

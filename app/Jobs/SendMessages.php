@@ -40,7 +40,8 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
         if($this->reply){
             $account = $this->reply->message->account;
 
-            if($account->channel->driver == 'aliexpress'){ //亚马逊渠道邮件
+           // if($account->channel->driver == 'aliexpress') //亚马逊渠道邮件
+
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 if($channel->sendMessages($this->reply)){//发送渠道message
                     $this->result['status'] = 'success';
@@ -49,7 +50,7 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = 'the message send to ['.$this->reply['to_email'].'] message failed!';
                 }
-            }
+
 
         }else{
             $this->result['status'] = 'fail';

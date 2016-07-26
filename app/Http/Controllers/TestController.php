@@ -37,6 +37,9 @@ use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
 use App\Models\CatalogModel;
+use App\Models\Message\MessageModel;
+use App\Models\Message\ReplyModel;
+
 
 use DB;
 
@@ -58,9 +61,9 @@ class TestController extends Controller
 
     public function index()
     {
-        $data = CatalogModel::all()->channels;
+        $data = ReplyModel::find(28558);
 
-        dd($data);
+        dd($data->message->message_id);
         exit;
         /*        $dataaaa = $reply->message->account->toArray();
                 var_dump($dataaaa);exit;*/

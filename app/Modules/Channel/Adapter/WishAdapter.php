@@ -747,6 +747,9 @@ Class WishAdapter implements AdapterInterface
      */
     public function sendMessages($replyMessage)
     {
+        $param['id'] = $replyMessage->message->from;
+        $param['access_token'] = $this->access_token;
+        $param['reply'] = $replyMessage->content;
 
     }
 }

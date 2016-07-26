@@ -16,6 +16,7 @@
  *
  */
 Route::get('test1', 'TestController@test1');
+Route::get('test2', 'TestController@test2');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -50,12 +51,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockShut', 'Stock\ShutController');
     //hold库存
     Route::resource('stockHold', 'Stock\HoldController');
-    //出库
+    //unhold库存
     Route::resource('stockUnhold', 'Stock\UnholdController');
     //入库
     Route::resource('stockIn', 'Stock\InController');
     //出库
     Route::resource('stockOut', 'Stock\OutController');
+    //出入库
+    Route::resource('stockInOut', 'Stock\InOutController');
     //供货商变更历史
     Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryController');
     //供货商评级
@@ -359,6 +362,9 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+
+    Route::any('pickList/printException/',
+        ['uses' => 'PickListController@printException', 'as' => 'pickList.printException']);
     Route::post('pickList/statisticsProcess',
         ['uses' => 'PickListController@statisticsProcess', 'as' => 'pickList.statisticsProcess']);
     Route::get('pickList/performanceStatistics',

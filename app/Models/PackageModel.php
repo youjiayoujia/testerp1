@@ -6,7 +6,9 @@ use App\Base\BaseModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
+use App\Models\WarehouseModel;
 use App\Models\Logistics\ZoneModel;
+use App\Models\LogisticsModel;
 
 class PackageModel extends BaseModel
 {
@@ -65,19 +67,27 @@ class PackageModel extends BaseModel
     {
         return [
             'relatedSearchFields' => [
-                'warehouse' => ['name'],
                 'channel' => ['name'],
                 'channelAccount' => ['account'],
-                'logistics' => ['code', 'name'],
                 'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
-            'filterSelects' => ['status' => config('package')],
+            'filterSelects' => ['status' => config('package'), 'warehouse_id' => $this->getArray('App\Models\WarehouseModel', 'name'), 'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
             ],
             'sectionSelect' => [],
         ];
+    }
+
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
     }
 
     public function assigner()
@@ -140,6 +150,104 @@ class PackageModel extends BaseModel
         $arr = config('package');
         return $arr[$this->status];
     }
+
+    /*******************************************************************************/
+    /**
+     * @param array $items
+     * @return array|bool
+     */
+    public function setPackageItems()
+    {
+        if ($this->count() > 1) { //多产品
+            $packageItem = $this->setMultiPackageItem();
+        } else { //单产品
+            $packageItem = $this->setSinglePackageItem();
+        }
+        return $packageItem;
+    }
+
+    //设置单产品订单包裹产品
+    public function setSinglePackageItem()
+    {
+        $packageItem = [];
+        $originPackageItem = $this->items->first();
+        $quantity = $originPackageItem->quantity;
+        if (!$quantity) {
+            return false;
+        }
+        $stocks = $originPackageItem->item->assignStock($quantity);
+        var_dump($stocks);
+        if ($stocks) {
+            foreach ($stocks as $warehouseId => $stock) {
+                foreach ($stock as $key => $value) {
+                    $packageItem[$warehouseId][$key] = $value;
+                    $packageItem[$warehouseId][$key]['order_item_id'] = $originPackageItem->order_item_id;
+                    $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                }
+            }
+        } else {
+            return false;
+        }
+var_dump($packageItem);exit;
+        return $packageItem;
+    }
+
+    //设置多产品订单包裹产品
+    public function setMultiPackageItem()
+    {
+        $packageItem = [];
+        $stocks = [];
+        //根据仓库满足库存数量进行排序
+        $warehouses = [];
+        foreach ($this->items as $originPackageItem) {
+            $quantity = $originPackageItem->quantity;
+            if (!$quantity) {
+                continue;
+            }
+            $itemStocks = $originPackageItem->item->matchStock($quantity);
+            if ($itemStocks) {
+                foreach ($itemStocks as $itemStock) {
+                    foreach ($itemStock as $warehouseId => $stock) {
+                        if (isset($warehouses[$warehouseId])) {
+                            $warehouses[$warehouseId] += 1;
+                        } else {
+                            $warehouses[$warehouseId] = 1;
+                        }
+                    }
+                }
+                $stocks[$originPackageItem->order_item_id] = $itemStocks;
+            } else {
+                return false;
+            }
+        }
+        krsort($warehouses);
+        //set package item
+        foreach ($stocks as $orderItemId => $itemStocks) {
+            foreach ($itemStocks as $type => $itemStock) {
+                if ($type == 'SINGLE') {
+                    $stock = collect($itemStock)->sortByDesc(function ($value, $key) use ($warehouses) {
+                        return $warehouses[$key];
+                    })->first();
+                    foreach ($stock as $key => $value) {
+                        $packageItem[$value['warehouse_id']][$key] = $value;
+                        $packageItem[$value['warehouse_id']][$key]['order_item_id'] = $orderItemId;
+                        $packageItem[$value['warehouse_id']][$key]['remark'] = 'REMARK';
+                    }
+                } else {
+                    foreach ($itemStock as $warehouseId => $warehouseStock) {
+                        foreach ($warehouseStock as $key => $value) {
+                            $packageItem[$warehouseId][$key] = $value;
+                            $packageItem[$warehouseId][$key]['order_item_id'] = $orderItemId;
+                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
+                        }
+                    }
+                }
+            }
+        }
+
+        return $packageItem;
+    }
+    /**********************************************************************************/
 
     public function getShippingLimitsAttribute()
     {

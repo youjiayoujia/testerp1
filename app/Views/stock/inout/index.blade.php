@@ -7,8 +7,9 @@
     <th class='sort' data-field='total_amount'>总金额(￥)</th>
     <th>仓库</th>
     <th>库位</th>
-    <th>入库类型</th>
-    <th>入库来源</th>
+    <th>出入库</th>
+    <th>类型</th>
+    <th>来源</th>
     <th>备注</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
@@ -22,12 +23,13 @@
             <td>{{ $stockin->amount}}</td>
             <td>{{ $stockin->stock ? $stockin->stock->warehouse ? $stockin->stock->warehouse->name : '' : '' }}</td>
             <td>{{ $stockin->stock ? $stockin->stock->position ? $stockin->stock->position->name : '' : '' }}</td>
+            <td>{{ $stockin->outer_type == 'IN' ? '入库' : '出库' }}</td>
             <td>{{ $stockin->type_name }}</td>
             <td>{{ $stockin->relation_name }}</td>
             <td>{{ $stockin->remark }} </td>
             <td>{{ $stockin->created_at }}</td>
             <td>
-                <a href="{{ route('stockIn.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('stockInOut.show', ['id'=>$stockin->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
             </td>

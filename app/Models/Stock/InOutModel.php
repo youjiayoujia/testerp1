@@ -6,7 +6,7 @@ use App\Base\BaseModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\ItemModel;
 
-class InModel extends BaseModel
+class InOutModel extends BaseModel
 {
 
     /**
@@ -14,14 +14,14 @@ class InModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_ins';
+    protected $table = 'stock_in_outs';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['quantity', 'amount', 'type', 'remark', 'relation_id', 'stock_id', 'created_at'];
+    protected $fillable = ['quantity', 'amount', 'inner_type', 'remark', 'relation_id', 'stock_id', 'created_at', 'outer_type'];
 
     // 用于查询
     public $searchFields = ['id' => 'ID'];
@@ -32,7 +32,7 @@ class InModel extends BaseModel
             'filterFields' => ['id'],
             'relatedSearchFields' => [],
             'doubleRelatedSearchFields' => ['stock' => ['item' => ['sku']]],
-            'filterSelects' => ['type' => config('in.in')],
+            'filterSelects' => ['outer_type' => ['IN' => '入库', 'OUT' => '出库'], 'inner_type' => config('inout.INNER_TYPE')],
             'selectRelatedSearchs' => [
             ],
             'sectionSelect' => [],
@@ -67,9 +67,10 @@ class InModel extends BaseModel
      */
     public function getTypeNameAttribute()
     {
-        $buf = config('in.in');
-        if(array_key_exists($this->type, $buf))
-            return $buf[$this->type];
+        $buf = config('inout.ALL_TYPE');
+        $type = $this->outer_type.'.'.$this->inner_type;
+        if(array_key_exists($type, $buf))
+            return $buf[$type];
     }
 
     /**
@@ -102,16 +103,31 @@ class InModel extends BaseModel
      */
     public function getRelationNameAttribute()
     {
-        if($this->type == 'ADJUSTMENT')
-            return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
-        if($this->type == 'PURCHASE')
-            return $this->stockPurchase ? $this->stockPurchase->id : '';
-        if($this->type == 'ALLOTMENT')
-            return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
-        if($this->type == 'INVENTORY_PROFIT' || $this->type == 'SHORTAGE')
-            return $this->stockTaking ? $this->stockTaking->taking_id : '';
-        if($this->type == 'MAKE_ACCOUNT')
-            return '库存导入';
+        switch ($this->inner_type) {
+            case 'ADJUSTMENT':
+                return $this->stockAdjustment ? $this->stockAdjustment->adjust_form_id : '';
+                break;
+            case 'ALLOTMENT':
+                return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
+                break;
+            case 'INVENTORY_PROFIT':
+                return $this->stockTaking ? $this->stockTaking->taking_id : '';
+                break;
+            case 'SHORTAGE':
+                return $this->stockTaking ? $this->stockTaking->taking_id : '';
+                break;
+            case 'MAKE_ACCOUNT':
+                return '库存导入';
+                break;
+            case 'PACKAGE':
+                return $this->packageItem ? (($this->packageItem->package ? ($this->packageItem->package->order ? $this->packageItem->package->order->ordernum : '') : ''). ' : ' . ($this->packageItem->package ? $this->packageItem->package->id : '')) : '';
+                break;
+        }
+    }
+
+    public function packageItem()
+    {
+        return $this->belongsTo('App\Models\Package\ItemModel', 'relation_id', 'id');
     }
 
     /**

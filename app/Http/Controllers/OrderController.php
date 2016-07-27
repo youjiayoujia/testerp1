@@ -436,7 +436,7 @@ class OrderController extends Controller
     {
         request()->flash();
         $data = request()->all();
-        $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw' => $data['withdraw']]);
+        $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
 
         return redirect($this->mainIndex);
     }

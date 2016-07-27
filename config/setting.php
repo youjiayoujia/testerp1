@@ -12,7 +12,7 @@ return [
     /**
      * 可选分页条数
      */
-    'pageSizes' => [10, 25, 50, 100],
+    'pageSizes' => [10, 25, 50, 100, 300],
     /**
      * 默认排序字段
      */
@@ -77,6 +77,8 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+        'by_id' => '买家ID',
+        'items.item.status' => 'SKU状态'
     ],
 ];
 

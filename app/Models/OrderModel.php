@@ -28,7 +28,7 @@ class OrderModel extends BaseModel
 
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
-    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱'];
+    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 
     /**
      * 退款rules
@@ -52,7 +52,6 @@ class OrderModel extends BaseModel
             'channel_account_id' => 'required',
             'ordernum' => 'required',
             'channel_ordernum' => 'required',
-            'email' => 'required',
             'status' => 'required',
             'active' => 'required',
             'customer_service' => 'required',
@@ -126,6 +125,7 @@ class OrderModel extends BaseModel
                 'ordernum',
                 'channel_ordernum',
                 'email',
+                'by_id',
                 'currency'
             ],
             'filterSelects' => [
@@ -137,6 +137,7 @@ class OrderModel extends BaseModel
                 'time' => ['created_at']
             ],
             'relatedSearchFields' => [
+                'items' => ['item' => ['status' => config('item.status')]],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
                 'country' => ['code'],

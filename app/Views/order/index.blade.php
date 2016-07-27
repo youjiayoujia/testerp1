@@ -6,6 +6,7 @@
     <th class="sort" data-field="channel">渠道</th>
     <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>邮箱</th>
+    <th>买家ID</th>
     <th>物流</th>
     <th>收货人</th>
     <th>国家</th>
@@ -31,6 +32,7 @@
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
+            <td>{{ $order->by_id }}</td>
             <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
@@ -85,6 +87,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
+                            <div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">
                                     <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
@@ -99,7 +102,7 @@
                                 <div class="col-lg-2">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
-                                <div class="col-lg-4">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
@@ -159,6 +162,7 @@
                                     title="退款">
                                 <span class="glyphicon glyphicon-link"></span> 退款
                             </button>
+                            <?php break ?>
                         @endif
                     @endforeach
                     <button class="btn btn-primary btn-xs"
@@ -220,6 +224,12 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-lg-6">
+                                    <label for="withdraw_reason" class='control-label'>原因</label>
+                                    <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason">{{ old('withdraw_reason') }}</textarea>
                                 </div>
                             </div>
                         </div>

@@ -18,7 +18,6 @@ class CreateOrders extends Migration
             $table->integer('channel_account_id')->comment('渠道账号');
             $table->string('ordernum')->comment('订单号');
             $table->string('channel_ordernum')->comment('渠道订单号');
-            $table->string('email')->comment('邮箱');
             $table->enum('status',
                 [
                     'UNPAID',

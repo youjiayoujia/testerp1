@@ -23,6 +23,7 @@ class CreateOrders extends Migration
                     'UNPAID',
                     'PAID',
                     'PREPARED',
+                    'PARTIAL',
                     'NEED',
                     'PACKED',
                     'SHIPPED',

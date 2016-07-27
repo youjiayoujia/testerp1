@@ -1,10 +1,13 @@
 <?php
 
-namespace App\models\Publish\Smt;
+namespace App\Models\Publish\Smt;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Base\BaseModel;
 
-class smtFreightTemplate extends Model
+class smtFreightTemplate extends BaseModel
 {
     protected $table = "smt_freight_template";
+    protected $fillable = ['id','token_id','templateId','templateName','default','freightSettingList','last_update_time',];
+    
+
 }

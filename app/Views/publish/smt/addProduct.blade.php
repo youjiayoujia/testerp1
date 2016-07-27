@@ -223,7 +223,12 @@ text-align: left;
                             ?>
                  </select>
 			 </div>
-			 
+			 <div class="col-sm-1">
+                <a title="同步" class="btn btn-primary btn-sm" id="freightTemplateId_refresh"
+                        onclick="refresh_template(this, <?php echo $token_id; ?>, '<?php echo $smtApi->filterData('freightTemplateId', $draft_detail); ?>')">
+                    <i class="glyphicon glyphicon-refresh"></i>
+                </a>
+            </div>			 
         </div>
         <div class="row">
             <div class="form-group col-sm-1">
@@ -247,11 +252,17 @@ text-align: left;
                             -->
                              <?php
                             foreach ($service as $s):
-                                echo '<option value="' . $s['serviceID'] . '" ' . ($draft_detail->promiseTemplateId == $s['serviceID'] ? 'selected="selected"' : '') . '>' . $s['serviceName'] . '</option>';
+                                echo '<option value="' . $s['serviceID'] . '" ' . ($draft_detail ? ($draft_detail->promiseTemplateId == $s['serviceID'] ? 'selected="selected"' : ''): '')  . '>' . $s['serviceName'] . '</option>';
                             endforeach;
                             ?>
                  </select>
 			 </div>	
+            <div class="col-sm-1">
+                <a title="同步" class="btn btn-primary btn-sm" id="promiseTemplateId_refresh"
+                        onclick="refresh_template(this, <?php echo $token_id; ?>, '<?php echo $smtApi->filterData('promiseTemplateId', $draft_detail); ?>')">
+                    <i class="glyphicon glyphicon-refresh"></i>
+                </a>
+            </div>
                 		    
 		</div>
 
@@ -366,13 +377,15 @@ text-align: left;
                             }
                         endforeach;
                     ?>
-                    <!-- 
-                    @foreach($group as $groupItem)
-                    <option value="{{$groupItem->group_id}}">{{$groupItem->group_name}}</option>
-                    @endforeach
-                    -->
+             
                 </select>			    
 			</div>
+			 <div class="col-sm-1">
+                <a title="同步" class="btn btn-primary btn-sm" id="groupId_refresh"
+                        onclick="refresh_template(this, <?php echo $token_id; ?>, '<?php echo $smtApi->filterData('groupId', $draft_info); ?>');">
+                    <i class="glyphicon glyphicon-refresh"></i>
+                </a>
+            </div>
         </div>
      
         <div class="row">
@@ -383,7 +396,7 @@ text-align: left;
                 <div>
                     <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="main">从我的电脑选取</a>                                    
                     &nbsp;&nbsp;
-                    <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="icon-trash"></i></a>
+                    <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="glyphicon glyphicon-trash"></i></a>
                 </div>
                 <ul class="list-inline pic-main" id="se-water-add">
                     <?php
@@ -729,7 +742,10 @@ $template['name'].'</option>';
                             endif;
                             ?>
                     </select>
-                </div>                  
+                </div> 
+                <a id="templateId_refresh" title="刷新" class="btn btn-primary btn-sm" onclick="refresh_template(this, <?php echo $token_id; ?>, '')">
+                        <i class="glyphicon glyphicon-refresh"></i>
+                </a>                 
                </div>
                <div class="row">
                     <div class="form-group col-sm-2">
@@ -758,7 +774,7 @@ $template['name'].'</option>';
                         </select>
                     </div>
                     <a class="btn btn-primary btn-sm" id="shouhouId_refresh" title="刷新" onclick="refresh_template(this, <?php echo $token_id;?>, '');">
-                        <i class="icon-refresh bigger-110"></i>
+                        <i class="glyphicon glyphicon-refresh"></i>
                     </a>
                 </div>
                 <div class="row">
@@ -789,7 +805,27 @@ $template['name'].'</option>';
                         </div>
                       </div>
                     </div>
-                    
+                    <div class="row">
+                        <label class="col-sm-2 control-label">自定义关联产品：</label>
+                         <div class="col-sm-10">
+                        <div>
+                            <a href="javascript:void(0);" class="btn btn-default btn-sm relate-product">选择产品</a>
+                            &nbsp;&nbsp;
+                            <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="glyphicon glyphicon-refresh"></i></a>
+                            &nbsp;&nbsp;
+                            插入到位置：
+                            <label>
+                                <input type="radio" name="relation_loction" value="header" <?php echo $smtApi->filterData('relationLocation', $draft_detail) == 'header' ? 'checked' : '';?>/>在前
+                            </label>
+                            <label>
+                                <input type="radio" name="relation_loction" value="footer" <?php echo ($smtApi->filterData('relationLocation', $draft_detail) == 'footer' || !$smtApi->filterData('relationLocation', $draft_detail)) ? 'checked' : '';?>/>在后
+                            </label>
+                        </div>
+                        <ul class="list-inline relate-list">
+                            
+                        </ul>
+                    </div>
+                    </div>
                     <div class="row">
                         <div class="form-group clearfix ">
                             <label for="detail" class=" col-sm-2 control-label">详情描述:</label>
@@ -825,6 +861,7 @@ $template['name'].'</option>';
 <script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
 -->
   <script src="{{ asset('plugins/kindeditor/kindeditor.js') }}"></script>
+  <script src="{{ asset('plugins/layer/layer.js') }}"></script>
 <script type="text/javascript">
     var skuConfig = eval(<?php echo $sku_config;?>); //SKU属性的信息
     var token_id; //账号ID
@@ -943,6 +980,13 @@ $template['name'].'</option>';
         //event.preventDefault();
         $(this).closest('li').remove();
     })
+    
+     //删除所有主图
+        $(document).on('click', '.pic-del-all', function () {
+            if (confirm('确认删除全部主图吗？')) {
+                $(this).closest('.form-group').find('ul li .pic-del').trigger('click');
+            }
+        });
     
     //属性选择时显示子属性或者显示其他属性 --主要针对多下拉框
     $(document).on('change', '#product_attributes select', function () {
@@ -1377,6 +1421,73 @@ $template['name'].'</option>';
         }
     });
 
+    /**
+     * 同步并刷新分组(包括运费模板、产品分组、服务模板)
+     * @param obj
+     * @param token_id
+     * @param selected
+     */
+    function refresh_template(obj, token_id, selected) {
+        //event.preventDefault();
+        var this_id = obj.id; //改对象的ID
+        var temp = this_id.split('_');
+        var target_id = temp[0];
+
+        if (token_id && target_id) {
+            var url = '';
+            var txt = '';
+            switch (target_id) {
+                case 'groupId':
+                    url = '{{route('smtProduct.getProductGroup')}}';
+                    txt = '产品分组';
+                    break;
+                case 'promiseTemplateId':
+                    url = '{{route('smtProduct.getServiceTemplateList')}}';
+                    txt = '服务模板';
+                    break;
+                case 'freightTemplateId':
+                    url = '{{route('smtProduct.getFreightTemplateList')}}';
+                    txt = '运费模板';
+                    break;
+                case 'module':
+                    url = '{{route('smtProduct.getProductModuleList')}}';
+                    txt = '产品信息模板';
+                    break;
+                case 'shouhouId': //售后模板ID
+                    url = '{{route('afterSales.ajaxSmtAfterServiceList')}}';
+                    txt = '售后服务模板';
+                    break;
+                case 'templateId': //模板ID
+                    url = '{{route('smtProduct.ajaxGetPlatTemplateList',['plat'=> 6])}}';
+                    txt = '模板';
+                    break;
+            }
+
+            $.ajax({
+                url: url,
+                data: 'token_id=' + token_id + '&return=data&selected=' + selected,
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.status) {
+                        var options = '<option>--请选择' + txt + '--</option>';
+                        options += data.data;
+                        $('#' + target_id).empty().append(options);
+                    } else {
+                        showtips(data.info, 'alert-warning');
+                    }
+                },
+                beforeSend: function () {
+                    $('#' + this_id).addClass('disabled').attr('title', '同步中');
+                },
+                complete: function () {
+                    $('#' + this_id).removeClass('disabled').attr('title', '同步');
+                }
+            });
+        } else {
+            showtips('请先选择账号', 'alert-warning');
+        }
+    }
 
     /**
      * 计算一个二维数组的笛卡尔积，并返回一维数组信息
@@ -1448,6 +1559,43 @@ $template['name'].'</option>';
     $('.submit_btn').click(function(e){
         $('#action').val($(this).attr('name'));
     })
+    
+    layer.use('extend/layer.ext.js');
+        ///选择关联产品
+        $(document).on('click', '.relate-product', function(){
+            //使用layer.js弹出层选择产品
+            $.layer({
+                type   : 2,
+                shade  : [0.8 , '' , true],
+                title  : ['选择产品',true],
+                iframe : {src : '{{route('smtProduct.selectRelationProducts',['token_id'=>$token_id])}}'},
+                area   : ['900px' , '400px'],
+                success : function(){
+                    layer.shift('top', 340)
+                },
+                btns : 2,
+                btn : ['确定', '取消'],
+                yes : function(index){ //确定按钮的操作
+                    var li_num = $('.relate-list').find('li').length;
+                    var product_str = '';
+                    layer.getChildFrame('.product-list:checked', index).each(function(){
+
+                        var product = $(this).val();
+                        if (product != '' && product != 'undefined' && li_num < 8) {
+                            var tmp = product.split(',');
+                            product_str += '<li><div><img src="'+tmp[1]+'" width="100" height="100" style="border: 0px"><input type="hidden" name="relationProduct[]" value="'+tmp[0]+'" /><a class="pic-del" href="javascript: void(0);">删除</a></div></li>';
+                            li_num++;
+                        }
+                    });
+                    $('.relate-list').append(product_str);
+
+                    layer.close(index);
+                },
+                no: function(index){
+                    layer.close(index);
+                }
+            });
+        });
     
     /*
      //表单验证

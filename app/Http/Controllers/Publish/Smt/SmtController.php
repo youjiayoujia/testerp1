@@ -40,11 +40,10 @@ class SmtController extends Controller{
    public function draftSearch(){
        request()->flash();
        $this->mainTitle='SMT待发布产品';
-       //$this->model = $this->model->where('productStatusType','=','waitPost')->first();
-      
        $response = [
            'metas' => $this->metas(__FUNCTION__),
-           'data' => $this->autoList($this->model->where('productStatusType','waitPost')),
+           'data' => $this->autoList($this->model),
+           'mixedSearchFields' => $this->model->mixed_search,
        ];    
        return view($this->viewPath . 'draft_list', $response);
    }
@@ -100,7 +99,8 @@ class SmtController extends Controller{
         $service = smtServiceTemplate::where('token_id',$token_id)->get();
         
         //产品分组
-        $group = smtProductGroup::where('token_id',$token_id)->get();
+        $product_group = new SmtProductController(); 
+        $group = $product_group->getLocalProductGroupList($token_id); 
         
         //单位列表
         $unit = smtProductUnit::all();
@@ -1124,8 +1124,8 @@ class SmtController extends Controller{
             $service = smtServiceTemplate::where('token_id',$token_id)->get();
             
             //产品分组
-            $group = smtProductGroup::where('token_id',$token_id)->get();
-            
+            $product_group = new SmtProductController(); 
+            $group = $product_group->getLocalProductGroupList($token_id);            
             //单位列表
             $unit = smtProductUnit::all();
             

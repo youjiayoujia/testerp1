@@ -39,9 +39,20 @@ class smtProductList extends BaseModel
         'old_productId'
     ];
   
-    protected $searchFields = [];
+    protected $searchFields = ['subject'=>'标题','productId'=>'产品ID'];
     
     protected $rules = [];
+    
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['productSku' => ['skuCode']],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
     
     public function details()
     {

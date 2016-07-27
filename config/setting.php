@@ -77,6 +77,7 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+        'productSku.skuCode'=>'产品SKU',
     ],
 ];
 

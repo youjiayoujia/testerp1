@@ -250,14 +250,14 @@ Class AliexpressAdapter implements AdapterInterface
         $apiInfo = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
 
         //参数
-        $app_parameter_url = ($parameter ? "$parameter&" : '') . "access_token=" . $this->_access_token;
+        $app_parameter_url = trim(($parameter ? "$parameter&" : '') . "access_token=" . $this->_access_token);
         $sign_url = '';
         if ($_aop_signature) { //是否需要签名
             //获取对应URL的签名
             $sign = $this->getApiSign($apiInfo, $app_parameter_url);
             $sign_url = "&_aop_signature=$sign"; //签名参数
         }
-        //组装URL
+        //组装URL  
         $get_url = $app_url . $apiInfo . '?' . $app_parameter_url . $sign_url;
         //if ( $this->debug ) echo $get_url. "\n";
         $result = $this->getCurlData($get_url);

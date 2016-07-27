@@ -546,10 +546,29 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('smt/recommendProductList',
         ['uses' => 'Publish\Smt\SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
     Route::post('smt/batchDel',
-        ['uses' => 'Publish\Smt\SmtController@batchDel', 'as' => 'smt.batchDel']);
-    
+        ['uses' => 'Publish\Smt\SmtController@batchDel', 'as' => 'smt.batchDel']);    
     Route::resource('smt', 'Publish\Smt\SmtController');
     
+    Route::group(['prefix' => 'smtProduct', 'namespace' => 'Publish\Smt'],function(){
+        Route::get('selectRelationProducts',
+            ['uses' => 'SmtProductController@selectRelationProducts', 'as' => 'smtProduct.selectRelationProducts']);
+        Route::post('getProductGroup',
+            ['uses' => 'SmtProductController@getProductGroup', 'as' => 'smtProduct.getProductGroup']);
+        Route::post('getServiceTemplateList',
+            ['uses' => 'SmtProductController@getServiceTemplateList', 'as' => 'smtProduct.getServiceTemplateList']);
+        Route::post('getFreightTemplateList',
+            ['uses' => 'SmtProductController@getFreightTemplateList', 'as' => 'smtProduct.getFreightTemplateList']);
+        Route::post('getProductModuleList',
+            ['uses' => 'SmtProductController@getProductModuleList', 'as' => 'smtProduct.getProductModuleList']);
+        Route::post('ajaxGetPlatTemplateList',
+            ['uses' => 'SmtProductController@ajaxGetPlatTemplateList', 'as' => 'smtProduct.ajaxGetPlatTemplateList']);
+        Route::post('ajaxSmtAfterServiceList',
+           ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']);           
+    });
+    
+    Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
+   
+ 
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
  

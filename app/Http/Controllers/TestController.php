@@ -49,17 +49,17 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
     }
 
-    public function test2()
-    {
-        $item = ItemModel::find('1');var_dump($item->toArray());
-        $item->out('8', 1, 'ADJUSTMENT', '1');exit;var_dump('ok');
-    }
-
     // public function test2()
     // {
-    //     $order = OrderModel::find(1);
-    //     $order->createPackage();
+    //     $item = ItemModel::find('1');var_dump($item->toArray());
+    //     $item->out('8', 1, 'ADJUSTMENT', '1');exit;var_dump('ok');
     // }
+
+    public function test2()
+    {
+        $package = PackageModel::find(98);
+        $package->createPackageItems();
+    }
 
     public function test1()
     {

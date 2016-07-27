@@ -20,16 +20,18 @@ class BaseModel extends Model
             }
         }
         return $rules;
-    }    
+    }
 
     public function showSearch()
     {
         $searchFields = $this->searchFields;
         $str = '';
-        foreach($searchFields as $key => $searchField) {
-            $str .= $searchField.',';
+        if ($searchFields) {
+            foreach ($searchFields as $key => $searchField) {
+                $str .= $searchField . ',';
+            }
         }
 
-        return substr($str, 0, strlen($str)-1);
+        return substr($str, 0, strlen($str) - 1);
     }
 }

@@ -88,15 +88,21 @@ Class AmazonAdapter implements AdapterInterface
 
         //TODO:return ERRORS
         if (isset($response->Error)) {
-            Tool::show($response, false);
+            return [
+                'Error' => [
+                    'code' => (string)$request->Error->Code,
+                    'message' => (string)$request->Error->Message
+                ]
+            ];
+        } else {
+            $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
+            foreach ($responseOrders->Orders->Order as $order) {
+                $orderItems = $this->getOrderItems($order->AmazonOrderId); //抓取订单行
+                $orders[] = $this->parseOrder($order, $orderItems);
+            }
+            $nextToken = $responseOrders->NextToken;
+            return ['orders' => $orders, 'nextToken' => $nextToken];
         }
-        $responseOrders = $nextToken ? $response->ListOrdersByNextTokenResult : $response->ListOrdersResult;
-        foreach ($responseOrders->Orders->Order as $order) {
-            $orderItems = $this->getOrderItems($order->AmazonOrderId); //抓取订单行
-            $orders[] = $this->parseOrder($order, $orderItems);
-        }
-        $nextToken = $responseOrders->NextToken;
-        return ['orders' => $orders, 'nextToken' => $nextToken];
     }
 
     /**

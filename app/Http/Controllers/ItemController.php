@@ -174,4 +174,18 @@ class ItemController extends Controller
         $model = $this->model->where('sku', $sku)->first();
         return json_encode($model);
     }
+
+    /**
+     * 打印产品
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function printsku()
+    {
+        $item_id = request()->input("id");
+        $model = $this->model->find($item_id);
+        $response['model']= $model;
+        return view($this->viewPath . 'printsku', $response);
+    }
 }

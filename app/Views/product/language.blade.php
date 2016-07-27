@@ -23,23 +23,23 @@
         <div>请选择编辑的语言</div>
             <ul class="dowebok">
                 @foreach($languages as $la_name=>$language)
-                    <li><input type="radio" name="info[{{$channel->id}}][language]" class="change_language" data-labelauty="{{$language}}" value="{{$la_name}}" {{$la_name=='de'?'checked':''}}></li>
+                    <li><input type="radio" name="info[{{$channel->id}}][language]" class="change_language" data-labelauty="{{$language}}" value="{{$la_name}}" {{$la_name=='en'?'checked':''}}></li>
                 @endforeach    
             </ul>
         <div class="row">
             <div class="form-group col-lg-12">
-                <input type='text' class="form-control {{$channel->id}}_myname" id="" placeholder="标题" name='info[{{$channel->id}}][name]' value="{{$default['de_name']}}">
+                <input type='text' class="form-control {{$channel->id}}_myname" id="" placeholder="标题" name='info[{{$channel->id}}][name]' value="{{$default['en_name']}}">
             </div>
         
             <div class="form-group  col-lg-12">    
-                <input type='text' class="form-control {{$channel->id}}_mykeywords" id="" placeholder="关键词" name='info[{{$channel->id}}][keywords]' value="{{$default['de_keywords']}}">
+                <input type='text' class="form-control {{$channel->id}}_mykeywords" id="" placeholder="关键词" name='info[{{$channel->id}}][keywords]' value="{{$default['en_keywords']}}">
             </div>
         </div> 
         <div class="row">
             <div class="col-lg-12" id="templateContent_{{$key}}">
                 <label for="" >描述：</label>
                 <div class="form-group">
-                    <textarea class="form-control {{$channel->id}}_mydescription" id="editor_{{$key}}" rows="16" placeholder="标题" name="info[{{$channel->id}}][description]" style="width:100%;height:400px;">{{ $default['de_description']}}</textarea>
+                    <textarea class="form-control {{$channel->id}}_mydescription" id="editor_{{$key}}" rows="16" placeholder="标题" name="info[{{$channel->id}}][description]" style="width:100%;height:400px;">{{ $default['en_description']}}</textarea>
                 </div>
             </div>
         </div>

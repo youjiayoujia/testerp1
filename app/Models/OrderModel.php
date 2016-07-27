@@ -119,7 +119,7 @@ class OrderModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         foreach(ChannelModel::all() as $channel) {
-            $arr[] = $channel->name;
+            $arr[$channel->name] = $channel->name;
         }
         return [
             'filterFields' => [
@@ -433,6 +433,45 @@ class OrderModel extends BaseModel
         return true;
     }
 
+    public function orderToWarehouse()
+    {
+        
+    }
+
+    public function createVirtualPackage()
+    {
+        $package = [];
+        //channel
+        $package['channel_id'] = $this->channel_id;
+        $package['channel_account_id'] = $this->channel_account_id;
+        //type
+        // $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
+        // $package['weight'] = collect($packageItems)->sum('weight');
+        $package['email'] = $this->email;
+        $package['shipping_firstname'] = $this->shipping_firstname;
+        $package['shipping_lastname'] = $this->shipping_lastname;
+        $package['shipping_address'] = $this->shipping_address;
+        $package['shipping_address1'] = $this->shipping_address1;
+        $package['shipping_city'] = $this->shipping_city;
+        $package['shipping_state'] = $this->shipping_state;
+        $package['shipping_country'] = $this->shipping_country;
+        $package['shipping_zipcode'] = $this->shipping_zipcode;
+        $package['shipping_phone'] = $this->shipping_phone;
+        $package = $this->packages()->create($package);
+        if ($package) {
+            foreach($this->items->toArray() as $packageItem) {                
+                if(!$packageItem['remark']) {
+                    $packageItem['remark'] = 'REMARK';
+                }
+                $packageItem['order_item_id'] = $packageItem['id'];
+                if($packageItem['is_active']) {
+                    $newPackageItem = $package->items()->create($packageItem);
+                }
+            }
+        }
+
+        return $package;
+    }
     /**
      * @param array $items
      * @return bool
@@ -440,7 +479,8 @@ class OrderModel extends BaseModel
     public function createPackage()
     {
         if ($this->canPackage()) {
-            $items = $this->setPackageItems();
+            $package = $this->createVirtualPackage();
+            $items = $package->setPackageItems();
             if ($items) {
                 return $this->createPackageDetail($items);
             } else { //生成订单需求
@@ -636,101 +676,6 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
-    /**
-     * @param array $items
-     * @return array|bool
-     */
-    public function setPackageItems()
-    {
-        if ($this->active_items->count() > 1) { //多产品
-            $packageItem = $this->setMultiPackageItem();
-        } else { //单产品
-            $packageItem = $this->setSinglePackageItem();
-        }
-
-        return $packageItem;
-    }
-
-    //设置单产品订单包裹产品
-    public function setSinglePackageItem()
-    {
-        $packageItem = [];
-        $orderItem = $this->active_items->first();
-        $quantity = $orderItem->quantity - $orderItem->split_quantity;
-        if (!$quantity) {
-            return false;
-        }
-        $stocks = $orderItem->item->assignStock($quantity);
-        if ($stocks) {
-            foreach ($stocks as $warehouseId => $stock) {
-                foreach ($stock as $key => $value) {
-                    $packageItem[$warehouseId][$key] = $value;
-                    $packageItem[$warehouseId][$key]['order_item_id'] = $orderItem->id;
-                    $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
-                }
-            }
-        } else {
-            return false;
-        }
-
-        return $packageItem;
-    }
-
-    //设置多产品订单包裹产品
-    public function setMultiPackageItem()
-    {
-        $packageItem = [];
-        $stocks = [];
-        //根据仓库满足库存数量进行排序
-        $warehouses = [];
-        foreach ($this->active_items as $orderItem) {
-            $quantity = $orderItem->quantity - $orderItem->split_quantity;
-            if (!$quantity) {
-                continue;
-            }
-            $itemStocks = $orderItem->item ? $orderItem->item->matchStock($quantity) : false;
-            if ($itemStocks) {
-                foreach ($itemStocks as $itemStock) {
-                    foreach ($itemStock as $warehouseId => $stock) {
-                        if (isset($warehouses[$warehouseId])) {
-                            $warehouses[$warehouseId] += 1;
-                        } else {
-                            $warehouses[$warehouseId] = 1;
-                        }
-                    }
-                }
-                $stocks[$orderItem->id] = $itemStocks;
-            } else {
-                return false;
-            }
-        }
-        krsort($warehouses);
-        //set package item
-        foreach ($stocks as $orderItemId => $itemStocks) {
-            foreach ($itemStocks as $type => $itemStock) {
-                if ($type == 'SINGLE') {
-                    $stock = collect($itemStock)->sortByDesc(function ($value, $key) use ($warehouses) {
-                        return $warehouses[$key];
-                    })->first();
-                    foreach ($stock as $key => $value) {
-                        $packageItem[$value['warehouse_id']][$key] = $value;
-                        $packageItem[$value['warehouse_id']][$key]['order_item_id'] = $orderItemId;
-                        $packageItem[$value['warehouse_id']][$key]['remark'] = 'REMARK';
-                    }
-                } else {
-                    foreach ($itemStock as $warehouseId => $warehouseStock) {
-                        foreach ($warehouseStock as $key => $value) {
-                            $packageItem[$warehouseId][$key] = $value;
-                            $packageItem[$warehouseId][$key]['order_item_id'] = $orderItemId;
-                            $packageItem[$warehouseId][$key]['remark'] = 'REMARK';
-                        }
-                    }
-                }
-            }
-        }
-
-        return $packageItem;
-    }
 
     /**
      * 根据单号取订单记录

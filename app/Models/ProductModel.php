@@ -597,10 +597,12 @@ class ProductModel extends BaseModel
             //print_r($arr);
             //exit;
             $model = $this->productMultiOption->where("channel_id", (int)$channel_id)->first();
-            //print_r($model);
-            $model->update($arr);
+            if($model){
+                $model->update($arr);
+            }
+           
         }
-        //exit;
+        //
     }
 
 }

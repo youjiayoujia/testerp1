@@ -12,17 +12,17 @@ namespace App\Http\Controllers\Stock;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Stock\InModel;
+use App\Models\Stock\InOutModel;
 use App\Models\WarehouseModel;
 use App\Models\Warehouse\PositionModel;
 
-class InController extends Controller
+class InOutController extends Controller
 {
-    public function __construct(InModel $in)
+    public function __construct(InOutModel $inout)
     {
-        $this->model = $in;
-        $this->mainIndex = route('stockIn.index');
-        $this->mainTitle = '入库';
-        $this->viewPath = 'stock.in.';
+        $this->model = $inout;
+        $this->mainIndex = route('stockInOut.index');
+        $this->mainTitle = '出入库';
+        $this->viewPath = 'stock.inout.';
     }
 }

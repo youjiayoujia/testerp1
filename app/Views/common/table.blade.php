@@ -77,7 +77,7 @@
                                             @if($type == 'filterSelects')
                                                 @foreach($value as $name => $content)
                                                     <div class="col-lg-2">
-                                                        <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control'>
+                                                        <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
                                                                 <option value="{{ $k }}">{{$v}}</option>
@@ -90,7 +90,7 @@
                                                 @foreach($value as $relation_ship => $contents)
                                                     @foreach($contents as $name => $single)
                                                         <div class='col-lg-2'>
-                                                            <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control'>
+                                                            <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                                 <option value=''>{{config('setting.transfer_search')[$relation_ship.'.'.$name]}}</option>
                                                                 @foreach($single as $key => $value1)
                                                                     <option value="{{ $key }}">{{$value1}}</option>
@@ -238,10 +238,7 @@
         });
 
         $('.datetime_select').datetimepicker({theme: 'dark'});
-        $('.relatedSelect').select2();
-        $('.relatedSelect').change(function () {
-            location.href = $(this).val();
-        });
+        $('.select_select0').select2();
     </script>
 @section('childJs')@show
 @stop

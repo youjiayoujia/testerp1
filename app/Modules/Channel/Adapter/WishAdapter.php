@@ -750,6 +750,9 @@ Class WishAdapter implements AdapterInterface
         $param['id'] = $replyMessage->message->from;
         $param['access_token'] = $this->access_token;
         $param['reply'] = $replyMessage->content;
+        $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
+
+
 
     }
 }

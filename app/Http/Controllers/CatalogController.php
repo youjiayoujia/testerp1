@@ -241,4 +241,141 @@ class CatalogController extends Controller
         ];
         return view($this->viewPath . 'edit', $response);
     }
+
+    public function  exportExcel($rows,$name){
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+    public function catalogCsvFormat(){
+        $rows = [
+            [
+                '中文分类名称'=>'鞋子',
+                '分类英文名称' => 'shoes',
+                '前缀'=>'XL',
+                'Set属性(影响产品图片的属性 例如:产品颜色)'=>'name1:value1,value2;name2:value1,value2;',
+                'variation属性(不影响产品图片但影响销售的属性 例如:产品尺寸)'=>'name1:value1,value2;name2:value1,value2;',
+                'Feature属性(产品附加的属性 例如:是否能水洗,是否有弹性等) '=>'单选-name1:value1,value2,value3;多选-name1:value1,value2,value3;文本:value;',
+            ]
+        ];
+
+        $channels = ChannelModel::all();
+        foreach ($channels as $channel){
+            $rows[0][$channel->name] = '20,40';
+        }
+
+        $this->exportExcel($rows, '批量添加产品品类csv格式');
+    }
+    public function addLotsOfCatalogs(){
+        $file = request()->file('excel');
+
+        $path = config('setting.excelPath');
+        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        $data_array = '';
+        $result = false;
+        Excel::load($path.'excelProcess.xls', function($reader) {
+            $reader->noHeading();
+            $data_array = $reader->all()->toArray();
+            $th_long = count($data_array[0]); //表头字段数
+            for($i = 6 ; $i < $th_long ; $i++){
+                $channels[$i] = $data_array[0][$i];
+            }
+            unset($data_array[0]); //去掉表头
+            if($data_array[1][1] == 'shoes'){
+                unset($data_array[1]); //去掉实例行
+            }
+            $insert_array =[];
+            foreach ($data_array as $item){
+                $set = '';
+                $variation = '';
+                $feature = '';
+                if(!empty($item[3])){ //SET属性
+                    $set_group = explode(';',trim($item[3]));
+                    foreach ($set_group as $itemset){
+                        $set_name_ary = '';
+                        $tmp_arr = explode(':',$itemset);
+                        //$set[$tmp_arr[0]] = explode(',',$tmp_arr[1]);
+                        $name_tmp_ary = explode(',',$tmp_arr[1]);
+                        foreach ($name_tmp_ary as $name_temp_value){
+                            $set_name_ary[] = ['name' => $name_temp_value];
+
+                        }
+
+                        $set[] = [
+                            'name'  => $tmp_arr[0],
+                            'value' => ['name' => $set_name_ary],
+                        ];
+
+                    }
+                }
+                if(!empty($item[4])){ //variation属性
+                    $set_group = explode(';',trim($item[4]));
+                    foreach ($set_group as $item_var){
+                        $var_name_ary = '';
+                        $tmp_variation_arr = explode(':',$item_var);
+                        //$variation[$tmp_arr[0]] = explode(',',$tmp_arr[1]);
+                        $name_var_ary = explode(',',$tmp_variation_arr[1]);
+                        foreach ($name_var_ary as $name_var_ary){
+                            $var_name_ary[] = ['name' => $name_var_ary];
+                        }
+                        $variation[] = [
+                            'name'  => $tmp_variation_arr[0],
+                            'value' => ['name' => $var_name_ary],
+                        ];
+
+                    }
+                }
+
+                if(!empty($item[5])){ //Feature属性 包括单选 多选 文本 通过 type控制
+                    $set_group = explode(';',trim($item[5]));
+                    foreach ($set_group as $item_feature){
+                        $feature_value_ary = explode(':',$item_feature);
+                        $fea_type_name = explode('-',$feature_value_ary[0]);
+                        if(count($feature_value_ary) == 1){//文本
+                             $fea_name_ary1[] = ['name' => ''];
+
+                            $feature[] = [
+                                'name'  => $fea_type_name[1],
+                                'type'  => $fea_type_name[0],
+                                'value' => ['name' => $fea_name_ary1]
+                            ];
+                        }else{
+                            $fea_name_ary2 = '';
+                            foreach (explode(',',$feature_value_ary[1]) as $val){
+                                $fea_name_ary2[] = ['name' => $val];
+                            }
+                            $feature[] = [
+                                'name'  => $fea_type_name[1],
+                                'type'  => $fea_type_name[0],
+                                'value' => ['name' => $fea_name_ary2]
+                            ];
+                        }
+                    }
+                }
+                //整合费率
+                $rates = '';
+                foreach ($channels as $key => $value){
+                    $rates[$value] = $item[$key];
+                }
+                $insert_array[] = [
+                    'c_name' => $item[0],
+                    'name'   => $item[1],
+                    'code'   => $item[2],
+                    'channel_rate' => $rates,
+                    'attributes' =>[
+                        'sets'       => $set,
+                        'variations' => $variation,
+                        'features'   => $feature,
+                    ],
+                ];
+            }
+            $result = $this->model->createLotsCatalogs($insert_array);
+        },'gb2312');
+
+        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
+
+    }
 }

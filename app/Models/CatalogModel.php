@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\ChannelModel;
 use Tool;
 
 class CatalogModel extends BaseModel
@@ -232,4 +233,61 @@ class CatalogModel extends BaseModel
         $result = $this->where("name",$catalog_name)->get();
         return count($result);
     }
+
+    /**
+     * 批量创建分类
+     */
+    public function createLotsCatalogs($data = NULL){
+        if($data){
+            foreach ($data as $item){
+                    //dd($item['attributes']);exit;
+                $catalog['c_name'] = $item['c_name'];
+                $catalog['name'] = $item['name'];
+                $catalog['code'] = $item['code'];
+
+                DB::beginTransaction();
+                $catalog_obj = $this->create($catalog);
+
+                //多对多写入费率
+                foreach ($item['channel_rate'] as $key => $item_channel_value){
+                    if($item_channel_value){ //若设置了对应渠道的费率
+                        $channel_obj = ChannelModel::where('name','=',$key)->first();
+                        $channel_ary['channel_id'] = $channel_obj->id;
+                        $rate_ary = explode(',',$item_channel_value);
+                        $catalog_obj->channels()->attach($channel_ary,['rate'=>$rate_ary[0],'flat_rate'=>$rate_ary[1]]);
+                    }
+                }
+                //属性名属性值添加
+                if ($item['attributes']) {
+                    foreach ($item['attributes'] as $model => $property) {
+                        if(count($property)==0){
+                            if($model=='features')continue;
+                            $property = [];
+                            $property[$model]['name'] = "Default";
+                            $property[$model]['value']['name'][0]['name'] = "Default";
+                        }
+                        try {
+                            if(!empty($property)){
+                                foreach ($property as $modelData) {
+                                    $modelObj = $catalog_obj->$model()->create($modelData);
+                                    foreach ($modelData['value'] as $valueModel) {
+                                        foreach($valueModel as $valueModelValue){
+                                            if($valueModelValue['name']!=''){
+                                                $modelObj->values()->create($valueModelValue);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        } catch (Exception $e) {
+                            DB::rollBack();
+                        }
+                    }
+                }
+                DB::commit();
+            }
+        }
+    }
+
 }

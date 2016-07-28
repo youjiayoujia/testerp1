@@ -273,6 +273,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('catalog/editCatalogRates/{str}',
         ['uses' => 'CatalogController@editCatalogRates', 'as' => 'catalog.editCatalogRates']);
     Route::any('updateCatalogRates', ['uses' => 'CatalogController@updateCatalogRates', 'as' => 'updateCatalogRates']);
+    Route::any('catalogCsvFormat',['uses' => 'CatalogController@catalogCsvFormat' , 'as' => 'catalogCsvFormat']);
+    Route::any('addLotsOfCatalogs',['uses' => 'CatalogController@addLotsOfCatalogs' , 'as' => 'addLotsOfCatalogs']);
 
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);

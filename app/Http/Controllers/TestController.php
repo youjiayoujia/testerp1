@@ -14,7 +14,7 @@ use Test;
 
 use App\Models\Purchase\PurchaseOrderModel;
 
-
+use Excel;
 use Tool;
 use Channel;
 use App\Models\Channel\AccountModel;
@@ -71,11 +71,30 @@ class TestController extends Controller
         var_dump(unserialize($shipment->shipmentCarrierInfo));
     }
 
+    public function  exportExcel($rows,$name){
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+
+
     public function index()
     {
-        $data = ReplyModel::find(28558);
 
-        dd($data->message->message_id);
+
+
+
+
+
+        $channels = ChannelModel::all();
+        foreach ($channels as $channel){
+            $tmpArray[$channel->name] = '20,40';
+        }
+
+        dd($tmpArray);
         exit;
         /*        $dataaaa = $reply->message->account->toArray();
                 var_dump($dataaaa);exit;*/

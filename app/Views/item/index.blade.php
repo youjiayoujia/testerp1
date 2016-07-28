@@ -41,7 +41,7 @@
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
             <td><img src="{{ asset($item->product->dimage) }}" width="100px"></td>
-            <td>{{ $item->sku }}</td>
+            <td>{{ $item->c_name }}<br>分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>开发时间：{{ $item->created_at }}<br></td>
             <td>{{ $item->c_name }}</td>
             <td>{{ $item->product and $item->product->catalog ? $item->product->catalog->name : ''}}</td>
             <td>{{ $item->weight }}</td>
@@ -49,8 +49,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
-            <td></td>
+            <td>{{ config('item.status')[$item->status]}}</td>
+            <td>{{ $item->product->weight }}</td>
             <td></td>
             <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
             <td>{{ $item->updated_at }}</td>

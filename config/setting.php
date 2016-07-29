@@ -78,6 +78,7 @@ return [
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
         'by_id' => '买家ID',
+        'profit_rate' => '利润率',
         'items.item.status' => 'SKU状态'
     ],
 ];

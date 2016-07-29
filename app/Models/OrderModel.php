@@ -126,7 +126,8 @@ class OrderModel extends BaseModel
                 'channel_ordernum',
                 'email',
                 'by_id',
-                'currency'
+                'currency',
+                'profit_rate'
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
@@ -323,10 +324,14 @@ class OrderModel extends BaseModel
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
             Storage::disk('product')->put($data['image'],file_get_contents($file->getRealPath()));
             if ($data['type'] == 'FULL') {
+                $total = 0;
                 foreach ($data['arr']['id'] as $id) {
                     $orderItem = $this->items->find($id);
                     $orderItem->update(['is_refund' => 1]);
+                    $total = $orderItem['price'] * $orderItem['quantity'] + $total;
                 }
+                $data['refund_amount'] = $total;
+                $data['price'] = $total;
             }
             if ($data['type'] == 'PARTIAL') {
                 foreach ($data['tribute_id'] as $id) {

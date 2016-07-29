@@ -76,7 +76,6 @@ class CreateOrders extends Migration
                 ])->comment('撤单原因')->nullable()->default(NULL);
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->integer('priority')->comment('优先级')->nullable()->default(0);
-            $table->integer('package_times')->comment('打包次数')->nullable()->default(0);
             $table->integer('split_times')->comment('拆分次数')->nullable()->default(0);
             $table->integer('split_quantity')->comment('被拆分数量')->nullable()->default(0);
             $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);

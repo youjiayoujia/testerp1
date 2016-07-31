@@ -17,6 +17,7 @@ use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\Product\RequireModel;
 use Gate;
 
 class ProductController extends Controller
@@ -47,11 +48,16 @@ class ProductController extends Controller
         /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }*/
+        $require_id = request()->input('id');
+        $requireModel = RequireModel::find($require_id);
+        $data = $this->catalog->getCatalogProperty($requireModel->catalog_id);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'catalogs' => $this->catalog->all(),
+            'catalogs' => $this->catalog->find($requireModel->catalog_id),
             'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
+            'data' =>$data,
+            'require_id' =>$require_id,
             'users' => UserModel::all(),
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'logisticsLimit' => $this->logisticsLimit->all(),

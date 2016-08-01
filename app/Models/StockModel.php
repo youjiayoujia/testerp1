@@ -39,7 +39,7 @@ class StockModel extends BaseModel
     ];
 
     // 用于查询
-    protected $searchFields = ['sku'];
+    public $searchFields = ['id' => 'ID'];
 
     // 规则验证
     public $rules = [
@@ -90,9 +90,9 @@ class StockModel extends BaseModel
      * @return
      *
      */
-    public function stockIn()
+    public function stockInOut()
     {
-        return $this->hasMany('App\Models\Stock\InModel', 'stock_id', 'id');
+        return $this->hasMany('App\Models\Stock\InOutModel', 'stock_id', 'id');
     }
 
     /**
@@ -186,10 +186,11 @@ class StockModel extends BaseModel
         $this->all_quantity += $quantity;
         $this->available_quantity += $quantity;
         $this->save();
-        $this->stockIn()->create([
+        $this->stockInOut()->create([
             'quantity' => $quantity,
             'amount' => $amount,
-            'type' => $type,
+            'outer_type' => 'IN',
+            'inner_type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
         ]);
@@ -301,10 +302,11 @@ class StockModel extends BaseModel
             throw new Exception('Quantity ERROR.');
         }
         $this->save();
-        $this->stockOut()->create([
+        $this->stockInOut()->create([
             'quantity' => $quantity,
             'amount' => $quantity * $price,
-            'type' => $type,
+            'outer_type' => 'OUT',
+            'inner_type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
         ]);

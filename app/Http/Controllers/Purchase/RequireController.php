@@ -43,6 +43,7 @@ class RequireController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->purchases),
+            'mixedSearchFields' => $this->model->mixed_search,
         ];
         
         return view($this->viewPath . 'index', $response);
@@ -73,7 +74,7 @@ class RequireController extends Controller
 			$needPurchases=$this->productItem->get();
 		}
 		foreach($needPurchases as $key=>$v){
-			$sumtrend=PurchasesModel::where('item_id',$v->id)->where('require_create',1)->get()->first();
+			$sumtrend=PurchasesModel::where('item_id',$v->id)->where('require_create','1')->get()->first();
 			if(!$sumtrend){
 				continue;	
 			}
@@ -89,12 +90,12 @@ class RequireController extends Controller
 			//print_r($data);exit;
 			if($data['purchase_num']>0){
 				$p_item = PurchaseItemModel::create($data);
-				$fillRequireNum = $this->model->where("item_id",$v->id)->where('is_require',1)->get()->sum('quantity');
+				$fillRequireNum = $this->model->where("item_id",$v->id)->where('is_require','1')->get()->sum('quantity');
 				//echo $fillRequireNum;echo $data['purchase_num'];exit;
 				$fillRequireArray =  $this->model->where("item_id",$v->id)->get();
 				//print_r($fillRequireArray);exit;
 				if($fillRequireNum <=$data['purchase_num']){
-					$this->model->where("item_id",$v->id)->update(['is_require'=>0]);
+					$this->model->where("item_id",$v->id)->update(['is_require'=>'0']);
 				}else{
 					$temp_quantity = 0;
 					foreach ($fillRequireArray as $value) {
@@ -104,11 +105,11 @@ class RequireController extends Controller
 						}
 					}
 				        
-				    $this->model->where("id",'<',$require_id)->where('item_id',$v->id)->update(['is_require'=>0,'purchase_item_id'=>$p_item->id]);
+				    $this->model->where("id",'<',$require_id)->where('item_id',$v->id)->update(['is_require'=>'0','purchase_item_id'=>$p_item->id]);
 				    
 				}
 			}
-			$sumtrend->update(['require_create'=>0]);
+			$sumtrend->update(['require_create'=>'0']);
 		}
 		$warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id','user_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->groupBy('user_id')->get()->toArray();
 		

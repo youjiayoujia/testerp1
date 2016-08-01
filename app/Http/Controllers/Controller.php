@@ -7,6 +7,8 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use DataList;
+use App\Models\Event\CategoryModel;
+use App\Models\Event\ChildModel;
 
 abstract class Controller extends BaseController
 {
@@ -30,6 +32,18 @@ abstract class Controller extends BaseController
         return $metas;
     }
 
+    public function eventLog($user_id, $content = '', $to = '', $from = '')
+    {
+        $modelName = $this->model->table;
+        if($modelName) {
+            $category = CategoryModel::where('model_name', $modelName)->first();
+            if(!$category) {
+                $category = CategoryModel::create(['model_name' => $modelName]);
+            }
+            $category->child()->create(['type_id' => ($to ? unserialize($to)->id : ''), 'what' => $content, 'when' => date('Y-m-d H:i:s', time()), 'to_arr' => $to, 'from_arr' => $from, 'who' => $user_id]);
+        }
+    }
+
     public function alert($type, $content)
     {
         $response = ['type' => $type, 'content' => $content];
@@ -43,45 +57,62 @@ abstract class Controller extends BaseController
             $keywords = request()->input('keywords');
             $searchFields = $model->searchFields;
             $list = $list->where(function ($query) use ($keywords, $searchFields) {
-                foreach ($searchFields as $searchField) {
-                    $query = $query->orWhere($searchField, 'like', '%' . trim($keywords) . '%');
+                foreach ($searchFields as $key => $searchField) {
+                    $query = $query->orWhere($key, 'like', '%' . trim($keywords) . '%');
                 }
             });
         }
-        if(request()->has('mixedSearchFields')) {
+        if (request()->has('mixedSearchFields')) {
             $relateds = request()->input('mixedSearchFields');
-            foreach($relateds as $type => $related) {
-                switch($type) {
+            foreach ($relateds as $type => $related) {
+                switch ($type) {
                     case 'relatedSearchFields':
-                        foreach($related as $relation_ship => $name_arr) {
-                            foreach($name_arr as $k => $name) {
-                                if($name) {
-                                    $list = $list->whereHas($relation_ship, function($query) use ($k, $name){
-                                        $query = $query->where($k, 'like', '%'.$name.'%');
+                        foreach ($related as $relation_ship => $name_arr) {
+                            foreach ($name_arr as $k => $name) {
+                                if ($name) {
+                                    $list = $list->whereHas($relation_ship, function ($query) use ($k, $name) {
+                                        $query = $query->where($k, 'like', '%' . $name . '%');
                                     });
-                                }     
+                                }
+                            }
+                        }
+                        break;
+                    case 'doubleRelatedSearchFields':
+                        foreach ($related as $relation_ship1 => $value1) {
+                            foreach ($value1 as $relation_ship2 => $value2) {
+                                foreach ($value2 as $key => $name) {
+                                    if ($name) {
+                                        $list = $list->whereHas($relation_ship1,
+                                            function ($query) use ($relation_ship2, $name, $key) {
+                                                $query = $query->wherehas($relation_ship2,
+                                                    function ($query1) use ($name, $key) {
+                                                        $query1 = $query1->where($key, 'like', '%' . $name . '%');
+                                                    });
+                                            });
+                                    }
+                                }
                             }
                         }
                         break;
                     case 'filterFields':
-                        foreach($related as $key => $value3) {
-                            if($value3) {
-                                $list = $list->where($key, 'like', '%'.$value3.'%');
+                        foreach ($related as $key => $value3) {
+                            if ($value3) {
+                                $list = $list->where($key, 'like', '%' . $value3 . '%');
                             }
                         }
                         break;
                     case 'filterSelects':
-                        foreach($related as $key => $value2) {
-                            if($value2) {
+                        foreach ($related as $key => $value2) {
+                            if ($value2) {
                                 $list = $list->where($key, $value2);
                             }
                         }
                         break;
                     case 'selectRelatedSearchs':
-                        foreach($related as $relation_ship => $contents) {
-                            foreach($contents as $name => $single) {
-                                if($single) {
-                                    $list = $list->whereHas($relation_ship, function($query) use ($name, $single){
+                        foreach ($related as $relation_ship => $contents) {
+                            foreach ($contents as $name => $single) {
+                                if ($single) {
+                                    $list = $list->whereHas($relation_ship, function ($query) use ($name, $single) {
                                         $query = $query->where($name, $single);
                                     });
                                 }
@@ -89,8 +120,8 @@ abstract class Controller extends BaseController
                         }
                         break;
                     case 'sectionSelect':
-                        foreach($related as $kind => $content) {
-                            if($content['begin'] && $content['end']) {
+                        foreach ($related as $kind => $content) {
+                            if ($content['begin'] && $content['end']) {
                                 $list = $list->whereBetween($kind, [$content['begin'], $content['end']]);
                             }
                         }
@@ -173,7 +204,8 @@ abstract class Controller extends BaseController
     {
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
-        $this->model->create(request()->all());
+        $model = $this->model->create(request()->all());
+        $this->eventLog(request()->user()->id, '数据新增', serialize($model));
         return redirect($this->mainIndex);
     }
 
@@ -205,12 +237,15 @@ abstract class Controller extends BaseController
     public function update($id)
     {
         $model = $this->model->find($id);
+        $from = serialize($model);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
+        $to = serialize($model);
+        $this->eventLog(request()->user()->id, '数据更新', $to, $from);
         return redirect($this->mainIndex);
     }
 

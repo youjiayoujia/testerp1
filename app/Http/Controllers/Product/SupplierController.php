@@ -99,6 +99,7 @@ class SupplierController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data=request()->all();
+        $this->validate(request(), $this->model->rules('update'));
         if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
                 'supplier_id' => $id,
@@ -108,11 +109,12 @@ class SupplierController extends Controller
             ]);
         }
         $res=$this->model->updateSupplier($id,$data,request()->file('qualifications'));
-		if($res =='imageError'){
-			return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '图片格式不正确.'));
-			}else{
-       		 return redirect($this->mainIndex);
-		}
+		if($res == true){
+            return redirect($this->mainIndex);
+        }else{
+            return redirect(route('productSupplier.edit', $id))->with('alert', $this->alert('danger', '文件上传失败.'));
+
+        }
     }
 
     /**
@@ -157,5 +159,28 @@ class SupplierController extends Controller
 			}
 		return 1;	
 	}
+
+    /**
+     * 获取供应商信息
+     */
+    public function ajaxSupplier()
+    {
+        if(request()->ajax()) {
+            $supplier = trim(request()->input('supplier'));
+            $buf = SupplierModel::where('name', 'like', '%'.$supplier.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
 	
 }

@@ -15,7 +15,7 @@
         </div>
         <div class="panel-body">
             <div class="col-lg-3">
-                <strong>分类</strong>: {{ $model->catalog->name }}
+                <strong>分类</strong>: {{ $model->catalog?$model->catalog->name:'无分类' }}
             </div>
             <div class="col-lg-3">
                 <strong>产品name</strong>: {{ $model->name }}
@@ -110,30 +110,24 @@
     <div class="panel panel-default">
         <div class="panel-heading">其他信息:</div>
         <div class="panel-body">
-            <div class="col-lg-3">
-                <strong>物流限制</strong>: 
-                <?php 
-                    $carriage_key_arr = explode(',',$model->carriage_limit);
-                    foreach(config('product.carriage_limit') as $carriage_key=>$carriage_value){
-                        if(in_array($carriage_key, $carriage_key_arr)){
-                            echo $carriage_value.",";
-                        }
-                    }
-
-                ?>
+            <div class="col-lg-12">
+                <strong>物流限制</strong>：
             </div>
-            <div class="col-lg-3">
-                <strong>包装限制</strong>: 
-                <?php 
-                    $package_key_arr = explode(',',$model->package_limit);
-                    foreach(config('product.package_limit') as $package_key=>$package_value){
-                        if(in_array($package_key, $package_key_arr)){
-                            echo $package_value.",";
-                        }
-                    }
-
-                ?>
+            @foreach($logisticsLimit_arr as $key=>$logistics_limit)
+                <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
+                    {{$key+1}}. {{$logistics_limit}}
+                </div>
+            @endforeach
+        </div>
+        <div class="panel-body">
+            <div class="col-lg-12">
+                <strong>包装限制</strong>：
             </div>
+            @foreach($wrapLimit_arr as $key=>$wrap_limit)
+                <div class="col-lg-12" @if($key==0)style="margin-top:10px" @endif>
+                    {{$key+1}}. {{$wrap_limit}}
+                </div>
+            @endforeach
         </div>
         <div class="panel-body">
             <div class="col-lg-3">

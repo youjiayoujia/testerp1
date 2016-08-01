@@ -56,55 +56,27 @@ Class LazadaAdapter implements AdapterInterface
      * @param int $perPage
      * @return array
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 0)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 0, $nextToken = '')
     {
         $result_orders = [];
-        $nextToken = null;
-
-        $step = 0;
-
-        if($perPage){
-            $this->perPage = $perPage;
+        if (empty($nextToken)) {
+            $nextToken = 1;
         }
 
-        do {
-
-            $step++;
-
-            $offset = ($step - 1) * $this->perPage;
-
-            $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
+        $offset = ((int)$nextToken - 1) * $perPage;
 
 
-            if(isset($orders_data['Head']['ErrorMessage']))
-            {
-                if($orders_data['Head']['ErrorMessage']=='Too many API requests')
-                {
-                    //need to write log info
+        $orders_data = $this->getLazadaOrder($startDate, $endDate, $status, $offset);
 
-                    break;
-                }
-                else
-                {
-                    //不是请求频繁，保存下错误原因
-                    $op = "获取订单失败，信息为 " . $orders_data['Head']['ErrorMessage'];
-                    //need to write log info
+        if (!isset($orders_data['Body']['Orders']['Order']) || empty($orders_data['Body']['Orders']['Order'])) {
+            $nextToken = '';
+            var_dump($orders_data);
 
-
-                    break;
-                }
-            }
-
-            if (!isset($orders_data['Body']['Orders']['Order'])) {
-                //need to write log info
-
-                break;
-            }
-
+        } else {
             //单订单情况
-            if(!isset($orders_data['Body']['Orders']['Order'][0])){
-                $orders = [ $orders_data['Body']['Orders']['Order'] ];
-            }else{
+            if (!isset($orders_data['Body']['Orders']['Order'][0])) {
+                $orders = [$orders_data['Body']['Orders']['Order']];
+            } else {
                 $orders = $orders_data['Body']['Orders']['Order'];//获取订单信息数组
             }
 
@@ -119,18 +91,18 @@ Class LazadaAdapter implements AdapterInterface
                 $tmp_order = $this->parseOrder($order_info, $items);
 
                 $result_orders[] = $tmp_order;
-
             }
+            $nextToken++;
+        }
 
 
-        } while (true);
+        return ['orders' => $result_orders, 'nextToken' => $nextToken];
 
-        return $result_orders;
     }
 
 
-
-    public function getLazadaOrder($startDate, $endDate, $status, $offset){
+    public function getLazadaOrder($startDate, $endDate, $status, $offset)
+    {
         $api_key = $this->config['lazada_access_key'];
         $lazada_api_host = $this->config['lazada_api_host'];
         $lazada_user_id = $this->config['lazada_user_id'];
@@ -148,12 +120,12 @@ Class LazadaAdapter implements AdapterInterface
             //  'UpdatedAfter' => $after->format(DateTime::ISO8601),
             //'Status' => 'pending', // 只抓pending 状态下的订单
 
-            'CreatedAfter'=>$after->format(\DateTime::ISO8601),
-            'Limit'	=>  $this->perPage,
-            'Offset'	=> $offset,
+            'CreatedAfter' => $after->format(\DateTime::ISO8601),
+            'Limit' => $this->perPage,
+            'Offset' => $offset,
         );
 
-        if($status){
+        if ($status) {
             $parameters['Status'] = $status[0];
         }
 
@@ -161,8 +133,7 @@ Class LazadaAdapter implements AdapterInterface
 
         $params = array();
 
-        foreach ($parameters as $name => $value)
-        {
+        foreach ($parameters as $name => $value) {
             $params[] = rawurlencode($name) . '=' . rawurlencode($value);
         }
         $strToSign = implode('&', $params);
@@ -171,10 +142,11 @@ Class LazadaAdapter implements AdapterInterface
 
         $request = http_build_query($parameters);
 
-        $url = $lazada_api_host .'/?'.$request;
+        $url = $lazada_api_host . '/?' . $request;
 
         $xml_orders = $this->setRequest($url);
         $orders = $this->XmlToArray($xml_orders);
+
 
         return $orders;
         //echo 'orders:<pre>';print_r($orders);exit;
@@ -182,7 +154,8 @@ Class LazadaAdapter implements AdapterInterface
     }
 
 
-    public function getLazadaOrderItems($order_id){
+    public function getLazadaOrderItems($order_id)
+    {
         $api_key = $this->config['lazada_access_key'];
         $lazada_api_host = $this->config['lazada_api_host'];
         $lazada_user_id = $this->config['lazada_user_id'];
@@ -211,26 +184,24 @@ Class LazadaAdapter implements AdapterInterface
 
         $request = http_build_query($parameters);
 
-        $xml_order_item = $this->setRequest($lazada_api_host.'/?'.$request);
+        $xml_order_item = $this->setRequest($lazada_api_host . '/?' . $request);
 
         $itemarr = $this->XmlToArray($xml_order_item);
 
         if (isset($itemarr['Head']['ErrorCode'])) {
-            if($itemarr['Head']['ErrorMessage']=='Too many API requests')
-            {
+            if ($itemarr['Head']['ErrorMessage'] == 'Too many API requests') {
                 //need to write log info
                 return false;
-            }
-            else
-            {
+            } else {
                 //不是请求频繁，保存下错误原因
-                $op = $order_info['OrderId']."获取订单产品失败，信息为 " . $itemarr['Head']['ErrorMessage'];
+                $op = $order_info['OrderId'] . "获取订单产品失败，信息为 " . $itemarr['Head']['ErrorMessage'];
                 //need to write log info
                 //$stillHasOrder = false;
                 return false;
 
             }
         }
+
 
         $items = $itemarr['Body']['OrderItems']['OrderItem'];
         if (isset($items['OrderItemId'])) {
@@ -243,7 +214,8 @@ Class LazadaAdapter implements AdapterInterface
 
     }
 
-    public function parseOrder($order_info, $item_info){
+    public function parseOrder($order_info, $item_info)
+    {
         $sku_data = $this->getSkuInfo($item_info);
         $total = $sku_data['total'];//订单总价格
         $orders_ship_fee = $sku_data['orders_ship_fee'];
@@ -252,7 +224,7 @@ Class LazadaAdapter implements AdapterInterface
 
         $data = array();
 
-        $buyer_address_1 = (!empty($order_info['AddressShipping']['Address1']))?$order_info['AddressShipping']['Address1']:'';
+        $buyer_address_1 = (!empty($order_info['AddressShipping']['Address1'])) ? $order_info['AddressShipping']['Address1'] : '';
 
         if (!empty($order_info['AddressShipping']['Address2'])) {
             $buyer_address_1 .= ' ' . $order_info['AddressShipping']['Address2'];
@@ -261,15 +233,15 @@ Class LazadaAdapter implements AdapterInterface
         //多地址
         $address = array();
         if (!empty($order_info['AddressShipping']['Address3'])) {
-            $address[] = $order_info['AddressShipping']['Address3']? $order_info['AddressShipping']['Address3']:'';
+            $address[] = $order_info['AddressShipping']['Address3'] ? $order_info['AddressShipping']['Address3'] : '';
         }
 
         if (!empty($order_info['AddressShipping']['Address4'])) {
-            $address[] = $order_info['AddressShipping']['Address4']? $order_info['AddressShipping']['Address4']:'';
+            $address[] = $order_info['AddressShipping']['Address4'] ? $order_info['AddressShipping']['Address4'] : '';
         }
 
         if (!empty($order_info['AddressShipping']['Address5'])) {
-            $address[] = $order_info['AddressShipping']['Address5']? $order_info['AddressShipping']['Address5']:'';
+            $address[] = $order_info['AddressShipping']['Address5'] ? $order_info['AddressShipping']['Address5'] : '';
         }
 
         $buyer_address_2 = "";
@@ -282,44 +254,46 @@ Class LazadaAdapter implements AdapterInterface
 
 
         $result = [
-            'channel_ordernum' => $order_info['OrderId'],
+            'channel_ordernum' => $order_info['OrderNumber'],
             //'email' => $order->BuyerEmail,
             'amount' => $total,
-            'amount_shipping'=> $orders_ship_fee,
+            'amount_shipping' => $orders_ship_fee,
             'currency' => $lazada_currency_type,
-            'payment' =>  $order_info['PaymentMethod'],
+            'payment' => $order_info['PaymentMethod'],
             'shipping' => "dropshipping",
             'shipping_firstname' => isset($order_info['AddressShipping']['FirstName']) ? $order_info['AddressShipping']['FirstName'] : '',
-            'shipping_lastname' => ( $order_info['AddressShipping']['LastName']) ?  $order_info['AddressShipping']['LastName'] : '',
+            'shipping_lastname' => ($order_info['AddressShipping']['LastName']) ? $order_info['AddressShipping']['LastName'] : '',
             'shipping_address' => $buyer_address_1,
             'shipping_address1' => $buyer_address_2,
-            'shipping_city' =>  $order_info['AddressShipping']['City'],
-            'shipping_state' =>  $order_info['AddressShipping']['Region']? $order_info['AddressShipping']['Region']:'',
+            'shipping_city' => $order_info['AddressShipping']['City'],
+            'shipping_state' => $order_info['AddressShipping']['Region'] ? $order_info['AddressShipping']['Region'] : '',
             'shipping_country' => $order_info['AddressShipping']['Country'],
             'shipping_zipcode' => $order_info['AddressShipping']['PostCode'],
             'shipping_phone' => $phone,
             'payment_date' => $order_info['CreatedAt'],
             'create_time' => $order_info['CreatedAt'],
             'fulfill_by' => "",
-            'remark' => $order_info['Remarks']? $order_info['Remarks']:'',
-            'status' => "PAID",
+            'status' => 'PAID',
+//            'remark' => $order_info['Remarks'] ? $order_info['Remarks'] : '',
             'items' => []
         ];
 
         $items = [];
 
-        foreach($sku_data  as $k => $v){
+        foreach ($sku_data as $k => $v) {
 
-            if(empty($v['orders_sku'])){
+            if (empty($v['orders_sku'])) {
                 continue;
             }
 
             $items[] = [
                 'sku' => $v['orders_sku'],
-                //'channel_sku' => $orderItem->SellerSKU,
+                'channel_sku' => $v['channel_sku'],
                 'quantity' => $v['item_count'],
-                'price' =>$v['item_price'],
-                //'currency' => $orderItem->ItemPrice->CurrencyCode,
+                'price' => $v['item_price'],
+                'currency' => $lazada_currency_type,
+                'channel_order_id' => $result['channel_ordernum'],
+                'transaction_id' => $v['comment_text']
             ];
         }
 
@@ -330,7 +304,8 @@ Class LazadaAdapter implements AdapterInterface
 
     }
 
-    public function getSkuInfo($item_info){
+    public function getSkuInfo($item_info)
+    {
         //整理数据
         $sku_data = array();
 
@@ -344,7 +319,7 @@ Class LazadaAdapter implements AdapterInterface
                 0 => array(
                     'sku' => $item['Sku'],
                     'count' => 1,
-                    'price' => $item['ItemPrice']
+                    'price' => $item['ItemPrice'],
                 )
             );
 
@@ -356,6 +331,7 @@ Class LazadaAdapter implements AdapterInterface
 
                 $orders_ship_fee += $item['ShippingAmount'];
 
+
                 if (isset($sku_data[$v['sku']])) {
                     $sku_data[$v['sku']]['item_count'] += 1;
                     $sku_data[$v['sku']]['comment_text'] = $item['OrderItemId'] . '@' . $v['sku'] . ',' . $sku_data[$v['sku']]['comment_text'];
@@ -365,7 +341,10 @@ Class LazadaAdapter implements AdapterInterface
                     $sku_data[$v['sku']]['item_count'] = $v['count'];
                     $sku_data[$v['sku']]['item_price'] = $v['price'];
                     $sku_data[$v['sku']]['orders_sku'] = $v['sku'];
+                    $sku_data[$v['sku']]['channel_sku'] = $v['channel_sku'];
                 }
+
+
             }
         }
         $sku_data['total'] = $total;
@@ -373,23 +352,26 @@ Class LazadaAdapter implements AdapterInterface
 
         $sku_data['orders_ship_fee'] = 0;    //lazada不需要运费
 
+
+        //  var_dump($sku_data);exit;
         return $sku_data;
     }
 
     // 解析ebaySKU信息
-    function resetTransactionDetail($array) {
+    function resetTransactionDetail($array)
+    {
         $newArray = array();
         if ($array) {
             foreach ($array as $row) {
                 //1.先去掉'+'
                 $tmpSkuArray = explode('+', $row['sku']);
-                $tmpCount    = count($tmpSkuArray); //SKU种类总数
+                $tmpCount = count($tmpSkuArray); //SKU种类总数
                 foreach ($tmpSkuArray as $tmpSku) {
                     //先用一个数组保存最原始的一维数组信息
                     $data = $row;
                     $data['sku'] = $tmpSku; //SKU信息暂时已变更，重新赋值下就行
                     $data['price'] = round($data['price'] / $tmpCount, 2); //组合SKU的单价平均处理
-
+                    $data['channel_sku'] = $row['sku'];
                     //2.再去掉‘*’,可以直接取星号之后的部分
                     $tmp = explode('*', $tmpSku);
                     $tmpSku = trim(array_pop($tmp));
@@ -407,7 +389,7 @@ Class LazadaAdapter implements AdapterInterface
                         $data['count'] = $qty * $data['count'];
                         $data['price'] = round($data['price'] / $qty, 2);
                         $newArray[] = $data;
-                    }else {
+                    } else {
                         $data['sku'] = trim($tmpSku);
                         $newArray[] = $data;
                     }
@@ -467,10 +449,73 @@ Class LazadaAdapter implements AdapterInterface
         return simplexml_load_string(Tool::curl($requestUrl));
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
-        // TODO: Implement returnTrack() method.
-        echo "return Amazon Tracking Informations";
+        $return = [];
+
+        $now = new \DateTime();
+        $api_key = $this->config['lazada_access_key'];
+        $lazada_api_host = $this->config['lazada_api_host'];
+        $lazada_user_id = $this->config['lazada_user_id'];
+
+        $parameters = array(
+            'UserID' => $lazada_user_id,
+            'Action' => 'SetStatusToReadyToShip',
+            'OrderItemIds' => '[' . $tracking_info['OrderItemIds'] . ']',
+            'DeliveryType' => 'dropship',
+            'ShippingProvider' => $tracking_info['ShippingProvider'],
+            'TrackingNumber' => $tracking_info['TrackingNumber'],
+            'Timestamp' => $now->format(\DateTime::ISO8601),
+            'Version' => '1.0',
+
+        );
+
+        ksort($parameters);
+        $params = array();
+
+        foreach ($parameters as $name => $value) {
+
+            $params[] = rawurlencode($name) . '=' . rawurlencode($value);
+
+        }
+        $strToSign = implode('&', $params);
+
+        $parameters['Signature'] = rawurlencode(hash_hmac('sha256', $strToSign, $api_key, false));
+
+        $request = http_build_query($parameters);
+
+        //$info =$this->setRequest($lazada_api_host.'/?'.$request);
+
+        //$result  = $this->XmlToArray($info);
+
+        $rand_id = rand(1, 10);
+        if ($rand_id > 5) {
+            $result['Body']['OrderItems']['OrderItem'] = 1;
+
+        } else {
+
+        }
+        if (isset($result['Body']['OrderItems']['OrderItem'])) {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['Head']['ErrorMessage']) ? $result['Head']['ErrorMessage'] : 'Error';
+        }
+
+
+        return $return;
+    }
+
+    public function getMessages()
+    {
+
+    }
+
+    public function sendMessages($replyMessage)
+    {
+
     }
 
 }

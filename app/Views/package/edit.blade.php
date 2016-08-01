@@ -12,7 +12,7 @@
                 </div>
                 <div class="col-lg-2">
                     <label>渠道</label>
-                    <input type='text' class='form-control' value="{{ old('channelAccount') ? old('channelAccount') : $model->channelAccount->alias }}" readonly>
+                    <input type='text' class='form-control' value="{{ old('channelAccount') ? old('channelAccount') : $model->channelAccount ? $model->channelAccount->alias : '' }}" readonly>
                 </div>
                 <div class="col-lg-2">
                     <label>订单号</label>
@@ -53,12 +53,12 @@
                 <tbody>
                 @foreach($model->items as $item)
                     <tr>
-                        <td><img src="{{ asset($item->item->image) }}" width="100" readonly></td>
+                        <td><img src="{{ asset($item->item ? $item->item->image : '') }}" width="100" readonly></td>
                         <td>
-                            <input type='text' class='form-control' value="{{ old('sku') ? old('sku') : $item->item->sku }}" readonly>
+                            <input type='text' class='form-control' value="{{ old('sku') ? old('sku') : $item->item ? $item->item->sku : '' }}" readonly>
                         </td>
                         <td>
-                            <input type='text' class='form-control' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : $item->warehousePosition->name }}" readonly>
+                            <input type='text' class='form-control' value="{{ old('warehouse_position_id') ? old('warehouse_position_id') : $item->warehousePosition ? $item->warehousePosition->name : '' }}" readonly>
                         </td>
                         <td>
                             <input type='text' class='form-control' value="{{ old('quantity') ? old('quantity') : $item->quantity }}" readonly>
@@ -91,7 +91,7 @@
                     <select name='logistics_id' class='form-control'>
                         <option value=""></option>
                         @foreach($logisticses as $logistics)
-                            <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : ''}}>{{ $logistics->short_code }}</option>
+                            <option value="{{ $logistics->id }}" {{ $logistics->id == $model->logistics_id ? 'selected' : ''}}>{{ $logistics->code }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -20,4 +20,6 @@ class SupplierLevelModel extends BaseModel
             'name' => 'required|unique:product_supplier_levels,name,{id}',
         ]
     ];
+    //查询
+    public $searchFields = ['name'=>'名称', 'description'=>'描述'];
 }

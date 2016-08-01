@@ -8,9 +8,10 @@
 @section('tableHeader')
 	
     <th>ID</th> 
-    <th>采购单信息</th> 
+    <th>采购单状态</th> 
     <th>采购单审核状态</th>
     <th>核销状态</th>
+    <th>付款状态</th>
     <th>采购人</th>
    	<th>供应商</th>
     <th>采购物品</th>
@@ -19,51 +20,39 @@
     <th>操作</th>
 @stop
 @section('tableBody')
+    @if(count($data)>0)
     @foreach($data as $purchaseOrder)
+
         <tr>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
-            	付款方式：{{$purchaseOrder->supplier->pay_type}}</br>
+            	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
                 外部单号：
-                @foreach($purchaseOrder->purchasePostage as $ppostage)
-                    {{$ppostage->post_coding}}(YF{{$ppostage->postage}})<br>
-                @endforeach
+                {{$purchaseOrder->post_coding }}
             </td>
-           <td> @foreach(config('purchase.purchaseOrder.status') as $k=>$statu)
-            	@if($purchaseOrder->status == $k)
-            	{{ $statu }}
-                @endif
-            @endforeach </td>
-            @foreach(config('purchase.purchaseOrder.examineStatus') as $k=>$statu)
-            	@if($purchaseOrder->examineStatus == $k)
-            	<td>{{ $statu }}</td>
-                @endif
-            @endforeach   
-            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>  
-    		<td>{{ $purchaseOrder->assigner_name }}
+            <td> 
+                {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
+            </td>
+            <td>{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</td>  
+            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>
+            <td>{{config('purchase.purchaseOrder.close_status')[$purchaseOrder->close_status]}}</td>   
+    		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
             <td>
-            
-            @if($purchaseOrder->supplier_id >0)
-            @foreach(config('purchase.purchaseOrder.close_status') as $k=>$close_statu)
-            	@if($purchaseOrder->close_status == $k)
-            	{{ $close_statu}}
-                @endif
-            @endforeach
-            	</br>供应商编号NO.{{ $purchaseOrder->supplier->id}}
-            @endif
+                {{ $purchaseOrder->supplier?$purchaseOrder->supplier->name:''}}
             </td>
             <td>
             @if($purchaseOrder->status <4)
                 <table class="table table-bordered table-striped table-hover sortable">
                 <thead>
                 <tr>
-                <th >sku</th>
+                <th>sku</th>
+                <th>状态</th>
                 <th>名称</th>
                 <th>采购数量</th>
                 <th>已到货数量</th>
                 <th>入库数量</th>
                 <th>不合格</th>
-                <th>预计到货日期</th>
+                
                 <th>实际到货日期</th>
                 <th>状态</th>
                 <th>单价</th>
@@ -77,12 +66,13 @@
                 @foreach($purchaseOrder->purchase_items as $purchase_item)
                 <tr>
                     <td>{{$purchase_item->sku}}</td>
+                    <td>{{config('item.status')[$purchase_item->productItem?$purchase_item->productItem->status:'notFound']}}</td>
                     <td>{{$purchase_item->item?$purchase_item->item->c_name:''}}</td>
                     <td>{{$purchase_item->purchase_num}}</td>
                     <td>{{$purchase_item->arrival_num}}</td>
                     <td>{{$purchase_item->storage_qty}}</td>
                     <td>{{$purchase_item->active_num}}</td>
-                    <td>{{$purchase_item->start_buying_time}}</td>
+                    
                     <td>{{$purchase_item->arrival_time}}</td>
                     <td>
                         @foreach(config('purchase.purchaseItem.status') as $key=>$status)
@@ -116,8 +106,8 @@
                 </table>
                 @endif
             </td>
-            <td>{{ $purchaseOrder->warehouse->name ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
-                  
+            <td>{{ $purchaseOrder->warehouse ? $purchaseOrder->warehouse->name : '暂无仓库'}}</td>
+                 
             <td>{{ $purchaseOrder->created_at }}</td>
             <td>
                 @if($purchaseOrder->examineStatus==2||$purchaseOrder->examineStatus==0)
@@ -145,7 +135,7 @@
                     </a>
                 @endif
                 @if($purchaseOrder->status == 1|| $purchaseOrder->status == 2||$purchaseOrder->status == 3)
-                <a data-toggle="modal" data-target="#myModal" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
+                <a data-toggle="modal" data-target="#myModal_{{$purchaseOrder->id}}" title="添加物流单号" class="btn btn-info btn-xs setPurchaseOrder" data-id="{{$purchaseOrder->id}}" >
                     <span class="glyphicon glyphicon-plus"></span>
                 </a> 
                 
@@ -154,26 +144,23 @@
                 </a>
                 @endif 
                 @if($purchaseOrder->examineStatus == 1||$purchaseOrder->examineStatus == 2)
-                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs">
+                    <a href="/purchaseOrder/cancelOrder/{{$purchaseOrder->id}}" title="退回" class="btn btn-danger btn-xs tuihui">
                         <span class="glyphicon glyphicon-remove-sign"></span>
                     </a>
                 @endif
-                @if($purchaseOrder->status == 1)
-                <a href="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" title="付款" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
+                @if($purchaseOrder->status == 1&&$purchaseOrder->close_status==0)
+                <a href="javascript:" title="付款" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}" class="btn btn-info btn-xs fukuan" data-url="/purchaseOrder/payOrder/{{$purchaseOrder->id}}">
                     <span class="glyphicon glyphicon glyphicon-usd"></span>
                 </a>
                 @endif 
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
-                </a>
-                           
-                
+                </a>  
             </td>
         </tr>
-    @endforeach
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+        <!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal_{{$purchaseOrder->id}}" tabindex="-1" role="dialog" 
    aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
@@ -190,20 +177,19 @@
          <input type="hidden" name="_token" value="{{ csrf_token() }}">
          <div class="panel panel-default">
         <div class="panel-heading">产品信息</div>
+        
         <div class="panel-body" id="itemDiv">
             <div class='row'>
                 <div class="form-group col-sm-2">
                     <label  class='control-label'>物流号</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div> 
-                 <div class="form-group col-sm-2">
+                <div class="form-group col-sm-2">
                     <label  class='control-label'>物流费</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>             
-            </div>       
-           
-             
-              <div class='row'>
+            </div>                   
+            <div class='row'>
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control post_coding" id="post[0][post_coding]" name='post[0][post_coding]' value="">
                 </div>
@@ -211,16 +197,8 @@
                 <div class="form-group col-sm-2">
                     <input type='text' class="form-control postage" id="post[0][postage]" placeholder="物流费" name='post[0][postage]' value="">
                 </div>
-                <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-                </div>
-                 
-                 
-                    <input type="hidden" id="currrent" value="1">
-                     
+            </div>   
         </div>
-        <!--<div class="panel-footer">
-            <div class="addItem create"><i class="glyphicon glyphicon-plus"></i><strong>新增采购单号和物流费</strong></div>
-        </div>-->
     </div> 
          
          <div class="modal-footer">
@@ -235,6 +213,8 @@
       </div>
 </div>
 </div>
+    @endforeach
+
 <!-- 模态框（Modal） -->
 <div class="modal fade" id="myModala" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" width="800px">
    <div class="modal-dialog" style="width:800px">
@@ -256,12 +236,14 @@
 </div>
 </div>
 
-
+@endif
 @stop
 
 @section('childJs')
     <script type='text/javascript'>
-	
+	$("#myModal").click(function(){
+        //$("#ajaxcode").val(1234);
+    })
 	$(".setPurchaseOrder div").each(function(){ alert($(this).attr("data-id")); }); 
 
 	$(".hexiao").click(function(){
@@ -272,8 +254,8 @@
     })
 
 
-    $(".find_shipment").click(function(){
-        if (confirm("确认待核销?")) {
+    $(".tuihui").click(function(){
+        if (confirm("确认退回?")) {
             var url = $(this).data('url');
             window.location.href=url;
         }

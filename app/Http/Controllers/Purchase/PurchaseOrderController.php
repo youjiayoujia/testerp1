@@ -24,9 +24,10 @@ use Tool;
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder)
+    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem)
     {
         $this->model = $purchaseOrder;
+        $this->purchaseItem = $purchaseItem;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
         $this->viewPath = 'purchase.purchaseOrder.';
@@ -40,21 +41,20 @@ class PurchaseOrderController extends Controller
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
+
         foreach($response['data'] as $key=>$vo){
             $response['data'][$key]['purchase_items']=PurchaseItemModel::where('purchase_order_id',$vo->id)->get();
             $response['data'][$key]['purchase_post_num']=PurchasePostageModel::where('purchase_order_id',$vo->id)->sum('postage');
             $response['data'][$key]['purchase_post']=PurchasePostageModel::where('purchase_order_id',$vo->id)->first();
             foreach($response['data'][$key]['purchase_items'] as $v){
-            $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
-            $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
-            $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
-            $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
-            $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
+                $response['data'][$key]['sum_purchase_num'] +=$v->purchase_num;
+                $response['data'][$key]['sum_arrival_num'] +=$v->arrival_num;
+                $response['data'][$key]['sum_storage_qty'] +=$v->storage_qty;
+                $response['data'][$key]['sum_purchase_account'] += ($v->purchase_num * $v->purchase_cost);
+                $response['data'][$key]['sum_purchase_storage_account'] +=  ($v->storage_qty * $v->purchase_cost);
             }
-            /*$response['data'][$key]['sum_purchase_num']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('purchase_num');
-            $response['data'][$key]['sum_arrival_num']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('arrival_num');
-            $response['data'][$key]['sum_storage_qty']=PurchaseItemModel::where('purchase_order_id',$vo->id)->sum('storage_qty');*/
-            }
+        }
+        
         return view($this->viewPath . 'index', $response);
     }
     
@@ -80,6 +80,7 @@ class PurchaseOrderController extends Controller
             'purchasePostage'=>PurchasePostageModel::where('purchase_order_id',$id)->get(),
             'purchaseSumPostage'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
             'current'=>count(PurchasePostageModel::where('purchase_order_id',$id)->get()->toArray()),
+            'warehouses' =>WarehouseModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);   
     }
@@ -130,35 +131,28 @@ class PurchaseOrderController extends Controller
         if ($model->status ==5 ) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '该采购单已取消.'));
         }
+
         $data=request()->all();
         if(isset($data['arr'])){
             if(isset($data['post'])){
                 $post="";
                 if($model->status <4 && $model->status >0){
-                foreach($data['arr'] as $key=>$vo){
-                    foreach($data['post'] as $k=>$value){
-                        if($value['post_coding'] == $vo['post_coding']){
-                            $purchaseItem=PurchaseItemModel::find($vo['id']);
-                            
-                            $post[$key]['purchase_order_id']=$purchaseItem->purchase_order_id;
-                            $post[$key]['post_coding']=$value['post_coding'];
-                            $post[$key]['postage']=$value['postage'];
-                            }
+                    foreach($data['post'] as $post_value){
+                        $post_array['purchase_order_id'] = $data['purchase_order_id'];
+                        $post_array['post_coding'] = $post_value['post_coding'];
+                        $post_array['postage'] = $post_value['postage'];
+                        $post_array['user_id'] = request()->user()->id;
+                        if(array_key_exists('id',$post_value)){
+                            PurchasePostageModel::where('id',$post_value['id'])->update($post_array);
+                        }else{
+                            PurchasePostageModel::create($post_array);
                         }
+                        
+                        
                     }
-                    if(!empty($post)){
-                        foreach($post as $num=>$val){
-                            $num=PurchasePostageModel::where('post_coding',$val['post_coding'])->count();
-                            if($num==0){
-                                PurchasePostageModel::create($val);
-                            }else{
-                                PurchasePostageModel::where('post_coding',$val['post_coding'])->update(['postage'=>$val['postage']]);
-                                }
-                            
-                            }   
-                        }
-                        }
                 }
+            }
+                
             foreach($data['arr'] as $k=>$v){
                 if($v['id']){
                     $purchaseItem=PurchaseItemModel::find($v['id']);
@@ -175,9 +169,6 @@ class PurchaseOrderController extends Controller
                         ItemModel::where('sku',$purchaseItem->sku)->update(['purchase_price'=>$item['purchase_cost']]); 
                     }else{
                         $item['costExamineStatus']=0;   
-                    }
-                    if($item['status']>0){
-                        $data['status']=1;
                     }
                     if($purchaseItem->purchaseOrder->examineStatus ==1){
                         if($purchaseItem->status < 4){
@@ -197,6 +188,7 @@ class PurchaseOrderController extends Controller
         if($num ==0){
             $data['costExamineStatus']=2;
         }
+        
         $data['start_buying_time']=date('Y-m-d h:i:s',time());  
         $model->update($data);
         return redirect( route('purchaseOrder.edit', $id));     
@@ -303,10 +295,14 @@ class PurchaseOrderController extends Controller
      */
     public function createItem($id){
         $data=request()->all();
+        $this->validate(request(), $this->purchaseItem->rules('create'));
+        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
+        if (!$item) {
+            return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', 'SKU不存在.'));
+        }
         $model=$this->model->find($id);
         $num=PurchaseItemModel::where('active_status','>',0)->where('sku',$data['sku'])->count();
         $Inum=ItemModel::where('sku',$data['sku'])->where('is_available','<>',1)->where('status',"selling")->count();
-        $item=ItemModel::where('sku',$data['sku'])->where('is_available',1)->where('status',"selling")->first();
         if($num > 0 || $Inum > 0){
             return redirect(route('purchaseOrder.edit', $id))->with('alert', $this->alert('danger', $this->mainTitle . '此Item存在异常不能添加进此采购单.'));
         }
@@ -390,7 +386,8 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
-        echo Tool::barcodePrint($id);
+        $response['id']= $id;
+        return view($this->viewPath . 'printpo', $response);
     }
 
     /**
@@ -483,7 +480,7 @@ class PurchaseOrderController extends Controller
                 if($purchase_item->arrival_num!=$purchase_item->purchase_num){
                     $filed['purchase_item_id'] = $purchase_item['id'];
                     $filed['sku'] = $purchase_item['sku'];
-                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>10?10:$purchase_item['arrival_num']+$update_data[1];
+                    $filed['arrival_num'] = $purchase_item['arrival_num']+$update_data[1]>$purchase_item['purchase_num']?$purchase_item['purchase_num']:$purchase_item['arrival_num']+$update_data[1];
                     $filed['lack_num'] =  $purchase_item['purchase_num']-$filed['arrival_num']<0?0:$purchase_item['purchase_num']-$filed['arrival_num'];
                     $filed['arrival_time'] = date('Y-m-d H:i:s',time());
                     $filed['status'] = 2;

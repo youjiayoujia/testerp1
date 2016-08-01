@@ -26,11 +26,12 @@ abstract class Job
     protected $lasting = 0.00;
     protected $result = ['status' => 'init', 'remark' => 'init'];
 
-    public function log()
+    public function log($queue, $data = '')
     {
         QueueLog::create([
             'relation_id' => $this->relation_id,
-            'queue' => __CLASS__,
+            'queue' => $queue,
+            'data' => $data,
             'description' => $this->description,
             'lasting' => $this->lasting,
             'result' => $this->result['status'],

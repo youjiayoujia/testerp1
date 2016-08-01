@@ -54,26 +54,6 @@ return [
                     'url' => 'product.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '选款选中',
-                    'url' => 'SelectProduct.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '选款产品编辑',
-                    'url' => 'EditProduct.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '选款产品审核',
-                    'url' => 'ExamineProduct.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '选款产品发布',
-                    'url' => 'PublishProduct.index',
-                    'icon' => '',
-                ],
             ],
             '通关报关' => [
                 [
@@ -107,18 +87,13 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => '订单利润率',
-                'url' => 'dashboard.index',
-                'icon' => '',
-            ],
-            [
                 'name' => '黑名单',
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
-			[
-                'name' => '订单投诉',
-                'url' => 'orderComplaint.index',
+            [
+                'name' => '标记发货规则设置',
+                'url' => 'orderMarkLogic.index',
                 'icon' => '',
             ],
         ],
@@ -174,13 +149,8 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '入库',
-                    'url' => 'stockIn.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '出库',
-                    'url' => 'stockOut.index',
+                    'name' => '出入库',
+                    'url' => 'stockInOut.index',
                     'icon' => '',
                 ],
                 [
@@ -264,6 +234,11 @@ return [
                     'url' => 'logisticsRule.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流渠道名',
+                    'url' => 'logisticsChannelName.index',
+                    'icon' => '',
+                ],
             ]
         ],
     ],
@@ -285,19 +260,14 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                /*[
-                    'name' => '采购条目',
-                    'url' => 'purchaseItemList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '打印采购单',
-                    'url' => 'printPurchaseOrder.create',
-                    'icon' => '',
-                ],*/
                 [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
                     'icon' => '',
                 ],
                 [
@@ -308,21 +278,6 @@ return [
                 [
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
-                    'icon' => '',
-                ],
-				[
-                    'name' => '采购单结算',
-                    'url' => 'closePurchaseOrder.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '异常采购条目',
-                    'url' => 'purchaseAbnormal.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '异常采购单',
-                    'url' => 'purchaseOrderAbnormal.index',
                     'icon' => '',
                 ],
             ],
@@ -356,14 +311,6 @@ return [
             ]
         ],
     ],
-    //财务导航
-    [
-        'name' => '财务',
-        'icon' => 'piggy-bank',
-        'url' => 'dashboard.index',
-    ],
-
-
     [
         'name' => ' 刊登',
         'icon' => 'glyphicon glyphicon-send',
@@ -385,27 +332,82 @@ return [
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
+            [
+                'name' => 'ebay站点信息',
+                'url' => 'ebayDetail.index',
+                'icon' => '',
+            ],
 
         ],
     ],
-
-
-
-    //客户导航
-//    [
-//        'name' => '客户',
-//        'icon' => 'user',
-//        'url' => 'dashboard.index',
-//        'type' => '',
-//        'subnavigations' => [
-//            [
-//                'name' => 'CRM',
-//                'url' => 'dashboard.index',
-//                'icon' => '',
-//            ],
-//        ],
-//
-//    ],
+    //CRM导航
+    [
+        'name' => 'CRM',
+        'icon' => 'envelope',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '邮件管理' => [
+                [
+                    'name' => '信息',
+                    'url' => 'message.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '发送队列',
+                    'url' => 'messageReply.index',
+                    'icon' => '',
+                ],
+            ],
+            '邮件模板管理' => [
+                [
+                    'name' => '模板类型',
+                    'url' => 'messageTemplateType.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '信息模板',
+                    'url' => 'messageTemplate.index',
+                    'icon' => '',
+                ],
+            ],
+        ]
+    ],
+    //监控导航
+    [
+        'name' => '监控',
+        'icon' => 'scale',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '定时任务' => [
+                [
+                    'name' => '任务日志',
+                    'url' => 'logCommand.index',
+                    'icon' => '',
+                ],
+            ],
+            '队列' => [
+                [
+                    'name' => '队列日志',
+                    'url' => 'logQueue.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '失败队列',
+                    'url' => 'jobFailed.index',
+                    'icon' => '',
+                ],
+            ],
+            '事件历史' => [
+                [
+                    'name' => '历史记录',
+                    'url' => 'eventChild.index',
+                    'icon' => '',
+                ],
+            ],
+        ]
+    ],
     //系统导航
     [
         'name' => '系统',
@@ -421,6 +423,26 @@ return [
             [
                 'name' => '添加用户',
                 'url' => 'user.create',
+                'icon' => '',
+            ],
+            [
+                'name' => '角色列表',
+                'url' => 'role.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加角色',
+                'url' => 'role.create',
+                'icon' => '',
+            ],
+            [
+                'name' => '权限列表',
+                'url' => 'permission.index',
+                'icon' => '',
+            ],
+            [
+                'name' => '添加权限',
+                'url' => 'permission.create',
                 'icon' => '',
             ],
             [
@@ -456,5 +478,6 @@ return [
 
         ],
     ],
+
 ];
 

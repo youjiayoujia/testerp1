@@ -12,8 +12,8 @@ class CurrencyModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'currencys';
-
+    public $table = 'currencys';
+    
     /**
      * The attributes that are mass assignable.
      *

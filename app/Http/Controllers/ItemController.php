@@ -43,6 +43,14 @@ class ItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $logisticsLimit_arr = [];
+        foreach($model->product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['pivot']['logistics_limits_id'];              
+        }
+        $wrapLimit_arr = [];
+        foreach($model->product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['pivot']['wrap_limits_id'];               
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
@@ -50,6 +58,8 @@ class ItemController extends Controller
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'wrapLimit' => $this->wrapLimit->all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
+            'wrapLimit_arr' => $wrapLimit_arr,
+            'logisticsLimit_arr' => $logisticsLimit_arr,
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -84,10 +94,21 @@ class ItemController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $logisticsLimit_arr = [];
+        foreach($model->product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['name'];              
+        }
+        
+        $wrapLimit_arr = [];
+        foreach($model->product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['name'];               
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouse' => $this->warehouse->find($model->warehouse_id),
+            'logisticsLimit_arr' => $logisticsLimit_arr,
+            'wrapLimit_arr' => $wrapLimit_arr,
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -152,5 +173,19 @@ class ItemController extends Controller
         $sku = trim(request('sku'));
         $model = $this->model->where('sku', $sku)->first();
         return json_encode($model);
+    }
+
+    /**
+     * 打印产品
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function printsku()
+    {
+        $item_id = request()->input("id");
+        $model = $this->model->find($item_id);
+        $response['model']= $model;
+        return view($this->viewPath . 'printsku', $response);
     }
 }

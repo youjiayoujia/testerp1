@@ -43,7 +43,7 @@ table.gridtable td {
 	</tr>
 	<tr>
 		<td>入库仓库</td>
-		<td>{{$purchase_order->warehouse->name}}</td>
+		<td>{{$purchase_order->warehouse?$purchase_order->warehouse->name:''}}</td>
 	</tr>
 	<tr>
 		<td>订单详情</td>

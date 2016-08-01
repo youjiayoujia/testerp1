@@ -5,7 +5,7 @@ body,
 .btn,
 .form-control,
 .dropdown-menu {
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .form-control {
@@ -20,7 +20,7 @@ body,
     padding: 60px 10px 10px;
 }
 
-.table tbody tr td{
+.table tbody tr td {
     vertical-align: middle;
 }
 
@@ -37,10 +37,22 @@ body,
 }
 
 .inboxNum {
-    width: 500px;
-    height: 500px;
+    width: 700px;
+    height: 700px;
     background: #ddd;
     left: 15px;
+}
+
+.result {
+    font-size:270px;
+}
+
+.result_cname {
+    font-size:100px;
+}
+
+.result_sku {
+    font-size:100px;
 }
 
 .inboxImage {
@@ -109,4 +121,15 @@ th:hover:not([data-sort=false]) {
     text-shadow: 0 1px 0 #fff;
     opacity: .8;
     cursor: pointer;
+}
+
+.divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+
+}
+.mailcontent {
+    height: 400px;
 }

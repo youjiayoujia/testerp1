@@ -29,7 +29,7 @@ class UserModel extends BaseModel implements AuthenticatableContract,
      * @var array
      */
     protected $fillable = ['id', 'name', 'email', 'password'];
-
+    public $searchFields = ['name', 'id'];
     /**
      * The attributes excluded from the model's JSON form.
      *
@@ -53,5 +53,27 @@ class UserModel extends BaseModel implements AuthenticatableContract,
     public function channelAccounts()
     {
         return $this->belongsToMany('App\Models\UserModel', 'channel_account_user', 'channel_account_id', 'user_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsToMany('App\Models\RoleModel', 'user_roles', 'user_id', 'role_id')->withTimestamps();
+    }
+
+    public function hasRole() {
+        if(is_string($role)){
+            return $this->roles->contains('name', $role);
+        }
+        return !!$role->intersect($this->roles)->count();
+    }
+
+    public function messages()
+    {
+        return $this->hasMany('App\Models\message\MessageModel', 'assign_id');
+    }
+
+    public function getProcessMessagesAttribute()
+    {
+        return $this->messages()->where('status', 'PROCESS')->count();
     }
 }

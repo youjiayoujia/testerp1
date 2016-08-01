@@ -20,7 +20,7 @@ class LimitsModel extends BaseModel
         'name'
     ];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['name' => '物流限制名称'];
 
     public $rules = [
         'create' => [

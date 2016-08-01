@@ -79,7 +79,7 @@ class BlacklistController extends Controller
     public function getBlacklist()
     {
         //根据邮编和收货人相同抓取黑名单用户
-        $channel_id = ChannelModel::where('name', 'Wish')->first()->id;
+        $channel_id = ChannelModel::where('driver', 'wish')->first()->id;
         $orders = OrderModel::where('created_at', '<=', date('Y-m-d H:m:s'))
             ->where('created_at', '>=', date('Y-m-d H:m:s', strtotime("last year")))
             ->where('channel_id', $channel_id)
@@ -169,7 +169,7 @@ class BlacklistController extends Controller
         //周日更新黑名单
         if(date('w') == 0) {
             foreach($this->model->all() as $blacklist) {
-                if($blacklist->channel->name == 'Wish') {
+                if($blacklist->channel->driver == 'wish') {
                     $lastname = explode(' ', $blacklist['name'])[0];
                     $firstname = explode(' ', $blacklist['name'])[1];
                     $orders = OrderModel::where('shipping_zipcode', $blacklist->zipcode)

@@ -3,7 +3,7 @@
     <div class="text-center">
         <div class="row">
             <div class="col-lg-4">
-                <a type="button" class="btn btn-info" href="{{ route('package.doPackage') }}">
+                <a type="button" class="btn btn-info" href="{{ route('order.putNeedQueue') }}">
                     Do Package <span class="badge">{{ $packageNum }}</span>
                 </a>
             </div>
@@ -38,7 +38,7 @@
             </div>
             <div class="col-lg-2 text-left">
                 <a type="button" class="btn btn-default" href="{{ route('package.manualShipping') }}">
-                    手工发货 <span class="badge">{{ $pickNum }}</span>
+                    手工发货 <span class="badge">{{ $manualShip }}</span>
                 </a>
             </div>
         </div>
@@ -88,10 +88,10 @@
             </div>
             <div class="col-lg-3 text-left">
                 <a type="button" class="btn btn-default" href="{{ route('pickList.oldPrint') }}">
-                    原面单重新打印 <span class="badge">{{ $pickNum }}</span>
+                    原面单重新打印 <span class="badge">0</span>
                 </a>
                 <a type="button" class="btn btn-default" href="{{ route('pickList.updatePrint') }}">
-                    更换物流面单 <span class="badge">{{ $pickNum }}</span>
+                    更换物流面单 <span class="badge">0</span>
                 </a>
             </div>
         </div>

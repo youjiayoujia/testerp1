@@ -61,8 +61,6 @@ class StockController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses' => WarehouseModel::where('is_available','1')->get(),
-            'uses' => UserModel::all(),
-            'skus' => ItemModel::all(),
         ];
 
         return view($this->viewPath.'create', $response);
@@ -91,6 +89,18 @@ class StockController extends Controller
         return view($this->viewPath.'showStockInfo', $response);
     }
 
+    public function changePosition()
+    {
+        $id = request('id');
+        $position_id = request('position');
+        $stock = $this->model->find($id);
+        if($stock) {
+            $stock->update(['warehouse_position_id' => $position_id]);
+            return json_encode(true);
+        }
+        return json_encode(false);
+    }
+
     public function getSingleSku()
     {
         $sku = request('sku');
@@ -100,11 +110,11 @@ class StockController extends Controller
         }
         $item_id = $item->id;
         $stocks = $this->model->where('item_id', $item_id)->get();
-        $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
+        $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th><th>按钮</th></thead><tbody>";
         foreach($stocks as $stock)
         {
             if($stock->available_quantity || $stock->hold_quantity) {
-            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
+            $str .= "<tr><td data-id='".$stock->id."' data-warehouseId='".$stock->warehouse_id."'>".($stock->warehouse ? $stock->warehouse->name : '')."</td><td class='col-lg-2'>".($stock->position ? $stock->position->name : '')."</td><td data-itemId='".$stock->item_id."'>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td><td><button type='button' class='btn btn-info change_position'>修改库位</button></td></tr>";
             }
         }
         $str .= "</tbody>";
@@ -429,5 +439,63 @@ class StockController extends Controller
             ];
             return view($this->viewPath.'excelResult', $response);
         }
+    }
+
+    /**
+     * item编辑页面库位查询
+     *
+     * @param none
+     *
+     */
+    public function ajaxWarehousePosition()
+    {   
+        $item_id = request()->input('item_id');
+        $warehouse_id = request()->input('warehouse_id');
+        $position_name = trim(request()->input('warehouse_position'));   
+        $obj1 = StockModel::where(['warehouse_id'=>$warehouse_id, 'item_id'=>$item_id])->with('position')->get();
+        if($obj1->toArray()) {
+            if(count($obj1->toArray())==2){
+                foreach ($obj1 as $value) {
+                    $position_id[]=$value->warehouse_position_id;
+                }
+                
+                $buf = PositionModel::where('warehouse_id',$warehouse_id)->whereIn('id',$position_id)->get();
+                $total = $buf->count();
+                $arr = [];
+                foreach($buf as $key => $value) {
+                    $arr[$key]['id'] = $value->id;
+                    $arr[$key]['text'] = $value->name;
+                }
+                if($total)
+                    return json_encode(['results' => $arr, 'total' => 2]);
+                else
+                    return json_encode(false);
+            }else{
+                $buf = PositionModel::where('warehouse_id',$warehouse_id)->where('name','like', '%'.$position_name.'%')->get();
+                $total = $buf->count();
+                $arr = [];
+                foreach($buf as $key => $value) {
+                    $arr[$key]['id'] = $value->id;
+                    $arr[$key]['text'] = $value->name;
+                }
+                if($total)
+                    return json_encode(['results' => $arr, 'total' => $total]);
+                else
+                    return json_encode(false);
+            }
+        }else{
+            $buf = PositionModel::where('warehouse_id',$warehouse_id)->where('name','like', '%'.$position_name.'%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+        
     }
 }

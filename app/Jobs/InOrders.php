@@ -37,20 +37,33 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
+            if (isset($this->order['remark'])) {
+                $order->remark($this->order['remark']);
+            }
             if ($order) {
-                $job = new DoPackage($order);
-                $job->onQueue('doPackages');
-                $this->dispatch($job);
-                $this->relation_id = $order->id;
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success.';
+                $package = $order->createPackage();
+                if ($order->status == 'PREPARED' && $package) {
+                    $job = new DoPackage($package);
+                    $job->onQueue('doPackages');
+                    $this->dispatch($job);
+                    $this->relation_id = $order->id;
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success.';
+                } else {
+                    $this->relation_id = 0;
+                    $this->result['status'] = 'fail';
+                    $this->result['remark'] = 'Fail to create virtual package.';
+                }
             } else {
                 $this->relation_id = 0;
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = 'Fail to put order in.';
             }
+        } else {
+            $this->result['status'] = 'success';
+            $this->result['remark'] = 'Order has been exist.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log();
+        $this->log('InOrders', serialize($this->order));
     }
 }

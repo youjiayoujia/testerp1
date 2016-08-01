@@ -8,10 +8,10 @@
                     <strong>ID</strong>: {{ $model->id }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>渠道</strong>: {{ $model->channelAccount->alias }}
+                    <strong>渠道</strong>: {{ $model->channelAccount ? $model->channelAccount->alias : '' }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>订单号</strong>: {{ $model->order->ordernum }}
+                    <strong>订单号</strong>: {{ $model->order ? $model->order->ordernum : '' }}
                 </div>
                 <div class="col-lg-2">
                     <strong>状态</strong>: {{ $model->status_name }}
@@ -20,7 +20,7 @@
                     <strong>类型</strong>: {{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>仓库</strong>: {{ $model->warehouse->name }}
+                    <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : '' }}
                 </div>
             </div>
         </div>
@@ -41,9 +41,9 @@
                 <tbody>
                 @foreach($model->items as $item)
                     <tr>
-                        <td><img src="{{ asset($item->item->image) }}" width="100"></td>
-                        <td>{{ $item->item->sku }}</td>
-                        <td>{{ $item->warehousePosition->name }}</td>
+                        <td><img src="{{ asset($item->item ? $item->item->image : '') }}" width="100"></td>
+                        <td>{{ $item->item ? $item->item->sku : '' }}</td>
+                        <td>{{ $item->warehousePosition ? $item->warehousePosition->name : '' }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>{{ $item->remark }}</td>
                     </tr>
@@ -67,7 +67,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-lg-2">
-                    <strong>物流方式</strong>: {!! $model->logistics ? $model->logistics->short_code : '<small>未分配物流</small>' !!}
+                    <strong>物流方式</strong>: {!! $model->logistics ? $model->logistics->code : '<small>未分配物流</small>' !!}
                 </div>
                 <div class="col-lg-2">
                     <strong>物流单号</strong>: {{ $model->tracking_no }}
@@ -76,7 +76,7 @@
                     <strong>查询地址</strong>: {{ $model->tracking_link }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>物流成本</strong>: {{ $model->cost }} 元
+                    <strong>物流成本</strong>: {{ $model->cost + $model->cost1 }} 元
                 </div>
                 <div class="col-lg-2">
                     <strong>重量</strong>: {{ $model->weight }} Kg

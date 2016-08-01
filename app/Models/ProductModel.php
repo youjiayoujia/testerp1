@@ -97,6 +97,17 @@ class ProductModel extends BaseModel
         'declared_value',
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['examine_status' => config('product.examineStatus')],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
+
     public function image()
     {
         return $this->belongsTo('App\Models\Product\ImageModel', 'default_image');
@@ -117,14 +128,34 @@ class ProductModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
+    public function secondSupplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'second_supplier_id');
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\UserModel', 'upload_user');
     }
 
+    public function purchaseAdminer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase_adminer');
+    }
+
     public function item()
     {
         return $this->hasMany('App\Models\ItemModel', 'product_id');
+    }
+
+    public function logisticsLimit()
+    {
+        return $this->belongsToMany('App\Models\Logistics\LimitsModel','product_logistics_limits','product_id','logistics_limits_id')->withTimestamps();
+    }
+
+    public function wrapLimit()
+    {
+        return $this->belongsToMany('App\Models\WrapLimitsModel','product_wrap_limits','product_id','wrap_limits_id')->withTimestamps();
     }
 
     public function variationValues()
@@ -204,6 +235,7 @@ class ProductModel extends BaseModel
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
             $code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
+            
             //创建spu，,并插入数据
             $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
             $data['spu_id'] = $spuobj->id;
@@ -238,13 +270,23 @@ class ProductModel extends BaseModel
             $aznum = 0;
             foreach ($data['modelSet'] as $model) {
                 //拼接model号
-                //$data['model'] = $spuobj->spu . "-" . $model['model'];
                 $data['model'] = $spuobj->spu . $az[$aznum];
-                $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',',
-                    $data['carriage_limit_arr']);
-                $data['package_limit'] = empty($data['package_limit_arr']) ? '' : implode(',',
-                    $data['package_limit_arr']);
+                $data['examine_status'] = 'pending';
                 $product = $this->create($data);
+                if(array_key_exists('carriage_limit_arr', $data)){
+                    foreach($data['carriage_limit_arr'] as $logistics_limit_id){
+                        $arr['logistics_limits_id'] = $logistics_limit_id;
+                        $product->logisticsLimit()->attach($arr);
+                    }
+                }
+
+                if(array_key_exists('package_limit_arr', $data)){
+                    foreach($data['package_limit_arr'] as $wrap_limits_id){
+                        $brr['wrap_limits_id'] = $wrap_limits_id;
+                        $product->wrapLimit()->attach($brr);
+                    }
+                }
+                
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
                 $channels = ChannelModel::all();
@@ -253,22 +295,8 @@ class ProductModel extends BaseModel
                     $product->productMultiOption()->create($data);
                 }
 
-                //默认图片id为0
-                /*$default_image_id = 0;
-                $imageModel = new ImageModel();
-                $i=0;
-                foreach ($model['image'] as $key => $file) {     
-                    if ($file != '') {
-                        $image_id = $imageModel->singleCreate($data, $file, $key);
-                        //获得首图的product_image_id
-                        if ($i == 0) {
-                            $default_image_id = $image_id;
-                        }
-                        $i++;
-                    }
-                }
                 //更新产品首图
-                $product->update(['default_image' => $default_image_id]);*/
+                //$product->update(['default_image' => $default_image_id]);
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
@@ -340,6 +368,19 @@ class ProductModel extends BaseModel
     {
         $spu_id = $this->spu_id;
         DB::beginTransaction();
+        
+        if(array_key_exists('package_limit_arr', $data)){
+            foreach($data['package_limit_arr'] as $wrap_limits_id){
+                $arr[] = $wrap_limits_id;         
+            }
+            $this->wrapLimit()->sync($arr);
+        }
+        if(array_key_exists('carriage_limit_arr', $data)){
+            foreach($data['carriage_limit_arr'] as $logistics_limits_id){
+                $brr[] = $logistics_limits_id;         
+            }
+            $this->logisticsLimit()->sync($brr);
+        }
         try {
             //更新产品variation属性
             if (array_key_exists('variations', $data)) {
@@ -421,10 +462,6 @@ class ProductModel extends BaseModel
 
                 }
             }
-
-            $data['carriage_limit'] = empty($data['carriage_limit_arr']) ? '' : implode(',',
-                $data['carriage_limit_arr']);
-            $data['package_limit'] = empty($data['package_limit_arr']) ? '' : implode(',', $data['package_limit_arr']);
             //更新基础信息
             $this->update($data);
         } catch (Exception $e) {
@@ -550,16 +587,22 @@ class ProductModel extends BaseModel
      * @param array data 修改的信息
      */
     public function updateMulti($data)
-    {
+    {   
         foreach ($data['info'] as $channel_id => $language) {
+            $arr = [];
+            $pre = $language['language'];
             foreach ($language as $prefix => $value) {
-                $arr[$prefix . '_name'] = $value[$prefix . '_name'];
-                $arr[$prefix . '_description'] = $value[$prefix . '_description'];
-                $arr[$prefix . '_keywords'] = $value[$prefix . '_keywords'];
+                $arr[$pre."_".$prefix] = $value;
             }
-            $model = $this->productMultiOption->where("channel_id", $channel_id)->first();
-            $model->update($arr);
+            //print_r($arr);
+            //exit;
+            $model = $this->productMultiOption->where("channel_id", (int)$channel_id)->first();
+            if($model){
+                $model->update($arr);
+            }
+           
         }
+        //
     }
 
 }

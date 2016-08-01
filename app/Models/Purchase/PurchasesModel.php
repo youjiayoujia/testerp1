@@ -20,10 +20,15 @@ class PurchasesModel extends BaseModel
      */
     protected $guarded  = [];
 
-
+    public $searchFields = ['id'=>'id','sku'=>'sku','c_name'=>'c_name'];
     public function item()
     {
         return $this->belongsTo('App\Models\ItemModel', 'item_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id');
     }
 
 }

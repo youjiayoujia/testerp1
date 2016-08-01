@@ -17,6 +17,7 @@ use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use Gate;
 
 class ProductController extends Controller
 {
@@ -32,10 +33,20 @@ class ProductController extends Controller
         $this->mainIndex = route('product.index');
         $this->mainTitle = '选款Model';
         $this->viewPath = 'product.';
+        /*if (Gate::denies('check','product_admin,product_staff|show')) {
+            echo "没有权限";exit;
+        }*/
+
+        /*if (Gate::denies('product_admin','product|show')) {
+            echo "没有权限";exit;
+        }*/
     }
 
     public function create()
     {
+        /*if (Gate::denies('check','product_admin,product_staff|add')) {
+            echo "没有权限";exit;
+        }*/
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -57,8 +68,15 @@ class ProductController extends Controller
      */
     public function store()
     {
+        /*if (Gate::denies('check','product_admin,product_staff|add')) {
+            echo "没有权限";exit;
+        }*/
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
+        if(!array_key_exists('modelSet',request()->all())){
+            return redirect(route('product.create'))->with('alert', $this->alert('danger', '请选择model.'));
+        }
+        
         $this->model->createProduct(request()->all(),request()->files);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
@@ -72,6 +90,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
+        /*if (Gate::denies('check','product_admin,product_staff|edit')) {
+            echo "没有权限";exit;
+        }*/
         $variation_value_id_arr = [];
         $features_value_id_arr  = [];
         $features_input = [];
@@ -91,6 +112,15 @@ class ProductController extends Controller
                 $features_value_id_arr[$key] = $arr['pivot']['feature_value_id'];
             }    
         }
+        $logisticsLimit_arr = [];
+        foreach($product->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['pivot']['logistics_limits_id'];              
+        }
+        $wrapLimit_arr = [];
+        foreach($product->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['pivot']['wrap_limits_id'];               
+        }
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $this->catalog->all(),
@@ -103,6 +133,8 @@ class ProductController extends Controller
             'wrapLimit' => $this->wrapLimit->all(),
             'users' => UserModel::all(),
             'logisticsLimit' => $this->logisticsLimit->all(),
+            'wrapLimit_arr' => $wrapLimit_arr,
+            'logisticsLimit_arr' => $logisticsLimit_arr,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -117,6 +149,9 @@ class ProductController extends Controller
      */
     public function update($id)
     {
+        /*if (Gate::denies('check','product_admin,product_staff|edit')) {
+            echo "没有权限";exit;
+        }*/
         request()->flash();
         $this->validate(request(), $this->model->rules('update',$id));
         $productModel = $this->model->find($id);
@@ -133,6 +168,9 @@ class ProductController extends Controller
      */
     public function destroy($id) 
     {
+        /*if (Gate::denies('check','product_admin,product_staff|delete')) {
+            echo "没有权限";exit;
+        }*/
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -207,14 +245,19 @@ class ProductController extends Controller
      */
     public function productMultiEdit()
     {
+        
         $data = request()->all();
         $language = config('product.multi_language');
+        $model = $this->model->find($data['id']);
+        $default = $model->productMultiOption->where("channel_id",ChannelModel::all()->first()->id)->first()->toArray();
+        //print_r($default);exit;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' =>$this->model->find($data['id']),
             'languages' => config('product.multi_language'),
             'channels' => ChannelModel::all(),
             'id' => $data['id'],
+            'default' =>$default,
         ];
 
         return view($this->viewPath . 'language', $response);
@@ -230,6 +273,8 @@ class ProductController extends Controller
     public function productMultiUpdate()
     {
         $data = request()->all();
+        //echo '<pre>';
+        //print_r($data);exit;
         $productModel = $this->model->find($data['product_id']);
         $productModel->updateMulti($data);
 
@@ -249,10 +294,21 @@ class ProductController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $logisticsLimit_arr = [];
+        foreach($model->logisticsLimit->toArray() as $key=>$arr){
+            $logisticsLimit_arr[$key] = $arr['name'];              
+        }
+        
+        $wrapLimit_arr = [];
+        foreach($model->wrapLimit->toArray() as $key=>$arr){
+            $wrapLimit_arr[$key] = $arr['name'];               
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'warehouse' => $this->warehouse->find($model->warehouse_id),
+            'logisticsLimit_arr' => $logisticsLimit_arr,
+            'wrapLimit_arr' => $wrapLimit_arr,
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -299,6 +355,81 @@ class ProductController extends Controller
         return redirect($this->mainIndex);
     }
 
-    
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function productInfo()
+    {
+        $channel_id = request()->input("channel_id");
+        $language = request()->input("language");
+        $product_id = request()->input("product_id");
+        $model = $this->model->find($product_id);
+        $info = $model->productMultiOption->where("channel_id",(int)$channel_id)->first()->toArray();
+        $result['name'] = $info[$language."_name"];
+        $result['description'] = $info[$language."_description"];
+        $result['keywords'] = $info[$language."_keywords"];
 
+        return $result;
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function changePurchaseAdmin($product_id)
+    {
+        $user_name = request()->input('manual_name');
+        $user_id = request()->input('purchase_adminer');
+        $model = $this->model->find($product_id);
+        if($user_id){
+            $model->update(['purchase_adminer'=>$user_id]);
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
+        }else{
+            $userModel = UserModel::where('name',$user_name)->first();
+            if($userModel){
+                $model->update(['purchase_adminer'=>$userModel->id]);
+                return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
+            }else{
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
+            }
+        }
+        
+    }
+
+    /**
+     * 获取供应商信息
+     */
+    public function ajaxSupplierUser()
+    {
+        $product_id = request()->input('product_id');
+        $model = $this->model->find($product_id);
+        $user_array = ProductModel::where('supplier_id',$model->supplier_id)->distinct()->get();
+        $in = [];
+
+        foreach ($user_array as $array) {
+            $in[] = $array->purchase_adminer;
+        }
+        
+        if(request()->ajax()) {
+            $user = trim(request()->input('user'));
+            $buf = UserModel::where('name', 'like', '%'.$user.'%')->whereIn('id',$in)->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
 }

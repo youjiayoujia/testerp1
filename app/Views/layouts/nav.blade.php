@@ -65,12 +65,6 @@
                         </li>
                     @endif
                 @endforeach
-                <li>
-                    <a href="http://crm.com">
-                        <span class="glyphicon glyphicon-user"></span>
-                        CRM
-                    </a>
-                </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">

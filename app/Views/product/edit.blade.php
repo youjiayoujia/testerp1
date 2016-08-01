@@ -30,33 +30,6 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="form-group" style="margin-left:25px">
-                    <label>编辑默认图片:</label><br>
-                    <?php if($product->default_image!=0){ ?>
-                    <img src="{{ asset($product->image->path) }}/{{$product->image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
-                        <br>
-                        <?php }else{ ?>
-                            <div class='upimage' style="float:right"><input name='replace_image_<?php echo $product->default_image ?>' type='file'/></div>
-                        <?php } ?>
-                    <?php $key=0; ?>
-                    @foreach($product->imageAll as $key=>$image)
-                        <?php if($product->default_image==$image->id){continue;}else{ ?>
-                            <label>编辑图片:</label><br>
-                        <?php } ?> 
-                        <img src="{{ asset($image->path) }}/{{$image->name}}" width="120px">
-                        <div class='upimage' style="float:right"><input name='replace_image_<?php echo $image->id ?>' type='file'/></div>
-                        <br>
-                    @endforeach
-                </div>
-                <?php if($key<5){ ?>
-                    <div style="margin-left:25px;margin-bottom:15px">
-                            <label for="color">上传图片：</label>
-                            <?php $j=0;for($i=$key;$i<5;$i++){ ?>
-                                <div class='upimage'><input name='image<?php echo $j ?>' type='file'/></div>
-                            <?php $j++;} ?>
-                    </div>
-                <?php } ?>  
         </div>
         <div class="form-group third">
             <label for='set'>feature属性:</label>
@@ -98,10 +71,8 @@
         </div>
         <div class="form-group col-md-3">
             <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>{{$supplier->name}}</option>
-                @endforeach
+            <select id="supplier_id" class="form-control supplier" name="supplier_id">
+               <option value="{{$product->supplier->id}}">{{$product->supplier->name}}</option>
             </select>
         </div> 
         <div class="form-group col-md-3">
@@ -112,11 +83,8 @@
 
     <div class='row'>  
         <div class="form-group col-md-3"><label for="color">辅供应商</label>
-            <select  class="form-control" name="second_supplier_id">
-                <option value="0"></option>
-                @foreach($suppliers as $supplier)
-                    <option value="{{ $supplier->id}}" {{ $supplier->id == $product->second_supplier_id ? 'selected' : '' }} >{{$supplier->name}}</option>
-                @endforeach
+            <select id="second_supplier_id" class="form-control supplier" name="second_supplier_id">
+               <option value="{{$product->second_supplier?$product->second_supplier->id:0}}">{{$product->second_supplier?$product->second_supplier->name:''}}</option>
             </select>
         </div>
         <div class="form-group col-md-3">
@@ -173,11 +141,9 @@
     </div>
     <div class="row">
         <div class="form-group col-md-3">
-            <label for="size">主供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select id="supplier_id" class="form-control" name="purchase_adminer">
-                @foreach($users as $user)
-                    <option value="{{ $user->id}}" {{ $user->id == $product->purchase_adminer ? 'selected' : '' }}>{{$user->name}}</option>
-                @endforeach
+            <label for="size">采购负责人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <select id="purchase_adminer" class="form-control purchase_adminer" name="purchase_adminer">
+               <option value="{{$product->purchaseAdminer?$product->purchase_adminer:0}}">{{$product->purchaseAdminer?$product->purchaseAdminer->name:''}}</option>
             </select>
         </div> 
         <div class="form-group col-md-3">
@@ -193,20 +159,21 @@
             <input class="form-control" id="url3" placeholder="url" name='url3' value="{{ old('url3') ?  old('url3') : $product->url3 }}">
         </div>
     </div>
+
     <div class='row'>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">物流限制</label>
             @foreach($logisticsLimit as $carriage_limit)
                     <label>
-                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, explode(',',$product->carriage_limit))? 'checked' : '' }} >{{$carriage_limit->name}}
+                        <input type='checkbox' name='carriage_limit_arr[]' value='{{$carriage_limit->id}}' {{ in_array($carriage_limit->id, $logisticsLimit_arr)? 'checked' : '' }} >{{$carriage_limit->name}}
                     </label>
             @endforeach
         </div>
-        <div class="form-group col-md-12" style="padding-top:26px">
+        <div class="form-group col-md-12" style="">
             <label for="color">包装限制</label>
             @foreach($wrapLimit as $wrap_limit)
                     <label>
-                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, explode(',',$product->package_limit))? 'checked' : '' }} >{{$wrap_limit->name}}
+                        <input type='checkbox' name='package_limit_arr[]' value='{{$wrap_limit->id}}' {{ in_array($wrap_limit->id, $wrapLimit_arr)? 'checked' : '' }} >{{$wrap_limit->name}}
                     </label>
             @endforeach
         </div>
@@ -228,4 +195,61 @@
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') ?  old('remark') : $product->remark }}">
         </div>
     </div>
+
+    <div class="row">    
+        <div class="form-group col-md-3">
+            <label for="color">申报中文</label>
+            <input class="form-control" id="declared_cn" placeholder="申报中文" name='declared_cn' value="{{ old('declared_cn') ?  old('declared_cn') : $product->declared_cn }}">
+        </div>
+        
+        <div class="form-group col-md-3">
+            <label for="color">申报英文</label>
+            <input class="form-control" id="declared_en" placeholder="申报中文" name='declared_en' value="{{ old('declared_en') ?  old('declared_en') : $product->declared_en }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">申报价格</label>
+            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') ?  old('declared_value') : $product->declared_value }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="color">配件</label>
+            <input class="form-control" id="parts" placeholder="配件" name='parts' value="{{ old('parts') ?  old('parts') : $product->parts }}">
+        </div>
+    </div>
+@stop
+
+@section('pageJs')
+    <script type="text/javascript">
+        $('.supplier').select2({
+                ajax: {
+                    url: "{{ route('ajaxSupplier') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        supplier:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+            });
+
+            $('.purchase_adminer').select2({
+                ajax: {
+                    url: "{{ route('ajaxUser') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                      return {
+                        user:params.term,
+                      };
+                    },
+                    results: function(data, page) {
+                        
+                    }
+                },
+        });
+
+    </script>
 @stop

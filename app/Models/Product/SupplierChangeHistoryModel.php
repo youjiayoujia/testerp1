@@ -19,6 +19,8 @@ class SupplierChangeHistoryModel extends BaseModel
         'update' => [   
         ]
     ];
+    public $searchFields = [];
+
 
     public function supplierName()
     {

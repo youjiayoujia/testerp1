@@ -21,7 +21,7 @@
 
     <div class="btn-group" role="group">
         <div class="form-group" style="margin-bottom:0px">
-            <select id="ms" multiple="multiple" style="width:200px" name="select_channel">
+            <select id="ms" class="js-example-basic-multiple" multiple="multiple" name="select_channel" style="width:200px">
                 <option value="1" class='aa'>Amazon</option>
                 <option value="2" class='aa'>EBay</option>
                 <option value="3" class='aa'>速卖通</option>
@@ -65,18 +65,20 @@
             <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
         </ul>
     </div>
-
+    {{--@can('check','product_admin,product_staff|add')--}}
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
             <i class="glyphicon glyphicon-plus"></i> 新增
         </a>
     </div>
+    {{--@endcan--}}
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th>ID</th>
     <th class="sort" data-field="model">MODEL</th>
     <th>图片</th>
+    <th>产品名称</th>
     <th>分类</th>
     <th>状态</th>
     <th>选中shop</th>
@@ -101,6 +103,7 @@
             <td>{{ $product->id }}</td>
             <td>{{ $product->model }}</td>
             <td><img src="{{ asset($product->dimage) }}" width="100px"></td>
+            <td>{{ $product->c_name }}<br>分类：{{ $product->catalog?$product->catalog->all_name:'' }}<br>开发时间：{{ $product->created_at }}<br></td>
             <td>{{ $product->catalog?$product->catalog->all_name:'' }}</td>
             <td><?php if ($product->edit_status == "") echo "新品上传";if ($product->edit_status == "picked") echo "被选中";if ($product->edit_status == "canceled") echo "取消"; ?></td>
             <td><?php if ($product->amazonProduct) echo "amazon,";if ($product->ebayProduct) echo "ebay,";if ($product->aliexpressProduct) echo "aliexpress,";if ($product->b2cProduct) echo "B2C,"; ?></td>
@@ -141,33 +144,7 @@
             <?php
             break;
             } ?>
-            <?php switch ($product->examine_status) {
-            case 'pass':
-            ?>
-            <td>通过</td>
-            <?php
-            break;
-
-            case 'notpass':
-            ?>
-            <td class="notremark">未通过</td>
-
-            <?php
-            break;
-
-            case '':
-            ?>
-            <td>未审核</td>
-            <?php
-            break;
-
-            case 'revocation':
-            ?>
-            <td>撤销</td>
-            <?php
-            break;
-
-            } ?>
+            <td>{{config('product.examineStatus')[$product->examine_status?$product->examine_status:'pending']}}</td>
             <td>{{ $product->name }}</td>
             <td>{{ $product->c_name }}</td>
             <td>{{ $product->supplier?$product->supplier->name:'无' }}</td>
@@ -176,33 +153,76 @@
                 <a href="{{ route('product.show', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                {{--@can('check','product_admin,product_staff|edit')--}}
                 <a href="{{ route('product.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
+                {{--@endcan--}}
                 <a href="{{ route('productMultiEdit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 小语言
                 </a>
                 <?php if(($product->edit_status == 'picked' || $product->edit_status == 'data_edited' || $product->edit_status == "image_edited" || $product->edit_status == "image_unedited") && $product->examine_status != 'pass'){ ?>
-                <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                {{--<a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
-                </a>
-                <?php } if(($product->edit_status == "data_edited" || $product->edit_status == "image_edited") && $product->examine_status != 'pass'){ ?>
-                <a href="{{ route('productEditImage', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                </a>--}}
+
+                <?php } ?>
+                <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="查询物流单号" class="btn btn-info btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-zoom-in"></span>
+
+                <a href="{{ route('createImage', ['model'=>$product->model]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
-                <?php } ?>
-                <?php if($product->edit_status == "image_unedited" || $product->edit_status == "image_edited"){ ?>
+                <?php //if($product->edit_status == "image_unedited" || $product->edit_status == "image_edited"){ ?>
                 <a href="{{ route('ExamineProduct.edit', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 查看并审核
                 </a>
-                <?php } ?>
+                <?php //} ?>
+{{--@can('check','product_admin,product_staff|delete')--}}
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $product->id }}"
                    data-url="{{ route('product.destroy', ['id' => $product->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+{{--@endcan--}}
             </td>
         </tr>
+
+        <!-- 模态框（Modal） -->
+        <form action="/product/changePurchaseAdmin/{{$product->id}}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="switch_purchase_{{$product->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           转移采购负责人
+                        </h4>
+                     </div>
+                     
+                     <div>当前采购负责人:{{$product->purchaseAdminer?$product->purchaseAdminer->name:'无负责人'}}</div>
+                     <div>转移至：</div>
+                     <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$product->id}}"></select></div>
+                     或者：
+                     <input type="text" value='' name='manual_name' id='manual_name'>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框结束（Modal） -->
     @endforeach
 @stop
 @section('childJs')
@@ -210,7 +230,8 @@
     <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script type="text/javascript">
 
-        $('#ms').multipleSelect();
+        //$('#ms').multipleSelect();
+        $(".js-example-basic-multiple").select2();
         //批量选中
         $('.choseShop').click(function () {
             var channel_ids = "";
@@ -240,6 +261,25 @@
                 })
             }
 
+        });
+        
+        /*ajax调取采购负责人*/
+        $('.purchase_adminer').select2({
+            //alert(1);return;
+            ajax: {
+                url: "{{ route('ajaxSupplierUser') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    user:params.term,
+                    product_id: $(this).attr('id'),
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
         });
 
         $('.batchedit').click(function () {

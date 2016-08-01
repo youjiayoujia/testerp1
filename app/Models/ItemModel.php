@@ -15,7 +15,7 @@ class ItemModel extends BaseModel
 
     protected $stock;
 
-    public $searchFields = ['sku'];
+    public $searchFields = ['sku' =>'sku'];
 
     public $rules = [
         'update' => []
@@ -68,9 +68,19 @@ class ItemModel extends BaseModel
         return $this->belongsTo('App\Models\Product\SupplierModel', 'supplier_id');
     }
 
+    public function secondSupplier()
+    {
+        return $this->belongsTo('App\Models\Product\SupplierModel', 'second_supplier_id');
+    }
+
     public function warehouse()
     {
         return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id');
+    }
+
+    public function warehousePosition()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel','warehouse_position');
     }
 
     public function purchase()
@@ -177,10 +187,12 @@ class ItemModel extends BaseModel
             if ($flag && $this->cost && ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3)) {
                 throw new Exception('入库单价不在原单价0.6-1.3范围内');
             }
-            $this->update([
-                'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
-            ]);
-            return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+            if($this->all_quantity + $quantity) {
+                $this->update([
+                    'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
+                ]);
+                return $stock->in($quantity, $amount, $type, $relation_id, $remark);
+            }
         }
         return false;
     }
@@ -372,7 +384,7 @@ class ItemModel extends BaseModel
     {
         $items = $this->all();
         $requireModel = new RequireModel();
-        $array = RequireModel::groupBy('item_id')
+        /*$array = RequireModel::groupBy('item_id')
             ->selectRaw('item_id, sum(quantity) as sum')
             ->where('is_require', 1)
             ->get()
@@ -380,7 +392,7 @@ class ItemModel extends BaseModel
 
         foreach ($array as $require_key => $require_val) {
             $requireArray[$require_val['item_id']] = $require_val['sum'];
-        }
+        }*/
 
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
@@ -464,7 +476,7 @@ class ItemModel extends BaseModel
                     $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
                 }
             }
-            $data['need_purchase_num'] = $needPurchaseNum;
+            $data['need_purchase_num'] = ceil($needPurchaseNum);
             //退款订单数
             $refund_num = $item->orderItem->where('is_refund', '1')->count();
             $all_order_num = 0;
@@ -483,19 +495,17 @@ class ItemModel extends BaseModel
                 }
 
             }
-            $refund_rate = $all_order_num ? $refund_num / $all_order_num : '100';
+            $refund_rate = $all_order_num ? $refund_num / $all_order_num : '0';
             //退款率
             $data['refund_rate'] = $refund_rate;
             //平均利润率
             $data['profit'] = $total_profit_num ? $total_profit_rate / $total_profit_num : '0';
 
-            $data['status'] = $item->status;
-            $data['require_create'] = 0;
+            $data['status'] = $item->status?$item->status:'saleOutStopping';
+            $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
-
-            if (array_key_exists($data['item_id'], $requireArray)) {
-                $data['require_create'] = 1;
-            }
+            $data['user_id'] = $item->product->purchase_adminer;
+            
             if ($thisModel) {
                 $thisModel->update($data);
             } else {
@@ -503,4 +513,6 @@ class ItemModel extends BaseModel
             }
         }
     }
+
+    
 }

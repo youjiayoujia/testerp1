@@ -14,7 +14,7 @@
             <select name="type_id" class="form-control" id="type_id">
                 @foreach($logisticses as $logistics)
                     <option value="{{$logistics->id}}" {{ $model->type_id == $logistics->id ? 'selected' : ''}}>
-                        {{$logistics->type}}
+                        {{$logistics->name}}
                     </option>
                 @endforeach
             </select>

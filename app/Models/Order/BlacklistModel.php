@@ -18,7 +18,7 @@ class BlacklistModel extends BaseModel
 {
     protected $table = 'order_blacklists';
 
-    public $searchFields = ['name', 'email', 'zipcode'];
+    public $searchFields = ['ordernum' => '订单号', 'name' => '姓名', 'email' => '邮箱', 'zipcode' => '邮编'];
 
     protected $fillable = [
         'channel_id',
@@ -57,9 +57,12 @@ class BlacklistModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        foreach(ChannelModel::all() as $channel) {
+            $arr[$channel->name] = $channel->name;
+        }
         return [
             'relatedSearchFields' => [
-                'channel' => ['name']
+                
             ],
             'filterFields' => [
                 'ordernum',
@@ -74,7 +77,7 @@ class BlacklistModel extends BaseModel
                 'time' => ['created_at']
             ],
             'selectRelatedSearchs' => [
-
+                'channel' => ['name' => $arr],
             ]
         ];
     }
@@ -175,7 +178,7 @@ class BlacklistModel extends BaseModel
             $blacklist['refund_order'] = iconv('gb2312','utf-8',$blacklist['refund_order']);
             $blacklist['refund_rate'] = iconv('gb2312','utf-8',$blacklist['refund_rate']);
             $blacklist['color'] = iconv('gb2312','utf-8','white');
-            $channel_id = ChannelModel::where('name', 'Wish')->first()->id;
+            $channel_id = ChannelModel::where('driver', 'wish')->first()->id;
             $orders1 = OrderModel::where('email', $blacklist['email'])
                 ->where('channel_id', '!=', $channel_id)
                 ->get();

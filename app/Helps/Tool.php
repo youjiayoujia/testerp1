@@ -1,8 +1,8 @@
 <?php
 namespace App\Helps;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use DNS1D;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Tool
 {
@@ -127,9 +127,24 @@ class Tool
     }
 
 
+
+
     // 1 处理捆绑的情况   A+B
     // 2 去除前后缀    $type = 2 的时候 sku前缀是  S*001KU[TEST]  这样存在的
     // 3 处理SKU（10）  处理打包的情况
+    /*
+     * 返回数据格式:
+     * [
+     *      'skuNum'=>'', //sku 总数量
+     *      [
+     *          'erpSku'=>'', //erpsku
+     *          'qty'=>'',  //数量
+     *      ]
+     *
+     * ]
+     *
+     *
+     */
     public function filter_sku($channel_sku, $type = 1)
     {
 
@@ -153,7 +168,15 @@ class Tool
                 $i = count($tmpErpSku) - 1;
                 $newSku = $tmpErpSku[$i];
             }
+            $newSku = explode('#', $newSku);
+            $newSku = $newSku[0];
 
+
+            if (strpos($newSku, 'FBA') !== false) {
+
+                $newSku =explode('FBA',$newSku);
+                $newSku =$newSku[1];
+            }
 
             $qty = 1;
             if (strpos($newSku, '(') !== false) {
@@ -175,4 +198,45 @@ class Tool
         return $returnSku;
 
     }
+
+    public function base64Decode($content)
+    {
+        $content = strtr($content, '-_', '+/');
+        return base64_decode($content);
+    }
+
+    public function base64Encode($content)
+    {
+        //return $content;
+        return rtrim(strtr(base64_encode($content), '+/', '-_'), '=');
+    }
+
+    /**
+     * 生成随机字符串
+     *
+     * @access public
+     * @param integer $length 字符串长度
+     * @param string $specialChars 是否有特殊字符
+     * @return string
+     */
+    public function randString($length, $specialChars = false)
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        if ($specialChars) {
+            $chars .= '!@#$%^&*()';
+        }
+
+        $result = '';
+        $max = strlen($chars) - 1;
+        for ($i = 0; $i < $length; $i++) {
+            $result .= $chars[rand(0, $max)];
+        }
+        return $result;
+    }
+
+    public function getPercent($num)
+    {
+        return $num . '%';
+    }
+
 }

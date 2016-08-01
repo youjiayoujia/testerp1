@@ -25,7 +25,7 @@ class AccountModel extends BaseModel
      */
     protected $guarded = [];
 
-    public $searchFields = ['account', 'alias'];
+    public $searchFields = ['account' => '渠道帐号', 'alias' => '帐号别名'];
 
     protected $rules = [
         'create' => [
@@ -90,7 +90,7 @@ class AccountModel extends BaseModel
         $status = [];
         switch ($this->channel->driver) {
             case 'amazon':
-                $status = ['Unshipped', 'PartiallyShipped'];
+                $status = ['Shipped', 'Unshipped', 'PartiallyShipped'];
                 break;
             case 'aliexpress':
                 $status = ['WAIT_SELLER_SEND_GOODS'];
@@ -122,6 +122,10 @@ class AccountModel extends BaseModel
                     'SellerId' => $this->amazon_seller_id,
                     'AWSAccessKeyId' => $this->amazon_accesskey_id,
                     'AWS_SECRET_ACCESS_KEY' => $this->amazon_accesskey_secret,
+                    'GmailSecret' => $this->message_secret,
+                    'GmailToken' => $this->message_token,
+                    'account_id' => $this->id,
+                    'account_email' => $this->account,
                 ];
                 break;
             case 'aliexpress':
@@ -180,5 +184,11 @@ class AccountModel extends BaseModel
                 break;
         }
         return $config;
+    }
+
+    public function replies()
+    {
+        return $this->hasManyThrough('App\Models\Message\ReplyModel', 'App\Models\Message\MessageModel',
+            'account_id', 'message_id');
     }
 }

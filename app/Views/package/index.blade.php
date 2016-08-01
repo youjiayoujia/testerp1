@@ -6,6 +6,7 @@
     <th>仓库</th>
     <th>状态</th>
     <th>类型</th>
+    <th>重量(kg)</th>
     <th>物流方式</th>
     <th>物流单号</th>
     <th class="sort" data-field="logistic_assigned_at">分配物流时间</th>
@@ -27,7 +28,8 @@
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>
             <td>{{ $package->status_name }}</td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
-            <td>{{ $package->logistics ? $package->logistics->short_code : '' }}</td>
+            <td>{{ $package->weight }}</td>
+            <td>{{ $package->logistics ? $package->logistics->code : '' }}</td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->logistics_assigned_at }}</td>
             <td>{{ $package->logistics_order_at }}</td>
@@ -41,14 +43,14 @@
                 <a href="{{ route('package.show', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
+<!--                 <a href="{{ route('package.edit', ['id'=>$package->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
-                @if($package->status == 'ASSIGNFAILED')
+                </a> -->
+                <!-- @if($package->status == 'ASSIGNFAILED')
                 <a href="{{ route('package.allocateLogistics', ['id'=>$package->id]) }}" class="btn btn-info btn-xs">
                     分配物流方式
                 </a>
-                @endif
+                @endif -->
                 @if($package->status == 'PACKED')
                     <a href="javascript:" class="btn btn-warning btn-xs send" data-id="{{ $package->id }}">
                         <span class="glyphicon glyphicon-pencil"></span> 发货

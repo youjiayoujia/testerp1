@@ -9,35 +9,34 @@
 namespace App\Http\Controllers;
 
 
+
+
+
+
+
 use App\Models\ChannelModel;
 use Test;
-
 use App\Models\Purchase\PurchaseOrderModel;
-
-
 use Tool;
 use Channel;
+use Logistics;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
-
 use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\ChannelNameModel;
-
 use App\Models\Publish\Wish\WishPublishProductModel;
 use App\Models\Publish\Wish\WishPublishProductDetailModel;
 use App\Modules\Channel\ChannelModule;
 use App\Jobs\Job;
 use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
-
 use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
 use App\Models\CatalogModel;
-
 use DB;
 
 class TestController extends Controller
@@ -70,80 +69,8 @@ class TestController extends Controller
 
     public function index()
     {
-        $data = CatalogModel::all()->channels;
-
-        dd($data);
+        $logistics = Logistics::driver('chukouyi', [])->getTracking([]);
         exit;
-        /*        $dataaaa = $reply->message->account->toArray();
-                var_dump($dataaaa);exit;*/
-
-        /*        $job = new SendMessages($reply);
-                $job = $job->onQueue('SendMessages');
-                $this->dispatch($job);
-
-                exit;*/
-
-
-        $package = PackageModel::find(request()->input('id'));
-        $package->assignLogistics();
-        $job = new PlaceLogistics($package);
-        $job = $job->onQueue('placeLogistics');
-        $this->dispatch($job);
-        exit;
-        $orderModel = new OrderModel;
-        $start = microtime(true);
-        $account = AccountModel::find(request()->input('id'));
-        if ($account) {
-            $i = 1;
-            $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
-            $endDate = date("Y-m-d H:i:s", time() - 300);
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $nextToken = '';
-            do {
-                $start = microtime(true);
-                $total = 0;
-                $commandLog = CommandLog::create([
-                    'relation_id' => $account->id,
-                    'signature' => __CLASS__,
-                    'description' => 'get orders form ' . $account->channel->name . ':' . $account->alias . '[' . $account->id . '] - ' . $i . '.',
-                    'lasting' => 0,
-                    'total' => 0,
-                    'result' => 'init',
-                    'remark' => 'init',
-                ]);
-                $orderList = $channel->listOrders(
-                    $startDate, //开始日期
-                    $endDate, //截止日期
-                    $account->api_status, //订单状态
-                    $account->sync_pages, //每页数量
-                    $nextToken //下一页TOKEN
-                );
-                foreach ($orderList['orders'] as $order) {
-                    $order['channel_id'] = $account->channel->id;
-                    $order['channel_account_id'] = $account->id;
-                    $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
-                    $order['operator'] = $account->operator ? $account->operator->id : 0;
-                    $job = new InOrders($order);
-                    $job = $job->onQueue('inOrders');
-                    $this->dispatch($job);
-                    $total++;
-                }
-                $nextToken = $orderList['nextToken'];
-                //todo::Adapter->error()
-                $result['status'] = 'success';
-                $result['remark'] = 'Success.';
-                $end = microtime(true);
-                $lasting = round($end - $start, 3);
-                $commandLog->update([
-                    'data' => serialize($orderList['orders']),
-                    'lasting' => $lasting,
-                    'total' => $total,
-                    'result' => $result['status'],
-                    'remark' => $result['remark'],
-                ]);
-                echo $account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页, 耗时 ' . $lasting . ' 秒' . '<br>';
-            } while ($nextToken);
-        }
     }
 
 
@@ -392,156 +319,161 @@ class TestController extends Controller
         $result = $channel->getEbaySite();
     }
 
-    public function testReturnTrack(){
+    public function testReturnTrack()
+    {
         $driver = request()->get('driver');
         $account_id = request()->get('account_id');
         $orderModel = new OrderModel;
-        $channel_id  = ChannelModel::where('driver',$driver)->first()->id;
+        $channel_id = ChannelModel::where('driver', $driver)->first()->id;
 
-        if($driver=='amazon'){
+        if ($driver == 'amazon') {
 
-        }elseif($driver=='aliexpress'){
-            $packages = PackageModel::where('is_mark', 0 )->where('order_id',2650)->whereHas('order', function ($query)  {
-                $query = $query->where('orders.create_time','>=', '2016-07-03' );
-            })->get();
-            foreach($packages as $package) {
+        } elseif ($driver == 'aliexpress') {
+            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2650)->whereHas('order',
+                function ($query) {
+                    $query = $query->where('orders.create_time', '>=', '2016-07-03');
+                })->get();
+            foreach ($packages as $package) {
                 $package_items = $package->items;
                 $remark = '';
                 $is_success = true;
-                $item_array =[];
+                $item_array = [];
 
                 //先判断订单状态
-                $order  = OrderModel::where('id',$package->order_id)->first();
+                $order = OrderModel::where('id', $package->order_id)->first();
                 $account = AccountModel::findOrFail($order->channel_account_id);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $order_status = $channel->getOrder($order->channel_ordernum);
-                $order_status['orderStatus']='SELLER_PART_SEND_GOODS';
-                if(isset($order_status['orderStatus'])&& $order_status['orderStatus']== "WAIT_BUYER_ACCEPT_GOODS"){
+                $order_status['orderStatus'] = 'SELLER_PART_SEND_GOODS';
+                if (isset($order_status['orderStatus']) && $order_status['orderStatus'] == "WAIT_BUYER_ACCEPT_GOODS") {
                     //已经处于买家收货状态， 不需标记发货
-                    $result['status'] =true;
-                    $result['info'] ='平台状态为等待买家收货';
+                    $result['status'] = true;
+                    $result['info'] = '平台状态为等待买家收货';
 
-                }elseif(isset($order_status['orderStatus'])&&($order_status['orderStatus']== "WAIT_SELLER_SEND_GOODS" || $order_status['orderStatus']== "SELLER_PART_SEND_GOODS")){
+                } elseif (isset($order_status['orderStatus']) && ($order_status['orderStatus'] == "WAIT_SELLER_SEND_GOODS" || $order_status['orderStatus'] == "SELLER_PART_SEND_GOODS")) {
 
-                    foreach($package_items as $item){
+                    foreach ($package_items as $item) {
                         $item_array[$item->order_item_id] = $item->order_item_id;
                     }
                     $order_item_count = $order->items->count();
 
-                    $tracking_info =[
-                        'serviceName'=>'test',
-                        'logisticsNo'=>$package->tracking_no,
-                        'description'=>'',
-                        'trackingWebsite'=>'',
+                    $tracking_info = [
+                        'serviceName' => 'test',
+                        'logisticsNo' => $package->tracking_no,
+                        'description' => '',
+                        'trackingWebsite' => '',
                     ];
-                    if(count($item_array) ==$order_item_count ){ //包裹item 的sku种类数目==订单item的sku种类数目  意味着没有拆分订单
-                        $tracking_info['sendType']='all';
-                    }else{ //数量不等
-                        if($order_status['orderStatus']== "WAIT_SELLER_SEND_GOODS"){ //说明没有进行标记发货。 sendType = part
-                            $tracking_info['sendType']='part';
-                        }else{ //这个已经部分发货了。 但是要确定 这次还是部分发货  sendType = part  或者 是最后一次发货 sendType = all 那么查找这个订单 已经标记发货了的包裹 sku种类相加
+                    if (count($item_array) == $order_item_count) { //包裹item 的sku种类数目==订单item的sku种类数目  意味着没有拆分订单
+                        $tracking_info['sendType'] = 'all';
+                    } else { //数量不等
+                        if ($order_status['orderStatus'] == "WAIT_SELLER_SEND_GOODS") { //说明没有进行标记发货。 sendType = part
+                            $tracking_info['sendType'] = 'part';
+                        } else { //这个已经部分发货了。 但是要确定 这次还是部分发货  sendType = part  或者 是最后一次发货 sendType = all 那么查找这个订单 已经标记发货了的包裹 sku种类相加
                             $is_mark_item = [];
-                            $is_mark_packages =     PackageModel::where('is_mark', 1 )->where('order_id',$package->order_id)->get();
-                            foreach($is_mark_packages as $is_mark_package ){
-                                foreach($is_mark_package->items as $item){
+                            $is_mark_packages = PackageModel::where('is_mark', 1)->where('order_id',
+                                $package->order_id)->get();
+                            foreach ($is_mark_packages as $is_mark_package) {
+                                foreach ($is_mark_package->items as $item) {
                                     $is_mark_item[$item->order_item_id] = $item->order_item_id;
                                 }
                             }
-                            if(count($is_mark_item)+count($item_array)==$order_item_count){ //已经标记数量+本次标记数量 = 总数量 sendType = all
-                                $tracking_info['sendType']='all';
-                            }else{
-                                $tracking_info['sendType']='part';
+                            if (count($is_mark_item) + count($item_array) == $order_item_count) { //已经标记数量+本次标记数量 = 总数量 sendType = all
+                                $tracking_info['sendType'] = 'all';
+                            } else {
+                                $tracking_info['sendType'] = 'part';
                             }
                         }
                     }
                     $tracking_info['outRef'] = $order->channel_ordernum;
                     $result = $channel->returnTrack($tracking_info);
 
-                }else{
+                } else {
 
-                    $result['status'] =false;
-                    $result['info'] ='未知错误'.var_export($order_status,true);
+                    $result['status'] = false;
+                    $result['info'] = '未知错误' . var_export($order_status, true);
 
                 }
 
 
-                if($result['status']){
-                    PackageModel::where('id',$package->id)->update(array(
-                        'is_mark' =>1,
-                        'is_upload' =>1,
+                if ($result['status']) {
+                    PackageModel::where('id', $package->id)->update(array(
+                        'is_mark' => 1,
+                        'is_upload' => 1,
                     ));
                 }
 
 
             }
-        }elseif($driver=='wish'){
-            $packages = PackageModel::where('is_mark', 0 )->whereHas('order', function ($query)  {
-                $query = $query->where('orders.create_time','>=', '2016-07-03' );
+        } elseif ($driver == 'wish') {
+            $packages = PackageModel::where('is_mark', 0)->whereHas('order', function ($query) {
+                $query = $query->where('orders.create_time', '>=', '2016-07-03');
             })->get();
-            foreach($packages as $package){
+            foreach ($packages as $package) {
                 $package_items = $package->items;
-                $remark ='';
+                $remark = '';
                 $is_success = true;
-                foreach($package_items as $item){
-                    $channel_order_id = ItemModel::where('id',$item->order_item_id)->first()->channel_order_id;
-                  $tracking_info =[
-                      'id' => $channel_order_id,
-                      'tracking_number' =>$package->tracking_no,
-                      'tracking_provider' =>'testtt',
-                      'ship_note' =>'',
-                  ];
-                    $account = AccountModel::findOrFail($package->channel_account_id);
-                    $channel = Channel::driver($account->channel->driver, $account->api_config);
-                    $result = $channel->returnTrack($tracking_info);
-                    if($result['status']){
-                        $remark =$remark.$channel_order_id.$result['info'].' ';
-                    }else{
-                        $is_success = false;
-                        $remark =$remark.$channel_order_id.$result['info'].' ';
-                    }
-                }
-                if($is_success){
-                    PackageModel::where('id',$package->id)->update(array(
-                        'is_mark' =>1
-                    ));
-                }
-                //var_dump($package);
-            }
-        }elseif($driver=='ebay'){
-            $packages = PackageModel::where(['channel_id'=>$channel_id,'is_mark'=>'0'])->where('tracking_no','!=','' )->whereHas('order', function ($query)  {
-                $query = $query->where('orders.created_at','>=', '2016-07-03' );
-            })->get();
-            foreach($packages as $package) {
-                $package_items = $package->items;
-                $remark ='';
-                $is_success = true;
-                $logistics_channel_name = ChannelNameModel::where('channel_id',$package->channel_id)->whereHas('logistics', function ($query) use($package)  {
-                    $query = $query->where('logistics_id',$package->logistics_id);
-                })->first()->name;
-
-                foreach($package_items as $item){
-                    $order_item = ItemModel::where('id',$item->order_item_id)->first();
-                    $tracking_info =[
-                    'IsUploadTrackingNumber' =>true, //true or false
-                    'ShipmentTrackingNumber'=>$package->tracking_no, //追踪号
-                    'ShippingCarrierUsed'=>$logistics_channel_name,//承运商
-                    'ShippedTime' =>date('Y-m-d\TH:i:s\Z',time()), //发货时间 date('Y-m-d\TH:i:s\Z')
-                    'ItemID' =>$order_item->orders_item_number, //商品id
-                    'TransactionID' =>!empty($order_item->transaction_id)?$order_item->transaction_id:0
+                foreach ($package_items as $item) {
+                    $channel_order_id = ItemModel::where('id', $item->order_item_id)->first()->channel_order_id;
+                    $tracking_info = [
+                        'id' => $channel_order_id,
+                        'tracking_number' => $package->tracking_no,
+                        'tracking_provider' => 'testtt',
+                        'ship_note' => '',
                     ];
                     $account = AccountModel::findOrFail($package->channel_account_id);
                     $channel = Channel::driver($account->channel->driver, $account->api_config);
                     $result = $channel->returnTrack($tracking_info);
-                    if($result['status']){
-                        $remark =$remark.$result['info'].' ';
-                    }else{
+                    if ($result['status']) {
+                        $remark = $remark . $channel_order_id . $result['info'] . ' ';
+                    } else {
                         $is_success = false;
-                        $remark =$remark.$result['info'].' ';
+                        $remark = $remark . $channel_order_id . $result['info'] . ' ';
                     }
                 }
-                if($is_success){
-                    PackageModel::where('id',$package->id)->update(array(
-                        'is_mark' =>1
+                if ($is_success) {
+                    PackageModel::where('id', $package->id)->update(array(
+                        'is_mark' => 1
+                    ));
+                }
+                //var_dump($package);
+            }
+        } elseif ($driver == 'ebay') {
+            $packages = PackageModel::where(['channel_id' => $channel_id, 'is_mark' => '0'])->where('tracking_no', '!=',
+                '')->whereHas('order', function ($query) {
+                $query = $query->where('orders.created_at', '>=', '2016-07-03');
+            })->get();
+            foreach ($packages as $package) {
+                $package_items = $package->items;
+                $remark = '';
+                $is_success = true;
+                $logistics_channel_name = ChannelNameModel::where('channel_id',
+                    $package->channel_id)->whereHas('logistics', function ($query) use ($package) {
+                    $query = $query->where('logistics_id', $package->logistics_id);
+                })->first()->name;
+
+                foreach ($package_items as $item) {
+                    $order_item = ItemModel::where('id', $item->order_item_id)->first();
+                    $tracking_info = [
+                        'IsUploadTrackingNumber' => true, //true or false
+                        'ShipmentTrackingNumber' => $package->tracking_no, //追踪号
+                        'ShippingCarrierUsed' => $logistics_channel_name,//承运商
+                        'ShippedTime' => date('Y-m-d\TH:i:s\Z', time()), //发货时间 date('Y-m-d\TH:i:s\Z')
+                        'ItemID' => $order_item->orders_item_number, //商品id
+                        'TransactionID' => !empty($order_item->transaction_id) ? $order_item->transaction_id : 0
+                    ];
+                    $account = AccountModel::findOrFail($package->channel_account_id);
+                    $channel = Channel::driver($account->channel->driver, $account->api_config);
+                    $result = $channel->returnTrack($tracking_info);
+                    if ($result['status']) {
+                        $remark = $remark . $result['info'] . ' ';
+                    } else {
+                        $is_success = false;
+                        $remark = $remark . $result['info'] . ' ';
+                    }
+                }
+                if ($is_success) {
+                    PackageModel::where('id', $package->id)->update(array(
+                        'is_mark' => 1
                     ));
                 }
 
@@ -550,13 +482,14 @@ class TestController extends Controller
             exit;
 
 
-        }elseif($driver=='lazada'){
+        } elseif ($driver == 'lazada') {
 
-            $packages = PackageModel::where('is_mark', 0 )->where('order_id',2685)->whereHas('order', function ($query)  {
-                $query = $query->where('orders.create_time','>=', '2016-07-03' );
-            })->get();
+            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2685)->whereHas('order',
+                function ($query) {
+                    $query = $query->where('orders.create_time', '>=', '2016-07-03');
+                })->get();
 
-            foreach($packages as $package) {
+            foreach ($packages as $package) {
                 $package_items = $package->items;
                 $order = OrderModel::where('id', $package->order_id)->first();
                 $remark = '';
@@ -564,81 +497,80 @@ class TestController extends Controller
                 $OrderItemIds = [];
                 foreach ($package_items as $item) {
                     $temp = ItemModel::where('id', $item->order_item_id)->first()->transaction_id;
-                    $temp =explode(',',$temp);
-                    foreach($temp as $v){
-                        $v_temp = explode('@',$v);
+                    $temp = explode(',', $temp);
+                    foreach ($temp as $v) {
+                        $v_temp = explode('@', $v);
                         $OrderItemIds[] = $v_temp[0];
                     }
 
                 }
                 $OrderItemIds = array_unique($OrderItemIds);
 
-                $tracking_info   = [];
+                $tracking_info = [];
                 $tracking_info['TrackingNumber'] = '';
-                $tracking_info['ShippingProvider']    = 'AS-Poslaju';
-                $tracking_info['OrderItemIds']    = implode(',',$OrderItemIds);
+                $tracking_info['ShippingProvider'] = 'AS-Poslaju';
+                $tracking_info['OrderItemIds'] = implode(',', $OrderItemIds);
             }
             $account = AccountModel::findOrFail($package->channel_account_id);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             $result = $channel->returnTrack($tracking_info);
 
 
-        }elseif($driver=='cdiscount'){
+        } elseif ($driver == 'cdiscount') {
 
-            $packages = PackageModel::where('is_mark', 0 )->where('order_id',2633)->whereHas('order', function ($query)  {
-                $query = $query->where('orders.create_time','>=', '2016-07-03' );
-            })->get();
+            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2633)->whereHas('order',
+                function ($query) {
+                    $query = $query->where('orders.create_time', '>=', '2016-07-03');
+                })->get();
 
-            foreach($packages as $package) {
+            foreach ($packages as $package) {
                 $package_items = $package->items;
-                $order  = OrderModel::where('id',$package->order_id)->first();
+                $order = OrderModel::where('id', $package->order_id)->first();
                 $remark = '';
                 $is_success = true;
-                $productsArr =[];
+                $productsArr = [];
                 foreach ($package_items as $item) {
-                    $productsArr[] = ItemModel::where('id',$item->order_item_id)->first()->channel_sku;
+                    $productsArr[] = ItemModel::where('id', $item->order_item_id)->first()->channel_sku;
 
                 }
 
-                $tracking_info   = [];
-                $tracking_info['OrderNumber']    = $order->channel_ordernum;
+                $tracking_info = [];
+                $tracking_info['OrderNumber'] = $order->channel_ordernum;
                 $tracking_info['TrackingNumber'] = $package->tracking_no;
-                $tracking_info['TrackingUrl']    = '';
-                $tracking_info['CarrierName']    = '';
-                $tracking_info['products_info']  = $productsArr;
+                $tracking_info['TrackingUrl'] = '';
+                $tracking_info['CarrierName'] = '';
+                $tracking_info['products_info'] = $productsArr;
 
                 $account = AccountModel::findOrFail($package->channel_account_id);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $result = $channel->returnTrack($tracking_info);
-                if($result['status']){
-                    PackageModel::where('id',$package->id)->update(array(
-                        'is_mark' =>1
+                if ($result['status']) {
+                    PackageModel::where('id', $package->id)->update(array(
+                        'is_mark' => 1
                     ));
                 }
             }
 
 
-        }else{
+        } else {
             echo '输入参数错误';
             exit;
         }
 
 
-
-
         //$result =  $orderModel->where('channel_ordernum','122015019019-1655048371002')->get();
-      //  $result =  $orderModel->with('items')->where('channel_sku','352*E3510A3')->get();
+        //  $result =  $orderModel->with('items')->where('channel_sku','352*E3510A3')->get();
 
-    /*    $result = OrderModel::with(['items' => function ($query) {
-            $query->where('channel_sku', '352*E3510A3')->where('order_id',2592);
-        }])->get();
-
-
-
-        var_dump($result);exit;*/
+        /*    $result = OrderModel::with(['items' => function ($query) {
+                $query->where('channel_sku', '352*E3510A3')->where('order_id',2592);
+            }])->get();
 
 
-      exit;
+
+            var_dump($result);exit;*/
+
+
+        exit;
 
     }
 }

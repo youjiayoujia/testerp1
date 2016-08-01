@@ -49,6 +49,15 @@ class WishSellerCodeModel extends BaseModel
         return $return;
     }
 
+    public function getWishCodeWithName(){
+        $result = $this->all();
+        $return =[];
+        foreach($result as $re){
+            $return[$re->user_id] = $re->operator->name;
+
+        }
+        return $return;
+    }
 
 
 }

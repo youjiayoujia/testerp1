@@ -191,4 +191,5 @@ class AccountModel extends BaseModel
         return $this->hasManyThrough('App\Models\Message\ReplyModel', 'App\Models\Message\MessageModel',
             'account_id', 'message_id');
     }
+
 }

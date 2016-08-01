@@ -401,10 +401,10 @@ class OrderModel extends BaseModel
     }
 
     //todo: Update order
-    public function updateOrder($data)
+    public function updateOrder($data,$order)
     {
         unset($data['items']);
-        $order = $this->update($data);
+        $order = $order->update($data);
         return $order;
     }
 

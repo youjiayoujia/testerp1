@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
     //产品图片路由
     Route::any('productImage/imageLable', ['uses' => 'Product\ImageController@imageLable', 'as' => 'imageLable']);
     Route::any('productImage/createImage', ['uses' => 'Product\ImageController@createImage', 'as' => 'createImage']);
+    Route::any('productImage/createSpuImage', ['uses' => 'Product\ImageController@createSpuImage', 'as' => 'createSpuImage']);
     Route::resource('productImage', 'Product\ImageController');
     //reported smissing  reportedMissingCreate
     Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');

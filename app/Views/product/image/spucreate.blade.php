@@ -9,9 +9,10 @@
       <li>图片类型包括Logo，Size，色卡，请在下方选择；</li>
      </ul>
     </div>
+    @foreach($productModel as $keys=>$product)
     <div class="panel panel-primary parent-sku-panel">
      <div class="panel-heading">
-      {{$model}}公共图片
+      {{$product->model}}图片
      </div>
      <div class="panel-body">
       <div class="panel panel-default image-panel">
@@ -22,7 +23,7 @@
            <div class="input-group-addon">
             <span class="glyphicon glyphicon-tag"></span>&nbsp;SKU:
            </div>
-           <input type="text" value="{{$model}}" disabled="" class="form-control" id="model" />
+           <input type="text" value="{{$product->model}}" disabled="" class="form-control" id="model{{$keys}}" />
 
           </div>
          </div>
@@ -33,7 +34,7 @@
         <?php $i=0; ?>
         @foreach($labels as $label)
           @if($label->group_id==1)
-            <li><input type="radio" name="is_link" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{ $i==0? 'checked' : '' }}></li>
+            <li><input type="radio" name="is_link{{$keys}}" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{ $i==0? 'checked' : '' }}></li>
             <?php $i++; ?>
           @endif  
           
@@ -43,18 +44,18 @@
         <?php $j=0; ?>
         @foreach($labels as $label)
             @if($label->group_id==2)
-                <li><input type="checkbox" name="image_type" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{$j==0?'checked':''}}></li>
+                <li><input type="checkbox" name="image_type{{$keys}}" data-labelauty="{{$label->name}}" value="{{$label->id}}" {{$j==0?'checked':''}}></li>
                 <?php $j++; ?>
             @endif
               
         @endforeach
       </ul>
       <div class="form-group">
-        <input id="file-1" class="file" type="file" multiple data-preview-file-type="any" data-sku="ssdf" input-name="dlo">
+        <input id="file-{{$keys}}" class="file" type="file" multiple data-preview-file-type="any" data-sku="ssdf" input-name="dlo">
       </div>
     </div>  
 <div class="panel panel-default">
-    @foreach($images as $image)
+    @foreach($product->imageAll as $image)
         <div class="panel-body preview-panel">
             <div class="file-preview-frame cover-container ui-droppable" name="{{$image->id}}">
                 <img class="file-preview-image ui-draggable ui-draggable-handle" src="{{ asset($image->path) }}/{{$image->name}}" title="{{$image->name}}" alt="{{$image->name}}">
@@ -72,6 +73,7 @@
         </div> 
     @endforeach
 </div>
+@endforeach
 @stop
 
 @section('pageJs')
@@ -84,8 +86,8 @@
             
         }); 
 
-        
-        $(".photoBtn").click(function(){
+        //图片移上去修改标签
+        /*$(".photoBtn").click(function(){
             var id = $(this).data("id");
             $.ajax({
                 url: "{{ route('imageLable') }}",
@@ -101,7 +103,7 @@
                     
                 }
             });  
-        })
+        })*/
 
         $(".file-preview-frame").mouseover(function(){
             var id = $(this).attr('name');
@@ -114,44 +116,105 @@
             $(".cover-container .tags_"+id).css("display","none");
             $(".cover-container .operations_"+id).css("display","none");
         })
-        
-        $("#file-1").fileinput({
-            //uploadAsync: false,  
-            uploadUrl: "{{route('productImage.store')}}",
-            uploadAsync: true,
-            overwriteInitial: false,
-            initialCaption: "请选择产品图（支持多选）",
-            dropZoneTitle: '',
-            initialPreviewAsData: true,
-            // identify if you are sending preview data only and not the raw markup
-            initialPreviewFileType: 'image',
-            // image is the default and can be overridden in config below
-            layoutTemplates: {
-                actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' + 'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
-                actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' + '{uploadIcon}</button>',
-            },
-            uploadExtraData: function() {
-                var str = document.getElementsByName("image_type");
-                var chestr = "";
-                for (i = 0; i < str.length; i++) {
-                    if (str[i].checked == true) {
-                        chestr += str[i].value + ",";
+        //for(var j=0;j<2;j++){
+            $("#file-0").fileinput({  
+                uploadUrl: "{{route('productImage.store')}}",
+                uploadAsync: true,
+                overwriteInitial: false,
+                initialCaption: "请选择产品图（支持多选）",
+                dropZoneTitle: '',
+                initialPreviewAsData: true,
+                // identify if you are sending preview data only and not the raw markup
+                initialPreviewFileType: 'image',
+                // image is the default and can be overridden in config below
+                layoutTemplates: {
+                    actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' + 'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
+                    actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' + '{uploadIcon}</button>',
+                },
+                uploadExtraData: function() {
+                    var str = document.getElementsByName("image_type0");
+                    var chestr = "";
+                    for (i = 0; i < str.length; i++) {
+                        if (str[i].checked == true) {
+                            chestr += str[i].value + ",";
+                        }
                     }
+                    return {
+                        is_link: $('input[name="is_link0"]:checked').val(),
+                        image_type: chestr,
+                        model: $("#model0").val(),
+                    };
                 }
-                return {
-                    is_link: $('input[name="is_link"]:checked').val(),
-                    image_type: chestr,
-                    model: $("#model").val(),
-                };
-            }
-        });
+            });
+
+$("#file-1").fileinput({  
+                uploadUrl: "{{route('productImage.store')}}",
+                uploadAsync: true,
+                overwriteInitial: false,
+                initialCaption: "请选择产品图（支持多选）",
+                dropZoneTitle: '',
+                initialPreviewAsData: true,
+                // identify if you are sending preview data only and not the raw markup
+                initialPreviewFileType: 'image',
+                // image is the default and can be overridden in config below
+                layoutTemplates: {
+                    actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' + 'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
+                    actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' + '{uploadIcon}</button>',
+                },
+                uploadExtraData: function() {
+                    var str = document.getElementsByName("image_type1");
+                    var chestr = "";
+                    for (i = 0; i < str.length; i++) {
+                        if (str[i].checked == true) {
+                            chestr += str[i].value + ",";
+                        }
+                    }
+                    return {
+                        is_link: $('input[name="is_link1"]:checked').val(),
+                        image_type: chestr,
+                        model: $("#model1").val(),
+                    };
+                }
+            });
+
+            $("#file-2").fileinput({  
+                uploadUrl: "{{route('productImage.store')}}",
+                uploadAsync: true,
+                overwriteInitial: false,
+                initialCaption: "请选择产品图（支持多选）",
+                dropZoneTitle: '',
+                initialPreviewAsData: true,
+                // identify if you are sending preview data only and not the raw markup
+                initialPreviewFileType: 'image',
+                // image is the default and can be overridden in config below
+                layoutTemplates: {
+                    actionDelete: '<button type="button" class="kv-file-remove {removeClass}" ' + 'title="{removeTitle}" {dataUrl}{dataKey}>{removeIcon}</button>\n',
+                    actionUpload: '<button type="button" class="kv-file-upload {uploadClass}" title="{uploadTitle}">' + '{uploadIcon}</button>',
+                },
+                uploadExtraData: function() {
+                    var str = document.getElementsByName("image_type2");
+                    var chestr = "";
+                    for (i = 0; i < str.length; i++) {
+                        if (str[i].checked == true) {
+                            chestr += str[i].value + ",";
+                        }
+                    }
+                    return {
+                        is_link: $('input[name="is_link2"]:checked').val(),
+                        image_type: chestr,
+                        model: $("#model2").val(),
+                    };
+                }
+            });
+        //}
+        
 
 $(':input').labelauty();
 
-$("#file-1").on("fileuploaded",
+/*$("#file-1").on("fileuploaded",
 function(event, data, previewId, index) {
-    //alert(data.files);
-});
+    
+});*/
     </script>
 @stop
  

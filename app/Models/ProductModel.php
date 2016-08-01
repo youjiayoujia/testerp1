@@ -605,4 +605,36 @@ class ProductModel extends BaseModel
         //
     }
 
+    /**
+     * 产品售价
+     * 说明： 美元售价 =分子/分母
+
+        分子=(成本价+总运费)/美元汇率+PP固定费用
+
+        分母=1-利润率-成交费率-PP成交费用
+        运费需要销售人员选国家和物流渠道，默认国家为美国。
+
+        PP允许切换大PP和小PP
+
+        特殊情况
+
+        【AMZ美国站平台费小于1美元，按1美元计算(珠宝及手表分类下，该条件用2美元计算);
+
+        AMZ英国站平台费小于0.5英镑，按0.5英镑计算(珠宝及手表分类下，该条件用1.25英镑计算);
+        AMZ欧洲站平台费小于0.5欧元，按0.5欧元计算(珠宝及手表分类下，该条件用1.5欧元计算);
+        AMZ日本站平台费小于30日元，按30日元计算(珠宝及手表分类下，该条件用50日元计算)】
+     *
+     */
+/*    public function getSalePrice($productId,$shipmentFee){
+        $product_obj = $this->find($productId);
+
+        (($product_obj->purchase_price + $shipmentFee) / '美元汇率' + 'PP固定费用')
+            /
+        (1 - )
+
+
+
+        dd($obj);exit;
+
+    }*/
 }

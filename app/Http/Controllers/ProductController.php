@@ -20,6 +20,8 @@ use App\Models\Product\ProductFeatureValueModel;
 use App\Models\Logistics\CatalogModel as LogisticsCatalog;
 use App\Models\LogisticsModel;
 use App\Models\Logistics\ZoneModel;
+use App\Models\Catalog\CatalogChannelsModel;
+use App\Models\CurrencyModel;
 
 use Gate;
 
@@ -441,4 +443,54 @@ class ProductController extends Controller
         return json_encode(false);
     }
 
+    public function ajaxReturnPrice(ZoneModel $zone){
+        $return_price_array = [];
+
+        $form_ary =  request()->input();
+        //获取运费
+        if(isset($form_ary['zone_id'])){
+            $shipment_fee = $zone->getShipmentFee($form_ary['zone_id'],$form_ary['product_weight']);
+        }
+        //获取售价
+        //$sale_price = $this->model->getSalePrice($form_ary['product_id'],$shipment_fee);
+        $product_obj = $this->model->find($form_ary['product_id']);
+        $channels_rate = $product_obj->catalog->channels;
+
+        foreach ($channels_rate as $item_channel){
+           // $item_channel->pivot->rate; //平台税率
+
+            //美元汇率
+            $currency_obj = CurrencyModel::where('code','=','RMB')->first();
+
+            $sale_price_big =  (($product_obj->purchase_price + $shipment_fee) / $currency_obj->rate + config('paypal.fixed_fee'))
+                           /
+                           (1 - $form_ary['profit_id']*0.01 - $item_channel->pivot->rate - config('paypal.transactions_fee_big') );
+
+            $sale_price_small = (($product_obj->purchase_price + $shipment_fee) / $currency_obj->rate + config('paypal.fixed_fee'))
+                /
+                (1 - $form_ary['profit_id']*0.01 - $item_channel->pivot->rate - config('paypal.transactions_fee_small') );
+
+            $return_price_array[] = [
+                'channel_name' => $item_channel->name,
+                'sale_price_big' => $sale_price_big,
+                'sale_price_small' => $sale_price_small,
+            ];
+
+
+        }
+
+
+        if($return_price_array){
+            print_r(json_encode(['status' =>1, 'data' => $return_price_array]));
+
+        }else{
+            print_r(json_encode(['status' => -1]));
+
+        }
+/*        if($form_ary['channel_id'] =='none'){ //全部分类
+        }*/
+    }
+
 }
+
+

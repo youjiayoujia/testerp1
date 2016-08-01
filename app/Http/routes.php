@@ -414,6 +414,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('examineProduct/examineAll',
         ['uses' => 'Product\ExamineProductController@examineAll', 'as' => 'productExamineAll']);
     Route::resource('ExamineProduct', 'Product\ExamineProductController');
+    Route::any('ajaxReturnPrice',
+        ['as' => 'product.ajaxReturnPrice', 'uses' => 'ProductController@ajaxReturnPrice']);
+
+    
     //产品渠道
     Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
     Route::any('product/price', ['uses' => 'Product\EditProductController@price', 'as' => 'productPrice']);

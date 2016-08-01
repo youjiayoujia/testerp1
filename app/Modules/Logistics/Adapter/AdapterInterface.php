@@ -11,7 +11,8 @@ interface AdapterInterface
 {
     /**
      * 物流下单
-     * @return mixed
+     * @param $package package model
+     * @return $trackingNumber
      */
-    public function getTracking($data);
+    public function getTracking($package);
 }

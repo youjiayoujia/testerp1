@@ -65,7 +65,7 @@ class TestController extends Controller
 
     public function index()
     {
-        $logistics = Logistics::driver('chukouyi', [])->getTracking([]);
+        $trackingNumber = Logistics::driver('chukouyi', [])->getTracking([]);
         exit;
     }
 

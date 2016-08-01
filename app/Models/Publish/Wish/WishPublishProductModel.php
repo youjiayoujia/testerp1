@@ -8,7 +8,7 @@
 namespace App\Models\Publish\Wish;
 
 use App\Base\BaseModel;
-
+use App\Models\Channel\AccountModel;
 class WishPublishProductModel extends BaseModel
 {
 
@@ -43,27 +43,19 @@ class WishPublishProductModel extends BaseModel
     public function getMixedSearchAttribute()
     {
         return [
+            'filterSelects' => [
+            ],
             'filterFields' => [
                 'productID',
             ],
-            'filterSelects' => [
-                /* 'status' => config('order.status'),
-                 'active' => config('order.active')*/
-            ],
-            'sectionSelect' => [
-                /*'price' => ['amount'],
-                'time' => ['created_at']*/
-            ],
             'relatedSearchFields' => [
                 'details'=>['erp_sku']
-                /*'channel' => ['name'],
-                'items' => ['sku'],
-                'channelAccount' => ['alias'],
-                'country' => ['code'],
-                'userService' => ['name']*/
+            ],
+            'sectionSelect' => [
+                'price' => ['number_sold'],
+                'time' =>['publishedTime']
             ],
             'selectRelatedSearchs' => [
-
             ]
         ];
     }
@@ -81,6 +73,19 @@ class WishPublishProductModel extends BaseModel
     public function operator()
     {
         return $this->belongsTo('App\Models\UserModel', 'sellerID', 'id');
+    }
+
+    /** 获取对应渠道账号
+     * @param $channel_id 渠道号
+     * @return array
+     */
+    public function getChannelAccount($channel_id){
+        $return=[];
+        $result =  AccountModel::where(['channel_id'=>$channel_id,'is_available'=>'1'])->get();
+        foreach($result as $account){
+            $return[$account->id]=$account->account;
+        }
+        return $return;
     }
 
 }

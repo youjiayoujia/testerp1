@@ -8,12 +8,6 @@
 
 namespace App\Http\Controllers;
 
-
-
-
-
-
-
 use App\Models\ChannelModel;
 use Test;
 use App\Models\Purchase\PurchaseOrderModel;
@@ -22,6 +16,10 @@ use Channel;
 use Logistics;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
+use App\Modules\Paypal\PaypalApi;
+use App\Models\Channel\AccountModel;
+use App\Models\OrderModel;
+use App\Models\Order\OrderPaypalDetailModel;
 use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
@@ -329,10 +327,17 @@ class TestController extends Controller
         if ($driver == 'amazon') {
 
         } elseif ($driver == 'aliexpress') {
-            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2650)->whereHas('order',
+            <<<<
+            <<< HEAD
+                        $packages = PackageModel::where('is_mark', 0)->where('order_id', 2650)->whereHas('order',
                 function ($query) {
                     $query = $query->where('orders.create_time', '>=', '2016-07-03');
                 })->get();
+=======
+            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2650)->whereHas('order', function ($query) {
+                $query = $query->where('orders.create_time', '>=', '2016-07-03');
+            })->get();
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
             foreach ($packages as $package) {
                 $package_items = $package->items;
                 $remark = '';
@@ -370,8 +375,12 @@ class TestController extends Controller
                             $tracking_info['sendType'] = 'part';
                         } else { //这个已经部分发货了。 但是要确定 这次还是部分发货  sendType = part  或者 是最后一次发货 sendType = all 那么查找这个订单 已经标记发货了的包裹 sku种类相加
                             $is_mark_item = [];
+<<<<<<< HEAD
                             $is_mark_packages = PackageModel::where('is_mark', 1)->where('order_id',
                                 $package->order_id)->get();
+=======
+                            $is_mark_packages = PackageModel::where('is_mark', 1)->where('order_id', $package->order_id)->get();
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
                             foreach ($is_mark_packages as $is_mark_package) {
                                 foreach ($is_mark_package->items as $item) {
                                     $is_mark_item[$item->order_item_id] = $item->order_item_id;
@@ -438,16 +447,24 @@ class TestController extends Controller
                 //var_dump($package);
             }
         } elseif ($driver == 'ebay') {
+<<<<<<< HEAD
             $packages = PackageModel::where(['channel_id' => $channel_id, 'is_mark' => '0'])->where('tracking_no', '!=',
                 '')->whereHas('order', function ($query) {
+=======
+            $packages = PackageModel::where(['channel_id' => $channel_id, 'is_mark' => '0'])->where('tracking_no', '!=', '')->whereHas('order', function ($query) {
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
                 $query = $query->where('orders.created_at', '>=', '2016-07-03');
             })->get();
             foreach ($packages as $package) {
                 $package_items = $package->items;
                 $remark = '';
                 $is_success = true;
+<<<<<<< HEAD
                 $logistics_channel_name = ChannelNameModel::where('channel_id',
                     $package->channel_id)->whereHas('logistics', function ($query) use ($package) {
+=======
+                $logistics_channel_name = ChannelNameModel::where('channel_id', $package->channel_id)->whereHas('logistics', function ($query) use ($package) {
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
                     $query = $query->where('logistics_id', $package->logistics_id);
                 })->first()->name;
 
@@ -484,10 +501,16 @@ class TestController extends Controller
 
         } elseif ($driver == 'lazada') {
 
+<<<<<<< HEAD
             $packages = PackageModel::where('is_mark', 0)->where('order_id', 2685)->whereHas('order',
                 function ($query) {
                     $query = $query->where('orders.create_time', '>=', '2016-07-03');
                 })->get();
+=======
+            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2685)->whereHas('order', function ($query) {
+                $query = $query->where('orders.create_time', '>=', '2016-07-03');
+            })->get();
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
 
             foreach ($packages as $package) {
                 $package_items = $package->items;
@@ -518,10 +541,16 @@ class TestController extends Controller
 
         } elseif ($driver == 'cdiscount') {
 
+<<<<<<< HEAD
             $packages = PackageModel::where('is_mark', 0)->where('order_id', 2633)->whereHas('order',
                 function ($query) {
                     $query = $query->where('orders.create_time', '>=', '2016-07-03');
                 })->get();
+=======
+            $packages = PackageModel::where('is_mark', 0)->where('order_id', 2633)->whereHas('order', function ($query) {
+                $query = $query->where('orders.create_time', '>=', '2016-07-03');
+            })->get();
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
 
             foreach ($packages as $package) {
                 $package_items = $package->items;
@@ -560,6 +589,12 @@ class TestController extends Controller
 
         //$result =  $orderModel->where('channel_ordernum','122015019019-1655048371002')->get();
         //  $result =  $orderModel->with('items')->where('channel_sku','352*E3510A3')->get();
+<<<<<<< HEAD
+
+        /*    $result = OrderModel::with(['items' => function ($query) {
+                $query->where('channel_sku', '352*E3510A3')->where('order_id',2592);
+            }])->get();
+=======
 
         /*    $result = OrderModel::with(['items' => function ($query) {
                 $query->where('channel_sku', '352*E3510A3')->where('order_id',2592);
@@ -571,6 +606,141 @@ class TestController extends Controller
 
 
         exit;
+
+    }
+
+    public function testLazada()
+    {
+        $packages = PackageModel::where('order_id', 12914)->get();
+
+        foreach ($packages as $package) {
+            $OrderItemIds = [];
+            foreach ($package->items as $item) {
+                $temp = $item->orderItem->transaction_id;
+                $temp = explode(',', $temp);
+                foreach ($temp as $v) {
+                    $v_temp = explode('@', $v);
+                    $OrderItemIds[] = $v_temp[0];
+                }
+
+            }
+           /* $OrderItemIds = [
+                9047009, 9047011
+            ];*/
+            $channel_listnum[] = $package->order->channel_listnum;
+            $account = AccountModel::findOrFail($package->channel_account_id);
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $result = $channel->getPackageId(implode(',', $channel_listnum));
+            if ($result) {
+                if (isset($result[$OrderItemIds[0]])) { // 获取到了 最踪号 和 PackageId
+                    $update_info = [
+                        'tracking_no'=>$result[$OrderItemIds[0]]['TrackingCode'],
+                        'lazada_package_id'=>$result[$OrderItemIds[0]]['PackageId'],
+                    ];
+                    $package->update($update_info);
+
+                } else { //特殊情况数据记录
+
+                }
+            } else { //api调用失败
+
+            }
+
+            var_dump($OrderItemIds);
+
+            var_dump($result);
+
+        }
+
+
+        exit;
+    }
+
+    public function testPaypal()
+    {
+
+        $orders = OrderModel::where('id', 12851)->get();
+        foreach ($orders as $order) {
+            $is_paypals = false;
+            //$erp_country      = trim($order->shipping_country);
+            $erp_country_code = trim($order->shipping_country);
+            $erp_state = trim($order->shipping_state);
+            $erp_city = trim($order->shipping_city);
+            $erp_address = trim($order->shipping_address);
+            $erp_address_1 = trim($order->shipping_address1);
+            $erp_address = trim($erp_address . $erp_address_1);
+            $erp_address = str_replace(' ', '', $erp_address); //把地址信息中的空格都去掉
+            $erp_name = trim($order->shipping_firstname . $order->shipping_lastname);
+            $erp_zip = trim($order->shipping_zipcode);
+            $error = array();
+            $paypals = $order->channelAccount->paypal;
+            foreach ($paypals as $paypal) {
+                $api = new  PaypalApi($paypal);
+                $result = $api->apiRequest('gettransactionDetails', $order->transaction_number);
+                $transactionInfo = $api->httpResponse;
+                if ($result && $transactionInfo != NULL && (strtoupper($transactionInfo ['ACK']) == 'SUCCESS' || strtoupper($transactionInfo ['ACK']) == 'SUCCESSWITHWARNING')) {
+                    $is_paypals = true;
+                    $tInfo = $transactionInfo;
+                    $paypal_account=isset($tInfo ['EMAIL'])?$tInfo ['EMAIL']:'';
+                    $paypal_buyer_name = trim($tInfo ['SHIPTONAME']);
+                    $paypal_country_code = trim($tInfo['SHIPTOCOUNTRYCODE']); //国家简称
+                    $paypal_country = trim($tInfo['SHIPTOCOUNTRYNAME']); //国家
+                    $paypal_city = trim($tInfo['SHIPTOCITY']);        //城市
+                    $paypal_state = trim($tInfo['SHIPTOSTATE']);       //州
+                    $paypal_street = trim($tInfo['SHIPTOSTREET']);      //街道1
+                    $paypal_street2 = trim($tInfo['SHIPTOSTREET2']);     //街道2
+                    $paypal_zip = trim($tInfo['SHIPTOZIP']);         //邮编
+                    $paypal_phone = isset($tInfo['SHIPTOPHONENUM']) ? trim($tInfo['SHIPTOPHONENUM']) : '';    //电话
+                    $paypalAddress = $paypal_street . ' ' . $paypal_street2 . ' ' . $paypal_city . ' ' . $paypal_state . ' ' . $paypal_country . '(' . $paypal_country_code . ') ' . $paypal_zip;
+                    if (strtoupper($erp_country_code) != strtoupper($paypal_country_code)) {
+                        $error[] = '国家不一致';
+                    }
+                    //把paypal的信息记录
+
+                    $is_exist = OrderPaypalDetailModel::where('order_id', $order->id)->first();
+                    if (empty($is_exist)) {
+                        $add = [
+                            'order_id' => $order->id,
+                            'paypal_account' => $paypal_account,
+                            'paypal_buyer_name'=>$paypal_buyer_name,
+                            'paypal_address'=>$paypalAddress,
+                            'paypal_country'=>$paypal_country_code
+                        ];
+                        OrderPaypalDetailModel::create($add);
+
+                    }
+
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
+
+                    if (!empty($error)) { //设置为匹配失败
+                        $order->update(['order_is_alert'=>2]);
+                        $order->remark('paypal匹配失败:'.implode(',',$error));
+
+
+<<<<<<< HEAD
+            var_dump($result);exit;*/
+=======
+                    } else { //设置为匹配成功
+                        $order->update(['order_is_alert'=>3]);
+                        $order->remark('paypal匹配成功');
+                        //remarks
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
+
+                    }
+                    break;
+                }
+            }
+            if (!$is_paypals) { //说明对应的paypal 都没有找到信息
+
+                $order->update(['order_is_alert'=>2]);
+                $order->remark('paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询');
+            }
+        }
+
+<<<<<<< HEAD
+        exit;
+=======
+>>>>>>> 7dc935b60b54489c0a8f78d65d32c5f2f7ff8056
 
     }
 }

@@ -8,9 +8,7 @@
 @section('tableHeader')
 	
     <th>ID</th> 
-    <th>采购单状态</th> 
-    <th>采购单审核状态</th>
-    <th>核销状态</th>
+    <th>采购单状态</th>
     <th>付款状态</th>
     <th>采购人</th>
    	<th>供应商</th>
@@ -30,10 +28,10 @@
                 {{$purchaseOrder->post_coding }}
             </td>
             <td> 
-                {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
+                <div>采购单状态：{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
+                <div>审核状态：{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</div><br>
+                <div>核销状态：{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</div>
             </td>
-            <td>{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</td>  
-            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>
             <td>{{config('purchase.purchaseOrder.close_status')[$purchaseOrder->close_status]}}</td>   
     		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>

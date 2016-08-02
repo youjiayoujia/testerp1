@@ -61,6 +61,7 @@ class ImageController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
+        //print_r($data);exit;
         $productModel = ProductModel::where("model",$data['model'])->first();
         
         $data['product_id'] = $productModel->id;
@@ -144,6 +145,25 @@ class ImageController extends Controller
             'images' => $image,
         ];
         return view($this->viewPath . 'create', $response);
+    }
+
+    public function createSpuImage()
+    {
+        $spu_id = request()->input('spu_id');
+        
+        $productModel = ProductModel::where("spu_id",$spu_id)->get();
+        //echo '<pre>';
+        //print_r($productModel);exit;
+        if (!count($productModel)) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'SPU不存在.'));
+        }
+        
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'productModel'=> $productModel,
+            'labels'=> LabelModel::all(),
+        ];
+        return view($this->viewPath . 'spucreate', $response);
     }
 
     /**

@@ -58,7 +58,33 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
     
-    
+    /**
+     * 新建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'warehouses' =>WarehouseModel::all(),
+        ];
+        return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->model->createPurchaseOrder(request()->all());
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
+    }  
     
     /**
      * 采购页面

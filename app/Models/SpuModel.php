@@ -21,6 +21,8 @@ class SpuModel extends BaseModel
      */
     protected $fillable = ['id', 'spu','product_require_id'];
 
+    public $searchFields = ['id' =>'ID','spu'=>'spu'];
+
     public function values()
     {
         return $this->hasMany('App\Models\Product');

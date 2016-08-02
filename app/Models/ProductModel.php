@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Base\BaseModel;
 use App\Models\Product\ImageModel;
+use App\Models\Product\RequireModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\ChannelModel;
+
 use Illuminate\Support\Facades\DB;
 use Tool;
 
@@ -355,7 +357,8 @@ class ProductModel extends BaseModel
                 }
                 $aznum++;
             }
-
+            $require_status['status']=3;
+            RequireModel::find($data['require_id'])->update($require_status);
         } catch (Exception $e) {
             DB::rollBack();
         }

@@ -4,6 +4,7 @@ namespace App\Models\Purchase;
 use Exception;
 use App\Base\BaseModel;
 use App\Models\Product\SupplierModel;
+use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 use App\Models\UserModel;
@@ -119,6 +120,16 @@ class PurchaseOrderModel extends BaseModel
             $PurchaseOrder->$key = $v;
         }
         $PurchaseOrder->save();
+    }
+
+    public function createPurchaseOrder($data)
+    {
+        $data['user_id'] = request()->user()->id;
+        $purchase_order = PurchaseOrderModel::create($data);
+        echo '<pre>';
+        print_r($data);exit;
+        //PurchaseItemModel::create();
+        exit;
     }
 
     /**

@@ -66,11 +66,11 @@
         </ul>
     </div>
     {{--@can('check','product_admin,product_staff|add')--}}
-    <div class="btn-group">
+    <!-- <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
             <i class="glyphicon glyphicon-plus"></i> 新增
         </a>
-    </div>
+    </div> -->
     {{--@endcan--}}
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')

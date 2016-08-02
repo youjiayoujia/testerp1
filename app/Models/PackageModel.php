@@ -62,6 +62,7 @@ class PackageModel extends BaseModel
         'created_at',
         'is_tonanjing',
         'is_over',
+        'lazada_package_id'
     ];
 
     public function getMixedSearchAttribute()

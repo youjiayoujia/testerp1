@@ -31,7 +31,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SetMessageRead::class,
         \App\Console\Commands\GetGmailCredentials::class,
         \App\Console\Commands\SentReturnTrack::class,
-        \App\Console\Commands\FooCommand::class,
+        \App\Console\Commands\MatchPaypal::class,
+        \App\Console\Commands\GetLazadaPackageId::class,
     ];
 
     /**

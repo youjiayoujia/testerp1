@@ -15,7 +15,7 @@ use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
 use App\Modules\Channel\Adapter\CdiscountAdapter;
 
-Class ChannelModule
+class ChannelModule
 {
     public function driver($adapter, $config)
     {

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SpuModel;
+use App\Models\UserModel;
 
 
 class SpuController extends Controller
@@ -19,5 +20,25 @@ class SpuController extends Controller
         $this->viewPath = 'spu.';
     }
 
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        foreach(config('spu.status') as $key=>$value){
+        	$num_arr[$key] = $this->model->where('status',$key)->count();
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'num_arr' =>$num_arr,
+            'users' => UserModel::all(),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
 
 }

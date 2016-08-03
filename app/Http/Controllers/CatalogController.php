@@ -255,9 +255,9 @@ class CatalogController extends Controller
                 '中文分类名称'=>'鞋子',
                 '分类英文名称' => 'shoes',
                 '前缀'=>'XL',
-                'Set属性(影响产品图片的属性 例如:产品颜色)'=>'name1:value1,value2;name2:value1,value2;',
-                'variation属性(不影响产品图片但影响销售的属性 例如:产品尺寸)'=>'name1:value1,value2;name2:value1,value2;',
-                'Feature属性(产品附加的属性 例如:是否能水洗,是否有弹性等) '=>'单选-name1:value1,value2,value3;多选-name1:value1,value2,value3;文本:value;',
+                'Set属性'=>'name1:value1,value2;name2:value1,value2',
+                'variation属性'=>'name1:value1,value2;name2:value1,value2',
+                'Feature属性(说明：1，文本；2，单选 ；3，多选 ) '=>'1-name1:value1,value2,value3;2-name1:value1,value2,value3;3:value',
             ]
         ];
 
@@ -276,7 +276,7 @@ class CatalogController extends Controller
         $file->move($path, 'excelProcess.xls');
         $data_array = '';
         $result = false;
-        Excel::load($path.'excelProcess.xls', function($reader) {
+        Excel::load($path.'excelProcess.xls', function($reader) use ($result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
             $th_long = count($data_array[0]); //表头字段数
@@ -375,7 +375,13 @@ class CatalogController extends Controller
             $result = $this->model->createLotsCatalogs($insert_array);
         },'gb2312');
 
-        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
+        if($result){
+            return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
+        }else{
+            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', '数据格式有误，请检查后再操作!'));
+
+        }
+
 
     }
 }

@@ -6,14 +6,18 @@
             <form method="POST" action="{{ route('addLotsOfCatalogs') }}" enctype="multipart/form-data" id="add-lots-form">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="file" class="file" id="qualifications" placeholder="上传审核资料" name="excel" value="">
+
             </form>
 
         </div>
     <div class="btn-group">
+        <a href="javascript:" class="btn btn-warning download-csv">Excel格式
+            <i class="glyphicon glyphicon-arrow-down"></i>
+
+        </a>
         <a class="btn btn-success add-lots-of-catagory" href="javascript:void(0);">
             <i class="glyphicon glyphicon-plus"></i> 批量导入品类
         </a>
-        <a href="javascript:" class="download-csv">格式下载</a>
     </div>
     <div class="btn-group" role="group">
         <div class="form-group" style="margin-bottom:0px">
@@ -117,7 +121,7 @@
         function addlotsOfCatagory() {
             var csv = $('input[name="excel"]').val();
             if(csv == ''){
-                alert('请选择excel文件！');
+                alert('请先上传excel文件！');
                 return false;
             }
             $('#add-lots-form').submit();

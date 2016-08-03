@@ -239,34 +239,34 @@ class CatalogModel extends BaseModel
      */
     public function createLotsCatalogs($data = NULL){
         if($data){
+            DB::beginTransaction();
+
             foreach ($data as $item){
-                    //dd($item['attributes']);exit;
-                $catalog['c_name'] = $item['c_name'];
-                $catalog['name'] = $item['name'];
-                $catalog['code'] = $item['code'];
 
-                DB::beginTransaction();
-                $catalog_obj = $this->create($catalog);
-
-                //多对多写入费率
-                foreach ($item['channel_rate'] as $key => $item_channel_value){
-                    if($item_channel_value){ //若设置了对应渠道的费率
-                        $channel_obj = ChannelModel::where('name','=',$key)->first();
-                        $channel_ary['channel_id'] = $channel_obj->id;
-                        $rate_ary = explode(',',$item_channel_value);
-                        $catalog_obj->channels()->attach($channel_ary,['rate'=>$rate_ary[0],'flat_rate'=>$rate_ary[1]]);
-                    }
-                }
-                //属性名属性值添加
-                if ($item['attributes']) {
-                    foreach ($item['attributes'] as $model => $property) {
-                        if(count($property)==0){
-                            if($model=='features')continue;
-                            $property = [];
-                            $property[$model]['name'] = "Default";
-                            $property[$model]['value']['name'][0]['name'] = "Default";
+                try{
+                    $catalog['c_name'] = $item['c_name'];
+                    $catalog['name'] = $item['name'];
+                    $catalog['code'] = $item['code'];
+                    $catalog_obj = $this->create($catalog);
+                    //多对多写入费率
+                    foreach ($item['channel_rate'] as $key => $item_channel_value){
+                        if($item_channel_value){ //若设置了对应渠道的费率
+                            $channel_obj = ChannelModel::where('name','=',$key)->first();
+                            $channel_ary['channel_id'] = $channel_obj->id;
+                            $rate_ary = explode(',',$item_channel_value);
+                            $catalog_obj->channels()->attach($channel_ary,['rate'=>$rate_ary[0],'flat_rate'=>$rate_ary[1]]);
                         }
-                        try {
+                    }
+                    //属性名属性值添加
+                    if ($item['attributes']) {
+                        foreach ($item['attributes'] as $model => $property) {
+                            if(count($property)==0){
+                                if($model=='features')continue;
+                                $property = [];
+                                $property[$model]['name'] = "Default";
+                                $property[$model]['value']['name'][0]['name'] = "Default";
+                            }
+
                             if(!empty($property)){
                                 foreach ($property as $modelData) {
                                     $modelObj = $catalog_obj->$model()->create($modelData);
@@ -279,14 +279,16 @@ class CatalogModel extends BaseModel
                                     }
                                 }
                             }
-
-                        } catch (Exception $e) {
-                            DB::rollBack();
                         }
                     }
-                }
-                DB::commit();
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    return false;
+                  }
             }
+            DB::commit();
+        }else{
+            return false;
         }
     }
 

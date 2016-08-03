@@ -322,8 +322,6 @@
             var product_weight = $('#weight-'+productId).val();
 
             var html = '';
-
-
             $.ajax({
                 url: "{{  route('product.ajaxReturnPrice') }}",
                 dataType: 'json',

@@ -10,6 +10,7 @@ namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Message\MessageModel;
 
 set_time_limit(1800);
 
@@ -111,18 +112,19 @@ Class AliexpressAdapter implements AdapterInterface
         $action = 'api.sellerShipment';
         $app_url = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
-        $parameter['access_token'] = $this->_access_token;
-        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
-        //$result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
-        //$result = json_decode($result,true);
-        $rand_id = rand(1, 10);
+        $tracking_info['access_token'] = $this->_access_token;
+        $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
+        $result = json_decode($result,true);
+    /*    $rand_id = rand(1, 10);
         if ($rand_id > 3) {
             $result['success'] = 'Falie';
 
         } else {
             $result['success'] = 'true';
 
-        }
+        }*/
+        var_dump($result);
         if (isset($result['success']) && ($result['success'] == 'true')) {
             $return['status'] = true;
             $return['info'] = 'Success';
@@ -165,8 +167,9 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
-        $orderInfo['shipping_firstname'] = $orderDetail['buyerInfo']['firstName'];
-        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];
+        $orderInfo['shipping_firstname'] = $orderDetail['receiptAddress'] ['contactPerson'];
+/*        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];*/
+        $orderInfo['shipping_lastname'] = '';
         $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
         $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"] ["city"];
@@ -421,7 +424,7 @@ Class AliexpressAdapter implements AdapterInterface
         curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+       // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
         curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
@@ -441,11 +444,101 @@ Class AliexpressAdapter implements AdapterInterface
     public function getMessages()
     {
 
+        $msgSourcesArr =array('message_center','order_msg');
+        $method = 'api.queryMsgRelationList';
+        $filter = 'readStat';
+        $pageSize = 5;
+        $j = 0;
+        $message_list = [];
+
+        foreach ($msgSourcesArr as $Sources){
+            for($i=1; $i>0; $i++){
+                $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
+                $returnJson = $this->getJsonData($method,$para);
+                $message_array = json_decode($returnJson, true);
+                if(!empty($message_array['result'])){
+                    foreach ($message_array['result'] as $item){
+
+                        //最后一条消息是自己这边发送的 或者 卖家账号为空 跳过
+                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
+                            continue;
+                        }
+
+
+                        /**
+                         * 获取信息详情
+                         */
+
+                        $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+                        //$detail_array = json_decode($detailArrJson);
+                        //$detail_array = (array)$detail_array;
+                        $message_list[$j]['message_id'] = $item['channelId'];
+                        $message_list[$j]['from_name'] = addslashes($item['otherName']);
+                        $message_list[$j]['from'] = $item['otherLoginId'];
+                        $message_list[$j]['to'] = '收信人';
+                        $message_list[$j]['labels'] = '';
+                        $message_list[$j]['label'] = 'INBOX';
+                        $message_list[$j]['date'] = $item['messageTime'];
+                        $message_list[$j]['subject'] = '信息描述';
+                        $message_list[$j]['attachment'] = ''; //附件
+
+                        $message_list[$j]['message_type'] = $Sources;
+                        $message_list[$j]['rank'] = $item['rank'];
+                        $message_list[$j]['dealStat'] = $item['dealStat'];
+                        $message_list[$j]['channelId'] = $item['channelId'];
+                        $message_list[$j]['unreadCount'] = $item['unreadCount'];
+                        $message_list[$j]['readStat'] = $item['readStat'];
+
+                        $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
+                    }
+                }else{
+                    break;
+                }
+                $j++;
+            }
+        }
+
+        return (!empty($message_list)) ? $message_list : false;
     }
 
     public function sendMessages($replyMessage)
     {
+        // TODO: Implement sendMessages() method.
+        //echo $this->_access_token;
+        $message_obj = $replyMessage->message;
 
+        if(!empty($message_obj)){
+
+             // step1:发信息
+
+            $send_param = [];
+            $send_param['channelId'] = $message_obj->message_id;
+            $send_param['buyerId'] = $message_obj->from;
+            $send_param['msgSources'] = $message_obj->'消息类型';
+            $send_param['content'] = $replyMessage->content;
+
+            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $api_return_array = json_decode($api_return,true);
+            if(isset($api_return_array['result']["isSuccess"])){
+                if($api_return_array['result']["isSuccess"]){
+
+                    //step2: 更新消息为已读
+                    $update_param = [];
+                    $update_param['channelId'] = $message_obj->message_id;
+                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
+
+                    $replyMessage->status = 'SENT';
+                }else{
+                    $replyMessage->status = 'FAIL';
+                }
+            }
+        }else{
+            $replyMessage->status = 'FAIL';
+        }
+        $replyMessage->save();
+
+        return $replyMessage->status== 'SENT' ? true : false;
     }
 
 

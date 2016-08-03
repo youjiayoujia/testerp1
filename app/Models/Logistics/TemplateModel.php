@@ -20,17 +20,20 @@ class TemplateModel extends BaseModel
 
     protected $fillable = [
         'name',
-        'view'
+        'view',
+        'size'
     ];
 
     public $rules = [
         'create' => [
             'name' => 'required|unique:logistics_templates,name',
-            'view' => 'required'
+            'view' => 'required',
+            'size' => 'required'
         ],
         'update' => [
             'name' => 'required|unique:logistics_templates,name,{id}',
-            'view' => 'required'
+            'view' => 'required',
+            'size' => 'required'
         ],
     ];
 

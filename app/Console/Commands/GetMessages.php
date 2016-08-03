@@ -44,11 +44,23 @@ class GetMessages extends Command
      */
     public function handle()
     {
+
+        //wish测试块
+/*        foreach (AccountModel::all() as $account) {
+            if($account->channel->driver =='wish'){
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $messageList = $channel->getMessages();
+
+            }
+        }*/
+        //wish测试块
+
+
         //遍历账号
         foreach (AccountModel::all() as $account) {
             //实例化渠道驱动
-
-            if($account->channel->driver == 'amazon'){
+            if($account->channel->driver == 'wish'){
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 //获取Message列表
                 $messageList = $channel->getMessages();
@@ -66,7 +78,6 @@ class GetMessages extends Command
                             $messageNew->date = $message['date'];
                             $messageNew->subject = $message['subject'];
                             $messageNew->content = $message['content'];
-
                             $messageNew->status  = 'UNREAD';
                             $messageNew->related  = 0;
                             $messageNew->required  = 1;

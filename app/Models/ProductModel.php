@@ -27,7 +27,7 @@ class ProductModel extends BaseModel
             'supplier_id' => 'required',
             'product_size' => 'required',
             'weight' => 'required|numeric',
-            'catalog_id' => 'required',
+            //'catalog_id' => 'required',
         ],
         'update' => [
             'c_name' => 'required',
@@ -234,10 +234,13 @@ class ProductModel extends BaseModel
         try {
             //获取catalog对象,将关联catalog的属性插入数据表
             $catalog = CatalogModel::find($data['catalog_id']);
-            $code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
+            //$code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
             
             //创建spu，,并插入数据
-            $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
+            //$spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
+            $spuobj = SpuModel::where('product_require_id',$data['require_id'])->get()->first();
+            //echo '<pre>';
+            //print_r($data);exit;
             $data['spu_id'] = $spuobj->id;
             $az = array(
                 'A',
@@ -294,14 +297,14 @@ class ProductModel extends BaseModel
                     $data['channel_id'] = $channel->id;
                     $product->productMultiOption()->create($data);
                 }
-
-                //更新产品首图
-                //$product->update(['default_image' => $default_image_id]);
+//print_r($catalog);exit;
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
                         //获得此产品的品类所对应的variation属性
                         $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
+                        echo '<pre>';
+
                         foreach ($variationValues as $value_id => $variationValue) {
                             //获得variation属性对应的属性值
                             $variationValueModel = $variationModel->values()->find($value_id);
@@ -597,10 +600,11 @@ class ProductModel extends BaseModel
             //print_r($arr);
             //exit;
             $model = $this->productMultiOption->where("channel_id", (int)$channel_id)->first();
-            //print_r($model);
-            $model->update($arr);
+            if($model){
+                $model->update($arr);
+            }
+           
         }
-        //exit;
+        //
     }
-
 }

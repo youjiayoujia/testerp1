@@ -62,6 +62,7 @@ class PackageModel extends BaseModel
         'created_at',
         'is_tonanjing',
         'is_over',
+        'lazada_package_id'
     ];
 
     public function getMixedSearchAttribute()
@@ -73,7 +74,11 @@ class PackageModel extends BaseModel
                 'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
-            'filterSelects' => ['status' => config('package'), 'warehouse_id' => $this->getArray('App\Models\WarehouseModel', 'name'), 'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')],
+            'filterSelects' => [
+                'status' => config('package'),
+                'warehouse_id' => $this->getArray('App\Models\WarehouseModel', 'name'),
+                'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')
+            ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
             ],
@@ -124,7 +129,7 @@ class PackageModel extends BaseModel
     {
         $arr = [];
         $inner_models = $model::all();
-        foreach($inner_models as $key => $single) {
+        foreach ($inner_models as $key => $single) {
             $arr[$single->id] = $single->$name;
         }
         return $arr;
@@ -232,18 +237,18 @@ class PackageModel extends BaseModel
     public function createChildPackage($arr)
     {
         $items = $this->items;
-        if($this->order->status == 'NEED') {
+        if ($this->order->status == 'NEED') {
             $this->order->update(['status' => 'PARTIAL']);
         }
-        foreach($arr as $warehouseId => $stockInfo) {
+        foreach ($arr as $warehouseId => $stockInfo) {
             $newPackage = $this->create($this->toArray());
-            foreach($stockInfo as $stockId => $info) {
+            foreach ($stockInfo as $stockId => $info) {
                 $item = $items->where('item_id', $info['item_id'])->first();
-                if($item->quantity <= $info['quantity']) {
+                if ($item->quantity <= $info['quantity']) {
                     $item->delete();
                     continue;
                 }
-                $item->update(['quantity' => ($item->quantity-$info['quantity'])]);
+                $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 $newPackage->items()->create($info);
             }
             $newPackage->update(['status' => 'WAITASSIGN', 'warehouse_id' => $info['warehouse_id']]);
@@ -265,7 +270,7 @@ class PackageModel extends BaseModel
         return $sum;
     }
 
-     public function explodePackage()
+    public function explodePackage()
     {
         $arr = $this->packageStockDiff($this->packageNeedArray());
         $sum = $this->atLeastTimes($arr);
@@ -453,13 +458,13 @@ class PackageModel extends BaseModel
 
     public function createPackageDetail($items)
     {
-        foreach($this->items as $packageItem) {
+        foreach ($this->items as $packageItem) {
             $packageItem->delete();
         }
         $this->order->update(['status' => 'PACKED']);
         $i = true;
         foreach ($items as $warehouseId => $packageItems) {
-            if($i) {
+            if ($i) {
                 foreach ($packageItems as $key => $packageItem) {
                     $newPackageItem = $this->items()->create($packageItem);
                     DB::beginTransaction();
@@ -479,7 +484,7 @@ class PackageModel extends BaseModel
                 $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
-                if($newPackage) {
+                if ($newPackage) {
                     foreach ($packageItems as $key => $packageItem) {
                         $newPackageItem = $newPackage->items()->create($packageItem);
                         DB::beginTransaction();
@@ -502,8 +507,8 @@ class PackageModel extends BaseModel
 
         return true;
     }
-    /**********************************************************************************/
 
+    /**********************************************************************************/
 
 
     public function getShippingLimitsAttribute()

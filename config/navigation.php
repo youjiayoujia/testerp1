@@ -485,7 +485,11 @@ return [
                 'url' => 'paypal.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'paypal固定税率',
+                'url'  => 'paypal.ShowPaypalRate',
+                'icon' => '',
+            ],
         ],
     ],
 

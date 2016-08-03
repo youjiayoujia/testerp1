@@ -28,7 +28,7 @@ class OrderModel extends BaseModel
 
     private $canPackageStatus = ['PREPARED', 'NEED'];
 
-    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱'];
+    public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 
     /**
      * 退款rules
@@ -52,7 +52,6 @@ class OrderModel extends BaseModel
             'channel_account_id' => 'required',
             'ordernum' => 'required',
             'channel_ordernum' => 'required',
-            'email' => 'required',
             'status' => 'required',
             'active' => 'required',
             'customer_service' => 'required',
@@ -126,7 +125,9 @@ class OrderModel extends BaseModel
                 'ordernum',
                 'channel_ordernum',
                 'email',
-                'currency'
+                'by_id',
+                'currency',
+                'profit_rate'
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
@@ -137,6 +138,7 @@ class OrderModel extends BaseModel
                 'time' => ['created_at']
             ],
             'relatedSearchFields' => [
+                'items' => ['item' => ['status' => config('item.status')]],
                 'items' => ['sku'],
                 'channelAccount' => ['alias'],
                 'country' => ['code'],
@@ -322,10 +324,14 @@ class OrderModel extends BaseModel
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
             Storage::disk('product')->put($data['image'],file_get_contents($file->getRealPath()));
             if ($data['type'] == 'FULL') {
+                $total = 0;
                 foreach ($data['arr']['id'] as $id) {
                     $orderItem = $this->items->find($id);
                     $orderItem->update(['is_refund' => 1]);
+                    $total = $orderItem['price'] * $orderItem['quantity'] + $total;
                 }
+                $data['refund_amount'] = $total;
+                $data['price'] = $total;
             }
             if ($data['type'] == 'PARTIAL') {
                 foreach ($data['tribute_id'] as $id) {
@@ -401,10 +407,10 @@ class OrderModel extends BaseModel
     }
 
     //todo: Update order
-    public function updateOrder($data)
+    public function updateOrder($data,$order)
     {
         unset($data['items']);
-        $order = $this->update($data);
+        $order = $order->update($data);
         return $order;
     }
 

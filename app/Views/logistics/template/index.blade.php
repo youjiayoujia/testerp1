@@ -3,6 +3,7 @@
     <th class="sort" data-field="id">编号</th>
     <th>面单名称</th>
     <th>视图</th>
+    <th>尺寸</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -13,6 +14,7 @@
             <td>{{ $template->id }}</td>
             <td>{{ $template->name }}</td>
             <td>{{ $template->view }}</td>
+            <td>{{ $template->size }}</td>
             <td>{{ $template->updated_at }}</td>
             <td>{{ $template->created_at }}</td>
             <td>

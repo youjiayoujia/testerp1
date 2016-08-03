@@ -386,7 +386,8 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
-        echo Tool::barcodePrint($id);
+        $response['id']= $id;
+        return view($this->viewPath . 'printpo', $response);
     }
 
     /**

@@ -122,12 +122,6 @@
             overwriteInitial: false,
             initialCaption: "请选择产品图（支持多选）",
             dropZoneTitle: '',
-            //showPreview: false,
-            //initialPreviewShowDelete: true,
-            /*initialPreview: [
-                        "http://www.youjia1.com/uploads/product/763/765/2/1467876193file_data.jpg",
-                        "http://www.youjia1.com/uploads/product/763/765/2/1467876128file_data.jpg",
-                    ],*/
             initialPreviewAsData: true,
             // identify if you are sending preview data only and not the raw markup
             initialPreviewFileType: 'image',
@@ -150,14 +144,6 @@
                     model: $("#model").val(),
                 };
             }
-            //key: 100,
-            //data:{"id":"12234"},
-            //uploadExtraData:{id:'kv-1'},
-            //uploadExtraData: function () {
-            //    return {
-            //extradata: { product_ID: $('#Product_ID').val(), type: "marketing_materials_EN"}
-            //    };
-            //}
         });
 
 $(':input').labelauty();

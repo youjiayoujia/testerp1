@@ -151,6 +151,7 @@ return [
          */
         App\Providers\HelpServiceProvider::class,
         App\Modules\Channel\ChannelServiceProvider::class,
+        App\Modules\Logistics\LogisticsServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
@@ -217,6 +218,7 @@ return [
         'DataList' => App\Facades\DataList::class,
         'Tool' => App\Facades\Tool::class,
         'Channel' => App\Modules\Channel\ChannelFacade::class,
+        'Logistics' => App\Modules\Logistics\LogisticsFacade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,

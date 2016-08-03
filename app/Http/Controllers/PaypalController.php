@@ -9,6 +9,8 @@
  */
 namespace App\Http\Controllers;
 use App\Models\PaypalsModel;
+use App\Models\PermissionModel;
+
 class PaypalController extends Controller
 {
     public function __construct(PaypalsModel $paypal)
@@ -17,6 +19,20 @@ class PaypalController extends Controller
         $this->mainIndex = route('paypal.index');
         $this->mainTitle = 'paypal';
         $this->viewPath = 'paypal.';
+    }
+    public function ShowPaypalRate(){
+        $fee_array = [
+            '固定费'=>config('paypal.fixed_fee'),
+            'PP大成交费'=>config('paypal.transactions_fee_big'),
+            'PP小成交费'=>config('paypal.transactions_fee_small'),
+        ];
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'fee_array'=>$fee_array,
+        ];
+
+
+        return view('paypal.paypal_rate',$response);
     }
 
 }

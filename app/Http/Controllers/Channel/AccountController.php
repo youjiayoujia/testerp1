@@ -73,9 +73,12 @@ class AccountController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(request()->all());
+
         $paypalIds = explode(',', request()->input("paypal_ids"));
         $model->paypal()->sync($paypalIds);
+        $data = request()->all();
+        unset($data['paypal_ids']);
+        $model->update($data);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $model->alias . ' 设置API成功.'));
     }
 }

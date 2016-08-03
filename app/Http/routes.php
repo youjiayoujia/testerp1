@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
     //产品图片路由
     Route::any('productImage/imageLable', ['uses' => 'Product\ImageController@imageLable', 'as' => 'imageLable']);
     Route::any('productImage/createImage', ['uses' => 'Product\ImageController@createImage', 'as' => 'createImage']);
+    Route::any('productImage/createSpuImage', ['uses' => 'Product\ImageController@createSpuImage', 'as' => 'createSpuImage']);
     Route::resource('productImage', 'Product\ImageController');
     //reported smissing  reportedMissingCreate
     Route::post('reportedMissingCreate', 'product\ReportedMissingController@store');
@@ -77,6 +78,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('productRequire/ajaxProcess',
         ['uses' => 'Product\RequireController@ajaxProcess', 'as' => 'productRequire.ajaxProcess']);
     Route::resource('productRequire', 'Product\RequireController');
+    Route::any('ajaxReturnLogistics',
+        ['as' => 'product.ajaxReturnLogistics', 'uses' => 'ProductController@ajaxReturnLogistics']);
+    Route::any('ajaxReutrnCatalogs',
+        ['uses' => 'ProductController@ajaxReutrnCatalogs', 'as' => 'ajaxReutrnCatalogs']);
     //通关报关
     Route::post('customsClearance/exportProduct',
         ['uses' => 'CustomsClearanceController@exportProduct', 'as' => 'customsClearance.exportProduct']);
@@ -269,9 +274,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('catalog/editCatalogRates/{str}',
         ['uses' => 'CatalogController@editCatalogRates', 'as' => 'catalog.editCatalogRates']);
     Route::any('updateCatalogRates', ['uses' => 'CatalogController@updateCatalogRates', 'as' => 'updateCatalogRates']);
+    Route::any('catalogCsvFormat',['uses' => 'CatalogController@catalogCsvFormat' , 'as' => 'catalogCsvFormat']);
+    Route::any('addLotsOfCatalogs',['uses' => 'CatalogController@addLotsOfCatalogs' , 'as' => 'addLotsOfCatalogs']);
 
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
+    Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::resource('item', 'ItemController');
     //渠道路由
@@ -391,6 +399,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('pickList', 'PickListController');
     //产品管理路由
     Route::any('productInfo', ['uses' => 'ProductController@productInfo', 'as' => 'productInfo']);
+    Route::any('product/changePurchaseAdmin/{id}', ['uses' => 'ProductController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
     Route::any('productBatchEdit', ['uses' => 'ProductController@productBatchEdit', 'as' => 'productBatchEdit']);
     Route::any('productBatchUpdate', ['uses' => 'ProductController@productBatchUpdate', 'as' => 'productBatchUpdate']);
     Route::any('product/getCatalogProperty', 'ProductController@getCatalogProperty');
@@ -408,6 +417,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('examineProduct/examineAll',
         ['uses' => 'Product\ExamineProductController@examineAll', 'as' => 'productExamineAll']);
     Route::resource('ExamineProduct', 'Product\ExamineProductController');
+    Route::any('ajaxReturnPrice',
+        ['as' => 'product.ajaxReturnPrice', 'uses' => 'ProductController@ajaxReturnPrice']);
+
+    
     //产品渠道
     Route::any('beChosed', ['uses' => 'Product\SelectProductController@beChosed', 'as' => 'beChosed']);
     Route::any('product/price', ['uses' => 'Product\EditProductController@price', 'as' => 'productPrice']);
@@ -431,6 +444,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('orderItem', 'Order\ItemController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
+    Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
     Route::any('blacklist/listAll', ['uses' => 'Order\BlacklistController@listAll', 'as' => 'listAll']);
     Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
     Route::get('updatePrepared', ['uses' => 'OrderController@updatePrepared', 'as' => 'updatePrepared']);
@@ -522,6 +536,7 @@ Route::group(['middleware' => 'auth'], function () {
     //图片标签
     Route::resource('label', 'LabelController');
     Route::resource('paypal', 'PaypalController');
+    Route::any('ShowPaypalRate', ['uses' => 'PaypalController@ShowPaypalRate', 'as' => 'paypal.ShowPaypalRate']);
     //editOnlineProduct
 
     Route::post('wish/editOnlineProductStore', ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);
@@ -622,6 +637,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
+    Route::get('productUser/ajaxSupplierUser', ['uses' => 'ProductController@ajaxSupplierUser', 'as' => 'ajaxSupplierUser']);
     Route::any('user/role',['uses' => 'UserController@per', 'as' => 'role']);
     Route::resource('user', 'UserController');
     Route::resource('role', 'RoleController');
@@ -642,6 +658,8 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 //getEbayInfo
+Route::any('testPaypal', ['uses' => 'TestController@testPaypal']);
+Route::any('testLazada', ['uses' => 'TestController@testLazada']);
 Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);
 Route::any('getEbayInfo', ['uses' => 'TestController@getEbayInfo']);
 

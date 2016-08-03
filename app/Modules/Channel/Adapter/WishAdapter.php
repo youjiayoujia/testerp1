@@ -690,7 +690,46 @@ Class WishAdapter implements AdapterInterface
 
     public function getMessages()
     {
+        $j = 0; //信息条数
+        $initArray = [];
+        $initArray['limit'] = 5; //每页数量
+        $return_array = [];
+        for($i=1; $i>0;$i++){
+            $initArray['start'] = ($i-1)*$initArray['limit'];
+            $initArray['access_token'] = $this->access_token;
+            $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
+            $jsonData = $this->getCurlData($url);
+            $apiReturn = json_decode($jsonData,true);
+            if(empty($apiReturn['data'])){
+                break;
+            }
+            foreach($apiReturn['data'] as $gd){
 
+                $return_array[$j]['message_id']      = $gd['Ticket']['transaction_id']; //message_id
+                $return_array[$j]['subject']		 = addslashes($gd['Ticket']['subject']);//邮件标题（发件人本地语言）
+                $return_array[$j]['date'] 	  	     = str_replace('T',' ',$gd['Ticket']['open_date']);//发件人发邮件的时间
+                $return_array[$j]['from_name'] 	  	 = str_replace('T',' ',$gd['Ticket']['UserInfo']['name']);//用户名
+                $return_array[$j]['from'] 	  	     = str_replace('T',' ',$gd['Ticket']['UserInfo']['id']);//用户Id
+
+                $return_array[$j]['content'] 	  	 = base64_encode(serialize(['wish' => $gd['Ticket']['replies']]));   //信息内容
+                $return_array[$j]['order_info']      = serialize(['wish' => $gd['Ticket']['items']]);
+                $return_array[$j]['to']         = '收信人';
+                $return_array[$j]['labels']     = '';
+                $return_array[$j]['label']      = 'INBOX';
+                $return_array[$j]['date']       = $gd['Ticket']['open_date'];
+                $return_array[$j]['attachment'] = ''; //附件
+                //$return_array[$j]['asdasd']   	 	 = addslashes($gd['Ticket']['label']);//邮件标题（英文）
+               // $return_array[$j]['sublabel']	 	 = addslashes($gd['Ticket']['sublabel']);
+                $return_array[$j]['state']  		 	 = $gd['Ticket']['state'];//wish邮件状态说明
+                $return_array[$j]['stateID']		 	 = $gd['Ticket']['state_id'];//wish邮件状态ID
+                $return_array[$j]['orderInfo']	  	     = serialize($gd['Ticket']['items']);//wish订单信息
+                $return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
+                $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
+
+                $j++;
+            }
+        }
+        return (!empty($return_array)) ?  $return_array : false;
     }
 
     /**
@@ -699,6 +738,12 @@ Class WishAdapter implements AdapterInterface
      */
     public function sendMessages($replyMessage)
     {
+        $param['id'] = $replyMessage->message->from;
+        $param['access_token'] = $this->access_token;
+        $param['reply'] = $replyMessage->content;
+        $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
+
+
 
     }
 }

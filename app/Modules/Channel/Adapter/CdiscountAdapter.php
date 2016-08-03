@@ -472,7 +472,7 @@ Class CdiscountAdapter implements AdapterInterface
     }
 
     public function getMessages(){
-
+        return false;
     }
     public function sendMessages($replyMessage){
         

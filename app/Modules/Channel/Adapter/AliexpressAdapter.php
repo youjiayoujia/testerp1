@@ -10,6 +10,7 @@ namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Message\MessageModel;
 
 set_time_limit(1800);
 
@@ -443,11 +444,101 @@ Class AliexpressAdapter implements AdapterInterface
     public function getMessages()
     {
 
+        $msgSourcesArr =array('message_center','order_msg');
+        $method = 'api.queryMsgRelationList';
+        $filter = 'readStat';
+        $pageSize = 5;
+        $j = 0;
+        $message_list = [];
+
+        foreach ($msgSourcesArr as $Sources){
+            for($i=1; $i>0; $i++){
+                $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
+                $returnJson = $this->getJsonData($method,$para);
+                $message_array = json_decode($returnJson, true);
+                if(!empty($message_array['result'])){
+                    foreach ($message_array['result'] as $item){
+
+                        //最后一条消息是自己这边发送的 或者 卖家账号为空 跳过
+                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
+                            continue;
+                        }
+
+
+                        /**
+                         * 获取信息详情
+                         */
+
+                        $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+                        //$detail_array = json_decode($detailArrJson);
+                        //$detail_array = (array)$detail_array;
+                        $message_list[$j]['message_id'] = $item['channelId'];
+                        $message_list[$j]['from_name'] = addslashes($item['otherName']);
+                        $message_list[$j]['from'] = $item['otherLoginId'];
+                        $message_list[$j]['to'] = '收信人';
+                        $message_list[$j]['labels'] = '';
+                        $message_list[$j]['label'] = 'INBOX';
+                        $message_list[$j]['date'] = $item['messageTime'];
+                        $message_list[$j]['subject'] = '信息描述';
+                        $message_list[$j]['attachment'] = ''; //附件
+
+                        $message_list[$j]['message_type'] = $Sources;
+                        $message_list[$j]['rank'] = $item['rank'];
+                        $message_list[$j]['dealStat'] = $item['dealStat'];
+                        $message_list[$j]['channelId'] = $item['channelId'];
+                        $message_list[$j]['unreadCount'] = $item['unreadCount'];
+                        $message_list[$j]['readStat'] = $item['readStat'];
+
+                        $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
+                    }
+                }else{
+                    break;
+                }
+                $j++;
+            }
+        }
+
+        return (!empty($message_list)) ? $message_list : false;
     }
 
     public function sendMessages($replyMessage)
     {
+        // TODO: Implement sendMessages() method.
+        //echo $this->_access_token;
+        $message_obj = $replyMessage->message;
 
+        if(!empty($message_obj)){
+
+             // step1:发信息
+
+            $send_param = [];
+            $send_param['channelId'] = $message_obj->message_id;
+            $send_param['buyerId'] = $message_obj->from;
+            $send_param['msgSources'] = $message_obj->'消息类型';
+            $send_param['content'] = $replyMessage->content;
+
+            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $api_return_array = json_decode($api_return,true);
+            if(isset($api_return_array['result']["isSuccess"])){
+                if($api_return_array['result']["isSuccess"]){
+
+                    //step2: 更新消息为已读
+                    $update_param = [];
+                    $update_param['channelId'] = $message_obj->message_id;
+                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
+
+                    $replyMessage->status = 'SENT';
+                }else{
+                    $replyMessage->status = 'FAIL';
+                }
+            }
+        }else{
+            $replyMessage->status = 'FAIL';
+        }
+        $replyMessage->save();
+
+        return $replyMessage->status== 'SENT' ? true : false;
     }
 
 

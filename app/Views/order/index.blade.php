@@ -599,6 +599,7 @@
                 var lr = $('.lr').val();
                 if (lr == '') {
                     alert('请输入利润!');
+                    $('.sx').val('null');
                 }else {
                     var sx = $('.sx').val();
                     if (sx != null) {

@@ -19,13 +19,13 @@ class RequireModel extends BaseModel
     public $rules = [
         'create' => [   
                 'name' => 'required|max:255|unique:product_requires,name',
-                'needer_id' => 'required',
-                'needer_shop_id' => 'required'
+                //'needer_id' => 'required',
+                //'needer_shop_id' => 'required'
         ],
         'update' => [   
                 'name' => 'required|max:255|unique:product_requires,name, {id}',
-                'needer_id' => 'required',
-                'needer_shop_id' => 'required',
+                //'needer_id' => 'required',
+                //'needer_shop_id' => 'required',
         ]
     ];
 

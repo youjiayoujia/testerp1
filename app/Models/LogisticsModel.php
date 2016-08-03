@@ -34,6 +34,7 @@ class LogisticsModel extends BaseModel
         'pool_quantity',
         'is_enable',
         'limit',
+        'driver',
     ];
 
 
@@ -50,6 +51,7 @@ class LogisticsModel extends BaseModel
             'logistics_email_template_id' => 'required',
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
+            'driver' => 'required',
         ],
         'update' => [
             'code' => 'required',
@@ -63,6 +65,7 @@ class LogisticsModel extends BaseModel
             'logistics_email_template_id' => 'required',
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
+            'driver' => 'required',
         ],
     ];
 

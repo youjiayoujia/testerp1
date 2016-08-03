@@ -41,14 +41,19 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $order->remark($this->order['remark']);
             }
             if ($order) {
-                if ($order->status == 'PREPARED') {
-                    $job = new DoPackage($order);
+                $package = $order->createPackage();
+                if ($order->status == 'PREPARED' && $package) {
+                    $job = new DoPackage($package);
                     $job->onQueue('doPackages');
                     $this->dispatch($job);
+                    $this->relation_id = $order->id;
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success.';
+                } else {
+                    $this->relation_id = 0;
+                    $this->result['status'] = 'fail';
+                    $this->result['remark'] = 'Fail to create virtual package.';
                 }
-                $this->relation_id = $order->id;
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success.';
             } else {
                 $this->relation_id = 0;
                 $this->result['status'] = 'fail';

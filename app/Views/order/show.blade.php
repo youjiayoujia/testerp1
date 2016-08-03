@@ -22,6 +22,9 @@
                 <strong>邮箱</strong>: {{ $model->email }}
             </div>
             <div class="col-lg-2">
+                <strong>买家ID</strong>: {{ $model->by_id }}
+            </div>
+            <div class="col-lg-2">
                 <strong>订单状态</strong>: {{ $model->status_name }}
             </div>
             <div class="col-lg-2">

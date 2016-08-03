@@ -14,6 +14,16 @@
             <input class="form-control" id="customer_id" placeholder="客户ID" name='customer_id' value="{{ old('customer_id') }}">
         </div>
         <div class="form-group col-lg-3">
+            <label for="password" class="control-label">密码</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="password" placeholder="密码" name='password' value="{{ old('password') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="url" class="control-label">URL</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="url" placeholder="URL" name='url' value="{{ old('url') }}">
+        </div>
+        <div class="form-group col-lg-3">
             <label for="secret_key" class="control-label">密钥</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="secret_key" placeholder="密钥" name='secret_key' value="{{ old('secret_key') }}">
@@ -42,7 +52,7 @@
             <label for="remark" class="control-label">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">
         </div>
-        <div class="form-group col-lg-12">
+        <div class="form-group col-lg-3">
             <label for="is_api">是否有API</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">

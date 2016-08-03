@@ -31,7 +31,11 @@ class EmailTemplateModel extends BaseModel
         'phone',
         'unit',
         'sender',
-        'remark'
+        'remark',
+        'country_code',
+        'province',
+        'city',
+
     ];
 
     public $rules = [
@@ -41,7 +45,10 @@ class EmailTemplateModel extends BaseModel
             'zipcode' => 'required',
             'phone' => 'required',
             'unit' => 'required',
-            'sender' => 'required'
+            'sender' => 'required',
+            'country_code' => 'required',
+            'province' => 'required',
+            'city' => 'required',
         ],
         'update' => [
             'customer' => 'required|unique:logistics_email_templates,customer,{id}',
@@ -49,7 +56,10 @@ class EmailTemplateModel extends BaseModel
             'zipcode' => 'required',
             'phone' => 'required',
             'unit' => 'required',
-            'sender' => 'required'
+            'sender' => 'required',
+            'country_code' => 'required',
+            'province' => 'required',
+            'city' => 'required',
         ],
     ];
 

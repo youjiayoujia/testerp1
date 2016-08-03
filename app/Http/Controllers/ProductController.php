@@ -17,6 +17,7 @@ use App\Models\UserModel;
 use App\Models\WarehouseModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
+use App\Models\Product\RequireModel;
 use Gate;
 
 class ProductController extends Controller
@@ -47,11 +48,16 @@ class ProductController extends Controller
         /*if (Gate::denies('check','product_admin,product_staff|add')) {
             echo "没有权限";exit;
         }*/
+        $require_id = request()->input('id');
+        $requireModel = RequireModel::find($require_id);
+        $data = $this->catalog->getCatalogProperty($requireModel->catalog_id);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'catalogs' => $this->catalog->all(),
+            'catalogs' => $this->catalog->find($requireModel->catalog_id),
             'suppliers' => $this->supplier->all(),
             'wrapLimit' => $this->wrapLimit->all(),
+            'data' =>$data,
+            'require_id' =>$require_id,
             'users' => UserModel::all(),
             'warehouses' => $this->warehouse->where('type','local')->get(),
             'logisticsLimit' => $this->logisticsLimit->all(),
@@ -375,4 +381,61 @@ class ProductController extends Controller
         return $result;
     }
 
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function changePurchaseAdmin($product_id)
+    {
+        $user_name = request()->input('manual_name');
+        $user_id = request()->input('purchase_adminer');
+        $model = $this->model->find($product_id);
+        if($user_id){
+            $model->update(['purchase_adminer'=>$user_id]);
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
+        }else{
+            $userModel = UserModel::where('name',$user_name)->first();
+            if($userModel){
+                $model->update(['purchase_adminer'=>$userModel->id]);
+                return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
+            }else{
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
+            }
+        }
+        
+    }
+
+    /**
+     * 获取供应商信息
+     */
+    public function ajaxSupplierUser()
+    {
+        $product_id = request()->input('product_id');
+        $model = $this->model->find($product_id);
+        $user_array = ProductModel::where('supplier_id',$model->supplier_id)->distinct()->get();
+        $in = [];
+
+        foreach ($user_array as $array) {
+            $in[] = $array->purchase_adminer;
+        }
+        
+        if(request()->ajax()) {
+            $user = trim(request()->input('user'));
+            $buf = UserModel::where('name', 'like', '%'.$user.'%')->whereIn('id',$in)->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+
+        return json_encode(false);
+    }
 }

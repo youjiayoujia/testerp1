@@ -182,12 +182,12 @@
                                                     </div>
 
                                                 </td>
-                                                <td>打包：</td>
+                                                <td>{{--打包：--}}</td>
                                                 <td>
-                                                    <div class="input-group">
+                                                 {{--   <div class="input-group">
                                                         <input type="text" class="form-control" style="width: 60px;">
                                                         <span class="input-group-addon">个</span>
-                                                    </div>
+                                                    </div>--}}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -216,7 +216,7 @@
                                                 <td>
                                                     物流：
                                                     <select class="form-control" onchange="changeSelectVlaue($(this),'logistics',{{$product->id}})" id="logistics-{{$product->id}}" style="width: 150px;">
-                                                        <option>请选择</option>
+                                                        <option value="none">请选择</option>
                                                     </select>
                                                 </td>
                                                 <td>
@@ -228,22 +228,22 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    渠道:
+                                                    渠道名称:
                                                     <select class="form-control" id="channel-{{$product->id}}">
                                                         <option value="none">请选择</option>
                                                     @foreach($Compute_channels as $item)
-                                                        <option value="{{$item->id}}">{{$item->name}}</option>
+                                                        <option value="{{$item->name}}">{{$item->name}}</option>
                                                     @endforeach
                                                     </select>
                                                 </td>
                                                 <td>
                                                     利润率：
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$product->id}}">
+                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$product->id}}" value="">
                                                         <span class="input-group-addon">%</span>
                                                     </div>
                                                 </td>
-                                                <td>汇率：XXXX</td>
+                                                <td>{{--汇率：XXXX--}}</td>
                                             </tr>
                                         </table>
                                         <div class=" text-right">
@@ -255,8 +255,8 @@
                                             <tr>
                                             <th>序号</th>
                                             <th>渠道名</th>
-                                            <th>大PP价格</th>
-                                            <th>小PP价格</th>
+                                            <th>大PP价格（单位：美元）</th>
+                                            <th>小PP价格（单位：美元）</th>
                                             </tr>
                                             </thead>
                                             <tbody id="result-price-{{$product->id}}">
@@ -316,10 +316,24 @@
          * @param productId
          */
         function doComputePrice(productId){
+
             var zone_id = $('#zones-'+productId).val();
             var channel_id = $('#channel-'+productId).val();
             var profit_id = $('#profit-'+productId).val();
             var product_weight = $('#weight-'+productId).val();
+
+            if(zone_id == 'none'){
+                alert('物流分区不能为空');
+                return false;
+            }
+            if(profit_id == ''){
+                alert('利润率不能为空');
+                return false;
+            }
+            if(product_weight == ''){
+                alert('产品重量不能为空');
+                return false;
+            }
 
             var html = '';
             $.ajax({
@@ -345,8 +359,6 @@
                 error:function () {
 
                 }
-
-
             });
 
         }

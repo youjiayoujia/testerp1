@@ -146,7 +146,7 @@
                         </table>
                     </div>
                 </div>
-                @section('doAction')@show{{-- 列表字段 --}}
+                @section('doAction')@show{{-- 数据操作 --}}
                 <div class="row">
                     <div class="col-lg-6">
                         <span>每页&nbsp;</span>

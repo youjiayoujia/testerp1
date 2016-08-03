@@ -57,7 +57,8 @@ class TestController extends Controller
     }
     public function index()
     {
-        $trackingNumber = Logistics::driver('chukouyi', [])->getTracking([]);
+        $package = PackageModel::findOrFail(1);
+        $trackingNumber = Logistics::driver('Coe', ["driver"=>"Coe-test"])->getTracking($package);
         exit;
     }
     public function aliexpressOrdersList()

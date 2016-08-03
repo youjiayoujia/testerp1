@@ -31,6 +31,8 @@ class SupplierModel extends BaseModel
         'remark',
         'bank',
         'card_number',
+        'url',
+        'password',
     ];
 
     public $rules = [
@@ -43,6 +45,8 @@ class SupplierModel extends BaseModel
             'technician' => 'required',
             'manager_tel' => 'required|digits_between:8,11',
             'technician_tel' => 'required|digits_between:8,11',
+            'url' => 'required',
+            'password' => 'required',
         ],
         'update' => [
             'name' => 'required|unique:logistics_suppliers,name,{id}',
@@ -53,6 +57,8 @@ class SupplierModel extends BaseModel
             'technician' => 'required',
             'manager_tel' => 'required|digits_between:8,11',
             'technician_tel' => 'required|digits_between:8,11',
+            'url' => 'required',
+            'password' => 'required',
         ],
     ];
 

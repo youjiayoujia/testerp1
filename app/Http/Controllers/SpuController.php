@@ -33,12 +33,45 @@ class SpuController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$this->model->where('status','purchase')),
             'num_arr' =>$num_arr,
             'users' => UserModel::all(),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+     /**
+     * 分配任务
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function dispatchUser()
+    {
+        $user_id = request()->input("user_id");
+        $action = request()->input("action");
+        $spu_ids = request()->input("spu_ids");
+        $arr = explode(',', $spu_ids);
+        foreach($arr as $id){
+        	$this->model->find($id)->update([$action=>$user_id]);
+        }	
+        return 1;
+    }
+
+    /**
+     * 处理任务
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function doAction()
+    {
+        $action = request()->input("action");
+        $spu_ids = request()->input("spu_ids");
+        $arr = explode(',', $spu_ids);
+        foreach($arr as $id){
+        	$this->model->find($id)->update(['status'=>$action]);
+        }	
+        return 1;
     }
 
 }

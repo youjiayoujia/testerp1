@@ -54,7 +54,7 @@
     @section('doAction')
         <div class="row">
             <div class="col-lg-12">
-                <button>批量已编辑</button>
+                <button class="doAction" value="image_edit">批量已制图</button>
                 <button>批量退回</button>
                 <button>批量已编辑</button>
                 <button>批量转采购</button>
@@ -66,16 +66,15 @@
                     @endforeach
                 </select>
 
-                <button type="button" disabled="disabled">批量转美工</button>
-                <select>
+                <button type="button" class="dispatch"  value="image_edit">批量转美工</button>
+                <select class="select">
                     <option>==美工==</option>
                     @foreach($users as $user)
-                    
                         <option value='{{$user->id}}'>{{$user->name}}</option>
                     @endforeach
                 </select>
 
-                <button>批量转编辑</button>
+                <button class='dispatch' value="edit_user">批量转编辑</button>
                 <select>
                     <option>==编辑==</option>
                     @foreach($users as $user)
@@ -113,5 +112,53 @@
                     coll[i].checked = false;
             }
         }
+
+        $('.dispatch').click(function () {
+            //console.log($(this).next().find("option:selected").val());
+            var user_id = $(this).next().find("option:selected").val();
+            var action = $(this).val();
+            var url = "{{route('dispatchUser')}}";
+
+            var checkbox = document.getElementsByName("tribute_id");
+            var spu_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                spu_ids += checkbox[i].value + ",";
+            }
+            spu_ids = spu_ids.substr(0, (spu_ids.length) - 1);
+            $.ajax({
+                url: url,
+                data: {user_id: user_id, action: action,spu_ids:spu_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
+        });
+
+        $('.doAction').click(function () {
+            //console.log($(this).next().find("option:selected").val());
+            //var user_id = $(this).next().find("option:selected").val();
+            var action = $(this).val();
+            var url = "{{route('doAction')}}";
+
+            var checkbox = document.getElementsByName("tribute_id");
+            var spu_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                spu_ids += checkbox[i].value + ",";
+            }
+            spu_ids = spu_ids.substr(0, (spu_ids.length) - 1);
+            $.ajax({
+                url: url,
+                data: {action: action,spu_ids:spu_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
+        });
     </script>
 @stop

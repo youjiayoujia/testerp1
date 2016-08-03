@@ -346,7 +346,7 @@
                                 <div class="form-group col-lg-4">
                                     <label for="type" class='control-label'>退款类型</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                    <select class="form-control" name="type" id="type">
+                                    <select class="form-control type" name="type" id="type">
                                         <option value="NULL">==退款类型==</option>
                                         @foreach(config('order.type') as $type_key => $type)
                                             <option value="{{ $type_key }}" {{ old('type') }}>
@@ -655,6 +655,17 @@
                     coll[i].checked = false;
             }
         }
+
+        $('.type').click(function() {
+            var type = $('.type').val();
+            if (type == 'FULL') {
+                document.getElementById('price').readOnly = true;
+                document.getElementById('refund_amount').readOnly = true;
+            } else {
+                document.getElementById('price').readOnly = false;
+                document.getElementById('refund_amount').readOnly = false;
+            }
+        });
 
         //SMT批量撤单
         $('.sub').click(function () {

@@ -148,6 +148,8 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
+        $sx = request()->input('sx');
+        $lr = request()->input('lr');
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
@@ -156,6 +158,31 @@ class OrderController extends Controller
             'currencys' => CurrencyModel::all(),
         ];
         return view($this->viewPath . 'index', $response);
+//        $response = [];
+//        $sx = request()->input('sx');
+//        $lr = request()->input('lr');
+//        if ($sx != null && $lr != '') {
+//            if ($sx == 'high') {
+//                $order = $this->model->where('profit_rate', '>=', $lr);
+//            }else {
+//                $order = $this->model->where('profit_rate', '<=', $lr);
+//            }
+//            $response = [
+//                'metas' => $this->metas(__FUNCTION__),
+//                'data' => $order,
+//                'mixedSearchFields' => $this->model->mixed_search,
+//                'countries' => CountriesModel::all(),
+//                'currencys' => CurrencyModel::all(),
+//            ];
+//        }else {
+//            $response = [
+//                'metas' => $this->metas(__FUNCTION__),
+//                'data' => $this->autoList($this->model),
+//                'mixedSearchFields' => $this->model->mixed_search,
+//                'countries' => CountriesModel::all(),
+//                'currencys' => CurrencyModel::all(),
+//            ];
+//        }
     }
 
     /**

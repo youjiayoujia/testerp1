@@ -1,8 +1,10 @@
 @extends('layouts.default')
 @section('body')
+@foreach($picklistitemsArray as $picklistitems)
+<div class='col-lg-10'>
     <div class='row'>
         <div class='form-group col-lg-offset-5'>
-            <h3>拣货单</h3>
+            <h3>仓库发货拣货单(面单尺寸:{{$size}})</h3>
         </div>
         <div class='form-group col-lg-offset-8'>
             {!! $barcode !!}
@@ -16,7 +18,7 @@
         </div>
         <div class='form-group col-lg-3'>
             <label>仓库</label>
-            <input type='text' class='form-control' value="{{ $model->picknum }}">
+            <input type='text' class='form-control' value="{{ $model->warehouse ? $model->warehouse->name : '仓库信息有误' }}">
         </div>
         <div class='form-group col-lg-3'>
             <label>状态:</label>
@@ -56,15 +58,19 @@
         </thead>
         <tbody>
             @foreach($picklistitems as $key => $picklistitem)
+            @if($picklistitem->quantity - $picklistitem->packed_quantity > 0)
             <tr>
                 <td>{{ $picklistitem->items ? $picklistitem->items->sku : '' }}</td>
                 <td>{{ $picklistitem->position ? $picklistitem->position->name : '' }}</td>
-                <td>{{ $picklistitem->quantity }}</td>
+                <td>{{ $picklistitem->quantity - $picklistitem->packed_quantity }}</td>
                 <td>{{ $picklistitem->items ? $picklistitem->items->remark : '' }}</td>
                 <td>{{ $picklistitem->items ? $picklistitem->items->c_name : '' }}</td>
                 <td>{{ $model->picknum }}</td>
             </tr>
+            @endif
             @endforeach
         </tbody>
     </table>
+</div>
+@endforeach
 @stop

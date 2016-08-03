@@ -37,10 +37,10 @@
         <div class='row'>
     @endif
             <div class="form-group col-lg-1">
-                <input type='text' name='arr[id][{{$key}}]' class='form-control' value="{{ $takingForm->id }}"readonly>
+                <input type='text' name='arr[id][{{$key}}]' class='form-control' value="{{  $takingForm->id }}" readonly>
             </div>
             <div class="form-group col-lg-2">
-                <input type='text' name='arr[sku][{{$key}}]' class='form-control' value="{{ $takingForm->stock ? $takingForm->stock->item ? $takingForm->stock->item->sku : '' : '' }}" readonly>
+                <input type='text' name='arr[sku][{{$key}}]' class='form-control' value="{{  $takingForm->stock ? $takingForm->stock->item ? $takingForm->stock->item->sku : '' : '' }}" readonly>
             </div>
             <div class="form-group col-lg-2">
                 <input type='text' name='arr[warehouse_id][{{$key}}]' class='form-control' value="{{ $takingForm->stock ? $takingForm->stock->warehouse ? $takingForm->stock->warehouse->name : '' : '' }}" readonly>
@@ -58,10 +58,13 @@
                 <input type='text' name='arr[all_quantity][{{$key}}]' class='form-control all_quantity' value="{{ $takingForm->stock ? $takingForm->stock->all_quantity : '' }}" readonly>
             </div>
             <div class="form-group col-lg-2">
-                <input type='text' name='arr[quantity][{{$key}}]' class='form-control quantity' placeholder='实盘数量' value={{$takingForm->quantity !== NULL ? $takingForm->quantity : ''}}>
+                <input type='text' name='arr[quantity][{{$key}}]' class='form-control quantity' placeholder='实盘数量' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : ($takingForm->quantity !== NULL ? $takingForm->quantity : '')}}">
             </div>
         </div>
     @endforeach
+    <div class='row'>
+        <?php echo $takingForms->render(); ?>
+    </div>
 @stop
 <script type='text/javascript'>
     $(document).ready(function(){

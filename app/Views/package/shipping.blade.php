@@ -63,6 +63,20 @@ $(document).ready(function(){
         $(this).remove();
     });
 
+    $(document).on('keypress', function(event){
+        if(event.keyCode == '13') {
+            if($('.weight').is(':focus')) {
+                $('.trackno').val('');
+                $('.trackno').focus();
+                return true;
+            }
+            if($('.trackno').is(':focus')) {
+                $('.shipping').click();
+                return true;
+            }
+        }
+    })
+
     $('.shipping').click(function(){
         trackno = $('.trackno').val();
         weight = $('.weight').val();
@@ -81,11 +95,17 @@ $(document).ready(function(){
                     $('.holder').text('');
                     $('.holder_weight').text('');
                     if(result == false) {
-                        alert('package不存在');
-                        return;
+                        $('.holder_weight').text('package不存在');
+                        $('.trackno').val('');
+                        $('.weight').val('');
+                        $('.weight').focus();
+                        return false;
                     }
                     if(result == 'logistic_error') {
-                        alert('物流不匹配');
+                        $('.holder_weight').text('物流不匹配');
+                        $('.trackno').val('');
+                        $('.weight').val('');
+                        $('.weight').focus();
                         return;
                     }
                     if(result == true) {
@@ -93,6 +113,7 @@ $(document).ready(function(){
                         $('.holder_weight').text('重量保存成功');
                         $('.trackno').val('');
                         $('.weight').val('');
+                        $('.weight').focus();
                     }
                 }
             });

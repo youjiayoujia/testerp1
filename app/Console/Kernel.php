@@ -33,6 +33,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SentReturnTrack::class,
         \App\Console\Commands\MatchPaypal::class,
         \App\Console\Commands\GetLazadaPackageId::class,
+        \App\Console\Commands\GetFeedBack::class,
+        \App\Console\Commands\SentFeedBack::class,
     ];
 
     /**

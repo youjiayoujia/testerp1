@@ -21,6 +21,9 @@ use App\Modules\Paypal\PaypalApi;
 use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Models\Order\OrderPaypalDetailModel;
+use App\Models\Publish\Ebay\EbayFeedBackModel;
+use App\Models\Publish\Ebay\EbaySpecificsModel;
+
 
 use App\Models\PackageModel;
 use App\Models\ItemModel;
@@ -644,48 +647,42 @@ class TestController extends Controller
 
     public function testLazada()
     {
-        $packages = PackageModel::where('order_id', 12914)->get();
-
-        foreach ($packages as $package) {
-            $OrderItemIds = [];
-            foreach ($package->items as $item) {
-                $temp = $item->orderItem->transaction_id;
-                $temp = explode(',', $temp);
-                foreach ($temp as $v) {
-                    $v_temp = explode('@', $v);
-                    $OrderItemIds[] = $v_temp[0];
-                }
-
-            }
-           /* $OrderItemIds = [
-                9047009, 9047011
-            ];*/
-            $channel_listnum[] = $package->order->channel_listnum;
-            $account = AccountModel::findOrFail($package->channel_account_id);
-            $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $result = $channel->getPackageId(implode(',', $channel_listnum));
-            if ($result) {
-                if (isset($result[$OrderItemIds[0]])) { // 获取到了 最踪号 和 PackageId
-                    $update_info = [
-                        'tracking_no'=>$result[$OrderItemIds[0]]['TrackingCode'],
-                        'lazada_package_id'=>$result[$OrderItemIds[0]]['PackageId'],
-                    ];
-                    $package->update($update_info);
-
-                } else { //特殊情况数据记录
+        $accountId= 201;
+        $account = AccountModel::findOrFail($accountId);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $startDate = date('Y-m-d',strtotime('-2 day'));
+        $page = 0;
+        $is_do = true;
+        do{
+            $result = $channel->getChangedOrders($startDate,$page,$pageSize=500);
+            if($result){
+                $page++;
+                foreach($result as $re){
+                    if($re['Order']['state'] =='REFUNDED'){ //退款状态
+                        var_dump($re);
+                    }
 
                 }
-            } else { //api调用失败
 
+            }else{
+                $is_do = false;
             }
-
-            var_dump($OrderItemIds);
-
-            var_dump($result);
-
-        }
+        }while($is_do);
 
 
+
+
+
+
+      /*  $result = $channel->GetFeedback();
+        foreach($result as $re){
+            $re['channel_account_id'] = $accountId;
+            $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$accountId])->first();
+            if(empty($feedback)){
+                echo 11;
+                EbayFeedBackModel::create($re);
+            }
+        }*/
         exit;
     }
 

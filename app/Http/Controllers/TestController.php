@@ -64,7 +64,7 @@ class TestController extends Controller
     {
         $package = PackageModel::findOrFail(1);
         $trackingNumber =
-            Logistics::driver($package->logistics->supplier->driver, $package->logistics->api_config)
+            Logistics::driver($package->logistics->driver, $package->logistics->api_config)
                 ->getTracking($package);
         exit;
     }

@@ -1,32 +1,22 @@
 <?php
 namespace App\Modules\Logistics\Adapter;
+
+
 /**
  * Created by PhpStorm.
  * User: Vincent
  * Date: 16/8/1
  * Time: 下午13:31
  */
-class CoeAdapter implements AdapterInterface
+class CoeAdapter extends CommonAdapter
 {
     public $config;
-    public function __construct($config)
+    public function __construct($logisticsConfig)
     {
-        //todo:直接从物流信息里面读出传入
-        $this->config = [
-            'j_company' => 'Shenzhen Salamoer Technology',      //寄件人公司
-            'j_contact' => 'huangchaoyun',                     //寄件人
-            'j_tel' => '18038094536',                 //电话
-            'j_address' => 'A3-2 Hekan Industrial Zone No.41 Wuhe Road South', //地址
-            'j_province' => 'GUANGDONG',                    //省
-            'j_city' => 'SHENZHEN',                        //市
-            'j_post_code' => '518129',                 //邮编
-            'j_country' => 'CN',
-            'url' => 'http://112.74.141.18:9000/coeapi/coeSync/saveCoeOrder.do',
-            'UserId' => 'SZE150401',
-            'UserPassword' => 'SZE150401Mima20150902',
-            'Key' => '7891524B3896284F496775CCEA10F32C',
-        ];
+        //直接从物流信息里面读出传入
+        parent::__construct($logisticsConfig);
     }
+
     public function getTracking($package)
     {
         $result = $this->doUpload($package);
@@ -68,7 +58,7 @@ class CoeAdapter implements AdapterInterface
                               <cur>USD</cur>
             			  </item>";
         }
-        $order = $item->order;
+        $order = $package->order;
         $total_value = round($order->amount, 2);
         $content = "
         <logisticsEventsRequest>
@@ -88,7 +78,7 @@ class CoeAdapter implements AdapterInterface
                     <pcs>" . $totalCount . "</pcs>
                     <destNo><![CDATA[" . $countryCode . "]]></destNo>
                     <date><![CDATA[" . date("Y-m-d H:i:s") . "]]></date>
-                    <custNo><![CDATA[" . $this->logisticInfo['UserId'] . "]]></custNo>
+                    <custNo><![CDATA[" . $this->config['UserId'] . "]]></custNo>
                     <weight>" . $totalWeight . "</weight>
                     <declaredValue>" . $totalValue . "</declaredValue>
                     <declaredCurrency>USD</declaredCurrency>

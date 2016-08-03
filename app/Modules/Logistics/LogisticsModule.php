@@ -8,7 +8,9 @@ namespace App\Modules\Logistics;
  * Time: 下午13:27
  */
 use Exception;
+use App\Modules\Logistics\CommonAdapter;
 use App\Modules\Logistics\Adapter\ChukouyiAdapter;
+use App\Modules\Logistics\Adapter\CoeAdapter;
 
 class LogisticsModule
 {
@@ -31,5 +33,10 @@ class LogisticsModule
     public function createChukouyiDriver($config)
     {
         return new ChukouyiAdapter($config);
+    }
+
+    public function createCoeDriver($config)
+    {
+        return new CoeAdapter($config);
     }
 }

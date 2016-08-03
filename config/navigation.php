@@ -126,6 +126,16 @@ return [
                     'url' => 'errorList.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '创建模板',
+                    'url' => 'exportPackage.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货单异常',
+                    'url' => 'errorList.index',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [

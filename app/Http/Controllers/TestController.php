@@ -32,6 +32,7 @@ use App\Jobs\Job;
 use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
 
+use App\Models\PickListModel;
 use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
@@ -57,8 +58,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(98);
-        $package->createPackageItems();
+        echo DNS1D::getBarcodeHTML('123', 'C128', '3', '33');exit;
     }
 
     public function test1()

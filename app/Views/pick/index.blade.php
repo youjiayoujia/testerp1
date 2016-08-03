@@ -5,11 +5,11 @@
     <th>拣货单号</th>
     <th>类型</th>
     <th>物流</th>
+    <th>未包装(包裹数)</th>
+    <th>已包装(包裹数)</th>
     <th>状态</th>
     <th>拣货人</th>
     <th>拣货时间</th>
-    <th>包装人</th>
-    <th>包装时间</th>
     <th class='sort' data-field='created_at'>创建时间</th>
     <th>操作</th>
 @stop
@@ -21,11 +21,11 @@
             <td>{{ $pickList->picknum }}</td>
             <td>{{ $pickList->type == 'SINGLE' ? '单单' : ($pickList->type == 'SINGLEMULTI' ? '单多' : '多多')}}
             <td>{{ $pickList->logistic ? $pickList->logistic->name : '混合物流'}}</td>
+            <td>{{ $pickList->package->where('status', 'PICKING')->count() }}</td>
+            <td>{{ $pickList->package->where('status', 'PACKED')->count() }}</td>
             <td>{{ $pickList->status_name }}</td>
             <td>{{ $pickList->pickByName ? $pickList->pickByName->name : ''}}</td>
             <td>{{ $pickList->pick_at }}</td>
-            <td>{{ $pickList->packByName ? $pickList->packByName->name : ''}}</td>
-            <td>{{ $pickList->pack_at }}</td>
             <td>{{ $pickList->created_at }}</td>
             <td>
                 <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs">

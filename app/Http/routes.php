@@ -361,7 +361,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
-
+    Route::any('pickList/printPackageDetails/{id}/{status}',
+        ['uses' => 'PickListController@printPackageDetails', 'as' => 'pickList.printPackageDetails']);
     Route::any('pickList/printException/',
         ['uses' => 'PickListController@printException', 'as' => 'pickList.printException']);
     Route::post('pickList/statisticsProcess',
@@ -448,7 +449,25 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
+
+    //包裹倒出
+    Route::resource('exportPackage', 'ExportPackageController');
+
     //包裹管理路由
+    Route::get('package/forceOutPackage',
+        ['uses' => 'PackageController@forceOutPackage', 'as' => 'package.forceOutPackage']);
+    Route::get('package/implodePackage/{arr}',
+        ['uses' => 'PackageController@implodePackage', 'as' => 'package.implodePackage']);
+    Route::get('package/actSplitPackage/{arr}/{id}',
+        ['uses' => 'PackageController@actSplitPackage', 'as' => 'package.actSplitPackage']);
+    Route::get('package/returnSplitPackage',
+        ['uses' => 'PackageController@returnSplitPackage', 'as' => 'package.returnSplitPackage']);
+    Route::get('package/downloadTrackingNo',
+        ['uses' => 'PackageController@downloadTrackingNo', 'as' => 'package.downloadTrackingNo']);
+    Route::post('package/editTrackStore/{id}',
+        ['uses' => 'PackageController@editTrackStore', 'as' => 'package.editTrackStore']);
+    Route::get('package/editTrackingNo/{id}',
+        ['uses' => 'PackageController@editTrackingNo', 'as' => 'package.editTrackingNo']);
     Route::get('package/ajaxUpdatePackageLogistics',
         ['uses' => 'PackageController@ajaxUpdatePackageLogistics', 'as' => 'package.ajaxUpdatePackageLogistics']);
     Route::get('package/ajaxReturnPackageId',

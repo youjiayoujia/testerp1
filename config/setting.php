@@ -46,7 +46,6 @@ return [
         'order.active' => '售后状态',
         'active' => '售后状态',
         'country.code' => '国家简称',
-        'time.created_at' => '时间',
         'price.amount' => '金额',
         'item.sku' => 'SKU',
         'items.sku' => 'SKU',
@@ -79,6 +78,8 @@ return [
         'inner_type' => '出入库类型',
         'warehouse_id' => '仓库',
         'logistics_id' => '物流方式',
+        'time.printed_at' => '打印时间',
+        'time.shipped_at' => '发货时间',
     ],
 ];
 

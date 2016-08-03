@@ -17,8 +17,7 @@ use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingFormModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\ItemModel;
-use App\Models\Stock\InModel;
-use App\Models\Stock\OutModel;
+use App\Models\Stock\InOutModel;
 
 class TakingController extends Controller
 {
@@ -46,9 +45,9 @@ class TakingController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'stockTakingForms'=>$model->stockTakingForms,
-            'stockins' => InModel::where(['type'=>'INVENTORY_PROFIT', 'relation_id'=>$id])->with('stock')->get(),
-            'stockouts' => OutModel::where(['type'=>'SHORTAGE', 'relation_id'=>$id])->with('stock')->get(),
+            'stockTakingForms'=>$model->stockTakingForms()->paginate('1000'),
+            'stockins' => InOutModel::where(['inner_type'=>'INVENTORY_PROFIT', 'relation_id'=>$id])->with('stock')->paginate('500'),
+            'stockouts' => InOutModel::where(['inner_type'=>'SHORTAGE', 'relation_id'=>$id])->with('stock')->paginate('500'),
         ];
 
         return view($this->viewPath.'show', $response);
@@ -70,7 +69,7 @@ class TakingController extends Controller
         $response= [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'takingForms' => $model->stockTakingForms
+            'takingForms' => $model->stockTakingForms()->paginate('1000')
         ];
 
         return view($this->viewPath.'edit', $response);
@@ -85,7 +84,7 @@ class TakingController extends Controller
         $response = [
             'metas'=>$this->metas(__FUNCTION__),
             'model'=>$model,
-            'stockTakingForms' => $model->stockTakingForms,
+            'stockTakingForms' => $model->stockTakingForms()->whereRaw('stock_taking_status != ?', ['equal'])->paginate('1000'),
         ];
 
         return view($this->viewPath.'takingAdjustmentShow', $response);
@@ -196,7 +195,7 @@ class TakingController extends Controller
         $response = [
             'metas'=>$this->metas(__FUNCTION__),
             'model'=>$model,
-            'stockTakingForms' => $model->stockTakingForms,
+            'stockTakingForms' => $model->stockTakingForms()->whereRaw('stock_taking_status != ?', ['equal'])->paginate('1000'),
         ];
 
         return view($this->viewPath.'check', $response);

@@ -12,7 +12,7 @@ return [
     /**
      * 可选分页条数
      */
-    'pageSizes' => [10, 25, 50, 100],
+    'pageSizes' => [10, 25, 50, 100, 300],
     /**
      * 默认排序字段
      */
@@ -79,6 +79,9 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+        'by_id' => '买家ID',
+        'profit_rate' => '利润率',
+        'items.item.status' => 'SKU状态',
         'outer_type' => '出库/入库', 
         'inner_type' => '出入库类型',
         'warehouse_id' => '仓库',

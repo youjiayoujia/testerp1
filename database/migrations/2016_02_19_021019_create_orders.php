@@ -18,6 +18,8 @@ class CreateOrders extends Migration
             $table->integer('channel_account_id')->comment('渠道账号');
             $table->string('ordernum')->comment('订单号');
             $table->string('channel_ordernum')->comment('渠道订单号');
+            $table->string('by_id')->comment('买家ID')->nullable()->default(NULL);
+            $table->string('email')->comment('邮箱')->nullable()->default(NULL);
             $table->enum('status',
                 [
                     'UNPAID',
@@ -70,6 +72,7 @@ class CreateOrders extends Migration
             $table->string('billing_country')->comment('账单国家/地区')->nullable()->default(NULL);
             $table->string('billing_zipcode')->comment('账单邮编')->nullable()->default(NULL);
             $table->string('billing_phone')->comment('账单电话')->nullable()->default(NULL);
+            $table->string('withdraw_reason')->comment('撤单原因(自述)')->nullable()->default(NULL);
             $table->enum('withdraw',
                 [
                     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'

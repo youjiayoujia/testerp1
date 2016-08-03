@@ -13,6 +13,12 @@
                 <strong>客户ID</strong>: {{ $model->customer_id }}
             </div>
             <div class="col-lg-3">
+                <strong>密码</strong>: {{ $model->password }}
+            </div>
+            <div class="col-lg-3">
+                <strong>URL</strong>: {{ $model->url }}
+            </div>
+            <div class="col-lg-3">
                 <strong>密钥</strong>: {{ $model->secret_key }}
             </div>
             <div class="col-lg-3">

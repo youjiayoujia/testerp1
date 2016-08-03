@@ -18,12 +18,14 @@ class CreateOrders extends Migration
             $table->integer('channel_account_id')->comment('渠道账号');
             $table->string('ordernum')->comment('订单号');
             $table->string('channel_ordernum')->comment('渠道订单号');
-            $table->string('email')->comment('邮箱');
+            $table->string('by_id')->comment('买家ID')->nullable()->default(NULL);
+            $table->string('email')->comment('邮箱')->nullable()->default(NULL);
             $table->enum('status',
                 [
                     'UNPAID',
                     'PAID',
                     'PREPARED',
+                    'PARTIAL',
                     'NEED',
                     'PACKED',
                     'SHIPPED',
@@ -70,13 +72,13 @@ class CreateOrders extends Migration
             $table->string('billing_country')->comment('账单国家/地区')->nullable()->default(NULL);
             $table->string('billing_zipcode')->comment('账单邮编')->nullable()->default(NULL);
             $table->string('billing_phone')->comment('账单电话')->nullable()->default(NULL);
+            $table->string('withdraw_reason')->comment('撤单原因(自述)')->nullable()->default(NULL);
             $table->enum('withdraw',
                 [
                     '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
                 ])->comment('撤单原因')->nullable()->default(NULL);
             $table->string('cele_admin')->comment('红人单')->nullable()->default(NULL);
             $table->integer('priority')->comment('优先级')->nullable()->default(0);
-            $table->integer('package_times')->comment('打包次数')->nullable()->default(0);
             $table->integer('split_times')->comment('拆分次数')->nullable()->default(0);
             $table->integer('split_quantity')->comment('被拆分数量')->nullable()->default(0);
             $table->string('fulfill_by')->comment('处理方')->nullable()->default(NULL);

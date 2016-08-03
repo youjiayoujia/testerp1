@@ -2,7 +2,9 @@
 namespace App\Models;
 
 use Excel;
+use DB;
 use App\Base\BaseModel;
+use App\Models\RequireModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
@@ -60,6 +62,7 @@ class PackageModel extends BaseModel
         'created_at',
         'is_tonanjing',
         'is_over',
+        'lazada_package_id'
     ];
 
     public function getMixedSearchAttribute()
@@ -77,6 +80,11 @@ class PackageModel extends BaseModel
             ],
             'sectionSelect' => [],
         ];
+    }
+
+    public function requires()
+    {
+        return $this->hasMany('App\Models\RequireModel', 'package_id', 'id');
     }
 
     public function getArray($model, $name)
@@ -151,6 +159,165 @@ class PackageModel extends BaseModel
     }
 
     /*******************************************************************************/
+    public function createPackageItems()
+    {
+        $items = $this->setPackageItems();
+        if ($items) {
+            $this->createPackageDetail($items);
+        } else {
+            if ($this->status == 'NEW') {
+                foreach ($this->items as $item) {
+                    $require = [];
+                    $require['item_id'] = $item->item_id;
+                    $require['warehouse_id'] = $item->item->warehouse_id;
+                    $require['order_item_id'] = $item->order_item_id;
+                    $require['sku'] = $item->item->sku;
+                    $require['quantity'] = $item->quantity;
+                    $this->requires()->create($require);
+                }
+                $this->update(['status' => 'NEED']);
+                $this->order->update(['status' => 'NEED']);
+                return true;
+            } elseif ($this->status == 'NEED') {
+                if (strtotime($this->created_at) < strtotime('-3 days')) {
+                    $arr = $this->explodePackage();
+                    if ($arr) {
+                        $this->createChildPackage($arr);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public function createChildPackage($arr)
+    {
+        $items = $this->items;
+        if($this->order->status == 'NEED') {
+            $this->order->update(['status' => 'PARTIAL']);
+        }
+        foreach($arr as $warehouseId => $stockInfo) {
+            $newPackage = $this->create($this->toArray());
+            foreach($stockInfo as $stockId => $info) {
+                $item = $items->where('item_id', $info['item_id'])->first();
+                if($item->quantity <= $info['quantity']) {
+                    $item->delete();
+                    continue;
+                }
+                $item->update(['quantity' => ($item->quantity-$info['quantity'])]);
+                $newPackage->items()->create($info);
+            }
+            $newPackage->update(['status' => 'WAITASSIGN', 'warehouse_id' => $info['warehouse_id']]);
+            //加入订单状态部分发货
+        }
+    }
+
+    public function atLeastTimes($arr)
+    {
+        $sum = 0;
+        foreach ($arr as $key => $value) {
+            if ($value['sum'] == $value['allocateSum'] || $value['allocateSum'] == 0) {
+                $sum += 1;
+            } else {
+                $sum += 2;
+            }
+        }
+
+        return $sum;
+    }
+
+     public function explodePackage()
+    {
+        $arr = $this->packageStockDiff($this->packageNeedArray());
+        $sum = $this->atLeastTimes($arr);
+        if ($this->order->split_times > (4 - $sum)) {
+            return false;
+        }
+        $stocks = [];
+        foreach ($arr as $key => $value) {
+            if (!($value['allocateSum'] >= 5 && $value['allocateSum'] / $value['sum'] >= 0.5 || $value['allocateSum'] < 5 && $value['allocateSum'] == $value['sum'])) {
+                continue;
+            }
+            foreach ($value as $k => $v) {
+                if (!is_array($v)) {
+                    continue;
+                }
+                if ($v['allocateQuantity']) {
+                    $defaultStocks = ItemModel::find($k)->assignDefaultStock($v['allocateQuantity'],
+                        $v['order_item_id']);
+                    if (array_key_exists($key, $stocks)) {
+                        $stocks[$key] = $stocks[$key] + $defaultStocks[$key];
+                    } else {
+                        $stocks += $defaultStocks;
+                    }
+                }
+            }
+        }
+
+        return $stocks;
+    }
+
+
+    public function PackageNeedArray()
+    {
+        $arr = [];
+        foreach ($this->items as $packageItem) {
+            $item = $packageItem->item;
+            $needQuantity = $packageItem->quantity;
+            if ($needQuantity) {
+                if (!array_key_exists($item->warehouse_id, $arr)) {
+                    $arr[$item->warehouse_id] = [];
+                    $arr[$item->warehouse_id]['sum'] = 0;
+                    if (!array_key_exists($packageItem->item_id, $arr[$item->warehouse_id])) {
+                        $arr[$item->warehouse_id][$packageItem->item_id]['quantity'] = $needQuantity;
+                        $arr[$item->warehouse_id][$packageItem->item_id]['order_item_id'] = $packageItem->order_item_id;
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
+                    } else {
+                        $arr[$item->warehouse_id][$packageItem->item_id]['quantity'] += $needQuantity;
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
+                    }
+                } else {
+                    if (!array_key_exists($packageItem->item_id, $arr[$item->warehouse_id])) {
+                        $arr[$item->warehouse_id][$packageItem->item_id]['quantity'] = $needQuantity;
+                        $arr[$item->warehouse_id][$packageItem->item_id]['order_item_id'] = $packageItem->order_item_id;
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
+                    } else {
+                        $arr[$item->warehouse_id][$packageItem->item_id]['quantity'] += $needQuantity;
+                        $arr[$item->warehouse_id]['sum'] += $needQuantity;
+                    }
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    public function packageStockDiff($arr)
+    {
+        foreach ($arr as $warehouseId => $singleWarehouseInfo) {
+            $arr[$warehouseId]['allocateSum'] = 0;
+            foreach ($singleWarehouseInfo as $key => $value) {
+                if ($key == 0) {
+                    continue;
+                }
+                foreach ($value as $k => $v) {
+                    $stocks = StockModel::where(['item_id' => $key, 'warehouse_id' => $warehouseId])->get();
+                    if (!count($stocks)) {
+                        $arr[$warehouseId][$key]['allocateQuantity'] = 0;
+                    } else {
+                        $stock_sum = $stocks->sum('available_quantity');
+                        $arr[$warehouseId][$key]['allocateQuantity'] = ($stock_sum <= $arr[$warehouseId][$key]['quantity']) ? $stock_sum : $arr[$warehouseId][$key]['quantity'];
+                        $arr[$warehouseId]['allocateSum'] += $arr[$warehouseId][$key]['allocateQuantity'];
+                    }
+                    continue 2;
+                }
+            }
+        }
+
+        return $arr;
+    }
+
     /**
      * @param array $items
      * @return array|bool
@@ -175,7 +342,6 @@ class PackageModel extends BaseModel
             return false;
         }
         $stocks = $originPackageItem->item->assignStock($quantity);
-        var_dump($stocks);
         if ($stocks) {
             foreach ($stocks as $warehouseId => $stock) {
                 foreach ($stock as $key => $value) {
@@ -187,7 +353,7 @@ class PackageModel extends BaseModel
         } else {
             return false;
         }
-var_dump($packageItem);exit;
+
         return $packageItem;
     }
 
@@ -246,7 +412,61 @@ var_dump($packageItem);exit;
 
         return $packageItem;
     }
+
+    public function createPackageDetail($items)
+    {
+        foreach($this->items as $packageItem) {
+            $packageItem->delete();
+        }
+        $this->order->update(['status' => 'PACKED']);
+        $i = true;
+        foreach ($items as $warehouseId => $packageItems) {
+            if($i) {
+                foreach ($packageItems as $key => $packageItem) {
+                    $newPackageItem = $this->items()->create($packageItem);
+                    DB::beginTransaction();
+                    try {
+                        $newPackageItem->item->hold(
+                            $packageItem['warehouse_position_id'],
+                            $packageItem['quantity'],
+                            'PACKAGE',
+                            $newPackageItem->id,
+                            $key);
+                    } catch (Exception $e) {
+                        DB::rollBack();
+                    }
+                    DB::commit();
+                }
+                $this->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN']);
+                $i = false;
+            } else {
+                $newPackage = $this->create($this->toArray());
+                if($newPackage) {
+                    foreach ($packageItems as $key => $packageItem) {
+                        $newPackageItem = $newPackage->items()->create($packageItem);
+                        DB::beginTransaction();
+                        try {
+                            $newPackageItem->item->hold(
+                                $packageItem['warehouse_position_id'],
+                                $packageItem['quantity'],
+                                'PACKAGE',
+                                $newPackageItem->id,
+                                $key);
+                        } catch (Exception $e) {
+                            DB::rollBack();
+                        }
+                        DB::commit();
+                    }
+                    $newPackage->update(['warehouse_id' => $warehouseId, 'status' => 'WAITASSIGN']);
+                }
+            }
+        }
+
+        return true;
+    }
     /**********************************************************************************/
+
+
 
     public function getShippingLimitsAttribute()
     {

@@ -33,6 +33,21 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="unit" placeholder="退件单位" name='unit' value="{{ old('unit') }}">
         </div>
+        <div class="form-group col-lg-3">
+            <label for="country_code" class="control-label">国家代码</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="country_code" placeholder="国家代码" name='country_code' value="{{ old('country_code') }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="province" class="control-label">省份</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="province" placeholder="省份" name='province' value="{{ old('province') }}">
+        </div>
+        <div class="form-group col-lg-6">
+            <label for="city" class="control-label">城市</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="city" placeholder="城市" name='city' value="{{ old('city') }}">
+        </div>
         <div class="form-group col-lg-12">
             <label for="remark" class="control-label">备注</label>
             <input class="form-control" id="remark" placeholder="备注" name='remark' value="{{ old('remark') }}">

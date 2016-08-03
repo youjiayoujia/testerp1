@@ -112,18 +112,19 @@ Class AliexpressAdapter implements AdapterInterface
         $action = 'api.sellerShipment';
         $app_url = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
-        $parameter['access_token'] = $this->_access_token;
-        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
-        //$result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
-        //$result = json_decode($result,true);
-        $rand_id = rand(1, 10);
+        $tracking_info['access_token'] = $this->_access_token;
+        $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
+        $result = json_decode($result,true);
+    /*    $rand_id = rand(1, 10);
         if ($rand_id > 3) {
             $result['success'] = 'Falie';
 
         } else {
             $result['success'] = 'true';
 
-        }
+        }*/
+        var_dump($result);
         if (isset($result['success']) && ($result['success'] == 'true')) {
             $return['status'] = true;
             $return['info'] = 'Success';
@@ -166,8 +167,9 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
-        $orderInfo['shipping_firstname'] = $orderDetail['buyerInfo']['firstName'];
-        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];
+        $orderInfo['shipping_firstname'] = $orderDetail['receiptAddress'] ['contactPerson'];
+/*        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];*/
+        $orderInfo['shipping_lastname'] = '';
         $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
         $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"] ["city"];
@@ -422,7 +424,7 @@ Class AliexpressAdapter implements AdapterInterface
         curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+       // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
         curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求

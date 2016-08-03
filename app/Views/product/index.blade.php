@@ -283,10 +283,14 @@
                     <span class="glyphicon glyphicon-pencil"></span> 小语言
                 </a>
                 <?php if(($product->edit_status == 'picked' || $product->edit_status == 'data_edited' || $product->edit_status == "image_edited" || $product->edit_status == "image_unedited") && $product->examine_status != 'pass'){ ?>
-                <a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                {{--<a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
-                </a>
+                </a>--}}
+
                 <?php } ?>
+                <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="查询物流单号" class="btn btn-info btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-zoom-in"></span>
+
                 <a href="{{ route('createImage', ['model'=>$product->model]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
@@ -304,6 +308,42 @@
 {{--@endcan--}}
             </td>
         </tr>
+
+        <!-- 模态框（Modal） -->
+        <form action="/product/changePurchaseAdmin/{{$product->id}}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="switch_purchase_{{$product->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           转移采购负责人
+                        </h4>
+                     </div>
+                     
+                     <div>当前采购负责人:{{$product->purchaseAdminer?$product->purchaseAdminer->name:'无负责人'}}</div>
+                     <div>转移至：</div>
+                     <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$product->id}}"></select></div>
+                     或者：
+                     <input type="text" value='' name='manual_name' id='manual_name'>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框结束（Modal） -->
     @endforeach
 @stop
 @section('childJs')
@@ -444,6 +484,25 @@
                     }
                 })
             }
+        });
+        
+        /*ajax调取采购负责人*/
+        $('.purchase_adminer').select2({
+            //alert(1);return;
+            ajax: {
+                url: "{{ route('ajaxSupplierUser') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    user:params.term,
+                    product_id: $(this).attr('id'),
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
         });
 
         $('.batchedit').click(function () {

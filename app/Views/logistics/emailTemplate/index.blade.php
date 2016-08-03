@@ -7,6 +7,9 @@
     <th>电话</th>
     <th>退件单位</th>
     <th>寄件人</th>
+    <th>国家代码</th>
+    <th>省份</th>
+    <th>城市</th>
     <th>备注</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -22,6 +25,9 @@
             <td>{{ $emailTemplate->phone }}</td>
             <td>{{ $emailTemplate->unit }}</td>
             <td>{{ $emailTemplate->sender }}</td>
+            <td>{{ $emailTemplate->country_code }}</td>
+            <td>{{ $emailTemplate->province }}</td>
+            <td>{{ $emailTemplate->city }}</td>
             <td>{{ $emailTemplate->remark }}</td>
             <td>{{ $emailTemplate->updated_at }}</td>
             <td>{{ $emailTemplate->created_at }}</td>

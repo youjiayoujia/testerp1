@@ -13,6 +13,7 @@ return [
         'UNPAID' => '未付款',
         'PAID' => '已付款',
         'PREPARED' => '准备发货',
+        'PARTIAL' => '部分发货',
         'NEED' => '缺货',
         'PACKED' => '打包完成',
         'SHIPPED' => '发货完成',

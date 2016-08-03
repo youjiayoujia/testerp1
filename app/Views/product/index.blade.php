@@ -437,7 +437,7 @@
                                     $('#logistics-'+productId).html('');
                                     $('#logistics-'+productId).append('<option value="none"> 请选择 </option>');
                                     $.each($returnInfo,function (index,item) {
-                                        $('#logistics-'+productId).append('<option value="' + item.id + '">' + item.logistics_type + '</option>');
+                                        $('#logistics-'+productId).append('<option value="' + item.id + '">' + item.code + '</option>');
                                     });
                                 case 'logistics':
                                     $('#zones-'+productId).html('');

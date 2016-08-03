@@ -38,6 +38,7 @@ class PurchaseOrderModel extends BaseModel
     protected $fillable = [
         'type',
         'status',
+        'carriage_type',
         'supplier_id',
         'user_id',
         'update_userid',
@@ -47,6 +48,7 @@ class PurchaseOrderModel extends BaseModel
         'post_coding',
         'total_postage',
         'total_purchase_cost',
+        'is_certificate',
         'close_status',
         'purchase_userid',
         'start_buying_time',
@@ -55,6 +57,7 @@ class PurchaseOrderModel extends BaseModel
         'pay_type',
         'write_off',
         'print_num',
+        'remark',
         'print_status'
     ];
 
@@ -126,10 +129,13 @@ class PurchaseOrderModel extends BaseModel
     {
         $data['user_id'] = request()->user()->id;
         $purchase_order = PurchaseOrderModel::create($data);
-        echo '<pre>';
-        print_r($data);exit;
-        //PurchaseItemModel::create();
-        exit;
+        foreach ($data['item'] as $item) {
+            $item['purchase_order_id'] = $purchase_order->id;
+            $item['supplier_id'] = $data['supplier_id'];
+            $item['warehouse_id'] = $data['warehouse_id'];
+            $item['user_id'] = request()->user()->id;
+            PurchaseItemModel::create($item);
+        }
     }
 
     /**

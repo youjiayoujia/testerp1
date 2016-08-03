@@ -167,7 +167,7 @@
                 </a>--}}
 
                 <?php } ?>
-                <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="查询物流单号" class="btn btn-info btn-xs" id="find_shipment">
+                <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-zoom-in"></span>
 
                 <a href="{{ route('createImage', ['model'=>$product->model]) }}" class="btn btn-warning btn-xs">

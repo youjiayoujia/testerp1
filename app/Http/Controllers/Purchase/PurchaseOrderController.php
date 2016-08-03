@@ -599,6 +599,39 @@ class PurchaseOrderController extends Controller
         $p_id = (int)$p_id;
         echo json_encode($p_id);
     }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseAjaxSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $supplier_id = request()->input('supplier_id')?request()->input('supplier_id'):'';
+            /*if($supplier_id){
+                $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->where('supplier_id',$supplier_id)->get();
+            }else{
+                $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            }*/
+            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->where('supplier_id',$supplier_id)->get();
+            $total = $skus->count();
+            $arr = [];
+            foreach($skus as $key => $sku) {
+                $arr[$key]['id'] = $sku->sku;
+                $arr[$key]['text'] = $sku->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
+    }
         
 }
 

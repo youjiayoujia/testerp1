@@ -9,9 +9,10 @@
 			<div class='row'>
 				<div class="form-group col-md-3">
 		            <label for="size">订单类型</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-		            <select  class="form-control" name="purchase_type">
-		                <option value="1">普通</option>
-		                <option value="2">特采</option>
+		            <select  class="form-control" name="type">
+		                @foreach(config('purchase.purchaseOrder.type') as $key=>$v)
+			                <option value="{{$key}}">{{$v}}</option>
+		                @endforeach
 		            </select>
 			    </div>
 			    <div class="form-group col-md-3">
@@ -24,7 +25,7 @@
 			    </div>
 			    <div class="form-group col-md-3">
 			        <label for="size">供应商</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-			        <select class='form-control supplier' name="supplier_id"></select>
+			        <select class='form-control supplier' id="supplier_id" name="supplier_id"></select>
 			    </div>
 			   
 			    <div class="form-group col-md-3">
@@ -43,11 +44,12 @@
 			</div>
 
 			<div class='row'>
-				<div class="form-group col-md-3">
-		            <label for="size">物流方式</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-		            <select  class="form-control" name="purchase_type">
-		                <option value="1">普通</option>
-		                <option value="2">特采</option>
+			    <div class="form-group col-md-3">
+			 		<label for="size">物流方式</label><small class="text-danger glyphicon glyphicon-asterisk"></small>			 
+			    	<select  class="form-control" name="carriage_type">
+			    		@foreach(config('purchase.purchaseOrder.carriage_type') as $key=>$v)
+			                <option value="{{$key}}">{{$v}}</option>
+		                @endforeach
 		            </select>
 			    </div>
 			    <div class="form-group col-md-3">
@@ -61,12 +63,16 @@
 
 			    <div class="form-group col-md-3">
 			        <label for="size">付款凭证</label>
-			         <select  class="form-control" name="purchase_type">
+			         <select  class="form-control" name="is_certificate">
 		                <option value="1">需要</option>
-		                <option value="2">不需要</option>
+		                <option value="0">不需要</option>
 		            </select>
 			    </div>
-			     
+			    
+			    <div class="form-group col-md-3">
+			        <label for="size">备注</label>
+			        <input class="form-control" id="remark" placeholder="备注" name='remark' value="">
+			    </div>
 			</div>
 		</div>
 </div>
@@ -75,42 +81,21 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">采购物品信息 :</div>
 		<div class="panel-body">
-			<div class='row'>
+			<div class='row  purchase_num'>
 			    <div class="form-group col-md-3">
 			        <label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-			        <select class='form-control sku' name="item[1][sku]"></select>
+			        <select class='form-control sku' name="item[0][sku]"></select>
 			    </div>
 			    
 			    <div class="form-group col-md-3">
 			        <label for="size">数量</label>
-			        <input class="form-control"  placeholder="数量" name='item[1][purchase_num]' value="">
-			    </div>
-			    
+			        <input class="form-control"  placeholder="数量" name='item[0][purchase_num]' value="">
+			    </div>  
 			</div>
-			<div class='row'>
-			    <div class="form-group col-md-3">
-			        <label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-			        <select class='form-control sku' name="item[2][sku]"></select>
-			    </div>
-			    
-			    <div class="form-group col-md-3">
-			        <label for="size">数量</label>
-			        <input class="form-control"  placeholder="数量" name='item[2][purchase_num]' value="">
-			    </div>
-			    
-			</div>
-			<div class='row'>
-			    <div class="form-group col-md-3">
-			        <label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-			        <select class='form-control sku' name="item[3][sku]"></select>
-			    </div>
-			    
-			    <div class="form-group col-md-3">
-			        <label for="size">数量</label>
-			        <input class="form-control"  placeholder="数量" name='item[3][purchase_num]' value="">
-			    </div>
-			    
-			</div>
+			<div class="panel-footer">
+            	<div class="create" id="additem"><i class="glyphicon glyphicon-plus"></i></div>
+        	</div>
+        </div>
 		</div>
 	</div>
     
@@ -120,12 +105,13 @@
 	<script type="text/javascript">
 		$('.sku').select2({
 	        ajax: {
-	            url: "{{ route('stock.ajaxSku') }}",
+	            url: "{{ route('purchaseAjaxSku') }}",
 	            dataType: 'json',
 	            delay: 250,
 	            data: function (params) {
 	              return {
 	                user:params.term,
+	                supplier_id: $("#supplier_id").val(),
 	              };
 	            },
 	            results: function(data, page) {
@@ -149,5 +135,29 @@
 	            }
 	        },
     	});
+    	{{-- 添加采购物品  --}}
+        $(document).on('click', '#additem', function () {
+            var aa = $("input[name^='item[']:last").attr('name');
+            var num = aa.substr(5, 1);
+            num = parseInt(num);
+            num = num + 1;
+            $(".purchase_num").last().after('<div class="row  purchase_num"><div class="form-group col-md-3"><label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small><select class="form-control sku" name="item['+num+'][sku]"></select></div><div class="form-group col-md-3"><label for="size">数量</label><input class="form-control"  placeholder="数量" name="item['+num+'][purchase_num]" value=""></div></div>');
+        	$('.sku').select2({
+		        ajax: {
+		            url: "{{ route('purchaseAjaxSku') }}",
+		            dataType: 'json',
+		            delay: 250,
+		            data: function (params) {
+		              return {
+		                user:params.term,
+		                supplier_id: $("#supplier_id").val(),
+		              };
+		            },
+		            results: function(data, page) {
+		                
+		            }
+		        },
+			});
+       });
 	</script>
 @stop

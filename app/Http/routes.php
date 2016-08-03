@@ -670,4 +670,7 @@ Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersLi
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
+//spu
+Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
+Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
 Route::resource('spu', 'SpuController');

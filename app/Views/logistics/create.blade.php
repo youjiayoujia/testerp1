@@ -105,6 +105,11 @@
     </div>
     <div class="row">
         <div class="form-group col-lg-2">
+            <label for="driver" class="control-label">驱动名</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') }}">
+        </div>
+        <div class="form-group col-lg-2">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">

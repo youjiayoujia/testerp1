@@ -27,11 +27,14 @@
         <div class="form-group col-lg-4">
             <label for="name" class='control-label'>订单状态</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select class="form-control" name="order_status">
+            @foreach($order_status as $key=> $status)
+            <div> {{ $status }}: <input type="checkbox" value="{{ $key }}"  name="order_status[]" ></div>
+            @endforeach
+            {{--<select class="form-control" name="order_status">
                 @foreach($order_status as $key=> $status)
                     <option value="{{ $key }}" {{ Tool::isSelected('order_status', $key) }}>{{ $status }}</option>
                 @endforeach
-            </select>
+            </select>--}}
         </div>
     </div>
 
@@ -115,7 +118,7 @@
 
     <div class="row">
         <div class="form-group col-lg-4">
-            <label for="name" class='control-label'>规则优先度</label>
+            <label for="name" class='control-label'>规则优先度(数字越大越先执行)</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="priority">
                 @for($i=1;$i<20;$i++)
@@ -135,7 +138,7 @@
                     <input type="radio" name="is_use" value="1" {{ Tool::isChecked('is_use', '1', null, true) }}>是
                 </label>
                 <label>
-                    <input type="radio" name="is_use" value="2" {{ Tool::isChecked('is_use', '2') }}>否
+                    <input type="radio" name="is_use" value="0" {{ Tool::isChecked('is_use', '0') }}>否
                 </label>
             </div>
         </div>

@@ -16,11 +16,18 @@
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th class="sort" data-field="id">ID</th>
-    <th class="sort" data-field="sku">sku名称</th>
     <th>图片</th>
-    <th>分类</th>
-    <th class="sort" data-field="name">名称</th>
+    <th class="sort" data-field="sku">sku名称</th>
     <th class="sort" data-field="c_name">中文名称</th>
+    <th>分类</th>
+    <th>重量</th>
+    <th>仓位</th>
+    <th>申报价值</th>
+    <th>注意事项</th>
+    <th>小计</th>
+    <th>状态</th>
+    <th>采购负责人</th>
+    <th>开发负责人</th>
     <th>供应商</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>更新时间</th>
@@ -31,14 +38,20 @@
 
     @foreach($data as $item)
         <tr>
-
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
-            <td>{{ $item->sku }}</td>
             <td><img src="{{ asset($item->product->dimage) }}" width="100px"></td>
-            <td>{{ $item->product and $item->product->catalog ? $item->product->catalog->name : ''}}</td>
-            <td>{{ $item->name }}</td>
+            <td>{{ $item->c_name }}<br>分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>开发时间：{{ $item->created_at }}<br></td>
             <td>{{ $item->c_name }}</td>
+            <td>{{ $item->product and $item->product->catalog ? $item->product->catalog->name : ''}}</td>
+            <td>{{ $item->weight }}</td>
+            <td>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ config('item.status')[$item->status]}}</td>
+            <td>{{ $item->product->weight }}</td>
+            <td></td>
             <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
             <td>{{ $item->updated_at }}</td>
             <td>{{ $item->created_at }}</td>
@@ -48,6 +61,9 @@
                 </a>
                 <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
+                </a>
+                <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
+                    <span class="glyphicon glyphicon-pencil"></span> 打印
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"

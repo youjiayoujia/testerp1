@@ -14,6 +14,7 @@
     <th>产品ID</th>
     <th>SKU</th>
     <th>标题</th>
+    <th class="sort" data-field="number_sold">售出量</th>
     <th>刊登人员</th>
     <th>刊登时间</th>
     <th>操作</th>
@@ -35,7 +36,11 @@
                     <a target="_blank" href="{{$onePic}}"><img style="width:50px;height:50px;" src="{{$onePic}}"></a>
                 @endif
             </td>
-            <td>{{  $wishProduct->channelAccount->account }}</td>
+            <td>
+                @if(isset($wishProduct->channelAccount->account))
+                {{  $wishProduct->channelAccount->account }}
+                @endif
+            </td>
             <td>{{  $wishProduct->productID }}</td>
             <td><?php
                 foreach ($wishProduct->details as $detail) {
@@ -43,6 +48,7 @@
                 }
                 ?></td>
             <td>{{  $wishProduct->product_name }}</td>
+            <td >{{  $wishProduct->number_sold }}</td>
             <td>
                 @if(isset( $wishProduct->operator->name))
                     {{ $wishProduct->operator->name }}

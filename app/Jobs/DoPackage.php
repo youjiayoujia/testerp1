@@ -12,18 +12,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class DoPackage extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
-    protected $order;
+    protected $package;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($order)
+    public function __construct($package)
     {
-        $this->order = $order;
-        $this->relation_id = $this->order->id;
-        $this->description = 'Order:' . $this->order->id . ' do package.';
+        $this->package = $package;
+        $this->relation_id = $this->package->id;
+        $this->description = 'Package:' . $this->package->id . ' do package.';
     }
 
     /**
@@ -34,7 +34,7 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
     public function handle()
     {
         $start = microtime(true);
-        if ($this->order->createPackage()) {
+        if ($this->package->createPackageItems()) {
             if ($this->order->status == 'PACKED') {
                 foreach ($this->order->packages as $package) {
                     $job = new AssignLogistics($package);

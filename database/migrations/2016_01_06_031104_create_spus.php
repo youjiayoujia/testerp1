@@ -15,6 +15,7 @@ class CreateSpus extends Migration
         Schema::create('spus', function (Blueprint $table) {
             $table->increments('id');
             $table->string('spu')->comment('spu')->nullable()->default(NULL);
+            $table->integer('product_require_id')->comment('product_require_id')->nullable()->default(NULL);
             $table->tinyInteger('status')->comment('状态')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();

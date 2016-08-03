@@ -1,6 +1,7 @@
 <?php
 namespace App\Helps;
 
+use DNS1D;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Tool
@@ -238,4 +239,19 @@ class Tool
         return $num . '%';
     }
 
+
+    public function isCheckedByJson($field, $value, $model = null, $default = false)
+    {
+        if (old($field) == $value) {
+            return 'checked';
+        } elseif ($model) {
+           $value_array = json_decode($model->$field,true);
+            if(in_array($value,$value_array)){
+                return 'checked';
+            }
+        } elseif ($default) {
+            return 'checked';
+        }
+        return false;
+    }
 }

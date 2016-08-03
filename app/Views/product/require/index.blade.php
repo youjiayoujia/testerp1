@@ -59,9 +59,6 @@
                     <span class="glyphicon glyphicon-eye-open"></span> 创建model
                 </a>
                 @endif
-                <a href="{{ route('createSpuImage', ['spu_id'=>'777']) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑图片
-                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $productRequire->id }}"
                    data-url="{{ route('productRequire.destroy', ['id' => $productRequire->id]) }}">

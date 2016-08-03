@@ -28,7 +28,17 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '产品SPU',
+                    'url' => 'spu.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '产品SKU',
+                    'url' => 'item.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '产品流程',
                     'url' => 'item.index',
                     'icon' => '',
                 ],

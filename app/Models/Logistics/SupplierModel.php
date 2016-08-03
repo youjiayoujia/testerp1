@@ -38,7 +38,7 @@ class SupplierModel extends BaseModel
     public $rules = [
         'create' => [
             'name' => 'required|unique:logistics_suppliers,name',
-            'customer_id' => 'required|numeric',
+            'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
@@ -50,7 +50,7 @@ class SupplierModel extends BaseModel
         ],
         'update' => [
             'name' => 'required|unique:logistics_suppliers,name,{id}',
-            'customer_id' => 'required|numeric',
+            'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',

@@ -25,6 +25,7 @@ class EmailTemplateModel extends BaseModel
     ];
 
     protected $fillable = [
+        'name',
         'customer',
         'address',
         'zipcode',
@@ -40,6 +41,7 @@ class EmailTemplateModel extends BaseModel
 
     public $rules = [
         'create' => [
+            'name' => 'required',
             'customer' => 'required|unique:logistics_email_templates,customer',
             'address' => 'required',
             'zipcode' => 'required',
@@ -51,6 +53,7 @@ class EmailTemplateModel extends BaseModel
             'city' => 'required',
         ],
         'update' => [
+            'name' => 'required',
             'customer' => 'required|unique:logistics_email_templates,customer,{id}',
             'address' => 'required',
             'zipcode' => 'required',

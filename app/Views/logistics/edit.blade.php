@@ -26,9 +26,9 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="logistics_supplier_id">物流商</label>
+            <label for="logistics_supplier_id" class="control-label">物流商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
+            <select name="logistics_supplier_id" class="form-control logistics_supplier_id" id="logistics_supplier_id">
                 @foreach($suppliers as $supplier)
                     <option value="{{$supplier->id}}" {{$supplier->id == $model->logistics_supplier_id ? 'selected' : ''}}>
                         {{$supplier->name}}
@@ -215,5 +215,7 @@
         $('.wish_merchant').select2();
         $('.amazon_merchant').select2();
         $('.logistics_limits').select2();
+
+        $('.logistics_supplier_id').select2();
     });
 </script>

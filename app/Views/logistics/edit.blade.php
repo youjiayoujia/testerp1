@@ -26,9 +26,9 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="logistics_supplier_id">物流商</label>
+            <label for="logistics_supplier_id" class="control-label">物流商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
+            <select name="logistics_supplier_id" class="form-control logistics_supplier_id" id="logistics_supplier_id">
                 @foreach($suppliers as $supplier)
                     <option value="{{$supplier->id}}" {{$supplier->id == $model->logistics_supplier_id ? 'selected' : ''}}>
                         {{$supplier->name}}
@@ -37,18 +37,6 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="type" class="control-label">物流商物流方式</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') ? old('type') : $model->type}}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="url" class="control-label">物流追踪网址</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') ? old('url') : $model->url}}">
-        </div>
-    </div>
-    <div class='row'>
-        <div class="form-group col-lg-4">
             <label for="docking" class="control-label">对接方式</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="docking" id="docking">
@@ -59,7 +47,19 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
+            <label for="type" class="control-label">物流商物流方式</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') ? old('type') : $model->type}}">
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-lg-2">
+            <label for="url" class="control-label">物流追踪网址</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') ? old('url') : $model->url}}">
+        </div>
+        <div class="form-group col-lg-2">
             <label for="logistics_catalog_id">物流分类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
@@ -71,7 +71,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
             <label for="logistics_email_template_id">回邮模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
@@ -83,18 +83,7 @@
                 @endforeach
             </select>
         </div>
-    </div>
-    <div class="row">
-        <div class='form-group col-lg-3'>
-            <label for="logistics_limits">物流限制</label>
-            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
-                <option value=''></option>
-                @foreach($limits as $limit)
-                    <option value="{{ $limit->id }}" {{ $model->hasLimits($limit->id) ? 'selected' : ''}}>{{$limit->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
             <label for="logistics_template_id" class="control-label">面单模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_template_id" id="logistics_template_id">
@@ -106,6 +95,17 @@
                 @endforeach
             </select>
         </div>
+        <div class='form-group col-lg-4'>
+            <label for="logistics_limits">物流限制</label>
+            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
+                <option value=''></option>
+                @foreach($limits as $limit)
+                    <option value="{{ $limit->id }}" {{ $model->hasLimits($limit->id) ? 'selected' : ''}}>{{$limit->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    <div class="row">
         <div class="form-group col-lg-2">
             <label for="driver" class="control-label">驱动名</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -215,5 +215,7 @@
         $('.wish_merchant').select2();
         $('.amazon_merchant').select2();
         $('.logistics_limits').select2();
+
+        $('.logistics_supplier_id').select2();
     });
 </script>

@@ -339,6 +339,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
+    Route::get('logistics/ajaxSupplier', ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCode', 'Logistics\CodeController');

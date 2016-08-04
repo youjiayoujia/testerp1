@@ -150,6 +150,7 @@ class OrderController extends Controller
         request()->flash();
         $sx = request()->input('sx');
         $lr = request()->input('lr');
+        $special = request()->input('special');
         if ($sx != null && $lr != '') {
             if ($sx == 'high') {
                 $order = $this->model->where('profit_rate', '>=', $lr);
@@ -158,6 +159,9 @@ class OrderController extends Controller
             }
         } else {
             $order = $this->model;
+        }
+        if ($special == 'yes') {
+            $order = $this->model->where('customer_remark', '!=', '');
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

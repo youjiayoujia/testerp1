@@ -76,6 +76,11 @@
                     <abbr title="ZipCode">Z:</abbr> {{ $order->shipping_zipcode }}
                     <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
                 </address>
+                @if($order->customer_remark)
+                    <div class="text-danger">
+                        {{ $order->customer_remark }}
+                    </div>
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div class="text-danger">
@@ -346,7 +351,7 @@
                                 <div class="form-group col-lg-4">
                                     <label for="type" class='control-label'>退款类型</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                    <select class="form-control" name="type" id="type">
+                                    <select class="form-control type" name="type" id="type">
                                         <option value="NULL">==退款类型==</option>
                                         @foreach(config('order.type') as $type_key => $type)
                                             <option value="{{ $type_key }}" {{ old('type') }}>
@@ -527,6 +532,12 @@
             <option value="low">低于</option>
         </select>
     </div>
+    <div class="btn-group" role="group">
+        <select class="form-control special" name="special" id="special">
+            <option value="null">特殊要求</option>
+            <option value="yes">有特殊要求</option>
+        </select>
+    </div>
     <div class="btn-group">
         <button class="btn btn-info"
                 data-toggle="modal"
@@ -595,6 +606,13 @@
                 }
             });
 
+            $('.special').click(function () {
+                var special = $('.special').val();
+                if (special != null) {
+                    location.href = "{{ route('order.index') }}?special=" + special;
+                }
+            });
+
             $('.sx').click(function () {
                 var lr = $('.lr').val();
                 if (lr == '') {
@@ -655,6 +673,17 @@
                     coll[i].checked = false;
             }
         }
+
+        $('.type').click(function() {
+            var type = $('.type').val();
+            if (type == 'FULL') {
+                document.getElementById('price').readOnly = true;
+                document.getElementById('refund_amount').readOnly = true;
+            } else {
+                document.getElementById('price').readOnly = false;
+                document.getElementById('refund_amount').readOnly = false;
+            }
+        });
 
         //SMT批量撤单
         $('.sub').click(function () {

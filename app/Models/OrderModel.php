@@ -117,7 +117,7 @@ class OrderModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
-        foreach(ChannelModel::all() as $channel) {
+        foreach (ChannelModel::all() as $channel) {
             $arr[$channel->name] = $channel->name;
         }
         return [
@@ -322,7 +322,7 @@ class OrderModel extends BaseModel
         $path = 'uploads/refund' . '/' . $data['order_id'] . '/';
         if ($file != '' && $file->getClientOriginalName()) {
             $data['image'] = $path . time() . '.' . $file->getClientOriginalExtension();
-            Storage::disk('product')->put($data['image'],file_get_contents($file->getRealPath()));
+            Storage::disk('product')->put($data['image'], file_get_contents($file->getRealPath()));
             if ($data['type'] == 'FULL') {
                 $total = 0;
                 foreach ($data['arr']['id'] as $id) {
@@ -356,8 +356,8 @@ class OrderModel extends BaseModel
         }
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
-            foreach($blacklist->get() as $value) {
-                if($value['type'] == 'CONFIRMED') {
+            foreach ($blacklist->get() as $value) {
+                if ($value['type'] == 'CONFIRMED') {
                     return true;
                 }
             }
@@ -367,28 +367,15 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-        $data['ordernum'] = $begin = microtime(true);
+        $data['ordernum'] = microtime(true);
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
-//            $channelProduct = ChannelProduct::where('channel_sku', $orderItem['channel_sku'])->first();
-//            if ($channelProduct) {
-//                $orderItem['item_id'] = $channelProduct->item->id;
-//                if (!$orderItem['sku']) {
-//                    $orderItem['sku'] = $channelProduct->item->sku;
-//                }
-//            } else {
             if ($orderItem['sku']) {
                 $item = ItemModel::where('sku', $orderItem['sku'])->first();
                 if ($item) {
-//                    ChannelProduct::create([
-//                        'channel_account_id' => $data['channel_account_id'],
-//                        'item_id' => $item->id,
-//                        'channel_sku' => $orderItem['channel_sku'],
-//                    ]);
                     $orderItem['item_id'] = $item->id;
                 }
             }
-//            }
             if (!isset($orderItem['item_id'])) {
                 $orderItem['item_id'] = 0;
                 $order->update(['status' => 'REVIEW']);
@@ -396,6 +383,11 @@ class OrderModel extends BaseModel
             }
             $order->items()->create($orderItem);
         }
+        //客户备注需审核
+        if ($data['remark']) {
+            $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
+        }
+        //黑名单需审核
         if ($order->checkBlack()) {
             $order->update(['status' => 'REVIEW']);
             $order->remark('黑名单订单.');
@@ -407,9 +399,8 @@ class OrderModel extends BaseModel
     }
 
     //todo: Update order
-    public function updateOrder($data,$order)
+    public function updateOrder($data, $order)
     {
-        unset($data['items']);
         $order = $order->update($data);
         return $order;
     }
@@ -461,12 +452,12 @@ class OrderModel extends BaseModel
         $package['status'] = 'NEW';
         $package = $this->packages()->create($package);
         if ($package) {
-            foreach($this->items->toArray() as $packageItem) {                
-                if(!$packageItem['remark']) {
+            foreach ($this->items->toArray() as $packageItem) {
+                if (!$packageItem['remark']) {
                     $packageItem['remark'] = 'REMARK';
                 }
                 $packageItem['order_item_id'] = $packageItem['id'];
-                if($packageItem['is_active']) {
+                if ($packageItem['is_active']) {
                     $newPackageItem = $package->items()->create($packageItem);
                 }
             }

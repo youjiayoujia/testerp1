@@ -632,6 +632,23 @@ class PurchaseOrderController extends Controller
 
         return json_encode('false');
     }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseExmaine()
+    {
+        $purchase_ids = request()->input("purchase_ids");
+        $arr = explode(',', $purchase_ids);
+        foreach($arr as $id){
+            $this->model->find($id)->update(['examineStatus'=>1]);
+        }
+        return 1;
+    }
         
 }
 

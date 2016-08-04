@@ -38,11 +38,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '产品流程',
-                    'url' => 'item.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',

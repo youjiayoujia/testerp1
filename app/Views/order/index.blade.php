@@ -675,8 +675,8 @@
         }
 
         $('.type').click(function() {
-            var type = $('.type').val();
-            var id = $('.type').attr('id');
+            var type = $(this).val();
+            var id = $(this).attr('id');
             if (type == 'FULL') {
                 document.getElementById('price'+id).readOnly = true;
                 document.getElementById('refund_amount'+id).readOnly = true;

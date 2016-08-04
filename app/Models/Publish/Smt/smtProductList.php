@@ -39,9 +39,9 @@ class smtProductList extends BaseModel
         'old_productId'
     ];
   
-    protected $searchFields = ['subject'=>'标题','productId'=>'产品ID'];
+    public $searchFields = ['subject'=>'标题','productId'=>'产品ID'];
     
-    protected $rules = [];
+    public $rules = [];
     
     public function getMixedSearchAttribute()
     {
@@ -65,6 +65,10 @@ class smtProductList extends BaseModel
     
     public function  productSku(){
         return $this->hasMany('App\Models\Publish\Smt\smtProductSku','productId','productId');
+    }
+    
+    public function userInfo(){
+        return $this->belongsTo('App\Models\UserModel', 'user_id', 'id');
     }
     
 }

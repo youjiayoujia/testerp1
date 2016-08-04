@@ -462,7 +462,6 @@ Class AliexpressAdapter implements AdapterInterface
     
         //参数
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
-    
         return $result;
     }
     
@@ -491,13 +490,14 @@ Class AliexpressAdapter implements AdapterInterface
                         'attribute'        => serialize($rs['attributes']),
                         'last_update_time' => date('Y-m-d H:i:s')
                     );
-                    $id = smtCategoryAttribute::where('category_id',$category_id)->get(array('category_id'));
+                    
+                    $category_attribute = smtCategoryAttribute::where('category_id',$category_id)->first();
                     $smtCategoryAttribute = new smtCategoryAttribute;
-                    if ($id) {
-                        $options['id'] = $id;
+                    if ($category_attribute) {
+                        $options['id'] = $category_attribute->id;
                         $smtCategoryAttribute->update($options);
                     } else {
-                        $smtCategoryAttribute->add($options);
+                        $smtCategoryAttribute->create($options);
                     }
                     return $rs['attributes'];
                 }else {
@@ -548,7 +548,7 @@ Class AliexpressAdapter implements AdapterInterface
          
         switch ($att['attributeShowTypeValue']){
             case 'check_box': //复选框
-                $attribute_string = '<div class="col-sm-10">';
+                $attribute_string = '<div class="row"><div class="col-sm-6">';
                 $attribute_string .= '<ul class="list-inline">';
                 foreach ($att['values'] as $item):
                 $checked = false;
@@ -566,10 +566,10 @@ Class AliexpressAdapter implements AdapterInterface
                 $attribute_string .= '</li>';
                 endforeach;
                 $attribute_string .= '</ul>';
-                $attribute_string .= '</div>';
+                $attribute_string .= '</div></div>';
                 break;
             case 'list_box': //下拉列表
-                $attribute_string = '<div class="col-sm-10">';
+                $attribute_string = '<div class="row"><div class="col-sm-8">';
                 $attribute_string .= '<select name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id']).']" class="form-control" '.($required ? 'datatype="*"' : '').' attr_id="'.$att['id'].'">';
                 $attribute_string .= '<option value="">---请选择---</option>';
                 foreach ($att['values'] as $item):
@@ -591,17 +591,17 @@ Class AliexpressAdapter implements AdapterInterface
                 $customized_string .= '<tr class="hide tr-p-'.$att['id'].'-'.$item['id'].'"><td>'.$item['names']['zh'].'</td>'.($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" /></td>' : '').($att['customizedPic'] ? '<td><a href="javascript: void(0);" class="btn btn-defaut btn-xs">选择图片</a><a href="" class="view-custom-image"></a><a href="" class="del-custom-image">删除</a><input type="hidden" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="" /></td>' : '').'</tr>';
                 endforeach;
                 $attribute_string .= '</select>';
-                $attribute_string .= '</div>';
+                $attribute_string .= '</div></div>';
                 if (array_key_exists($att['id'], $array2) && $array2[$att['id']]){
                     $other_string .= '<div class="form-group">';
                     $other_string .= '<div class="col-sm-10 col-sm-offset-2">';
                     $other_string .= '<input type="text" name="otherAttributeTxt['.$att['id'].']" class="form-control" value="'.$array2[$att['id']]['attrValue'].'"/>';
                     $other_string .= '</div>';
-                    $other_string .= '</div>';
+                    $other_string .= '</div></div>';
                 }
                 break;
             case 'group_table': //复选框 再有子复选框 --待扩展
-                $attribute_string = '<div class="col-sm-10">';
+                $attribute_string = '<div class="row"><div class="col-sm-6">';
                 $attribute_string .= '<ul class="list-inline">';
                 foreach ($att['values'] as $item):
                 $attribute_string .= '<li class="col-sm-4 no-padding-left groupTab">';
@@ -611,7 +611,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $attribute_string .= '</li>';
                 endforeach;
                 $attribute_string .= '</ul>';
-                $attribute_string .= '</div>';
+                $attribute_string .= '</div></div>';
                 break;
             case 'input':
             default:
@@ -630,7 +630,7 @@ Class AliexpressAdapter implements AdapterInterface
                         list($input, $u) = explode(' ', $inputValue);
                     }
                      
-                    $attribute_string = '<div class="col-sm-8">';
+                    $attribute_string = '<div class="row"><div class="col-sm-6">';
                     $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="'.$input.'" />';
                     $attribute_string .= '</div>';
                      
@@ -641,11 +641,11 @@ Class AliexpressAdapter implements AdapterInterface
                         $attribute_string .= '<option value="'.$unit['unitName'].'" '.($u == $unit['unitName'] ? 'selected="selected"' : '').'>'.$unit['unitName'].'</option>';
                     }
                     $attribute_string .= '</select>';
-                    $attribute_string .= '</div>';
+                    $attribute_string .= '</div></div>';
                 } else {
-                    $attribute_string = '<div class="col-sm-10">';
+                    $attribute_string = '<div class="row"><div class="col-sm-8">';
                     $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="' .$inputValue. '" />';
-                    $attribute_string .= '</div>';
+                    $attribute_string .= '</div></div>';
                 }
                 break;
         }
@@ -685,7 +685,7 @@ Class AliexpressAdapter implements AdapterInterface
         $key_string        = $att['keyAttribute'] ? '<span class="green">！</span>' : '';  //关键属性
         $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
     
-        $attribute_string = '<div class="col-sm-10">';
+        $attribute_string = '<div class="row"><div class="col-sm-8">';
         $attribute_string .= '<ul class="list-inline">';
         foreach ($att['values'] as $k => $item):
         $attribute_string .= '<li>';
@@ -700,12 +700,12 @@ Class AliexpressAdapter implements AdapterInterface
                 .'<td><span class="customize-pic pull-right">'
                     .(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? '<img src="'.$array[$att['id']][$item['id']]['skuImage'].'" width="30" height="30" /><a href="javascript: void(0);" class="del-custom-image">删除</a>' : '').'</span>'
                         .'<a href="javascript: void(0);" class="btn btn-default btn-xs add-custom-image pull-left" lang="'.$att['id'].'_'.$item['id'].'">选择图片</a>'
-                            .'<a href="javascript: void(0);" class="btn btn-default btn-xs copyToCust" >详情图片</a>'
+                            .'<a href="javascript: void(0);" class="btn btn-default btn-xs copyToCust" onclick="copyToHere(this, \'pic-detail\');" >详情图片</a>'
                                 .'<input type="hidden" class="customized-pic-input customizedPic-'.$att['id'].'_'.$item['id'].'" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="'.(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? $array[$att['id']][$item['id']]['skuImage'] : '').'" /></td>'
                                     .'</tr>';
         endforeach;
         $attribute_string .= '</ul>';
-        $attribute_string .= '</div>';
+        $attribute_string .= '</div></div>';
     
         $product_attribute .= '<div class="form-group  s_attr" attr_id="'.$att['id'].'" custome="'.(($att['customizedName'] || $att['customizedPic']) ? '1' : '0').'">';
         $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
@@ -943,6 +943,20 @@ Class AliexpressAdapter implements AdapterInterface
         //$this->setCurlErrorLog($result);
         return json_decode($result, true);
     } */
+    
+    public function updateProductPublishState($action,$productId){
+        $app_url  = "http://" . self::GWURL . "/openapi/";       
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;  
+        $parameter['productIds'] = $productId;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+       
+     
+        //参数
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+ 
+        return json_decode($result,true);
+    }
     
     public function uploadBankImage($action, $file, $fileName=''){
         //接口URL

@@ -281,7 +281,7 @@ $(function(){
 				$('#category_select').addClass('hide');
 			}
 			$.ajax({
-				url: '',
+				url: '{{route('smt.showCommandCategoryList')}}',
 				data: 'keyword='+keyword+'&token_id='+token_id,
 				type: 'GET',
 				dataType: 'json',
@@ -301,7 +301,7 @@ $(function(){
 				}
 			});
 		}else {
-			showtips('推荐类目必须输入关键词并选择账号');
+			alert('推荐类目必须输入关键词并选择账号');
 		}
 		return false;
 	});

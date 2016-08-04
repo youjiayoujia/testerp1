@@ -340,7 +340,13 @@ return [
             [
 
                 'name' => 'SMT待发布产品列表',
-                'url' => 'smt.draftSearch',
+                'url' => 'smt.index',
+                'icon' => '',
+            ],
+            [
+            
+                'name' => 'SMT在线产品列表',
+                'url' => 'smt.onlineProductIndex',
                 'icon' => '',
             ],
             [

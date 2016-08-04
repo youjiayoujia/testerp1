@@ -10,11 +10,13 @@ use App\Models\Publish\Smt\smtProductList;
 use App\Models\Publish\Smt\smtFreightTemplate;
 use App\Models\Publish\Smt\smtServiceTemplate;
 use App\Models\Publish\Smt\smtTemplates;
+use App\Models\Publish\Smt\smtProductModule;
 use Illuminate\Support\Facades\Input;
 use App\Models\Channel\AccountModel;
 use App\Modules\Channel\ChannelModule;
 use App\Models\ChannelModel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
+
 
 
 class SmtProductController extends Controller
@@ -34,6 +36,7 @@ class SmtProductController extends Controller
         $this->Smt_freight_template_model = new smtFreightTemplate();
         $this->Smt_service_template_model = new smtServiceTemplate();
         $this->Smt_template_model = new smtTemplates();
+        $this->Smt_product_model = new smtProductModule();
         $this->viewPath = 'publish.smt.';
         $this->channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
     }
@@ -498,5 +501,6 @@ class SmtProductController extends Controller
         $result = array('data' => $data, 'info' => $info, 'status' => $status);
         exit( json_encode($result) );
     }
+    
     
 }

@@ -44,17 +44,24 @@ class KindeditorController extends Controller
     /**
      * API上传到速卖通
      */
-    public function upload() {       
-        $token_id = Input::get('amp;token_id');      //请求的url中多参数连接符&被转义为'&amp;',故取此参数暂时以这种方式.
-        $target   = trim(Input::get('target'));
-        $token_id = $token_id ? $token_id : 36;
+    public function upload() { 
+        
+        $target   = trim(Input::get('target'));   
         //$this->getTokenForThisCall($token_id);
-        $api      = 'api.uploadImage'; //调用的API
-        if ($target == 'temp') {
+        if ($target == 'temp' ) {
+            $token_id = Input::get('token_id');
             $api  = 'api.uploadTempImage';
+        }else{
+            if(array_key_exists('amp;token_id', Input::get())){
+                $token_id = Input::get('amp;token_id');
+            }else{
+                $token_id = Input::get('token_id');
+            }
+               
+            $api      = 'api.uploadImage'; 
         }
+        $token_id = $token_id ? $token_id : 36;
         $this->setControlParams($api);
-         
         //PHP上传失败
         if (!empty($_FILES['imgFile']['error'])) {
             switch($_FILES['imgFile']['error']){
@@ -123,7 +130,7 @@ class KindeditorController extends Controller
             $smtApi = $ChannelModule->driver($account->channel->driver, $account->api_config);
             $data = $smtApi->uploadBankImage($api, $tmp_name, $filename);
             header('Content-type: text/html; charset=UTF-8');
-            if ($data['success']) {
+            if (isset($data['success']) && $data['success']) {
                 if ($api == 'api.uploadImage'){
                     if ($data['status'] == 'SUCCESS' || $data['status'] == 'DUPLICATE') {
                         //返回并插入到表单中--没返回iid，暂时不插入到数据库中

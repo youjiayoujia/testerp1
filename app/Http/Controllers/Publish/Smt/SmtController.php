@@ -26,6 +26,8 @@ use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Models\ProductModel;
 use App\Modules\Common\common_helper;
 use App\Models\SkuPublishRecords;
+use Illuminate\Support\Facades\Redirect;
+
 
 class SmtController extends Controller{
    public function __construct(smtProductList $smtProductList){ 
@@ -33,21 +35,35 @@ class SmtController extends Controller{
        $this->model = $smtProductList;
        $this->smtProductDetailModel = new smtProductDetail();
        $this->smtProductSkuModel = new smtProductSku();
+       $this->smtProductUnitModel = new smtProductUnit();
        $this->channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
-       $this->mainIndex = route('smt.draftSearch');
+       $this->mainIndex = route('smt.index');
+       $this->mainOnlineIndex = route('smt.onlineProductIndex');
    }
    
-   public function draftSearch(){
+   public function index(){
        request()->flash();
        $this->mainTitle='SMT待发布产品';
        $response = [
            'metas' => $this->metas(__FUNCTION__),
-           'data' => $this->autoList($this->model),
+           'data' => $this->autoList($this->model->where('productStatusType','waitPost')),
            'mixedSearchFields' => $this->model->mixed_search,
-       ];    
-       return view($this->viewPath . 'draft_list', $response);
+       ];
+       return view($this->viewPath . 'index', $response);
    }
    
+   public function onlineProductIndex(){
+       request()->flash();
+       $this->mainTitle='SMT在线产品';
+       $response = [
+           'metas' => $this->metas(__FUNCTION__),
+           'data' => $this->autoList($this->model->where('productStatusType','!=','waitPost')),
+           'mixedSearchFields' => $this->model->mixed_search,
+           'type' => 'online',
+       ];
+       return view($this->viewPath . 'index', $response);
+   }
+      
    public function create()
    {
        
@@ -103,7 +119,7 @@ class SmtController extends Controller{
         $group = $product_group->getLocalProductGroupList($token_id); 
         
         //单位列表
-        $unit = smtProductUnit::all();
+        $unit = $this->smtProductUnitModel->getAllUnit();
         
         //产品模板
         $module = smtProductModule::where('token_id',$token_id)->get();
@@ -140,20 +156,27 @@ class SmtController extends Controller{
       
    public function doAction(){
        $action = Input::get('action');
+  
         if ($action == 'save') { //保存
-            $this->save($action);
-        } elseif ($action == 'post') { //发布        	
-            $this->post();
+            return $this->save($action,true);
+        } elseif ($action == 'post') { //发布     
+            return $this->post();
         } elseif ($action == 'saveToPost') { //保存为待发布
-            $this->save($action);
+            return  $this->save($action,true);
         }elseif ($action == 'editAndPost'){ //编辑并发布        	
-        	$this->editAndPost(); //修改在线广告
+            return $this->editAndPost(); //修改在线广告
         } else { //都不是以上操作
-           $this->ajax_return('非法操作', 'false');
+           return $this->ajax_return('非法操作', 'false');
         }
    }
    
-   public function save($action='save', $exit=true){
+   /**
+    * 保存 及 保存为待发布
+    * @param string $action:操作选择
+    * @param bool $exit:是否退出执行,即exit
+    * @return array
+    */
+   public function save($action='save', $exit=false){
        header('Content-Type: text/html; Charset=utf-8');
        //提及数据
        $posts = Input::get();  
@@ -250,6 +273,7 @@ class SmtController extends Controller{
        if (count($imageURLs) > 6){
            $this->ajax_return('主图不能超过6张', false);
        }
+  
        $draft_detail['imageURLs']              = implode(';', $imageURLs);   //图片
        $draft_detail['isImageDynamic']         = count($imageURLs) > 1 ? 1 : 0; //是否动态图      
        /**自定义产品关联信息开始**/
@@ -278,6 +302,7 @@ class SmtController extends Controller{
        /**自定义产品关联信息结束**/
        
        $draft_detail['detail']                 = htmlspecialchars($detail_str); //详情
+
        $draft_detail['detailLocal']            = $draft_detail['detail'];
        $draft_detail['keyword']                = $smtApi->filterForSmtProduct($posts['keyword']);      //关键字
        $draft_detail['productMoreKeywords1']   = $smtApi->filterForSmtProduct($posts['productMoreKeywords1']);
@@ -309,7 +334,6 @@ class SmtController extends Controller{
        $draft_detail['templateId']   = $posts['templateId'];
        $draft_detail['shouhouId']    = $posts['shouhouId'];
        $draft_detail['detail_title'] = htmlspecialchars(trim($posts['detail_title']));
-       
        if (array_key_exists('detailPicList', $posts)){ //有描述图片详情
            $draft_detail['detailPicList'] = implode(';', $posts['detailPicList']);
        }
@@ -329,7 +353,6 @@ class SmtController extends Controller{
        $productMinPrice = 0;
        //最大价格
        $productMaxPrice = 0;
-       
        if ($skuPrice && $ipmSkuStock) { //单价和库存都存在，应该会存在SKU来着
            foreach ($skuPrice as $key => $price) {
                if (!trim($skuCode[$key])) { //sku不存在的话直接pass掉
@@ -394,8 +417,7 @@ class SmtController extends Controller{
        $code = ''; //账号前缀
        if ($used_id){
            $saleCode = smtUserSaleCode::where('user_id',$used_id)->first();          
-           $code = $saleCode? $saleCode->sale_code : '';     
-     
+           $code = $saleCode? $saleCode->sale_code : '';      
        }     
        
        if ($posts['id']) { //草稿ID存在，还是直接更新       
@@ -427,13 +449,12 @@ class SmtController extends Controller{
                    $newSkus = $smtApi->buildSysSku($per_sku['skuCode']);
                    $withErr = false; //循环中是否出错
                    foreach ($newSkus as $sku){
-                       $per_sku['skuCode'] = (($valId > 0 && $valId != 201336100) ? '{YY}' : '').$sku;
+                       $per_sku['skuCode'] = (($valId > 0 && $valId != 201336100) ? '{YY}' : '').$sku;                     
                        $isSkuExists = smtProductSku::where(['productId'=>$posts['id'],
                                                             'smtSkuCode'=>$per_sku['smtSkuCode'],
                                                             'skuCode'=>$per_sku['skuCode'],
                                                             'overSeaValId'=>$valId])->first();
-                       echo $isSkuExists['sku_id'];
-                       if ($isSkuExists['sku_id']) {//更新
+                       if ($isSkuExists['id']) {//更新
                            $where = array();
                            $where['productId']    = $posts['id'];
                            $where['smtSkuCode']   = $per_sku['smtSkuCode'];
@@ -457,12 +478,12 @@ class SmtController extends Controller{
                $newData            = array();
                $newData['updated'] = 0;
                $smtProductSkuModel->where('productId','=',$posts['id'])->update($newData);
-               if ($exit){
-                   DB::commit();
-                   return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功.'));
-                   //$this->ajax_return('保存'.($result_flag ? '成功' : '失败').$info, $result_flag);
-               }else {
-                   return $this->alert('danger', '保存失败.');
+               DB::commit();
+               if ($exit){       
+                   //return Redirect::to($this->mainIndex)->with('alert', $this->alert('success', '保存成功.'));
+                   return array('status' => $result_flag, 'info' => '保存'.($result_flag ? '成功' : '失败').$info, 'id' => $posts['id']);             
+               }else {                 
+                   return array('status' => true, 'info' => '保存成功', 'id' => $posts['id']);
                    //return array('status' => $result_flag, 'info' => '保存'.($result_flag ? '成功' : '失败').$info, 'id' => $posts['id']);
                }                               
                
@@ -477,7 +498,8 @@ class SmtController extends Controller{
            //$draft_product['user_id'] = $token_info['customerservice_id'];         
            $draft_product['productStatusType'] = ($action == 'saveToPost') ? 'waitPost' : 'newData';    //新增产品的状态
            
-           $result = $this->model->create($draft_product);        
+           $result = $this->model->create($draft_product);   
+           
            if (!$result->id){
                DB::rollback();
                $this->ajax_return('保存到产品列表出错', false);
@@ -516,32 +538,40 @@ class SmtController extends Controller{
                }
                if ($withErr) break;
            }
-        
            if ($sku_flag) { //都插入成功了才进行提交
                DB::commit();
-               if ($exit){                   
-                   return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功.'));
-               }else {
-                   return redirect($this->mainIndex)->with('alert', $this->alert('success', '保存成功.'));
-               }
+                if ($exit){                   
+                	$this->ajax_return('保存成功', true, array('id' => $productId)); //这个productId还是返回吧
+                }else {
+                	return array('status' => true, 'info' => '保存成功', 'id' => $productId);
+                }
            } else {
                DB::rollback();
                $this->ajax_return('保存到SKU列表出错', false);
            }
        }
-}
+   }
    
    public function post(){
        $return = $this->save('saveToPost', false);
-       
-       if ($return && $return['status']){
-            
-           //主表ID
-           $main_id = $return['id'];
-           //发布
-           $this->postAeProduct($main_id, true);
+       if ($return && $return['status']){                    
+           $main_id = $return['id'];         
+           $this->postAeProduct($main_id, true);       //发布
        }else {
            $this->ajax_return('保存失败,未上传', false);
+       }
+   }
+   
+   /**
+    * 编辑并上传
+    */
+   public function editAndPost(){
+       $return = $this->save('save', false);
+       if ($return && $return['status']){   
+           $productId = $return['id'];   
+           return $this->postAeProduct($productId, false);
+       }else {
+           $this->ajax_return('编辑时保存失败', false);
        }
    }
    
@@ -580,10 +610,8 @@ class SmtController extends Controller{
             $draft_detail = $draft_info->details;            
             //读取待发布产品SKU信息
             $draft_skus = $draft_info->productSku; 
- 
             $token_id = $draft_info->token_id;
             $account = AccountModel::findOrFail($token_id);
-           
             $smtApi = Channel::driver($account->channel->driver, $account->api_config);
             $firstSku = $smtApi->rebuildSmtSku($draft_skus[0]['smtSkuCode']); //简单解析下第一个SKU
 
@@ -606,7 +634,7 @@ class SmtController extends Controller{
 	        $skudatastr = implode( $skudatastr,',');//价格属性字符串
 	     
             $checkeinfo['token_id'] = $token_id;   //
-            $checkeinfo['categoryId']=$draft_info->ategoryId; //获取分类ID
+            $checkeinfo['categoryId']=$draft_info->categoryId; //获取分类ID
             $checkeinfo['subject']=$draft_info->subject;  //获取标题
             $checkeinfo['aeopAeProductPropertys']=$draft_detail->aeopAeProductPropertys; //获取属性
             $checkeinfo['keyword']=$draft_detail->keyword; //获取关键字1
@@ -615,7 +643,7 @@ class SmtController extends Controller{
             $checkeinfo['detail']=$draft_detail->detail;//获取详情
 
             //侵权验证
-            $re = $this->findAeProductProhibitedWords($checkeinfo);        
+            $re = $this->findAeProductProhibitedWords($checkeinfo);  
             if($re!='success')
             {
                 $re =   str_replace("FORBIDEN_TYPE", "禁用", $re);
@@ -637,6 +665,7 @@ class SmtController extends Controller{
             $checkeinfoss = $checkeinfo;
             $checkeinfoss['detail'] = $skudatastr;
             $re = $this->findAeProductProhibitedWords($checkeinfoss);
+            
             if($re!='success')
             {
                 $re =   str_replace("FORBIDEN_TYPE", "禁用", $re);
@@ -723,7 +752,6 @@ class SmtController extends Controller{
             //$templateId = $this->input->get_post('templateId');
             $templateId = $draft_detail->templateId;         
             $templateInfo = smtTemplates::where('id',$templateId)->first();
-
             if ($templateInfo && $templateInfo->id) {
                 //位置调整下，没模板的话就不要传了，不然也是浪费
                 $picStr = '';
@@ -892,35 +920,23 @@ class SmtController extends Controller{
                 $product_arr['productMoreKeywords2'] = $productMoreKeywords2;
             }
 
-            if ($draft_info->groupId) {
-                //产品组ID
-                $product_arr['groupId'] = $draft_info->groupId;
+            if ($draft_info->groupId) {              
+                $product_arr['groupId'] = $draft_info->groupId;   //产品组ID
             }
-
-            //运费模板ID
-            $product_arr['freightTemplateId'] = $draft_detail->freightTemplateId;
-
-            //是否添加水印
-            $product_arr['isImageWatermark'] = 'false';
-
-            //单位
-            $product_arr['productUnit'] = $draft_detail->productUnit;
-
-            //是否打包
-            if ($draft_detail->packageType) {
-                //每包件数
-                $lotNum                = $draft_detail->lotNum;
-                $product_arr['lotNum'] = intval($lotNum) > 1 ? intval($lotNum) : 2;
+            $product_arr['freightTemplateId'] = $draft_detail->freightTemplateId;  //运费模板ID            
+            $product_arr['isImageWatermark'] = 'false'; //是否添加水印            
+            $product_arr['productUnit'] = $draft_detail->productUnit; //单位         
+            if ($draft_detail->packageType) {                
+                $lotNum                = $draft_detail->lotNum; //每包件数
+                $product_arr['lotNum'] = intval($lotNum) > 1 ? intval($lotNum) : 2;   
             }
-            $product_arr['packageType'] = $draft_detail->packageType ? 'true' : 'false';
+            $product_arr['packageType'] = $draft_detail->packageType ? 'true' : 'false';     //是否打包
 
             //包装长宽高
             $product_arr['packageLength'] = (int)$draft_info->packageLength;
             $product_arr['packageWidth']  = (int)$draft_info->packageWidth;
-            $product_arr['packageHeight'] = (int)$draft_info->packageHeight;
-
-            //商品毛重
-            $product_arr['grossWeight'] = $draft_info->grossWeight;
+            $product_arr['packageHeight'] = (int)$draft_info->packageHeight;            
+            $product_arr['grossWeight'] = $draft_info->grossWeight;   //商品毛重
 
             //是否自定义记重 -- 自定义记重暂时未作
             $isPackSell = $draft_detail->isPackSell;
@@ -929,8 +945,8 @@ class SmtController extends Controller{
             $addUnit    = '';
             $addWeight  = '';
             $product_arr['isPackSell'] = false; // api变动 暂时都设置成false
-            //有效期
-            $product_arr['wsValidNum'] = $draft_info->wsValidNum;
+            
+            $product_arr['wsValidNum'] = $draft_info->wsValidNum;   //有效期
 
             if ($isAdd) {
                 //商品来源 --固定死
@@ -965,14 +981,13 @@ class SmtController extends Controller{
             if (!empty($draft_detail->sizechartId) && $draft_detail->sizechartId > 0) {
                 $product_arr['sizechartId'] = $draft_detail->sizechartId;
             }
-// print_r($product_arr);
             //发布或者修改
             $result = $smtApi->getJsonDataUsePostMethod($api, $product_arr);
-            $data   = json_decode($result, true);
-            // var_dump($data);exit;
+            $data   = json_decode($result, true);   
+            //$data = array('success'=>true,'productId'=>123);
             //不管成功还是失败，都把数据保存下来
             $product_arr['productId'] = $draft_info->productId;
-            $product['productId']     = $draft_inf->productId;
+            $product['productId']     = $draft_info->productId;
             $return                   = $this->hanleProductData($product);
             if (!$return['status']) {
                 //写错误日志
@@ -980,9 +995,8 @@ class SmtController extends Controller{
 
             unset($draft_info);
             unset($draft_detail);
-
             if (array_key_exists('success', $data) && $data['success']) { //操作成功了
-                if ($isAdd) { //是新刊登的产品
+                if ($isAdd) { //是新刊登的产品            
                     $realProductId = $data['productId'];               
 
                     $newListData['productId'] = $realProductId;
@@ -993,6 +1007,7 @@ class SmtController extends Controller{
                     //$newListData['ownerMemberId']     = $token_info['member_id'];
                     
                     //更新详情表的产品ID
+                    DB::beginTransaction();
                     $newData['productId'] = $realProductId;
                     $this->smtProductDetailModel->where('productId',$id)->update($newData);
              
@@ -1006,14 +1021,16 @@ class SmtController extends Controller{
                         $rs[$r->sale_code] = $r->sale_code;
                     }*/
                     $user_id = 0; //解析前缀获取广告对应的用户
-
                     //更新SKU列表信息
+                    $draft_skus = $draft_skus->toArray();
+                    $productId = $id;
                     foreach ($draft_skus as $sku) {
                         $skus = $smtApi->buildSysSku($sku['smtSkuCode']); //还是会带{YY}
+                        
                         foreach ($skus as $skuCode) { //发布成功了，更新现有的数据
                             $newData['skuMark'] = $realProductId . ':' . $skuCode;
-                            $oldMark            = $id . ':' . $skuCode;                                                                             
-                            $this->smtProductSkuModel->where(['productId'=>$id,'overSeaValId'=>$sku['overSeaValId'],'skuMark'=>$oldMark])->update($newData);
+                            $oldMark            = $productId . ':' . $skuCode;                             
+                            $id = $this->smtProductSkuModel->where(['productId'=>$productId,'overSeaValId'=>$sku['overSeaValId'],'skuMark'=>$oldMark])->update($newData);
                             $common = new common_helper();
                             $prefix = $common->get_skucode_prefix($sku['smtSkuCode']); //产品的前缀
                             if ($prefix) {
@@ -1027,7 +1044,7 @@ class SmtController extends Controller{
                                 'publishTime'    => date('Y-m-d H:i:s'),
                                 'platTypeID'     => $plat_info['platTypeID'],
                                 'publishPlat'    => $plat_info['platID'],
-                                'sellerAccount'  => $this->smt->_seller_account, //账号，通过tokenid来吧
+                                'sellerAccount'  => $account->account, //账号，通过tokenid来吧
                                 'itemNumber'     => $realProductId,
                                 'publishViewUrl' => 'http://www.aliexpress.com/item/-/' . $realProductId . '.html' //链接，处理下吧
                             );
@@ -1035,11 +1052,13 @@ class SmtController extends Controller{
                             SkuPublishRecords::create($publishRecord);
                             /****插入一条记录到刊登记录内结束****/
                         }
-
+        
                         //更新列表页的产品信息
                         $newListData['user_id'] = $user_id; //用老账号的用户id --不要通过session处理，怕以后会跑计划任务
-                        $this->model->where('productId',$id)->update($newListData);
+                        $this->model->where('productId',$productId)->update($newListData);
+                       
                     }
+                    DB::commit();
                     unset($newListData);
                     unset($newData);
                 }
@@ -1048,22 +1067,24 @@ class SmtController extends Controller{
                 if ($auto) {
                     return array('status' => true, 'info' => '产品:' . $id . ($isAdd ? '发布成功，新产品ID为:' . $realProductId : '修改成功'));
                 }else {
-                    ajax_return('产品:' . $id . ($isAdd ? '发布成功，新产品ID为:' . $realProductId : '修改成功'), true);
+                    return redirect($this->mainOnlineIndex)->with('alert', $this->alert('success', '操作成功!'));
+                    //$this->ajax_return('产品:' . $id . ($isAdd ? '发布成功，新产品ID为:' . $realProductId : '修改成功'), true);
                 }
             } else {
                 unset($product_arr);
                 unset($draft_skus);
+                
                 if ($auto){
                     return array('info' => '产品:' . $id . ($isAdd ? '发布' : '修改') . '失败,'.(isset($data['error_code']) ? $data['error_code'] : '').$data['error_message'], 'status' => false);
                 }else {
-                    ajax_return('产品:' . $id . ($isAdd ? '发布' : '修改') . '失败,'.(isset($data['error_code']) ? $data['error_code'] : '') . $data['error_message'], false);
+                    $this->ajax_return('产品:' . $id . ($isAdd ? '发布' : '修改') . '失败,'.(isset($data['error_code']) ? $data['error_code'] : '') . $data['error_message'], false);
                 }
             }
         } else {
             if ($auto){
                 return array('status' => false, 'info' => '产品:' . $id . '不存在');
             }else {
-                ajax_return('产品:' . $id . '不存在', false);
+                $this->ajax_return('产品:' . $id . '不存在', false);
             }
         }
     }
@@ -1107,6 +1128,7 @@ class SmtController extends Controller{
                     $category_attributes = $return;
             }else { //属性存在但不是最新的           
                 $category_attributes = unserialize($attributes->attribute);
+                 
                 //这个属性今天还没更新呢，更新下吧
                 if (!$attributes->last_update_time || date('Y-m-d') != date('Y-m-d', strtotime($attributes->last_update_time))) {
                     $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id, $category_id);
@@ -1116,7 +1138,6 @@ class SmtController extends Controller{
             }
             //对属性进行排序处理
             $category_attributes = $smtApi->sortAttribute($category_attributes);
-            
             //获取运费模版
             $freight = smtFreightTemplate::where('token_id',$token_id)->get();
            
@@ -1127,8 +1148,8 @@ class SmtController extends Controller{
             $product_group = new SmtProductController(); 
             $group = $product_group->getLocalProductGroupList($token_id);            
             //单位列表
-            $unit = smtProductUnit::all();
-            
+            $unit = $this->smtProductUnitModel->getAllUnit();
+
             //产品模板
             $module = smtProductModule::where('token_id',$token_id)->get();
             
@@ -1160,6 +1181,122 @@ class SmtController extends Controller{
             return view($this->viewPath . 'addProduct',$response);
         } else { //没有ID--直接跳转到列表页吧
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+    }
+    
+    public function editOnlineProduct(){ 
+        $this->mainTitle='SMT在线数据修改';
+        $this->mainIndex = route('smt.onlineProductIndex');
+        $id = Input::get('id');
+        if ($id) {
+            //查询草稿数据
+            $draft_info = $this->model->where('productId',$id)->first();
+        
+            //查询草稿SKU信息
+            $draft_skus = $this->smtProductSkuModel->where(['productId'=>$id,'isRemove'=>0])->get();
+            //查询草稿详情
+            $draft_detail = $draft_info->details;
+            
+            //已选择的分类
+            $smtCategoryModel = new smtCategoryModel;
+            $category_id = $draft_info->categoryId;
+            $category_info = $smtCategoryModel->getCateroryAndParentName($category_id);
+        
+            $token_id = $draft_info->token_id;
+            //查询选择的分类的属性
+        
+            $attributes = smtCategoryAttribute::where('category_id',$category_id)->first();
+            $category_attributes = array();
+            $account = AccountModel::findOrFail($token_id);
+            $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+            if (!$attributes){ //属性直接不存在
+                $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id,$category_id);
+                if ($return)
+                    $category_attributes = $return;
+            }else { //属性存在但不是最新的
+                $category_attributes = unserialize($attributes->attribute);
+                 
+                //这个属性今天还没更新呢，更新下吧
+                if (!$attributes->last_update_time || date('Y-m-d') != date('Y-m-d', strtotime($attributes->last_update_time))) {
+                    $return = $smtApi->getChildAttributesResultByPostCateIdAndPath($token_id, $category_id);
+                    if ($return)
+                        $category_attributes = $return;
+                }
+            }
+            //对属性进行排序处理
+            $category_attributes = $smtApi->sortAttribute($category_attributes);
+            //获取运费模版
+            $freight = smtFreightTemplate::where('token_id',$token_id)->get();
+             
+            //服务模板
+            $service = smtServiceTemplate::where('token_id',$token_id)->get();
+        
+            //产品分组
+            $product_group = new SmtProductController();
+            $group = $product_group->getLocalProductGroupList($token_id);
+            //单位列表
+            $unit = $this->smtProductUnitModel->getAllUnit();
+        
+            //产品模板
+            $module = smtProductModule::where('token_id',$token_id)->get();
+        
+            //速脉通模板及售后模板
+            $plat = 6;
+            $template_list = smtTemplates::where('plat',$plat)->get();
+            $shouhou_list  = afterSalesService::where(['plat'=>$plat,'token_id'=>$token_id])->get();
+            //产品信息不组合成一条数据了
+            $response = [
+                'metas' => $this->metas(__FUNCTION__),
+                'draft_info'    => $draft_info,
+                'draft_skus'    => $draft_skus,
+                'draft_detail'  => $draft_detail,
+                'category_info' => $category_info,
+                'freight'       => $freight,
+                'service'       => $service,
+                'group'         => $group,
+                'module'        => $module,
+                'productUnit'   => $unit,
+                'action'        => 'edit',
+                'attributes'    => $category_attributes,
+                'token_id'      => $draft_info['token_id'],
+                'template_list' => $template_list,
+                'shouhou_list'  => $shouhou_list,
+                'token_id' => $token_id,
+                'category_id' => $category_id,
+            ];
+            return view($this->viewPath . 'editOnlineProduct',$response);
+        } else { //没有ID--直接跳转到列表页吧
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+    }
+    
+    public function ajaxOperateOnlineProduct(){
+        $get = Input::get();
+        $type = $get['type'];
+        $product =[];
+        $smtProduct = $this->model->where('productId',$get['id'])->first();
+        $account = AccountModel::findOrFail($smtProduct->token_id);
+        $smtApi = Channel::driver($account->channel->driver, $account->api_config); 
+        if($type == 'online'){
+            $api = 'api.offlineAeProduct';
+        }elseif($type == 'offline'){
+            $api = 'api.onlineAeProduct';
+        }else{
+            $this->ajax_return('操作失败!',0);
+        }     
+
+        $productId = $smtProduct->productId;
+        $result= $smtApi->updateProductPublishState($api,$productId);
+        if($result['success']){
+            if($type == 'online'){
+                $data['productStatusType'] = 'offline';
+            }else{
+                $data['productStatusType'] = 'onSelling';
+            }            
+            $this->model->where('productId',$productId)->update($data);
+            $this->ajax_return('操作成功!',true);
+        }else{
+            $this->ajax_return('操作失败!',false);
         }
     }
   
@@ -1208,11 +1345,19 @@ class SmtController extends Controller{
             $productIdArr = explode(',', $productIds);           
             foreach ($productIdArr as $id){
                 $rs = $this->draftDel($id);
+                if ($rs['status']){
+                        $success[] = "草稿$id 删除成功";
+                    }else{
+                        $error[] = "草稿$id 删除失败，".$rs['msg'];
+                    }
             }
-           return redirect($this->mainIndex)->with('alert', $this->alert('success', '删除成功.'));
+            $msg = !empty($success) ? implode(';', $success) : '';
+            $msg .= !empty($error) ? implode(';', $error) : '';
+            echo json_encode(array('status' => true, 'msg' => $msg));
         }else {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '非法操作.'));
+            echo json_encode(array('status' => false, 'msg' => '非法操作'));
         }
+        exit;
     }
    //json返回数据结构
    function ajax_return($info='', $status=1, $data='') {
@@ -1227,14 +1372,13 @@ class SmtController extends Controller{
        $productProperties =array();
        if(!empty($checkeinfo['aeopAeProductPropertys']))
        {
-           $productpropertys = unserialize($checkeinfo['aeopAeProductPropertys']);  
+           $productpropertys = unserialize($checkeinfo['aeopAeProductPropertys']); 
            foreach($productpropertys as $pro)
-           {
-               
-                   if(is_string($pro['attrValueId']))
-                   {
-                       $productProperties[]=$pro;
-                   }
+           {      
+               if(array_key_exists('attrValueId', $pro))
+               {
+                   $productProperties[]=$pro;
+               }
                
            }
        }
@@ -1304,7 +1448,7 @@ class SmtController extends Controller{
    }
    
    public function copycheck($copyworld){
-       $copyright= smtCopyright::where('no_is_del',1)->get();
+       $copyright= smtCopyright::where('is_del',1)->get();
        $copuSku = array();//侵权的SKU
        $copyTra = array();//侵权的品牌名
        foreach($copyright as $v){
@@ -1519,6 +1663,50 @@ html;
    }
    
    /**
+    * 获取关键字推荐类目的分类名称信息--父分类也显示出去吧
+    */
+   public function showCommandCategoryList()
+   {   
+       $keyword  = trim(Input::get('keyword'));
+       $token_id = trim(Input::get('token_id'));
+       $category_list = $this->getOnlineCategoryId($token_id, $keyword);
+       //$category_list = array('200000174', '200000236', '3010');
+       $rs            = array();
+       if ($category_list) {
+           foreach ($category_list as $category_id) {
+               //显示推荐的类目信息
+               $rs[] = array('id' => $category_id, 'name' => $this->smt_category->getCateroryAndParentName($category_id));
+           }
+       }
+       echo json_encode($rs);
+   }
+   
+   /**
+    * 根据关键词返回推荐子叶类目信息--在线获取的
+    * @param $token_id
+    * @param $keyword
+    * @return array
+    */
+    public function getOnlineCategoryId($token_id, $keyword)
+    {
+        $result = '';
+        $rs     = array(); //返回的数组
+        $api    = 'api.recommendCategoryByKeyword';
+        
+        if ($token_id && $keyword) {
+        $account = AccountModel::findOrFail($token_id);
+        $smtApi = Channel::driver($account->channel->driver, $account->api_config);   
+        $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
+        }
+        $data = json_decode($result, true);
+        if ($data['success'] && $data['total'] > 0) {
+           $rs = $data['cateogryIds'];
+        }
+        
+        return $rs;
+    }
+   
+   /**
     * 根据SKU模糊查询并推荐产品列表
     */
    public function recommendProductList(){
@@ -1537,7 +1725,7 @@ html;
        //产品ID
        $productId = $product['productId'];
        $product_list_data                        = array();
-       $product_list_data['gmtCreate']           = date('Y-m-d H:i:s');
+       //$product_list_data['gmtCreate']           = date('Y-m-d H:i:s');
        $aeopAeProductSKUs                        = $product['aeopAeProductSKUs'];
        $product_list_data['multiattribute']      = (count($aeopAeProductSKUs) > 1 ? 1 : 0);
        $product_list_data['isRemove']            = '0';
@@ -1561,7 +1749,7 @@ html;
    
        DB::beginTransaction();
        //直接更新
-       $this->model->where('productId',$productId)->details->update($detail_data);       
+       $this->smtProductDetailModel->where('productId',$productId)->update($detail_data);       
    
        $smtSkuCodeArr = array();
        $common = new common_helper();
@@ -1584,9 +1772,143 @@ html;
        return array('status' => true);
    }
    
+   /**
+    * 异步上传SKU目录
+    */
+   public function ajaxUploadDirImage(){      
+       $token_id = Input::get('token_id');
+       $dirName  = trim(Input::get('dirName'));
+       $opt      = trim(Input::get('opt'));
    
-    
-    
+       if (empty($token_id) || empty($dirName)) {
+           $this->ajax_return('账号或者SKU不能为空', false);
+       } 
+       //本程序的上级目录
+       $topDir = str_replace('\\', '/', dirname($_SERVER['DOCUMENT_ROOT']));
+       //图片库中ebay图片的位置
+       $ebayPicDir = $topDir . '/erp/imgServer/upload/SMT';
+       $skuDir = $ebayPicDir . '/' . $dirName;
+       if (strtoupper($opt) == 'SP'){
+           $spArray = array('SP', 'sp', 'Sp', 'sP');
+           $hasFlag = false;
+           foreach ($spArray as $sp){
+               $skuDir = $ebayPicDir . '/' . $dirName.'/'.$sp;
+               if (file_exists($skuDir)){ //文件夹还是存在的
+                   $hasFlag = true;
+                   break;
+               }
+           }
+           if (!$hasFlag){
+               $this->ajax_return('SKU对应的文件夹不存在(若发现该SKU目录的名称含有小写，请让修改)', false);
+           }
+       }else {
+           if (!file_exists($skuDir)) { //SKU对应的文件夹不存在
+               $this->ajax_return('SKU对应的文件夹不存在(若发现该SKU目录的名称含有小写，请让修改)', false);
+           }
+       }
+   
+       if (!is_dir($skuDir)) {
+           $this->ajax_return('SKU对应的信息不是文件夹，请检查路径', false);
+       }
+   
+       $handle = opendir($skuDir);
+   
+       //图片扩展列表
+       $common = new common_helper();
+       $imageExt = $common->defineSmtImageExd();
+   
+       $api = 'api.uploadImage'; //上传到哪个图片接口
+   
+       $success = array();
+       $error   = array();
+   
+       //获取要上传到的账号信息
+       //获取账号的信息
+       $account = AccountModel::findOrFail($token_id);
+       $smtApi = Channel::driver($account->channel->driver, $account->api_config);    
+       if (empty($account)) {
+           $this->ajax_return('没有查找到账号信息', false);
+       }
+       while ($file = readdir($handle)) {
+           if ($file != '.' && $file != '..' && !is_dir($skuDir . '/' . $file)) {
+               $exd = strtolower($common->getFileExtendName($file));
+               if (in_array($exd, $imageExt)) { //是速卖通的图片
+                   $temp      = explode('.', $file);
+                   $fileName  = array_shift($temp);
+                   $imagePath = $skuDir . '/' . $file; //真实的图片路径
+                   $result    = $smtApi->uploadBankImage($api, $imagePath, $fileName); //返回的图片结果
+                   //print_r($result);exit;
+                   //$result = array();
+                   if (array_key_exists('status', $result) && ($result['status'] == 'SUCCESS' || $result['status'] == 'DUPLICATE')) {
+                       $url       = $result['photobankUrl']; //返回的url链接
+                       $success[] = $url;
+                   } else {
+                       $msg = $file;
+                       if (array_key_exists('error_code', $result)){
+                           $msg .= ',error_code:'.$result['error_code'].','.$result['error_message'];
+                       }
+                       $error[] = $msg; //失败的图片名称
+                   }
+               }
+           }
+       }
+       closedir($handle);
+   
+       $this->ajax_return($error, true, $success);
+   }
+   
+   /**
+    * 异步上传一张图片到临时文件以添加自定义属性图片
+    */
+   public function ajaxUploadOneCustomPic(){
+       $token_id = Input::get('token_id');
+       $oldImg   = Input::get('img');
+       if (empty($token_id)) {
+           $this->ajax_return('上传失败，账号为空', false);
+       }
+   
+       if (empty($oldImg)) {
+           $this->ajax_return('上传失败，需要上传的图片链接为空', false);
+       }
+   
+       //获取账号的信息
+       $account = AccountModel::findOrFail($token_id);
+       $smtApi = Channel::driver($account->channel->driver, $account->api_config);    
+       if (empty($account)) {
+           $this->ajax_return('上传失败,没有查到对应的账号信息', false);
+       }   
+       
+       $api = 'api.uploadTempImage';  
+       //上传图片到临时目录
+       $result = $smtApi->uploadBankImage($api, $oldImg);
+       if ($result && array_key_exists('success', $result) && $result['success']) {
+           $this->ajax_return('', true, $result['url']);
+       } else { //失败了，写下日志吧
+           $this->ajax_return('error_code:' . $result['error_code'] . ',' . $result['error_message'], false);
+       }
+   }
+   
+   public function getskuinfo()
+   {
+       $sku = Input::get('sku');
+       $resukt = $this->Products_data_model->where('productsIsActive',1)->where('products_sku','like',$sku);
+       $returnarr = array();
+       $returnarr['weight'] = $resukt[0]['products_weight'];
+       $returnarr['length'] = 0;
+       $returnarr['width'] = 0;
+       $returnarr['height'] = 0;
+       if(!empty($resukt[0]['products_volume']))
+       {
+           $volume = unserialize($resukt[0]['products_volume']);
+           $returnarr['length'] = $volume['ap']['length'];
+           $returnarr['width'] = $volume['ap']['width'];
+           $returnarr['height'] = $volume['ap']['height'];
+       }
+       $returnarr['products_html_mod'] = htmlspecialchars_decode($resukt[0]['products_html_mod']);
+   
+       $this->ajax_return('',1,$returnarr);
+   
+   }
    
 }
 

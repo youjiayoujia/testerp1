@@ -8,7 +8,6 @@
     <link href="{{ asset('css/jquery.cxcalendar.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/jquery.datetimepicker.css') }}">
-   
 @stop
 @section('js')
     {{--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--}}{{-- JQuery --}}

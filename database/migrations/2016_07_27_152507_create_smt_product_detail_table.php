@@ -16,7 +16,7 @@ class CreateSmtProductDetailTable extends Migration
             $table->increments('id');
             $table->string('productId')->comment('产品id');
             $table->text('aeopAeProductPropertys')->comment('产品属性，序列化后保存');
-            $table->string('imageURLs')->comment('产品图片,以分号分隔');
+            $table->text('imageURLs')->comment('产品图片,以分号分隔');
             $table->string('detail')->comment('详情描述(注意过滤)');
             $table->string('keyword')->comment('关键字');
             $table->string('productMoreKeywords1')->comment('更多关键字1');

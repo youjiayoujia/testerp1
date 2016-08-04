@@ -878,14 +878,8 @@ $template['name'].'</option>';
 <input type="hidden" name="id" value="<?php echo $draft_info ? $draft_info['productId'] : ''; ?>" id="id"/>
 @stop
 @section('formButton')
-    <div class="text-center">
-     @if($api == 'post')
-        <button type="submit" name="save" class="btn btn-success submit_btn ">保存</button>
-        <button type="submit" name="post" class="btn btn-success submit_btn ">发布</button>
-        <button type="submit" name="saveToPost" class="btn btn-success submit_btn ">保存为待发布</button>
-     @else
-        <button type="submit" name="editAndPost" class="btn btn-success submit_btn ">保存并且发布</button>
-     @endif
+    <div class="text-center">    
+        <button type="submit" name="editAndPost" class="btn btn-success submit_btn ">修改线上产品</button>  
     </div>
 
 @show{{-- 表单按钮 --}}
@@ -1880,14 +1874,14 @@ $template['name'].'</option>';
                        }
                    }
                    
-                   location.href = "{{route('smt.index')}}";
+                   showxbtips(data.info);
                } else {
-                   layer.alert(data.info, 'alert-warning');
+                   showxbtips(data.info, 'alert-warning');
                }
             }
         });
-       */ 
-      
+        
+      */
 
     /*var ue = UM.getEditor('detail', {
     	initialFrameWidth: 1000,

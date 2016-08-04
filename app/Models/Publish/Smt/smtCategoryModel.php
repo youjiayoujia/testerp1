@@ -2,7 +2,7 @@
 namespace App\Models\Publish\Smt;
 use Illuminate\Database\Eloquent\Model;
 class smtCategoryModel extends Model{
-    protected $table = "smt_categorylist";
+    protected $table = "smt_category_list";
     
     protected $fileable = ['category_id','category_name','pid','level','isleaf'];
     

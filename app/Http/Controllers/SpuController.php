@@ -33,7 +33,7 @@ class SpuController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->where('status','purchase')),
+            'data' => $this->autoList($this->model),
             'num_arr' =>$num_arr,
             'users' => UserModel::all(),
             'mixedSearchFields' => $this->model->mixed_search,
@@ -72,6 +72,41 @@ class SpuController extends Controller
         	$this->model->find($id)->update(['status'=>$action]);
         }	
         return 1;
+    }
+
+    /**
+     * 退回
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function actionBack()
+    {
+        $action = request()->input("action");
+        $spu_ids = request()->input("spu_ids");
+        $arr = explode(',', $spu_ids);
+        foreach(config("spu.status") as $key=>$value){
+            if($key==$action){
+                $action = config("spu.status")[$key];break;
+            }
+            $prev_action = $key;
+        }
+        
+        foreach($arr as $id){
+            $this->model->find($id)->update(['status'=>$prev_action]);
+        }   
+        return 1;
+    }
+
+    /**
+     * 保存备注
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function saveRemark()
+    {
+        $data = request()->all();echo '<pre>';
+        $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
     }
 
 }

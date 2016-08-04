@@ -19,7 +19,10 @@ class SpuModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'spu','product_require_id'];
+    //protected $fillable = ['id', 'spu','product_require_id','status','edit_user','image_user'];
+    protected $guarded = [];
+
+    public $searchFields = ['id' =>'ID','spu'=>'spu'];
 
     public function values()
     {

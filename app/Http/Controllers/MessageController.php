@@ -76,8 +76,8 @@ class MessageController extends Controller
                 'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
                 //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
+                'content'=>$message->MessageInfo,
             ];
-
             return view($this->viewPath . 'process', $response)->with('count',$count);
 
         }
@@ -93,7 +93,7 @@ class MessageController extends Controller
         }
 
         //return $model->message_content;  原来逻辑
-        return $model->content;
+        return $model->MessageInfo;
     }
 
     /**

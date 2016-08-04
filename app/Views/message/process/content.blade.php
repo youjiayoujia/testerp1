@@ -25,7 +25,9 @@
         <div class="row">
             <div class="col-lg-12 mailcontent" >
                 <div class="embed-responsive embed-responsive-16by9">
-                    <iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$message->id]) }}"></iframe>
+                                            <?php echo $content; ?>
+                    {{--{{$content}}--}}
+                    {{--<iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$message->id]) }}"></iframe>--}}
                 </div>
             </div>
         </div>

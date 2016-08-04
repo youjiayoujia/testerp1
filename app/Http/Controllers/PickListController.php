@@ -44,7 +44,6 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model, 
-            'packages' => $model->package()->with('items')->get(),
         ];
 
         return view($this->viewPath.'show', $response);
@@ -70,11 +69,27 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'picklistitems' => $model->pickListItem,
+            'size' => "100*100",
+            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('1'),
             'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);
+    }
+
+    public function printPackageDetails($id, $status)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'packages' => ($status != 'all' ? $model->package->where('status', $status) : $model->package),
+        ];
+
+        return view($this->viewPath.'printPackages', $response);
     }
 
     public function performanceStatistics()
@@ -164,6 +179,22 @@ class PickListController extends Controller
                 }
                 return $this->pickListPackage($model->id);
                 break;
+            case 'forceOut':
+                $picknum = request('picknum');
+                $model = PackageModel::find($picknum);
+                if(!$model) {
+                    $model = PackageModel::where('tracking_no', $picknum)->first();
+                }
+                if(!$model) {
+                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '对应包裹不存在.'));
+                }
+                $response = [
+                    'metas' => $this->metas(__FUNCTION__, '强制出库'),
+                    'package' => $model,
+                ];
+                return view($this->viewPath.'forceOut', $response);
+
+                exit;
         }
         
     }
@@ -346,6 +377,11 @@ class PickListController extends Controller
             }
             if($flag == 1) {
                 $package->status = 'PACKED';
+                $picklistItems = $package->picklistItems;
+                foreach($picklistItems as $picklistItem) {
+                    $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
+                    $picklistItem->save();
+                }
                 $package->save();
             }
             return json_encode('1');

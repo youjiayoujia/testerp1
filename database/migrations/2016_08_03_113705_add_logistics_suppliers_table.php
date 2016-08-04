@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class DeleteLogisticsSuppliersTable extends Migration
+class AddLogisticsSuppliersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,8 @@ class DeleteLogisticsSuppliersTable extends Migration
     public function up()
     {
         Schema::table('logistics_suppliers', function (Blueprint $table) {
-            $table->dropColumn('customer_id');
+            $table->string('password')->comment('密码')->nullable()->default(NULL)->after('customer_id');
+            $table->string('url')->comment('URL')->nullable()->default(NULL)->after('customer_id');
         });
     }
 
@@ -25,7 +26,8 @@ class DeleteLogisticsSuppliersTable extends Migration
     public function down()
     {
         Schema::table('logistics_suppliers', function (Blueprint $table) {
-            //
+            $table->dropColumn('password');
+            $table->dropColumn('url');
         });
     }
 }

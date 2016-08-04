@@ -21,7 +21,7 @@ class ListItemModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picklist_id', 'type', 'warehouse_position_id', 'logistic_id', 'item_id', 'quantity', 'created_at'];
+    protected $fillable = ['picklist_id', 'type', 'warehouse_position_id', 'logistic_id', 'item_id', 'sku', 'packed_quantity', 'quantity', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -34,6 +34,11 @@ class ListItemModel extends BaseModel
     public function pickListItemPackages()
     {
         return $this->hasMany('App\Models\Pick\ListItemPackageModel', 'picklist_item_id', 'id');
+    }
+
+    public function packages()
+    {
+        return $this->belongsToMany('App\Models\PackageModel', 'picklistitem_packages', 'picklist_item_id', 'package_id');
     }
 
     public function items()

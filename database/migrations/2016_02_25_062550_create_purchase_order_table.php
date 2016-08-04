@@ -15,6 +15,7 @@ class CreatePurchaseOrderTable extends Migration
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->increments('id');
 			$table->integer('type')->comment('采购类型')->nullable()->default(NULL);
+            $table->integer('carriage_type')->comment('物流方式')->nullable()->default(NULL);
 			$table->integer('status')->comment('采购单的状态')->default(0);
 			$table->integer('examineStatus')->comment('采购单的审核状态')->default(0);
 			$table->integer('costExamineStatus')->comment('采购单价格审核状态')->default(0);
@@ -27,6 +28,8 @@ class CreatePurchaseOrderTable extends Migration
 			$table->double('total_postage', 15, 8)->comment('物流费用')->nullable()->default(NULL);
 			$table->string('post_coding')->comment('物流单号')->nullable()->default(NULL);
 			$table->double('total_purchase_cost', 15, 8)->comment('采购价格')->nullable()->default(NULL);
+            $table->tinyInteger('is_certificate')->comment('是否需要凭证')->default(NULL);
+            $table->string('remark')->comment('备注')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

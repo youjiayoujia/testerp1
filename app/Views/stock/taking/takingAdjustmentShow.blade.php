@@ -21,7 +21,7 @@
                 <div class="form-group col-lg-1">
                     <label for="ID" class='control-label'>ID</label>
                 </div>
-                <div class="form-group col-lg-1">
+                <div class="form-group col-lg-2">
                     <label for="sku" class='control-label'>sku</label>
                 </div>
                 <div class="form-group col-lg-2">
@@ -30,7 +30,7 @@
                 <div class="form-group col-lg-2">
                     <label for="库位" class='control-label'>库位</label>
                 </div>
-                <div class="form-group col-lg-2">
+                <div class="form-group col-lg-1">
                     <label for="总数量" class='control-label'>总数量</label>
                 </div>
                 <div class="form-group col-lg-2">
@@ -44,13 +44,12 @@
                 </div>
             </div>
         @foreach($stockTakingForms as $stockTakingForm)
-            @if($stockTakingForm->stock_taking_status != 'equal')
             <div class='row'>
                 <div class="form-group col-lg-1">
                     <input type='text' name='arr[id][]' class='form-control' value="{{ $stockTakingForm->id }}" readonly>
                 </div>
-                <div class="form-group col-lg-1">
-                    <input type='text' name='arr[sku][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->items ? $stockTakingForm->stock->items->sku : '' : '' }}" readonly>
+                <div class="form-group col-lg-2">
+                    <input type='text' name='arr[sku][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->item ? $stockTakingForm->stock->item->sku : '' : '' }}" readonly>
                 </div>
                 <div class="form-group col-lg-2">
                     <input type='text' name='arr[warehouse_id][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->warehouse ? $stockTakingForm->stock->warehouse->name : '' : '' }}" readonly>
@@ -58,7 +57,7 @@
                 <div class="form-group col-lg-2">
                     <input type='text' name='arr[warehouse_position_id][]' class='form-control' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->position ? $stockTakingForm->stock->position->name : '' : '' }}" readonly>
                 </div>
-                <div class="form-group col-lg-2">
+                <div class="form-group col-lg-1">
                     <input type='text' name='arr[all_quantity][]' class='form-control all_quantity' value="{{ $stockTakingForm->stock ? $stockTakingForm->stock->all_quantity : '' }}" readonly>
                 </div>
                 <div class="form-group col-lg-2">
@@ -71,8 +70,9 @@
                     <input type='text' name='arr[adjust_quantity][]' class='form-control adjust_quantity' placeholder='调整数量' value="{{ abs($stockTakingForm->quantity - ($stockTakingForm->stock ? $stockTakingForm->stock->all_quantity : '')) }}" readonly>
                 </div>
             </div>
-            @endif
+            <?php echo $stockTakingForms->render(); ?>
         @endforeach
+        
     </div>
 </div>
 @stop

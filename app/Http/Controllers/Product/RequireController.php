@@ -147,7 +147,7 @@ class RequireController extends Controller
             $catalog = CatalogModel::find($model->catalog_id);
             $code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
             //创建spu，,并插入数据
-            $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num),'product_require_id'=>$model->id]);
+            $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num),'product_require_id'=>$model->id,'status'=>'purchase']);
             $model->update(['status'=>'2', 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
         }
 

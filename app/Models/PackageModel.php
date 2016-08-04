@@ -74,12 +74,50 @@ class PackageModel extends BaseModel
                 'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
-            'filterSelects' => ['status' => config('package'), 'warehouse_id' => $this->getArray('App\Models\WarehouseModel', 'name'), 'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')],
+            'filterSelects' => [
+                'status' => config('package'),
+                'warehouse_id' => $this->getArray('App\Models\WarehouseModel', 'name'),
+                'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code')
+            ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
             ],
-            'sectionSelect' => [],
+            'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
         ];
+    }
+
+    public function getStatusColorAttribute()
+    {
+        switch ($this->status) {
+            case 'ASSIGNFAILED':
+                $color = 'danger';
+                break;
+            case 'NEW':
+                $color = 'info';
+                break;
+            case 'ASSIGNED':
+                $color = 'info';
+                break;
+            case 'PROCESSING':
+                $color = 'info';
+                break;
+            case 'PICKING':
+                $color = 'info';
+                break;
+            case 'PACKED':
+                $color = 'info';
+                break;
+            case 'CANCLE':
+                $color = 'warning';
+                break;
+            case 'SHIPPED':
+                $color = 'success';
+                break;
+            default:
+                $color = 'info';
+                break;
+        }
+        return $color;
     }
 
     public function requires()
@@ -91,7 +129,7 @@ class PackageModel extends BaseModel
     {
         $arr = [];
         $inner_models = $model::all();
-        foreach($inner_models as $key => $single) {
+        foreach ($inner_models as $key => $single) {
             $arr[$single->id] = $single->$name;
         }
         return $arr;
@@ -125,6 +163,11 @@ class PackageModel extends BaseModel
     public function picklist()
     {
         return $this->belongsTo('App\Models\PickListModel', 'picklist_id');
+    }
+
+    public function picklistItems()
+    {
+        return $this->belongsToMany('App\Models\Pick\ListItemModel', 'picklistitem_packages', 'package_id', 'picklist_item_id');
     }
 
     public function logistics()
@@ -194,18 +237,18 @@ class PackageModel extends BaseModel
     public function createChildPackage($arr)
     {
         $items = $this->items;
-        if($this->order->status == 'NEED') {
+        if ($this->order->status == 'NEED') {
             $this->order->update(['status' => 'PARTIAL']);
         }
-        foreach($arr as $warehouseId => $stockInfo) {
+        foreach ($arr as $warehouseId => $stockInfo) {
             $newPackage = $this->create($this->toArray());
-            foreach($stockInfo as $stockId => $info) {
+            foreach ($stockInfo as $stockId => $info) {
                 $item = $items->where('item_id', $info['item_id'])->first();
-                if($item->quantity <= $info['quantity']) {
+                if ($item->quantity <= $info['quantity']) {
                     $item->delete();
                     continue;
                 }
-                $item->update(['quantity' => ($item->quantity-$info['quantity'])]);
+                $item->update(['quantity' => ($item->quantity - $info['quantity'])]);
                 $newPackage->items()->create($info);
             }
             $newPackage->update(['status' => 'WAITASSIGN', 'warehouse_id' => $info['warehouse_id']]);
@@ -227,7 +270,7 @@ class PackageModel extends BaseModel
         return $sum;
     }
 
-     public function explodePackage()
+    public function explodePackage()
     {
         $arr = $this->packageStockDiff($this->packageNeedArray());
         $sum = $this->atLeastTimes($arr);
@@ -415,13 +458,13 @@ class PackageModel extends BaseModel
 
     public function createPackageDetail($items)
     {
-        foreach($this->items as $packageItem) {
+        foreach ($this->items as $packageItem) {
             $packageItem->delete();
         }
         $this->order->update(['status' => 'PACKED']);
         $i = true;
         foreach ($items as $warehouseId => $packageItems) {
-            if($i) {
+            if ($i) {
                 foreach ($packageItems as $key => $packageItem) {
                     $newPackageItem = $this->items()->create($packageItem);
                     DB::beginTransaction();
@@ -441,7 +484,7 @@ class PackageModel extends BaseModel
                 $i = false;
             } else {
                 $newPackage = $this->create($this->toArray());
-                if($newPackage) {
+                if ($newPackage) {
                     foreach ($packageItems as $key => $packageItem) {
                         $newPackageItem = $newPackage->items()->create($packageItem);
                         DB::beginTransaction();
@@ -464,8 +507,8 @@ class PackageModel extends BaseModel
 
         return true;
     }
-    /**********************************************************************************/
 
+    /**********************************************************************************/
 
 
     public function getShippingLimitsAttribute()
@@ -752,17 +795,28 @@ class PackageModel extends BaseModel
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
         foreach ($arr as $key => $content) {
-            $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
-            $content['cost'] = iconv('gb2312', 'utf-8', trim($content['cost']));
-            $tmp_package = $this->where('id', $content['package_id'])->first();
-            if (!$tmp_package || $tmp_package->status != 'SHIPPED') {
-                $error[] = $key;
-                continue;
-            }
-            if ($type == 1) {
-                $this->find($content['package_id'])->update(['cost' => $content['cost']]);
+            if($type != '3') {
+                $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                $content['cost'] = iconv('gb2312', 'utf-8', trim($content['cost']));
+                $tmp_package = $this->where('id', $content['package_id'])->first();
+                if (!$tmp_package || $tmp_package->status != 'SHIPPED') {
+                    $error[] = $key;
+                    continue;
+                }
+                if ($type == 1) {
+                    $this->find($content['package_id'])->update(['cost' => $content['cost']]);
+                } else {
+                    $this->find($content['package_id'])->update(['cost1' => $content['cost']]);
+                }
             } else {
-                $this->find($content['package_id'])->update(['cost1' => $content['cost']]);
+                $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
+                $content['tracking_no'] = iconv('gb2312', 'utf-8', trim($content['tracking_no']));
+                $tmp_package = $this->where('id', $content['package_id'])->first();
+                if (!$tmp_package) {
+                    $error[] = $key;
+                    continue;
+                }
+                $this->find($content['package_id'])->update(['tracking_no' => $content['tracking_no']]);
             }
         }
 

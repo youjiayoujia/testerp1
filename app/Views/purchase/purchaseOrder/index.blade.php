@@ -4,6 +4,11 @@
         <a href="/purchaseOrder/purchaseOrdersOut" class="btn btn-info" id="orderExcelOut"> 采购单导出
         </a>
     </div>
+    <div class="btn-group">
+        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+            <i class="glyphicon glyphicon-plus"></i> 新增
+        </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
 	
@@ -154,7 +159,12 @@
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
-                </a>  
+                </a>
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $purchaseOrder->id }}"
+                   data-url="{{ route('purchaseOrder.destroy', ['id' => $purchaseOrder->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </a> 
             </td>
         </tr>
         <!-- 模态框（Modal） -->

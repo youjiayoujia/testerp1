@@ -17,6 +17,10 @@
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
     <th>图片</th>
+    <th>采购员</th>
+    <th>编辑</th>
+    <th>美工</th>
+    <th>开发</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -29,6 +33,10 @@
             <td><input type="checkbox" name="tribute_id" value="{{$spu->id}}"></td>
             <td>{{ $spu->id }}</td>
             <td>{{ $spu->spu }}</td>
+            <td>{{ $spu->spu }}</td>
+            <td>{{ $spu->spu }}</td>
+            <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>
+            <td>{{ $spu->imageEdit?$spu->imageEdit->name:'' }}</td>
             <td>{{ $spu->spu }}</td>
             <td>{{ $spu->updated_at }}</td>
             <td>{{ $spu->created_at }}</td>
@@ -54,10 +62,16 @@
     @section('doAction')
         <div class="row">
             <div class="col-lg-12">
-                <button class="doAction" value="image_edit">批量已制图</button>
-                <button>批量退回</button>
-                <button>批量已编辑</button>
-                <button>批量转采购</button>
+                <button class="doAction" value="edit">批量已建SKU维护资料</button>
+                <button class="doAction" value="image_edit">批量已编辑</button>
+                <button class="doAction" value="image_examine">批量已制图</button>
+                <button class="doAction" value="final_examine">批量已审图</button>
+                <button class="doAction" value="pass">批量 终审</button>
+                <?php $condition = request()->input('filters')?explode('.',request()->input('filters'))[2]:''; ?>
+                <?php if($condition=='image_edit'||$condition=='edit'||$condition=='image_examine'||$condition=='final_examine'){ ?>
+                <button class="actionBack" value="{{$condition}}">批量退回</button>
+                <?php } ?>               
+                <button type="button" class="dispatch"  value="purchase">批量转采购</button>
                 <select>
                     <option>==采购==</option>
                     @foreach($users as $user)
@@ -83,11 +97,10 @@
                     @endforeach
                 </select>
 
-                <button>批量转开发</button>
+                <button class='dispatch' value="developer">批量转开发</button>
                 <select>
                     <option>==开发==</option>
                     @foreach($users as $user)
-                        
                         <option value='{{$user->id}}'>{{$user->name}}</option>
                     @endforeach
                 </select>
@@ -142,6 +155,28 @@
             //var user_id = $(this).next().find("option:selected").val();
             var action = $(this).val();
             var url = "{{route('doAction')}}";
+
+            var checkbox = document.getElementsByName("tribute_id");
+            var spu_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                spu_ids += checkbox[i].value + ",";
+            }
+            spu_ids = spu_ids.substr(0, (spu_ids.length) - 1);
+            $.ajax({
+                url: url,
+                data: {action: action,spu_ids:spu_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
+        });
+
+        $('.actionBack').click(function () {
+            var action = $(this).val();
+            var url = "{{route('actionBack')}}";
 
             var checkbox = document.getElementsByName("tribute_id");
             var spu_ids = "";

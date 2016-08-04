@@ -76,6 +76,11 @@
                     <abbr title="ZipCode">Z:</abbr> {{ $order->shipping_zipcode }}
                     <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
                 </address>
+                @if($order->customer_remark)
+                    <div class="text-danger">
+                        {{ $order->customer_remark }}
+                    </div>
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div class="text-danger">
@@ -527,6 +532,12 @@
             <option value="low">低于</option>
         </select>
     </div>
+    <div class="btn-group" role="group">
+        <select class="form-control special" name="special" id="special">
+            <option value="null">特殊要求</option>
+            <option value="yes">有特殊要求</option>
+        </select>
+    </div>
     <div class="btn-group">
         <button class="btn btn-info"
                 data-toggle="modal"
@@ -592,6 +603,13 @@
                             window.location.reload();
                         }
                     });
+                }
+            });
+
+            $('.special').click(function () {
+                var special = $('.special').val();
+                if (special != null) {
+                    location.href = "{{ route('order.index') }}?special=" + special;
                 }
             });
 

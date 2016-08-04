@@ -367,4 +367,14 @@ class TestController extends Controller
             }
         }
     }
+    public function jdtestCrm(){
+        //渠道测试块
+        foreach (AccountModel::all() as $account) {
+            if($account->channel->driver =='ebay'){ //测试diver
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getMessages();
+
+            }
+        }
+    }
 }

@@ -16,8 +16,11 @@ class AlterPackageAddStatus extends Migration
             $table->enum('status',
                 [
                     'NEW',
+                    'WAITASSIGN',
                     'ASSIGNED',
                     'ASSIGNFAILED',
+                    'NEED',
+                    'TRACKINGFAILED',
                     'PROCESSING',
                     'PICKING',
                     'PICKED',

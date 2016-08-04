@@ -4,13 +4,16 @@
         <a href="/purchaseOrder/purchaseOrdersOut" class="btn btn-info" id="orderExcelOut"> 采购单导出
         </a>
     </div>
+    <div class="btn-group">
+        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+            <i class="glyphicon glyphicon-plus"></i> 新增
+        </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
 	
     <th>ID</th> 
-    <th>采购单状态</th> 
-    <th>采购单审核状态</th>
-    <th>核销状态</th>
+    <th>采购单状态</th>
     <th>付款状态</th>
     <th>采购人</th>
    	<th>供应商</th>
@@ -30,10 +33,10 @@
                 {{$purchaseOrder->post_coding }}
             </td>
             <td> 
-                {{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}
+                <div>采购单状态：{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
+                <div>审核状态：{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</div><br>
+                <div>核销状态：{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</div>
             </td>
-            <td>{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</td>  
-            <td>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</td>
             <td>{{config('purchase.purchaseOrder.close_status')[$purchaseOrder->close_status]}}</td>   
     		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
             </td>
@@ -156,7 +159,12 @@
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
-                </a>  
+                </a>
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $purchaseOrder->id }}"
+                   data-url="{{ route('purchaseOrder.destroy', ['id' => $purchaseOrder->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </a> 
             </td>
         </tr>
         <!-- 模态框（Modal） -->

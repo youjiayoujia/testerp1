@@ -54,6 +54,11 @@
                     <span class="glyphicon glyphicon-eye-open"></span>未找到
                 </a>
                 @endif
+                @if($productRequire->status==2)
+                <a href="{{ route('product.create', ['id'=>$productRequire->id]) }}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-eye-open"></span> 创建model
+                </a>
+                @endif
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $productRequire->id }}"
                    data-url="{{ route('productRequire.destroy', ['id' => $productRequire->id]) }}">

@@ -20,7 +20,7 @@
                     <strong>类型</strong>: {{ $model->type == 'SINGLE' ? '单单' : ($model->type == 'SINGLEMULTI' ? '单多' : '多多') }}
                 </div>
                 <div class="col-lg-2">
-                    <strong>仓库</strong>: {{ $model->warehouse->name }}
+                    <strong>仓库</strong>: {{ $model->warehouse ? $model->warehouse->name : '' }}
                 </div>
             </div>
         </div>

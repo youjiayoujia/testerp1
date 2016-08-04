@@ -168,28 +168,14 @@ class EbayAdapter implements AdapterInterface
         $xml .= '<ItemID>' . $tracking_info['ItemID'] . '</ItemID>';
         $xml .= '<Shipped>true</Shipped>';
         $xml .= '<TransactionID>' . $tracking_info['TransactionID'] . '</TransactionID>';
-
-
-        //   $result =  $this->buildEbayBody($xml,'CompleteSale');
-
-
-        $rand_id = rand(1, 10);
-        if ($rand_id > 7) {
-            $result['test'] = 'Falie';
-
-        } else {
-            $result['test'] = 'Success';
-
-        }
-        if ($result['test'] == 'Success') {
-            //if((string)$result->Ack=='Success'){
+        $result =  $this->buildEbayBody($xml,'CompleteSale');
+        if((string)$result->Ack=='Success'){
             $return['status'] = true;
             $return['info'] = 'Success';
         } else {
             $return['status'] = false;
-            //$return['info'] = isset($result->LongMessage)?(string)$result->LongMessage:'error';
-            $return['info'] = '模拟标记失败';
-
+            $return['info'] = isset($result->LongMessage)?(string)$result->LongMessage:'error';
+            //$return['info'] = '模拟标记失败';
         }
         return $return;
     }
@@ -197,6 +183,7 @@ class EbayAdapter implements AdapterInterface
 
     public function parseOrder($order)
     {
+
 
         $reurnOrder = array();
         $attr = $order->Total->attributes();
@@ -215,12 +202,13 @@ class EbayAdapter implements AdapterInterface
         }
 
 
+
         //121864765676-1639850594002
-        $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
+     /*   $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
 
         if ($thisOrder) {
             return false;
-        }
+        }*/
         /*  if((string)$order->OrderID=='121864765676-1639850594002'){
               $paidTime ='2016-06-02 09:00:00';
               echo '121864765676-1639850594002';
@@ -236,6 +224,7 @@ class EbayAdapter implements AdapterInterface
 
         $reurnOrder['currency'] = (string)$currencyID;
         $reurnOrder['channel_ordernum'] = (string)$order->OrderID;
+        $reurnOrder['channel_listnum'] = isset($order->ShippingDetails->SellingManagerSalesRecordNumber)?(string)$order->ShippingDetails->SellingManagerSalesRecordNumber:'';
         $reurnOrder['amount'] = (float)$order->Total;
         $reurnOrder['amount_shipping'] = (float)$order->ShippingServiceSelected->ShippingServiceCost;
         $reurnOrder['email'] = '';
@@ -474,7 +463,7 @@ class EbayAdapter implements AdapterInterface
 
     public function getMessages()
     {
-
+        return false;
     }
 
     public function sendMessages($replyMessage)

@@ -22,6 +22,15 @@
                 <strong>退件单位</strong>: {{ $model->unit }}
             </div>
             <div class="col-lg-3">
+                <strong>国家代码</strong>: {{ $model->country_code }}
+            </div>
+            <div class="col-lg-3">
+                <strong>省份</strong>: {{ $model->province }}
+            </div>
+            <div class="col-lg-3">
+                <strong>城市</strong>: {{ $model->city }}
+            </div>
+            <div class="col-lg-3">
                 <strong>寄件人</strong>: {{ $model->sender }}
             </div>
             <div class="col-lg-9">

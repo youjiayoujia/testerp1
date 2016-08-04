@@ -41,6 +41,11 @@
                     手工发货 <span class="badge">{{ $manualShip }}</span>
                 </a>
             </div>
+            <div class="col-lg-2 text-left">
+                <a type="button" class="btn btn-default" href="{{ route('pickList.indexPrintPickList', ['content' => 'forceOut']) }}">
+                    强制出库
+                </a>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-4">

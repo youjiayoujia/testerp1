@@ -37,26 +37,42 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
-            if (isset($this->order['remark'])) {
-                $order->remark($this->order['remark']);
-            }
             if ($order) {
-                if ($order->status == 'PREPARED') {
-                    $job = new DoPackage($order);
+                $package = $order->createPackage();
+                if ($order->status == 'PREPARED' && $package) {
+                    $job = new DoPackage($package);
                     $job->onQueue('doPackages');
                     $this->dispatch($job);
+                    $this->relation_id = $order->id;
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success.';
+                } else {
+                    $this->relation_id = 0;
+                    $this->result['status'] = 'fail';
+                    $this->result['remark'] = 'Fail to create virtual package.';
                 }
-                $this->relation_id = $order->id;
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success.';
             } else {
                 $this->relation_id = 0;
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = 'Fail to put order in.';
             }
         } else {
-            $this->result['status'] = 'success';
-            $this->result['remark'] = 'Order has been exist.';
+            if ($oldOrder->channel_id == 4 && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
+                $this->order['id'] = $oldOrder->id;
+                $order = $orderModel->updateOrder($this->order, $oldOrder);
+                if ($order) {
+                    $this->relation_id = $oldOrder->id;
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'UNPAID to PAID.';
+                } else {
+                    $this->relation_id = 0;
+                    $this->result['status'] = 'fail';
+                    $this->result['remark'] = 'Fail to update to PAID.';
+                }
+            } else {
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'Order has been exist.';
+            }
         }
         $this->lasting = round(microtime(true) - $start, 3);
         $this->log('InOrders', serialize($this->order));

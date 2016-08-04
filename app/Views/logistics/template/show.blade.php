@@ -12,6 +12,9 @@
             <div class="col-lg-3">
                 <strong>视图</strong>: {{ $model->view }}
             </div>
+            <div class="col-lg-3">
+                <strong>尺寸</strong>: {{ $model->size }}
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

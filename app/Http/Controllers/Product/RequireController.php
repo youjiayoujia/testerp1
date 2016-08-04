@@ -15,6 +15,8 @@ use App\Models\Product\RequireModel;
 use App\Models\CatalogModel;
 use App\Models\ChannelModel;
 use App\Models\Channel\AccountModel;
+use App\Models\SpuModel;
+use Tool;
 
 class RequireController extends Controller
 {
@@ -138,9 +140,14 @@ class RequireController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        
         if($status == 1) {
             $model->update(['status'=>'1', 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
         } else {
+            $catalog = CatalogModel::find($model->catalog_id);
+            $code_num = SpuModel::where("spu", "like", $catalog->code . "%")->get()->count();
+            //创建spu，,并插入数据
+            $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num),'product_require_id'=>$model->id,'status'=>'purchase']);
             $model->update(['status'=>'2', 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
         }
 

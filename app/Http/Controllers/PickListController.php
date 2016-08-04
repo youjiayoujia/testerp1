@@ -44,7 +44,6 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model, 
-            'packages' => $model->package()->with('items')->get(),
         ];
 
         return view($this->viewPath.'show', $response);
@@ -70,11 +69,27 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'picklistitems' => $model->pickListItem,
+            'size' => "100*100",
+            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('1'),
             'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);
+    }
+
+    public function printPackageDetails($id, $status)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'packages' => ($status != 'all' ? $model->package->where('status', $status) : $model->package),
+        ];
+
+        return view($this->viewPath.'printPackages', $response);
     }
 
     public function performanceStatistics()
@@ -164,8 +179,49 @@ class PickListController extends Controller
                 }
                 return $this->pickListPackage($model->id);
                 break;
+            case 'forceOut':
+                $picknum = request('picknum');
+                $model = PackageModel::find($picknum);
+                if(!$model) {
+                    $model = PackageModel::where('tracking_no', $picknum)->first();
+                }
+                if(!$model) {
+                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '对应包裹不存在.'));
+                }
+                $response = [
+                    'metas' => $this->metas(__FUNCTION__, '强制出库'),
+                    'package' => $model,
+                ];
+                return view($this->viewPath.'forceOut', $response);
+
+                exit;
         }
         
+    }
+
+    public function printException() 
+    {
+        $arr = explode(',', request('arr'));
+        $buf = [];
+        foreach($arr as $key => $value) {
+            $tmp = explode('.', $value);
+            $buf[$tmp[0]][$tmp[1]] = $tmp[2];
+        }
+        $barcodes = [];
+        $packages = [];
+        foreach($buf as $key => $barcode) {
+            $barcodes[$key] = Tool::barcodePrint($key);
+            $packages[$key] = PackageModel::find($key);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'buf' => $buf,
+            'barcodes' => $barcodes,
+            'packages' => $packages
+        ];
+
+        return view($this->viewPath.'printException', $response);
+
     }
 
     /**
@@ -321,6 +377,11 @@ class PickListController extends Controller
             }
             if($flag == 1) {
                 $package->status = 'PACKED';
+                $picklistItems = $package->picklistItems;
+                foreach($picklistItems as $picklistItem) {
+                    $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
+                    $picklistItem->save();
+                }
                 $package->save();
             }
             return json_encode('1');
@@ -379,45 +440,49 @@ class PickListController extends Controller
      *
      */
     public function createPickStore()
-    {   
-        if(request()->has('logistics')) {
+    {
+        $sum = 0;
+        if(!request()->has('mixed') && request()->has('logistics')) {
             foreach(request()->input('logistics') as $logistic_id) {
                 $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1'])->where(function($query){
                     if(request()->has('package')) {
-                        foreach(request()->input('package') as $key => $package)
-                            $query = ($key == 0 ? $query->where('type', $package) : $query->orwhere('type', $package));
+                        $query = $query->whereIn('type', request('package'));
                     }
                 })->where(function($query){
                     if(request()->has('channel')) {
-                        foreach(request()->input('channel') as $key => $channel)
-                            $query = ($key == 0 ? $query->where('channel_id', $channel) : $query->orwhere('channel_id', $channel));
+                        $query =$query->whereIn('channel_id', request('channel'));
                     }
                 })->get();
-                if(count($packages)) {
+                $sum += $packages->count();
+                if($packages->count()) {
                     $this->model->createPickListItems($packages);
                     $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                  (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
                 }
             }
-        } else {
+        } elseif(request()->has('mixed') && request()->has('logistics')) {
             $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1'])->where(function($query){
                 if(request()->has('package')) {
-                    foreach(request()->input('package') as $key => $package)
-                        $query = ($key == 0 ? $query->where('type', $package) : $query->orwhere('type', $package));
+                    $query = $query->whereIn('type', request('package'));
+                }
+            })->
+            where(function($query){
+                if(request()->has('logistics')) {
+                    $query = $query->whereIn('logistics_id', request('logistics'));
                 }
             })->where(function($query){
                 if(request()->has('channel')) {
-                    foreach(request()->input('channel') as $key => $channel)
-                        $query = ($key == 0 ? $query->where('channel_id', $channel) : $query->orwhere('channel_id', $channel));
+                    $query = $query->whereIn('channel_id', request('channel'));
                 }
             })->get();
-            if(count($packages)) {
+            $sum += $packages->count();
+            if($packages->count()) {
                 $this->model->createPickListItems($packages);
                 $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                              (request()->has('multitext') ? request()->input('multitext') : '20'));
             }
         }
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '已生成'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $sum.'个包裹已加入生成拣货单'));
     }
 }

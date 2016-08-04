@@ -46,7 +46,6 @@
                 </div>
             </div>
         @foreach($stockTakingForms as $stockTakingForm)
-            @if($stockTakingForm->stock_taking_status != 'equal')
             <div class='row'>
                 <div class="form-group col-lg-1">
                     <input type='text' name='arr[id][]' class='form-control' value="{{ $stockTakingForm->id }}" readonly>
@@ -73,7 +72,7 @@
                     <input type='text' name='arr[adjust_quantity][]' class='form-control adjust_quantity' placeholder='调整数量' value="{{ abs($stockTakingForm->quantity - ($stockTakingForm->stock ? $stockTakingForm->stock->all_quantity : '')) }}" readonly>
                 </div>
             </div>
-            @endif
+            <?php echo $stockTakingForms->render(); ?>
         @endforeach
     </div>
 </div>

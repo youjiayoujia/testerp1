@@ -28,6 +28,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '产品SPU',
+                    'url' => 'spu.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '产品SKU',
                     'url' => 'item.index',
                     'icon' => '',
@@ -126,6 +131,16 @@ return [
                     'url' => 'errorList.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '创建模板',
+                    'url' => 'exportPackage.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货单异常',
+                    'url' => 'errorList.index',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [
@@ -149,13 +164,8 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '入库',
-                    'url' => 'stockIn.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '出库',
-                    'url' => 'stockOut.index',
+                    'name' => '出入库',
+                    'url' => 'stockInOut.index',
                     'icon' => '',
                 ],
                 [
@@ -492,7 +502,11 @@ return [
                 'url' => 'paypal.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'paypal固定税率',
+                'url'  => 'paypal.ShowPaypalRate',
+                'icon' => '',
+            ],
         ],
     ],
 

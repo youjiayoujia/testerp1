@@ -36,38 +36,37 @@ class PackageController extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function edit($id)
-    {
-        $model = $this->model->find($id);
-        if (!$model) {
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'logisticses' => LogisticsModel::all(),
-            'status' => config('package'),
-        ];
+    // public function edit($id)
+    // {
+    //     $model = $this->model->find($id);
+    //     if (!$model) {
+    //         return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+    //     }
+    //     $response = [
+    //         'metas' => $this->metas(__FUNCTION__),
+    //         'model' => $model,
+    //         'logisticses' => LogisticsModel::all(),
+    //         'status' => config('package'),
+    //     ];
 
-        return view($this->viewPath . 'edit', $response);
-    }
+    //     return view($this->viewPath . 'edit', $response);
+    // }
 
     public function flow()
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => OrderModel::where('active', 'NORMAL')
-                ->whereIn('status', ['NEED'])->count(),
-            'assignNum' => $this->model->where(['status' => 'NEW'])->count(),
-            'placeNum' => $this->model->where(['status' => 'ASSIGNED'])->count(),
+            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
+            'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
+            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
             'singlePack' => PickListModel::where('type', 'SINGLE')->whereIn('status',
-                ['PICKED', 'PACKAGEING', 'PICKING'])->count(),
+                ['PACKAGEING', 'PICKING'])->count(),
             'singleMultiPack' => PickListModel::where('type', 'SINGLEMULTI')->whereIn('status',
-                ['PICKED', 'PACKAGEING', 'PICKING'])->count(),
-            'multiInbox' => PickListModel::where('type', 'MULTI')->whereIn('status', ['PICKED', 'PICKING'])->count(),
+                ['PACKAGEING', 'PICKING'])->count(),
+            'multiInbox' => PickListModel::where('type', 'MULTI')->where('status', 'PICKING')->count(),
             'multiPack' => PickListModel::where('type', 'MULTI')->whereIn('status', ['INBOXED', 'PACKAGEING'])->count(),
             'packageShipping' => $this->model->where('status', 'PACKED')->count(),
             'packageException' => $this->model->where('status', 'ERROR')->count(),
@@ -101,6 +100,150 @@ class PackageController extends Controller
         })->download('csv');
     }
 
+    public function returnSplitPackage()
+    {
+        $quantity = request('quantity');
+        $id = request('id');
+        $model = $this->model->find($id);
+        if(!$model) {
+            return json_encode(false);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'quantity' => $quantity,
+        ];
+
+        return view($this->viewPath.'splitPackage', $response);
+    }
+    
+    public function editTrackingNo($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__, '修改追踪号'),
+            'model' => $model,
+        ];
+
+        return view($this->viewPath.'editTrackingNo', $response);
+    }
+
+    public function implodePackage($tmp)
+    {
+        $arr = [];
+        $buf = explode(',', $tmp);
+        foreach($buf as $key => $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            }
+            foreach($model->items as $packageItem) {
+                if(!array_key_exists($packageItem->item_id, $arr)) {
+                    $arr[$packageItem->item_id]['quantity'] = $packageItem->quantity;
+                    $arr[$packageItem->item_id]['warehouse_position_id'] = $packageItem->warehouse_position_id;
+                    $arr[$packageItem->item_id]['order_item_id'] = $packageItem->order_item_id;
+                    $arr[$packageItem->item_id]['remark'] = $packageItem->remark;
+                    $arr[$packageItem->item_id]['is_mark'] = $packageItem->is_mark;
+                    $arr[$packageItem->item_id]['is_upload'] = $packageItem->is_upload;
+                } else {
+                    $arr[$packageItem->item_id]['quantity'] += $packageItem->quantity;
+                }
+                $packageItem->delete();
+            }
+            if($key) {
+                $model->delete();
+            }
+        }
+        $model = $this->model->find($buf[0]);
+        $model->update(['status' => 'NEW']);
+        $model->order->update(['status' => 'REVIEW']);
+        if($model) {
+            foreach($arr as $itemId => $info) {
+                $info['item_id'] = $itemId;
+                $model->items()->create($info);
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));
+    }
+
+    public function editTrackStore($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->update(['tracking_no' => request('tracking_no')]);
+
+        return redirect($this->mainIndex);
+    }
+
+    public function actSplitPackage($arr, $id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $tmp = $this->processArr($arr, $model);
+        sort($tmp);
+        if(count($tmp) == 1) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('warning', $this->mainTitle . '拆后包裹个数还是1.'));
+        } else {
+            foreach($model->items as $item) {
+                $item->delete();
+            }
+            foreach($tmp as $packageId => $info) {
+                if(!$packageId) {
+                    foreach($info as $itemId => $packageItem) {
+                        $packageItem['item_id'] = $itemId;
+                        $model->items()->create($packageItem);
+                    }
+                    $model->update(['status' => 'NEW']);
+                    $model->order->update(['status' => 'REVIEW']);
+                } else {
+                    $newPackage = $this->model->create($model->toArray());
+                    foreach($info as $itemId => $packageItem) {
+                        $packageItem['item_id'] = $itemId;
+                        $newPackage->items()->create($packageItem);
+                    }
+                    $newPackage->update(['status' => 'NEW']);
+                    $newPackage->order->update(['status' => 'REVIEW']);
+                } 
+            }
+        }
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '包裹拆分成功.'));
+
+    }
+
+    public function processArr($arr, $model)
+    {
+        $tmp = [];
+        foreach(explode(',', $arr) as $key => $value) {
+            $buf = explode('.', $value);
+            if(!array_key_exists($buf[0], $tmp)) {
+                $tmp[$buf[0]] = [];
+            }
+            if(!array_key_exists($buf[1], $tmp[$buf[0]])) {
+                $tmp[$buf[0]][$buf[1]]['quantity'] = 0;
+                $item = $model->items()->where('item_id', $buf[1])->first();
+                if($item) {
+                    $tmp[$buf[0]][$buf[1]]['warehouse_position_id'] = $item->warehouse_position_id;
+                    $tmp[$buf[0]][$buf[1]]['order_item_id'] = $item->order_item_id;
+                    $tmp[$buf[0]][$buf[1]]['remark'] = $item->remark;
+                    $tmp[$buf[0]][$buf[1]]['is_remark'] = $item->is_remark;
+                    $tmp[$buf[0]][$buf[1]]['is_upload'] = $item->is_upload;
+                }
+            }
+            $tmp[$buf[0]][$buf[1]]['quantity'] += 1;
+        }
+
+        return $tmp;
+    }
+
     public function downloadType()
     {
         $rows[] = [
@@ -114,6 +257,37 @@ class PackageController extends Controller
                 $sheet->fromArray($rows);
             });
         })->download('csv');
+    }
+
+    public function downloadTrackingNo()
+    {
+        $rows[] = [
+            'package_id' => '',
+            'tracking_no' => '',
+        ];
+        $name = 'editTrackingNo';
+        Excel::create($name, function ($excel) use ($rows) {
+            $excel->sheet('', function ($sheet) use ($rows) {
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    public function forceOutPackage()
+    {
+        $package_id = trim(request('package_id'));
+        $package = $this->model->find($package_id);
+        if (!$package) {
+            return json_encode(false);
+        }
+        $items = $package->items;
+        foreach ($items as $item) {
+            $item->update(['picked_quantity' => $item->quantity]);
+            $item->item->out($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
+        }
+        $package->update(['status' => 'PACKED']);
+
+        return json_encode(true);
     }
 
     public function multiPackage()
@@ -366,7 +540,6 @@ class PackageController extends Controller
     {
         $id = request()->input('id');
         $package = $this->model->find($id);
-
         foreach ($package->items as $packageItem) {
             $item = ItemModel::find($packageItem->item_id);
             $item->unhold($packageItem->warehouse_position_id, $packageItem->picked_quantity);
@@ -561,7 +734,7 @@ class PackageController extends Controller
     public function returnFee()
     {
         $response = [
-            'metas' => $this->metas(__FUNCTION__, '导入fee'),
+            'metas' => $this->metas(__FUNCTION__),
             'action' => route('package.excelProcessFee', ['type' => request('type')]),
             'type' => request('type') ? request('type') : '',
         ];
@@ -583,6 +756,7 @@ class PackageController extends Controller
             $response = [
                 'metas' => $this->metas(__FUNCTION__, '导入结果'),
                 'errors' => $errors,
+                'type' => $type,
             ];
 
             return view($this->viewPath . 'excelFeeResult', $response);

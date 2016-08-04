@@ -3,6 +3,8 @@
     <th class="sort" data-field="id">ID</th>
     <th>物流商名称</th>
     <th class="sort">客户ID</th>
+    <th>密码</th>
+    <th>URL</th>
     <th>密钥</th>
     <th>是否有API</th>
     <th>客户经理</th>
@@ -20,6 +22,8 @@
             <td>{{ $supplier->id }}</td>
             <td>{{ $supplier->name }}</td>
             <td>{{ $supplier->customer_id }}</td>
+            <td>{{ $supplier->passwprd }}</td>
+            <td>{{ $supplier->url }}</td>
             <td>{{ $supplier->secret_key }}</td>
             <td>{{ $supplier->is_api == '1' ? '有' : '没有' }}</td>
             <td>{{ $supplier->client_manager }}</td>

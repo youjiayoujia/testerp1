@@ -33,7 +33,8 @@
         <div class="panel-body">
             <table class='table table-bordered table-condensed'>
                 <thead>
-                    <td class='col-lg-2'>package ID</td>
+                    <td class='col-lg-1'>package ID</td>
+                    <td class='col-lg-1'>订单号</td>
                     <td class='col-lg-3'>sku</td>
                     <td class='col-lg-3'>注意事项</td>
                     <td class='col-lg-1'>应拣数量</td>
@@ -47,7 +48,8 @@
                         @foreach($package->items as $key => $packageitem)
                             <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                                 @if($key == '0')
-                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
+                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
                                 @endif
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
@@ -76,7 +78,8 @@
         <div class="panel-body">
             <table class='table table-bordered table-condensed'>
                 <thead>
-                    <td class='col-lg-2'>package ID</td>
+                    <td class='col-lg-1'>package ID</td>
+                    <td class='col-lg-1'>订单号</td>
                     <td class='col-lg-3'>sku</td>
                     <td class='col-lg-3'>注意事项</td>
                     <td class='col-lg-1'>应拣数量</td>
@@ -89,7 +92,8 @@
                         @foreach($package->items as $key => $packageitem)
                             <tr data-id="{{ $package->id}}" class="{{ $package->id}}">
                                 @if($key == '0')
-                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-2'>{{ $package->id }}</td>
+                                <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1'>{{ $package->id }}</td>
+                                <td rowspan="{{$package->items()->count()}}" class='col-lg-1'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
                                 @endif
                                 <td class='sku col-lg-3'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                                 <td class='col-lg-3'>{{ $packageitem->item ? $packageitem->item->remark : '' }}</td>
@@ -105,12 +109,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class='already'>
-    <label>已扫描</label>
-    </div><hr/>
-    <div class='old2'>
-    <label>未扫描</label>
     </div>
     <div class='row'>
         <iframe id='barcode' style='display:none'></iframe>
@@ -130,20 +128,20 @@ $(document).on('keypress', function (event) {
 
 $(document).ready(function(){
     $('.printException').click(function(){
+        arr = new Array();
+        i=0;
         $.each($('.sku'), function(){
             tmp = $(this).parent();
+            package_id = tmp.data('id');
             sku = $(this).text();
             picked_quantity = parseInt(tmp.find('.picked_quantity').text());
             quantity = parseInt(tmp.find('.quantity').text());
-            if(picked_quantity) {
-                str1 = "<p>" + sku + '    ' + picked_quantity + "</p>";
-                $('.already').append(str1); 
-            }
             if(quantity > picked_quantity) {
-                str2 = "<p>" + sku + '    ' + (quantity - picked_quantity) + "</p>";
-                $('.old2').append(str2);
+                arr[i] = package_id + '.' + sku + '.' + (quantity - picked_quantity);
+                i+=1;
             }
         });
+        location.href="{{ route('pickList.printException', ['arr' => ''])}}"+arr;
     });
 
     $(document).on('click', '.cz', function(){
@@ -163,7 +161,8 @@ $(document).ready(function(){
         $('.notFindSku').text('');
         extern_flag = 0;
         out_js = 0;
-        $('.notFindSku').text('');
+        $('.searchSku').val('');
+        $('.searchSku').focus();
         if(val) {
             $.each($('.new tr'), function(){
                 tmp = $(this);
@@ -270,6 +269,7 @@ $(document).ready(function(){
                     }
                     $('.new').append(str);
                     out_js = 1;
+                    return false;
                 }
             });
         }
@@ -279,8 +279,6 @@ $(document).ready(function(){
         if(!extern_flag) {
             $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
         }
-        $('.searchSku').val('');
-        $('.searchSku').focus();
     });
 });
 </script>

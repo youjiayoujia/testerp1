@@ -37,6 +37,9 @@
                 <strong>面单模版</strong>: {{ $model->logistics_template_id == '0' ? '未选择' : $model->template->name }}
             </div>
             <div class="col-lg-4">
+                <strong>驱动名</strong>: {{ $model->driver }}
+            </div>
+            <div class="col-lg-4">
                 <strong>是否启用</strong>: {{ $model->is_enable == '1' ? '是' : '否' }}
             </div>
             <div class="col-lg-4">

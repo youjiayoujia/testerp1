@@ -58,7 +58,33 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
     
-    
+    /**
+     * 新建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'warehouses' =>WarehouseModel::all(),
+        ];
+        return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->model->createPurchaseOrder(request()->all());
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
+    }  
     
     /**
      * 采购页面
@@ -386,7 +412,8 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
-        echo Tool::barcodePrint($id);
+        $response['id']= $id;
+        return view($this->viewPath . 'printpo', $response);
     }
 
     /**
@@ -571,6 +598,39 @@ class PurchaseOrderController extends Controller
         $purchasrOrder->update(['status'=>$p_status]);
         $p_id = (int)$p_id;
         echo json_encode($p_id);
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseAjaxSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $supplier_id = request()->input('supplier_id')?request()->input('supplier_id'):'';
+            /*if($supplier_id){
+                $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->where('supplier_id',$supplier_id)->get();
+            }else{
+                $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            }*/
+            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->where('supplier_id',$supplier_id)->get();
+            $total = $skus->count();
+            $arr = [];
+            foreach($skus as $key => $sku) {
+                $arr[$key]['id'] = $sku->sku;
+                $arr[$key]['text'] = $sku->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
     }
         
 }

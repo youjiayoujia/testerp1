@@ -21,6 +21,7 @@
     <th>编辑</th>
     <th>美工</th>
     <th>开发</th>
+    <th>备注</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -34,10 +35,11 @@
             <td>{{ $spu->id }}</td>
             <td>{{ $spu->spu }}</td>
             <td>{{ $spu->spu }}</td>
-            <td>{{ $spu->spu }}</td>
+            <td>{{ $spu->Purchase?$spu->Purchase->name:'' }}</td>
             <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>
             <td>{{ $spu->imageEdit?$spu->imageEdit->name:'' }}</td>
-            <td>{{ $spu->spu }}</td>
+            <td>{{ $spu->Developer?$spu->Developer->name:'' }}</td>
+            <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
             <td>{{ $spu->created_at }}</td>
             <td>
@@ -45,10 +47,10 @@
                     <span class="glyphicon glyphicon-pencil"></span> 查看
                 </a>
                 <a href="{{ route('spu.edit', ['id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                    <span class="glyphicon glyphicon-pencil"></span> 备注
                 </a>
-                <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑图片
+                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $spu->id }}"
@@ -57,6 +59,38 @@
                 </a>
             </td>
         </tr>
+
+        <!-- 模态框（Modal） -->
+        <form action="{{route('saveRemark')}}" method="get">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="switch_purchase_{{$spu->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           添加备注
+                        </h4>
+                     </div>  
+                     <div><input type="text" value='' name='remark'></div>               
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='spu_id' value='{{$spu->id}}'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框结束（Modal） -->
+
     @endforeach
 
     @section('doAction')

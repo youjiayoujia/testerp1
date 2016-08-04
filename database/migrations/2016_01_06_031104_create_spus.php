@@ -21,6 +21,7 @@ class CreateSpus extends Migration
             $table->integer('image_edit')->comment('美工人')->nullable()->default(NULL);
             $table->integer('developer')->comment('开发人')->nullable()->default(NULL);
             $table->tinyInteger('status')->comment('状态')->nullable()->default(0);
+            $table->string('remark')->comment('remark')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -97,4 +97,16 @@ class SpuController extends Controller
         return 1;
     }
 
+    /**
+     * 保存备注
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function saveRemark()
+    {
+        $data = request()->all();echo '<pre>';
+        $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
+    }
+
 }

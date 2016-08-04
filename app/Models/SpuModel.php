@@ -44,6 +44,16 @@ class SpuModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'image_edit');
     }
 
+    public function Purchase()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase');
+    }
+
+    public function Developer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'developer');
+    }
+
     /*public function productFeatureValue()
     {
         return $this->hasMany('App\Models\Product\ProductFeatureValueModel','spu_id');

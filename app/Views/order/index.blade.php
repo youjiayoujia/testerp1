@@ -307,11 +307,11 @@
                                 {{--</div>--}}
                                 <div class="form-group col-lg-2">
                                     <label for="refund_amount" class='control-label'>退款金额</label>
-                                    <input class="form-control" id="refund_amount" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
+                                    <input class="form-control" id="refund_amount{{ $order->id }}" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
                                 </div>
                                 <div class="form-group col-lg-2">
                                     <label for="price" class='control-label'>确认金额</label>
-                                    <input class="form-control" id="price" placeholder="确认金额" name='price' value="{{ old('price') }}">
+                                    <input class="form-control" id="price{{ $order->id }}" placeholder="确认金额" name='price' value="{{ old('price') }}">
                                 </div>
                                 <div class="form-group col-lg-2">
                                     <label for="refund_currency" class='control-label'>退款币种</label>
@@ -351,7 +351,7 @@
                                 <div class="form-group col-lg-4">
                                     <label for="type" class='control-label'>退款类型</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                    <select class="form-control type" name="type" id="type">
+                                    <select class="form-control type" name="type" id="{{ $order->id }}">
                                         <option value="NULL">==退款类型==</option>
                                         @foreach(config('order.type') as $type_key => $type)
                                             <option value="{{ $type_key }}" {{ old('type') }}>
@@ -676,12 +676,13 @@
 
         $('.type').click(function() {
             var type = $('.type').val();
+            var id = $('.type').attr('id');
             if (type == 'FULL') {
-                document.getElementById('price').readOnly = true;
-                document.getElementById('refund_amount').readOnly = true;
+                document.getElementById('price'+id).readOnly = true;
+                document.getElementById('refund_amount'+id).readOnly = true;
             } else {
-                document.getElementById('price').readOnly = false;
-                document.getElementById('refund_amount').readOnly = false;
+                document.getElementById('price'+id).readOnly = false;
+                document.getElementById('refund_amount'+id).readOnly = false;
             }
         });
 

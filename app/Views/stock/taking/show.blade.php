@@ -48,6 +48,7 @@
                 @endforeach
             </tbody>
         </table>
+        <?php echo $stockTakingForms->render(); ?>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">出库信息 : {{ $model->outwarehouse ? $model->outwarehouse->name : '' }}</div>
@@ -74,6 +75,7 @@
                 </div>
             </div>
         @endforeach
+        <?php echo $stockouts->render(); ?>
         </div>
     </div>
     <div class="panel panel-default">
@@ -101,6 +103,7 @@
             </div>
         </div>
         @endforeach
+        <?php echo $stockins->render(); ?>
         </div>
     </div>
     <div class="panel panel-default">

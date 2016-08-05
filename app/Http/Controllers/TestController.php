@@ -6,6 +6,7 @@
  * Time: 上午9:19
  */
 namespace App\Http\Controllers;
+
 use App\Models\ChannelModel;
 use Test;
 use App\Models\Purchase\PurchaseOrderModel;
@@ -26,15 +27,20 @@ use App\Modules\Channel\ChannelModule;
 use App\Jobs\Job;
 use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
+
+use App\Models\PickListModel;
+
 use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
 use App\Models\CatalogModel;
 use DB;
+
 class TestController extends Controller
 {
     private $itemModel;
+
     public function __construct(OrderModel $orderModel, ItemModel $itemModel)
     {
         $this->itemModel = $itemModel;
@@ -46,20 +52,25 @@ class TestController extends Controller
     // }
     public function test2()
     {
-        $package = PackageModel::find(98);
-        $package->createPackageItems();
+        echo DNS1D::getBarcodeHTML('123', 'C128', '3', '33');exit;
     }
+
     public function test1()
     {
         $shipment = ShipmentModel::where('shipmentID', '2')->first();
         var_dump($shipment->shipmentCarrierInfo);
         var_dump(unserialize($shipment->shipmentCarrierInfo));
     }
+
     public function index()
     {
-        $trackingNumber = Logistics::driver('chukouyi', [])->getTracking([]);
+        $package = PackageModel::findOrFail(1);
+        $trackingNumber =
+            Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+                ->getTracking($package);
         exit;
     }
+
     public function aliexpressOrdersList()
     {
         $begin = microtime(true);
@@ -108,6 +119,7 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
     public function lazadaOrdersList()
     {
         $begin = microtime(true);
@@ -130,6 +142,7 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
     public function cdiscountOrdersList()
     {
         $begin = microtime(true);
@@ -152,6 +165,7 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
     public function test()
     {
         $datas = DB::table('test')->get();
@@ -195,6 +209,7 @@ class TestController extends Controller
             );
         }
     }
+
     public function getWishProduct()
     {
         $accountID = request()->get('id');
@@ -256,6 +271,7 @@ class TestController extends Controller
         $end = microtime(true);
         echo '耗时' . round($end - $begin, 3) . '秒';
     }
+
     public function getEbayInfo()
     {
         $accountID = request()->get('id');
@@ -264,6 +280,7 @@ class TestController extends Controller
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbaySite();
     }
+
     public function testLazada()
     {
         $packages = PackageModel::where('order_id', 12914)->get();
@@ -300,6 +317,7 @@ class TestController extends Controller
         }
         exit;
     }
+
     public function testPaypal()
     {
         $orders = OrderModel::where('id', 12851)->get();

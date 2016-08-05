@@ -1,17 +1,7 @@
 @extends('common.table')
 @section('tableToolButtons')
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            审核
-            <span class="caret"></span>
-        </button>
 
-        <ul class="dropdown-menu">
-            <li><a href="javascript:" class="examine" data-channel="0" data-name="待审核">待审核</a></li>
-            <li><a href="javascript:" class="examine" data-channel="1" data-name="待复审 ">待复审</a></li>
-            <li><a href="javascript:" class="examine" data-channel="2" data-name="审核通过">审核通过</a></li>
-            <li><a href="javascript:" class="examine" data-channel="3" data-name="审核不通过">审核不通过</a></li>
-        </ul>
         <div class="btn-group">
             &nbsp;
             <a class="btn btn-success" href="{{ route('supplierChangeHistory.index') }}">
@@ -94,6 +84,23 @@
             </td>
         </tr>
     @endforeach
+    @section('doAction')
+        <div class="btn-group dropup">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            审核
+            <span class="caret"></span>
+        </button>
+
+        <ul class="dropdown-menu">
+            <li><a href="javascript:" class="examine" data-channel="0" data-name="待审核">待审核</a></li>
+            <li><a href="javascript:" class="examine" data-channel="1" data-name="待复审 ">待复审</a></li>
+            <li><a href="javascript:" class="examine" data-channel="2" data-name="审核通过">审核通过</a></li>
+            <li><a href="javascript:" class="examine" data-channel="3" data-name="审核不通过">审核不通过</a></li>
+        </ul>
+        </div>
+    @stop
+
+
 @stop
 @section('childJs')
     <script type="text/javascript">

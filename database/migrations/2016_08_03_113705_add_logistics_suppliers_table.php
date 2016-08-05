@@ -13,7 +13,8 @@ class AddLogisticsSuppliersTable extends Migration
     public function up()
     {
         Schema::table('logistics_suppliers', function (Blueprint $table) {
-            $table->string('customer_id')->comment('客户ID')->nullable()->default(NULL)->after('name');
+            $table->string('password')->comment('密码')->nullable()->default(NULL)->after('customer_id');
+            $table->string('url')->comment('URL')->nullable()->default(NULL)->after('customer_id');
         });
     }
 
@@ -25,7 +26,8 @@ class AddLogisticsSuppliersTable extends Migration
     public function down()
     {
         Schema::table('logistics_suppliers', function (Blueprint $table) {
-            $table->dropColumn('customer_id');
+            $table->dropColumn('password');
+            $table->dropColumn('url');
         });
     }
 }

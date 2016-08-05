@@ -215,4 +215,28 @@ class LogisticsController extends Controller
         return $str;
     }
 
+    /**
+     * 获取物流商信息
+     */
+    public function ajaxSupplier()
+    {
+        if (request()->ajax()) {
+            $supplier = trim(request()->input('logistics_supplier_id'));
+            $buf = SupplierModel::where('name', 'like', '%' . $supplier . '%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach ($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if ($total) {
+                return json_encode(['results' => $arr, 'total' => $total]);
+            } else {
+                return json_encode(false);
+            }
+        }
+
+        return json_encode(false);
+    }
+
 }

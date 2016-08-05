@@ -28,6 +28,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '产品SPU',
+                    'url' => 'spu.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '产品SKU',
                     'url' => 'item.index',
                     'icon' => '',
@@ -119,6 +124,16 @@ return [
                 [
                     'name' => '效能统计',
                     'url' => 'pickList.performanceStatistics',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货单异常',
+                    'url' => 'errorList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '创建模板',
+                    'url' => 'exportPackage.index',
                     'icon' => '',
                 ],
                 [

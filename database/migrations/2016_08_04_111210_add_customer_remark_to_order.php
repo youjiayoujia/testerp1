@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class DeleteLogisticsSuppliersTable extends Migration
+class AddCustomerRemarkToOrder extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,9 @@ class DeleteLogisticsSuppliersTable extends Migration
      */
     public function up()
     {
-        Schema::table('logistics_suppliers', function (Blueprint $table) {
-            $table->dropColumn('customer_id');
+        //
+        Schema::table('orders', function (Blueprint $table) {
+            $table->text('customer_remark')->comment('客户备注')->after('billing_phone');
         });
     }
 
@@ -24,8 +25,9 @@ class DeleteLogisticsSuppliersTable extends Migration
      */
     public function down()
     {
-        Schema::table('logistics_suppliers', function (Blueprint $table) {
-            //
+        //
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('customer_remark');
         });
     }
 }

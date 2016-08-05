@@ -606,14 +606,14 @@
                 }
             });
 
-            $('.special').click(function () {
+            $('.special').change(function () {
                 var special = $('.special').val();
                 if (special != null) {
                     location.href = "{{ route('order.index') }}?special=" + special;
                 }
             });
 
-            $('.sx').click(function () {
+            $('.sx').change(function () {
                 var lr = $('.lr').val();
                 if (lr == '') {
                     alert('请输入利润!');

@@ -284,12 +284,12 @@ class CatalogModel extends BaseModel
                 } catch (Exception $e) {
                     DB::rollBack();
                     return false;
-                  }
+                }
             }
             DB::commit();
         }else{
             return false;
         }
+        return true;
     }
-
 }

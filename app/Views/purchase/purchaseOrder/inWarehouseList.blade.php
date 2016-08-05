@@ -1,3 +1,4 @@
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
 <!-- CSS goes in the document HEAD or added to your external stylesheet -->
 <style type="text/css">
 table.gridtable {
@@ -91,8 +92,53 @@ table.gridtable td {
 	<tr>
 		<td colspan="2">
 			<button class="modify">修改</button>
+			<button class="back" onclick="back()">返回</button>
 		</td>
 	</tr>
 </table>
 
+<script type='text/javascript'>
+	function back(){
+		window.location.href="recieve";
+	}
+
+ 	$(document).on('click','.printpo',function(){
+        var purchase_item_id = $(this).val();
+        var url = "{{route('printpo')}}"
+        window.open(url+"?id="+purchase_item_id);
+        
+    });
+
+	$(document).on('click','.modify',function(){
+        var data = "";
+        var p_id = "{{$id}}";
+        var url = "{{ route('updateArriveLog') }}";
+		$("input[name^='goodnum_']").each(function(){
+			id = $(this).attr("name");
+            if($(this).val()!=0&&($(this).attr("disabled")!='disabled')){
+                id = id.substr(8);
+                data += id+":"+$(this).val();
+                data +=":"+$('#badnum_'+id).val()+",";
+            }   
+　　　　});
+		window.location.href=url+"?data="+data+"&p_id="+p_id;
+
+        /*$.ajax({
+            url:"{{ route('updateArriveLog') }}",
+            data:{data:data,p_id:$("#ajaxp_id").val()},
+            dataType:'json',
+            type:'get',
+            success:function(result){
+                if(typeof(result)=='string'){
+                    alert("sku:"+result+"库位不存在");return;
+                }
+                $("#p_id").val(result);
+                javascript:document.getElementById("p_id").focus();
+                var e = jQuery.Event("keydown");//模拟一个键盘事件
+                e.keyCode =13;//keyCode=13是回车
+                $("#p_id").trigger(e); 
+            }
+        });   */                      
+	});
+</script>
 

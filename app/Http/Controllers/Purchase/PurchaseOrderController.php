@@ -502,6 +502,7 @@ class PurchaseOrderController extends Controller
     public function updateArriveNum(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");
+
         if($data!=''){
             $data = substr($data, 0,strlen($data)-1);
             $arr = explode(',', $data);
@@ -536,7 +537,11 @@ class PurchaseOrderController extends Controller
             }
         }
         
-        echo json_encode($p_id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        $response['metas']['title']='采购收货';
+        return view($this->viewPath . 'recieve', $response);
     }
 
     public function inWarehouse(){
@@ -549,6 +554,7 @@ class PurchaseOrderController extends Controller
 
     public function ajaxInWarehouse(){
         $id = request()->input('id');
+
         $purchase_order = $this->model->find($id);
         $response = [
                 'purchase_order' => $purchase_order,
@@ -588,9 +594,10 @@ class PurchaseOrderController extends Controller
                 if($datas['storage_qty']>=$purchase_item->purchase_num){
                     $datas['status'] = 4;
                 }
-                //print_r($datas);
+                
                 $purchase_item->update($datas);
                 $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
+                
             }       
         }
         
@@ -602,8 +609,13 @@ class PurchaseOrderController extends Controller
             }
         }
         $purchasrOrder->update(['status'=>$p_status]);
-        $p_id = (int)$p_id;
-        echo json_encode($p_id);
+        /*$p_id = (int)$p_id;
+        echo json_encode($p_id);*/
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        $response['metas']['title']='采购收货';
+        return view($this->viewPath . 'recieve', $response);
     }
 
     /**

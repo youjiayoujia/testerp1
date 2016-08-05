@@ -477,11 +477,17 @@ class PurchaseOrderController extends Controller
             if($data['po_id']!=''){
                 $result = $result->where("purchase_order_id",$data["po_id"]);
             }
-            if($data['status']!=''){
-               $data['status']?$result = $result->where("purchase_order_id",'!=',''):$result->where("purchase_order_id",'');
+            if($data['status']!='2'){
+               $data['status']?$result = $result->where("purchase_order_id",'!=',''):$result = $result->where("purchase_order_id",0);
             }
             if($data['trackingNo']!=''){
                 $result = $result->where("post_coding",$data["trackingNo"]);
+            }
+            if($data['date_from']!=''){
+                $result = $result->where("created_at",'>=',$data["date_from"]);
+            }
+            if($data['date_to']!=''){
+                $result = $result->where("created_at",'<=',$data["date_to"]);
             }
             $result = $result->get();
         }
@@ -631,6 +637,23 @@ class PurchaseOrderController extends Controller
         }
 
         return json_encode('false');
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseExmaine()
+    {
+        $purchase_ids = request()->input("purchase_ids");
+        $arr = explode(',', $purchase_ids);
+        foreach($arr as $id){
+            $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+        }
+        return 1;
     }
         
 }

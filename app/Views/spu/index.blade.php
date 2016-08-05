@@ -17,6 +17,11 @@
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
     <th>图片</th>
+    <th>采购员</th>
+    <th>编辑</th>
+    <th>美工</th>
+    <th>开发</th>
+    <th>备注</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
@@ -30,17 +35,22 @@
             <td>{{ $spu->id }}</td>
             <td>{{ $spu->spu }}</td>
             <td>{{ $spu->spu }}</td>
+            <td>{{ $spu->Purchase?$spu->Purchase->name:'' }}</td>
+            <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>
+            <td>{{ $spu->imageEdit?$spu->imageEdit->name:'' }}</td>
+            <td>{{ $spu->Developer?$spu->Developer->name:'' }}</td>
+            <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
             <td>{{ $spu->created_at }}</td>
             <td>
                 <a href="{{ route('spu.show', ['id'=>$spu->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 查看
                 </a>
-                <a href="{{ route('spu.edit', ['id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
-                </a>
                 <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
+                </a>
+                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-info btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $spu->id }}"
@@ -49,15 +59,53 @@
                 </a>
             </td>
         </tr>
+
+        <!-- 模态框（Modal） -->
+        <form action="{{route('saveRemark')}}" method="get">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="switch_purchase_{{$spu->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           添加备注
+                        </h4>
+                     </div>  
+                     <div><input type="text" value='' name='remark'></div>               
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='spu_id' value='{{$spu->id}}'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框结束（Modal） -->
+
     @endforeach
 
     @section('doAction')
         <div class="row">
             <div class="col-lg-12">
-                <button class="doAction" value="image_edit">批量已制图</button>
-                <button>批量退回</button>
-                <button>批量已编辑</button>
-                <button>批量转采购</button>
+                <button class="doAction" value="edit">批量已建SKU维护资料</button>
+                <button class="doAction" value="image_edit">批量已编辑</button>
+                <button class="doAction" value="image_examine">批量已制图</button>
+                <button class="doAction" value="final_examine">批量已审图</button>
+                <button class="doAction" value="pass">批量 终审</button>
+                <?php $condition = request()->input('filters')?explode('.',request()->input('filters'))[2]:''; ?>
+                <?php if($condition=='image_edit'||$condition=='edit'||$condition=='image_examine'||$condition=='final_examine'){ ?>
+                <button class="actionBack" value="{{$condition}}">批量退回</button>
+                <?php } ?>               
+                <button type="button" class="dispatch"  value="purchase">批量转采购</button>
                 <select>
                     <option>==采购==</option>
                     @foreach($users as $user)
@@ -83,11 +131,10 @@
                     @endforeach
                 </select>
 
-                <button>批量转开发</button>
+                <button class='dispatch' value="developer">批量转开发</button>
                 <select>
                     <option>==开发==</option>
                     @foreach($users as $user)
-                        
                         <option value='{{$user->id}}'>{{$user->name}}</option>
                     @endforeach
                 </select>
@@ -142,6 +189,28 @@
             //var user_id = $(this).next().find("option:selected").val();
             var action = $(this).val();
             var url = "{{route('doAction')}}";
+
+            var checkbox = document.getElementsByName("tribute_id");
+            var spu_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                spu_ids += checkbox[i].value + ",";
+            }
+            spu_ids = spu_ids.substr(0, (spu_ids.length) - 1);
+            $.ajax({
+                url: url,
+                data: {action: action,spu_ids:spu_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
+        });
+
+        $('.actionBack').click(function () {
+            var action = $(this).val();
+            var url = "{{route('actionBack')}}";
 
             var checkbox = document.getElementsByName("tribute_id");
             var spu_ids = "";

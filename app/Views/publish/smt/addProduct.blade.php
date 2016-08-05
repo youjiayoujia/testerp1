@@ -391,9 +391,11 @@ text-align: left;
                 <label for="subject" class="right">产品图片:</label>
             </div>
             <div class="col-sm-10">	
-                <div>
-                    <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="main">从我的电脑选取</a>                                    
+                <div>      
+                    
+                    <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="main" onclick="upImage()">从我的电脑选取</a>                                    
                     &nbsp;&nbsp;
+                    <script type="text/plain" id="myEditor"></script>
                     <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="glyphicon glyphicon-trash"></i></a>
                 </div>
                 <ul class="list-inline pic-main" id="se-water-add">
@@ -890,12 +892,13 @@ $template['name'].'</option>';
 
 @show{{-- 表单按钮 --}}
 @section('pageJs')
-<!-- 
-<link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
+
+
 <script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
-<script src="{{ asset('plugins/UEditor/umeditor.js') }}"></script>
+{{--<script src="{{ asset('plugins/ueditor/umeditor.js') }}"></script>--}}
 <script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
--->
+<link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
+
 
 <script src="{{ asset('plugins/kindeditor/kindeditor.js') }}"></script>
 <script src="{{ asset('plugins/layer/layer.js') }}"></script>
@@ -904,8 +907,9 @@ $template['name'].'</option>';
     var token_id; //账号ID
     var skuObj;   //SKU对象,全部模糊查询查出的
     var productProperty; //用来保存属性的json信息                        
-
+	
     /**自定义kindeditor插件开始,样式类ke-icon-module**/
+
     KindEditor.plugin('module', function (K) {
         var self = this, name = 'module', lang = self.lang(name + '.');
         self.clickToolbar(name, function () {
@@ -949,9 +953,9 @@ $template['name'].'</option>';
             var iframe = K('.ke-textarea', dialog.div);            
         });
     });
-
+	
     /**自定义kindeditor插件结束**/
-
+	
     KindEditor.ready(function (K) {
         var editor = K.create("[name=detail]", {
             'uploadJson': '{{route('upload',['_token' => csrf_token(),'token_id'=> $token_id])}}',
@@ -1887,11 +1891,33 @@ $template['name'].'</option>';
             }
         });
        */ 
-      
-
-    /*var ue = UM.getEditor('detail', {
-    	initialFrameWidth: 1000,
-        initialFrameHeight: 300
-    });*/
+        
+      	/*		 	   
+        var _editor= new UM.Editor();       
+        _editor.render('_editor');        
+        _editor.ready(function(){
+        	_editor.setDisabled();
+        	_editor.hide();//隐藏UE框体
+        	_editor.addListener('beforeInsertImage',function(t, arg){
+        		alert(arg[0].src);//arg就是上传图片的返回值，是个数组，如果上传多张图片，请遍历该值。        		
+        		for(var i = 0; i < arg.length; i++ ){
+	        		var div = $('.pic-main');
+        			var myli = '<li><div><img src="' + arg[i].url + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="'+imgLists+'[]" value="' + arg[i].url + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                    div.append(myli);
+	        	}
+        	});
+        });
+        console.log(_editor);
+		
+        function upImage() { 
+            var myImage = _editor.getDialog("insertimage");
+            myImage.render();
+            myImage.open();
+        }
+       
+        var ue = UM.getEditor('detail', {
+        	initialFrameWidth: 1000,
+            initialFrameHeight: 300
+        });*/
 </script>
 @stop

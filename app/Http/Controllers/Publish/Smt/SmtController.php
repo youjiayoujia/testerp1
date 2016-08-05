@@ -992,7 +992,6 @@ class SmtController extends Controller{
             if (!$return['status']) {
                 //写错误日志
             }
-
             unset($draft_info);
             unset($draft_detail);
             if (array_key_exists('success', $data) && $data['success']) { //操作成功了

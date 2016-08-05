@@ -65,10 +65,12 @@
                    </a>
 
                   @else
-                    <a href="{{ route('smt.editOnlineProduct', ['id'=>$smtProductList->productId]) }}"
-                       class="btn btn-warning btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 编辑在线信息
-                    </a>
+                       @if($smtProductList->productStatusType=='onSelling')
+                        <a href="{{ route('smt.editOnlineProduct', ['id'=>$smtProductList->productId]) }}"
+                           class="btn btn-warning btn-xs">
+                            <span class="glyphicon glyphicon-pencil"></span> 编辑在线信息
+                        </a>
+                        @endif
                     <a onclick="operator('<?php echo $smtProductList->productId;  ?>' ,'online',this)" class="btn btn-danger btn-xs  <?php   if($smtProductList->productStatusType=='offline'){echo "hidden"; }      ?>">
                         <span class="glyphicon glyphicon-pencil "></span> 下架
                     </a>
@@ -220,9 +222,11 @@ function operator(id,type,e){
 		                    $(e).prev().removeClass('hidden');
 		                    $(e).addClass('hidden');
 		                }
+		                
 		                layer.alert(result.info);
+		                parent.location.reload();
 		            }else{
-		            	layer.alert(result.info);
+		            	layer.alert(result.info);		            	
 		            }
 		        }
 		    });

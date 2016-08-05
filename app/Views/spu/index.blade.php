@@ -46,10 +46,10 @@
                 <a href="{{ route('spu.show', ['id'=>$spu->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 查看
                 </a>
-                <a href="{{ route('spu.edit', ['id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 备注
+                <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
-                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
+                <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-zoom-in"></span>
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"

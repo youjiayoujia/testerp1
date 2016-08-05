@@ -225,6 +225,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '收款信息',
+                    'url' => 'logisticsCollectionInfo.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',

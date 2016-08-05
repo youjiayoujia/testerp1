@@ -342,6 +342,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('logistics/ajaxSupplier', ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
+    Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
     Route::get('logisticsZone/getCountries',
         ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);

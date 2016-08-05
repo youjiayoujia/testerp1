@@ -33,6 +33,16 @@ class SupplierModel extends BaseModel
         'card_number',
         'url',
         'password',
+        'customer_service_name',
+        'customer_service_qq',
+        'customer_service_tel',
+        'finance_name',
+        'finance_qq',
+        'finance_tel',
+        'driver',
+        'driver_tel',
+        'logistics_collection_info_id',
+        'credentials',
     ];
 
     public $rules = [

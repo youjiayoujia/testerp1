@@ -26,7 +26,7 @@ class CreateProductSupplier extends Migration
             $table->string('telephone')->comment('供货商联系方式')->default(NULL);
             $table->string('wangwang')->comment('旺旺')->default(NULL);
             $table->string('qq')->comment('QQ')->default(NULL);
-            $table->integer('purchase_id')->comment('采购员id')->default(NULL);
+            /*$table->integer('purchase_id')->comment('采购员id')->default(NULL);*/
             $table->integer('level_id')->comment('供货商评级id')->default(0);
             $table->integer('created_by')->comment('创建人id')->default(NULL);
             $table->timestamps();

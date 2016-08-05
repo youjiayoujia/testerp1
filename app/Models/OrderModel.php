@@ -384,7 +384,7 @@ class OrderModel extends BaseModel
             $order->items()->create($orderItem);
         }
         //客户备注需审核
-        if ($data['remark']) {
+        if (isset($data['remark']) and !empty($data['remark'])) {
             $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
         }
         //黑名单需审核

@@ -43,19 +43,16 @@
             <td>{{ $spu->updated_at }}</td>
             <td>{{ $spu->created_at }}</td>
             <td>
-                <a href="{{ route('spu.show', ['id'=>$spu->id]) }}" class="btn btn-info btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 查看
-                </a>
+                <?php if(count($spu->products)>0){ ?>
                 <a href="{{ route('createSpuImage', ['spu_id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
+                <?php } ?>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in"></span>
+                    <span class="glyphicon glyphicon-zoom-in"></span>备注
                 </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $spu->id }}"
-                   data-url="{{ route('spu.destroy', ['id' => $spu->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除
+                <a href="" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 日志
                 </a>
             </td>
         </tr>

@@ -21,8 +21,9 @@
     <th>编辑</th>
     <th>美工</th>
     <th>开发</th>
+    <th>当前进度</th>
     <th>备注</th>
-    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort" data-field="created_at">录入时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
@@ -39,6 +40,7 @@
             <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>
             <td>{{ $spu->imageEdit?$spu->imageEdit->name:'' }}</td>
             <td>{{ $spu->Developer?$spu->Developer->name:'' }}</td>
+            <td>{{ config('spu.status')[$spu->status] }}</td>
             <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
             <td>{{ $spu->created_at }}</td>

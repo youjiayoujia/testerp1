@@ -63,7 +63,7 @@
                 <th>系统采购价格</th>
                 <th>小计</th>
                 <th>入库金额</th>
-                <th>审单备注</th>
+                <th>审单备注<button class='view' id="{{$purchaseOrder->id}}">查看</button></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -87,7 +87,7 @@
                     <td>{{$purchase_item->item?$purchase_item->item->purchase_price:''}}</td>
                     <td>{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>
                     <td>{{$purchase_item->purchase_cost * $purchase_item->storage_qty}}</td>
-                    <td>{{$purchase_item->remark}}</td>
+                    <td id="pitem_warn_{{$purchase_item->id}}"></td>
                 </tr>
                 @endforeach
                 <tr>
@@ -104,7 +104,7 @@
                     <th>&nbsp;</th>
                     <th>{{ $purchaseOrder->sum_purchase_account}}+YF{{$purchaseOrder->purchase_post_num}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</th>
                     <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
-                    <th>&nbsp;</th>
+                    <th id="warn_{{$purchaseOrder->id}}"></th>
                 </tr>
                 </tbody>
                 </table>
@@ -354,6 +354,24 @@
                 type: 'get',
                 success: function (result) {
                     window.location.reload();
+                }
+            })
+        });
+
+        $('.view').click(function () {
+            var purchaseOrder_id = $(this).attr('id');
+            var url = "{{route('purchaseOrder.view')}}";
+            $.ajax({
+                url: url,
+                data: {purchaseOrder_id:purchaseOrder_id},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    for(var el in result){ 
+                        $("#pitem_warn_"+el).text(result[el]['price']);
+                    } 
+                                        
+                    $("#warn_"+purchaseOrder_id).text(result[0]['total_price']);
                 }
             })
         });

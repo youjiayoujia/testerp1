@@ -667,6 +667,30 @@ class PurchaseOrderController extends Controller
         }
         return 1;
     }
+
+    /**
+     * 采购单提示
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function view()
+    {
+        $purchaseOrder_id = request()->input("purchaseOrder_id");
+        $purchaseOrderModel = $this->model->find($purchaseOrder_id);
+        $total_price = 0;
+        $data = [];
+        foreach ($purchaseOrderModel->purchaseItem as $key => $purchaseItemModel) {
+            $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
+            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = 'ddd':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致';
+           
+        }
+        
+        $total_price>2000?$data[0]['total_price'] = '采购单总金额大于2000':$data[0]['total_price'] = '';
+        //print_r($data);exit;
+        return $data;
+    }
         
 }
 

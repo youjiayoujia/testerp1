@@ -276,8 +276,12 @@ class MessageModel extends BaseModel{
 
     public function getMessageInfoAttribute(){
         if($this->content){
+
             //$content_array = unserialize($this->content);
             $content_array = unserialize(base64_decode($this->content));
+
+            //print_r($content_array);exit;
+
             $html = '';
             foreach($content_array as $key => $content){
                 switch ($key){
@@ -297,15 +301,18 @@ class MessageModel extends BaseModel{
                     case 'aliexpress':
                         foreach ($content->result as $k => $item){
                             $html .= '<p>'.$item->senderName.':</p>';
-                            $html .= '<div class="alert alert-success" role="alert">'.$item->content.'<a href="'.$item->summary->orderUrl.'">orderUrl</a></div>';
+                            $html .= '<div class="alert alert-success" role="alert">'.$item->content.'</div>';
                         }
+                        break;
 
-
+                    case 'ebay':
+                        $html = $content;
 
                     default :
                         echo 'invalid message type';
                 }
             }
+
             return $html;
         }else{
             return '';

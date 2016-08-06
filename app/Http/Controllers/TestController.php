@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChannelModel;
+use App\Models\Message\MessageModel;
 use Test;
 use App\Models\Purchase\PurchaseOrderModel;
 use Tool;
@@ -36,6 +37,7 @@ use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
 use App\Models\CatalogModel;
 use DB;
+use App\Models\Message\ReplyModel;
 
 class TestController extends Controller
 {
@@ -387,12 +389,41 @@ class TestController extends Controller
     }
     public function jdtestCrm(){
         //渠道测试块
+
+/*        $message_obj = MessageModel::find(36259);
+        $fields = unserialize(base64_decode($message_obj->channel_message_fields));
+        dd($fields);exit;*/
+
+/*
+         $reply_obj = ReplyModel::find(28565);
+
+          foreach (AccountModel::all() as $account) {
+            if( $account->account == '15899691882@163.com'){ //测试diver
+
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->sendMessages($reply_obj);
+                print_r($messageList);exit;
+
+            }
+        }*/
+
         foreach (AccountModel::all() as $account) {
-            if($account->channel->driver =='ebay'){ //测试diver
+            if($account->account == '15899691882@163.com'){ //测试diver
+
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
+                print_r($messageList);exit;
 
             }
         }
+
+
+
+
+
+
+
+
+
     }
 }

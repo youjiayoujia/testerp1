@@ -456,6 +456,9 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
+
+                print_r($message_array);exit;
+
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -488,6 +491,7 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['channelId'] = $item['channelId'];
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
+                        $message_list[$j]['channel_message_fields'] = '';
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
                     }
@@ -507,6 +511,13 @@ Class AliexpressAdapter implements AdapterInterface
         //echo $this->_access_token;
         $message_obj = $replyMessage->message;
 
+
+        $replyMessage->content = 'Hello, 
+You could check this website.
+http://www.aliexpress.com/store/all-wholesale-products/1861109.html?spm=2114.8147860.0.56.u8mymS
+
+tks';
+
         if(!empty($message_obj)){
 
              // step1:发信息
@@ -514,18 +525,22 @@ Class AliexpressAdapter implements AdapterInterface
             $send_param = [];
             $send_param['channelId'] = $message_obj->message_id;
             $send_param['buyerId'] = $message_obj->from;
-            $send_param['msgSources'] = $message_obj->'消息类型';
+         // zzzzzzzzzzzzzzzzzzzzzzzzzzzzzhuyi  $send_param['msgSources'] = $message_obj->'消息类型';
             $send_param['content'] = $replyMessage->content;
-
-            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $paramx = implode('&',$send_param);
+            print_r($paramx);exit;
+            $api_return =  $this->getJsonData('api.addMsg', $paramx);
             $api_return_array = json_decode($api_return,true);
+
+            //print_r($api_return_array);exit;
+
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
 
                     //step2: 更新消息为已读
                     $update_param = [];
                     $update_param['channelId'] = $message_obj->message_id;
-                    $update_param['msgSources'] = $message_obj->'消息类型';
+               //  zzzzzzzzzzzzzzzzzzzzzzzzzzzzzhuyi    $update_param['msgSources'] = $message_obj->'消息类型';
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
 
                     $replyMessage->status = 'SENT';

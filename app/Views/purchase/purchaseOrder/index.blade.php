@@ -368,7 +368,10 @@
                 type: 'get',
                 success: function (result) {
                     for(var el in result){ 
-                        $("#pitem_warn_"+el).text(result[el]['price']);
+                        var temp = ''
+                        temp = result[el]['price']+';'+result[el]['quantity']
+                        $("#pitem_warn_"+el).text(temp);
+                        //$("#pitem_warn_"+el).text(result[el]['quantity']);
                     } 
                                         
                     $("#warn_"+purchaseOrder_id).text(result[0]['total_price']);

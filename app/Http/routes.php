@@ -205,6 +205,10 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
+    //采购单提示
+    Route::any('purchaseOrder/view',
+        ['uses' => 'Purchase\PurchaseOrderController@view', 'as' => 'purchaseOrder.view']);
+
     Route::any('purchaseOrder/updateArriveNum',
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('purchaseOrder/updateArriveLog',

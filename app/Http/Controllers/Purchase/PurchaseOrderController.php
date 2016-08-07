@@ -19,6 +19,7 @@ use App\Models\ItemModel;
 use App\Models\Stock\InModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
+use App\Models\Order\ItemModel as OrderItemModel;
 use Tool;
 
 class PurchaseOrderController extends Controller
@@ -666,6 +667,98 @@ class PurchaseOrderController extends Controller
             $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
         }
         return 1;
+    }
+
+    /**
+     * 采购单提示
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function view()
+    {
+        $purchaseOrder_id = request()->input("purchaseOrder_id");
+        $purchaseOrderModel = $this->model->find($purchaseOrder_id);
+        $total_price = 0;
+        $data = [];
+        foreach ($purchaseOrderModel->purchaseItem as $key => $purchaseItemModel) {
+            $itemModel = ItemModel::find($purchaseItemModel->item_id);
+            //实时计算建议采购量
+            $zaitu_num = 0;//在途
+            if ($purchaseItemModel->status > 0 || $purchaseItemModel->status < 4) {
+                if (!$purchaseItemModel->purchaseOrder->write_off) {
+                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty - $purchaseItemModel->unqualified_qty;
+                }
+            }
+            //虚库存
+            $xu_kucun = $itemModel->available_quantity;
+            //7天销量
+            $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('order_items.quantity', '<', 5)
+                ->where('order_items.item_id', $purchaseItemModel->item_id)
+                ->sum('order_items.quantity');
+
+            //14天销量
+            $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('order_items.quantity', '<', 5)
+                ->where('order_items.item_id', $purchaseItemModel->item_id)
+                ->sum('order_items.quantity');
+
+            //30天销量
+            $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('order_items.quantity', '<', 5)
+                ->where('order_items.item_id', $purchaseItemModel->item_id)
+                ->sum('order_items.quantity');
+            //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
+            if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
+                $coefficient_status = 3;
+                $coefficient = 1;
+            } else {
+                if (($sevenDaySellNum / 7) / ($fourteenDaySellNum / 14 * 1.1) >= 1) {
+                    $coefficient = 1.3;
+                    $coefficient_status = 1;
+                } elseif (($fourteenDaySellNum / 14 * 0.9) / ($sevenDaySellNum / 7) >= 1) {
+                    $coefficient = 0.6;
+                    $coefficient_status = 2;
+                } else {
+                    $coefficient = 1;
+                    $coefficient_status = 4;
+                }
+            }
+            //预交期
+            $delivery = $itemModel->supplier ? $itemModel->supplier->purchase_time : 7;
+            //采购建议数量
+            if ($itemModel->purchase_price > 200 && $fourteenDaySellNum < 3 || $itemModel->status == 4) {
+                $needPurchaseNum = 0 - $xu_kucun - $zaitu_num;
+            } else {
+                if ($itemModel->purchase_price > 3 && $itemModel->purchase_price <= 40) {
+                    $needPurchaseNum = ($fourteenDaySellNum / 14) * (7 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+                } elseif ($itemModel->purchase_price <= 3) {
+                    $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+                } elseif ($itemModel->purchase_price > 40) {
+                    $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+                }
+            }
+            $need_purchase_num = ceil($needPurchaseNum);
+            
+            ($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';
+            //计算总价
+            $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
+            //计算采购价和系统价格是否一致
+            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = '':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致';
+           
+        }
+        
+        $total_price>2000?$data[0]['total_price'] = '采购单总金额大于2000':$data[0]['total_price'] = '';
+       
+        return $data;
     }
         
 }

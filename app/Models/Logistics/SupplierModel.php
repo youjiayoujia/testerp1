@@ -57,6 +57,16 @@ class SupplierModel extends BaseModel
             'technician_tel' => 'required|digits_between:8,11',
             'url' => 'required',
             'password' => 'required',
+            'customer_service_name' => 'required',
+            'customer_service_qq' => 'required',
+            'customer_service_tel' => 'required',
+            'finance_name' => 'required',
+            'finance_qq' => 'required',
+            'finance_tel' => 'required',
+            'driver' => 'required',
+            'driver_tel' => 'required',
+            'logistics_collection_info_id' => 'required',
+            'credentials' => 'required',
         ],
         'update' => [
             'name' => 'required|unique:logistics_suppliers,name,{id}',
@@ -69,7 +79,22 @@ class SupplierModel extends BaseModel
             'technician_tel' => 'required|digits_between:8,11',
             'url' => 'required',
             'password' => 'required',
+            'customer_service_name' => 'required',
+            'customer_service_qq' => 'required',
+            'customer_service_tel' => 'required',
+            'finance_name' => 'required',
+            'finance_qq' => 'required',
+            'finance_tel' => 'required',
+            'driver' => 'required',
+            'driver_tel' => 'required',
+            'logistics_collection_info_id' => 'required',
+            'credentials' => 'required',
         ],
     ];
+
+    public function collectionInfo()
+    {
+        return $this->belongsTo('App\Models\Logistics\CollectionInfoModel', 'logistics_collection_info_id', 'id');
+    }
 
 }

@@ -34,9 +34,39 @@
                 <strong>技术联系方式</strong>: {{ $model->technician_tel }}
             </div>
             <div class="col-lg-3">
-                <strong>是否有API</strong>: {{ $model->is_api == '1' ? '有' : '没有' }}
+                <strong>客服名称</strong>: {{ $model->customer_service_name }}
             </div>
             <div class="col-lg-3">
+                <strong>客服QQ</strong>: {{ $model->customer_service_qq }}
+            </div>
+            <div class="col-lg-3">
+                <strong>客服电话</strong>: {{ $model->customer_service_tel }}
+            </div>
+            <div class="col-lg-3">
+                <strong>财务名称</strong>: {{ $model->finance_name }}
+            </div>
+            <div class="col-lg-3">
+                <strong>财务QQ</strong>: {{ $model->finance_qq }}
+            </div>
+            <div class="col-lg-3">
+                <strong>财务电话</strong>: {{ $model->tel }}
+            </div>
+            <div class="col-lg-3">
+                <strong>取件司机</strong>: {{ $model->driver }}
+            </div>
+            <div class="col-lg-3">
+                <strong>司机电话</strong>: {{ $model->driver_tel }}
+            </div>
+            <div class="col-lg-3">
+                <strong>收款信息</strong>: {{ $model->collectionInfo ? $model->collectionInfo->bank : '没有收款信息' }}
+            </div>
+            <div class="col-lg-3">
+                <strong>企业证件</strong>: {{ $model->credentials }}
+            </div>
+            <div class="col-lg-3">
+                <strong>是否有API</strong>: {{ $model->is_api == '1' ? '有' : '没有' }}
+            </div>
+            <div class="col-lg-6">
                 <strong>备注</strong>: {{ $model->remark }}
             </div>
         </div>

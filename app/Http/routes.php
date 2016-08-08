@@ -187,6 +187,7 @@ Route::group(['middleware' => 'auth'], function () {
     //未结算订单
     Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
     //采购单
+    Route::get('purchase/purchaseAjaxSku', ['uses' => 'Purchase\PurchaseOrderController@purchaseAjaxSku', 'as' => 'purchaseAjaxSku']);
     Route::any('/purchaseOrder/addPost/{id}', 'Purchase\PurchaseOrderController@addPost');
     Route::any('PurchaseOrder/trackingNoSearch',
         ['uses' => 'Purchase\PurchaseOrderController@trackingNoSearch', 'as' => 'trackingNoSearch']);
@@ -194,6 +195,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@changePrintStatus', 'as' => 'changePrintStatus']);
     Route::any('purchaseOrder/payOrder/{id}',
         ['uses' => 'Purchase\PurchaseOrderController@payOrder', 'as' => 'payOrder']);
+    Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
     Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
@@ -203,6 +205,10 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
+    //采购单提示
+    Route::any('purchaseOrder/view',
+        ['uses' => 'Purchase\PurchaseOrderController@view', 'as' => 'purchaseOrder.view']);
+
     Route::any('purchaseOrder/updateArriveNum',
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('purchaseOrder/updateArriveLog',
@@ -338,6 +344,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
+    Route::get('logistics/ajaxSupplier', ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
@@ -682,3 +689,11 @@ Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersLi
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
+Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
+//spu
+Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
+Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
+Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
+Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+Route::resource('spu', 'SpuController');
+

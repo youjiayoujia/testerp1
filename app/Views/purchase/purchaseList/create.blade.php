@@ -28,11 +28,11 @@
 		    	采购单号：<input type="text" id="po_id">
 		    	状态
 		    	<select name="" id="status">
-		    		<option value=""></option>
+		    		<option value="2"></option>
 		    		<option value="0">未关联</option>
 		    		<option value="1">已关联</option>
 		    	</select>
-		    	扫单时间<input type="text">--<input type="text">
+		    	扫单时间<input type="text" id='date_from' class='datetimepicker_dark'>--<input type="text" id='date_to' class='datetimepicker_dark'>
 		    	<button class="search">查询</button>
 		    </div>
 
@@ -46,7 +46,9 @@
 @stop
 
 @section('pageJs')
+<script src="{{ asset('js/jquery.datetimepicker.full.js') }}"></script>
 <script type='text/javascript'>
+$('.datetimepicker_dark').datetimepicker({theme:'dark'})
     $(document).ready(function(){
     	javascript:document.getElementById("p_id").focus();
     	$(document).on('keydown', function (event) {
@@ -99,9 +101,11 @@
         var trackingNo = $("#trackingNo").val();
         var po_id = $("#po_id").val();
         var status = $("#status").val();
+        var date_from = $("#date_from").val();
+        var date_to = $("#date_to").val()
         $.ajax({
                 url: "{{ route('trackingNoSearch') }}",
-                data: {trackingNo: trackingNo,po_id:po_id,status:status},
+                data: {trackingNo: trackingNo,po_id:po_id,status:status,date_from:date_from,date_to:date_to},
                 dataType: 'html',
                 type: 'get',
                 success: function (result) {

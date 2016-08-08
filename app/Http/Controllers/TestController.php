@@ -66,7 +66,7 @@ class TestController extends Controller
     {
         $package = PackageModel::findOrFail(1);
         $trackingNumber =
-            Logistics::driver($package->logistics->supplier->driver, $package->logistics->api_config)
+            Logistics::driver($package->logistics->driver, $package->logistics->api_config)
                 ->getTracking($package);
         exit;
     }
@@ -382,6 +382,16 @@ class TestController extends Controller
             if (!$is_paypals) { //说明对应的paypal 都没有找到信息
                 $order->update(['order_is_alert' => 2]);
                 $order->remark('paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询');
+            }
+        }
+    }
+    public function jdtestCrm(){
+        //渠道测试块
+        foreach (AccountModel::all() as $account) {
+            if($account->channel->driver =='ebay'){ //测试diver
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getMessages();
+
             }
         }
     }

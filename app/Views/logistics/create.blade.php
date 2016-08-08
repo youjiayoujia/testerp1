@@ -24,28 +24,10 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="logistics_supplier_id">物流商</label>
+            <label for="logistics_supplier_id" class='control-label'>物流商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{$supplier->id}}" {{ Tool::isSelected('logistics_supplier_id', $supplier->id) }}>
-                        {{$supplier->name}}
-                    </option>
-                @endforeach
-            </select>
+            <select class="form-control logistics_supplier_id" id="logistics_supplier_id" name="logistics_supplier_id"></select>
         </div>
-        <div class="form-group col-lg-2">
-            <label for="type" class="control-label">物流商物流方式</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') }}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="url" class="control-label">物流追踪网址</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
-        </div>
-    </div>
-    <div class='row'>
         <div class="form-group col-lg-2">
             <label for="docking" class="control-label">对接方式</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -56,6 +38,18 @@
                     </option>
                 @endforeach
             </select>
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="type" class="control-label">物流商物流方式</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') }}">
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-lg-2">
+            <label for="url" class="control-label">物流追踪网址</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
         </div>
         <div class="form-group col-lg-2">
             <label for="logistics_catalog_id" class="control-label">物流分类</label>
@@ -120,20 +114,6 @@
             <div class="radio">
                 <label>
                     <input type="radio" name="is_enable" value="0" checked>否
-                </label>
-            </div>
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="is_track" class="control-label">平邮or挂号</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="is_track" value="1">平邮
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="is_track" value="0" checked>挂号
                 </label>
             </div>
         </div>
@@ -249,6 +229,29 @@
         $('.wish_merchant').select2();
         $('.amazon_merchant').select2();
         $('.logistics_limits').select2();
+
+        $('.logistics_supplier_id').select2({
+            ajax: {
+                url: "{{ route('logistics.ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        logistics_supplier_id: params.term,
+                        page: params.page
+                    };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            }
+        });
+
     });
 </script>
 @stop

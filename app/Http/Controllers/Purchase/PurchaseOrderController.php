@@ -19,6 +19,7 @@ use App\Models\ItemModel;
 use App\Models\Stock\InModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
+use App\Models\Order\ItemModel as OrderItemModel;
 use Tool;
 
 class PurchaseOrderController extends Controller
@@ -58,7 +59,33 @@ class PurchaseOrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
     
-    
+    /**
+     * 新建
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'warehouses' =>WarehouseModel::all(),
+        ];
+        return view($this->viewPath . 'create', $response);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store()
+    {
+        request()->flash();
+        $this->model->createPurchaseOrder(request()->all());
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
+    }  
     
     /**
      * 采购页面
@@ -451,11 +478,17 @@ class PurchaseOrderController extends Controller
             if($data['po_id']!=''){
                 $result = $result->where("purchase_order_id",$data["po_id"]);
             }
-            if($data['status']!=''){
-               $data['status']?$result = $result->where("purchase_order_id",'!=',''):$result->where("purchase_order_id",'');
+            if($data['status']!='2'){
+               $data['status']?$result = $result->where("purchase_order_id",'!=',''):$result = $result->where("purchase_order_id",0);
             }
             if($data['trackingNo']!=''){
                 $result = $result->where("post_coding",$data["trackingNo"]);
+            }
+            if($data['date_from']!=''){
+                $result = $result->where("created_at",'>=',$data["date_from"]);
+            }
+            if($data['date_to']!=''){
+                $result = $result->where("created_at",'<=',$data["date_to"]);
             }
             $result = $result->get();
         }
@@ -470,6 +503,7 @@ class PurchaseOrderController extends Controller
     public function updateArriveNum(){
         $data = request()->input("data");
         $p_id = request()->input("p_id");
+
         if($data!=''){
             $data = substr($data, 0,strlen($data)-1);
             $arr = explode(',', $data);
@@ -504,7 +538,11 @@ class PurchaseOrderController extends Controller
             }
         }
         
-        echo json_encode($p_id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        $response['metas']['title']='采购收货';
+        return view($this->viewPath . 'recieve', $response);
     }
 
     public function inWarehouse(){
@@ -517,6 +555,7 @@ class PurchaseOrderController extends Controller
 
     public function ajaxInWarehouse(){
         $id = request()->input('id');
+
         $purchase_order = $this->model->find($id);
         $response = [
                 'purchase_order' => $purchase_order,
@@ -556,9 +595,10 @@ class PurchaseOrderController extends Controller
                 if($datas['storage_qty']>=$purchase_item->purchase_num){
                     $datas['status'] = 4;
                 }
-                //print_r($datas);
+                
                 $purchase_item->update($datas);
                 $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
+                
             }       
         }
         
@@ -570,8 +610,155 @@ class PurchaseOrderController extends Controller
             }
         }
         $purchasrOrder->update(['status'=>$p_status]);
-        $p_id = (int)$p_id;
-        echo json_encode($p_id);
+        /*$p_id = (int)$p_id;
+        echo json_encode($p_id);*/
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+        ];
+        $response['metas']['title']='采购收货';
+        return view($this->viewPath . 'recieve', $response);
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseAjaxSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $supplier_id = request()->input('supplier_id')?request()->input('supplier_id'):'';
+            /*if($supplier_id){
+                $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->where('supplier_id',$supplier_id)->get();
+            }else{
+                $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
+            }*/
+            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->where('supplier_id',$supplier_id)->get();
+            $total = $skus->count();
+            $arr = [];
+            foreach($skus as $key => $sku) {
+                $arr[$key]['id'] = $sku->sku;
+                $arr[$key]['text'] = $sku->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseExmaine()
+    {
+        $purchase_ids = request()->input("purchase_ids");
+        $arr = explode(',', $purchase_ids);
+        foreach($arr as $id){
+            $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+        }
+        return 1;
+    }
+
+    /**
+     * 采购单提示
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function view()
+    {
+        $purchaseOrder_id = request()->input("purchaseOrder_id");
+        $purchaseOrderModel = $this->model->find($purchaseOrder_id);
+        $total_price = 0;
+        $data = [];
+        foreach ($purchaseOrderModel->purchaseItem as $key => $purchaseItemModel) {
+            $itemModel = ItemModel::find($purchaseItemModel->item_id);
+            //实时计算建议采购量
+            $zaitu_num = 0;//在途
+            if ($purchaseItemModel->status > 0 || $purchaseItemModel->status < 4) {
+                if (!$purchaseItemModel->purchaseOrder->write_off) {
+                    $zaitu_num += $purchaseItemModel->purchase_num - $purchaseItemModel->storage_qty - $purchaseItemModel->unqualified_qty;
+                }
+            }
+            //虚库存
+            $xu_kucun = $itemModel->available_quantity;
+            //7天销量
+            $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('order_items.quantity', '<', 5)
+                ->where('order_items.item_id', $purchaseItemModel->item_id)
+                ->sum('order_items.quantity');
+
+            //14天销量
+            $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('order_items.quantity', '<', 5)
+                ->where('order_items.item_id', $purchaseItemModel->item_id)
+                ->sum('order_items.quantity');
+
+            //30天销量
+            $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+                ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('order_items.quantity', '<', 5)
+                ->where('order_items.item_id', $purchaseItemModel->item_id)
+                ->sum('order_items.quantity');
+            //计算趋势系数 $coefficient系数 $coefficient_status系数趋势
+            if ($sevenDaySellNum == 0 || $fourteenDaySellNum == 0) {
+                $coefficient_status = 3;
+                $coefficient = 1;
+            } else {
+                if (($sevenDaySellNum / 7) / ($fourteenDaySellNum / 14 * 1.1) >= 1) {
+                    $coefficient = 1.3;
+                    $coefficient_status = 1;
+                } elseif (($fourteenDaySellNum / 14 * 0.9) / ($sevenDaySellNum / 7) >= 1) {
+                    $coefficient = 0.6;
+                    $coefficient_status = 2;
+                } else {
+                    $coefficient = 1;
+                    $coefficient_status = 4;
+                }
+            }
+            //预交期
+            $delivery = $itemModel->supplier ? $itemModel->supplier->purchase_time : 7;
+            //采购建议数量
+            if ($itemModel->purchase_price > 200 && $fourteenDaySellNum < 3 || $itemModel->status == 4) {
+                $needPurchaseNum = 0 - $xu_kucun - $zaitu_num;
+            } else {
+                if ($itemModel->purchase_price > 3 && $itemModel->purchase_price <= 40) {
+                    $needPurchaseNum = ($fourteenDaySellNum / 14) * (7 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+                } elseif ($itemModel->purchase_price <= 3) {
+                    $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+                } elseif ($itemModel->purchase_price > 40) {
+                    $needPurchaseNum = ($fourteenDaySellNum / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+                }
+            }
+            $need_purchase_num = ceil($needPurchaseNum);
+            
+            ($needPurchaseNum-$purchaseItemModel->purchase_num)<0?$data[$purchaseItemModel->id]['quantity']='采购量大于建议采购值('.($needPurchaseNum-$purchaseItemModel->purchase_num).')':$data[$purchaseItemModel->id]['quantity']='';
+            //计算总价
+            $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
+            //计算采购价和系统价格是否一致
+            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = '':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致';
+           
+        }
+        
+        $total_price>2000?$data[0]['total_price'] = '采购单总金额大于2000':$data[0]['total_price'] = '';
+       
+        return $data;
     }
         
 }

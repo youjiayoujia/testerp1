@@ -11,6 +11,9 @@ class CoeAdapter extends BasicAdapter
 {
     public function getTracking($package)
     {
+
+        $this->config = $package->logistics->api_config;
+
         $result = [];
         $response = $this->doUpload($package);
         if ($response['status'] != 0) {
@@ -33,6 +36,7 @@ class CoeAdapter extends BasicAdapter
 
     public function doUpload($package)
     {
+
         $countryCode = $package->shipping_country;//发货国家简码
         $countryCode = $countryCode == "UK" ? "GB" : $countryCode;
         $buyer_name = $package->shipping_firstname . " " . $package->shipping_lastname;
@@ -77,7 +81,7 @@ class CoeAdapter extends BasicAdapter
                     <pcs>" . $totalCount . "</pcs>
                     <destNo><![CDATA[" . $countryCode . "]]></destNo>
                     <date><![CDATA[" . date("Y-m-d H:i:s") . "]]></date>
-                    <custNo><![CDATA[" . $this->config['UserId'] . "]]></custNo>
+                    <custNo><![CDATA[" . $this->config['userId'] . "]]></custNo>
                     <weight>" . $totalWeight . "</weight>
                     <declaredValue>" . $totalValue . "</declaredValue>
                     <declaredCurrency>USD</declaredCurrency>

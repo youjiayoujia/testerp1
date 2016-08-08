@@ -463,7 +463,97 @@ class EbayAdapter implements AdapterInterface
 
     public function getMessages()
     {
-        return false;
+        $message_lists =[];
+        // 1.封装message 的XML DOM
+        $before_day = 1;
+        $time_begin = date("Y-m-d H:i:s", time() - (86400 * $before_day));
+        $time_end   = date('Y-m-d H:i:s');
+        $arr = explode(' ', $time_end);
+        $time_end = $arr[0] . 'T' . $arr[1] . '.000Z';
+        $arr = explode(' ', $time_begin);
+        $time_begin = $arr[0] . 'T' . $arr[1] . '.000Z';
+
+        $message_xml_dom = '<WarningLevel>High</WarningLevel>
+                            <DetailLevel>ReturnSummary</DetailLevel>
+                            <StartTime>' . $time_begin . '</StartTime>
+                            <EndTime>' . $time_end . '</EndTime>';
+        //2.获取消息
+        $call = 'GetMyMessages';
+        $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
+        $headers_count = $message_ary->Summary->TotalMessageCount;
+        $headers_pages_count = ceil($headers_count / 100); //统计页数
+
+        for($index = 1 ; $index <= $headers_pages_count ; $index ++){
+            $content_xml_dom = '<WarningLevel>High</WarningLevel>
+                                <DetailLevel>ReturnHeaders</DetailLevel>
+                                <Pagination>
+                                    <EntriesPerPage>100</EntriesPerPage>
+                                    <PageNumber>' . $index . '</PageNumber>
+                                </Pagination>        
+                                <StartTime>' . $time_begin . '</StartTime>
+                                <EndTime>' . $time_end . '</EndTime>';
+            $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
+            foreach ($content->Messages as $message){
+/*
+ *             message 数据格式 样例
+                SimpleXMLElement Object
+                (
+                    [Sender] => priya.suryavanshi
+                    [SendingUserID] => 774805616
+                    [RecipientUserID] => wintrade9
+                    [SendToName] => wintrade9
+                    [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                    [MessageID] => 80473418726
+                    [ExternalMessageID] => 1340213839016
+                    [Flagged] => false
+                    [Read] => false
+                    [ReceiveDate] => 2016-08-04T09:16:42.000Z
+                    [ExpirationDate] => 2017-08-04T09:16:42.000Z
+                    [ItemID] => 222123713737
+                    [ResponseDetails] => SimpleXMLElement Object
+                    (
+                         [ResponseEnabled] => true
+                         [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
+                    )
+
+                    [Folder] => SimpleXMLElement Object
+                    (
+                        [FolderID] => 0
+                     )
+
+                    [MessageType] => ResponseToASQQuestion
+                    [Replied] => false
+                    [ItemEndTime] => 2016-08-18T08:16:14.000Z
+                    [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                )*/
+
+                $message_lists[] = [];
+
+
+
+                $message_lists[]['message_id'] = $message->MessageID;
+                $message_lists[]['from_name'] = $message->Sender;
+                $message_lists[]['from'] = $message->SendingUserID;
+                $message_lists[]['to'] = $message->SendToName;
+                $message_lists[]['labels'] = '';
+                $message_lists[]['label'] = 'INBOX';
+                $message_lists[]['date'] = $message->ReceiveDate;
+                $message_lists[]['subject'] = $message->Subject;
+                $message_lists[]['attachment'] = ''; //附件
+
+                $message_lists[]['content'] = $message->Subject;
+
+
+
+
+
+
+
+
+            }
+
+
+        }
     }
 
     public function sendMessages($replyMessage)

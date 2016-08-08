@@ -102,9 +102,18 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="credentials" class="control-label">企业证件</label>
+            <label for="credentials">企业证件: </label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="credentials" placeholder="企业证件" name='credentials' value="{{ old('credentials') ? old('credentials') : $model->credentials }}">
+            @if($model->credentials)
+                <br/>
+                <filearea id="filearea">
+                    <a href="../../{{ 'uploads/supplier' . '/' }}{{ $model->credentials }}" target="_blank">{{ $model->credentials }}</a>
+                    &nbsp;&nbsp;
+                    <a class="glyphicon glyphicon-remove" href="javascript:void(0)" onclick="deleteFile()"></a>
+                </filearea>
+            @else
+                <input name='credentials' type='file'/>
+            @endif
         </div>
         <div class="form-group col-lg-4">
             <label for="remark" class="control-label">备注</label>
@@ -125,4 +134,12 @@
             </div>
         </div>
     </div>
+@stop
+@section('pageJs')
+    <script type='text/javascript'>
+        function deleteFile() {
+            var fileThml = '<input type="file" class="file white-space:nowrap" id="credentials" placeholder="企业证件" name="credentials" value="" />';
+            $('#filearea').html(fileThml);
+        }
+    </script>
 @stop

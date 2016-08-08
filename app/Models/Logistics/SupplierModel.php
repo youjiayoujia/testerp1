@@ -48,14 +48,14 @@ class SupplierModel extends BaseModel
 
     public $rules = [
         'create' => [
-            'name' => 'required|unique:logistics_suppliers,name',
+            'name' => 'required',
             'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
             'technician' => 'required',
-            'manager_tel' => 'required|digits_between:8,11',
-            'technician_tel' => 'required|digits_between:8,11',
+            'manager_tel' => 'required',
+            'technician_tel' => 'required',
             'url' => 'required',
             'password' => 'required',
             'customer_service_name' => 'required',
@@ -69,14 +69,14 @@ class SupplierModel extends BaseModel
             'logistics_collection_info_id' => 'required',
         ],
         'update' => [
-            'name' => 'required|unique:logistics_suppliers,name,{id}',
+            'name' => 'required',
             'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
             'technician' => 'required',
-            'manager_tel' => 'required|digits_between:8,11',
-            'technician_tel' => 'required|digits_between:8,11',
+            'manager_tel' => 'required',
+            'technician_tel' => 'required',
             'url' => 'required',
             'password' => 'required',
             'customer_service_name' => 'required',
@@ -104,6 +104,26 @@ class SupplierModel extends BaseModel
             Storage::disk('product')->put($data['credentials'], file_get_contents($file->getRealPath()));
         }
         return $this->create($data);
+    }
+
+    public function updateSupplier($id, $data, $file = null)
+    {
+        $path = 'uploads/supplier' . '/';
+        if ($file != '' && $file->getClientOriginalName()) {
+            $supplier = $this->where('id', $id)->first();
+            $supplierPath = $supplier['credentials'];
+            if($file->getClientOriginalExtension() != 'php') {
+                $data['credentials'] = $path . time() . '.' . $file->getClientOriginalExtension();
+                if($file->move($path, $data['credentials']) && $supplierPath != ''){
+                    if(file_exists('./' . $path . $supplierPath)){
+                        unlink('./' . $path . $supplierPath);
+                    }
+                }
+            }
+        } else {
+            $data['credentials'] = '';
+        }
+        return $this->find($id)->update($data);
     }
 
 }

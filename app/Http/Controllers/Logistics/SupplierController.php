@@ -57,4 +57,16 @@ class SupplierController extends Controller
         return view($this->viewPath . 'edit', $response);
     }
 
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $data = request()->all();
+        $this->validate(request(), $this->model->rules('update'));
+        $this->model->updateSupplier($id, $data, request()->file('credentials'));
+        return redirect($this->mainIndex);
+    }
+
 }

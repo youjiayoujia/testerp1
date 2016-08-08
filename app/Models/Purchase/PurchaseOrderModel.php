@@ -74,7 +74,7 @@ class PurchaseOrderModel extends BaseModel
                                 'close_status'=>config('purchase.purchaseOrder.close_status'),
                                 ],
             'selectRelatedSearchs' => [],
-            'sectionSelect' => [],
+            'sectionSelect' => ['time' => ['created_at']],
         ];
     }
 

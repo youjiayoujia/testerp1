@@ -25,31 +25,44 @@ class EmailTemplateModel extends BaseModel
     ];
 
     protected $fillable = [
+        'name',
         'customer',
         'address',
         'zipcode',
         'phone',
         'unit',
         'sender',
-        'remark'
+        'remark',
+        'country_code',
+        'province',
+        'city',
+
     ];
 
     public $rules = [
         'create' => [
+            'name' => 'required',
             'customer' => 'required|unique:logistics_email_templates,customer',
             'address' => 'required',
             'zipcode' => 'required',
             'phone' => 'required',
             'unit' => 'required',
-            'sender' => 'required'
+            'sender' => 'required',
+            'country_code' => 'required',
+            'province' => 'required',
+            'city' => 'required',
         ],
         'update' => [
+            'name' => 'required',
             'customer' => 'required|unique:logistics_email_templates,customer,{id}',
             'address' => 'required',
             'zipcode' => 'required',
             'phone' => 'required',
             'unit' => 'required',
-            'sender' => 'required'
+            'sender' => 'required',
+            'country_code' => 'required',
+            'province' => 'required',
+            'city' => 'required',
         ],
     ];
 

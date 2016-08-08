@@ -51,56 +51,64 @@ Class WishAdapter implements AdapterInterface
         return $orderID;
     }
 
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
-        $hasOrder = true;
-        $start = 0;
         $orders = [];
         $returnOrders = [];
-
-        while ($hasOrder) {
-            $url = "https://china-merchant.wish.com/api/v2/order/get-fulfill?";
-            $apiArr = array();//api请求数组
-            $apiArr['limit'] = urlencode($perPage);
-            $apiArr['start'] = urlencode($start * $perPage);
-            if ($startDate != '') {
-                $apiArr['since'] = urlencode(date("Y-m-d", strtotime($startDate)));
-            }
-            $apiArr['access_token'] = urldecode($this->access_token);
-            $apiString = http_build_query($apiArr);
-            $url = $url . $apiString;
-            $orderjson = $this->getCurlData($url);
-            $orderList = json_decode($orderjson, true);
-            if (isset($orderList['code']) && ($orderList['code'] == 0) && !empty($orderList['data'])) {
-                $start++;
-                foreach ($orderList['data'] as $order) {
-                    $orders[$order['Order']['transaction_id']][] = $order;
-                }
-
-            } else {
-                var_dump($orderList);
-                $hasOrder = false;
-            }
+        if (empty($nextToken)) {
+            $nextToken = 0;
         }
-
+        $url = "https://china-merchant.wish.com/api/v2/order/get-fulfill?";
+        $apiArr = array();//api请求数组
+        $apiArr['limit'] = urlencode($perPage);
+        $apiArr['start'] = urlencode($nextToken * $perPage);
+        if ($startDate != '') {
+            $apiArr['since'] = urlencode(date("Y-m-d", strtotime($startDate)));
+        }
+        $apiArr['access_token'] = urldecode($this->access_token);
+        $apiString = http_build_query($apiArr);
+        $url = $url . $apiString;
+        $orderjson = $this->getCurlData($url);
+        $orderList = json_decode($orderjson, true);
+        if (isset($orderList['code']) && ($orderList['code'] == 0) && !empty($orderList['data'])) {
+            foreach ($orderList['data'] as $order) {
+                $orders[$order['Order']['transaction_id']][] = $order;
+            }
+            $nextToken++;
+        } else {
+            var_dump($orderList);
+            $nextToken='';
+        }
         foreach ($orders as $key => $order) {
             $midOrder = $this->parseOrder($order, $key);
             if ($midOrder) {
                 $returnOrders[] = $midOrder;
             }
         }
-
-
-        return $returnOrders;
+        return ['orders' => $returnOrders, 'nextToken' => $nextToken];
     }
 
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
+        $return = [];
+        $tracking_info['access_token'] = urldecode($this->access_token);
+        array_filter($tracking_info);
+        $url =$tracking_info['api'];
+        unset($tracking_info['api']);
+        $resultJson = $this->postCurlHttpsData($url, $tracking_info);
+        $result = json_decode($resultJson, true);
+        if (isset($result['code']) && ($result['code'] == 0)) {
+            $return['status'] = true;
+            $return['info'] = isset($result['message']) ? $result['message'] : 'Success';
+
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['message']) ? $result['message'] : '未知错误';
+        }
+        return $return;
 
 
-
-        return 'returnTrack';
     }
 
     public function parseOrder($order, $transaction_number)
@@ -140,7 +148,7 @@ Class WishAdapter implements AdapterInterface
             $orderInfo['shipping_zipcode'] = isset($orderSingle['ShippingDetail']['zipcode']) ? $orderSingle['ShippingDetail']['zipcode'] : '';
             $orderInfo['shipping_phone'] = isset($orderSingle['ShippingDetail']['phone_number']) ? $orderSingle['ShippingDetail']['phone_number'] : '';
             $orderInfo['payment_date'] = $this->getPayTime($orderSingle['order_time']);
-            $orderInfo['status'] ='PAID';
+            $orderInfo['status'] = 'PAID';
 
             //处理一下 SKU的前后缀问题
             $erpSku = $this->filter_sku($orderSingle['sku'], $this->wish_sku_resolve); //根据账号的sku解析设定
@@ -254,6 +262,7 @@ Class WishAdapter implements AdapterInterface
         $productList = json_decode($productjson, true);
         if (isset($productList['code']) && ($productList['code'] == 0) && !empty($productList['data'])) {
             foreach ($productList['data'] as $num => $product) {
+
                 $productInfo = [];
                 //$productInfo['original_image_url'] = $product['Product']['original_image_url'];
                 //  $productInfo['main_image'] = $product['Product']['main_image'];
@@ -276,6 +285,13 @@ Class WishAdapter implements AdapterInterface
                 $productInfo['parent_sku'] = isset($product['Product']['parent_sku']) ? $product['Product']['parent_sku'] : '';
                 $productInfo['productID'] = $product['Product']['id'];
                 $productInfo['product_type_status'] = 2;
+
+                if (isset($product['Product']['date_uploaded'])) {
+                    $publishedTime = $product['Product']['date_uploaded'];
+                    $publishedTime = explode('-', $publishedTime);
+                    $publishedTime = $publishedTime[2] . '-' . $publishedTime[0] . '-' . $publishedTime[1];
+                    $productInfo['publishedTime'] = date('Y-m-d H:i:s', strtotime($publishedTime));
+                }
                 // $publishedTime = isset($product['Product']['date_uploaded'])?strtotime($product['Product']['date_uploaded']):'';
                 // $productInfo['publishedTime'] = !empty($publishedTime)?date('Y-m-d H:i:s',$publishedTime):'';
                 $productInfo['product_description'] = $product['Product']['description'];
@@ -284,17 +300,17 @@ Class WishAdapter implements AdapterInterface
                 $i = 1;
                 $j = 1;
                 foreach ($product['Product']['variants'] as $key => $variant) {
-                  /*  if ($key == 1) {
-                        $this->wish_sku_resolve = 2;
-                        $variant['Variant']['sku'] = 'S002AASSSW4(1200)[W3]';
+                    /*  if ($key == 1) {
+                          $this->wish_sku_resolve = 2;
+                          $variant['Variant']['sku'] = 'S002AASSSW4(1200)[W3]';
 
-                    } else if ($key == 2) {
-                        $this->wish_sku_resolve = 1;
-                        $variant['Variant']['sku'] = '002*SSSSSW4(1200)[W3]+002*DA1403W7[Ww]';
+                      } else if ($key == 2) {
+                          $this->wish_sku_resolve = 1;
+                          $variant['Variant']['sku'] = '002*SSSSSW4(1200)[W3]+002*DA1403W7[Ww]';
 
-                    } elseif ($key == 3) {
-                        $variant['Variant']['sku'] = '002*DA1403W4[W3]+002*DA1403W7[Ww]';
-                    }*/
+                      } elseif ($key == 3) {
+                          $variant['Variant']['sku'] = '002*DA1403W4[W3]+002*DA1403W7[Ww]';
+                      }*/
 
                     $variants[$key]['sku'] = $variant['Variant']['sku'];
                     $variants[$key]['msrp'] = $variant['Variant']['msrp'];
@@ -317,7 +333,7 @@ Class WishAdapter implements AdapterInterface
                     $variants[$key]['size'] = isset($variant['Variant']['size']) ? $variant['Variant']['size'] : '';
                     $variants[$key]['erp_sku'] = $this->getErpSkuByWishSku($variants[$key]['sku'], $this->wish_sku_resolve);
                     $sellID = $this->getSellCode($variants[$key]['sku'], $this->wish_sku_resolve);
-                    $variants[$key]['sellerID'] = isset($sellerIdInfo[(string)$sellID])?$sellerIdInfo[(string)$sellID]:0;
+                    $variants[$key]['sellerID'] = isset($sellerIdInfo[(string)$sellID]) ? $sellerIdInfo[(string)$sellID] : 0;
 
                     $j++;
                 }
@@ -383,8 +399,8 @@ Class WishAdapter implements AdapterInterface
                            WishPublishProductDetailModel::create($item);
                        }*/
             }
-          /*  var_dump($return);
-            exit;*/
+            /*  var_dump($return);
+              exit;*/
             return $return;
 
 
@@ -543,7 +559,8 @@ Class WishAdapter implements AdapterInterface
      *  $url = https://china-merchant.wish.com/api/v2/order/modify-tracking  //更新追踪号
      *  $url = https://china-merchant.wish.com/api/v2/order/fulfill-one // 可不传追踪号，
      */
-    public function trackOperate($data,$url){
+    public function trackOperate($data, $url)
+    {
         $product['access_token'] = urldecode($this->access_token);
         $return = [];
         $resultJson = $this->postCurlHttpsData($url, $data);
@@ -648,7 +665,7 @@ Class WishAdapter implements AdapterInterface
         curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+        // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
 
@@ -670,11 +687,63 @@ Class WishAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-    
-    public function getMessages(){
 
+    public function getMessages()
+    {
+        $j = 0; //信息条数
+        $initArray = [];
+        $initArray['limit'] = 5; //每页数量
+        $return_array = [];
+        for($i=1; $i>0;$i++){
+            $initArray['start'] = ($i-1)*$initArray['limit'];
+            $initArray['access_token'] = $this->access_token;
+            $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
+            $jsonData = $this->getCurlData($url);
+            $apiReturn = json_decode($jsonData,true);
+            if(empty($apiReturn['data'])){
+                break;
+            }
+            foreach($apiReturn['data'] as $gd){
+
+                $return_array[$j]['message_id']      = $gd['Ticket']['transaction_id']; //message_id
+                $return_array[$j]['subject']		 = addslashes($gd['Ticket']['subject']);//邮件标题（发件人本地语言）
+                $return_array[$j]['date'] 	  	     = str_replace('T',' ',$gd['Ticket']['open_date']);//发件人发邮件的时间
+                $return_array[$j]['from_name'] 	  	 = str_replace('T',' ',$gd['Ticket']['UserInfo']['name']);//用户名
+                $return_array[$j]['from'] 	  	     = str_replace('T',' ',$gd['Ticket']['UserInfo']['id']);//用户Id
+
+                $return_array[$j]['content'] 	  	 = base64_encode(serialize(['wish' => $gd['Ticket']['replies']]));   //信息内容
+                $return_array[$j]['order_info']      = serialize(['wish' => $gd['Ticket']['items']]);
+                $return_array[$j]['to']         = '收信人';
+                $return_array[$j]['labels']     = '';
+                $return_array[$j]['label']      = 'INBOX';
+                $return_array[$j]['date']       = $gd['Ticket']['open_date'];
+                $return_array[$j]['attachment'] = ''; //附件
+                //$return_array[$j]['asdasd']   	 	 = addslashes($gd['Ticket']['label']);//邮件标题（英文）
+               // $return_array[$j]['sublabel']	 	 = addslashes($gd['Ticket']['sublabel']);
+                $return_array[$j]['state']  		 	 = $gd['Ticket']['state'];//wish邮件状态说明
+                $return_array[$j]['stateID']		 	 = $gd['Ticket']['state_id'];//wish邮件状态ID
+                $return_array[$j]['orderInfo']	  	     = serialize($gd['Ticket']['items']);//wish订单信息
+                $return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
+                $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
+
+                $j++;
+            }
+        }
+        return (!empty($return_array)) ?  $return_array : false;
     }
-    public function sendMessages(){
-        
+
+    /**
+     * 发送邮件
+     * @param $replyMessage 回复记录
+     */
+    public function sendMessages($replyMessage)
+    {
+        $param['id'] = $replyMessage->message->from;
+        $param['access_token'] = $this->access_token;
+        $param['reply'] = $replyMessage->content;
+        $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
+
+
+
     }
 }

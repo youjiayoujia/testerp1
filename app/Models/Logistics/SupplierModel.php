@@ -31,28 +31,34 @@ class SupplierModel extends BaseModel
         'remark',
         'bank',
         'card_number',
+        'url',
+        'password',
     ];
 
     public $rules = [
         'create' => [
             'name' => 'required|unique:logistics_suppliers,name',
-            'customer_id' => 'required|numeric',
+            'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
             'technician' => 'required',
             'manager_tel' => 'required|digits_between:8,11',
             'technician_tel' => 'required|digits_between:8,11',
+            'url' => 'required',
+            'password' => 'required',
         ],
         'update' => [
             'name' => 'required|unique:logistics_suppliers,name,{id}',
-            'customer_id' => 'required|numeric',
+            'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
             'technician' => 'required',
             'manager_tel' => 'required|digits_between:8,11',
             'technician_tel' => 'required|digits_between:8,11',
+            'url' => 'required',
+            'password' => 'required',
         ],
     ];
 

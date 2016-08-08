@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'default' => 'database',
+    'default' => 'redis',
 
     /*
     |--------------------------------------------------------------------------
@@ -96,6 +96,8 @@ return [
         'DoPackage' => '打包',
         'AssignLogistics' => '分配物流',
         'PlaceLogistics' => '物流下单',
+        'SendMessages' => '发送邮件',
+        'MatchPaypal'=>'匹配Paypal'
     ]
 
 ];

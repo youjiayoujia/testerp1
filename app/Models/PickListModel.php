@@ -38,7 +38,7 @@ class PickListModel extends BaseModel
     ];
 
     //查询
-    public $searchFields=['picknum'];
+    public $searchFields=['picknum' => '拣货单号'];
 
     //拣货单item关联关系
     public function pickListItem()
@@ -122,7 +122,7 @@ class PickListModel extends BaseModel
         {
             $query = ListItemModel::where(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'picklist_id'=>'0'])->first();
             if(!$query) {
-                $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
+                $obj = ListItemModel::create(['type'=>$package->type, 'item_id'=>$packageitem->item_id, 'sku'=>$packageitem->item->sku, 'warehouse_position_id'=>$packageitem->warehouse_position_id, 'quantity'=>$packageitem->quantity]);
                 $obj->pickListItemPackages()->create(['package_id' => $package->id]);
             } else {
                 $query->quantity += $packageitem->quantity;

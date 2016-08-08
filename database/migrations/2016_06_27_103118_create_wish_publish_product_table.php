@@ -29,8 +29,8 @@ class CreateWishPublishProductTable extends Migration
             $table->string('brand')->comment('品牌');
             $table->string('landing_page_url')->comment('查询产品详情地址');
             $table->string('upc')->comment('UPC');
-            $table->string('number_saves')->comment('产品保存量');
-            $table->string('number_sold')->comment('产品销售量');
+            $table->integer('number_saves')->comment('产品保存量');
+            $table->integer('number_sold')->comment('产品销售量');
             $table->text('extra_images')->comment('额外图片');
             $table->timestamps();
             $table->softDeletes();

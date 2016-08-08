@@ -24,29 +24,11 @@
             </select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="logistics_supplier_id">物流商</label>
+            <label for="logistics_supplier_id" class='control-label'>物流商</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name="logistics_supplier_id" class="form-control" id="logistics_supplier_id">
-                @foreach($suppliers as $supplier)
-                    <option value="{{$supplier->id}}" {{ Tool::isSelected('logistics_supplier_id', $supplier->id) }}>
-                        {{$supplier->name}}
-                    </option>
-                @endforeach
-            </select>
+            <select class="form-control logistics_supplier_id" id="logistics_supplier_id" name="logistics_supplier_id"></select>
         </div>
         <div class="form-group col-lg-2">
-            <label for="type" class="control-label">物流商物流方式</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') }}">
-        </div>
-        <div class="form-group col-lg-2">
-            <label for="url" class="control-label">物流追踪网址</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
-        </div>
-    </div>
-    <div class='row'>
-        <div class="form-group col-lg-4">
             <label for="docking" class="control-label">对接方式</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="docking" id="docking">
@@ -57,7 +39,19 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
+            <label for="type" class="control-label">物流商物流方式</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="type" placeholder="物流商物流方式" name='type' value="{{ old('type') }}">
+        </div>
+    </div>
+    <div class='row'>
+        <div class="form-group col-lg-2">
+            <label for="url" class="control-label">物流追踪网址</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') }}">
+        </div>
+        <div class="form-group col-lg-2">
             <label for="logistics_catalog_id" class="control-label">物流分类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
@@ -69,7 +63,7 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-4">
+        <div class="form-group col-lg-2">
             <label for="logistics_email_template_id" class="control-label">回邮模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_email_template_id" id="logistics_email_template_id">
@@ -81,18 +75,7 @@
                 @endforeach
             </select>
         </div>
-    </div>
-    <div class="row">
-        <div class='form-group col-lg-3'>
-            <label for="logistics_limits">物流限制</label>
-            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
-                <option value=''></option>
-                @foreach($limits as $limit)
-                    <option value="{{ $limit->id }}">{{$limit->name}}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-2">
             <label for="logistics_template_id" class="control-label">面单模版</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_template_id" id="logistics_template_id">
@@ -104,12 +87,23 @@
                 @endforeach
             </select>
         </div>
-        <div class="form-group col-lg-3" id="pool_quantity">
-            <label for="pool_quantity" class="control-label">号码池数量</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="pool_quantity" placeholder="号码池数量" name='pool_quantity' value="{{ old('pool_quantity') }}">
+        <div class='form-group col-lg-4'>
+            <label for="logistics_limits">物流限制</label>
+            <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
+                <option value=''></option>
+                @foreach($limits as $limit)
+                    <option value="{{ $limit->id }}">{{$limit->name}}</option>
+                @endforeach
+            </select>
         </div>
-        <div class="form-group col-lg-3">
+    </div>
+    <div class="row">
+        <div class="form-group col-lg-2">
+            <label for="driver" class="control-label">驱动名</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') }}">
+        </div>
+        <div class="form-group col-lg-2">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
@@ -125,10 +119,10 @@
         </div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">承运商信息</div>
+        <div class="panel-heading">渠道对应物流</div>
         <div class="panel-body">
             <div class='form-group col-lg-3'>
-                <label>Amazon承运商</label>
+                <label>Amazon</label>
                 <select name='merchant[amazon_merchant]' class='form-control amazon_merchant'>
                     <option value=''></option>
                     @foreach($amazons as $key => $single)
@@ -137,7 +131,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>ebay承运商</label>
+                <label>ebay</label>
                 <select name='merchant[ebay_merchant]' class='form-control ebay_merchant'>
                     <option value=''></option>
                     @foreach($ebays as $key => $single)
@@ -146,7 +140,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>wish承运商</label>
+                <label>wish</label>
                 <select name='merchant[wish_merchant]' class='form-control wish_merchant'>
                     <option value=''></option>
                     @foreach($wishes as $key => $single)
@@ -155,7 +149,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>lazada承运商</label>
+                <label>lazada</label>
                 <select name='merchant[lazada_merchant]' class='form-control lazada_merchant'>
                     <option value=''></option>
                     @foreach($lazadas as $key => $single)
@@ -164,7 +158,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>dhgate承运商</label>
+                <label>dhgate</label>
                 <select name='merchant[dhgate_merchant]' class='form-control dhgate_merchant'>
                     <option value=''></option>
                     @foreach($dhgates as $key => $single)
@@ -173,7 +167,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>cdiscount承运商</label>
+                <label>cdiscount</label>
                 <select name='merchant[cdiscount_merchant]' class='form-control cdiscount_merchant'>
                     <option value=''></option>
                     @foreach($cdiscounts as $key => $single)
@@ -182,7 +176,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>速卖通承运商</label>
+                <label>速卖通</label>
                 <select name='merchant[aliExpress_merchant]' class='form-control aliExpress_merchant'>
                     <option value=''></option>
                     @foreach($aliExpresses as $key => $single)
@@ -191,7 +185,7 @@
                 </select>
             </div>
             <div class='form-group col-lg-3'>
-                <label>joom承运商</label>
+                <label>joom</label>
                 <select name='merchant[joom_merchant]' class='form-control joom_merchant'>
                     <option value=''></option>
                     @foreach($jooms as $key => $single)
@@ -199,6 +193,27 @@
                     @endforeach
                 </select>
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">渠道是否回传</div>
+        <div class="panel-body">
+            @foreach($channels as $channel)
+                <div class="form-group col-lg-2">
+                    <label for="channel_id_{{ $channel->id }}" class="control-label">{{ $channel->name }}平台</label>
+                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="channel_id_{{ $channel->id }}" value="1">{{ $channel->driver }}上传
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="channel_id_{{ $channel->id }}" value="0" checked>{{ $channel->driver }}不上传
+                        </label>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 @stop
@@ -214,6 +229,29 @@
         $('.wish_merchant').select2();
         $('.amazon_merchant').select2();
         $('.logistics_limits').select2();
+
+        $('.logistics_supplier_id').select2({
+            ajax: {
+                url: "{{ route('logistics.ajaxSupplier') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        logistics_supplier_id: params.term,
+                        page: params.page
+                    };
+                },
+                results: function(data, page) {
+                    if((data.results).length > 0) {
+                        var more = (page * 20)<data.total;
+                        return {results:data.results,more:more};
+                    } else {
+                        return {results:data.results};
+                    }
+                }
+            }
+        });
+
     });
 </script>
 @stop

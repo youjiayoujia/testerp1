@@ -12,7 +12,7 @@ return [
     /**
      * 可选分页条数
      */
-    'pageSizes' => [10, 25, 50, 100],
+    'pageSizes' => [10, 25, 50, 100, 300],
     /**
      * 默认排序字段
      */
@@ -46,7 +46,6 @@ return [
         'order.active' => '售后状态',
         'active' => '售后状态',
         'country.code' => '国家简称',
-        'time.created_at' => '时间',
         'price.amount' => '金额',
         'item.sku' => 'SKU',
         'items.sku' => 'SKU',
@@ -70,11 +69,27 @@ return [
         'stock.item.sku' => 'sku',
         'time.created_at'=>'创建时间',
         'order.ordernum' => '订单号',
+        'productID'=>'Wish产品ID',
+        'details.erp_sku'=>'erpSKU',
+        'account_id' =>'账号',
+        'sellerID' =>'销售人员',
+        'price.number_sold' =>'产品销量',
+        'time.publishedTime'=>'产品刊登时间',
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
+        'by_id' => '买家ID',
+        'profit_rate' => '利润率',
+        'items.item.status' => 'SKU状态',
+        'outer_type' => '出库/入库', 
+        'inner_type' => '出入库类型',
+        'warehouse_id' => '仓库',
+        'logistics_id' => '物流方式',
+        'time.printed_at' => '打印时间',
+        'time.shipped_at' => '发货时间',
+
     ],
 ];
 

@@ -10,6 +10,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CatalogModel;
 use App\Models\ChannelModel;
+use App\Models\Catalog\CatalogChannelsModel;
+use Excel;
 
 class CatalogController extends Controller
 {
@@ -104,5 +106,282 @@ class CatalogController extends Controller
     {
         $catalog_name = request()->input('catalog_name');
         return $this->model->checkName($catalog_name);
+    }
+
+    public function index(){
+        request()->flash();
+        $channels = ChannelModel::all();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'channels' => $channels,
+        ];
+        return view($this->viewPath . 'index',$response);
+
+    }
+
+    /**
+     * 导出分类平台税率
+     * 
+     */
+    public function exportCatalogRates(){
+
+        $filters = request()->input('filter');
+        $filtersArray = explode('|',$filters);
+        $catalogIds = explode(',',$filtersArray[0]);
+        $channelIds = explode(',',$filtersArray[1]);
+        $cvsArray = [];
+        $i = 1;
+        $cvsArray[0] = '';
+        $th = false;
+        foreach ($this->model->whereIn('id',$catalogIds)->get() as $itemCatalog){
+            $channelsData = $this->model->find($itemCatalog->id)->channels;
+            //$cvsArray [$i][$itemCatalog->name] = $itemCatalog->name;
+            $cvsArray [$i][] = $i;
+            $cvsArray [$i][] = $itemCatalog->c_name;
+            foreach ($channelsData as $itemChannel){
+                if(in_array($itemChannel['id'],$channelIds)){
+                    //<th>
+                    if($i ==1){
+                        $th[] = $itemChannel->name;
+                    }
+                    $cvsArray [$i][] = $itemChannel->pivot->rate;
+                }
+            }
+            $i++;
+        }
+
+        if($th == false){
+            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', '包含没有添加税率的分类记录，请先编辑，再导出!'));
+        }
+
+        $cvsArray[0] = array_merge(['序号','分类名'],$th);
+
+        $name = 'CatalogRates';
+        Excel::create($name, function ($excel) use ($cvsArray) {
+            $nameSheet = '导出分类税率';
+            $excel->sheet($nameSheet, function ($sheet) use ($cvsArray) {
+                $sheet->fromArray($cvsArray);
+            });
+        })->download('csv');
+    }
+
+    /**
+     * 编辑税率
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function editCatalogRates(){
+
+        $filters = request()->input('filter');
+        $filtersArray = explode('|',$filters);
+        $catalogIds = explode(',',$filtersArray[0]);
+        $channelIds = explode(',',$filtersArray[1]);
+        $catalogs = $this->model->whereIn('id',$catalogIds)->get();
+        $channels = ChannelModel::whereIn('id',$channelIds)->get();
+        $response =[
+            'metas' => $this->metas(__FUNCTION__),
+            'catalogs' => $catalogs,
+            'channels' => $channels,
+            'filters' => $filters
+        ];
+        return view($this->viewPath . 'edit_rate',$response);
+    }
+
+    /**
+     * 更新税率
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateCatalogRates(){
+
+        $requestArray = request()->input();
+        $filters = $requestArray['filter'];
+        $filtersArray = explode('|',$filters);
+        $catalogIds = explode(',',$filtersArray[0]);
+        $channelIds = explode(',',$filtersArray[1]);
+        foreach ($catalogIds as $catalogId){
+            foreach ($channelIds as $channelId){
+                $CatalogChannel = CatalogChannelsModel::where('catalog_id','=',$catalogId)->where('channel_id','=',$channelId)->first();
+                if(isset($requestArray[$channelId]) && !empty($CatalogChannel)){
+                    $CatalogChannel->rate = $requestArray[$channelId];
+                    $CatalogChannel->save();
+                }else{
+                    $obj = new CatalogChannelsModel;
+                    $obj->rate = $requestArray[$channelId];
+                    $obj->catalog_id = $catalogId;
+                    $obj->channel_id = $channelId;
+                    $obj->save();
+                }
+            }
+        }
+
+        return redirect(route('catalog.index'))->with('alert', $this->alert('success', '操作成功!'));
+    }
+
+    /**
+     * 编辑
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $channels = ChannelModel::all();
+        foreach ($channels as $channel){
+            $channels_all[$channel->id] = $channel;
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'channels_all' => $channels_all,
+        ];
+        return view($this->viewPath . 'edit', $response);
+    }
+
+    public function  exportExcel($rows,$name){
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+    public function catalogCsvFormat(){
+        $rows = [
+            [
+                '中文分类名称'=>'鞋子',
+                '分类英文名称' => 'shoes',
+                '前缀'=>'XL',
+                'Set属性'=>'name1:value1,value2;name2:value1,value2',
+                'variation属性'=>'name1:value1,value2;name2:value1,value2',
+                'Feature属性(说明：1，文本；2，单选 ；3，多选 ) '=>'1-value;2-name1:value1,value2,value3;3:value1,value2,value3',
+            ]
+        ];
+
+        $channels = ChannelModel::all();
+        foreach ($channels as $channel){
+            $rows[0][$channel->name] = '20,40';
+        }
+
+        $this->exportExcel($rows, '批量添加产品品类csv格式');
+    }
+    public function addLotsOfCatalogs(){
+        $file = request()->file('excel');
+
+        $path = config('setting.excelPath');
+        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        $data_array = '';
+        $result = false;
+        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
+            $reader->noHeading();
+            $data_array = $reader->all()->toArray();
+            $th_long = count($data_array[0]); //表头字段数
+            for($i = 6 ; $i < $th_long ; $i++){
+                $channels[$i] = $data_array[0][$i];
+            }
+            unset($data_array[0]); //去掉表头
+            if($data_array[1][1] == 'shoes'){
+                unset($data_array[1]); //去掉实例行
+            }
+            $insert_array =[];
+            foreach ($data_array as $item){
+                $set = '';
+                $variation = '';
+                $feature = '';
+                if(!empty($item[3])){ //SET属性
+                    $set_group = explode(';',trim($item[3]));
+                    foreach ($set_group as $itemset){
+                        $set_name_ary = '';
+                        $tmp_arr = explode(':',$itemset);
+                        //$set[$tmp_arr[0]] = explode(',',$tmp_arr[1]);
+                        $name_tmp_ary = explode(',',$tmp_arr[1]);
+                        foreach ($name_tmp_ary as $name_temp_value){
+                            $set_name_ary[] = ['name' => $name_temp_value];
+
+                        }
+
+                        $set[] = [
+                            'name'  => $tmp_arr[0],
+                            'value' => ['name' => $set_name_ary],
+                        ];
+
+                    }
+                }
+                if(!empty($item[4])){ //variation属性
+                    $set_group = explode(';',trim($item[4]));
+                    foreach ($set_group as $item_var){
+                        $var_name_ary = '';
+                        $tmp_variation_arr = explode(':',$item_var);
+                        //$variation[$tmp_arr[0]] = explode(',',$tmp_arr[1]);
+                        $name_var_ary = explode(',',$tmp_variation_arr[1]);
+                        foreach ($name_var_ary as $name_var_ary){
+                            $var_name_ary[] = ['name' => $name_var_ary];
+                        }
+                        $variation[] = [
+                            'name'  => $tmp_variation_arr[0],
+                            'value' => ['name' => $var_name_ary],
+                        ];
+
+                    }
+                }
+
+                if(!empty($item[5])){ //Feature属性 包括单选 多选 文本 通过 type控制
+                    $set_group = explode(';',trim($item[5]));
+                    foreach ($set_group as $item_feature){
+                        $feature_value_ary = explode(':',$item_feature);
+                        $fea_type_name = explode('-',$feature_value_ary[0]);
+                        if(count($feature_value_ary) == 1){//文本
+                             $fea_name_ary1[] = ['name' => ''];
+
+                            $feature[] = [
+                                'name'  => $fea_type_name[1],
+                                'type'  => $fea_type_name[0],
+                                'value' => ['name' => $fea_name_ary1]
+                            ];
+                        }else{
+                            $fea_name_ary2 = '';
+                            foreach (explode(',',$feature_value_ary[1]) as $val){
+                                $fea_name_ary2[] = ['name' => $val];
+                            }
+                            $feature[] = [
+                                'name'  => $fea_type_name[1],
+                                'type'  => $fea_type_name[0],
+                                'value' => ['name' => $fea_name_ary2]
+                            ];
+                        }
+                    }
+                }
+                //整合费率
+                $rates = '';
+                foreach ($channels as $key => $value){
+                    $rates[$value] = $item[$key];
+                }
+                $insert_array[] = [
+                    'c_name' => $item[0],
+                    'name'   => $item[1],
+                    'code'   => $item[2],
+                    'channel_rate' => $rates,
+                    'attributes' =>[
+                        'sets'       => $set,
+                        'variations' => $variation,
+                        'features'   => $feature,
+                    ],
+                ];
+            }
+            $result = $this->model->createLotsCatalogs($insert_array);
+        },'gb2312');
+
+        if($result){
+            return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
+        }else{
+            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', '数据格式有误，请检查后再操作!'));
+
+        }
+
+
     }
 }

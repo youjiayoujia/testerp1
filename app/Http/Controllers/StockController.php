@@ -89,6 +89,18 @@ class StockController extends Controller
         return view($this->viewPath.'showStockInfo', $response);
     }
 
+    public function changePosition()
+    {
+        $id = request('id');
+        $position_id = request('position');
+        $stock = $this->model->find($id);
+        if($stock) {
+            $stock->update(['warehouse_position_id' => $position_id]);
+            return json_encode(true);
+        }
+        return json_encode(false);
+    }
+
     public function getSingleSku()
     {
         $sku = request('sku');
@@ -98,11 +110,19 @@ class StockController extends Controller
         }
         $item_id = $item->id;
         $stocks = $this->model->where('item_id', $item_id)->get();
-        $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th></thead><tbody>";
+        $str = "<table class='table table-bordered'><thead><th>仓库</th><th>库位</th><th>sku</th><th>总数量</th><th>可用数量</th>";
+        if(!request()->has('type')) {
+            $str .= "<th>按钮</th>";
+        }
+        $str .= "</thead><tbody>";
         foreach($stocks as $stock)
         {
             if($stock->available_quantity || $stock->hold_quantity) {
-            $str .= "<tr><td>".($stock->warehouse ? $stock->warehouse->name : '').'</td><td>'.($stock->position ? $stock->position->name : '')."</td><td>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td></tr>";
+                $str .= "<tr><td data-id='".$stock->id."' data-warehouseId='".$stock->warehouse_id."'>".($stock->warehouse ? $stock->warehouse->name : '')."</td><td class='col-lg-2'>".($stock->position ? $stock->position->name : '')."</td><td data-itemId='".$stock->item_id."'>".($stock->item ? $stock->item->sku : '')."</td><td>".($stock->all_quantity ? $stock->all_quantity : '')."</td><td>".($stock->available_quantity ? $stock->available_quantity : '')."</td>";
+                if(!request()->has('type')) {
+                    $str .= "<td><button type='button' class='btn btn-info change_position'>修改库位</button></td>";
+                }
+                $str .= "</tr>";
             }
         }
         $str .= "</tbody>";
@@ -140,12 +160,14 @@ class StockController extends Controller
     {
         Cache::store('file')->forever('stockIOStatus', '0');
         $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
-        $stocks = $this->model->all();
-        foreach($stocks as $stock) 
-        {
-            $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
+        $stocks_arr = $this->model->all()->chunk(1000);
+        foreach($stocks_arr as $stocks) {
+            foreach($stocks as $stock) 
+            {
+                $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
+            }
         }
-
+        
         return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
     }
 

@@ -10,6 +10,7 @@ namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Message\MessageModel;
 
 set_time_limit(1800);
 
@@ -39,53 +40,48 @@ Class AliexpressAdapter implements AdapterInterface
     }
 
 
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 10)
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
+        if (empty($nextToken)) {
+            $nextToken = 1;
+        }
         $orders = [];
-        foreach ($status as $orderStatus) {
-            $pageTotalNum = 1;
-            for ($i = 1; $i <= $pageTotalNum; $i++) {
-                $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
-                    strtotime($startDate));
-                $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
-                    strtotime($endDate));
-                $param = "page=" . $i . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
-                $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
-                $orderList = json_decode($orderjson, true);
-                unset($orderjson);
-                if (isset($orderList['orderList'])) {
-                    if ($i == 1) {
-                        $pageTotalNum = ceil($orderList['totalItem'] / $perPage); //重新生成总页数
+        $orderStatus = $status[0];
+        $startDate = empty($startDate) ? date("m/d/Y H:i:s", strtotime('-30 day')) : date("m/d/Y H:i:s",
+            strtotime($startDate));
+        $endDate = empty($endDate) ? date("m/d/Y H:i:s", strtotime('-12 hours')) : date("m/d/Y H:i:s",
+            strtotime($endDate));
+        $param = "page=" . $nextToken . "&pageSize=" . $perPage . "&orderStatus=" . $orderStatus . "&createDateStart=" . rawurlencode($startDate) . "&createDateEnd=" . rawurlencode($endDate);
+        $orderjson = $this->getJsonData('api.findOrderListQuery', $param);
+        $orderList = json_decode($orderjson, true);
+        unset($orderjson);
+        if (isset($orderList['orderList'])) {
+            foreach ($orderList['orderList'] as $list) {
+                $thisOrder = orderModel::where('channel_ordernum',
+                    $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
+                if ($thisOrder) {
+                    continue;
+                }
+                $param = "orderId=" . $list['orderId'];
+                $orderjson = $this->getJsonData('api.findOrderById', $param);
+                $orderDetail = json_decode($orderjson, true);
+                if ($orderDetail) {
+                    $order = $this->parseOrder($list, $orderDetail);
+                    if ($order) {
+                        $orders[] = $order;
                     }
-                    foreach ($orderList['orderList'] as $list) {
-                        $thisOrder = orderModel::where('channel_ordernum',
-                            $list['orderId'])->first();     //获取详情之前 进行判断是否存在 存在就没必要调API了
-                        if ($thisOrder) {
-                            continue;
-                        }
-                        $param = "orderId=" . $list['orderId'];
-                        $orderjson = $this->getJsonData('api.findOrderById', $param);
-                        $orderDetail = json_decode($orderjson, true);
-                        if ($orderDetail) {
-                            $order = $this->parseOrder($list, $orderDetail);
-                            if ($order) {
-                                $orders[] = $order;
-                            }
-                        } else {
-                            continue;
-                        }
-                    }
-
                 } else {
-                    break;
+                    continue;
                 }
             }
-
-            // if ($createDateStart && $createDateEnd) $param .= "&createDateStart=" . rawurlencode($createDateStart) . "&createDateEnd=" . rawurlencode($createDateEnd);
-
+            $nextToken++;
+        } else {
+            var_dump($orderList);
+            $nextToken ='';
         }
 
-        return $orders;
+        return ['orders' => $orders, 'nextToken' => $nextToken];
+
     }
 
     public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
@@ -110,9 +106,36 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
-    public function returnTrack()
+    public function returnTrack($tracking_info)
     {
-        echo 'returnTrack';
+        $return = [];
+        $action = 'api.sellerShipment';
+        $app_url = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
+        $tracking_info['access_token'] = $this->_access_token;
+        $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
+        $result = json_decode($result,true);
+    /*    $rand_id = rand(1, 10);
+        if ($rand_id > 3) {
+            $result['success'] = 'Falie';
+
+        } else {
+            $result['success'] = 'true';
+
+        }*/
+        var_dump($result);
+        if (isset($result['success']) && ($result['success'] == 'true')) {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+
+        } else {
+            $return['status'] = false;
+            $return['info'] = isset($result['error_message']) ? $result['error_message'] : "error";
+        }
+        return $return;
+
+
     }
 
 
@@ -144,15 +167,16 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
-        $orderInfo['shipping_firstname'] = $orderDetail['buyerInfo']['firstName'];
-        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];
+        $orderInfo['shipping_firstname'] = $orderDetail['receiptAddress'] ['contactPerson'];
+/*        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];*/
+        $orderInfo['shipping_lastname'] = '';
         $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
         $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"] ["city"];
         $orderInfo['shipping_state'] = $orderDetail ["receiptAddress"] ["province"];
         $orderInfo['shipping_country'] = $orderDetail ["receiptAddress"] ["country"];
         $orderInfo['shipping_zipcode'] = $orderDetail ["receiptAddress"] ["zip"];
-        $orderInfo['status'] ='PAID';
+        $orderInfo['status'] = 'PAID';
 
         $mobileNo = isset($orderDetail ["receiptAddress"] ["mobileNo"]) ? $orderDetail ["receiptAddress"] ["mobileNo"] : '';
         $phoneCountry = isset($orderDetail ["receiptAddress"] ["phoneCountry"]) ? $orderDetail ["receiptAddress"] ["phoneCountry"] : '';
@@ -314,6 +338,47 @@ Class AliexpressAdapter implements AdapterInterface
     }
 
     /**
+     * 计算签名
+     * @param $apiInfo
+     * @param $parameter_arr
+     * @return string
+     */
+    public function getApiSignature($apiInfo, $parameter_arr)
+    {
+        ksort($parameter_arr);
+        $sign_str = '';
+        if (array_key_exists('domesticLogisticsCompanyId', $parameter_arr) && array_key_exists('domesticLogisticsCompany', $parameter_arr)) {
+            $domesticLogisticsCompanyIdIndex = 0; //在数组中的位置
+            $domesticLogisticsCompanyIndex = 0; //该元素在数组中的位置
+            $domesticLogisticsCompanyIdStr = $domesticLogisticsCompanyStr = ''; //中间变量
+            $i = 0;
+            $temp = array(); //中间变量
+            foreach ($parameter_arr as $key => $val) {
+                $temp[$i] = $key . $val;
+                if (in_array($key, array('domesticLogisticsCompanyId', 'domesticLogisticsCompany'))) {
+                    $index = $key . 'Index';
+                    $str = $key . 'Str';
+                    $$index = $i;
+                    $$str = $key . $val;
+                }
+                $i++;
+            }
+            //实现位置进行替换
+            $temp[$domesticLogisticsCompanyIdIndex] = $domesticLogisticsCompanyStr;
+            $temp[$domesticLogisticsCompanyIndex] = $domesticLogisticsCompanyIdStr;
+            $sign_str = implode('', $temp);
+            unset($temp);
+        } else {
+            foreach ($parameter_arr as $key => $val) {
+                $sign_str .= $key . $val;
+            }
+        }
+        $sign_str = $apiInfo . $sign_str;
+        $code_sign = strtoupper(bin2hex(hash_hmac("sha1", $sign_str, $this->_appsecret, true)));
+        return $code_sign;
+    }
+
+    /**
      * 获取acees_token
      * 判断access_token是否过期(10小时)
      */
@@ -359,7 +424,7 @@ Class AliexpressAdapter implements AdapterInterface
         curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
+       // curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER ['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
         curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
@@ -375,12 +440,105 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
-   
-    public function getMessages(){
-        
+
+    public function getMessages()
+    {
+
+        $msgSourcesArr =array('message_center','order_msg');
+        $method = 'api.queryMsgRelationList';
+        $filter = 'readStat';
+        $pageSize = 5;
+        $j = 0;
+        $message_list = [];
+
+        foreach ($msgSourcesArr as $Sources){
+            for($i=1; $i>0; $i++){
+                $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
+                $returnJson = $this->getJsonData($method,$para);
+                $message_array = json_decode($returnJson, true);
+                if(!empty($message_array['result'])){
+                    foreach ($message_array['result'] as $item){
+
+                        //最后一条消息是自己这边发送的 或者 卖家账号为空 跳过
+                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
+                            continue;
+                        }
+
+
+                        /**
+                         * 获取信息详情
+                         */
+
+                        $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+                        //$detail_array = json_decode($detailArrJson);
+                        //$detail_array = (array)$detail_array;
+                        $message_list[$j]['message_id'] = $item['channelId'];
+                        $message_list[$j]['from_name'] = addslashes($item['otherName']);
+                        $message_list[$j]['from'] = $item['otherLoginId'];
+                        $message_list[$j]['to'] = '收信人';
+                        $message_list[$j]['labels'] = '';
+                        $message_list[$j]['label'] = 'INBOX';
+                        $message_list[$j]['date'] = $item['messageTime'];
+                        $message_list[$j]['subject'] = '信息描述';
+                        $message_list[$j]['attachment'] = ''; //附件
+
+                        $message_list[$j]['message_type'] = $Sources;
+                        $message_list[$j]['rank'] = $item['rank'];
+                        $message_list[$j]['dealStat'] = $item['dealStat'];
+                        $message_list[$j]['channelId'] = $item['channelId'];
+                        $message_list[$j]['unreadCount'] = $item['unreadCount'];
+                        $message_list[$j]['readStat'] = $item['readStat'];
+
+                        $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
+                    }
+                }else{
+                    break;
+                }
+                $j++;
+            }
+        }
+
+        return (!empty($message_list)) ? $message_list : false;
     }
-    public function sendMessages(){
-        
+
+    public function sendMessages($replyMessage)
+    {
+        // TODO: Implement sendMessages() method.
+        //echo $this->_access_token;
+        $message_obj = $replyMessage->message;
+
+        if(!empty($message_obj)){
+
+             // step1:发信息
+
+            $send_param = [];
+            $send_param['channelId'] = $message_obj->message_id;
+            $send_param['buyerId'] = $message_obj->from;
+            $send_param['msgSources'] = $message_obj->'消息类型';
+            $send_param['content'] = $replyMessage->content;
+
+            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $api_return_array = json_decode($api_return,true);
+            if(isset($api_return_array['result']["isSuccess"])){
+                if($api_return_array['result']["isSuccess"]){
+
+                    //step2: 更新消息为已读
+                    $update_param = [];
+                    $update_param['channelId'] = $message_obj->message_id;
+                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
+
+                    $replyMessage->status = 'SENT';
+                }else{
+                    $replyMessage->status = 'FAIL';
+                }
+            }
+        }else{
+            $replyMessage->status = 'FAIL';
+        }
+        $replyMessage->save();
+
+        return $replyMessage->status== 'SENT' ? true : false;
     }
 
 

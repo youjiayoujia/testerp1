@@ -610,5 +610,4 @@ class ProductModel extends BaseModel
         }
         //
     }
-
 }

@@ -34,8 +34,8 @@ class LogisticsModel extends BaseModel
         'pool_quantity',
         'is_enable',
         'limit',
+        'driver',
     ];
-
 
     public $rules = [
         'create' => [
@@ -50,6 +50,7 @@ class LogisticsModel extends BaseModel
             'logistics_email_template_id' => 'required',
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
+            'driver' => 'required',
         ],
         'update' => [
             'code' => 'required',
@@ -63,6 +64,7 @@ class LogisticsModel extends BaseModel
             'logistics_email_template_id' => 'required',
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
+            'driver' => 'required',
         ],
     ];
 
@@ -103,7 +105,29 @@ class LogisticsModel extends BaseModel
 
     public function channelName()
     {
-        return $this->belongsToMany('App\Models\Logistics\ChannelNameModel', 'logistics_belongstos', 'logistics_id', 'logistics_channel_id');
+        return $this->belongsToMany('App\Models\Logistics\ChannelNameModel', 'logistics_belongstos', 'logistics_id',
+            'logistics_channel_id');
+    }
+
+    public function getApiConfigAttribute()
+    {
+        $config = [];
+        $config['type'] = $this->type;
+
+        $config['url'] = $this->supplier->url;
+        $config['userId'] = $this->supplier->customer_id;
+        $config['userPassword'] = $this->supplier->password;
+        $config['key'] = $this->supplier->secret_key;
+
+        $config['returnCompany'] = $this->emailTemplate->unit;
+        $config['returnContact'] = $this->emailTemplate->secret_key;
+        $config['returnPhone'] = $this->emailTemplate->phone;
+        $config['returnAddress'] = $this->emailTemplate->address;
+        $config['returnZipcode'] = $this->emailTemplate->zipcode;
+        $config['returnCountry'] = $this->emailTemplate->country_code;
+        $config['returnProvince'] = $this->emailTemplate->province;
+        $config['returnCity'] = $this->emailTemplate->city;
+        return $config;
     }
 
     public function getDockingNameAttribute()
@@ -112,10 +136,10 @@ class LogisticsModel extends BaseModel
         return $arr[$this->docking];
     }
 
-    public function hasLimits($id) 
+    public function hasLimits($id)
     {
         $arr = explode(',', $this->limit);
-        if(in_array($id, $arr)) {
+        if (in_array($id, $arr)) {
             return true;
         }
         return false;
@@ -124,8 +148,8 @@ class LogisticsModel extends BaseModel
     public function inType($id)
     {
         $multi = $this->channelName;
-        foreach($multi as $single) {
-            if($single->id == $id) {
+        foreach ($multi as $single) {
+            if ($single->id == $id) {
                 return true;
             }
         }

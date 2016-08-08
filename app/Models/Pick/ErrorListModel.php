@@ -3,6 +3,7 @@
 namespace App\Models\Pick;
 
 use App\Base\BaseModel;
+use App\Models\StockModel;
 
 class ErrorListModel extends BaseModel
 {
@@ -19,8 +20,9 @@ class ErrorListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picklist_id', 'package_id', 'status', 'process_by', 'process_time', 'created_at'];
+    protected $fillable = ['item_id', 'packageNum', 'warehouse_position_id', 'warehouse_id', 'quantity', 'created_at'];
 
+    public $searchFields = [];
     // 规则验证
     public $rules = [
         'create' => [
@@ -29,18 +31,43 @@ class ErrorListModel extends BaseModel
         ]
     ];
 
-    public function picklist()
+    public function getMixedSearchAttribute()
     {
-        return $this->belongsTo('App\Models\PickListModel', 'picklist_id', 'id');
+        return [
+            'filterFields' => [
+            ],
+            'filterSelects' => [
+            ],
+            'sectionSelect' => [
+            ],
+            'relatedSearchFields' => [
+            ],
+            'selectRelatedSearchs' => [
+            ]
+        ];
     }
 
-    public function package()
+    public function item()
     {
-        return $this->belongsTo('App\Models\PackageModel', 'package_id', 'id');
+        return $this->belongsTo('App\Models\ItemModel', 'item_id', 'id');
     }
 
-    public function processByName()
+    public function warehouse()
     {
-        return $this->belongsTo('App\Models\UserModel', 'process_by', 'id');
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+    }
+
+    public function warehousePosition()
+    {
+        return $this->belongsTo('App\Models\Warehouse\PositionModel', 'warehouse_position_id', 'id');
+    }
+
+    public function getQuantityAttribute()
+    {
+        $stock = StockModel::where(['item_id' => $this->item_id, 'warehouse_position_id' => $this->warehouse_position_id])->first();
+        if(!$stock) {
+            return false;
+        }
+        return $stock->all_quantity;
     }
 }

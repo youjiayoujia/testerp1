@@ -15,7 +15,7 @@ use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
 use App\Modules\Channel\Adapter\CdiscountAdapter;
 
-Class ChannelModule
+class ChannelModule
 {
     public function driver($adapter, $config)
     {
@@ -43,6 +43,12 @@ Class ChannelModule
         return new EbayAdapter($config);
     }
 
+    /**
+     * 亚马逊接口驱动
+     *
+     * @param $config
+     * @return AmazonAdapter
+     */
     public function createWishDriver($config)
     {
         return new WishAdapter($config);

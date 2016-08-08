@@ -53,6 +53,7 @@ class LogisticsController extends Controller
             'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
             'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
             'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
+            'channels' => ChannelModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -212,6 +213,30 @@ class LogisticsController extends Controller
         }
         $str = "<option class='logis' value='".$logistics->id."'>".$logistics->code."</option>";
         return $str;
+    }
+
+    /**
+     * 获取物流商信息
+     */
+    public function ajaxSupplier()
+    {
+        if (request()->ajax()) {
+            $supplier = trim(request()->input('logistics_supplier_id'));
+            $buf = SupplierModel::where('name', 'like', '%' . $supplier . '%')->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach ($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if ($total) {
+                return json_encode(['results' => $arr, 'total' => $total]);
+            } else {
+                return json_encode(false);
+            }
+        }
+
+        return json_encode(false);
     }
 
 }

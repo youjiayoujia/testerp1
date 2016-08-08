@@ -8,6 +8,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\Channel\AccountModel;
+use App\Models\Message\MessageModel;
+use App\Models\ChannelModel;
 use Channel;
 
 
@@ -25,9 +27,8 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
     {
         //
         $this->reply = $reply;
-
+        $this->description = 'Send message to'.$this->reply['to_email'].'(message_id:'.$this->reply['message_id'].') in SYS.';
     }
-
     /**
      * Execute the job.
      *
@@ -35,18 +36,29 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        //
-        //遍历账号
-        foreach (AccountModel::all() as $account) {
 
-            if($account->channel->driver == 'amazon' && $account->message_secret !=''){ //亚马逊渠道邮件
+        if($this->reply){
+            $account = $this->reply->message->account;
+
+           // if($account->channel->driver == 'aliexpress') //亚马逊渠道邮件
+
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
+                if($channel->sendMessages($this->reply)){//发送渠道message
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'the message send to ['.$this->reply['to_email'].'] message successful!';
+                }else{
+                    $this->result['status'] = 'fail';
+                    $this->result['remark'] = 'the message send to ['.$this->reply['to_email'].'] message failed!';
+                }
 
-                $channel->sendMessages($account);//发送渠道message
 
-            }
-
+        }else{
+            $this->result['status'] = 'fail';
+            $this->result['remark'] = 'not find message';
         }
+        $start = microtime(true);
 
+        $this->lasting = round(microtime(true) - $start, 3);
+        $this->log('SendMessages', addslashes($this->reply));
     }
 }

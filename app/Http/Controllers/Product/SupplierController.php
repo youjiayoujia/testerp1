@@ -56,9 +56,9 @@ class SupplierController extends Controller
 		if($model=='imageError'){
 			return redirect(route('productSupplier.create'))->with('alert', $this->alert('danger', '图片格式不正确.'));
 		}else{
-			SupplierChangeHistoryModel::create([              
+			SupplierChangeHistoryModel::create([
 				'supplier_id' => $model->id,
-				'to' =>request()->input('purchase_id'),
+				/*'to' =>request()->input('purchase_id'),*/
 				'adjust_by' => '3',
 			]);
         return redirect($this->mainIndex);
@@ -99,6 +99,7 @@ class SupplierController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $data=request()->all();
+        $this->validate(request(), $this->model->rules('update'));
         if($model->purchase_id != request('purchase_id')) {
             SupplierChangeHistoryModel::create([              
                 'supplier_id' => $id,

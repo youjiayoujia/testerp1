@@ -32,7 +32,7 @@ class SupplierModel extends BaseModel
         'address',
         'type',
         'telephone',
-        'purchase_id',
+    /*    'purchase_id',*/
         'level_id',
         'created_by',
         'purchase_time',
@@ -41,24 +41,29 @@ class SupplierModel extends BaseModel
         'pay_type',
         'qualifications',
         'examine_status',
+        'qq',
+        'wangwang'
     ];
 
     //查询
-    public $searchFields = ['name', 'telephone'];
+    public $searchFields = ['company'=>'公司名称', 'telephone'=>'手机','contact_name'=>'联系人','qq'=>'QQ','wangwang'=>'旺旺'];
 
     //验证规则
     public $rules = [
         'create' => [
-            'name' => 'required|max:128|unique:product_suppliers,name',
-            'purchase_id' => 'required|integer',
+/*            'name' => 'required|max:128|unique:product_suppliers,name',*/
+            /*'purchase_id' => 'required|integer',*/
             'telephone' => 'required|max:256|digits_between:8,11',
             'purchase_time' => 'required|integer',
             'bank_account' => 'required|string',
         ],
         'update' => [
-            'name' => 'required|max:128|unique:product_suppliers,name, {id}',
-            'purchase_id' => 'required|integer',
-            'telephone' => 'required|max:256|digits_between:8,11'
+/*            'name' => 'required|max:128',*/
+            /*'purchase_id' => 'required|integer',*/
+            'telephone' => 'required|max:256|digits_between:8,11',
+            'purchase_time' => 'required|integer',
+            'bank_account' => 'required|string',
+
         ]
     ];
 
@@ -128,7 +133,6 @@ class SupplierModel extends BaseModel
      */
     public function updateSupplier($id, $data, $file = null)
     {
-
         if ($data['type'] == 0 && $file != null) { //线下类型
             $path = config('product.product_supplier.file_path');
                 if ($file->getClientOriginalName()) {

@@ -23,15 +23,15 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="code" placeholder="跟踪号" name='code' value="{{ old('code') }}">
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-3" id="package_id">
             <label for="package_id" class="control-label">包裹ID</label>
             <input class="form-control" id="package_id" placeholder="包裹ID" name='package_id' value="{{ old('package_id') }}" disabled>
         </div>
-        <div class="form-group col-lg-3">
+        <div class="form-group col-lg-3" id="used_at">
             <label for="used_at" class="control-label">使用时间</label>
             <input class="form-control" id="used_at" placeholder="使用时间" name='used_at' value="{{ old('used_at') }}" disabled>
         </div>
-        <div class="form-group col-lg-12">
+        <div class="form-group col-lg-12" id="status">
             <label for="status" class="control-label">状态</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <div class="radio">
@@ -50,5 +50,8 @@
 <script type='text/javascript'>
     $(document).ready(function(){
         $('#used_at').cxCalendar();
+        document.getElementById('package_id').style.display='none';
+        document.getElementById('used_at').style.display='none';
+        document.getElementById('status').style.display='none';
     });
 </script>

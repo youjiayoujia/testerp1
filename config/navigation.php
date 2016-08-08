@@ -96,6 +96,11 @@ return [
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
             ],
+            [
+                'name' => '标记发货规则设置',
+                'url' => 'orderMarkLogic.index',
+                'icon' => '',
+            ],
         ],
     ],
     //仓储导航
@@ -126,6 +131,21 @@ return [
                     'url' => 'errorList.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '创建模板',
+                    'url' => 'exportPackage.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '模板数据导出',
+                    'url' => 'exportPackage.exportPackageView',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '退货处理',
+                    'url' => 'package.returnGoods',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [
@@ -149,13 +169,8 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '入库',
-                    'url' => 'stockIn.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '出库',
-                    'url' => 'stockOut.index',
+                    'name' => '出入库',
+                    'url' => 'stockInOut.index',
                     'icon' => '',
                 ],
                 [
@@ -404,6 +419,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            '事件历史' => [
+                [
+                    'name' => '历史记录',
+                    'url' => 'eventChild.index',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //系统导航
@@ -473,7 +495,11 @@ return [
                 'url' => 'paypal.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'paypal固定税率',
+                'url'  => 'paypal.ShowPaypalRate',
+                'icon' => '',
+            ],
         ],
     ],
 

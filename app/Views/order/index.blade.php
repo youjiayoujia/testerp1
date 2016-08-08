@@ -1,11 +1,13 @@
 @extends('common.table')
 @section('tableHeader')
+    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuanOrder()">全选</th>
     <th class="sort" data-field="id">ID</th>
     <th class="sort" data-field="ordernum">订单号</th>
     <th class="sort" data-field="channel_ordernum">渠道订单号</th>
     <th class="sort" data-field="channel">渠道</th>
     <th class="sort" data-field="channel_account_id">渠道账号</th>
     <th>邮箱</th>
+    <th>买家ID</th>
     <th>物流</th>
     <th>收货人</th>
     <th>国家</th>
@@ -20,6 +22,9 @@
 @section('tableBody')
     @foreach($data as $order)
         <tr class="{{ $order->status_color }}">
+            <td>
+                <input type="checkbox" name="tribute_id" value="{{$order->id}}">
+            </td>
             <td>{{ $order->id }}</td>
             <td>{{ $order->ordernum }}</td>
             <td>
@@ -31,6 +36,7 @@
             <td>{{ $order->channel ? $order->channel->name : '' }}</td>
             <td>{{ $order->channelAccount ? $order->channelAccount->alias : '' }}</td>
             <td>{{ $order->email }}</td>
+            <td>{{ $order->by_id }}</td>
             <td>{{ $order->shipping }}</td>
             <td>{{ $order->shipping_firstname . ' ' . $order->shipping_lastname }}</td>
             <td>{{ $order->shipping_country }}</td>
@@ -70,6 +76,11 @@
                     <abbr title="ZipCode">Z:</abbr> {{ $order->shipping_zipcode }}
                     <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
                 </address>
+                @if($order->customer_remark)
+                    <div class="text-danger">
+                        {{ $order->customer_remark }}
+                    </div>
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div class="text-danger">
@@ -85,6 +96,7 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
+                            <div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>
                             @if($orderItem->item)
                                 <div class="col-lg-2">
                                     <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
@@ -99,7 +111,7 @@
                                 <div class="col-lg-2">
                                     <strong>{{ $orderItem->item->status_name }}</strong>
                                 </div>
-                                <div class="col-lg-4">{{ $orderItem->item->c_name }}</div>
+                                <div class="col-lg-3">{{ $orderItem->item->c_name }}</div>
                             @else
                                 <div class="col-lg-2">
                                     <strong class="text-danger">未匹配</strong>
@@ -139,18 +151,29 @@
                         </a>
                     @endif
                     @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
-                        <a href="{{ route('withdraw', ['id'=>$order->id]) }}" class="btn btn-danger btn-xs">
-                            <span class="glyphicon glyphicon-pencil"></span> 撤单
-                        </a>
+                        <button class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#withdraw{{ $order->id }}"
+                                title="撤单">
+                            <span class="glyphicon glyphicon-link"></span> 撤单
+                        </button>
                         <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                            data-id="{{ $order->id }}"
                            data-url="{{ route('order.destroy', ['id' =>$order->id]) }}">
                             <span class="glyphicon glyphicon-pencil"></span> 删除
                         </a>
                     @endif
-                    <a href="{{ route('refund', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
-                        <span class="glyphicon glyphicon-pencil"></span> 退款
-                    </a>
+                    @foreach($order->items as $item)
+                        @if($item->is_refund == 0)
+                            <button class="btn btn-primary btn-xs"
+                                    data-toggle="modal"
+                                    data-target="#refund{{ $order->id }}"
+                                    title="退款">
+                                <span class="glyphicon glyphicon-link"></span> 退款
+                            </button>
+                            <?php break ?>
+                        @endif
+                    @endforeach
                     <button class="btn btn-primary btn-xs"
                             data-toggle="modal"
                             data-target="#remark{{ $order->id }}"
@@ -172,18 +195,241 @@
                             <span class="glyphicon glyphicon-pencil"></span> 恢复正常
                         </a>
                     @endif
-                    <button class="btn btn-primary btn-xs"
-                            data-toggle="modal"
-                            data-target="#package{{ $order->id }}"
-                            title="包裹">
-                        <span class="glyphicon glyphicon-link"></span> 包裹
-                    </button>
+                    @if(count($order->packages) > 0)
+                        <button class="btn btn-primary btn-xs"
+                                data-toggle="modal"
+                                data-target="#package{{ $order->id }}"
+                                title="包裹">
+                            <span class="glyphicon glyphicon-link"></span> 包裹
+                        </button>
+                    @endif
                     <a href="{{ route('order.show', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 查看
                     </a>
                 </div>
             </td>
         </tr>
+        <div class="modal fade" id="withdraw{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                        {!! csrf_field() !!}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">撤单</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-lg-6">
+                                    <label for="withdraw" class='control-label'>撤单原因</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select class="form-control" name="withdraw" id="withdraw">
+                                        <option value="NULL">==选择原因==</option>
+                                        @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
+                                            <option value="{{ $withdraw_key }}" {{ old('withdraw') == $withdraw_key ? 'selected' : '' }}>
+                                                {{ $withdraw }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-lg-6">
+                                    <label for="withdraw_reason" class='control-label'>原因</label>
+                                    <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason">{{ old('withdraw_reason') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="refund{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
+                        {!! csrf_field() !!}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">退款信息</h4>
+                        </div>
+                        <div class="modal-body">
+                            <label class='control-label'>历史退款</label>
+                            @if($order->refunds->toArray())
+                                <div class='row'>
+                                    <div class="form-group col-sm-2">
+                                        <label for="id" class='control-label'>退款ID</label>
+                                    </div>
+                                    <div class="form-group col-sm-2">
+                                        <label for="refund_amount" class='control-label'>退款金额</label>
+                                    </div>
+                                    <div class="form-group col-sm-4">
+                                        <label for="reason" class='control-label'>退款原因</label>
+                                    </div>
+                                    <div class="form-group col-sm-4">
+                                        <label for="created_at" class='control-label'>申请时间</label>
+                                    </div>
+                                </div>
+                                @foreach($order->refunds as $refund)
+                                    <div class="row text-danger">
+                                        <div class="col-lg-2">{{ $refund->id }}</div>
+                                        <div class="col-lg-2">{{ $refund->refund_amount }}</div>
+                                        <div class="col-lg-4">{{ $refund->reason ? $refund->reason_name : '' }}</div>
+                                        <div class="col-lg-4">{{ $refund->created_at }}</div>
+                                    </div>
+                                    <div class="divider"></div>
+                                @endforeach
+                            @else
+                                <div class="divider"></div>
+                            @endif
+                            <div class='row'>
+                                <div class="form-group col-lg-4">
+                                    <label for="ordernum" class='control-label'>订单号</label>
+                                    <label class="text-danger">(已付款时长: {{ '' }} 天)</label>
+                                    <input class="form-control" id="ordernum" placeholder="订单号" name='ordernum' value="{{ old('ordernum') ? old('ordernum') : $order->ordernum }}" readonly>
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="channel_account_id">渠道账号</label>
+                                    <input class="form-control" id="channel_account_id" placeholder="渠道账号" name='channel_account_id' value="{{ old('channel_account_id') ? old('channel_account_id') : $order->channelAccount->alias }}" readonly>
+                                </div>
+                                {{--<div class="form-group col-lg-2" id="payment">--}}
+                                    {{--<label for="payment_date" class='control-label'>支付时间</label>--}}
+                                    {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
+                                    {{--<input class="form-control" id="payment_date" placeholder="支付时间" name='payment_date' value="{{ old('payment_date') }}">--}}
+                                {{--</div>--}}
+                                <div class="form-group col-lg-2">
+                                    <label for="refund_amount" class='control-label'>退款金额</label>
+                                    <input class="form-control" id="refund_amount{{ $order->id }}" placeholder="退款金额" name='refund_amount' value="{{ old('refund_amount') }}">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="price" class='control-label'>确认金额</label>
+                                    <input class="form-control" id="price{{ $order->id }}" placeholder="确认金额" name='price' value="{{ old('price') }}">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="refund_currency" class='control-label'>退款币种</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select class="form-control" name="refund_currency" id="refund_currency">
+                                        @foreach($currencys as $refund_currency)
+                                            <option value="{{ $refund_currency->code }}" {{ old('refund_currency') }}>
+                                                {{ $refund_currency->code }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label for="refund" class='control-label'>退款方式</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select class="form-control" name="refund" id="refund">
+                                        <option value="NULL">==退款方式==</option>
+                                        @foreach(config('order.refund') as $refund_key => $refund)
+                                            <option value="{{ $refund_key }}" {{ old('refund') }}>
+                                                {{ $refund }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label for="reason" class='control-label'>退款原因</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select class="form-control" name="reason" id="reason">
+                                        <option value="NULL">==退款原因==</option>
+                                        @foreach(config('order.reason') as $reason_key => $reason)
+                                            <option value="{{ $reason_key }}" {{ old('reason') }}>
+                                                {{ $reason }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-4">
+                                    <label for="type" class='control-label'>退款类型</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select class="form-control type" name="type" id="{{ $order->id }}">
+                                        <option value="NULL">==退款类型==</option>
+                                        @foreach(config('order.type') as $type_key => $type)
+                                            <option value="{{ $type_key }}" {{ old('type') }}>
+                                                {{ $type }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            @if($order->items->toArray())
+                                <div class='row'>
+                                    <div class="form-group col-sm-2">
+                                        <input type="checkbox" isCheck="true" id="checkall{{ $order->id }}" placeholder="" onclick="quanxuan('{{ $order->id }}')">全选
+                                    </div>
+                                    <div class="form-group col-sm-2">
+                                        <label for="id" class='control-label'>ID</label>
+                                    </div>
+                                    <div class="form-group col-sm-2">
+                                        <label for="sku" class='control-label'>sku</label>
+                                    </div>
+                                    <div class="form-group col-sm-2">
+                                        <label for="price" class='control-label'>单价</label>
+                                    </div>
+                                    <div class="form-group col-sm-2">
+                                        <label for="quantity" class='control-label'>数量</label>
+                                    </div>
+                                </div>
+                                @foreach($order->items as $key => $orderItem)
+                                    @if($orderItem->is_refund == 0)
+                                        <div class='row'>
+                                            <div class="form-group col-sm-2">
+                                                <input type="checkbox" name="tribute_id[]" value="{{$orderItem->id}}">
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <input type='text' class="id" id="arr[id][{{$key}}]" style="border: 0" placeholder="id" name='arr[id][{{$key}}]' value="{{ old('arr[id][$key]') ? old('arr[id][$key]') : $orderItem->id }}" readonly>
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <input type='text' class="sku" id="arr[sku][{{$key}}]" style="border: 0" placeholder="sku" name='arr[sku][{{$key}}]' value="{{ old('arr[sku][$key]') ? old('arr[sku][$key]') : $orderItem->sku }}" readonly>
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <input type='text' class="form-control price" id="arr[price][{{$key}}]" placeholder="单价" name='arr[price][{{$key}}]' value="{{ old('arr[price][$key]') ? old('arr[price][$key]') : $orderItem->price }}" readonly>
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <input type='text' class="form-control quantity" id="arr[quantity][{{$key}}]" placeholder="数量" name='arr[quantity][{{$key}}]' value="{{ old('arr[quantity][$key]') ? old('arr[quantity][$key]') : $orderItem->quantity }}" readonly>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @endif
+                            <div class="row">
+                                <div class="form-group col-lg-12">
+                                    <label for="memo" class='control-label'>Memo(只能填写英文)</label>
+                                    <label class="text-danger">发给客户看的</label>
+                                    <input class="form-control" id="memo" placeholder="" name='memo' value="{{ old('memo') }}">
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <label for="detail_reason" class='control-label'>详细原因</label>
+                                    <label class="text-danger">挂号的,必须填写查询结果</label>
+                                    <textarea class="form-control" rows="3" name="detail_reason" id="detail_reason">{{ old('detail_reason') }}</textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-lg-12">
+                                    <label for="image">上传截图：</label>
+                                    <label class="text-danger">(图片最大支持上传40Kb)</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input name='image' type='file'/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="remark{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -207,6 +453,7 @@
                                     <div class="divider"></div>
                                 @endforeach
                             @else
+                                <div class="divider"></div>
                             @endif
                             <div class="row">
                                 <div class="form-group col-lg-12">
@@ -275,6 +522,69 @@
     @endforeach
 @stop
 @section('tableToolButtons')
+    <div class="btn-group" role="group">
+        <input class="form-control lr" id="lr" placeholder="利润" name="lr">
+    </div>
+    <div class="btn-group" role="group">
+        <select class="form-control sx" name="sx" id="sx">
+            <option value="null">利润筛选</option>
+            <option value="high">高于</option>
+            <option value="low">低于</option>
+        </select>
+    </div>
+    <div class="btn-group" role="group">
+        <select class="form-control special" name="special" id="special">
+            <option value="null">特殊要求</option>
+            <option value="yes">有特殊要求</option>
+        </select>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-info"
+                data-toggle="modal"
+                data-target="#withdraw"
+                title="SMT批量撤单">
+            <span class="glyphicon glyphicon-link"></span> SMT批量撤单
+        </button>
+    </div>
+    <div class="modal fade" id="withdraw" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                {!! csrf_field() !!}
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-left" id="myModalLabel">SMT批量撤单</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group text-left col-lg-6">
+                            <label for="withdraw" class='control-label'>撤单原因</label>
+                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                            <select class="form-control withdraw" name="withdraw" id="withdraw">
+                                <option value="NULL">==选择原因==</option>
+                                @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
+                                    <option value="{{ $withdraw_key }}" {{ old('withdraw') == $withdraw_key ? 'selected' : '' }}>
+                                        {{ $withdraw }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group text-left col-lg-6">
+                            <label for="withdraw_reason" class='control-label'>原因</label>
+                            <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason">{{ old('withdraw_reason') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary sub">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
     @parent
 @stop
 @section('childJs')
@@ -293,6 +603,26 @@
                             window.location.reload();
                         }
                     });
+                }
+            });
+
+            $('.special').change(function () {
+                var special = $('.special').val();
+                if (special != null) {
+                    location.href = "{{ route('order.index') }}?special=" + special;
+                }
+            });
+
+            $('.sx').change(function () {
+                var lr = $('.lr').val();
+                if (lr == '') {
+                    alert('请输入利润!');
+                    $('.sx').val('null');
+                }else {
+                    var sx = $('.sx').val();
+                    if (sx != null) {
+                        location.href = "{{ route('order.index') }}?sx=" + sx +"&lr=" + lr;
+                    }
                 }
             });
 
@@ -328,5 +658,71 @@
                 }
             });
         });
+
+        //全选订单产品
+        function quanxuan(id)
+        {
+            var collid = document.getElementById("checkall"+id);
+            var coll = document.getElementsByName("tribute_id[]");
+            if (collid.checked){
+                for(var i = 0; i < coll.length; i++)
+                    coll[i].checked = true;
+                $('.price').style.readonly = 'false';
+            }else{
+                for(var i = 0; i < coll.length; i++)
+                    coll[i].checked = false;
+            }
+        }
+
+        $('.type').click(function() {
+            var type = $(this).val();
+            var id = $(this).attr('id');
+            if (type == 'FULL') {
+                document.getElementById('price'+id).readOnly = true;
+                document.getElementById('refund_amount'+id).readOnly = true;
+            } else {
+                document.getElementById('price'+id).readOnly = false;
+                document.getElementById('refund_amount'+id).readOnly = false;
+            }
+        });
+
+        //SMT批量撤单
+        $('.sub').click(function () {
+            if (confirm('确认提交?')) {
+                var checkbox = document.getElementsByName("tribute_id");
+                var order_ids = "";
+                var withdraw = $('.withdraw').val();
+                var withdraw_reason = $('#withdraw_reason').val();
+                for (var i = 0; i < checkbox.length; i++) {
+                    if(!checkbox[i].checked)
+                        continue;
+                    order_ids += checkbox[i].value+",";
+                }
+                order_ids = order_ids.substr(0,(order_ids.length)-1);
+                $.ajax({
+                    url : "{{ route('withdrawAll') }}",
+                    data : {order_ids : order_ids, withdraw : withdraw, withdraw_reason : withdraw_reason},
+                    dataType : 'json',
+                    type : 'get',
+                    success:function(result){
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+
+        //全选订单
+        function quanxuanOrder()
+        {
+            var collid = document.getElementById("checkall");
+            var coll = document.getElementsByName("tribute_id");
+            if (collid.checked){
+                for(var i = 0; i < coll.length; i++)
+                    coll[i].checked = true;
+            }else{
+                for(var i = 0; i < coll.length; i++)
+                    coll[i].checked = false;
+            }
+        }
     </script>
 @stop

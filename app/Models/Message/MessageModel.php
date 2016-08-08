@@ -30,7 +30,7 @@ class MessageModel extends BaseModel{
         'label',
     ];
 
-    public $searchFields = ['id','subject', 'from_name', 'from', 'to'];
+    public $searchFields = ['id'=>'ID','subject'=>'主题', 'from_name'=>'发信人', 'from'=>'发件邮箱'];
 
     public $rules = [];
 
@@ -273,5 +273,45 @@ class MessageModel extends BaseModel{
 
         ];
     }
+
+    public function getMessageInfoAttribute(){
+        if($this->content){
+            //$content_array = unserialize($this->content);
+            $content_array = unserialize(base64_decode($this->content));
+            $html = '';
+            foreach($content_array as $key => $content){
+                switch ($key){
+                    case 'wish':
+                        foreach ($content as $k => $item){
+                           if(!empty($item['Reply']['message'])){
+                               if($item['Reply']['sender'] == 'user'){
+                                   $html .= '<p>'.$item['Reply']['sender'].'-'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-warning" role="alert">'.$item['Reply']['message'].'</div>';
+                               }else{
+                                   $html .= '<p style="text-align:right">'.$item['Reply']['sender'].'-'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-success" role="alert">'.$item['Reply']['message'].'</div>';
+                               }
+                           }
+                        }
+                        break;
+                    case 'aliexpress':
+                        foreach ($content->result as $k => $item){
+                            $html .= '<p>'.$item->senderName.':</p>';
+                            $html .= '<div class="alert alert-success" role="alert">'.$item->content.'<a href="'.$item->summary->orderUrl.'">orderUrl</a></div>';
+                        }
+
+
+
+                    default :
+                        echo 'invalid message type';
+                }
+            }
+            return $html;
+        }else{
+            return '';
+        }
+    }
+
+
 
 }

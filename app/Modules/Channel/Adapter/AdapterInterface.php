@@ -22,7 +22,7 @@ interface AdapterInterface
      *
      * @param $startDate
      * @param $endDate
-     * @param array $status
+     * @param array $status呵da
      * @param int $perPage
      * @return $orderArray
      *
@@ -69,13 +69,20 @@ interface AdapterInterface
      *      ],
      * ]
      */
-    public function listOrders($startDate, $endDate, $status = [], $perPage = 10);
+    public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = null);
 
     /**
      * 回传物流信息
      *
+     * $tracking_info =[
+     * 'id' => '',//wish 使用
+     * 'tracking_number' =>'',  //wish 使用
+     * 'tracking_provider' =>'', //wish 使用
+     * 'ship_note' =>'' //wish 使用
+     * ]
+     *
      */
-    public function returnTrack();
+    public function returnTrack($tracking_info);
 
     /**
      * 获取平台邮件
@@ -110,7 +117,7 @@ interface AdapterInterface
      */
     public function getMessages();
 
-    public function sendMessages();
+    public function sendMessages($replyMessage);
 
 
 }

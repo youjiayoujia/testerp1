@@ -16,6 +16,7 @@ class CreateLogisticsTemplates extends Migration
             $table->increments('id')->comment('编号');
             $table->string('name')->comment('面单名称');
             $table->string('view')->comment('视图');
+            $table->string('size')->comment('尺寸');
             $table->timestamps();
             $table->softDeletes();
         });

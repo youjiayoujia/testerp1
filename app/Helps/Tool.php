@@ -1,8 +1,8 @@
 <?php
 namespace App\Helps;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use DNS1D;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Tool
 {
@@ -17,9 +17,9 @@ class Tool
         }
     }
 
-    public function barcodePrint($content, $type = 'C128')
+    public function barcodePrint($content, $type = 'C128', $width = '3', $height='33')
     {
-        return DNS1D::getBarcodeHTML($content, $type);
+        return DNS1D::getBarcodeHTML($content, $type, $width, $height);
     }
 
     public function getFileExtension($fileName)
@@ -168,9 +168,15 @@ class Tool
                 $i = count($tmpErpSku) - 1;
                 $newSku = $tmpErpSku[$i];
             }
-            $newSku =explode('#',$newSku);
+            $newSku = explode('#', $newSku);
             $newSku = $newSku[0];
 
+
+            if (strpos($newSku, 'FBA') !== false) {
+
+                $newSku =explode('FBA',$newSku);
+                $newSku =$newSku[1];
+            }
 
             $qty = 1;
             if (strpos($newSku, '(') !== false) {
@@ -213,7 +219,8 @@ class Tool
      * @param string $specialChars 是否有特殊字符
      * @return string
      */
-    public function randString($length, $specialChars = false) {
+    public function randString($length, $specialChars = false)
+    {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         if ($specialChars) {
             $chars .= '!@#$%^&*()';
@@ -226,5 +233,25 @@ class Tool
         }
         return $result;
     }
-    
+
+    public function getPercent($num)
+    {
+        return $num . '%';
+    }
+
+
+    public function isCheckedByJson($field, $value, $model = null, $default = false)
+    {
+        if (old($field) == $value) {
+            return 'checked';
+        } elseif ($model) {
+           $value_array = json_decode($model->$field,true);
+            if(in_array($value,$value_array)){
+                return 'checked';
+            }
+        } elseif ($default) {
+            return 'checked';
+        }
+        return false;
+    }
 }

@@ -148,11 +148,27 @@ class OrderController extends Controller
     public function index()
     {
         request()->flash();
+        $sx = request()->input('sx');
+        $lr = request()->input('lr');
+        $special = request()->input('special');
+        if ($sx != null && $lr != '') {
+            if ($sx == 'high') {
+                $order = $this->model->where('profit_rate', '>=', $lr);
+            }else {
+                $order = $this->model->where('profit_rate', '<=', $lr);
+            }
+        } else {
+            $order = $this->model;
+        }
+        if ($special == 'yes') {
+            $order = $this->model->where('customer_remark', '!=', '');
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($order),
             'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
+            'currencys' => CurrencyModel::all(),
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -240,7 +256,6 @@ class OrderController extends Controller
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
-        $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
         $data['order_id'] = $id;
         $model->refundCreate($data, request()->file('image'));
@@ -432,11 +447,29 @@ class OrderController extends Controller
         return 1;
     }
 
+    /**
+     * 批量撤单
+     *
+     * @return int
+     */
+    public function withdrawAll()
+    {
+        $order_ids = request()->input('order_ids');
+        $order_ids_arr = explode(',', $order_ids);
+        $data = request()->all();
+        foreach($order_ids_arr as $id) {
+            if($this->model->find($id)) {
+                $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
+            }
+        }
+        return 1;
+    }
+
     public function withdrawUpdate($id)
     {
         request()->flash();
         $data = request()->all();
-        $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw' => $data['withdraw']]);
+        $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
 
         return redirect($this->mainIndex);
     }

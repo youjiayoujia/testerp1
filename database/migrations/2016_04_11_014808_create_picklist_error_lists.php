@@ -14,11 +14,11 @@ class CreatePicklistErrorLists extends Migration
     {
         Schema::create('picklist_error_lists', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('picklist_id')->comment('拣货单id')->default(0);
-            $table->integer('package_id')->comment('package id号')->default(0);
-            $table->enum('status', ['0', '1'])->comment('状态')->default(0);
-            $table->integer('process_by')->comment('处理人')->default(0);
-            $table->timestamp('process_time')->comment('处理时间')->default(NULL);
+            $table->integer('item_id')->comment('itemId')->default(0);
+            $table->string('packageNum')->comment('packageNum')->default(NULL);
+            $table->integer('warehouse_position_id')->comment('库位')->default(0);
+            $table->integer('warehouse_id')->comment('仓库')->default(0);
+            $table->integer('quantity')->comment('库存')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

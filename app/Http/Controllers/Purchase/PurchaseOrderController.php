@@ -455,13 +455,17 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-        $response['metas']['title']='采购收货';
+        $response['metas']['title']='采购收货与入库';
         return view($this->viewPath . 'recieve', $response);
     }
 
     public function ajaxRecieve(){
         $id = request()->input('id');
         $purchase_order = $this->model->find($id);
+
+        if (!$purchase_order) {
+            return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
+        }
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
@@ -557,6 +561,9 @@ class PurchaseOrderController extends Controller
         $id = request()->input('id');
 
         $purchase_order = $this->model->find($id);
+        if (!$purchase_order) {
+            return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
+        }
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,

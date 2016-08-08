@@ -286,15 +286,15 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '采购收货',
+                    'name' => '采购收货和入库',
                     'url' => 'recieve',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '供应链' => [
                 [

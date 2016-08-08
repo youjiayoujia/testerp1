@@ -3,7 +3,7 @@
     <div class="panel panel-default">    
         <div class="panel-body">
            <div class="form-group col-lg-2">
-                <strong>采购单号</strong>       
+                <strong>收货</strong>       
                 <input class="form-control" id="p_id" placeholder="采购单号" name='post_coding' value="">
                 <button class="item_receive">展开单据</button>
             </div>
@@ -16,7 +16,7 @@
     <div class="panel panel-default">    
         <div class="panel-body">
            <div class="form-group col-lg-2">
-                <strong>采购单号</strong>       
+                <strong>入库</strong>       
                 <input class="form-control" id="p_id1" placeholder="采购单号" name='post_coding' value="">
                 <button class="item_inwarehouse">展开单据</button>
             </div>

@@ -319,6 +319,13 @@ class MessageModel extends BaseModel{
         }
     }
 
+    //渠道信息特殊属性
+/*    public function getChannelMessageFieldsAttribute(){
+        return $this->channel_message_fields;
+        return unserialize(base64_decode($this->channel_message_fields));
+
+    }*/
+
 
 
 }

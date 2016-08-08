@@ -394,28 +394,27 @@ class TestController extends Controller
         $fields = unserialize(base64_decode($message_obj->channel_message_fields));
         dd($fields);exit;*/
 
-/*
-         $reply_obj = ReplyModel::find(28565);
+
+         $reply_obj = ReplyModel::find(28569);
 
           foreach (AccountModel::all() as $account) {
-            if( $account->account == '15899691882@163.com'){ //测试diver
+            if( $account->account == 'rebeauty'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->sendMessages($reply_obj);
                 print_r($messageList);exit;
 
             }
-        }*/
-
-        foreach (AccountModel::all() as $account) {
-            if($account->account == '15899691882@163.com'){ //测试diver
+        }
+/*        foreach (AccountModel::all() as $account) {
+            if($account->account == 'rebeauty'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
                 print_r($messageList);exit;
 
             }
-        }
+        }*/
 
 
 

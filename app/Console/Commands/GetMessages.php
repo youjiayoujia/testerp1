@@ -62,7 +62,7 @@ class GetMessages extends Command
         //遍历账号
         foreach (AccountModel::all() as $account) {
             //实例化渠道驱动
-            if($account->account == '15899691882@163.com'){
+            if($account->account == 'rebeauty'){
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 //获取Message列表
                 $messageList = $channel->getMessages();

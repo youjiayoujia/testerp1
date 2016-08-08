@@ -66,7 +66,13 @@ class PurchaseOrderModel extends BaseModel
         return [
             'relatedSearchFields' => ['supplier' => ['name'], 'purchaseUser' => ['name'], 'warehouse' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['status' => config('purchase.purchaseOrder.status'),'examineStatus' => config('purchase.purchaseOrder.examineStatus'),'write_off' => config('purchase.purchaseOrder.write_off')],
+            'filterSelects' => ['status' => config('purchase.purchaseOrder.status'),
+                                'examineStatus' => config('purchase.purchaseOrder.examineStatus'),
+                                'write_off' => config('purchase.purchaseOrder.write_off'),
+                                'type' =>config('purchase.purchaseOrder.type'),
+                                'pay_type'=>config('purchase.purchaseOrder.pay_type'),
+                                'close_status'=>config('purchase.purchaseOrder.close_status'),
+                                ],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];
@@ -126,7 +132,7 @@ class PurchaseOrderModel extends BaseModel
     }
 
     public function createPurchaseOrder($data)
-    {
+    {   
         $data['user_id'] = request()->user()->id;
         $purchase_order = PurchaseOrderModel::create($data);
         foreach ($data['item'] as $item) {

@@ -89,7 +89,7 @@ abstract class Controller extends BaseController
                         break;
                     case 'filterSelects':
                         foreach ($related as $key => $value2) {
-                            if ($value2) {
+                            if ($value2||$value2=='0') {
                                 $list = $list->where($key, $value2);
                             }
                         }

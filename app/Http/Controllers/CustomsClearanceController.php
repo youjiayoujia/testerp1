@@ -16,7 +16,6 @@ use App\Models\ItemModel;
 
 class CustomsClearanceController extends Controller
 {
-
     public function __construct(CustomsClearanceModel $customesClearance)
     {
         $this->model = $customesClearance;

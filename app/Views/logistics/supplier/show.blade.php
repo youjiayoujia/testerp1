@@ -61,14 +61,20 @@
                 <strong>收款信息</strong>: {{ $model->collectionInfo ? $model->collectionInfo->bank : '没有收款信息' }}
             </div>
             <div class="col-lg-3">
-                <strong>企业证件</strong>: {{ $model->credentials }}
-            </div>
-            <div class="col-lg-3">
                 <strong>是否有API</strong>: {{ $model->is_api == '1' ? '有' : '没有' }}
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <strong>备注</strong>: {{ $model->remark }}
             </div>
+            <div class="col-lg-12">
+                <strong>企业证件</strong>:
+                @if($model->credentials)
+                    <img src="{{ asset($model->credentials) }}" width="200px">
+                @else
+                    未上传
+                @endif
+            </div>
+
         </div>
     </div>
     <div class="panel panel-default">

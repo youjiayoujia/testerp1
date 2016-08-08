@@ -34,6 +34,15 @@ class SupplierController extends Controller
         return view($this->viewPath . 'create', $response);
     }
 
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $data = request()->all();
+        $this->model->createSupplier($data, request()->file('credentials'));
+        return redirect($this->mainIndex);
+    }
+
     public function edit($id)
     {
         $model = $this->model->find($id);

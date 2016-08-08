@@ -10,6 +10,7 @@
 
 namespace App\Models\Logistics;
 
+use Storage;
 use App\Base\BaseModel;
 
 class SupplierModel extends BaseModel
@@ -66,7 +67,6 @@ class SupplierModel extends BaseModel
             'driver' => 'required',
             'driver_tel' => 'required',
             'logistics_collection_info_id' => 'required',
-            'credentials' => 'required',
         ],
         'update' => [
             'name' => 'required|unique:logistics_suppliers,name,{id}',
@@ -88,13 +88,22 @@ class SupplierModel extends BaseModel
             'driver' => 'required',
             'driver_tel' => 'required',
             'logistics_collection_info_id' => 'required',
-            'credentials' => 'required',
         ],
     ];
 
     public function collectionInfo()
     {
         return $this->belongsTo('App\Models\Logistics\CollectionInfoModel', 'logistics_collection_info_id', 'id');
+    }
+
+    public function createSupplier($data, $file = null)
+    {
+        $path = 'uploads/supplier' . '/';
+        if ($file != '' && $file->getClientOriginalName()) {
+            $data['credentials'] = $path . time() . '.' . $file->getClientOriginalExtension();
+            Storage::disk('product')->put($data['credentials'], file_get_contents($file->getRealPath()));
+        }
+        return $this->create($data);
     }
 
 }

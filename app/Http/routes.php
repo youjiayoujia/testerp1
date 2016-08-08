@@ -365,6 +365,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
+    Route::get('errorList/exportException/{arr}',
+        ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
+
     Route::get('errorList/ajaxProcess',
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
@@ -464,10 +467,20 @@ Route::group(['middleware' => 'auth'], function () {
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
 
-    //包裹倒出
+    //包裹导出
+    Route::get('exportPackage/extraField',
+        ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
+    Route::post('exportPackage/exportPackageDetail',
+        ['uses' => 'ExportPackageController@exportPackageDetail', 'as' => 'exportPackage.exportPackageDetail']);
+    Route::get('exportPackage/exportPackageView',
+        ['uses' => 'ExportPackageController@exportPackageView', 'as' => 'exportPackage.exportPackageView']);
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::post('package/processReturnGoods',
+        ['uses' => 'PackageController@processReturnGoods', 'as' => 'package.processReturnGoods']);
+    Route::get('package/returnGoods',
+        ['uses' => 'PackageController@returnGoods', 'as' => 'package.returnGoods']);
     Route::get('package/forceOutPackage',
         ['uses' => 'PackageController@forceOutPackage', 'as' => 'package.forceOutPackage']);
     Route::get('package/implodePackage/{arr}',

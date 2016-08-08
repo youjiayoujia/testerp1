@@ -22,4 +22,47 @@
             @endforeach
         </div>
     </div>
+    <div class="panel panel-info">
+        <div class="panel-heading">其他字段</div>
+        <div class="panel-body add_row">
+            <div class='row'>
+                <div class='form-group col-sm-2'>
+                    <label>字段名</label>
+                </div>
+                <div class='form-group col-sm-2'>
+                    <label>字段值</label>
+                </div>
+                <div class='form-group col-sm-2'>
+                    <label>字段排序</label>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer create_form">
+            <div class="create"><i class="glyphicon glyphicon-plus"></i></div>
+        </div>
+    </div>
+@stop
+
+@section('pageJs')
+<script type='text/javascript'>
+$(document).ready(function(){
+    current = 1;
+    $(document).on('click', '.create_form', function(){
+        $.ajax({
+            url:"{{ route('exportPackage.extraField') }}",
+            data:{current:current},
+            dataType:'html',
+            type:'get',
+            success:function(result) {
+                $('.add_row').children('div:last').after(result);
+            }
+        });
+        current++;
+    });
+
+    $(document).on('click', '.bt_right', function(){
+        $(this).parent().remove();
+    });
+})
+</script>
 @stop

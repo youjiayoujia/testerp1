@@ -132,8 +132,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '拣货单异常',
-                    'url' => 'errorList.index',
+                    'name' => '模板数据导出',
+                    'url' => 'exportPackage.exportPackageView',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '退货处理',
+                    'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
             ],

@@ -137,8 +137,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '拣货单异常',
-                    'url' => 'errorList.index',
+                    'name' => '模板数据导出',
+                    'url' => 'exportPackage.exportPackageView',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '退货处理',
+                    'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
             ],
@@ -291,15 +296,15 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '采购收货',
+                    'name' => '采购收货和入库',
                     'url' => 'recieve',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '供应链' => [
                 [

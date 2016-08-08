@@ -257,7 +257,7 @@ class CatalogController extends Controller
                 '前缀'=>'XL',
                 'Set属性'=>'name1:value1,value2;name2:value1,value2',
                 'variation属性'=>'name1:value1,value2;name2:value1,value2',
-                'Feature属性(说明：1，文本；2，单选 ；3，多选 ) '=>'1-name1:value1,value2,value3;2-name1:value1,value2,value3;3:value',
+                'Feature属性(说明：1，文本；2，单选 ；3，多选 ) '=>'1-value;2-name1:value1,value2,value3;3:value1,value2,value3',
             ]
         ];
 
@@ -276,7 +276,7 @@ class CatalogController extends Controller
         $file->move($path, 'excelProcess.xls');
         $data_array = '';
         $result = false;
-        Excel::load($path.'excelProcess.xls', function($reader) use ($result) {
+        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
             $th_long = count($data_array[0]); //表头字段数

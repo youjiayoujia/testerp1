@@ -102,30 +102,31 @@
             <label for="qq">QQ</label>
             <input class="form-control" id="qq" placeholder="QQ" name='qq' value="{{ old('qq') ? old('qq') : $model->qq }}">
         </div>
+
+        <div class="form-group col-lg-2">
+            <label for="level">供货商等级</label>
+            <select id='level' name='level_id' class='form-control' >
+                @foreach($levels as $level)
+                    <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $model->level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
+                @endforeach
+            </select>
+        </div>
+        <div class='form-group col-lg-2'>
+            <label name='created_by' class='control-group'>
+                创建人
+            </label>
+            <input class='form-control' type='text' value='1' name='created_by' id = 'created_by' readonly/>
+        </div>
     </div>
     <div class="row">
-        <div class="form-group col-lg-4">
+{{--        <div class="form-group col-lg-4">
             <label for="purchase_id">采购员</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='purchase_id' class='form-control'>
             @foreach($users as $user)
             <option value="{{ $user->id }}" {{ $user->id == $model->purchase_id ? 'selected' : ''}}>{{ $user->name }}</option>
             @endforeach
             </select>
-        </div>
-        <div class="form-group col-lg-4">
-            <label for="level">供货商等级</label>
-            <select id='level' name='level_id' class='form-control' >
-            @foreach($levels as $level)
-                <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $model->level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
-            @endforeach
-            </select>
-        </div>
-        <div class='form-group col-lg-4'>
-            <label name='created_by' class='control-group'>
-                创建人
-            </label>
-            <input class='form-control' type='text' value='1' name='created_by' id = 'created_by' readonly/>
-        </div>
+        </div>--}}
     </div>
 @stop
 @section('pageJs')

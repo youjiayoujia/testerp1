@@ -45,16 +45,18 @@ class GetMessages extends Command
     public function handle()
     {
 
-        //wish测试块
-/*        foreach (AccountModel::all() as $account) {
-            if($account->channel->driver =='wish'){
+        //渠道测试块
+        foreach (AccountModel::all() as $account) {
+            if($account->channel->driver =='ebay'){ //测试diver
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-
                 $messageList = $channel->getMessages();
 
             }
-        }*/
-        //wish测试块
+        }
+
+
+        exit;
+        //渠道测试块
 
 
         //遍历账号

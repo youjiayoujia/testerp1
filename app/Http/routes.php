@@ -195,6 +195,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@changePrintStatus', 'as' => 'changePrintStatus']);
     Route::any('purchaseOrder/payOrder/{id}',
         ['uses' => 'Purchase\PurchaseOrderController@payOrder', 'as' => 'payOrder']);
+    Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
     Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
@@ -204,6 +205,10 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
+    //采购单提示
+    Route::any('purchaseOrder/view',
+        ['uses' => 'Purchase\PurchaseOrderController@view', 'as' => 'purchaseOrder.view']);
+
     Route::any('purchaseOrder/updateArriveNum',
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('purchaseOrder/updateArriveLog',
@@ -368,6 +373,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
+    Route::get('errorList/exportException/{arr}',
+        ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
+
     Route::get('errorList/ajaxProcess',
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
@@ -467,10 +475,20 @@ Route::group(['middleware' => 'auth'], function () {
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
 
-    //包裹倒出
+    //包裹导出
+    Route::get('exportPackage/extraField',
+        ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
+    Route::post('exportPackage/exportPackageDetail',
+        ['uses' => 'ExportPackageController@exportPackageDetail', 'as' => 'exportPackage.exportPackageDetail']);
+    Route::get('exportPackage/exportPackageView',
+        ['uses' => 'ExportPackageController@exportPackageView', 'as' => 'exportPackage.exportPackageView']);
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::post('package/processReturnGoods',
+        ['uses' => 'PackageController@processReturnGoods', 'as' => 'package.processReturnGoods']);
+    Route::get('package/returnGoods',
+        ['uses' => 'PackageController@returnGoods', 'as' => 'package.returnGoods']);
     Route::get('package/forceOutPackage',
         ['uses' => 'PackageController@forceOutPackage', 'as' => 'package.forceOutPackage']);
     Route::get('package/implodePackage/{arr}',
@@ -672,9 +690,11 @@ Route::any('aliexpressOrdersList', ['uses' => 'TestController@aliexpressOrdersLi
 Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
+Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
 //spu
 Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
 Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
 Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
 Route::resource('spu', 'SpuController');
+

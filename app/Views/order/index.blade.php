@@ -203,6 +203,9 @@
                             <span class="glyphicon glyphicon-link"></span> 包裹
                         </button>
                     @endif
+                    <a href="{{ route('invoice', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 德国发票
+                    </a>
                     <a href="{{ route('order.show', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 查看
                     </a>

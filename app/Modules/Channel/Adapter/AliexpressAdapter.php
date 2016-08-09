@@ -458,7 +458,6 @@ Class AliexpressAdapter implements AdapterInterface
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
 
-
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 

@@ -481,6 +481,8 @@ class EbayAdapter implements AdapterInterface
         //2.获取消息
         $call = 'GetMyMessages';
         $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
+
+
         $headers_count = $message_ary->Summary->TotalMessageCount;
         $headers_pages_count = ceil($headers_count / 100); //统计页数
 
@@ -494,6 +496,9 @@ class EbayAdapter implements AdapterInterface
                                 <StartTime>' . $time_begin . '</StartTime>
                                 <EndTime>' . $time_end . '</EndTime>';
             $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
+
+            //print_r($content);exit;
+
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
                     /*
@@ -540,7 +545,7 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['attachment'] = ''; //附件
                     $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$message->Subject]));
                     $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID,
+                        'ItemID' => (string)$message->ItemID, //应该是订单号
                         'ExternalMessageID' =>(string)$message->ExternalMessageID,
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));

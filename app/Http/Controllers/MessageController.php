@@ -66,6 +66,17 @@ class MessageController extends Controller
         
         if ($message->assign(request()->user()->id)) {
             //$userarr=config('user.staff');
+
+            //dd(request()->input());exit;
+
+            /**
+             * 未关联 的消息
+             * 消息中的订单号 与 erp订单匹配
+             */
+            if($message->related == 0){
+                $message->findOrderWithMessage();
+            }
+
             $emailarr=config('user.email');
             $response = [
                 'metas' => $this->metas(__FUNCTION__),

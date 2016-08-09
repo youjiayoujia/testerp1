@@ -275,15 +275,9 @@ class MessageModel extends BaseModel{
     }
 
     public function getMessageInfoAttribute(){
-        if($this->content){
-
-            //$content_array = unserialize($this->content);
-            $content_array = unserialize(base64_decode($this->content));
-
-            //print_r($content_array);exit;
-
+        if($this->ContentDecodeBase64){
             $html = '';
-            foreach($content_array as $key => $content){
+            foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
                         foreach ($content as $k => $item){
@@ -320,8 +314,10 @@ class MessageModel extends BaseModel{
 
                     case 'ebay':
                         $html = $content;
+                        break;
                     case 'amazon':
                         $html = $content;
+                        break;
                     default :
                         echo 'invalid message type';
                 }
@@ -334,18 +330,61 @@ class MessageModel extends BaseModel{
     }
 
     //渠道信息特殊属性
-/*    public function getChannelMessageFieldsAttribute(){
-        return $this->channel_message_fields;
-        return unserialize(base64_decode($this->channel_message_fields));
-
-    }*/
-
+    public function getMessageFieldsDecodeBase64Attribute(){
+        if($this->channel_message_fields){
+            return unserialize(base64_decode($this->channel_message_fields));
+        }else{
+            return '';
+        }
+    }
+    public function getContentDecodeBase64Attribute(){
+        if($this->content){
+            return unserialize(base64_decode($this->content));
+        }else{
+            return '';
+        }
+    }
     /**
      * 获取消息对应的渠道
      * @return mixed
      */
     public function getChannelDiver(){
         return $this->account->channel->driver;
+    }
+
+    public function findOrderWithMessage(){
+        $order_id = $this->getChannelMessageOrderId();
+        $order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
+        if($order_obj){
+            if($this->relatedOrders()->create(['order_id' => $order_obj->id])){
+                $this->related = 1;
+                $this->save();
+            }
+
+        }
+    }
+
+    public function getChannelMessageOrderId(){
+        $fields_ary = $this->MessageFieldsDecodeBase64;
+        if($fields_ary){
+            switch ($this->getChannelDiver()){
+                case 'ebay':
+                    $order_id = $fields_ary['ItemID'];
+                    break;
+                case 'wish':
+                    $order_id = '';
+                    break;
+                case 'aliexpress':
+                    $order_id = $fields_ary['order_id'];
+                    break;
+                default:
+                    $order_id = '';
+
+            }
+        }else{
+            $order_id = '';
+        }
+        return $order_id;
     }
 
 

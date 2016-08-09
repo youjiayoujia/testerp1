@@ -160,12 +160,14 @@ class StockController extends Controller
     {
         Cache::store('file')->forever('stockIOStatus', '0');
         $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
-        $stocks = $this->model->all();
-        foreach($stocks as $stock) 
-        {
-            $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
+        $stocks_arr = $this->model->all()->chunk(1000);
+        foreach($stocks_arr as $stocks) {
+            foreach($stocks as $stock) 
+            {
+                $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
+            }
         }
-
+        
         return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
     }
 

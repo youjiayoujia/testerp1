@@ -205,6 +205,10 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Purchase\PurchaseOrderController@inWarehouse', 'as' => 'inWarehouse']);
     Route::any('purchaseOrder/ajaxRecieve',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxRecieve', 'as' => 'ajaxRecieve']);
+    //采购单提示
+    Route::any('purchaseOrder/view',
+        ['uses' => 'Purchase\PurchaseOrderController@view', 'as' => 'purchaseOrder.view']);
+
     Route::any('purchaseOrder/updateArriveNum',
         ['uses' => 'Purchase\PurchaseOrderController@updateArriveNum', 'as' => 'updateArriveNum']);
     Route::any('purchaseOrder/updateArriveLog',
@@ -343,6 +347,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('logistics/ajaxSupplier', ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);
     Route::resource('logistics', 'LogisticsController');
     Route::resource('logisticsSupplier', 'Logistics\SupplierController');
+    Route::resource('logisticsCollectionInfo', 'Logistics\CollectionInfoController');
     Route::resource('logisticsCode', 'Logistics\CodeController');
     Route::get('logisticsZone/getCountries',
         ['uses' => 'Logistics\ZoneController@getCountries', 'as' => 'logisticsZone.getCountries']);
@@ -368,6 +373,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
+    Route::get('errorList/exportException/{arr}',
+        ['uses' => 'Picklist\ErrorListController@exportException', 'as' => 'errorList.exportException']);
+
     Route::get('errorList/ajaxProcess',
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
@@ -462,15 +470,26 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('exportAll', ['uses' => 'Order\BlacklistController@exportAll', 'as' => 'exportAll']);
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
+    Route::get('invoice/{id}', ['uses' => 'OrderController@invoice', 'as' => 'invoice']);
     Route::get('downloadUpdateBlacklist',
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
 
-    //包裹倒出
+    //包裹导出
+    Route::get('exportPackage/extraField',
+        ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
+    Route::post('exportPackage/exportPackageDetail',
+        ['uses' => 'ExportPackageController@exportPackageDetail', 'as' => 'exportPackage.exportPackageDetail']);
+    Route::get('exportPackage/exportPackageView',
+        ['uses' => 'ExportPackageController@exportPackageView', 'as' => 'exportPackage.exportPackageView']);
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::post('package/processReturnGoods',
+        ['uses' => 'PackageController@processReturnGoods', 'as' => 'package.processReturnGoods']);
+    Route::get('package/returnGoods',
+        ['uses' => 'PackageController@returnGoods', 'as' => 'package.returnGoods']);
     Route::get('package/forceOutPackage',
         ['uses' => 'PackageController@forceOutPackage', 'as' => 'package.forceOutPackage']);
     Route::get('package/implodePackage/{arr}',

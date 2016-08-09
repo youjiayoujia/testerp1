@@ -30,8 +30,12 @@
             <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
+                物流方式：{{is_null($purchaseOrder->carriage_type)?'':config('purchase.purchaseOrder.carriage_type')[$purchaseOrder->carriage_type]}}</br>
                 外部单号：
-                {{$purchaseOrder->post_coding }}
+                {{$purchaseOrder->post_coding }}</br>
+                已打印次数:</br></br>
+                总价:{{ $purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</br>
+                运单号:
             </td>
             <td> 
                 <div>采购单状态：{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
@@ -63,7 +67,7 @@
                 <th>系统采购价格</th>
                 <th>小计</th>
                 <th>入库金额</th>
-                <th>审单备注</th>
+                <th>审单备注<button class='view' id="{{$purchaseOrder->id}}">查看</button></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -87,7 +91,7 @@
                     <td>{{$purchase_item->item?$purchase_item->item->purchase_price:''}}</td>
                     <td>{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>
                     <td>{{$purchase_item->purchase_cost * $purchase_item->storage_qty}}</td>
-                    <td>{{$purchase_item->remark}}</td>
+                    <td id="pitem_warn_{{$purchase_item->id}}"></td>
                 </tr>
                 @endforeach
                 <tr>
@@ -104,7 +108,7 @@
                     <th>&nbsp;</th>
                     <th>{{ $purchaseOrder->sum_purchase_account}}+YF{{$purchaseOrder->purchase_post_num}}={{$purchaseOrder->sum_purchase_account+$purchaseOrder->purchase_post_num}}</th>
                     <th>{{ $purchaseOrder->sum_purchase_storage_account}}</th>
-                    <th>&nbsp;</th>
+                    <th id="warn_{{$purchaseOrder->id}}"></th>
                 </tr>
                 </tbody>
                 </table>
@@ -354,6 +358,27 @@
                 type: 'get',
                 success: function (result) {
                     window.location.reload();
+                }
+            })
+        });
+
+        $('.view').click(function () {
+            var purchaseOrder_id = $(this).attr('id');
+            var url = "{{route('purchaseOrder.view')}}";
+            $.ajax({
+                url: url,
+                data: {purchaseOrder_id:purchaseOrder_id},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    for(var el in result){ 
+                        var temp = ''
+                        temp = result[el]['price']+';'+result[el]['quantity']
+                        $("#pitem_warn_"+el).text(temp);
+                        //$("#pitem_warn_"+el).text(result[el]['quantity']);
+                    } 
+                                        
+                    $("#warn_"+purchaseOrder_id).text(result[0]['total_price']);
                 }
             })
         });

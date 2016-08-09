@@ -18,7 +18,7 @@ class PurchasePostageModel extends BaseModel
  			 
         ]
     ];
-    public $searchFields = ['id','purchase_item_id','purchase_order_id','post_coding','postage'];
+    public $searchFields = ['id'=>'ID','purchase_order_id'=>'采购单号','post_coding'=>'运单号'];
     /**
      * The attributes that are mass assignable.
      *

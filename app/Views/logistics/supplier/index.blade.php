@@ -22,7 +22,7 @@
             <td>{{ $supplier->id }}</td>
             <td>{{ $supplier->name }}</td>
             <td>{{ $supplier->customer_id }}</td>
-            <td>{{ $supplier->passwprd }}</td>
+            <td>{{ $supplier->password }}</td>
             <td>{{ $supplier->url }}</td>
             <td>{{ $supplier->secret_key }}</td>
             <td>{{ $supplier->is_api == '1' ? '有' : '没有' }}</td>

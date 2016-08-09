@@ -470,6 +470,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('exportAll', ['uses' => 'Order\BlacklistController@exportAll', 'as' => 'exportAll']);
     Route::any('exportPart', ['uses' => 'Order\BlacklistController@exportPart', 'as' => 'exportPart']);
     Route::post('uploadBlacklist', ['uses' => 'Order\BlacklistController@uploadBlacklist', 'as' => 'uploadBlacklist']);
+    Route::get('invoice/{id}', ['uses' => 'OrderController@invoice', 'as' => 'invoice']);
     Route::get('downloadUpdateBlacklist',
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
     //订单投诉

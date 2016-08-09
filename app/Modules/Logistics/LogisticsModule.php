@@ -10,6 +10,8 @@ namespace App\Modules\Logistics;
 use Exception;
 use App\Modules\Logistics\Adapter\ChukouyiAdapter;
 use App\Modules\Logistics\Adapter\CoeAdapter;
+use App\Modules\Logistics\Adapter\szChinaPostAdapter;
+use App\Modules\Logistics\Adapter\WinitAdapter;
 
 class LogisticsModule
 {
@@ -37,5 +39,14 @@ class LogisticsModule
     public function createCoeDriver($config)
     {
         return new CoeAdapter($config);
+    }
+    
+    public function createSzChinaPostDriver($config)
+    {
+        return new SzChinaPostAdapter($config);
+    }
+    
+    public function createWinitDriver($config){
+        return new WinitAdapter($config);
     }
 }

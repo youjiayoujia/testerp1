@@ -70,6 +70,20 @@ class TestController extends Controller
                 ->getTracking($package);
         exit;
     }
+    
+    public function testChinaPost(){
+        $package = PackageModel::findOrFail(2);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
+    
+    public function testWinit(){
+        $package = PackageModel::findOrFail(2);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
 
     public function aliexpressOrdersList()
     {

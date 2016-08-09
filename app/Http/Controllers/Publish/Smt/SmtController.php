@@ -1286,7 +1286,7 @@ class SmtController extends Controller{
 
         $productId = $smtProduct->productId;
         $result= $smtApi->updateProductPublishState($api,$productId);
-        if($result['success']){
+        if(array_key_exists('success',$result) && $result['success']){
             if($type == 'online'){
                 $data['productStatusType'] = 'offline';
             }else{

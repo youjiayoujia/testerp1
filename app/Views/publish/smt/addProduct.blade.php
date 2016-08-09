@@ -393,7 +393,7 @@ text-align: left;
             <div class="col-sm-10">	
                 <div>      
                     
-                    <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="main" onclick="upImage()">从我的电脑选取</a>                                    
+                    <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="main">从我的电脑选取</a>                                    
                     &nbsp;&nbsp;
                     <script type="text/plain" id="myEditor"></script>
                     <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="glyphicon glyphicon-trash"></i></a>
@@ -898,8 +898,6 @@ $template['name'].'</option>';
 {{--<script src="{{ asset('plugins/ueditor/umeditor.js') }}"></script>--}}
 <script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
 <link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
-
-
 <script src="{{ asset('plugins/kindeditor/kindeditor.js') }}"></script>
 <script src="{{ asset('plugins/layer/layer.js') }}"></script>
 <script type="text/javascript">
@@ -909,7 +907,7 @@ $template['name'].'</option>';
     var productProperty; //用来保存属性的json信息                        
 	
     /**自定义kindeditor插件开始,样式类ke-icon-module**/
-
+	
     KindEditor.plugin('module', function (K) {
         var self = this, name = 'module', lang = self.lang(name + '.');
         self.clickToolbar(name, function () {

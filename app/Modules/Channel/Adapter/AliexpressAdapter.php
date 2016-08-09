@@ -321,6 +321,7 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $code_arr = explode("&", $strcode);//去掉&
         $newcode_arr = array();
+
         foreach ($code_arr as $key => $val) {
             $code_narr = explode("=", $val);//分割=
             $newcode_arr [$code_narr [0]] = $code_narr [1];//重组数组
@@ -456,6 +457,8 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
+
+
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -489,6 +492,21 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
 
+                        if($Sources == 'order_msg'){
+                            $message_fields_ary = [
+                                'message_type'=> $Sources, //消息类型
+                                'order_id'=> $item['channelId'] //消息类型
+                            ];
+                        }else{
+                            $message_fields_ary = [
+                                'message_type'=> $Sources, //消息类型
+                                'order_id'=> ''
+
+                            ];
+                        }
+
+                        $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
                     }
                 }else{
@@ -497,35 +515,32 @@ Class AliexpressAdapter implements AdapterInterface
                 $j++;
             }
         }
-
         return (!empty($message_list)) ? $message_list : false;
     }
 
     public function sendMessages($replyMessage)
     {
         // TODO: Implement sendMessages() method.
-        //echo $this->_access_token;
         $message_obj = $replyMessage->message;
-
         if(!empty($message_obj)){
-
-             // step1:发信息
-
+            $ChannelMessageFields = unserialize(base64_decode($message_obj->channel_message_fields));
+            // step1:发信息
             $send_param = [];
-            $send_param['channelId'] = $message_obj->message_id;
-            $send_param['buyerId'] = $message_obj->from;
-            $send_param['msgSources'] = $message_obj->'消息类型';
-            $send_param['content'] = $replyMessage->content;
+            $channelId = rawurlencode($message_obj->message_id);
+            $buyerId = rawurlencode($message_obj->from);
+            $msgSources = rawurlencode($ChannelMessageFields['message_type']);
+            $content = rawurlencode($replyMessage->content);
 
-            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
+            $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
+
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
-
                     //step2: 更新消息为已读
                     $update_param = [];
                     $update_param['channelId'] = $message_obj->message_id;
-                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $update_param['msgSources'] = $ChannelMessageFields['message_type'];
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
 
                     $replyMessage->status = 'SENT';

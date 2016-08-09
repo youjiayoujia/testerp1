@@ -325,8 +325,9 @@ Class AmazonAdapter implements AdapterInterface
                 $tempPayLoad = '';
                 $tempAttachment = '';
                 $this->getPayloadNew($tempPayLoad, $tempAttachment, $messagePayload, $service, $message);
-                $returnAry[$j]['content'] = $this->getMaillContent($tempPayLoad);
+                $returnAry[$j]['content'] = base64_encode(serialize([ 'amazon' => $this->getMaillContent($tempPayLoad)]));
                 $returnAry[$j]['attachment'] = $tempAttachment;
+                $returnAry[$j]['channel_message_fields'] = '';
             }
         } while ($nextPageToken != '');
         return $returnAry;

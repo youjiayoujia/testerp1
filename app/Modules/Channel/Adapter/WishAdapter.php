@@ -705,7 +705,7 @@ Class WishAdapter implements AdapterInterface
             }
             foreach($apiReturn['data'] as $gd){
 
-                $return_array[$j]['message_id']      = $gd['Ticket']['transaction_id']; //message_id
+                $return_array[$j]['message_id']      = $gd['Ticket']['id']; //message_id
                 $return_array[$j]['subject']		 = addslashes($gd['Ticket']['subject']);//邮件标题（发件人本地语言）
                 $return_array[$j]['date'] 	  	     = str_replace('T',' ',$gd['Ticket']['open_date']);//发件人发邮件的时间
                 $return_array[$j]['from_name'] 	  	 = str_replace('T',' ',$gd['Ticket']['UserInfo']['name']);//用户名
@@ -726,6 +726,10 @@ Class WishAdapter implements AdapterInterface
                 $return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
 
+                $return_array[$j]['channel_message_fields'] = '';
+
+
+
                 $j++;
             }
         }
@@ -738,12 +742,35 @@ Class WishAdapter implements AdapterInterface
      */
     public function sendMessages($replyMessage)
     {
-        $param['id'] = $replyMessage->message->from;
+
+        $message_obj = $replyMessage->message;
+
+        $replyMessage->content = "Thanks for your concern.
+
+    We double checked that the buyer ordered a green one, and we shipped it out accordingly, so we shouldn't be asked to resend it again, could you please kindly check it?
+
+I look forward to hearing from you sincerely.
+
+Regards";
+
+
+
+
+        $param['id'] = $message_obj->message_id;
         $param['access_token'] = $this->access_token;
         $param['reply'] = $replyMessage->content;
-        $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
+        //print_r($param);exit;
 
+        $result_json = $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
+        $result_ary = json_decode($result_json,true);
 
+        print_r($result_ary);exit;
 
+        if(!empty($result_ary['data']) && $result_ary['data']['success']==1){
+            $replyMessage->status = 'SENT';
+        }else{
+            $replyMessage->status = 'FAIL';
+        }
+        return $replyMessage->status== 'SENT' ? true : false;
     }
 }

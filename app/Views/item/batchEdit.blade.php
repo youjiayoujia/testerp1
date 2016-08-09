@@ -23,12 +23,9 @@
                      <div class="form-group col-md-3">
                         <label for="size">状态</label>
                         <select id="status" class="form-control" name="status">
-                            <option value="sellWaiting">待售</option>
-                            <option value="selling">在售</option>
-                            <option value="saleOutStopping">卖完下架</option>
-                            <option value="stopping">停产</option>
-                            <option value="trySale">试销</option>
-                            <option value="unSellTemp">货源待定</option>
+                            @foreach(config('item.status') as $key=>$value)
+                                <option value="{{$key}}">{{$value}}</option>
+                            @endforeach
                         </select>
                     </div>
                 <?php 
@@ -62,6 +59,34 @@
                         <input class="form-control" id="package_size" placeholder="" name='package_size' value="{{old('package_size')}}">
                     </div>
                 
+                <?php
+                    break;
+
+                case 'name':
+                ?>
+                
+                    <div class="form-group col-md-3">
+                        <label for="color">中文资料</label>
+                        <input class="form-control" id="c_name" placeholder="" name='c_name' value="{{old('c_name')}}">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="color">英文资料</label>
+                        <input class="form-control" id="name" placeholder="" name='name' value="{{old('name')}}">
+                    </div>
+                
+                <?php
+                    break;
+
+                case 'catalog':
+                ?>
+                    <div class="form-group col-md-3">
+                        <label for="color">分类</label>
+                        <select id="status" class="form-control" name="status">
+                            @foreach($catalogs as $key=>$catalog)
+                                <option value="{{$key}}">{{$catalog->name}}</option>
+                            @endforeach
+                        </select>                    
+                    </div>
                 <?php
                     break;
             } 

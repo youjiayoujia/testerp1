@@ -114,20 +114,106 @@ class ItemModel extends BaseModel
         return '/default.jpg';
     }
 
+    //实库存
     public function getAllQuantityAttribute()
     {
         return $this->stocks->sum('all_quantity');
     }
 
+    //虚库存
     public function getAvailableQuantityAttribute()
     {
         return $this->stocks->sum('available_quantity');
+    }
+
+    //普通在途库存
+    public function getNormalTransitQuantityAttribute()
+    {
+        $zaitu_num = 0;
+        foreach ($this->purchase as $purchaseItem) {
+            if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
+                if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
+                    $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                }
+            }
+        }
+
+        return $zaitu_num;
+    }
+
+    //特殊在途库存
+    public function getSpecialTransitQuantityAttribute()
+    {
+        $szaitu_num = 0;
+        foreach ($this->purchase as $purchaseItem) {
+            if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
+                if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
+                    $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                }
+            }
+        }
+
+        return $szaitu_num;
     }
 
     public function getStatusNameAttribute()
     {
         $config = config('item.status');
         return $config[$this->status];
+    }
+
+    //获得sku销量 period参数格式为 -7 day
+    public function getsales($period)
+    {
+        //销量
+        $sellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
+            ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime($period)))
+            ->where('order_items.quantity', '<', 5)
+            ->where('order_items.item_id', $this->id)
+            ->sum('order_items.quantity');
+        return $sellNum;
+    }
+
+    //计算sku采购建议数量
+    public function getNeedPurchase()
+    {
+        //计算趋势系数
+        //7天销量和14天销量
+        $seven_sales = $this->getsales('-7 days');
+        $fourteen_sales = $this->getsales('-14 days');
+        if ($seven_sales == 0 || $fourteen_sales == 0) {
+            $coefficient = 1;
+        } else {
+            if (($seven_sales / 7) / ($fourteen_sales / 14 * 1.1) >= 1) {
+                $coefficient = 1.3; 
+            } elseif (($fourteen_sales / 14 * 0.9) / ($seven_sales / 7) >= 1) {
+                $coefficient = 0.6; 
+            } else {
+                $coefficient = 1;
+            }
+        }
+        //虚库存
+        $xu_kucun = $this->available_quantity;
+        //普通在途库存
+        $zaitu_num = $this->normal_transit_quantity;
+        //预交期
+        $delivery = $this->supplier ? $this->supplier->purchase_time : 7;
+        //计算采购量
+        //采购建议数量
+        if ($this->purchase_price > 200 && $fourteen_sales < 3 || $this->status == 4) {
+            $needPurchaseNum = 0 - $xu_kucun - $zaitu_num;
+        } else {
+            if ($this->purchase_price > 3 && $this->purchase_price <= 40) {
+                $needPurchaseNum = ($fourteen_sales / 14) * (7 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+            } elseif ($this->purchase_price <= 3) {
+                $needPurchaseNum = ($fourteen_sales / 14) * (12 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+            } elseif ($this->purchase_price > 40) {
+                $needPurchaseNum = ($fourteen_sales / 14) * (5 + $delivery) * $coefficient - $xu_kucun - $zaitu_num;
+            }
+        }
+
+        return ceil($needPurchaseNum);
     }
 
     /**

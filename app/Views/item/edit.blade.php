@@ -136,12 +136,9 @@
         <div class="form-group col-md-3">
             <label for="color">在售状态</label>
             <select  class="form-control" name="status">
-                <option value="selling" {{ $model->status == 'selling' ? 'selected' : '' }}>在售</option>
-                <option value="sellWaiting" {{ $model->status == 'sellWaiting' ? 'selected' : '' }}>待售</option>
-                <option value="saleOutStopping" {{ $model->status == 'saleOutStopping' ? 'selected' : '' }}>卖完下架</option>
-                <option value="stopping" {{ $model->status == 'stopping' ? 'selected' : '' }}>停产</option>
-                <option value="trySale" {{ $model->status == 'trySale' ? 'selected' : '' }}>试销</option>
-                <option value="unSellTemp" {{ $model->status == 'unSellTemp' ? 'selected' : '' }}>货源待定</option>
+                @foreach(config('item.status') as $key=>$value)
+                    <option value="{{$key}}" {{ $model->status == $key ? 'selected' : '' }}>{{$value}}</option>
+                @endforeach
             </select>
         </div>
         <div class="form-group col-md-3">

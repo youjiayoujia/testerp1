@@ -58,6 +58,7 @@ class CreateProducts extends Migration
             $table->string('data_edit_not_pass_remark')->comment('资料审核不通过备注')->nullable()->default(NULL);
             $table->string('declared_cn')->comment('申报中文')->nullable()->default(NULL);
             $table->string('declared_en')->comment('申报英文')->nullable()->default(NULL);
+            $table->string('declared_value')->comment('申报价值')->nullable()->default(NULL);
             $table->string('notify')->comment('注意事项')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();

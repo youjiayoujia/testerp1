@@ -15,6 +15,7 @@ use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
+use App\Models\CatalogModel;
 
 class ItemController extends Controller
 {
@@ -131,6 +132,7 @@ class ItemController extends Controller
             'skus' => $skus,
             'item_ids'=>$item_ids,
             'param'  =>$param,
+            'catalogs'=>CatalogModel::all(),
         ];
         return view($this->viewPath . 'batchEdit', $response);
     }

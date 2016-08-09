@@ -10,6 +10,9 @@
             <li><a href="javascript:" class="batchedit" data-name="purchase_price">参考成本</a></li>
             <li><a href="javascript:" class="batchedit" data-name="status">SKU状态</a></li>
             <li><a href="javascript:" class="batchedit" data-name="package_size">体积</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="name">中英文资料</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="wrap_limit">包装方式</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="catalog">分类</a></li>
         </ul>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -52,9 +55,26 @@
             <td>{{ $item->weight }}kg</td>
             <td>{{ $item->warehouse?$item->warehouse->name:'' }}<br>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
             <td>{{ $item->product?$item->product->declared_en:'' }}<br>{{ $item->product?$item->product->declared_cn:'' }}<br>
-                    $<?php if(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);} ?></td>
+                    $<?php 
+                        if($item->product){
+                                if($item->product->declared_value>0){
+                                    echo $item->product->declared_value;
+                                }elseif(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);} 
+                        }
+                    ?>
+            </td>
             <td>{{$item->product?$item->product->notify:''}}</td>
-            <td></td>
+            <td>
+                <div>虚：{{$item->available_quantity}}</div>
+                <div>实：{{$item->all_quantity}}</div>
+                <div>途：{{$item->normal_transit_quantity}}</div>
+                <div>特：{{$item->special_transit_quantity}}</div>
+                <div>7天销量：{{$item->getsales('-7 day')}}</div>
+                <div>14天销量：{{$item->getsales('-14 day')}}</div>
+                <div>28天销量：{{$item->getsales('-28 day')}}</div>
+                <div>建议采购值：{{$item->getNeedPurchase()}}</div>
+                <div>库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
+            </td>
             <td>{{ config('item.status')[$item->status]}}</td>
             <td>{{ $item->product->purchaseAdminer?$item->product->purchaseAdminer->name:''}}</td>
             <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>

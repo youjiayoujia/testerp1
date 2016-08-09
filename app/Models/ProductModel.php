@@ -97,6 +97,7 @@ class ProductModel extends BaseModel
         'declared_cn',
         'declared_en',
         'notify',
+        'declared_value',
     ];
 
     public function getMixedSearchAttribute()

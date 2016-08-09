@@ -17,7 +17,7 @@ class GetMessages extends Command
      *
      * @var string
      */
-    protected $signature = 'message:get';
+    protected $signature = 'message:get {accountName}';
 
     /**
      * The console command description.
@@ -45,6 +45,8 @@ class GetMessages extends Command
     public function handle()
     {
 
+        $account_name =  $this->argument('accountName');  //渠道名称
+
         //渠道测试块
 /*       foreach (AccountModel::all() as $account) {
             if($account->channel->driver =='ebay' && $account->account == 'ebay@licn2011'){ //测试diver
@@ -62,7 +64,9 @@ class GetMessages extends Command
         //遍历账号
         foreach (AccountModel::all() as $account) {
             //实例化渠道驱动
-            if($account->account == 'rebeauty'){
+            if($account->account == $account_name){
+                $this->info( $account->account . '  start get messages.');
+
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 //获取Message列表
                 $messageList = $channel->getMessages();

@@ -388,6 +388,11 @@ class TestController extends Controller
         }
     }
     public function jdtestCrm(){
+        $message_obj = MessageModel::find(36304);
+        dd($message_obj->getChannelDiver());
+        exit;
+
+
         //渠道测试块
 
 /*        $message_obj = MessageModel::find(36259);

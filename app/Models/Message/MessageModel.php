@@ -289,25 +289,39 @@ class MessageModel extends BaseModel{
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
                                if($item['Reply']['sender'] == 'user'){
-                                   $html .= '<p>'.$item['Reply']['sender'].'-'.$item['Reply']['date'].'</p>';
-                                   $html .= '<div class="alert alert-warning" role="alert">'.$item['Reply']['message'].'</div>';
+                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '</div>';
                                }else{
-                                   $html .= '<p style="text-align:right">'.$item['Reply']['sender'].'-'.$item['Reply']['date'].'</p>';
-                                   $html .= '<div class="alert alert-success" role="alert">'.$item['Reply']['message'].'</div>';
+                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '</div>';
                                }
                            }
                         }
                         break;
                     case 'aliexpress':
+                       // print_r($content->result);exit;
                         foreach ($content->result as $k => $item){
-                            $html .= '<p>'.$item->senderName.':</p>';
-                            $html .= '<div class="alert alert-success" role="alert">'.$item->content.'</div>';
+
+                            if($k % 2 == 0){
+                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$item->content;
+                                $html .= '<p class="time"><strong>时间 </strong>XXXX-XX-XX XX:XX</p>';
+                                $html .= '</div>';
+                            }else{
+                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item->senderName.':</p>'.$item->content;
+                                $html .= '<p class="time"><strong>时间 </strong>XXXX-XX-XX XX:XX </p>';
+                                $html .= '</div>';
+                            }
+
+
                         }
                         break;
 
                     case 'ebay':
                         $html = $content;
-
+                    case 'amazon':
+                        $html = $content;
                     default :
                         echo 'invalid message type';
                 }
@@ -325,6 +339,14 @@ class MessageModel extends BaseModel{
         return unserialize(base64_decode($this->channel_message_fields));
 
     }*/
+
+    /**
+     * 获取消息对应的渠道
+     * @return mixed
+     */
+    public function getChannelDiver(){
+        return $this->account->channel->driver;
+    }
 
 
 

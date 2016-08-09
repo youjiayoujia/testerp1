@@ -30,7 +30,7 @@
             <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
-                物流方式：{{config('purchase.purchaseOrder.carriage_type')[$purchaseOrder->carriage_type]}}</br>
+                物流方式：{{is_null($purchaseOrder->carriage_type)?'':config('purchase.purchaseOrder.carriage_type')[$purchaseOrder->carriage_type]}}</br>
                 外部单号：
                 {{$purchaseOrder->post_coding }}</br>
                 已打印次数:</br></br>

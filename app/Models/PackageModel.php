@@ -172,7 +172,8 @@ class PackageModel extends BaseModel
 
     public function picklistItems()
     {
-        return $this->belongsToMany('App\Models\Pick\ListItemModel', 'picklistitem_packages', 'package_id', 'picklist_item_id');
+        return $this->belongsToMany('App\Models\Pick\ListItemModel', 'picklistitem_packages', 'package_id',
+            'picklist_item_id');
     }
 
     public function logistics()
@@ -209,24 +210,23 @@ class PackageModel extends BaseModel
     public function processGoods($file)
     {
         $path = config('setting.excelPath');
-        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        !file_exists($path . 'excelProcess.xls') or unlink($path . 'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
-        $path = $path.'excelProcess.xls';
+        $path = $path . 'excelProcess.xls';
         $fd = fopen($path, 'r');
         $arr = [];
-        while(!feof($fd))
-        {
+        while (!feof($fd)) {
             $row = fgetcsv($fd);
             $arr[] = $row;
         }
         fclose($fd);
-        if(!$arr[count($arr)-1]) {
-            unset($arr[count($arr)-1]);
+        if (!$arr[count($arr) - 1]) {
+            unset($arr[count($arr) - 1]);
         }
-        foreach($arr as $key => $value) {
+        foreach ($arr as $key => $value) {
             $arr[$key] = $value[0];
         }
-        
+
         return $arr;
     }
 
@@ -824,7 +824,7 @@ class PackageModel extends BaseModel
         $arr = $this->transfer_arr($arr);
         $error[] = $arr;
         foreach ($arr as $key => $content) {
-            if($type != '3') {
+            if ($type != '3') {
                 $content['package_id'] = iconv('gb2312', 'utf-8', trim($content['package_id']));
                 $content['cost'] = iconv('gb2312', 'utf-8', trim($content['cost']));
                 $tmp_package = $this->where('id', $content['package_id'])->first();

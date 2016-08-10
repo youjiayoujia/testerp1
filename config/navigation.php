@@ -245,11 +245,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '跟踪号',
-                    'url' => 'logisticsCode.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流分区报价',
                     'url' => 'logisticsZone.index',
                     'icon' => '',

@@ -26,7 +26,6 @@ class LogisticsModel extends BaseModel
         'warehouse_id',
         'logistics_supplier_id',
         'type',
-        'url',
         'docking',
         'logistics_catalog_id',
         'logistics_email_template_id',
@@ -44,7 +43,6 @@ class LogisticsModel extends BaseModel
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
-            'url' => 'required',
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
             'logistics_email_template_id' => 'required',
@@ -58,7 +56,6 @@ class LogisticsModel extends BaseModel
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
-            'url' => 'required',
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
             'logistics_email_template_id' => 'required',
@@ -107,6 +104,11 @@ class LogisticsModel extends BaseModel
     {
         return $this->belongsToMany('App\Models\Logistics\ChannelNameModel', 'logistics_belongstos', 'logistics_id',
             'logistics_channel_id');
+    }
+
+    public function logisticsChannels()
+    {
+        return $this->hasMany('App\Models\Logistics\ChannelModel', 'logistics_id', 'id');
     }
 
     public function getApiConfigAttribute()

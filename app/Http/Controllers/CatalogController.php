@@ -279,11 +279,14 @@ class CatalogController extends Controller
         Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
+
             $th_long = count($data_array[0]); //表头字段数
             for($i = 6 ; $i < $th_long ; $i++){
                 $channels[$i] = $data_array[0][$i];
             }
             unset($data_array[0]); //去掉表头
+            echo '<pre>';
+            print_r($data_array);exit;
             if($data_array[1][1] == 'shoes'){
                 unset($data_array[1]); //去掉实例行
             }

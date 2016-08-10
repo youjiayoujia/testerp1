@@ -13,6 +13,8 @@
             <li><a href="javascript:" class="batchedit" data-name="name">中英文资料</a></li>
             <li><a href="javascript:" class="batchedit" data-name="wrap_limit">包装方式</a></li>
             <li><a href="javascript:" class="batchedit" data-name="catalog">分类</a></li>
+            <li><a href="javascript:" class="batchdelete" data-name="catalog">批量删除</a></li>
+            <li><a href="javascript:" class="" data-toggle="modal" data-target="#myModal">上传表格修改状态</a></li>
         </ul>
     </div>
 @stop{{-- 工具按钮 --}}
@@ -99,6 +101,37 @@
             </td>
         </tr>
     @endforeach
+
+        <!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               上传表格修改sku状态
+            </h4>
+         </div>
+             <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
+                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                 <input type="file" name="upload" >  
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default" 
+                       data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary" >
+                       提交
+                    </button>
+                 </div>
+             </form>
+        </div>
+    </div>
+</div>
+    
 
 @stop
 

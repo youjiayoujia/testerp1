@@ -17,7 +17,7 @@ class GetMessages extends Command
      *
      * @var string
      */
-    protected $signature = 'message:get';
+    protected $signature = 'message:get {accountName}';
 
     /**
      * The console command description.
@@ -45,24 +45,28 @@ class GetMessages extends Command
     public function handle()
     {
 
+        $account_name =  $this->argument('accountName');  //渠道名称
+
         //渠道测试块
-        foreach (AccountModel::all() as $account) {
-            if($account->channel->driver =='ebay'){ //测试diver
+/*       foreach (AccountModel::all() as $account) {
+            if($account->channel->driver =='ebay' && $account->account == 'ebay@licn2011'){ //测试diver
+                print_r($account);exit;
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
 
             }
-        }
+        }*/
 
 
-        exit;
         //渠道测试块
 
 
         //遍历账号
         foreach (AccountModel::all() as $account) {
             //实例化渠道驱动
-            if($account->channel->driver == 'wish'){
+            if($account->account == $account_name){
+                $this->info( $account->account . '  start get messages.');
+
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 //获取Message列表
                 $messageList = $channel->getMessages();
@@ -80,6 +84,7 @@ class GetMessages extends Command
                             $messageNew->date = $message['date'];
                             $messageNew->subject = $message['subject'];
                             $messageNew->content = $message['content'];
+                            $messageNew->channel_message_fields = $message['channel_message_fields'];
                             $messageNew->status  = 'UNREAD';
                             $messageNew->related  = 0;
                             $messageNew->required  = 1;

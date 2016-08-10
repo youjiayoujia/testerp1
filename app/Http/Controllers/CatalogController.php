@@ -257,7 +257,7 @@ class CatalogController extends Controller
                 '前缀'=>'XL',
                 'Set属性'=>'name1:value1,value2;name2:value1,value2',
                 'variation属性'=>'name1:value1,value2;name2:value1,value2',
-                'Feature属性(说明：1，文本；2，单选 ；3，多选 ) '=>'1-value;2-name1:value1,value2,value3;3:value1,value2,value3',
+                'Feature属性(说明：1，文本；2，单选 ；3，多选 ) '=>'1-value;2-name1:value1,value2,value3;3-nname:value1,value2,value3',
             ]
         ];
 
@@ -293,6 +293,7 @@ class CatalogController extends Controller
                 $variation = '';
                 $feature = '';
                 if(!empty($item[3])){ //SET属性
+
                     $set_group = explode(';',trim($item[3]));
                     foreach ($set_group as $itemset){
                         $set_name_ary = '';
@@ -312,6 +313,7 @@ class CatalogController extends Controller
                     }
                 }
                 if(!empty($item[4])){ //variation属性
+
                     $set_group = explode(';',trim($item[4]));
                     foreach ($set_group as $item_var){
                         $var_name_ary = '';
@@ -356,6 +358,7 @@ class CatalogController extends Controller
                     }
                 }
                 //整合费率
+
                 $rates = '';
                 foreach ($channels as $key => $value){
                     $rates[$value] = $item[$key];
@@ -372,8 +375,10 @@ class CatalogController extends Controller
                     ],
                 ];
             }
-            $result = $this->model->createLotsCatalogs($insert_array);
+
+                $result = $this->model->createLotsCatalogs($insert_array);
         },'gb2312');
+
 
         if($result){
             return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
@@ -382,6 +387,32 @@ class CatalogController extends Controller
 
         }
 
+
+    }
+
+    /**
+     * 检查属性格式有效性
+     * @param $AttributeAry
+     * @param $type
+     * return bool
+     */
+    public function doCheckAttribute($AttributeAry,$type){
+        $result = TRUE;
+        switch ($type){
+            case 'set':
+            case 'variation':
+                $check_ary = explode(';',trim($AttributeAry));
+                foreach ($check_ary as $item){
+                    $result = strstr($item,':');
+                    if($result == FALSE){
+                        break;
+                    }
+                }
+                break;
+            default:
+                return;
+        }
+        return $result;
 
     }
 }

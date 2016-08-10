@@ -106,6 +106,11 @@
         </div>
     </div>
     <div class="row">
+        <div class="form-group col-lg-2">
+            <label for="logistics_code" class="control-label">物流编码</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="logistics_code" placeholder="物流编码" name='logistics_code' value="{{ old('logistics_code') ? old('logistics_code') : $model->logistics_code }}">
+        </div>
         <div class="form-group col-lg-3">
             <label for="is_enable" class="control-label">是否启用</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>

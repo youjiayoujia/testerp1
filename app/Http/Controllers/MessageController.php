@@ -315,8 +315,7 @@ class MessageController extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show($id)
-    {
+    public function show($id){
         $model = $this->model->find($id);
         //$sum=$this->model::all();
 
@@ -330,6 +329,21 @@ class MessageController extends Controller
             'count' => $count,
         ];
         return view($this->viewPath . 'show', $response)->with('count',$count);
+    }
+
+    /**
+     * 百度翻译 copy
+     */
+    public function testbaidu(){
+        $text =$_POST['info'];
+        $baidu = new Mybaidu_transapi();
+        $result =  $baidu->translate($text);
+        if(isset($result['trans_result'][0]['dst'])){
+            ajax_return($result['trans_result'][0]['dst'],1);
+        }else{
+            ajax_return('',2);
+        }
+
     }
 
 

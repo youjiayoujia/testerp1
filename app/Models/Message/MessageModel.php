@@ -277,6 +277,7 @@ class MessageModel extends BaseModel{
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
             $html = '';
+            //dd($this->ContentDecodeBase64);exit;
             foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
@@ -295,20 +296,36 @@ class MessageModel extends BaseModel{
                         }
                         break;
                     case 'aliexpress':
-                       // print_r($content->result);exit;
-                        foreach ($content->result as $k => $item){
+                        //dd($content->result);exit;
+                        $message_content = array_reverse($content->result); //逆序
+                        foreach ($message_content as $k => $item){
+                            $content = $item->content;
 
-                            if($k % 2 == 0){
-                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$item->content;
-                                $html .= '<p class="time"><strong>时间 </strong>XXXX-XX-XX XX:XX</p>';
+                            $content = str_replace("&nbsp;", ' ', $content);
+                            $content = str_replace("&amp;nbsp;", ' ', $content);
+                            $content = str_replace("&amp;iquest;", ' ', $content);
+                            $content = str_replace("\n", "<br />", $content);
+                            $content = preg_replace("'<br \/>[\t]*?<br \/>'", '', $content);
+
+                            $content = str_replace("/:000", '<img src="http://i02.i.aliimg.com/wimg/feedback/emotions/0.gif" />', $content);
+
+                            $content = preg_replace("'\/\:0+([1-9]+0*)'", "<img src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
+                            $content = (stripslashes(stripslashes($content)));
+
+
+                            $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
+                            if($this->from_name != $item->summary->receiverName){
+                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$content;
+                                $html .= '<p class="time"><strong>时间: </strong>'.$datetime.'</p>';
+                                $html .= '<button style="float: right;" type="button" class="btn btn-success" data-container="body" data-toggle="popover" data-placement="top" data-content="需要翻译的内容">
+                                    翻译
+                                </button>';
                                 $html .= '</div>';
                             }else{
-                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item->senderName.':</p>'.$item->content;
-                                $html .= '<p class="time"><strong>时间 </strong>XXXX-XX-XX XX:XX </p>';
+                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item->senderName.':</p>'.$content;
+                                $html .= '<p class="time"><strong>时间: </strong> '.$datetime.'</p>';
                                 $html .= '</div>';
                             }
-
-
                         }
                         break;
 

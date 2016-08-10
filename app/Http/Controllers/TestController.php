@@ -388,11 +388,11 @@ class TestController extends Controller
         }
     }
     public function jdtestCrm(){
-        $message_obj = MessageModel::find(36336);
+/*        $message_obj = MessageModel::find(36336);
         //$tt = $message_obj->ChannelMessageFields();
 
         dd($message_obj->MessageFields);exit;
-        exit;
+        exit;*/
 
 
         //渠道测试块
@@ -417,7 +417,7 @@ class TestController extends Controller
  *
  *
  */        foreach (AccountModel::all() as $account) {
-            if($account->account == 'ebay@licn2011'){ //测试diver
+            if($account->account == '15899691882@163.com'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();

@@ -457,7 +457,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-
+                //print_r($message_array);exit;
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -466,12 +466,13 @@ Class AliexpressAdapter implements AdapterInterface
                             continue;
                         }
 
-
                         /**
                          * 获取信息详情
                          */
 
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+
+                        print_r(json_decode($detailArrJson));
                         //$detail_array = json_decode($detailArrJson);
                         //$detail_array = (array)$detail_array;
                         $message_list[$j]['message_id'] = $item['channelId'];
@@ -492,14 +493,18 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['readStat'] = $item['readStat'];
 
                         if($Sources == 'order_msg'){
+                            $temp_message = json_decode($detailArrJson);
+
                             $message_fields_ary = [
-                                'message_type'=> $Sources, //消息类型
-                                'order_id'=> $item['channelId'] //消息类型
+                                'message_type' => $Sources, //消息类型
+                                'order_id' => $item['channelId'], //消息类型
+                                'order_url' => $temp_message->summary->orderUrl,
                             ];
                         }else{
                             $message_fields_ary = [
-                                'message_type'=> $Sources, //消息类型
-                                'order_id'=> ''
+                                'message_type' => $Sources, //消息类型
+                                'order_id' => '',
+                                'order_url' =>'',
 
                             ];
                         }

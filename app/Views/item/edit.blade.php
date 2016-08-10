@@ -81,6 +81,35 @@
         </div>        
     </div>
 
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="length">长</label>
+            <input class="form-control" id="length" placeholder="length" name='length' value="{{ old('length') ?  old('length') : $model->length }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="width">宽</label>
+            <input class="form-control" id="width" placeholder="width" name='width' value="{{old('width') ?  old('width') : $model->width }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="height">高</label>
+            <input class="form-control" id="height" placeholder="height" name='height' value="{{ old('height') ?  old('height') : $model->height }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="package_length">包装后长</label>
+            <input class="form-control" id="package_length" placeholder="package_length" name='package_length' value="{{ old('package_length') ?  old('package_length') : $model->package_length }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="package_width">包装后宽</label>
+            <input class="form-control" id="package_width" placeholder="package_width" name='package_width' value="{{old('package_width') ?  old('package_width') : $model->package_width }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="package_height">包装后高</label>
+            <input class="form-control" id="package_height" placeholder="package_height" name='package_height' value="{{ old('package_height') ?  old('package_height') : $model->package_height }}">
+        </div>
+    </div>
 
     <div class="row">
         <div class="form-group col-md-1">

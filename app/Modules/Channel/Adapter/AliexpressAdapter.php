@@ -458,7 +458,6 @@ Class AliexpressAdapter implements AdapterInterface
         $parameter['access_token'] = $this->_access_token;
     
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
-    
         //参数
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return $result;

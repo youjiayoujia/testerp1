@@ -12,6 +12,8 @@ use App\Modules\Logistics\Adapter\ChukouyiAdapter;
 use App\Modules\Logistics\Adapter\CoeAdapter;
 use App\Modules\Logistics\Adapter\szChinaPostAdapter;
 use App\Modules\Logistics\Adapter\WinitAdapter;
+use App\Modules\Logistics\Adapter\FpxAdapter;
+use App\Modules\Logistics\Adapter\SmtAdapter;
 
 class LogisticsModule
 {
@@ -48,5 +50,13 @@ class LogisticsModule
     
     public function createWinitDriver($config){
         return new WinitAdapter($config);
+    }
+    
+    public function createFpxDriver($config){
+        return new FpxAdapter($config);
+    }
+    
+    public function createSmtDriver($config){
+        return new SmtAdapter($config);
     }
 }

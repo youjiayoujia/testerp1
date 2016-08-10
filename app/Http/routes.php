@@ -15,7 +15,7 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@testWinit');
+Route::get('test1', 'TestController@testSmt');
 Route::get('test2', 'TestController@test2');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');

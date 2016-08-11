@@ -342,6 +342,8 @@ Route::group(['middleware' => 'auth'], function () {
     //物流路由
     Route::get('logisticsCode/one/{id}',
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
+    Route::get('logisticsZone/one/{id}',
+        ['uses' => 'Logistics\ZoneController@one', 'as' => 'logisticsZone.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::get('logistics/ajaxSupplier', ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);

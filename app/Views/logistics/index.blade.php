@@ -50,6 +50,9 @@
                         <span class="glyphicon glyphicon-eye-open"></span> 追踪号
                     </a>
                 @endif
+                <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-eye-open"></span> 分区报价
+                </a>
             </td>
         </tr>
     @endforeach

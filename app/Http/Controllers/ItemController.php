@@ -230,6 +230,16 @@ class ItemController extends Controller
 
     public function batchDelete()
     {
-        
+        $item_ids = request()->input('item_ids');
+        $item_ids = explode(',', $item_ids);
+        foreach ($item_ids as $key => $item_id) {
+            $model = $this->model->find($item_id);
+            if (!$model) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            }
+            $model->destroy($item_id);
+        }
+
+        return 1;
     }
 }

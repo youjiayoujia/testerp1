@@ -164,5 +164,28 @@
             }
         }
 
+        $('.batchdelete').click(function () {
+            
+            var url = "{{route('item.batchDelete')}}";
+
+            var checkbox = document.getElementsByName("tribute_id");
+            var item_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                item_ids += checkbox[i].value + ",";
+            }
+            item_ids = item_ids.substr(0, (item_ids.length) - 1);
+
+            $.ajax({
+                url: url,
+                data: {item_ids:item_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
+        });
+
     </script>
 @stop

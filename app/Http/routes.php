@@ -288,6 +288,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::any('item/uploadSku', ['uses' => 'ItemController@uploadSku', 'as' => 'item.uploadSku']);
+    Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');

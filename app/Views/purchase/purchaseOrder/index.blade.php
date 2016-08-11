@@ -4,9 +4,14 @@
         <a href="/purchaseOrder/purchaseOrdersOut" class="btn btn-info" id="orderExcelOut"> 采购单导出
         </a>
     </div>
+    <div class="btn-group">
+        <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
+            <i class="glyphicon glyphicon-plus"></i> 新增
+        </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-	
+	<th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th>ID</th> 
     <th>采购单状态</th>
     <th>付款状态</th>
@@ -22,6 +27,7 @@
     @foreach($data as $purchaseOrder)
 
         <tr>
+            <td><input type="checkbox" name="tribute_id" value="{{$purchaseOrder->id}}"></td>
             <td>单据号：NO.{{$purchaseOrder->id }}</br>
             	付款方式：{{$purchaseOrder->supplier?$purchaseOrder->supplier->pay_type:''}}</br>
                 外部单号：
@@ -154,7 +160,12 @@
                 
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
-                </a>  
+                </a>
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $purchaseOrder->id }}"
+                   data-url="{{ route('purchaseOrder.destroy', ['id' => $purchaseOrder->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </a> 
             </td>
         </tr>
         <!-- 模态框（Modal） -->
@@ -235,6 +246,15 @@
 </div>
 
 @endif
+
+@section('doAction')
+    <div class="row">
+        <div class="col-lg-12">
+            <button class="examine" value="edit">批量审核</button>
+        </div>
+    </div>
+@stop
+
 @stop
 
 @section('childJs')
@@ -300,6 +320,42 @@
                 }
             });
            
+        });
+
+        //全选
+        function quanxuan() {
+            var collid = document.getElementById("checkall");
+            var coll = document.getElementsByName("tribute_id");
+            if (collid.checked) {
+                for (var i = 0; i < coll.length; i++)
+                    coll[i].checked = true;
+            } else {
+                for (var i = 0; i < coll.length; i++)
+                    coll[i].checked = false;
+            }
+        }
+
+        $('.examine').click(function () {
+            
+            var url = "{{route('purchaseExmaine')}}";
+
+            var checkbox = document.getElementsByName("tribute_id");
+            var purchase_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                purchase_ids += checkbox[i].value + ",";
+            }
+            purchase_ids = purchase_ids.substr(0, (purchase_ids.length) - 1);
+
+            $.ajax({
+                url: url,
+                data: {purchase_ids:purchase_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
         });
     </script>
 @stop

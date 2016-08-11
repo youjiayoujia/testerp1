@@ -37,9 +37,6 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
-            if (isset($this->order['remark'])) {
-                $order->remark($this->order['remark']);
-            }
             if ($order) {
                 $package = $order->createPackage();
                 if ($order->status == 'PREPARED' && $package) {
@@ -60,10 +57,9 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $this->result['remark'] = 'Fail to put order in.';
             }
         } else {
-
-            if($oldOrder->channel_id==4&&$oldOrder->status=='UNPAID'&&$this->order['status']=='PAID'){//ebay  以前是UNPAID  现在是PAID 需要更新
+            if ($oldOrder->channel_id == 4 && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
                 $this->order['id'] = $oldOrder->id;
-                $order= $orderModel->updateOrder($this->order,$oldOrder);
+                $order = $orderModel->updateOrder($this->order, $oldOrder);
                 if ($order) {
                     $this->relation_id = $oldOrder->id;
                     $this->result['status'] = 'success';
@@ -73,7 +69,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                     $this->result['status'] = 'fail';
                     $this->result['remark'] = 'Fail to update to PAID.';
                 }
-            }else{
+            } else {
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Order has been exist.';
             }

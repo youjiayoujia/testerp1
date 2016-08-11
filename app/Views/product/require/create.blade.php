@@ -86,7 +86,7 @@
         </div>
     </div>
     <div class='row'>
-        <div class="form-group col-lg-4">
+        <!-- <div class="form-group col-lg-4">
             <label for="needer_id">需求渠道</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 <select  class="form-control" name="needer_id" id="needer_id">
                     @foreach($channel as $_channel)
@@ -103,10 +103,10 @@
                     @endforeach
                 </select>
             
-        </div>
+        </div> -->
         <div class="form-group col-lg-4">
-            <label for="created_by">创建人</label>
-            <input class="form-control" id="created_by" placeholder="创建人" name='created_by' value="{{ old('created_by') }}" readonly>
+            <label for="purchase_id">采购人</label>
+            <select class='form-control purchase_id' name="purchase_id"></select>
         </div>
     </div>
 
@@ -153,6 +153,22 @@
                     }                  
             })
         })
+    });
+
+    $('.purchase_id').select2({
+        ajax: {
+            url: "{{ route('ajaxUser') }}",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+              return {
+                user:params.term,
+              };
+            },
+            results: function(data, page) {
+                
+            }
+        },
     });
 </script>
 @stop

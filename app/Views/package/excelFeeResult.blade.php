@@ -11,13 +11,21 @@
         <div class="panel-body">
             <div class='row'>
                 <div class='col-lg-4'><label>package_id</label></div>
-                <div class='col-lg-4'><label>cost</label></div>
+                @if($type != '3')
+                    <div class='col-lg-4'><label>cost</label></div>
+                @else
+                    <div class='col-lg-4'><label>tracking_no</label></div>
+                @endif
             </div>
             @foreach($errors as $key => $value)
             @if($key != 0)
             <div class='row'>
                 <div class='col-lg-4'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value]['package_id']) }}"></div>
-                <div class='col-lg-4'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value]['cost']) }}"></div>
+                @if($type != '3')
+                    <div class='col-lg-4'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value]['cost']) }}"></div>
+                @else
+                    <div class='col-lg-4'><input type='text' class='form-control' value="{{ iconv('gb2312','utf-8',$errors[0][$value]['tracking_no']) }}"></div>
+                @endif
             </div>
             @endif
             @endforeach

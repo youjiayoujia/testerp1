@@ -37,8 +37,9 @@ class CreateProductRequire extends Migration
             $table->date('expected_date')->comment('希望上传日期');
             $table->integer('needer_id')->comment('需求人id')->default(NULL);
             $table->integer('needer_shop_id')->comment('需求店铺id')->default(NULL);
-            $table->string('created_by')->comment('创建人')->default(NULL);
-            $table->enum('status',['0', '1', '2'])->comment('处理状态')->default('0');
+            $table->integer('created_by')->comment('创建人')->default(NULL);
+            $table->integer('purchase_id')->comment('采购人')->default(NULL);
+            $table->enum('status',['0', '1', '2','3'])->comment('处理状态')->default('0');
             $table->integer('handle_id')->comment('处理人id')->nullable()->default(NULL);
             $table->date('handle_time')->comment('处理时间')->nullable()->default(NULL);
             $table->timestamps();

@@ -39,6 +39,37 @@ class CodeController extends Controller
         return view($this->viewPath . 'create', $response);
     }
 
+    public function store()
+    {
+        request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
+        $data = request()->all();
+        $codes = $this->model->where('code', request('code'))->count();
+        if($codes == 0) {
+            $this->model->create($data);
+            return redirect($this->mainIndex);
+        }else {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '跟踪号已存在'));
+        }
+    }
+
+    public function update($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $this->validate(request(), $this->model->rules('update'));
+        $data = request()->all();
+        $codes = $this->model->where('code', request('code'))->count();
+        if($codes == 0) {
+            $model->update($data);
+            return redirect($this->mainIndex);
+        }else {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '跟踪号已存在'));
+        }
+    }
+
     /**
      * 某个物流方式追踪号首页
      */

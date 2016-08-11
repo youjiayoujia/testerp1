@@ -178,6 +178,12 @@ class BlacklistModel extends BaseModel
             $blacklist['refund_order'] = iconv('gb2312','utf-8',$blacklist['refund_order']);
             $blacklist['refund_rate'] = iconv('gb2312','utf-8',$blacklist['refund_rate']);
             $blacklist['color'] = iconv('gb2312','utf-8','white');
+            $channel = ChannelModel::where('id', $blacklist['channel_id'])->count();
+            if($channel > 0) {
+                $this->create($blacklist);
+            }else {
+                break;
+            }
             $channel_id = ChannelModel::where('driver', 'wish')->first()->id;
             $orders1 = OrderModel::where('email', $blacklist['email'])
                 ->where('channel_id', '!=', $channel_id)
@@ -199,7 +205,6 @@ class BlacklistModel extends BaseModel
                     $order2->update(['blacklist' => '0']);
                 }
             }
-            $this->create($blacklist);
         }
 
         return $error;

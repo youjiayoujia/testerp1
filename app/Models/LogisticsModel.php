@@ -123,7 +123,7 @@ class LogisticsModel extends BaseModel
         $config['key'] = $this->supplier->secret_key;
 
         $config['returnCompany'] = $this->emailTemplate->unit;
-        $config['returnContact'] = $this->emailTemplate->secret_key;
+        $config['returnContact'] = $this->emailTemplate->sender;
         $config['returnPhone'] = $this->emailTemplate->phone;
         $config['returnAddress'] = $this->emailTemplate->address;
         $config['returnZipcode'] = $this->emailTemplate->zipcode;

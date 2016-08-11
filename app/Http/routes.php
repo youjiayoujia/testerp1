@@ -287,6 +287,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
+    Route::any('item/uploadSku', ['uses' => 'ItemController@uploadSku', 'as' => 'item.uploadSku']);
+    Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
@@ -342,6 +344,8 @@ Route::group(['middleware' => 'auth'], function () {
     //物流路由
     Route::get('logisticsCode/one/{id}',
         ['uses' => 'Logistics\CodeController@one', 'as' => 'logisticsCode.one']);
+    Route::get('logisticsZone/one/{id}',
+        ['uses' => 'Logistics\ZoneController@one', 'as' => 'logisticsZone.one']);
     Route::get('logistics/getLogistics',
         ['uses' => 'LogisticsController@getLogistics', 'as' => 'logistics.getLogistics']);
     Route::get('logistics/ajaxSupplier', ['uses' => 'LogisticsController@ajaxSupplier', 'as' => 'logistics.ajaxSupplier']);

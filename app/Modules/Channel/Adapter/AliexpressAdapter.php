@@ -42,7 +42,14 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
-
+    /** 获取订单
+     * @param $startDate 开始时间
+     * @param $endDate 结束时间
+     * @param array $status 订单状态
+     * @param int $perPage 页码
+     * @param string $nextToken
+     * @return array
+     */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
         if (empty($nextToken)) {
@@ -87,6 +94,14 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
+    /**获取订单(暂时没有用)
+     * @param $startDate
+     * @param $endDate
+     * @param $status
+     * @param int $page
+     * @param int $perPage
+     * @return mixed
+     */
     public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
     {
 
@@ -101,7 +116,10 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
-
+    /** 获取订单详情
+     * @param $orderID 订单号
+     * @return mixed
+     */
     public function getOrder($orderID)
     {
         $param = "orderId=" . $orderID;
@@ -109,24 +127,22 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
+    /** 回传追踪号
+     * @param $tracking_info 需要上传的信息
+     * @return array
+     */
     public function returnTrack($tracking_info)
     {
         $return = [];
         $action = 'api.sellerShipment';
         $app_url = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
-        $parameter['access_token'] = $this->_access_token;
-        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
-        //$result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
-        //$result = json_decode($result,true);
-        $rand_id = rand(1, 10);
-        if ($rand_id > 3) {
-            $result['success'] = 'Falie';
 
-        } else {
-            $result['success'] = 'true';
+        $tracking_info['access_token'] = $this->_access_token;
+        $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
+        $result = json_decode($result,true);
 
-        }
         if (isset($result['success']) && ($result['success'] == 'true')) {
             $return['status'] = true;
             $return['info'] = 'Success';
@@ -136,11 +152,42 @@ Class AliexpressAdapter implements AdapterInterface
             $return['info'] = isset($result['error_message']) ? $result['error_message'] : "error";
         }
         return $return;
+    }
 
+    /** 获取需要评价的订单
+     * @param int $currentPage 页码
+     * @param int $pageSize 页数
+     * @return bool
+     */
+    public function getSellerEvaluationOrderList($currentPage=1, $pageSize=100){
+        $param ="currentPage=$currentPage&pageSize=$pageSize";
+        $result = $this->getJsonData('api.evaluation.querySellerEvaluationOrderList', $param);
+        $result = json_decode($result,true);
+        if(isset($result['listResult'])||!empty($result['listResult'])){
+            return     $result['listResult'];
+        }else{
+            return false;
+        }
+    }
 
+    /** 评价订单
+     * @param $orderID 订单号
+     * @param string $text 内容
+     * @param int $score 评分
+     */
+    public function evaluateOrder($orderID,$text='Excellent buyer, welcome! Any questions please contact us.',$score=5){
+        $feedbackContent = rawurlencode($text);//评价的内容
+        $param = "orderId=$orderID&score=$score&feedbackContent=$feedbackContent";
+        $result = $this->getJsonData("api.evaluation.saveSellerFeedback", $param);
+        var_dump($result);
     }
 
 
+    /** 订单信息的组装
+     * @param $list
+     * @param $orderDetail
+     * @return array
+     */
     public function parseOrder($list, $orderDetail)
     {
 
@@ -227,7 +274,7 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
-    /**
+    /** 支付时间 转换
      * @param $paytime
      * @return bool|string
      */

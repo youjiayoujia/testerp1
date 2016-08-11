@@ -385,6 +385,7 @@ class PurchaseOrderController extends Controller
             'id' => $id,
             'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
             'purchase_num_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
+            'purchase_cost_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_cost'),
             'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
             'postage_sum'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
         ];
@@ -394,6 +395,23 @@ class PurchaseOrderController extends Controller
             }
             $response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
+    }
+
+    /**
+    * 打印入库单
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function printInWarehouseOrder($id){
+        $model=$this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'printInWarehouseOrder', $response);
     }
 
     /**

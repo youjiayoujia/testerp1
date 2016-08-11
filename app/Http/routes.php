@@ -198,6 +198,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printInWarehouseOrder/{id}', ['uses' => 'Purchase\PurchaseOrderController@printInWarehouseOrder', 'as' => 'purchaseOrder.printInWarehouseOrder']);
     Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
     Route::any('purchaseOrder/ajaxInWarehouse',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);

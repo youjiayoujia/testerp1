@@ -6,6 +6,7 @@
  * Time: 上午9:19
  */
 namespace App\Http\Controllers;
+header('Content-type: text/html; charset=UTF-8');
 
 use App\Models\ChannelModel;
 use App\Models\Message\MessageModel;
@@ -18,6 +19,12 @@ use App\Models\Channel\AccountModel;
 use App\Models\OrderModel;
 use App\Modules\Paypal\PaypalApi;
 use App\Models\Order\OrderPaypalDetailModel;
+
+use App\Models\Publish\Ebay\EbayFeedBackModel;
+use App\Models\Publish\Ebay\EbaySpecificsModel;
+
+
+
 use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
@@ -66,10 +73,9 @@ class TestController extends Controller
 
     public function index()
     {
-        $package = PackageModel::findOrFail(1);
-        $trackingNumber =
-            Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-                ->getTracking($package);
+        $package = PackageModel::findOrFail(3931);
+        $trackingNumber = Logistics::driver($package->logistics->driver, $package->logistics->api_config)->getTracking($package);
+        var_dump($trackingNumber);
         exit;
     }
 
@@ -285,6 +291,44 @@ class TestController extends Controller
 
     public function testLazada()
     {
+
+
+        $accountId= 201;
+        $account = AccountModel::findOrFail($accountId);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $startDate = date('Y-m-d',strtotime('-2 day'));
+        $page = 0;
+        $is_do = true;
+        do{
+            $result = $channel->getChangedOrders($startDate,$page,$pageSize=500);
+            if($result){
+                $page++;
+                foreach($result as $re) {
+                    if ($re['Order']['state'] == 'REFUNDED') { //退款状态
+                        var_dump($re);
+                    }
+
+                }
+            }else{
+                $is_do = false;
+            }
+        }while($is_do);
+
+
+
+
+
+
+      /*  $result = $channel->GetFeedback();
+        foreach($result as $re){
+            $re['channel_account_id'] = $accountId;
+            $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$accountId])->first();
+            if(empty($feedback)){
+                echo 11;
+                EbayFeedBackModel::create($re);
+            }
+        }*/
+
         $packages = PackageModel::where('order_id', 12914)->get();
         foreach ($packages as $package) {
             $OrderItemIds = [];
@@ -317,6 +361,7 @@ class TestController extends Controller
             var_dump($OrderItemIds);
             var_dump($result);
         }
+
         exit;
     }
 

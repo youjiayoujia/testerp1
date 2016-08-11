@@ -499,10 +499,12 @@
     <script type='text/javascript'>
 
 
-        var ue = UM.getEditor('content', {
+        var content = UM.getEditor('content', {
             initialFrameHeight: 500,
             initialFrameWidth:1200
         });
+        content.setWidth("100%");
+        $(".edui-body-container").css("width", "98%");
         /* ue.ready(function() {
          ue.setContent('<p>hello!</p>'); //ture 追加内容
          });*/

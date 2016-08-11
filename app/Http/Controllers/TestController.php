@@ -78,6 +78,34 @@ class TestController extends Controller
         var_dump($trackingNumber);
         exit;
     }
+    
+    public function testChinaPost(){
+        $package = PackageModel::findOrFail(2);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
+    
+    public function testWinit(){
+        $package = PackageModel::findOrFail(2);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
+    
+    public function test4px(){
+        $package = PackageModel::findOrFail(2);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
+    
+    public function testSmt(){
+        $package = PackageModel::findOrFail(2);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->createWarehouseOrder($package);
+        exit;
+    }
 
     public function aliexpressOrdersList()
     {

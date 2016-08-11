@@ -75,6 +75,7 @@ class LogisticsController extends Controller
             $data['is_up'] = request('channel_id')[$k];
             $model->logisticsChannels()->create($data);
         }
+        $str = '';
         if(request()->has('logistics_limits')) {
             $str = implode(',', request('logistics_limits'));
         }
@@ -165,6 +166,7 @@ class LogisticsController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $buf = request()->all();
+        $buf['limit'] = '';
         if(request()->has('logistics_limits')) {
             $buf['limit'] = implode(',', request('logistics_limits'));
         }

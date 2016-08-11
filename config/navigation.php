@@ -245,11 +245,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '物流分区报价',
-                    'url' => 'logisticsZone.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流分配规则',
                     'url' => 'logisticsRule.index',
                     'icon' => '',

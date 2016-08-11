@@ -55,11 +55,6 @@
     </div>
     <div class='row'>
         <div class="form-group col-lg-2">
-            <label for="url" class="control-label">物流追踪网址</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') ? old('url') : $model->url}}">
-        </div>
-        <div class="form-group col-lg-2">
             <label for="logistics_catalog_id">物流分类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
@@ -95,6 +90,11 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-lg-2">
+            <label for="driver" class="control-label">驱动名</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') ? old('driver') : $model->driver }}">
+        </div>
         <div class='form-group col-lg-4'>
             <label for="logistics_limits">物流限制</label>
             <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
@@ -107,9 +107,9 @@
     </div>
     <div class="row">
         <div class="form-group col-lg-2">
-            <label for="driver" class="control-label">驱动名</label>
+            <label for="logistics_code" class="control-label">物流编码</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') ? old('driver') : $model->driver }}">
+            <input class="form-control" id="logistics_code" placeholder="物流编码" name='logistics_code' value="{{ old('logistics_code') ? old('logistics_code') : $model->logistics_code }}">
         </div>
         <div class="form-group col-lg-3">
             <label for="is_enable" class="control-label">是否启用</label>
@@ -201,6 +201,78 @@
                     @endforeach
                 </select>
             </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">渠道是否回传</div>
+        <div class="panel-body">
+            @if($channels->count() == $logisticsChannels->count())
+                @foreach($channels as $channel)
+                    @foreach($logisticsChannels as $logisticsChannel)
+                        @if($channel->id == $logisticsChannel->channel_id)
+                            <div class="form-group col-lg-2">
+                                <label for="channel_id[{{ $channel->id }}]" class="control-label">{{ $channel->name }}平台</label>
+                                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="channel_id[{{ $channel->id }}]" value="1" {{ $logisticsChannel->is_up == '1' ? 'checked' : '' }}>上传
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="channel_id[{{ $channel->id }}]" value="0" {{ $logisticsChannel->is_up == '0' ? 'checked' : '' }}>不上传
+                                    </label>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                @endforeach
+            @endif
+            @if($logisticsChannels->count() == 0)
+                @foreach($channels as $channel)
+                    <div class="form-group col-lg-2">
+                        <label for="channel_id[{{ $channel->id }}]" class="control-label">{{ $channel->name }}平台</label>
+                        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="channel_id[{{ $channel->id }}]" value="1">上传
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="channel_id[{{ $channel->id }}]" value="0" checked>不上传
+                            </label>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">物流追踪网址</div>
+        <div class="panel-body">
+            @if($channels->count() == $logisticsChannels->count())
+                @foreach($channels as $channel)
+                    @foreach($logisticsChannels as $logisticsChannel)
+                        @if($channel->id == $logisticsChannel->channel_id)
+                            <div class="form-group col-lg-2">
+                                <label for="url[{{ $channel->id }}]" class="control-label">{{ $channel->name }}追踪网址</label>
+                                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                <input class="form-control" id="url[{{ $channel->id }}]" placeholder="追踪网址" name='url[{{ $channel->id }}]' value="{{ old('url[' . $channel->id . ']') ? old('url[' . $channel->id . ']') : $logisticsChannel->url }}">
+                            </div>
+                        @endif
+                    @endforeach
+                @endforeach
+            @endif
+            @if($logisticsChannels->count() == 0)
+                @foreach($channels as $channel)
+                    <div class="form-group col-lg-2">
+                        <label for="url[{{ $channel->id }}]" class="control-label">{{ $channel->name }}追踪网址</label>
+                        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <input class="form-control" id="url[{{ $channel->id }}]" placeholder="追踪网址" name='url[{{ $channel->id }}]' value="{{ old('url[' . $channel->id . ']') }}">
+                    </div>
+                @endforeach
+            @endif
         </div>
     </div>
 @stop

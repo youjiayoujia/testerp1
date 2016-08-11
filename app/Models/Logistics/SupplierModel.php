@@ -10,6 +10,7 @@
 
 namespace App\Models\Logistics;
 
+use Storage;
 use App\Base\BaseModel;
 
 class SupplierModel extends BaseModel
@@ -33,33 +34,96 @@ class SupplierModel extends BaseModel
         'card_number',
         'url',
         'password',
+        'customer_service_name',
+        'customer_service_qq',
+        'customer_service_tel',
+        'finance_name',
+        'finance_qq',
+        'finance_tel',
+        'driver',
+        'driver_tel',
+        'logistics_collection_info_id',
+        'credentials',
     ];
 
     public $rules = [
         'create' => [
-            'name' => 'required|unique:logistics_suppliers,name',
+            'name' => 'required',
             'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
             'technician' => 'required',
-            'manager_tel' => 'required|digits_between:8,11',
-            'technician_tel' => 'required|digits_between:8,11',
+            'manager_tel' => 'required',
+            'technician_tel' => 'required',
             'url' => 'required',
             'password' => 'required',
+            'customer_service_name' => 'required',
+            'customer_service_qq' => 'required',
+            'customer_service_tel' => 'required',
+            'finance_name' => 'required',
+            'finance_qq' => 'required',
+            'finance_tel' => 'required',
+            'driver' => 'required',
+            'driver_tel' => 'required',
+            'logistics_collection_info_id' => 'required',
         ],
         'update' => [
-            'name' => 'required|unique:logistics_suppliers,name,{id}',
+            'name' => 'required',
             'customer_id' => 'required',
             'secret_key' => 'required',
             'is_api' => 'required',
             'client_manager' => 'required',
             'technician' => 'required',
-            'manager_tel' => 'required|digits_between:8,11',
-            'technician_tel' => 'required|digits_between:8,11',
+            'manager_tel' => 'required',
+            'technician_tel' => 'required',
             'url' => 'required',
             'password' => 'required',
+            'customer_service_name' => 'required',
+            'customer_service_qq' => 'required',
+            'customer_service_tel' => 'required',
+            'finance_name' => 'required',
+            'finance_qq' => 'required',
+            'finance_tel' => 'required',
+            'driver' => 'required',
+            'driver_tel' => 'required',
+            'logistics_collection_info_id' => 'required',
         ],
     ];
+
+    public function collectionInfo()
+    {
+        return $this->belongsTo('App\Models\Logistics\CollectionInfoModel', 'logistics_collection_info_id', 'id');
+    }
+
+    public function createSupplier($data, $file = null)
+    {
+        $path = 'uploads/supplier' . '/';
+        if ($file != '' && $file->getClientOriginalName()) {
+            $data['credentials'] = $path . time() . '.' . $file->getClientOriginalExtension();
+            Storage::disk('product')->put($data['credentials'], file_get_contents($file->getRealPath()));
+        }
+        return $this->create($data);
+    }
+
+    public function updateSupplier($id, $data, $file = null)
+    {
+        $path = 'uploads/supplier' . '/';
+        if ($file != '' && $file->getClientOriginalName()) {
+            $supplier = $this->where('id', $id)->first();
+            $supplierPath = $supplier['credentials'];
+            if($file->getClientOriginalExtension() != 'php') {
+                $data['credentials'] = $path . time() . '.' . $file->getClientOriginalExtension();
+                if($file->move($path, $data['credentials']) && $supplierPath != ''){
+                    if(file_exists('./' . $path . $supplierPath)){
+                        unlink('./' . $path . $supplierPath);
+                    }
+                }
+            }
+        } else {
+            $data['credentials'] = '';
+        }
+        return $this->find($id)->update($data);
+    }
 
 }

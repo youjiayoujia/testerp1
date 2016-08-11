@@ -322,6 +322,7 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $code_arr = explode("&", $strcode);//去掉&
         $newcode_arr = array();
+
         foreach ($code_arr as $key => $val) {
             $code_narr = explode("=", $val);//分割=
             $newcode_arr [$code_narr [0]] = $code_narr [1];//重组数组
@@ -478,6 +479,8 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
+
+
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -511,6 +514,21 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
 
+                        if($Sources == 'order_msg'){
+                            $message_fields_ary = [
+                                'message_type'=> $Sources, //消息类型
+                                'order_id'=> $item['channelId'] //消息类型
+                            ];
+                        }else{
+                            $message_fields_ary = [
+                                'message_type'=> $Sources, //消息类型
+                                'order_id'=> ''
+
+                            ];
+                        }
+
+                        $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
                     }
                 }else{
@@ -519,7 +537,6 @@ Class AliexpressAdapter implements AdapterInterface
                 $j++;
             }
         }
-
         return (!empty($message_list)) ? $message_list : false;
     }
     

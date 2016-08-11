@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pick\ErrorListModel;
 use App\Models\PackageModel;
+use Excel;
 
 class ErrorListController extends Controller
 {
@@ -33,14 +34,6 @@ class ErrorListController extends Controller
     public function index()
     {
         request()->flash();
-        $packages = PackageModel::where('status', 'ERROR')->get();
-        foreach($packages as $package) 
-        {
-            if(!$this->model->where('package_id', $package->id)->count()) {
-                $this->model->create(['picklist_id'=>$package->picklist_id, 'package_id'=>$package->id]);
-            }
-        }
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
@@ -86,5 +79,30 @@ class ErrorListController extends Controller
         $package->update(['status' => 'SHIPPED']);
         $model->update(['status' => '1', 'process_by' => request()->user()->id, 'process_time' => date('Y-m-d h:m:s', time())]);
         return json_encode('true');
+    }
+
+    public function exportException($arr)
+    {
+        $rows = [];
+        foreach(explode(',', $arr) as $id) {
+            $model = $this->model->find($id);
+            $rows[] = [
+                'sku' => $model->item ? $model->item->sku : '',
+                // iconv('utf-8', 'gbk', '包裹号') => $model->packageNum,
+                // iconv('utf-8', 'gbk', '库位') => iconv('utf-8', 'gbk', $model->warehousePosition ? $model->warehousePosition->name : ''),
+                // iconv('utf-8', 'gbk', '仓库') => iconv('utf-8', 'gbk', $model->warehouse ? $model->warehouse->name : ''),
+                // iconv('utf-8', 'gbk', '数量') => $model->quantity,
+                '包裹号' => $model->packageNum,
+                '库位' => $model->warehousePosition ? $model->warehousePosition->name : '',
+                '仓库' => $model->warehouse ? $model->warehouse->name : '',
+                '数量' => $model->quantity,
+            ];
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 }

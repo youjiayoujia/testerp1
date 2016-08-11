@@ -77,6 +77,7 @@ class MessageController extends Controller
                 //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
+                'driver' => $message->getChannelDiver(),
             ];
             return view($this->viewPath . 'process', $response)->with('count',$count);
 

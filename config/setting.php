@@ -78,7 +78,12 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+
         'productSku.skuCode'=>'产品SKU',
+
+
+        'pay_type' =>'付款类型',
+        'close_status'=>'付款状态',
 
         'by_id' => '买家ID',
         'profit_rate' => '利润率',

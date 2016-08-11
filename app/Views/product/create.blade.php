@@ -216,8 +216,8 @@
             <input class="form-control" id="declared_en" placeholder="申报英文" name='declared_en' value="{{ old('declared_en') }}">
         </div>
         <div class="form-group col-md-3">
-            <label for="color">申报价格</label>
-            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') }}">
+            <label for="color">注意事项</label>
+            <input class="form-control" id="notify" placeholder="注意事项" name='notify' value="{{ old('notify') }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">配件</label>

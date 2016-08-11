@@ -17,12 +17,11 @@
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
     <th class="sort" data-field="id">ID</th>
     <th>图片</th>
-    <th class="sort" data-field="sku">sku名称</th>
-    <th class="sort" data-field="c_name">中文名称</th>
-    <th>分类</th>
+    <th class="sort" data-field="sku">产品名称</th>
+    <th class="sort" data-field="c_name">sku</th>
     <th>重量</th>
     <th>仓位</th>
-    <th>申报价值</th>
+    <th>申报资料</th>
     <th>注意事项</th>
     <th>小计</th>
     <th>状态</th>
@@ -41,17 +40,24 @@
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
             <td><img src="{{ asset($item->product->dimage) }}" width="100px"></td>
-            <td>{{ $item->c_name }}<br>分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>开发时间：{{ $item->created_at }}<br></td>
-            <td>{{ $item->c_name }}</td>
-            <td>{{ $item->product and $item->product->catalog ? $item->product->catalog->name : ''}}</td>
-            <td>{{ $item->weight }}</td>
-            <td>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
-            <td></td>
-            <td></td>
+            <td>{{ $item->c_name }}<br>物品分类：{{ $item->product->catalog?$item->product->catalog->all_name:'' }}<br>
+                                    开发时间：{{ $item->created_at }}<br>
+                                    【包装方式：<br>
+                                    @foreach($item->product->wrapLimit as $wrap)
+                                        {{$wrap->name}}<br>
+                                    @endforeach
+                                    】
+                                </td>
+            <td>{{ $item->sku }}</td>
+            <td>{{ $item->weight }}kg</td>
+            <td>{{ $item->warehouse?$item->warehouse->name:'' }}<br>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
+            <td>{{ $item->product?$item->product->declared_en:'' }}<br>{{ $item->product?$item->product->declared_cn:'' }}<br>
+                    $<?php if(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);} ?></td>
+            <td>{{$item->product?$item->product->notify:''}}</td>
             <td></td>
             <td>{{ config('item.status')[$item->status]}}</td>
-            <td>{{ $item->product->weight }}</td>
-            <td></td>
+            <td>{{ $item->product->purchaseAdminer?$item->product->purchaseAdminer->name:''}}</td>
+            <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>
             <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
             <td>{{ $item->updated_at }}</td>
             <td>{{ $item->created_at }}</td>

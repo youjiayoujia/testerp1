@@ -102,9 +102,6 @@
         </div>
     </div>
 <script>
-    $(function () {
-        $('[data-toggle="popover"]').popover()
-    });
     function check() {
         var to_email = $("#to_email").val();
         //对电子邮件的验证

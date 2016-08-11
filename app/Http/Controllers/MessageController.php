@@ -12,6 +12,7 @@ use App\Models\Message\AccountModel;
 use App\Models\Message\Message_logModel;
 use App\Models\Message\ReplyModel;
 use App\Jobs\SendMessages;
+use Translation;
 
 
 class MessageController extends Controller
@@ -332,9 +333,29 @@ class MessageController extends Controller
     }
 
     /**
-     * 百度翻译 copy
+     * ajax获取百度翻译
      */
-    public function testbaidu(){
+    public function ajaxGetTranInfo(){
+        if(request()->ajax()){
+            $content = request()->input('content');
+            if(!empty($content)){
+                $result = Translation::translate($content);
+            }else{
+                $result = false;
+            }
+            if(isset($result['trans_result'][0]['dst'])){
+                echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
+            }else{
+                echo json_encode(['status'=>config('status.ajax.fail')]);
+            }
+
+        }
+    }
+
+
+
+
+/*    public function testbaidu(){
         $text =$_POST['info'];
         $baidu = new Mybaidu_transapi();
         $result =  $baidu->translate($text);
@@ -344,7 +365,10 @@ class MessageController extends Controller
             ajax_return('',2);
         }
 
-    }
+    }*/
+
+
+
 
 
 }

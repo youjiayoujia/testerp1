@@ -12,6 +12,7 @@
             @include('message.process.reply')
         </div>
         <div class="col-lg-4">
+            @include('message.process.operate')
             @if($message->related)
                 @include('message.process.orders')
             @else
@@ -39,6 +40,52 @@
 @stop
 @section('pageJs')
     <script type="text/javascript">
+        $(document).ready(function () {
+            $('.btn-translation').click(function(){
+                text =changeSome($(this).attr('need-translation-content'),1);
+                if(tran_content = getTransInfo(text)){
+                    $(this).prev().show().addClass('alert-success');
+                    $(this).prev().children('.content').text(tran_content);
+                    $(this).hide();
+                }else{
+                    $(this).prev().show().addClass('alert-danger');
+                    $(this).prev().children('.content').text('翻译失败');
+                    $(this).hide();
+
+                }
+            });
+        });
+
+        function changeSome(text,type){
+            if(type==1){
+
+                text=text.replace(/\?/g, "^");
+            }
+            if(type==2){
+                text=text.replace(/\^/g, "?");
+            }
+
+            return text;
+        }
+
+        function getTransInfo(content) {
+            var tran_info = false;
+            $.ajax({
+                url: "{{route('ajaxGetTranInfo')}}",
+                data: 'content=' + content,
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if(data.status == {{config('status.ajax.success')}}){
+                        tran_info = changeSome( data.info,2);
+                    }else{
+                        tran_info = false;
+                    }
+                }
+            });
+            return tran_info;
+        }
+
         function changeChildren(parent) {
             $('#loadingDiv').show();
             $('#children').html('');

@@ -8,11 +8,13 @@
  */
 namespace App\Helps;
 class Translation{
+
     private $URL='http://api.fanyi.baidu.com/api/trans/vip/translate';
-    private $APP_ID='20160402000017432';
-    private $SEC_KEY='BxEnZlGyW9QOV73xQAWu';
+    private $APP_ID='20160810000026566'; //测试账号
+    private $SEC_KEY='lxFBZbXjMmV9BfUjnpZP';
     //翻译入口
     function translate($query, $from='auto', $to='en'){
+
         $args = array(
             'q' => $query,
             'appid' => $this->APP_ID,
@@ -28,31 +30,30 @@ class Translation{
     }
 
 //加密
-    function buildSign($query, $appID, $salt, $secKey){/*{{{*/
+    function buildSign($query, $appID, $salt, $secKey){
         $str = $appID . $query . $salt . $secKey;
         $ret = md5($str);
         return $ret;
-    }/*}}}*/
+    }
 
 //发起网络请求
-    function call($url, $args=null, $method="post", $testflag = 0, $timeout = 10, $headers=array()){/*{{{*/
+    function call($url, $args=null, $method="post", $testflag = 0, $timeout = 10, $headers=array()){
         $ret = false;
         $i = 0;
         while($ret === false)
         {
             if($i > 1)
                 break;
-            if($i > 0)
-            {
+            if($i > 0) {
                 sleep(1);
             }
             $ret = $this->callOnce($url, $args, $method, false, $timeout, $headers);
             $i++;
         }
         return $ret;
-    }/*}}}*/
+    }
 
-    function callOnce($url, $args=null, $method="post", $withCookie = false, $timeout = 10, $headers=array()){/*{{{*/
+    function callOnce($url, $args=null, $method="post", $withCookie = false, $timeout = 10, $headers=array()){
         $ch = curl_init();
         if($method == "post")
         {
@@ -65,12 +66,9 @@ class Translation{
             $data = $this->convert($args);
             if($data)
             {
-                if(stripos($url, "?") > 0)
-                {
+                if(stripos($url, "?") > 0) {
                     $url .= "&$data";
-                }
-                else
-                {
+                } else {
                     $url .= "?$data";
                 }
             }
@@ -78,34 +76,26 @@ class Translation{
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if(!empty($headers))
-        {
+        if(!empty($headers)){
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
-        if($withCookie)
-        {
+        if($withCookie) {
             curl_setopt($ch, CURLOPT_COOKIEJAR, $_COOKIE);
         }
         $r = curl_exec($ch);
         curl_close($ch);
         return $r;
-    }/*}}}*/
+    }
 
-    function convert(&$args){/*{{{*/
+    function convert(&$args){
         $data = '';
-        if (is_array($args))
-        {
-            foreach ($args as $key=>$val)
-            {
-                if (is_array($val))
-                {
-                    foreach ($val as $k=>$v)
-                    {
+        if (is_array($args)) {
+            foreach ($args as $key=>$val) {
+                if (is_array($val)) {
+                    foreach ($val as $k=>$v) {
                         $data .= $key.'['.$k.']='.rawurlencode($v).'&';
                     }
-                }
-                else
-                {
+                } else {
                     $data .="$key=".rawurlencode($val)."&";
                 }
             }

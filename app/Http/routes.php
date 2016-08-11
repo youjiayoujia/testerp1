@@ -655,6 +655,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('message_log', 'Message\Messages_logController');
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
+    Route::any('ajaxGetTranInfo',
+        ['as' => 'ajaxGetTranInfo', 'uses' => 'MessageController@ajaxGetTranInfo']);
 
 
     //用户路由

@@ -10,6 +10,7 @@ use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
 use Tool;
+use Translation;
 
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
@@ -277,19 +278,19 @@ class MessageModel extends BaseModel{
     public function getMessageInfoAttribute(){
         if($this->ContentDecodeBase64){
             $html = '';
-            //dd($this->ContentDecodeBase64);exit;
             foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
-                               if($item['Reply']['sender'] == 'user'){
-                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>'.$item['Reply']['date'].'</p>';
+                               if($item['Reply']['sender'] != 'merchant'){
+                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>用户名：</strong>'.$this->from_name.':</p>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert-danger"><strong>Wish翻译: </strong><p>'.$item['Reply']['translated_message'].'</p><p>'.$item['Reply']['translated_message_zh'].'</p></div>';
                                    $html .= '</div>';
                                }else{
-                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
                                    $html .= '</div>';
                                }
                            }
@@ -315,9 +316,11 @@ class MessageModel extends BaseModel{
 
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
                             if($this->from_name != $item->summary->receiverName){
+
                                 $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$content;
                                 $html .= '<p class="time"><strong>时间: </strong>'.$datetime.'</p>';
-                                $html .= '<button style="float: right;" type="button" class="btn btn-success" data-container="body" data-toggle="popover" data-placement="top" data-content="需要翻译的内容">
+                                $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
+                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'">
                                     翻译
                                 </button>';
                                 $html .= '</div>';
@@ -389,7 +392,9 @@ class MessageModel extends BaseModel{
                     $order_id = $fields_ary['ItemID'];
                     break;
                 case 'wish':
-                    $order_id = '';
+                    $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
+                    $order_obj = OrderModel::where('channel_ordernum','=',$transaction_id)->first();
+                    $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
                     break;
                 case 'aliexpress':
                     $order_id = $fields_ary['order_id'];

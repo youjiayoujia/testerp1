@@ -90,7 +90,11 @@
 			    <div class="form-group col-md-3">
 			        <label for="size">数量</label>
 			        <input class="form-control"  placeholder="数量" name='item[0][purchase_num]' value="">
-			    </div>  
+			    </div>
+			    <div class="form-group col-md-3">
+			        <label for="size">单价</label>
+			        <input class="form-control"  placeholder="单价" name='item[0][purchase_cost]' value="">
+			    </div>   
 			</div>
 			<div class="panel-footer">
             	<div class="create" id="additem"><i class="glyphicon glyphicon-plus"></i></div>
@@ -141,7 +145,7 @@
             var num = aa.substr(5, 1);
             num = parseInt(num);
             num = num + 1;
-            $(".purchase_num").last().after('<div class="row  purchase_num"><div class="form-group col-md-3"><label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small><select class="form-control sku" name="item['+num+'][sku]"></select></div><div class="form-group col-md-3"><label for="size">数量</label><input class="form-control"  placeholder="数量" name="item['+num+'][purchase_num]" value=""></div></div>');
+            $(".purchase_num").last().after('<div class="row  purchase_num"><div class="form-group col-md-3"><label for="size">SKU</label><small class="text-danger glyphicon glyphicon-asterisk"></small><select class="form-control sku" name="item['+num+'][sku]"></select></div><div class="form-group col-md-3"><label for="size">数量</label><input class="form-control"  placeholder="数量" name="item['+num+'][purchase_num]" value=""></div><div class="form-group col-md-3"><label for="size">单价</label><input class="form-control"  placeholder="单价" name="item['+num+'][purchase_cost]" value=""></div></div>');
         	$('.sku').select2({
 		        ajax: {
 		            url: "{{ route('purchaseAjaxSku') }}",

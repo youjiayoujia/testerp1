@@ -137,8 +137,13 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '拣货单异常',
-                    'url' => 'errorList.index',
+                    'name' => '模板数据导出',
+                    'url' => 'exportPackage.exportPackageView',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '退货处理',
+                    'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
             ],
@@ -225,6 +230,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '收款信息',
+                    'url' => 'logisticsCollectionInfo.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',
@@ -232,16 +242,6 @@ return [
                 [
                     'name' => '物流方式',
                     'url' => 'logistics.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '跟踪号',
-                    'url' => 'logisticsCode.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '物流分区报价',
-                    'url' => 'logisticsZone.index',
                     'icon' => '',
                 ],
                 [
@@ -286,15 +286,15 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '采购收货',
+                    'name' => '采购收货和入库',
                     'url' => 'recieve',
                     'icon' => '',
                 ],
-                [
+                /*[
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
                     'icon' => '',
-                ],
+                ],*/
             ],
             '供应链' => [
                 [

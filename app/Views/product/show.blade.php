@@ -35,6 +35,30 @@
             <div class="col-lg-3">
                 <strong>产品重量（kg）</strong>: {{ $model->weight }}
             </div>
+        </div> 
+
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>长(单位：厘米)</strong>: {{ $model->length }}
+            </div>
+            <div class="col-lg-3">
+                <strong>宽(单位：厘米)</strong>: {{ $model->width }}
+            </div>
+            <div class="col-lg-3">
+                <strong>高(单位：厘米)</strong>: {{ $model->height }}
+            </div>
+        </div> 
+
+        <div class="panel-body">
+            <div class="col-lg-3">
+                <strong>包装后长(单位：厘米)</strong>: {{ $model->package_length }}
+            </div>
+            <div class="col-lg-3">
+                <strong>包装后宽(单位：厘米)</strong>: {{ $model->package_width }}
+            </div>
+            <div class="col-lg-3">
+                <strong>包装后高(单位：厘米)</strong>: {{ $model->package_height }}
+            </div>
         </div>       
     </div>
 

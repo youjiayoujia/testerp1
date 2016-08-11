@@ -18,7 +18,7 @@ use App\Models\WarehouseModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\ChannelModel;
 use App\Models\Logistics\ChannelNameModel;
-
+use App\Models\Logistics\ChannelModel as logisticsChannel;
 
 class LogisticsController extends Controller
 {
@@ -69,6 +69,13 @@ class LogisticsController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $model = $this->model->create(request()->all());
+        foreach(request('url') as $k => $v) {
+            $data['channel_id'] = $k;
+            $data['url'] = $v;
+            $data['is_up'] = request('channel_id')[$k];
+            $model->logisticsChannels()->create($data);
+        }
+        $str = '';
         if(request()->has('logistics_limits')) {
             $str = implode(',', request('logistics_limits'));
         }
@@ -102,6 +109,7 @@ class LogisticsController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'channelNames' => $model->channelName,
+            'logisticsChannels' => $model->logisticsChannels,
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -122,6 +130,7 @@ class LogisticsController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $logistics,
+            'logisticsChannels' => $logistics->logisticsChannels,
             'warehouses'=>WarehouseModel::all(),
             'suppliers'=>SupplierModel::all(),
             'limits' => LimitsModel::orderBy('id', 'asc')->get(['id', 'name']),
@@ -137,6 +146,7 @@ class LogisticsController extends Controller
             'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
             'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
             'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
+            'channels' => ChannelModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }
@@ -156,10 +166,28 @@ class LogisticsController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $buf = request()->all();
+        $buf['limit'] = '';
         if(request()->has('logistics_limits')) {
             $buf['limit'] = implode(',', request('logistics_limits'));
         }
         $model->update($buf);
+        foreach(request('url') as $k => $v) {
+            $logisticsChannels = logisticsChannel::where(['logistics_id' => $id, 'channel_id' => $k]);
+            if($logisticsChannels->count() > 0) {
+                if($logisticsChannels->first()->url != $v) {
+                    $logisticsChannels->update(['url' => $v]);
+                }
+                if($logisticsChannels->first()->is_up != request('channel_id')[$k]) {
+                    $logisticsChannels->update(['is_up' => request('channel_id')[$k]]);
+                }
+            }else {
+                $data['logistics_id'] = $id;
+                $data['channel_id'] = $k;
+                $data['url'] = $v;
+                $data['is_up'] = request('channel_id')[$k];
+                logisticsChannel::create($data);
+            }
+        }
         $buf = [];
         foreach(request('merchant') as $key => $value) {
             $arr = explode(',', $value);

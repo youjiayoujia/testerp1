@@ -56,9 +56,9 @@ class SupplierController extends Controller
 		if($model=='imageError'){
 			return redirect(route('productSupplier.create'))->with('alert', $this->alert('danger', '图片格式不正确.'));
 		}else{
-			SupplierChangeHistoryModel::create([              
+			SupplierChangeHistoryModel::create([
 				'supplier_id' => $model->id,
-				'to' =>request()->input('purchase_id'),
+				/*'to' =>request()->input('purchase_id'),*/
 				'adjust_by' => '3',
 			]);
         return redirect($this->mainIndex);

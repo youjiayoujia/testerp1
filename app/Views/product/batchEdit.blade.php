@@ -68,6 +68,25 @@
                 
                 <?php
                     break;
+
+                case 'declared':
+                ?>
+                
+                    <div class="form-group col-md-3">
+                        <label for="color">申报英文</label>
+                        <input class="form-control" id="declared_en" placeholder="" name='declared_en' value="{{old('declared_en')}}">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="color">申报中文</label>
+                        <input class="form-control" id="declared_cn" placeholder="" name='declared_cn' value="{{old('declared_cn')}}">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="color">申报价值</label>
+                        <input class="form-control" id="declared_value" placeholder="" name='declared_value' value="{{old('declared_value')}}">
+                    </div>
+                
+                <?php
+                    break;
             } 
         ?>
     </div>

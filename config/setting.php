@@ -87,6 +87,7 @@ return [
         'logistics_id' => '物流方式',
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
+        'warehousePosition.name' => '库位'
     ],
 ];
 

@@ -64,6 +64,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryController');
     //供货商评级
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
+    //物流对账
+    Route::resource('shipmentCost', 'ShipmentCostController');
     //供货商
     Route::get('productSupplier/ajaxSupplier',
         ['uses' => 'Product\SupplierController@ajaxSupplier', 'as' => 'ajaxSupplier']);
@@ -443,8 +445,6 @@ Route::group(['middleware' => 'auth'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
     //订单管理路由
-    Route::get('order/putNeedQueue',
-        ['uses' => 'OrderController@putNeedQueue', 'as' => 'order.putNeedQueue']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
@@ -484,6 +484,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/putNeedQueue',
+        ['uses' => 'PackageController@putNeedQueue', 'as' => 'package.putNeedQueue']);
     Route::post('package/processReturnGoods',
         ['uses' => 'PackageController@processReturnGoods', 'as' => 'package.processReturnGoods']);
     Route::get('package/returnGoods',

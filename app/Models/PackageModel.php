@@ -235,7 +235,7 @@ class PackageModel extends BaseModel
     {
         $items = $this->setPackageItems();
         if ($items) {
-            $this->createPackageDetail($items);
+            return $this->createPackageDetail($items);
         } else {
             if ($this->status == 'NEW') {
                 foreach ($this->items as $item) {
@@ -250,7 +250,7 @@ class PackageModel extends BaseModel
                 $this->update(['status' => 'NEED']);
                 $this->order->update(['status' => 'NEED']);
                 return true;
-            } elseif ($this->status == 'NEED') {
+            } else {
                 if (strtotime($this->created_at) < strtotime('-3 days')) {
                     $arr = $this->explodePackage();
                     if ($arr) {
@@ -260,6 +260,7 @@ class PackageModel extends BaseModel
                 }
             }
         }
+        
         return false;
     }
 
@@ -396,7 +397,7 @@ class PackageModel extends BaseModel
      */
     public function setPackageItems()
     {
-        if ($this->count() > 1) { //多产品
+        if ($this->items->count() > 1) { //多产品
             $packageItem = $this->setMultiPackageItem();
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
@@ -502,8 +503,7 @@ class PackageModel extends BaseModel
                             $packageItem['warehouse_position_id'],
                             $packageItem['quantity'],
                             'PACKAGE',
-                            $newPackageItem->id,
-                            $key);
+                            $newPackageItem->id);
                     } catch (Exception $e) {
                         DB::rollBack();
                     }
@@ -522,8 +522,7 @@ class PackageModel extends BaseModel
                                 $packageItem['warehouse_position_id'],
                                 $packageItem['quantity'],
                                 'PACKAGE',
-                                $newPackageItem->id,
-                                $key);
+                                $newPackageItem->id);
                         } catch (Exception $e) {
                             DB::rollBack();
                         }
@@ -570,7 +569,7 @@ class PackageModel extends BaseModel
     public function canAssignLogistics()
     {
         //判断订单状态
-        if ($this->status != 'NEW') {
+        if ($this->status != 'WAITASSIGN') {
             return false;
         }
 

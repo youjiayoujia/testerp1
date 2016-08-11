@@ -22,6 +22,7 @@ use App\Jobs\AssignLogistics;
 use App\Models\WarehouseModel;
 use DB;
 use Exception;
+use App\Jobs\DoPackage;
 
 class PackageController extends Controller
 {
@@ -31,6 +32,24 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+    }
+
+    public function putNeedQueue()
+    {
+        $len = 1000;
+        $start = 0;
+        $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+        while ($packages->count()) {
+            foreach ($packages as $package) {
+                $job = new DoPackage($package);
+                $job->onQueue('assignStocks');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            unset($packages);
+            $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+        }
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
     }
 
     /**
@@ -59,7 +78,7 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
+            'packageNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
@@ -71,7 +90,7 @@ class PackageController extends Controller
                 ['PACKAGEING', 'PICKING'])->count(),
             'multiInbox' => PickListModel::where('type', 'MULTI')->where('status', 'PICKING')->count(),
             'multiPack' => PickListModel::where('type', 'MULTI')->whereIn('status', ['INBOXED', 'PACKAGEING'])->count(),
-            'packageShipping' => $this->model->where('status', 'PACKED')->count(),
+            'packageShipping' => $this->model->where('status', 'SHIPPED')->count(),
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
@@ -182,6 +201,8 @@ class PackageController extends Controller
         return view($this->viewPath.'returnErrors', $response);
         
     }
+
+   
 
     public function returnSplitPackage()
     {
@@ -424,7 +445,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->where('status', 'NEW')
+            ->where('status', 'WAITASSIGN')
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {
@@ -434,6 +455,7 @@ class PackageController extends Controller
                 $this->dispatch($job);
             }
             $start += $len;
+            unset($packages);
             $packages = $this->model
                 ->where('status', 'NEW')
                 ->where('is_auto', '1')
@@ -451,7 +473,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->where('status', 'ASSIGNED')
+            ->whereIn('status', ['ASSIGNED','TRACKINGFAILED'])
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {
@@ -464,6 +486,7 @@ class PackageController extends Controller
                 }
             }
             $start += $len;
+            unlink($packages);
             $packages = $this->model
                 ->where('status', 'ASSIGNED')
                 ->where('is_auto', '1')

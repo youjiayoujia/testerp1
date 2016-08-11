@@ -36,6 +36,7 @@ use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
 use App\Models\CatalogModel;
 use DB;
+use Excel;
 
 class TestController extends Controller
 {
@@ -52,7 +53,16 @@ class TestController extends Controller
     // }
     public function test2()
     {
-        echo DNS1D::getBarcodeHTML('123', 'C128', '3', '33');exit;
+        $rows[] = [
+            '南京' => '上海',
+            iconv('utf-8', 'gb2312', '武汉市') => iconv('utf-8', 'gb2312', '江苏省懂')
+        ];
+        $name='test';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            }, 'GB2312');
+        })->download('XLS');
     }
 
     public function test1()

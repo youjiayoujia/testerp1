@@ -121,78 +121,19 @@
     <div class="panel panel-default">
         <div class="panel-heading">渠道对应物流</div>
         <div class="panel-body">
+            @foreach($arr as $key1 => $singles)
             <div class='form-group col-lg-3'>
-                <label>Amazon</label>
-                <select name='merchant[amazon_merchant]' class='form-control amazon_merchant'>
+                <label>{{$key1}}</label>
+                <select name='merchant[{{$key1}}_merchant]' class='form-control merchant'>
                     <option value=''></option>
-                    @foreach($amazons as $key => $single)
+                    @foreach($singles as $key => $single)
                         <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
                     @endforeach
                 </select>
+                <input type='text' class='form-control' name='{{$key1}}_merchant_name' placeholder='备选框'>
+                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $single->channel_id }}>
             </div>
-            <div class='form-group col-lg-3'>
-                <label>ebay</label>
-                <select name='merchant[ebay_merchant]' class='form-control ebay_merchant'>
-                    <option value=''></option>
-                    @foreach($ebays as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='form-group col-lg-3'>
-                <label>wish</label>
-                <select name='merchant[wish_merchant]' class='form-control wish_merchant'>
-                    <option value=''></option>
-                    @foreach($wishes as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='form-group col-lg-3'>
-                <label>lazada</label>
-                <select name='merchant[lazada_merchant]' class='form-control lazada_merchant'>
-                    <option value=''></option>
-                    @foreach($lazadas as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='form-group col-lg-3'>
-                <label>dhgate</label>
-                <select name='merchant[dhgate_merchant]' class='form-control dhgate_merchant'>
-                    <option value=''></option>
-                    @foreach($dhgates as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='form-group col-lg-3'>
-                <label>cdiscount</label>
-                <select name='merchant[cdiscount_merchant]' class='form-control cdiscount_merchant'>
-                    <option value=''></option>
-                    @foreach($cdiscounts as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='form-group col-lg-3'>
-                <label>速卖通</label>
-                <select name='merchant[aliExpress_merchant]' class='form-control aliExpress_merchant'>
-                    <option value=''></option>
-                    @foreach($aliExpresses as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='form-group col-lg-3'>
-                <label>joom</label>
-                <select name='merchant[joom_merchant]' class='form-control joom_merchant'>
-                    <option value=''></option>
-                    @foreach($jooms as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}">{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
+            @endforeach
         </div>
     </div>
     <div class="panel panel-default">
@@ -220,14 +161,7 @@
 @section('pageJs')
 <script type='text/javascript'>
     $(document).ready(function () {
-        $('.ebay_merchant').select2();
-        $('.cdiscount_merchant').select2();
-        $('.aliExpress_merchant').select2();
-        $('.joom_merchant').select2();
-        $('.dhgate_merchant').select2();
-        $('.lazada_merchant').select2();
-        $('.wish_merchant').select2();
-        $('.amazon_merchant').select2();
+        $('.merchant').select2();
         $('.logistics_limits').select2();
 
         $('.logistics_supplier_id').select2({

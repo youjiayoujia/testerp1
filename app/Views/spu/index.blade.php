@@ -40,7 +40,7 @@
             <td>{{ $spu->editUser?$spu->editUser->name:'' }}</td>
             <td>{{ $spu->imageEdit?$spu->imageEdit->name:'' }}</td>
             <td>{{ $spu->Developer?$spu->Developer->name:'' }}</td>
-            <td>{{ config('spu.status')[$spu->status] }}</td>
+            <td>{{ $spu->status?config('spu.status')[$spu->status]:'' }}</td>
             <td>{{ $spu->remark }}</td>
             <td>{{ $spu->updated_at }}</td>
             <td>{{ $spu->created_at }}</td>

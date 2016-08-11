@@ -18,7 +18,7 @@ class GetLazadaPackageId extends Command
      *
      * @var string
      */
-    protected $signature = 'get:account{accountIDs}';
+    protected $signature = 'getLazadaPackageId:account{accountIDs}';
 
     /**
      * The console command description.

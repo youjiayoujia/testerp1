@@ -139,6 +139,37 @@
             <input class="form-control" id="upload_user" placeholder="上传人" name='upload_user' value="{{ old('upload_user') ?  old('upload_user') : $product->upload_user }}">
         </div>
     </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="length">长</label>
+            <input class="form-control" id="length" placeholder="length" name='length' value="{{ old('length') ?  old('length') : $product->length }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="width">宽</label>
+            <input class="form-control" id="width" placeholder="width" name='width' value="{{old('width') ?  old('width') : $product->width }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="height">高</label>
+            <input class="form-control" id="height" placeholder="height" name='height' value="{{ old('height') ?  old('height') : $product->height }}">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label for="package_length">包装后长</label>
+            <input class="form-control" id="package_length" placeholder="package_length" name='package_length' value="{{ old('package_length') ?  old('package_length') : $product->package_length }}">
+        </div>
+            <div class="form-group col-md-3">
+            <label for="package_width">包装后宽</label>
+            <input class="form-control" id="package_width" placeholder="package_width" name='package_width' value="{{old('package_width') ?  old('package_width') : $product->package_width }}">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="package_height">包装后高</label>
+            <input class="form-control" id="package_height" placeholder="package_height" name='package_height' value="{{ old('package_height') ?  old('package_height') : $product->package_height }}">
+        </div>
+    </div>
+
     <div class="row">
         <div class="form-group col-md-3">
             <label for="size">采购负责人</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
@@ -207,8 +238,8 @@
             <input class="form-control" id="declared_en" placeholder="申报中文" name='declared_en' value="{{ old('declared_en') ?  old('declared_en') : $product->declared_en }}">
         </div>
         <div class="form-group col-md-3">
-            <label for="color">申报价格</label>
-            <input class="form-control" id="declared_value" placeholder="申报价格" name='declared_value' value="{{ old('declared_value') ?  old('declared_value') : $product->declared_value }}">
+            <label for="color">注意事项</label>
+            <input class="form-control" id="declared_value" placeholder="注意事项" name='notify' value="{{ old('notify') ?  old('notify') : $product->notify }}">
         </div>
         <div class="form-group col-md-3">
             <label for="color">配件</label>

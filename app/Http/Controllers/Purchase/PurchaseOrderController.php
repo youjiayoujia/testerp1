@@ -455,13 +455,17 @@ class PurchaseOrderController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];
-        $response['metas']['title']='采购收货';
+        $response['metas']['title']='采购收货与入库';
         return view($this->viewPath . 'recieve', $response);
     }
 
     public function ajaxRecieve(){
         $id = request()->input('id');
         $purchase_order = $this->model->find($id);
+
+        if (!$purchase_order) {
+            return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
+        }
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
@@ -557,6 +561,9 @@ class PurchaseOrderController extends Controller
         $id = request()->input('id');
 
         $purchase_order = $this->model->find($id);
+        if (!$purchase_order) {
+            return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
+        }
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
@@ -579,9 +586,11 @@ class PurchaseOrderController extends Controller
             $update_data = explode(':', $value);
             $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
             $purchase_item = $arrivel_log->purchaseItem;
-            //print_r($purchase_item->item->sku);exit;
+            
             if($purchase_item->item->warehouse_position==''){
-                echo json_encode($purchase_item->item->sku);exit;
+                //echo json_encode($purchase_item->item->sku);exit;
+                //return view($this->viewPath . 'recieve', $response);
+                return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
             }else{
                 $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
                 $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];

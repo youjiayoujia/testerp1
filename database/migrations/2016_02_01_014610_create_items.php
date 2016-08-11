@@ -36,6 +36,12 @@ class CreateItems extends Migration
             $table->float('cost')->nullable()->default(null);
             $table->string('product_size')->nullable();
             $table->string('package_size')->nullable();
+            $table->decimal('package_height',5,2)->comment('包装后高')->nullable()->default(0);
+            $table->decimal('package_width',5,2)->comment('包装后宽')->nullable()->default(0);
+            $table->decimal('package_length',5,2)->comment('包装后长')->nullable()->default(0);
+            $table->decimal('height',5,2)->comment('高')->nullable()->default(0);
+            $table->decimal('width',5,2)->comment('宽')->nullable()->default(0);
+            $table->decimal('length',5,2)->comment('长')->nullable()->default(0);
             $table->string('carriage_limit')->nullable();
             $table->string('package_limit')->nullable();
             $table->enum('status',['selling','sellWaiting','stopping','saleOutStopping','unSellTemp','trySale'])->comment('item状态')->default('selling');

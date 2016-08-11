@@ -23,12 +23,10 @@
 	
     <div class="panel-body">
         <div class="row">
-            <div class="col-lg-12 mailcontent" >
-                <div class="embed-responsive embed-responsive-16by9">
+            <div class="col-lg-12">
                                             <?php echo $content; ?>
                     {{--{{$content}}--}}
                     {{--<iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$message->id]) }}"></iframe>--}}
-                </div>
             </div>
         </div>
         @if(count($message->message_attanchments) > 0)

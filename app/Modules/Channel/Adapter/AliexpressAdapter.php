@@ -39,7 +39,14 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
-
+    /** 获取订单
+     * @param $startDate 开始时间
+     * @param $endDate 结束时间
+     * @param array $status 订单状态
+     * @param int $perPage 页码
+     * @param string $nextToken
+     * @return array
+     */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
         if (empty($nextToken)) {
@@ -84,6 +91,14 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
+    /**获取订单(暂时没有用)
+     * @param $startDate
+     * @param $endDate
+     * @param $status
+     * @param int $page
+     * @param int $perPage
+     * @return mixed
+     */
     public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
     {
 
@@ -98,7 +113,10 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
-
+    /** 获取订单详情
+     * @param $orderID 订单号
+     * @return mixed
+     */
     public function getOrder($orderID)
     {
         $param = "orderId=" . $orderID;
@@ -106,6 +124,10 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
+    /** 回传追踪号
+     * @param $tracking_info 需要上传的信息
+     * @return array
+     */
     public function returnTrack($tracking_info)
     {
         $return = [];
@@ -116,15 +138,6 @@ Class AliexpressAdapter implements AdapterInterface
         $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
         $result = json_decode($result,true);
-    /*    $rand_id = rand(1, 10);
-        if ($rand_id > 3) {
-            $result['success'] = 'Falie';
-
-        } else {
-            $result['success'] = 'true';
-
-        }*/
-        var_dump($result);
         if (isset($result['success']) && ($result['success'] == 'true')) {
             $return['status'] = true;
             $return['info'] = 'Success';
@@ -134,11 +147,42 @@ Class AliexpressAdapter implements AdapterInterface
             $return['info'] = isset($result['error_message']) ? $result['error_message'] : "error";
         }
         return $return;
+    }
 
+    /** 获取需要评价的订单
+     * @param int $currentPage 页码
+     * @param int $pageSize 页数
+     * @return bool
+     */
+    public function getSellerEvaluationOrderList($currentPage=1, $pageSize=100){
+        $param ="currentPage=$currentPage&pageSize=$pageSize";
+        $result = $this->getJsonData('api.evaluation.querySellerEvaluationOrderList', $param);
+        $result = json_decode($result,true);
+        if(isset($result['listResult'])||!empty($result['listResult'])){
+            return     $result['listResult'];
+        }else{
+            return false;
+        }
+    }
 
+    /** 评价订单
+     * @param $orderID 订单号
+     * @param string $text 内容
+     * @param int $score 评分
+     */
+    public function evaluateOrder($orderID,$text='Excellent buyer, welcome! Any questions please contact us.',$score=5){
+        $feedbackContent = rawurlencode($text);//评价的内容
+        $param = "orderId=$orderID&score=$score&feedbackContent=$feedbackContent";
+        $result = $this->getJsonData("api.evaluation.saveSellerFeedback", $param);
+        var_dump($result);
     }
 
 
+    /** 订单信息的组装
+     * @param $list
+     * @param $orderDetail
+     * @return array
+     */
     public function parseOrder($list, $orderDetail)
     {
 
@@ -226,7 +270,7 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
-    /**
+    /** 支付时间 转换
      * @param $paytime
      * @return bool|string
      */
@@ -321,6 +365,7 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $code_arr = explode("&", $strcode);//去掉&
         $newcode_arr = array();
+
         foreach ($code_arr as $key => $val) {
             $code_narr = explode("=", $val);//分割=
             $newcode_arr [$code_narr [0]] = $code_narr [1];//重组数组
@@ -456,6 +501,8 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
+
+
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -489,6 +536,21 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
 
+                        if($Sources == 'order_msg'){
+                            $message_fields_ary = [
+                                'message_type'=> $Sources, //消息类型
+                                'order_id'=> $item['channelId'] //消息类型
+                            ];
+                        }else{
+                            $message_fields_ary = [
+                                'message_type'=> $Sources, //消息类型
+                                'order_id'=> ''
+
+                            ];
+                        }
+
+                        $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
                     }
                 }else{
@@ -497,35 +559,32 @@ Class AliexpressAdapter implements AdapterInterface
                 $j++;
             }
         }
-
         return (!empty($message_list)) ? $message_list : false;
     }
 
     public function sendMessages($replyMessage)
     {
         // TODO: Implement sendMessages() method.
-        //echo $this->_access_token;
         $message_obj = $replyMessage->message;
-
         if(!empty($message_obj)){
-
-             // step1:发信息
-
+            $ChannelMessageFields = unserialize(base64_decode($message_obj->channel_message_fields));
+            // step1:发信息
             $send_param = [];
-            $send_param['channelId'] = $message_obj->message_id;
-            $send_param['buyerId'] = $message_obj->from;
-            $send_param['msgSources'] = $message_obj->'消息类型';
-            $send_param['content'] = $replyMessage->content;
+            $channelId = rawurlencode($message_obj->message_id);
+            $buyerId = rawurlencode($message_obj->from);
+            $msgSources = rawurlencode($ChannelMessageFields['message_type']);
+            $content = rawurlencode($replyMessage->content);
 
-            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
+            $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
+
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
-
                     //step2: 更新消息为已读
                     $update_param = [];
                     $update_param['channelId'] = $message_obj->message_id;
-                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $update_param['msgSources'] = $ChannelMessageFields['message_type'];
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
 
                     $replyMessage->status = 'SENT';

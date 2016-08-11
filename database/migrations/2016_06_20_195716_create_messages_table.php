@@ -34,7 +34,8 @@ class CreateMessagesTable extends Migration
             $table->timestamp('start_at')->nullable()->default(NULL);
             $table->timestamp('end_at')->nullable()->default(NULL);
             $table->integer('dont_reply')->nullable()->default(0);
-            $table->string('content')->nullable()->default(NULL);
+            $table->mediumText('content')->nullable()->default(NULL);
+            $table->text('channel_message_fields')->nullable()->comment('渠道信息数据数组')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

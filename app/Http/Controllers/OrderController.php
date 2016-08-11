@@ -158,6 +158,16 @@ class OrderController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    public function invoice($id)
+    {
+        $model = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'germanInvoice', $response);
+    }
+
     /**
      * 跳转编辑页面
      *

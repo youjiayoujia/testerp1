@@ -11,6 +11,10 @@
             <div class="form-group col-lg-4">
                 <strong>数量</strong>:
                 <input type="sku" class="form-control" name="purchase_num" value=""> 
+            </div>
+            <div class="form-group col-lg-4">
+                <strong>单价</strong>:
+                <input type="sku" class="form-control" name="purchase_cost" value=""> 
             </div>  
             </div>                 
       </div>

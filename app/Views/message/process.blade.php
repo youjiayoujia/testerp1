@@ -79,7 +79,10 @@
             $('#loadingDiv').hide();
         }
 
-        function changeTemplate(template) {
+        /**
+         * type mail邮件 或者 text文本
+         */
+        function changeTemplate(template,type) {
             $('#loadingDiv').show();
             $.post(
                     '{{ route('messageTemplate.ajaxGetTemplate') }}',
@@ -90,7 +93,12 @@
                         if (response != 'error') {
                             //替换字符串
                             response['content']=response['content'].replace("署名", assign_name);
-                            editor.setContent(response['content']);
+
+                            if(type == 'email'){
+                                editor.setContent(response['content']);
+                            }else if(type == 'text'){
+                                $('#textcontent').val(response['content']);
+                            }
                             /*
                             $('#templateContent').html('<div class="form-group"><textarea rows="16" name="content" style="width:100%;height:400px;">'+response['content']+'</textarea></div>');
                             */

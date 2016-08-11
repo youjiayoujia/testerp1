@@ -15,6 +15,8 @@ use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
+use App\Models\CatalogModel;
+use Excel;
 
 class ItemController extends Controller
 {
@@ -131,6 +133,7 @@ class ItemController extends Controller
             'skus' => $skus,
             'item_ids'=>$item_ids,
             'param'  =>$param,
+            'catalogs'=>CatalogModel::all(),
         ];
         return view($this->viewPath . 'batchEdit', $response);
     }
@@ -187,5 +190,56 @@ class ItemController extends Controller
         $model = $this->model->find($item_id);
         $response['model']= $model;
         return view($this->viewPath . 'printsku', $response);
+    }
+
+    /**
+     * 上传表格修改sku状态
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function uploadSku()
+    {
+        $file = request()->file('upload');
+        $path = config('setting.excelPath');
+        !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
+        $file->move($path, 'excelProcess.xls');
+        $data_array = '';
+        $result = false;
+        Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
+            $reader->noHeading();
+            $data_array = $reader->all()->toArray();
+            foreach ($data_array as $key => $value) {
+                if($key==0)continue;
+                if($this->model->where('sku',$value['1'])->first()){
+                    $this->model->where('sku',$value['1'])->first()->update(['status'=>$value['2']]);
+                }else{
+                    $result = $key;
+                }
+                
+            }
+        },'gb2312');
+
+        if($result){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '第'.$result."行SKU不存在，请重新上传"));
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('success',  '状态修改成功.')); 
+        }
+        
+    }
+
+    public function batchDelete()
+    {
+        $item_ids = request()->input('item_ids');
+        $item_ids = explode(',', $item_ids);
+        foreach ($item_ids as $key => $item_id) {
+            $model = $this->model->find($item_id);
+            if (!$model) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            }
+            $model->destroy($item_id);
+        }
+
+        return 1;
     }
 }

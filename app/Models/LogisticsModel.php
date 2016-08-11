@@ -26,7 +26,6 @@ class LogisticsModel extends BaseModel
         'warehouse_id',
         'logistics_supplier_id',
         'type',
-        'url',
         'docking',
         'logistics_catalog_id',
         'logistics_email_template_id',
@@ -35,6 +34,7 @@ class LogisticsModel extends BaseModel
         'is_enable',
         'limit',
         'driver',
+        'logistics_code',
     ];
 
     public $rules = [
@@ -44,7 +44,6 @@ class LogisticsModel extends BaseModel
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
-            'url' => 'required',
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
             'logistics_email_template_id' => 'required',
@@ -58,7 +57,6 @@ class LogisticsModel extends BaseModel
             'warehouse_id' => 'required',
             'logistics_supplier_id' => 'required',
             'type' => 'required',
-            'url' => 'required',
             'docking' => 'required',
             'logistics_catalog_id' => 'required',
             'logistics_email_template_id' => 'required',
@@ -109,6 +107,11 @@ class LogisticsModel extends BaseModel
             'logistics_channel_id');
     }
 
+    public function logisticsChannels()
+    {
+        return $this->hasMany('App\Models\Logistics\ChannelModel', 'logistics_id', 'id');
+    }
+
     public function getApiConfigAttribute()
     {
         $config = [];
@@ -120,7 +123,7 @@ class LogisticsModel extends BaseModel
         $config['key'] = $this->supplier->secret_key;
 
         $config['returnCompany'] = $this->emailTemplate->unit;
-        $config['returnContact'] = $this->emailTemplate->secret_key;
+        $config['returnContact'] = $this->emailTemplate->sender;
         $config['returnPhone'] = $this->emailTemplate->phone;
         $config['returnAddress'] = $this->emailTemplate->address;
         $config['returnZipcode'] = $this->emailTemplate->zipcode;

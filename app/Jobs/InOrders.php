@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\Job;
-use App\Jobs\DoPackage;
+use App\Jobs\AssignStocks;
 use App\Models\OrderModel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -40,7 +40,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             if ($order) {
                 $package = $order->createPackage();
                 if ($order->status == 'PREPARED' && $package) {
-                    $job = new DoPackage($package);
+                    $job = new AssignStocks($package);
                     $job->onQueue('assignStocks');
                     $this->dispatch($job);
                     $this->relation_id = $order->id;

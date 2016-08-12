@@ -143,7 +143,7 @@
     </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route('package.shipping') }}">
-            执行发货
+            出库复检
         </a>
     </div>
     <div class="btn-group">

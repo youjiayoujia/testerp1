@@ -41,7 +41,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $package = $order->createPackage();
                 if ($order->status == 'PREPARED' && $package) {
                     $job = new DoPackage($package);
-                    $job->onQueue('doPackages');
+                    $job->onQueue('assignStocks');
                     $this->dispatch($job);
                     $this->relation_id = $order->id;
                     $this->result['status'] = 'success';

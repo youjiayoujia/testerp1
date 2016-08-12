@@ -159,6 +159,10 @@ class StockController extends Controller
     public function createTaking()
     {
         Cache::store('file')->forever('stockIOStatus', '0');
+        $first = TakingModel::orderBy('id', 'desc')->first();
+        if($first->check_status == '0') {
+            return redirect(route('stockTaking.index'))->with('alert', $this->alert('danger', '请先完成之前盘点'));
+        }
         $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
         $stocks_arr = $this->model->all()->chunk(1000);
         foreach($stocks_arr as $stocks) {

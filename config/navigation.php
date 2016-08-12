@@ -353,6 +353,18 @@ return [
                 'icon' => '',
             ],
             [
+
+                'name' => 'SMT待发布产品列表',
+                'url' => 'smt.index',
+                'icon' => '',
+            ],
+            [
+            
+                'name' => 'SMT在线产品列表',
+                'url' => 'smt.onlineProductIndex',
+                'icon' => '',
+            ],
+            [
                 'name' => 'ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',

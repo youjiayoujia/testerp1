@@ -10,11 +10,18 @@ namespace App\Modules\Logistics;
 use Exception;
 use App\Modules\Logistics\Adapter\ChukouyiAdapter;
 use App\Modules\Logistics\Adapter\CoeAdapter;
+<<<<<<< HEAD
+use App\Modules\Logistics\Adapter\szChinaPostAdapter;
+use App\Modules\Logistics\Adapter\WinitAdapter;
+use App\Modules\Logistics\Adapter\FpxAdapter;
+use App\Modules\Logistics\Adapter\SmtAdapter;
+
 use App\Modules\Logistics\Adapter\ShunyouAdapter;
 use App\Modules\Logistics\Adapter\ShunfengAdapter;
 use App\Modules\Logistics\Adapter\ShunfenghlAdapter;
 use App\Modules\Logistics\Adapter\EubofflineAdapter;
 use App\Modules\Logistics\Adapter\EubAdapter;
+
 
 
 
@@ -45,6 +52,25 @@ class LogisticsModule
     {
         return new CoeAdapter($config);
     }
+
+    
+    public function createSzChinaPostDriver($config)
+    {
+        return new SzChinaPostAdapter($config);
+    }
+    
+    public function createWinitDriver($config){
+        return new WinitAdapter($config);
+    }
+    
+    public function createFpxDriver($config){
+        return new FpxAdapter($config);
+    }
+    
+    public function createSmtDriver($config){
+        return new SmtAdapter($config);
+    }
+
 
     /** 实例化顺友
      * @param $config

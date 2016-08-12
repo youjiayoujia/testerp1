@@ -3,14 +3,13 @@
 namespace App\Jobs;
 
 use App\Jobs\Job;
-use App\Models\PackageModel;
 use App\Jobs\AssignLogistics;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class DoPackage extends Job implements SelfHandling, ShouldQueue
+class AssignStocks extends Job implements SelfHandling, ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
     protected $package;
@@ -41,7 +40,7 @@ class DoPackage extends Job implements SelfHandling, ShouldQueue
                 $job = $job->onQueue('assignLogistics');
                 $this->dispatch($job);
                 $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success to do package.';
+                $this->result['remark'] = 'Success to assign stock.';
             } elseif ($this->package->status == 'NEED') {
                 $this->result['status'] = 'success';
                 $this->result['remark'] = 'Out of stock.';

@@ -85,13 +85,11 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $response = $this->setRequest('Orders', $request);
-
-        //TODO:return ERRORS
         if (isset($response->Error)) {
             return [
-                'Error' => [
-                    'code' => (string)$request->Error->Code,
-                    'message' => (string)$request->Error->Message
+                'error' => [
+                    'code' => (string)$response->Error->Code,
+                    'message' => (string)$response->Error->Message
                 ]
             ];
         } else {
@@ -325,7 +323,7 @@ Class AmazonAdapter implements AdapterInterface
                 $tempPayLoad = '';
                 $tempAttachment = '';
                 $this->getPayloadNew($tempPayLoad, $tempAttachment, $messagePayload, $service, $message);
-                $returnAry[$j]['content'] = base64_encode(serialize([ 'amazon' => $this->getMaillContent($tempPayLoad)]));
+                $returnAry[$j]['content'] = base64_encode(serialize(['amazon' => $this->getMaillContent($tempPayLoad)]));
                 $returnAry[$j]['attachment'] = $tempAttachment;
                 $returnAry[$j]['channel_message_fields'] = '';
             }

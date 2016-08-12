@@ -425,7 +425,7 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-    * 收货节面打印采购条目
+    * 收货节面打印选择尺寸
     *
     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
     */
@@ -433,6 +433,22 @@ class PurchaseOrderController extends Controller
         $id = request()->input('id');
         $response['id']= $id;
         return view($this->viewPath . 'printpo', $response);
+    }
+
+    /**
+    * 收货节面打印
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function showpo(){
+        $id = request()->input('pp_id');
+        $size = request()->input('labelSize');
+        $po_id = request()->input('po_id');
+        $response['id']= $id;
+        $response['model'] = PurchaseItemModel::where('id',$id)->get()->first();
+        $response['size']= $size;
+        $response['po_id']= $po_id;
+        return view($this->viewPath . 'showpo', $response);
     }
 
     /**

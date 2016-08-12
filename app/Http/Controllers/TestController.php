@@ -85,7 +85,7 @@ class TestController extends Controller
     public function index()
     {
         set_time_limit(0);
-        $account = AccountModel::find(187);
+        $account = AccountModel::find(28);
         if ($account) {
             //初始化
             $i = 1;

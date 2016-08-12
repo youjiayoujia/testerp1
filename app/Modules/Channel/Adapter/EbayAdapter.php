@@ -424,6 +424,24 @@ class EbayAdapter implements AdapterInterface
 
     }
 
+    /**
+     * case XML DOM
+     */
+    public function buildcaseBody($xml,$call){
+        $this->verb = $call;
+        $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="http://www.ebay.com/marketplace/resolution/v1/services">';
+        $requestXmlBody .= $xml;
+        $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
+        return $requestXmlBody;
+
+        print_r($requestXmlBody);
+
+        $result = $this->sendHttpRequest($requestXmlBody);
+        $response = simplexml_load_string($result);
+
+        return $response;
+    }
+
 
     private function buildEbayHeaders()
     {
@@ -497,42 +515,101 @@ class EbayAdapter implements AdapterInterface
                                 <EndTime>' . $time_end . '</EndTime>';
             $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
 
-            //print_r($content);exit;
 
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
                     /*
-                     *             message 数据格式 样例
-                                    SimpleXMLElement Object
-                                    (
-                                        [Sender] => priya.suryavanshi
-                                        [SendingUserID] => 774805616
-                                        [RecipientUserID] => wintrade9
-                                        [SendToName] => wintrade9
-                                        [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                                        [MessageID] => 80473418726
-                                        [ExternalMessageID] => 1340213839016
-                                        [Flagged] => false
-                                        [Read] => false
-                                        [ReceiveDate] => 2016-08-04T09:16:42.000Z
-                                        [ExpirationDate] => 2017-08-04T09:16:42.000Z
-                                        [ItemID] => 222123713737
-                                        [ResponseDetails] => SimpleXMLElement Object
-                                        (
-                                             [ResponseEnabled] => true
-                                             [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
-                                        )
+                        message 数据格式 样例
+                        SimpleXMLElement Object
+                        (
+                            [Sender] => priya.suryavanshi
+                            [SendingUserID] => 774805616
+                            [RecipientUserID] => wintrade9
+                            [SendToName] => wintrade9
+                            [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                            [MessageID] => 80473418726
+                            [ExternalMessageID] => 1340213839016
+                            [Flagged] => false
+                            [Read] => false
+                            [ReceiveDate] => 2016-08-04T09:16:42.000Z
+                            [ExpirationDate] => 2017-08-04T09:16:42.000Z
+                            [ItemID] => 222123713737
+                            [ResponseDetails] => SimpleXMLElement Object
+                            (
+                                 [ResponseEnabled] => true
+                                 [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
+                            )
 
-                                        [Folder] => SimpleXMLElement Object
-                                        (
-                                            [FolderID] => 0
-                                         )
+                            [Folder] => SimpleXMLElement Object
+                            (
+                                [FolderID] => 0
+                             )
 
-                                        [MessageType] => ResponseToASQQuestion
-                                        [Replied] => false
-                                        [ItemEndTime] => 2016-08-18T08:16:14.000Z
-                                        [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                                    )*/
+                            [MessageType] => ResponseToASQQuestion
+                            [Replied] => false
+                            [ItemEndTime] => 2016-08-18T08:16:14.000Z
+                            [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                        )*/
+
+
+
+                    /**消息详情
+                     *  call GetMyMessages
+                     * SimpleXMLElement Object
+                    (
+                    [Timestamp] => 2016-08-12T03:16:10.880Z
+                    [Ack] => Success
+                    [Version] => 963
+                    [Build] => E963_CORE_APIMSG_17909225_R1
+                    [Messages] => SimpleXMLElement Object
+                    (
+                    [Message] => SimpleXMLElement Object
+                    (
+                            [Timestamp] => 2016-08-12T03:16:10.880Z
+                            [Ack] => Success
+                            [Version] => 963
+                            [Build] => E963_CORE_APIMSG_17909225_R1
+                            [Messages] => SimpleXMLElement Object
+                            (
+                            [Message] => SimpleXMLElement Object
+                            (
+                            [Sender] => csfeedback@ebay.com
+                            [RecipientUserID] => wintrade9
+                            [Subject] => wintrade9锛屾垜浠湪姝ゆ彁閱掓偍鐢?3 鍒嗛挓鏃堕棿鍒嗕韩鎮ㄥ杩戞湡 eBay 鏀寔浣撻獙鐨勫弽棣堟剰瑙
+
+                            [MessageID] => 80624164816
+                            [Text] =>          邮件富文本（html）
+                            [Flagged] => false
+                            [Read] => false
+                            [ReceiveDate] => 2016-08-12T01:39:56.000Z
+                            [ExpirationDate] => 2016-08-13T07:00:00.000Z
+                            [ResponseDetails] => SimpleXMLElement Object
+                            (
+                            [ResponseEnabled] => false
+                            )
+
+                            [Folder] => SimpleXMLElement Object
+                            (
+                            [FolderID] => 0
+                            )
+
+                            [Replied] => false
+                            )
+                     * )
+
+                     */
+
+                    $member_xlm_dom = '
+                                    <WarningLevel>High</WarningLevel>
+                                    <DetailLevel>ReturnMessages</DetailLevel>
+                                    <MessageIDs><MessageID>'.$message->MessageID.'</MessageID>
+                                    </MessageIDs>                    
+                                    ';
+                    $content_detail = $this->buildEbayBody($member_xlm_dom,'GetMyMessages');
+
+
+
+
 
                     $message_lists[$order]['message_id'] = $message->MessageID;
                     $message_lists[$order]['from_name'] = $message->Sender;
@@ -543,10 +620,11 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['date'] = $message->ReceiveDate;
                     $message_lists[$order]['subject'] = $message->Subject;
                     $message_lists[$order]['attachment'] = ''; //附件
-                    $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$message->Subject]));
+                    $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
                         'ItemID' => (string)$message->ItemID, //应该是订单号
-                        'ExternalMessageID' =>(string)$message->ExternalMessageID,
+                        'ExternalMessageID' => (string)$message->ExternalMessageID,
+                        'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
                     $order += 1;
@@ -557,6 +635,22 @@ class EbayAdapter implements AdapterInterface
 
         return (!empty($message_lists)) ?  $message_lists : false;
 
+    }
+
+    public function createMemberMessageXML($page) {
+        $this->input_str = '
+                            <RequesterCredentials>
+                            <eBayAuthToken>' . $this->userToken . '</eBayAuthToken>
+                            </RequesterCredentials>
+                            <WarningLevel>High</WarningLevel>
+                            <MailMessageType>All</MailMessageType>
+                            <EndCreationTime>' . $this->time_e . '</EndCreationTime>
+                            <StartCreationTime>' . $this->time_b . '</StartCreationTime>
+                            <Pagination>
+                                <EntriesPerPage>100</EntriesPerPage>
+                                <PageNumber>' . $page . '</PageNumber>
+                            </Pagination>
+        ';
     }
 
     public function sendMessages($replyMessage)
@@ -583,6 +677,44 @@ class EbayAdapter implements AdapterInterface
 
             return $content->Ack == 'Success' ? true : false;
         }
+    }
+
+    /**
+     * 获取纠纷
+     */
+    public function getCases(){
+
+        /**
+         * status   先写死   所有状态都获取
+         * time 写死 7天
+         *
+         */
+
+        $time_begin = date('Y-m-d\TH:i:s.000\Z', time());
+        $time_end = date('Y-m-d\TH:i:s.000\Z', strtotime('-30 day'));
+
+        $page = 1;
+
+        $cases_xml = '<creationDateRangeFilter>
+                     <fromDate>'.$time_begin.'</fromDate>
+                     <toDate>'.$time_end.'</toDate>
+                     </creationDateRangeFilter>
+                     <paginationInput>
+                        <entriesPerPage>100</entriesPerPage>
+                        <pageNumber>'.$page.'</pageNumber>
+                     </paginationInput>
+                     <sortOrder>CREATION_DATE_DESCENDING</sortOrder>';
+
+
+        $usercase = $this->buildcaseBody($cases_xml,'getUserCases');
+        echo '<pre>';
+        print_r($usercase);exit;
+
+
+
+
+
+
     }
 
 

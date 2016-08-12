@@ -65,6 +65,9 @@ Route::group(['middleware' => 'auth'], function () {
     //供货商评级
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
     //物流对账
+    Route::post('shipmentCost.importProcess', ['uses' => 'ShipmentCostController@importProcess', 'as' => 'shipmentCost.importProcess']);
+    Route::get('shipmentCost.import', ['uses' => 'ShipmentCostController@import', 'as' => 'shipmentCost.import']);
+    Route::get('shipmentCost.export', ['uses' => 'ShipmentCostController@export', 'as' => 'shipmentCost.export']);
     Route::resource('shipmentCost', 'ShipmentCostController');
     //供货商
     Route::get('productSupplier/ajaxSupplier',

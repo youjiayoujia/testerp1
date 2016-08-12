@@ -428,20 +428,17 @@ class EbayAdapter implements AdapterInterface
      * case XML DOM
      */
     public function buildcaseBody($xml,$call){
+        $this->serverUrl = 'https://svcs.ebay.com/services/resolution/v1/ResolutionCaseManagementService';  //cases API地址
         $this->verb = $call;
         $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="http://www.ebay.com/marketplace/resolution/v1/services">';
         $requestXmlBody .= $xml;
         $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
-        return $requestXmlBody;
 
-        print_r($requestXmlBody);
-
-        $result = $this->sendHttpRequest($requestXmlBody);
+        $result = $this->sendHttpRequest($requestXmlBody,'Resolution');
         $response = simplexml_load_string($result);
 
         return $response;
     }
-
 
     private function buildEbayHeaders()
     {
@@ -458,9 +455,67 @@ class EbayAdapter implements AdapterInterface
         return $headers;
     }
 
-    public function sendHttpRequest($requestBody)
+
+/*    public function sendHttpRequestMessage($requestBody, $mode='Trading') {
+        //build eBay headers using variables passed via constructor
+        if (strcasecmp($mode, 'Trading') === 0) {       //交易API的头信息
+            $headers = $this->buildEbayHeaders();
+        }elseif (strcasecmp($mode, 'Resolution') === 0){//resolution Api头信息
+            $headers = $this->buildEbayResolutionHeaders();
+        }elseif (strcasecmp($mode, 'Return') === 0){ //return case Api头信息
+            $headers = $this->buildEbayReturnHeaders();
+        }else {
+            $headers = $this->buildEbayHeaders();
+        }
+        $connection = curl_init();
+        curl_setopt($connection, CURLOPT_VERBOSE, 1);
+        //set the server we are using (could be Sandbox or Production server)
+        curl_setopt($connection, CURLOPT_URL, $this->serverUrl);
+        //stop CURL from verifying the peer's certificate
+        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
+        //set the headers using the array of headers
+        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
+        //set method as POST
+        curl_setopt($connection, CURLOPT_POST, 1);
+        //set the XML body of the request
+        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
+        //set it to return the transfer as a string from curl_exec
+        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($connection, CURLOPT_TIMEOUT, 250);
+        //Send the Request
+        $response = curl_exec($connection);
+        //$error = curl_error($connection);
+        //close the connection
+        curl_close($connection);
+        return $response;
+    }*/
+
+    /**
+     * cases 使用的头部
+     * 创建resolution API的头信息
+     * @return multitype:
+     */
+    private function buildEbayResolutionHeaders(){
+        $headers = array(
+            'X-EBAY-SOA-SERVICE-NAME: ResolutionCaseManagementService',
+            'X-EBAY-SOA-OPERATION-NAME: '.$this->verb,
+            'X-EBAY-SOA-SERVICE-VERSION: 1.1.0',
+            'X-EBAY-SOA-SECURITY-TOKEN: '.$this->requestToken,
+            'X-EBAY-SOA-REQUEST-DATA-FORMAT: XML'
+        );
+        return $headers;
+    }
+
+    public function sendHttpRequest($requestBody,$type=false)
     {
-        $headers = $this->buildEbayHeaders();
+        if($type == 'Resolution'){ //case 头部
+            $headers = $this->buildEbayResolutionHeaders();
+        }else{
+            $headers = $this->buildEbayHeaders();
+
+        }
         //print_r($headers);
 
         $connection = curl_init();
@@ -689,12 +744,9 @@ class EbayAdapter implements AdapterInterface
          * time 写死 7天
          *
          */
-
-        $time_begin = date('Y-m-d\TH:i:s.000\Z', time());
-        $time_end = date('Y-m-d\TH:i:s.000\Z', strtotime('-30 day'));
-
+        $time_end = date('Y-m-d\TH:i:s.000\Z', time());
+        $time_begin = date('Y-m-d\TH:i:s.000\Z', strtotime('-30 day'));
         $page = 1;
-
         $cases_xml = '<creationDateRangeFilter>
                      <fromDate>'.$time_begin.'</fromDate>
                      <toDate>'.$time_end.'</toDate>
@@ -707,6 +759,58 @@ class EbayAdapter implements AdapterInterface
 
 
         $usercase = $this->buildcaseBody($cases_xml,'getUserCases');
+
+
+
+
+
+        /**SimpleXMLElement Object
+        (
+        [ack] => Success
+        [version] => 1.3.0
+        [timestamp] => 2016-08-12T07:48:15.322Z
+        [cases] => SimpleXMLElement Object
+                                    (
+                                    [caseSummary] => Array
+                                    (
+                                    [0] => SimpleXMLElement Object
+                                    (
+                                    [caseId] => SimpleXMLElement Object
+                                    (
+                                    [id] => 685784541
+                                    [type] => UPI
+                                    )
+
+                                    [user] => SimpleXMLElement Object
+                                    (
+                                    [userId] => pandaserveyou
+                                    [role] => SELLER
+                                    )
+
+                                    [otherParty] => SimpleXMLElement Object
+                                    (
+                                    [userId] => deis-br
+                                    [role] => BUYER
+                                    )
+
+                                    [status] => SimpleXMLElement Object
+                                    (
+                                    [UPIStatus] => OTHER_PARTY_RESPONSE_DUE
+                                    )
+
+                                    [item] => SimpleXMLElement Object
+                                    (
+                                    [itemId] => 172218797476
+                                    [itemTitle] => Original Andrea Hair Growth Pilatory Essence Oil Baldness Alopecia anti Loss
+                                    [transactionId] => 1578377865007
+                                    )
+
+                                    [caseQuantity] => 2
+                                    [caseAmount] => 1.85
+                                    [respondByDate] => 2016-10-08T16:12:15.000Z
+                                    [creationDate] => 2016-08-11T22:11:10.000Z
+                                    [lastModifiedDate] => 2016-08-11T22:11:10.000Z
+        )
         echo '<pre>';
         print_r($usercase);exit;
 

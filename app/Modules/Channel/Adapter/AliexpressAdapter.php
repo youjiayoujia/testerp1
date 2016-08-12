@@ -448,7 +448,7 @@ Class AliexpressAdapter implements AdapterInterface
         $msgSourcesArr =array('message_center','order_msg');
         $method = 'api.queryMsgRelationList';
         $filter = 'readStat';
-        $pageSize = 5;
+        $pageSize = 5; //每页个数
         $j = 0;
         $message_list = [];
 
@@ -558,6 +558,45 @@ Class AliexpressAdapter implements AdapterInterface
         $replyMessage->save();
 
         return $replyMessage->status== 'SENT' ? true : false;
+    }
+
+    /**
+     * 纠纷
+     */
+    public function getIssues(){
+
+        $issue_ary = array(
+            'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
+            'SELLER_REFUSE_REFUND', //卖家拒绝纠
+            // 'ACCEPTISSUE', //卖家接受纠纷     相当于完成了的纠纷
+            // 'WAIT_BUYER_SEND_GOODS', //等待买家发货
+            //  'WAIT_SELLER_RECEIVE_GOODS', // 买家发货，等待卖家收货
+            'ARBITRATING', // 仲裁中
+            //   'SELLER_RESPONSE_ISSUE_TIMEOUT' // 卖家响应纠纷超时  对应相关超时的不需要获取
+        );
+        $page = 1;
+        $page_size = 10;
+
+
+        foreach ($issue_ary as $issue){
+            for($i = 1 ; $i>0; $i++){
+
+                $method = 'api.queryIssueList';
+                $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
+                $issue_list = json_decode($this->getJsonData($method, $para));
+                if(isset($issue_list['success']) && $issue_list['success'] ) {
+                    foreach ($issue_list as $item) {
+                        echo $item;
+                        exit;
+                    }
+                }else{
+                    break;
+                }
+
+            }
+
+        }
+
     }
 
 

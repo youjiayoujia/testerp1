@@ -762,8 +762,6 @@ class EbayAdapter implements AdapterInterface
 
 
 
-
-
         /**SimpleXMLElement Object
         (
         [ack] => Success
@@ -811,6 +809,7 @@ class EbayAdapter implements AdapterInterface
                                     [creationDate] => 2016-08-11T22:11:10.000Z
                                     [lastModifiedDate] => 2016-08-11T22:11:10.000Z
         )
+         */
         echo '<pre>';
         print_r($usercase);exit;
 

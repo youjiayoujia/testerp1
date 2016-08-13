@@ -10,6 +10,20 @@ namespace App\Modules\Logistics;
 use Exception;
 use App\Modules\Logistics\Adapter\ChukouyiAdapter;
 use App\Modules\Logistics\Adapter\CoeAdapter;
+<<<<<<< HEAD
+use App\Modules\Logistics\Adapter\szChinaPostAdapter;
+use App\Modules\Logistics\Adapter\WinitAdapter;
+use App\Modules\Logistics\Adapter\FpxAdapter;
+use App\Modules\Logistics\Adapter\SmtAdapter;
+
+use App\Modules\Logistics\Adapter\ShunyouAdapter;
+use App\Modules\Logistics\Adapter\ShunfengAdapter;
+use App\Modules\Logistics\Adapter\ShunfenghlAdapter;
+use App\Modules\Logistics\Adapter\EubofflineAdapter;
+use App\Modules\Logistics\Adapter\EubAdapter;
+
+
+
 
 class LogisticsModule
 {
@@ -38,4 +52,65 @@ class LogisticsModule
     {
         return new CoeAdapter($config);
     }
+
+    
+    public function createSzChinaPostDriver($config)
+    {
+        return new SzChinaPostAdapter($config);
+    }
+    
+    public function createWinitDriver($config){
+        return new WinitAdapter($config);
+    }
+    
+    public function createFpxDriver($config){
+        return new FpxAdapter($config);
+    }
+    
+    public function createSmtDriver($config){
+        return new SmtAdapter($config);
+    }
+
+
+    /** 实例化顺友
+     * @param $config
+     * @return ShunyouAdapter
+     */
+    public function createShunyouDriver($config)
+    {
+        return new ShunyouAdapter($config);
+    }
+
+    /** 实例化顺丰俄罗斯
+     * @param $config
+     * @return ShunfengAdapter
+     */
+    public function createShunfengDriver($config){
+        return new ShunfengAdapter($config);
+    }
+
+    /**实例化顺丰荷兰
+     * @param $config
+     * @return ShunfenghlAdapter
+     */
+    public function createShunfenghlDriver($config){
+        return new ShunfenghlAdapter($config);
+    }
+
+    /**实例化线下Eub
+     * @param $config
+     * @return EubofflineAdapter
+     */
+    public function createEubofflineDriver($config){
+        return new EubofflineAdapter($config);
+    }
+
+    /**实例化线上eub
+     * @param $config
+     * @return EubAdapter
+     */
+    public function createEubDriver($config){
+        return new EubAdapter($config);
+    }
+
 }

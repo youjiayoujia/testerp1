@@ -67,6 +67,20 @@ class ZoneController extends Controller
     }
 
     /**
+     * 某个物流方式分区报价首页
+     */
+    public function one($id)
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model->where('logistics_id', $id)),
+            'id' => $id,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 详情
      *
      * @param $id

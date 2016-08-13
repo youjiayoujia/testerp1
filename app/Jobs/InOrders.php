@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\Job;
-use App\Jobs\DoPackage;
+use App\Jobs\AssignStocks;
 use App\Models\OrderModel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -40,8 +40,8 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             if ($order) {
                 $package = $order->createPackage();
                 if ($order->status == 'PREPARED' && $package) {
-                    $job = new DoPackage($package);
-                    $job->onQueue('doPackages');
+                    $job = new AssignStocks($package);
+                    $job->onQueue('assignStocks');
                     $this->dispatch($job);
                     $this->relation_id = $order->id;
                     $this->result['status'] = 'success';
@@ -57,6 +57,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $this->result['remark'] = 'Fail to put order in.';
             }
         } else {
+            //todo:计算利润率,验证黑名单,生成包裹
             if ($oldOrder->channel_id == 4 && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
                 $this->order['id'] = $oldOrder->id;
                 $order = $orderModel->updateOrder($this->order, $oldOrder);

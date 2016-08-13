@@ -245,16 +245,6 @@ return [
                     'icon' => '',
                 ],
                 [
-                    'name' => '跟踪号',
-                    'url' => 'logisticsCode.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '物流分区报价',
-                    'url' => 'logisticsZone.index',
-                    'icon' => '',
-                ],
-                [
                     'name' => '物流分配规则',
                     'url' => 'logisticsRule.index',
                     'icon' => '',
@@ -355,6 +345,18 @@ return [
             [
                 'name' => 'wish销售代码设置',
                 'url' => 'wishSellerCode.index',
+                'icon' => '',
+            ],
+            [
+
+                'name' => 'SMT待发布产品列表',
+                'url' => 'smt.index',
+                'icon' => '',
+            ],
+            [
+            
+                'name' => 'SMT在线产品列表',
+                'url' => 'smt.onlineProductIndex',
                 'icon' => '',
             ],
             [

@@ -97,6 +97,13 @@ class ProductModel extends BaseModel
         'declared_cn',
         'declared_en',
         'notify',
+        'declared_value',
+        'package_height',
+        'package_width',
+        'package_length',
+        'height',
+        'width',
+        'length',
     ];
 
     public function getMixedSearchAttribute()
@@ -299,7 +306,7 @@ class ProductModel extends BaseModel
                     $data['channel_id'] = $channel->id;
                     $product->productMultiOption()->create($data);
                 }
-//print_r($catalog);exit;
+
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
@@ -355,10 +362,12 @@ class ProductModel extends BaseModel
                         }
                     }
                 }
+                $product->createItem();
                 $aznum++;
             }
             $require_status['status']=3;
             RequireModel::find($data['require_id'])->update($require_status);
+            
         } catch (Exception $e) {
             DB::rollBack();
         }
@@ -500,11 +509,15 @@ class ProductModel extends BaseModel
         $variations = $this->variationValues->toArray();
         //产品model号赋值
         $model = $this->model;
+
         foreach ($variations as $key => $value) {
             $item = $model . ($key + 1);
             $product_data = $this->toArray();
             $product_data['sku'] = $item;
             $product_data['product_id'] = $this->id;
+            $product_data['status'] = 'sellWaiting';
+            unset($product_data['id']);
+            //echo '<pre>';print_r($product_data);exit;
             $this->item()->create($product_data);
         }
 

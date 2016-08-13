@@ -11,6 +11,7 @@
             <li><a href="javascript:" class="batchedit" data-name="quality_standard">质检</a></li>
             <li><a href="javascript:" class="batchedit" data-name="package_limit">包装方式</a></li>
             <li><a href="javascript:" class="batchedit" data-name="purchase_url">参考链接</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="declared">申报资料</a></li>
         </ul>
     </div>
     <div class="btn-group">
@@ -393,7 +394,7 @@
                             $('#result-table-'+productId).show();
                         });
                     }else{
-
+                        alert('出错了，请检查下物流分区，汇率是否有误 ');
                     }
                 },
                 error:function () {

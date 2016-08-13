@@ -45,12 +45,19 @@ Class WishAdapter implements AdapterInterface
 
     }
 
-
     public function getOrder($orderID)
     {
         return $orderID;
     }
 
+    /** 获取wish订单
+     * @param $startDate
+     * @param $endDate
+     * @param array $status
+     * @param int $perPage
+     * @param string $nextToken
+     * @return array
+     */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
         $orders = [];
@@ -87,8 +94,10 @@ Class WishAdapter implements AdapterInterface
         }
         return ['orders' => $returnOrders, 'nextToken' => $nextToken];
     }
-
-
+    /**回传追踪信息
+     * @param $tracking_info
+     * @return array
+     */
     public function returnTrack($tracking_info)
     {
         $return = [];
@@ -110,7 +119,11 @@ Class WishAdapter implements AdapterInterface
 
 
     }
-
+    /**组装订单信息
+     * @param $order
+     * @param $transaction_number
+     * @return array|bool
+     */
     public function parseOrder($order, $transaction_number)
     {
 
@@ -184,11 +197,11 @@ Class WishAdapter implements AdapterInterface
         return $orderInfo;
 
     }
-
-    //wish sku 解析规则
-    // 1 处理捆绑的情况   A+B
-    // 2 去除前后缀    $type = 2 的时候 sku前缀是  S*001KU[TEST]  这样存在的
-    // 3 处理SKU（10）  处理打包的情况
+    /**SKU 解析
+     * @param $channel_sku
+     * @param int $type
+     * @return array
+     */
     public function filter_sku($channel_sku, $type = 1)
     {
 
@@ -235,13 +248,20 @@ Class WishAdapter implements AdapterInterface
         return $returnSku;
 
     }
-
+    /**付款时间转换
+     * @param $time
+     * @return bool|string
+     */
     public function getPayTime($time)
     {
         return date('Y-m-d H:i:s', strtotime($time) + 8 * 3600);
     }
-
-
+    /** 获取在线广告数据
+     * @param $start
+     * @param int $perPage
+     * @param string $startDate
+     * @return array|bool
+     */
     public function getOnlineProduct($start, $perPage = 100, $startDate = '')
     {
         $return = [];
@@ -411,7 +431,11 @@ Class WishAdapter implements AdapterInterface
 
 
     }
-
+    /**解析销售代码
+     * @param $wishSku
+     * @param $type
+     * @return array|string
+     */
     public function getSellCode($wishSku, $type)
     {
         if ($type == 2) {
@@ -427,8 +451,11 @@ Class WishAdapter implements AdapterInterface
 
 
     }
-
-
+    /** 获取对应的erp SKU
+     * @param $wishSku
+     * @param $type
+     * @return string
+     */
     public function getErpSkuByWishSku($wishSku, $type)
     {
 
@@ -460,9 +487,7 @@ Class WishAdapter implements AdapterInterface
         return implode('+', $returnSku);
 
     }
-
-
-    /*
+    /* 创建新广告
      * data=[
      * 'name'=>'',
      * 'description'=>'',
@@ -503,7 +528,10 @@ Class WishAdapter implements AdapterInterface
         }
         return $return;
     }
-
+    /**新增变量
+     * @param $variant
+     * @return bool
+     */
     public function createVariation($variant)
     {
         $variant['access_token'] = urldecode($this->access_token);
@@ -519,7 +547,11 @@ Class WishAdapter implements AdapterInterface
             return false;
         }
     }
-
+    /** 更新子sku 信息
+     * @param $variant
+     * @param $url
+     * @return array
+     */
     public function updateProductVariation($variant, $url)
     {
         $return = [];
@@ -536,7 +568,10 @@ Class WishAdapter implements AdapterInterface
         }
         return $return;
     }
-
+    /** 更新广告信息
+     * @param $product
+     * @return array
+     */
     public function updateProduct($product)
     {
         $return = [];
@@ -553,6 +588,26 @@ Class WishAdapter implements AdapterInterface
             $return['info'] = isset($result['message']) ? $result['message'] : '未知错误';
         }
         return $return;
+    }
+
+    public function getChangedOrders($startDate,$start,$limit){
+        $url = "https://china-merchant.wish.com/api/v2/order/multi-get?";
+        $apiArr = array();//api请求数组
+        $apiArr['since'] = urlencode(date("Y-m-d", strtotime($startDate)));
+        $apiArr['limit'] = urlencode($limit);
+        $apiArr['start'] = urlencode($start * $limit);
+        $apiArr['access_token'] = urldecode($this->access_token);
+        $apiString = http_build_query($apiArr);
+        $url = $url . $apiString;
+        $orderjson = $this->getCurlData($url);
+        $orderList = json_decode($orderjson, true);
+        if (isset($orderList['code']) && ($orderList['code'] == 0) && !empty($orderList['data'])){
+
+            return $orderList['data'];
+        }else{
+            return false;
+        }
+
     }
 
     /*  $data=['id','tracking_provider','tracking_number','ship_note']
@@ -576,7 +631,6 @@ Class WishAdapter implements AdapterInterface
         return $return;
 
     }
-
 
     public function isResetAccesstoken()
     {

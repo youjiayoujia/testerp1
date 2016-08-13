@@ -85,13 +85,11 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $response = $this->setRequest('Orders', $request);
-
-        //TODO:return ERRORS
         if (isset($response->Error)) {
             return [
-                'Error' => [
-                    'code' => (string)$request->Error->Code,
-                    'message' => (string)$request->Error->Message
+                'error' => [
+                    'code' => (string)$response->Error->Code,
+                    'message' => (string)$response->Error->Message
                 ]
             ];
         } else {

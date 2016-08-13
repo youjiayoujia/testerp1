@@ -102,6 +102,8 @@ class MessageModel extends BaseModel{
             })->first();
     }
 
+
+    //根据邮件或者 from 关联订单
     public function guessRelatedOrders($email = null)
     {
         $relatedOrders = [];
@@ -339,7 +341,7 @@ class MessageModel extends BaseModel{
                         $html = $content;
                         break;
                     default :
-                        echo 'invalid message type';
+                        $html = 'invalid message type';
                 }
             }
 

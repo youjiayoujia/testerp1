@@ -158,10 +158,9 @@ class ZoneModel extends BaseModel
      */
     public function getShipmentFee($zoneId,$productWeight){
         $zone_obj = $this->find($zoneId);
-       // dd($zone_obj);exit;
+        //dd($zone_obj);exit;
         if($zone_obj && $productWeight){
             $shipment_fee = $zone_obj->fixed_price + (($productWeight - $zone_obj->fixed_weight) / $zone_obj->continued_weight)  * $zone_obj->continued_price + 0;
-
         }else{
             $shipment_fee = false;
         }

@@ -70,12 +70,8 @@ class MessageController extends Controller
 
             //dd(request()->input());exit;
 
-            /**
-             * 未关联 的消息
-             * 消息中的订单号 与 erp订单匹配
-             */
             if($message->related == 0){
-                $message->findOrderWithMessage();
+                $message->findOrderWithMessage();  //消息中的订单号 与 erp订单匹配
             }
 
             $emailarr=config('user.email');
@@ -85,7 +81,7 @@ class MessageController extends Controller
                 'parents' => TypeModel::where('parent_id', 0)->get(),
                 'users' => UserModel::all(),
                 'emailarr' => $emailarr,
-                'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
+               // 'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
                 //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
@@ -290,7 +286,7 @@ class MessageController extends Controller
         }
         request()->flash();
         $this->validate(request(), $reply->rules('create')); //
-        
+
         if ($message->reply(request()->all())) {
             /*
              * 写入队列

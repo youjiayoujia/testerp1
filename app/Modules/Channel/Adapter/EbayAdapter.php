@@ -47,7 +47,7 @@ class EbayAdapter implements AdapterInterface
         if (empty($nextToken)) {
             $nextToken = 1;
         }
-        $requestXmlBody = $this->getListOrdersXml($startDate, $endDate, $OrderStatus, $perPage,$nextToken);
+        $requestXmlBody = $this->getListOrdersXml($startDate, $endDate, $OrderStatus, $perPage, $nextToken);
         $result = $this->sendHttpRequest($requestXmlBody);
         $response = simplexml_load_string($result);
         if (isset($response->OrderArray->Order) && !empty($response->OrderArray->Order)) {
@@ -67,7 +67,7 @@ class EbayAdapter implements AdapterInterface
     }
 
 
-    public function getListOrdersXml($startDate, $endDate, $OrderStatus,$pageSizem,$page)
+    public function getListOrdersXml($startDate, $endDate, $OrderStatus, $pageSizem, $page)
     {
         $returnMustBe = 'OrderArray.Order.OrderID,';
         $returnMustBe .= 'OrderArray.Order.ShippingAddress.Name,';
@@ -168,13 +168,13 @@ class EbayAdapter implements AdapterInterface
         $xml .= '<ItemID>' . $tracking_info['ItemID'] . '</ItemID>';
         $xml .= '<Shipped>true</Shipped>';
         $xml .= '<TransactionID>' . $tracking_info['TransactionID'] . '</TransactionID>';
-        $result =  $this->buildEbayBody($xml,'CompleteSale');
-        if((string)$result->Ack=='Success'){
+        $result = $this->buildEbayBody($xml, 'CompleteSale');
+        if ((string)$result->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
         } else {
             $return['status'] = false;
-            $return['info'] = isset($result->LongMessage)?(string)$result->LongMessage:'error';
+            $return['info'] = isset($result->LongMessage) ? (string)$result->LongMessage : 'error';
             //$return['info'] = '模拟标记失败';
         }
         return $return;
@@ -202,13 +202,12 @@ class EbayAdapter implements AdapterInterface
         }
 
 
-
         //121864765676-1639850594002
-     /*   $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
+        /*   $thisOrder = orderModel::where(['channel_ordernum' => (string)$order->OrderID])->where('status', '!=', 'UNPAID')->first();     //获取详情之前 进行判断是否存在 状态是未付款还是的继续
 
-        if ($thisOrder) {
-            return false;
-        }*/
+           if ($thisOrder) {
+               return false;
+           }*/
         /*  if((string)$order->OrderID=='121864765676-1639850594002'){
               $paidTime ='2016-06-02 09:00:00';
               echo '121864765676-1639850594002';
@@ -224,7 +223,7 @@ class EbayAdapter implements AdapterInterface
 
         $reurnOrder['currency'] = (string)$currencyID;
         $reurnOrder['channel_ordernum'] = (string)$order->OrderID;
-        $reurnOrder['channel_listnum'] = isset($order->ShippingDetails->SellingManagerSalesRecordNumber)?(string)$order->ShippingDetails->SellingManagerSalesRecordNumber:'';
+        $reurnOrder['channel_listnum'] = isset($order->ShippingDetails->SellingManagerSalesRecordNumber) ? (string)$order->ShippingDetails->SellingManagerSalesRecordNumber : '';
         $reurnOrder['amount'] = (float)$order->Total;
         $reurnOrder['amount_shipping'] = (float)$order->ShippingServiceSelected->ShippingServiceCost;
         $reurnOrder['email'] = '';
@@ -407,6 +406,184 @@ class EbayAdapter implements AdapterInterface
         }
 
         return $return;
+
+    }
+
+    /** 获取对应站点分类
+     * @param $level 分类级别
+     * @param string $categoryParent 上级分类
+     * @param int $site 站点
+     * @return array|bool
+     */
+    public function getEbayCategoryList($level, $categoryParent = '', $site = 0)
+    {
+        $return = [];
+        $xml = '<DetailLevel>ReturnAll</DetailLevel>';
+        $xml .= '<LevelLimit>' . $level . '</LevelLimit>';
+        if (!empty($categoryParent)) {
+            $xml .= '<CategoryParent>' . $categoryParent . '</CategoryParent>';
+        }
+        $xml .= '<CategorySiteID>' . $site . '</CategorySiteID>';
+        $response = $this->buildEbayBody($xml, 'GetCategories', $site);
+        if ($response->Ack == 'Success') {
+            foreach ($response->CategoryArray->Category as $category) {
+                $data = [];
+                $data['category_id'] = (int)$category->CategoryID;
+                $data['best_offer'] = isset($category->BestOfferEnabled) ? (string)$category->BestOfferEnabled : '';
+                $data['auto_pay'] = isset($category->AutoPayEnabled) ? (string)$category->AutoPayEnabled : '';
+                $data['category_level'] = (int)$category->CategoryLevel;
+                $data['category_name'] = (string)$category->CategoryName;
+                $data['category_parent_id'] = (int)$category->CategoryParentID;
+                $data['leaf_category'] = isset($category->LeafCategory) ? (string)$category->LeafCategory : '';
+                $data['site'] = $site;
+                $return[] = $data;
+            }
+        } else {
+            return false;
+        }
+        return $return;
+
+    }
+
+    public function getEbayCondition($category_id, $site)
+    {
+        $return = [];
+        $xml = '<DetailLevel>ReturnAll</DetailLevel>
+                <FeatureID>ConditionEnabled</FeatureID>
+                <FeatureID>ConditionValues</FeatureID>
+                <FeatureID>ItemSpecificsEnabled</FeatureID>
+                <FeatureID>VariationsEnabled</FeatureID>
+                <FeatureID>UPCEnabled</FeatureID>
+                <FeatureID>EANEnabled</FeatureID>
+                <FeatureID>ISBNEnabled</FeatureID>';
+        $xml .= '<CategoryID>' . $category_id . '</CategoryID>';
+        $xml .= '<CategorySiteID>' . $site . '</CategorySiteID>';
+        $response = $this->buildEbayBody($xml, 'GetCategoryFeatures', $site);
+        if ($response->Ack == 'Success') {
+            $conditions = $response->Category->ConditionValues->Condition;
+            foreach ($conditions as $condition) {
+                $data = [];
+                $data['condition_id'] = (int)$condition->ID;
+                $data['condition_name'] = (string)$condition->DisplayName;
+                $data['category_id'] = $category_id;
+                $data['site'] = $site;
+                $data['is_variations'] = isset($response->Category->VariationsEnabled) ? (string)$response->Category->VariationsEnabled : '';
+                $data['is_condition'] = isset($response->Category->ConditionEnabled) ? (string)$response->Category->ConditionEnabled : '';
+                $data['is_upc'] = isset($response->Category->UPCEnabled) ? (string)$response->Category->UPCEnabled : '';
+                $data['is_ean'] = isset($response->Category->EANEnabled) ? (string)$response->Category->EANEnabled : '';
+                $data['is_isbn'] = isset($response->Category->ISBNEnabled) ? (string)$response->Category->ISBNEnabled : '';
+                $data['last_update_time'] = date('Y-m-d H:i:s', time());
+                $return[] = $data;
+            }
+        } else {
+            return false;
+        }
+
+        return $return;
+
+    }
+
+    public function getEbayCategorySpecifics($category_id, $site)
+    {
+        $return = [];
+        $xml = '<CategorySpecific><CategoryID>' . $category_id . '</CategoryID></CategorySpecific>';
+        $response = $this->buildEbayBody($xml, 'GetCategorySpecifics', $site);
+        if ($response->Ack == 'Success') {
+            foreach ($response->Recommendations->NameRecommendation as $v) {
+                $data = [];
+                $data['name'] = (string)$v->Name;
+                $data['value_type'] = isset($v->ValidationRules->ValueType) ? (string)$v->ValidationRules->ValueType : '';
+                $data['min_values'] = isset($v->ValidationRules->MinValues) ? (string)$v->ValidationRules->MinValues : '';
+                $data['max_values'] = isset($v->ValidationRules->MaxValues) ? (string)$v->ValidationRules->MaxValues : '';
+                $data['selection_mode'] = isset($v->ValidationRules->SelectionMode) ? (string)$v->ValidationRules->SelectionMode : '';
+                $data['variation_specifics'] = isset($v->ValidationRules->VariationSpecifics) ? (string)$v->ValidationRules->VariationSpecifics : '';
+                $data['last_update_time'] = date('Y-m-d H:i:s', time());
+                $specific_values = array();
+                foreach ($v->ValueRecommendation as $i_v) {
+                    $specific_values[] = (string)$i_v->Value;
+                }
+                $data['specific_values'] = serialize($specific_values);
+                $data['category_id'] = $category_id;
+                $data['site'] = $site;
+                $return[] = $data;
+            }
+        } else {
+            return false;
+        }
+        return $return;
+    }
+
+
+    /** 获取该账号近一个月的Feedback
+     * @param int $site
+     */
+    public function GetFeedback($site = 0)
+    {
+        $return = [];
+        $pageSize = 100;
+        $end = 10;
+        $is_break = false;
+        for ($page = 1; $page < $end; $page++) {
+            $xml = '<DetailLevel>ReturnAll</DetailLevel>
+			  <FeedbackType>FeedbackReceivedAsSeller</FeedbackType>
+              <CommentType>Positive</CommentType>
+			  <CommentType>Negative</CommentType>
+			  <CommentType>Neutral</CommentType>
+			  <OutputSelector>FeedbackDetailArray</OutputSelector>
+			  <OutputSelector>PaginationResult</OutputSelector>
+			  <WarningLevel>High</WarningLevel>
+			  <Pagination><EntriesPerPage>' . $pageSize . '</EntriesPerPage>
+		      <PageNumber>' . $page . '</PageNumber></Pagination>';
+            $response = $this->buildEbayBody($xml, 'GetFeedback', $site);
+            if ($response->Ack == 'Success') {
+                $end = (int)$response->PaginationResult->TotalNumberOfPages;
+                foreach ($response->FeedbackDetailArray->FeedbackDetail as $FeedbackDetail) {
+                    $detail = [];
+                    $detail['feedback_id'] = (string)$FeedbackDetail->FeedbackID;
+                    $detail['commenting_user'] = (string)$FeedbackDetail->CommentingUser;
+                    $detail['commenting_user_score'] = (int)$FeedbackDetail->CommentingUserScore;
+                    $detail['comment_text'] = (string)$FeedbackDetail->CommentText;
+                    $detail['comment_type'] = (string)$FeedbackDetail->CommentType;
+                    $detail['ebay_item_id'] = (string)$FeedbackDetail->ItemID;
+                    $detail['transaction_id'] = (string)$FeedbackDetail->TransactionID;
+                    $detail['comment_time'] = date('Y-m-d H:i:s', strtotime($FeedbackDetail->CommentTime));
+                    $return[] = $detail;
+                    if (time() - strtotime($detail['comment_time']) > 30 * 24 * 60 * 60) { //超过30
+                        $is_break = true;
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+            if ($is_break) {
+                break;
+            }
+        }
+        return $return;
+
+    }
+
+    /** 评价订单API
+     * @param $data
+     * @param string $type Positive 好评 Neutral中评 Negative 差评
+     * @param string $text 评价内容
+     * @param int $site 站点
+     * @return bool
+     */
+    public function LeaveFeedback($data, $type = 'Positive', $text = 'Good buyer,prompt payment,nice to deal with!', $site = 0)
+    {
+        $xml = '<CommentText>' . $text . '</CommentText>';
+        $xml .= '<CommentType>' . $type . '</CommentType>';
+        $xml .= '<ItemID>' . $data['item_id'] . '</ItemID>';
+        $xml .= '<TransactionID>' . $data['transaction_id'] . '</TransactionID>';
+        $xml .= '<TargetUser>' . $data['target_user'] . '</TargetUser>';
+        $response = $this->buildEbayBody($xml, 'LeaveFeedback', $site);
+        if ($response->Ack == 'Success') {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 

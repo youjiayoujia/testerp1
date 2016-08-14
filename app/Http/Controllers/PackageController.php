@@ -22,7 +22,7 @@ use App\Jobs\AssignLogistics;
 use App\Models\WarehouseModel;
 use DB;
 use Exception;
-use App\Jobs\DoPackage;
+use App\Jobs\AssignStocks;
 
 class PackageController extends Controller
 {
@@ -41,7 +41,7 @@ class PackageController extends Controller
         $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
         while ($packages->count()) {
             foreach ($packages as $package) {
-                $job = new DoPackage($package);
+                $job = new AssignStocks($package);
                 $job->onQueue('assignStocks');
                 $this->dispatch($job);
             }
@@ -746,17 +746,13 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
-        if (!in_array($package->logistics_id, $logistic_id)) {
-            return json_encode('logistic_error');
-        }
         $package->update([
-            'status' => 'SHIPPED',
             'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => '2',
+            'shipper_id' => request()->user()->id,
             'actual_weight' => $weight
         ]);
-        foreach ($package->items as $packageitem) {
-            $packageitem->orderItem->update(['status' => 'SHIPPED']);
+        if (!in_array($package->logistics_id, $logistic_id)) {
+            return json_encode('logistic_error');
         }
 
         return json_encode(true);

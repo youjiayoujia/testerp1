@@ -146,6 +146,11 @@ return [
                     'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流对账',
+                    'url' => 'shipmentCost.index',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [

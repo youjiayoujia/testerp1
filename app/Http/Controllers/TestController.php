@@ -46,6 +46,7 @@ use App\Models\CatalogModel;
 use DB;
 use Excel;
 use App\Models\Message\ReplyModel;
+use App\Jobs\Inorders;
 
 
 class TestController extends Controller
@@ -58,22 +59,35 @@ class TestController extends Controller
     }
     // public function test2()
     // {
-    //     $item = ItemModel::find('1');var_dump($item->toArray());
-    //     $item->out('8', 1, 'ADJUSTMENT', '1');exit;var_dump('ok');
+    //     echo Tool::barcodePrint('123', 'c128', '2', '33');
     // }
     public function test2()
     {
-        $rows[] = [
-            '南京' => '上海',
-            iconv('utf-8', 'gb2312', '武汉市') => iconv('utf-8', 'gb2312', '江苏省懂')
-        ];
-        $name = 'test';
-        Excel::create($name, function ($excel) use ($rows) {
-            $excel->sheet('', function ($sheet) use ($rows) {
-                $sheet->fromArray($rows);
-            }, 'GB2312');
-        })->download('XLS');
+        $data['channel_ordernum'] = '2123123';
+        $data['ordernum'] = '3000';
+        $data['channel_account_id'] = '365';
+        $data['channel_id'] = '2';
+        $data['status'] = 'PREPARED';
+        $data['active'] = 'NORMAL';
+        $data['items'][0]['sku'] = 'MPJ845D';
+        $data['items'][0]['quantity'] = 1;
+        $job = new Inorders($data);
+        $job->onQueue('Inorders');
+        $this->dispatch($job);
     }
+    // public function test2()
+    // {
+    //     $rows[] = [
+    //         '南京' => '上海',
+    //         iconv('utf-8', 'gb2312', '武汉市') => iconv('utf-8', 'gb2312', '江苏省懂')
+    //     ];
+    //     $name = 'test';
+    //     Excel::create($name, function ($excel) use ($rows) {
+    //         $excel->sheet('', function ($sheet) use ($rows) {
+    //             $sheet->fromArray($rows);
+    //         }, 'GB2312');
+    //     })->download('XLS');
+    // }
 
     public function test1()
     {

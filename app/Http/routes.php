@@ -737,6 +737,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('jobFailed', 'Job\FailedController');
     //标记发货规则设置
     Route::resource('orderMarkLogic', 'Order\OrderMarkLogicController');
+    Route::resource('ebayCases','Message\EbayCasesController');
 });
 
 

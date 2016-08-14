@@ -398,6 +398,18 @@ return [
                     'icon' => '',
                 ],
             ],
+            '平台纠纷' => [
+                [
+                    'name' => 'ebay cases',
+                    'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'aliexpress issues',
+                    'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航

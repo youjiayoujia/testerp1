@@ -1374,12 +1374,16 @@ Class AliexpressAdapter implements AdapterInterface
                 $method = 'api.queryIssueList';
                 $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
                 $issue_list = json_decode($this->getJsonData($method, $para));
-                dd($issue_list);exit;
+                if(isset($issue_list->success)) {
+                    foreach ($issue_list->dataList as $item) {
 
-                if(isset($issue_list['success'])) {
-                    foreach ($issue_list as $item) {
-                        echo $item;
-                        exit;
+                        $detail_param = "issueId=".$item->id;
+                        $issue_detail = json_decode($this->getJsonData('api.queryIssueDetail',$detail_param));
+                        dd($issue_detail);exit;
+/*                        DB::beginTransaction();
+
+                        DB::commit();*/
+
                     }
                 }else{
                     break;

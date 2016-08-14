@@ -10,6 +10,9 @@ namespace App\Modules\Channel\Adapter;
 
 use Tool;
 use App\Models\OrderModel;
+use App\Models\Message\Issues\EbayCasesListsModel;
+use App\Models\Message\Issues\EbayCasesDetailsModel;
+
 
 set_time_limit(1800);
 
@@ -921,8 +924,9 @@ class EbayAdapter implements AdapterInterface
          * time 写死 7天
          *
          */
+
         $time_end = date('Y-m-d\TH:i:s.000\Z', time());
-        $time_begin = date('Y-m-d\TH:i:s.000\Z', strtotime('-30 day'));
+        $time_begin = date('Y-m-d\TH:i:s.000\Z', strtotime('-7 day'));
         $page = 1;
         $cases_xml = '<creationDateRangeFilter>
                      <fromDate>'.$time_begin.'</fromDate>
@@ -935,8 +939,7 @@ class EbayAdapter implements AdapterInterface
                      <sortOrder>CREATION_DATE_DESCENDING</sortOrder>';
 
 
-        $usercase = $this->buildcaseBody($cases_xml,'getUserCases');
-
+        $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
 
 
         /**SimpleXMLElement Object
@@ -987,14 +990,108 @@ class EbayAdapter implements AdapterInterface
                                     [lastModifiedDate] => 2016-08-11T22:11:10.000Z
         )
          */
-        echo '<pre>';
-        print_r($usercase);exit;
+        if($usercases->ack == 'Success'){
+
+
+            foreach ($usercases->cases->caseSummary as $case){
+
+                $buyer = '';
+                $seller = '';
+                if((string)$case->user->role == 'BUYER'){
+                    $buyer = (string)$case->user->userId;
+                }
+                if((string)$case->user->role == 'SELLER'){
+                    $seller = (string)$case->user->userId;
+                }
+
+                if((string)$case->otherParty->role == 'BUYER'){
+                    $buyer = (string)$case->user->userId;
+                }
+                if((string)$case->otherParty->role == 'SELLER'){
+                    $seller = (string)$case->user->userId;
+                }
+
+                $status = array_values((array)$case->status);
+                if($case->lastModifiedDate){
+                    $modify_date = (string)$case->lastModifiedDate;
+                }else{
+                    $modify_date = '';
+                }
+                $case_new_ary = [
+                    'case_id'        => (string)$case->caseId->id,
+                    'status'         => $status[0],
+                    'type'           => (string)$case->caseId->type,
+                    'seller_id'      => $seller,
+                    'buyer_id'       => $buyer,
+                    'item_id'        => (string)$case->item->itemId,
+                    'item_title'     => (string)$case->item->itemTitle,
+                    'transaction_id' => (string)$case->item->transactionId,
+                    'case_quantity'  => (int)$case->caseQuantity,
+                    'case_amount'    => (float)$case->caseAmount,
+                    'respon_date'    => (string)$case->respondByDate,
+                    'creation_date'  => (string)$case->creationDate,
+                    'creation_date'  => (string)$case->creationDate,
+                    'last_modify_date'=> $modify_date,
+                ];
+
+                //获取case 详情	 获取EBP_INR，EBP_SNAD， RETURN三类的详情
+
+                $valid_type = ['EBP_INR','EBP_SNAD','RETURN'];
+
+                if(in_array($case->caseId->type,$valid_type)){
+                    $case_detail_ary = [];
+                    $content = '';
+                    $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
+                    if($case_detail->ack == 'Success'){
+
+                        if($case_detail->caseDetail->responseHistory){
+                            $detail = (array)$case_detail->caseDetail;
+
+                            if(isset($detail['responseHistory'])){  //若包括消息
+                                foreach ($detail['responseHistory'] as $note){
+                                    $content []= [
+                                        'role' =>(string)$note->author->role,
+                                        'activity' => (string)$note->activity,
+                                        'creationDate'=> (string)$note->creationDate,
+                                        'note' => (string)$note->note,
+                                    ];
+                                }
+                                $content = base64_encode(serialize($content));
+                            }
+                        }
 
 
 
 
+                        $case_detail_ary = [
+                            'tran_price' => $case_detail->item->transactionPrice,
+                            'tran_date' => $case_detail->item->transactionDate,
+                            'tran_date' => $case_detail->item->transactionDate,
+                            'global_id' => $case_detail->item->globalId,
+                            'open_reason'=> $case_detail->caseDetail->openReason,
+                            'decision'=> $case_detail->caseDetail->decision,
+                            'fvf_credited'=> $case_detail->caseDetail->FVFCredited,
+                            'agreed_renfund_amount'=> $case_detail->caseDetail->agreedRefundAmount,
+                            'buyer_expection'=> $case_detail->caseDetail->initialBuyerExpectation,
+                            'content' => $content,
+                        ];
+                    }
+                }
 
+                $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
+                if(empty($list_obj)){
+                    EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary));
+                    echo '导入成功';
+                }
+            }
+        }
+    }
 
+    public function createCaseDetailXml($caseId,$caseType){
+        return '<caseId>
+					<id>'.$caseId.'</id>
+					<type>'.$caseType.'</type>
+				</caseId>';
     }
 
 

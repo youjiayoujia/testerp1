@@ -16,19 +16,29 @@ class ShipmentCostItemModel extends BaseModel
     protected $table = 'shipment_cost_items';
 
     protected $fillable = [
-    	'poarent_id',
+    	'parent_id',
     	'hang_number',
     	'package_id',
     	'type',
     	'shipped_at',
+        'logistics_id',
     	'code',
     	'destination',
         'all_weight',
         'theory_weight',
-        'weight_diff',
         'all_cost',
         'theory_cost',
-        'channel_id',
+        'channel_name',
     	'created_at'
     ];
+
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\Package\ShipmentCostModel', 'parent_id', 'id');
+    }
+
+    public function logistics()
+    {
+        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+    }
 }

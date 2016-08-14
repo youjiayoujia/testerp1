@@ -24,6 +24,66 @@ class ShipmentCostController extends Controller
         $this->viewPath = 'package.shipmentCost.';
     }
 
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'items' => $model->items()->paginate('20')
+        ];
+        return view($this->viewPath . 'show', $response);
+    }
+
+    /**
+     * 详情
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function showError($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'items' => $model->errors()->paginate('20')
+        ];
+
+        return view($this->viewPath . 'showErrors', $response);
+    }
+
+    public function destroyRows($arr)
+    {
+        foreach(explode(',', $arr) as $id) {
+            $model = $this->model->find($id);
+            if(!$model) {
+                continue;
+            }
+            foreach($model->items as $item) {
+                $item->delete();
+            }
+            foreach($model->errors as $error) {
+                $item->delete();
+            }
+            $model->delete();
+        }
+
+        return redirect($this->mainIndex);
+    }
+
     public function export()
     {
     	$rows[] = [
@@ -56,8 +116,7 @@ class ShipmentCostController extends Controller
     public function importProcess()
     {
     	$file = request()->file('import');
-        $arr = $this->model->importProcess($file);
-        $errors = [];
-       	var_dump($arr[0]);exit;
+        $arr = $this->model->importProcess($file, request()->user()->id);
+        return redirect($this->mainIndex);
     }
 }

@@ -37,7 +37,7 @@
                     <div style="font-weight:bold; font-size:2.5mm; line-height:4mm; text-align:center; width:100%; white-space: normal; word-break: break-all; word-wrap: break-word;">
                         {{$model->productItem->c_name}}
                     </div>
-                    <?php echo Tool::barcodePrint($id) ?>
+                    <?php echo Tool::barcodePrint($model->sku) ?>
                     <br />
                     <span style="font-size:10px;">
                         {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]
@@ -61,7 +61,7 @@
                             </span>
                         </b>
                         
-                        <?php echo Tool::barcodePrint($id) ?>
+                        <?php echo Tool::barcodePrint($model->sku) ?>
                         <br />
                         <div style="font-weight:bold; font-size:2.8mm; text-align:center; width:40mm;">
                             {{$model->sku}}
@@ -89,7 +89,7 @@
                            {{$model->productItem->c_name}}
                         </div>
                         
-                        <?php echo Tool::barcodePrint($id) ?>
+                        <?php echo Tool::barcodePrint($model->sku) ?>
                         <br />
                         <span style="font-size:8px;">
                             {{date('m-d',time())}}[{{$model->productItem->warehousePosition?$model->productItem->warehousePosition->name:''}}][PO:{{$po_id}}]

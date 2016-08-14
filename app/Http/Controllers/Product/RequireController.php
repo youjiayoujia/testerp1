@@ -150,6 +150,10 @@ class RequireController extends Controller
             //创建spu，,并插入数据
             $spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num),'product_require_id'=>$model->id,'status'=>'purchase','purchase'=>$model->purchase_id,'developer'=>$model->created_by]);
             $model->update(['status'=>'2', 'handle_id'=>'1', 'handle_time'=>date('Y-m-d h:i:s')]);
+            $channels = ChannelModel::all();
+            foreach ($channels as $channel) {
+                $spuobj->spuMultiOption()->create(['spu_id'=>$spuobj->id,'channel_id'=>$channel->id]);
+            }    
         }
 
         return json_encode($status);

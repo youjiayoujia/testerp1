@@ -699,5 +699,8 @@ Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
 Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
 Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
+Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
+Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
 Route::resource('spu', 'SpuController');
 

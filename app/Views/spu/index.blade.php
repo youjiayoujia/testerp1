@@ -50,6 +50,9 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
                 <?php } ?>
+                <a href="{{ route('spu.MultiEdit', ['id'=>$spu->id]) }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 小语言
+                </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$spu->id}}" title="备注" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-zoom-in"></span>备注
                 </a>

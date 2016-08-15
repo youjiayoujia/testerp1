@@ -82,6 +82,7 @@ class PurchaseOrderController extends Controller
     public function store()
     {
         request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
         $this->model->createPurchaseOrder(request()->all());
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));

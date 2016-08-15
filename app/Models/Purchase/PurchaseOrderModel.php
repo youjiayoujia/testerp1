@@ -22,12 +22,11 @@ class PurchaseOrderModel extends BaseModel
     protected $table = 'purchase_orders';
     public $rules = [
         'create' => [
-            /*'type' => 'required',
-            'purchase_num' => 'required',
-            'platform_id' => 'required',
+            'supplier_id' => 'required',
             'warehouse_id' => 'required',
-            'userid' => 'required',
-			'sku_id' => 'required',*/
+            'item.0.name' => 'required',
+            'item.0.purchase_num' => 'required',
+            'item.0.purchase_cost' => 'required',
         ],
         'update' => [
             /*'status' => 'required',*/

@@ -257,9 +257,10 @@ class ProductModel extends BaseModel
             //创建spu，,并插入数据
             //$spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
             $spuobj = SpuModel::where('product_require_id',$data['require_id'])->get()->first();
-            //echo '<pre>';
-            //print_r($data);exit;
+            
+            $data['purchase_adminer'] = $spuobj->purchase;
             $data['spu_id'] = $spuobj->id;
+            
             $az = array(
                 'A',
                 'B',

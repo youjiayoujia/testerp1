@@ -2,11 +2,6 @@
 @section('formAction') {{ route('product.store') }} @stop
 @section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
-<?php 
-//echo '<pre>';
-  //          print_r($logisticsLimit);exit;
-?>
-
     <div class="form-group">
         <label for="catalog_id">分类</label>：
         {{$catalogs->name}}
@@ -138,11 +133,7 @@
                 <option value="小">小</option>
             </select>
         </div>
-        <div class="form-group col-md-3">
-            <label for="color">产品包装尺寸（cm）(长*宽*高)</label></label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="package_size" placeholder="产品包装尺寸" name='package_size' value="{{ old('package_size') }}">
-        </div>
-            <div class="form-group col-md-2">
+        <div class="form-group col-md-2">
             <label for="size">产品重量(kg)</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="weight" placeholder="产品重量" name='weight' value="{{ old('weight') }}">
         </div>
@@ -179,12 +170,7 @@
         </div>
     </div>
 
-    <div class="row">
-        
-        <div class="form-group col-md-3"><label for="color">采购负责人</label>
-            <select class='form-control purchase_adminer' name="purchase_adminer"></select>
-        </div>
-        
+    <div class="row">  
         <div class="form-group col-md-3">
             <label for="color">url1</label>
             <input class="form-control" id="url1" placeholder="url" name='url1' value="{{ old('url1') }}">

@@ -401,12 +401,20 @@ class PickListController extends Controller
                     $flag = 0;
             }
             if($flag == 1) {
-                $package->status = 'PACKED';
+                $package->status = 'SHIPPED';
                 $picklistItems = $package->picklistItems;
                 foreach($picklistItems as $picklistItem) {
                     $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
                     $picklistItem->save();
                 }
+                foreach($package->items as $packageItem) {
+                    $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                                                $packageItem->quantity,
+                                                'PACKAGE',
+                                                $packageItem->id);
+                    $packageitem->orderItem->update(['status' => 'SHIPPED']);
+                }
+
                 $package->save();
             }
             return json_encode('1');

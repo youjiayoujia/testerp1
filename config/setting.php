@@ -78,8 +78,13 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+
+        'productSku.skuCode'=>'产品SKU',
+
+
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
+
         'by_id' => '买家ID',
         'profit_rate' => '利润率',
         'items.item.status' => 'SKU状态',
@@ -89,7 +94,7 @@ return [
         'logistics_id' => '物流方式',
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
-
+        'warehousePosition.name' => '库位'
     ],
 ];
 

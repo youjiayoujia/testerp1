@@ -8,6 +8,7 @@ use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
 use App\Models\WarehouseModel;
 use App\Models\UserModel;
+use App\Models\ItemModel;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -135,10 +136,12 @@ class PurchaseOrderModel extends BaseModel
     {   
         $data['user_id'] = request()->user()->id;
         $purchase_order = PurchaseOrderModel::create($data);
+        
         foreach ($data['item'] as $item) {
             $item['purchase_order_id'] = $purchase_order->id;
             $item['supplier_id'] = $data['supplier_id'];
             $item['warehouse_id'] = $data['warehouse_id'];
+            $item['item_id'] = ItemModel::where('sku',$item['sku'])->first()->id;
             $item['user_id'] = request()->user()->id;
             PurchaseItemModel::create($item);
         }

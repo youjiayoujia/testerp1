@@ -37,6 +37,11 @@ class LogisticsController extends Controller
      */
     public function create()
     {
+        $arr = [];
+        $channels = ChannelModel::all();
+        foreach($channels as $channel) {
+            $arr[$channel->name] = $channel->logisticsChannelName;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'warehouses'=>WarehouseModel::all(),
@@ -45,14 +50,7 @@ class LogisticsController extends Controller
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
-            'amazons' => ChannelModel::where('name', 'Amazon')->first()->logisticsChannelName,
-            'wishes' => ChannelModel::where('name', 'Wish')->first()->logisticsChannelName,
-            'aliExpresses' => ChannelModel::where('name', 'AliExpress')->first()->logisticsChannelName,
-            'lazadas' => ChannelModel::where('name', 'Lazada')->first()->logisticsChannelName,
-            'ebays' => ChannelModel::where('name', 'Ebay')->first()->logisticsChannelName,
-            'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
-            'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
-            'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
+            'arr' => $arr,
             'channels' => ChannelModel::all(),
         ];
 
@@ -78,16 +76,23 @@ class LogisticsController extends Controller
         $str = '';
         if(request()->has('logistics_limits')) {
             $str = implode(',', request('logistics_limits'));
+            $model->update(['limit' => $str]);
         }
-        $model->update(['limit' => $str]);
         $buf = [];
         foreach(request('merchant') as $key => $value) {
-            $arr = explode(',', $value);
-            $channelName = ChannelNameModel::where(['channel_id' => $arr[0], 'name' => $arr[1]])->first();
-            if(!$channelName) {
-                continue;
+            if(!empty($value)) {
+                $arr = explode(',', $value);
+                $channelName = ChannelNameModel::where(['channel_id' => $arr[0], 'name' => $arr[1]])->first();
+                if(!$channelName) {
+                    continue;
+                }
+                $buf[$key] = $channelName->id;
+            } else {
+                if(!empty(request($key.'_name'))) {
+                    $channelName = ChannelNameModel::create(['channel_id' => request($key.'_channelId'), 'name' => request($key.'_name')]);
+                    $buf[$key] = $channelName->id;
+                }
             }
-            $buf[$key] = $channelName->id;
         }
         $model->channelName()->sync($buf);
         return redirect($this->mainIndex);
@@ -127,6 +132,11 @@ class LogisticsController extends Controller
         if (!$logistics) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $arr = [];
+        $channels = ChannelModel::all();
+        foreach($channels as $channel) {
+            $arr[$channel->name] = $channel->logisticsChannelName;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $logistics,
@@ -138,14 +148,7 @@ class LogisticsController extends Controller
             'catalogs' => CatalogModel::all(),
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
-            'amazons' => ChannelModel::where('name', 'Amazon')->first()->logisticsChannelName,
-            'wishes' => ChannelModel::where('name', 'Wish')->first()->logisticsChannelName,
-            'aliExpresses' => ChannelModel::where('name', 'AliExpress')->first()->logisticsChannelName,
-            'lazadas' => ChannelModel::where('name', 'Lazada')->first()->logisticsChannelName,
-            'ebays' => ChannelModel::where('name', 'Ebay')->first()->logisticsChannelName,
-            'dhgates' => ChannelModel::where('name', 'Dhgate')->first()->logisticsChannelName,
-            'cdiscounts' => ChannelModel::where('name', 'Cdiscount')->first()->logisticsChannelName,
-            'jooms' => ChannelModel::where('name', 'Joom')->first()->logisticsChannelName,
+            'arr' => $arr,
             'channels' => ChannelModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
@@ -190,12 +193,19 @@ class LogisticsController extends Controller
         }
         $buf = [];
         foreach(request('merchant') as $key => $value) {
-            $arr = explode(',', $value);
-            $channelName = ChannelNameModel::where(['channel_id' => $arr[0], 'name' => $arr[1]])->first();
-            if(!$channelName) {
-                continue;
+            if(!empty(request($key.'_name'))) {
+                $channelName = ChannelNameModel::create(['channel_id' => request($key.'_channelId'), 'name' => request($key.'_name')]);
+                $buf[$key] = $channelName->id;
+            } else {
+                if(!empty($value)) {
+                    $arr = explode(',', $value);
+                    $channelName = ChannelNameModel::where(['channel_id' => $arr[0], 'name' => $arr[1]])->first();
+                    if(!$channelName) {
+                        continue;
+                    }
+                    $buf[$key] = $channelName->id;
+                }
             }
-            $buf[] = $channelName->id;
         }
         $model->channelName()->sync($buf);
         return redirect($this->mainIndex);

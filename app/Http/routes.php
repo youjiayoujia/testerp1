@@ -15,7 +15,7 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@test1');
+Route::get('test1', 'TestController@testSmt');
 Route::get('test2', 'TestController@test2');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -64,6 +64,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryController');
     //供货商评级
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
+    //物流对账
+    Route::get('shipmentCost/destroyRows/{arr}', ['uses' => 'ShipmentCostController@destroyRows', 'as' => 'shipmentCost.destroyRows']);
+    Route::get('shipmentCost/showError/{id}', ['uses' => 'ShipmentCostController@showError', 'as' => 'shipmentCost.showError']);
+    Route::post('shipmentCost/importProcess', ['uses' => 'ShipmentCostController@importProcess', 'as' => 'shipmentCost.importProcess']);
+    Route::get('shipmentCost/import', ['uses' => 'ShipmentCostController@import', 'as' => 'shipmentCost.import']);
+    Route::get('shipmentCost/export', ['uses' => 'ShipmentCostController@export', 'as' => 'shipmentCost.export']);
+    Route::resource('shipmentCost', 'ShipmentCostController');
     //供货商
     Route::get('productSupplier/ajaxSupplier',
         ['uses' => 'Product\SupplierController@ajaxSupplier', 'as' => 'ajaxSupplier']);
@@ -198,7 +205,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printInWarehouseOrder/{id}', ['uses' => 'Purchase\PurchaseOrderController@printInWarehouseOrder', 'as' => 'purchaseOrder.printInWarehouseOrder']);
     Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
+    Route::any('purchaseOrder/showpo', ['uses' => 'Purchase\PurchaseOrderController@showpo', 'as' => 'purchase.showpo']);
     Route::any('purchaseOrder/ajaxInWarehouse',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
     Route::any('purchaseOrder/inWarehouse',
@@ -448,8 +457,6 @@ Route::group(['middleware' => 'auth'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
     //订单管理路由
-    Route::get('order/putNeedQueue',
-        ['uses' => 'OrderController@putNeedQueue', 'as' => 'order.putNeedQueue']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);
@@ -490,6 +497,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/putNeedQueue',
+        ['uses' => 'PackageController@putNeedQueue', 'as' => 'package.putNeedQueue']);
     Route::post('package/processReturnGoods',
         ['uses' => 'PackageController@processReturnGoods', 'as' => 'package.processReturnGoods']);
     Route::get('package/returnGoods',
@@ -598,6 +607,59 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wish', 'Publish\Wish\WishPublishController');
     Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
     // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
+   
+    Route::get('smt/onlineProductIndex',
+        ['uses' => 'Publish\Smt\SmtController@onlineProductIndex', 'as' => 'smt.onlineProductIndex']);
+    Route::get('smt/showChildCategory',
+        ['uses' => 'Publish\Smt\SmtController@showChildCategory', 'as' => 'smt.showChildCategory']);
+    Route::get('smt/showCommandCategoryList',
+        ['uses' => 'Publish\Smt\SmtController@showCommandCategoryList', 'as' => 'smt.showCommandCategoryList']);
+    Route::post('smt/doAction',
+        ['uses' => 'Publish\Smt\SmtController@doAction', 'as' => 'smt.doAction']);
+    Route::post('smt/create',
+        ['uses' => 'Publish\Smt\SmtController@addProduct', 'as' => 'smt.addProduct']);
+    Route::post('smt/batchPost',
+        ['uses' => 'Publish\Smt\SmtController@batchPost', 'as' => 'smt.batchPost']);   
+    Route::post('smt/recommendProductList',
+        ['uses' => 'Publish\Smt\SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
+    Route::post('smt/batchDel',
+        ['uses' => 'Publish\Smt\SmtController@batchDel', 'as' => 'smt.batchDel']);   
+    Route::post('smt/ajaxUploadDirImage',
+        ['uses' => 'Publish\Smt\SmtController@ajaxUploadDirImage', 'as' => 'smt.ajaxUploadDirImage']);  
+    Route::post('smt/ajaxUploadOneCustomPic',
+        ['uses' => 'Publish\Smt\SmtController@ajaxUploadOneCustomPic', 'as' => 'smt.ajaxUploadOneCustomPic']);  
+    Route::post('smt/getskuinfo',
+        ['uses' => 'Publish\Smt\SmtController@getskuinfo', 'as' => 'smt.getskuinfo']);
+    Route::get('smt/editOnlineProduct',
+        ['uses' => 'Publish\Smt\SmtController@editOnlineProduct', 'as' => 'smt.editOnlineProduct']);
+    Route::get('smt/ajaxOperateOnlineProduct',
+        ['uses' => 'Publish\Smt\SmtController@ajaxOperateOnlineProduct', 'as' => 'smt.ajaxOperateOnlineProduct']);    
+    Route::resource('smt', 'Publish\Smt\SmtController');
+    
+    Route::group(['prefix' => 'smtProduct', 'namespace' => 'Publish\Smt'],function(){
+        Route::get('selectRelationProducts',
+            ['uses' => 'SmtProductController@selectRelationProducts', 'as' => 'smtProduct.selectRelationProducts']);
+        Route::post('getProductGroup',
+            ['uses' => 'SmtProductController@getProductGroup', 'as' => 'smtProduct.getProductGroup']);
+        Route::post('getServiceTemplateList',
+            ['uses' => 'SmtProductController@getServiceTemplateList', 'as' => 'smtProduct.getServiceTemplateList']);
+        Route::post('getFreightTemplateList',
+            ['uses' => 'SmtProductController@getFreightTemplateList', 'as' => 'smtProduct.getFreightTemplateList']);
+        Route::post('getProductModuleList',
+            ['uses' => 'SmtProductController@getProductModuleList', 'as' => 'smtProduct.getProductModuleList']);
+        Route::post('ajaxGetPlatTemplateList',
+            ['uses' => 'SmtProductController@ajaxGetPlatTemplateList', 'as' => 'smtProduct.ajaxGetPlatTemplateList']);
+        Route::post('ajaxSmtAfterServiceList',
+           ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']);           
+    });
+    
+    Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
+   
+ 
+    Route::any('upload',
+         ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
+ 
+
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);
@@ -701,5 +763,8 @@ Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
 Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
 Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
+Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
+Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
 Route::resource('spu', 'SpuController');
 

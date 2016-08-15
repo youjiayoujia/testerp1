@@ -146,6 +146,11 @@ return [
                     'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流对账',
+                    'url' => 'shipmentCost.index',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [
@@ -345,6 +350,18 @@ return [
             [
                 'name' => 'wish销售代码设置',
                 'url' => 'wishSellerCode.index',
+                'icon' => '',
+            ],
+            [
+
+                'name' => 'SMT待发布产品列表',
+                'url' => 'smt.index',
+                'icon' => '',
+            ],
+            [
+            
+                'name' => 'SMT在线产品列表',
+                'url' => 'smt.onlineProductIndex',
                 'icon' => '',
             ],
             [

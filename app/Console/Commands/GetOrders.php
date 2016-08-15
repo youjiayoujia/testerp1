@@ -66,38 +66,47 @@ class GetOrders extends Command
                         'result' => 'init',
                         'remark' => 'init',
                     ]);
-                    $orderList = $channel->listOrders(
+                    $response = $channel->listOrders(
                         $startDate, //开始日期
                         $endDate, //截止日期
                         $account->api_status, //订单状态
                         $account->sync_pages, //每页数量
                         $nextToken //下一页TOKEN
                     );
-                    foreach ($orderList['orders'] as $order) {
-                        $order['channel_id'] = $account->channel->id;
-                        $order['channel_account_id'] = $account->id;
-                        $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
-                        $order['operator'] = $account->operator ? $account->operator->id : 0;
-                        $job = new InOrders($order);
-                        $job = $job->onQueue('inOrders');
-                        $this->dispatch($job);
-                        $total++;
+                    if (isset($response['error'])) {
+                        $result['status'] = 'fail';
+                        $result['remark'] = '[' . $response['error']['code'] . '] ' . $response['error']['message'] . '.';
+                        $result['data'] = serialize($response['error']);
+                        $this->error($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页失败');
+                        $this->error($result['remark']);
+                    } else {
+                        foreach ($response['orders'] as $order) {
+                            $order['channel_id'] = $account->channel->id;
+                            $order['channel_account_id'] = $account->id;
+                            $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
+                            $order['operator'] = $account->operator ? $account->operator->id : 0;
+                            $job = new InOrders($order);
+                            $job = $job->onQueue('inOrders');
+                            $this->dispatch($job);
+                            $total++;
+                        }
+                        $nextToken = $response['nextToken'];
+                        $result['status'] = 'success';
+                        $result['remark'] = 'Success.';
+                        $result['data'] = serialize($response['orders']);
+                        $this->info($account->alias . ':' . $account->id . ' 抓取第 ' . $i . ' 页成功');
+                        $i++;
                     }
-                    $nextToken = $orderList['nextToken'];
-                    //todo::Adapter->error()
-                    $result['status'] = 'success';
-                    $result['remark'] = 'Success.';
                     $end = microtime(true);
                     $lasting = round($end - $start, 3);
+                    $this->info('Lasting ' . $lasting . 's.');
                     $commandLog->update([
-                        'data' => serialize($orderList['orders']),
+                        'data' => $result['data'],
                         'lasting' => $lasting,
                         'total' => $total,
                         'result' => $result['status'],
                         'remark' => $result['remark'],
                     ]);
-                    $this->info($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页, 耗时 ' . $lasting . ' 秒');
-                    $i++;
                 } while ($nextToken);
             } else {
                 $this->error('Account is not exist.');

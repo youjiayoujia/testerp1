@@ -240,10 +240,12 @@ class CatalogModel extends BaseModel
     public function createLotsCatalogs($data = NULL){
         if($data){
             DB::beginTransaction();
-
             foreach ($data as $item){
-
                 try{
+                    $count = $this->checkName($item['name']);
+                    if($count > 0){
+                        continue;
+                    }
                     $catalog['c_name'] = $item['c_name'];
                     $catalog['name'] = $item['name'];
                     $catalog['code'] = $item['code'];

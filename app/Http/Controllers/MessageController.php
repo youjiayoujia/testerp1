@@ -12,6 +12,7 @@ use App\Models\Message\AccountModel;
 use App\Models\Message\Message_logModel;
 use App\Models\Message\ReplyModel;
 use App\Jobs\SendMessages;
+use Translation;
 
 
 class MessageController extends Controller
@@ -38,7 +39,7 @@ class MessageController extends Controller
         $users=UserModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->where('label', 'INBOX')),
+            'data' => $this->autoList($this->model,$this->model),
             //'mixedSearchFields' => $this->model->mixed_search,
             'users' => $users,
         ];
@@ -66,6 +67,13 @@ class MessageController extends Controller
         
         if ($message->assign(request()->user()->id)) {
             //$userarr=config('user.staff');
+
+            //dd(request()->input());exit;
+
+            if($message->related == 0){
+                $message->findOrderWithMessage();  //消息中的订单号 与 erp订单匹配
+            }
+
             $emailarr=config('user.email');
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
@@ -73,7 +81,7 @@ class MessageController extends Controller
                 'parents' => TypeModel::where('parent_id', 0)->get(),
                 'users' => UserModel::all(),
                 'emailarr' => $emailarr,
-                'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
+               // 'relatedOrders' => $message->related == 0 ? $message->guessRelatedOrders(request()->input('email')) : '',
                 //'ordernum' =>$ordernum,
                 'accounts'=>AccountModel::all(),
                 'content'=>$message->MessageInfo,
@@ -278,7 +286,7 @@ class MessageController extends Controller
         }
         request()->flash();
         $this->validate(request(), $reply->rules('create')); //
-        
+
         if ($message->reply(request()->all())) {
             /*
              * 写入队列
@@ -304,8 +312,7 @@ class MessageController extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show($id)
-    {
+    public function show($id){
         $model = $this->model->find($id);
         //$sum=$this->model::all();
 
@@ -320,6 +327,44 @@ class MessageController extends Controller
         ];
         return view($this->viewPath . 'show', $response)->with('count',$count);
     }
+
+    /**
+     * ajax获取百度翻译
+     */
+    public function ajaxGetTranInfo(){
+        if(request()->ajax()){
+            $content = request()->input('content');
+            if(!empty($content)){
+                $result = Translation::translate($content);
+            }else{
+                $result = false;
+            }
+            if(isset($result['trans_result'][0]['dst'])){
+                echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
+            }else{
+                echo json_encode(['status'=>config('status.ajax.fail')]);
+            }
+
+        }
+    }
+
+
+
+
+/*    public function testbaidu(){
+        $text =$_POST['info'];
+        $baidu = new Mybaidu_transapi();
+        $result =  $baidu->translate($text);
+        if(isset($result['trans_result'][0]['dst'])){
+            ajax_return($result['trans_result'][0]['dst'],1);
+        }else{
+            ajax_return('',2);
+        }
+
+    }*/
+
+
+
 
 
 }

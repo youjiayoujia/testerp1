@@ -10,6 +10,7 @@ use App\Models\PackageModel;
 use App\Models\OrderModel;
 use App\Models\UserModel;
 use Tool;
+use Translation;
 
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
@@ -101,6 +102,8 @@ class MessageModel extends BaseModel{
             })->first();
     }
 
+
+    //根据邮件或者 from 关联订单
     public function guessRelatedOrders($email = null)
     {
         $relatedOrders = [];
@@ -275,55 +278,70 @@ class MessageModel extends BaseModel{
     }
 
     public function getMessageInfoAttribute(){
-        if($this->content){
-
-            //$content_array = unserialize($this->content);
-            $content_array = unserialize(base64_decode($this->content));
-
-            //print_r($content_array);exit;
-
+        if($this->ContentDecodeBase64){
             $html = '';
-            foreach($content_array as $key => $content){
+            foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
-                               if($item['Reply']['sender'] == 'user'){
-                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>'.$item['Reply']['date'].'</p>';
+                               if($item['Reply']['sender'] != 'merchant'){
+                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>用户名：</strong>'.$this->from_name.':</p>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert-danger"><strong>Wish翻译: </strong><p>'.$item['Reply']['translated_message'].'</p><p>'.$item['Reply']['translated_message_zh'].'</p></div>';
                                    $html .= '</div>';
                                }else{
-                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
                                    $html .= '</div>';
                                }
                            }
                         }
                         break;
                     case 'aliexpress':
-                       // print_r($content->result);exit;
-                        foreach ($content->result as $k => $item){
+                        //dd($content->result);exit;
+                        $message_content = array_reverse($content->result); //逆序
+                        foreach ($message_content as $k => $item){
+                            $content = $item->content;
 
-                            if($k % 2 == 0){
-                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$item->content;
-                                $html .= '<p class="time"><strong>时间 </strong>XXXX-XX-XX XX:XX</p>';
+                            $content = str_replace("&nbsp;", ' ', $content);
+                            $content = str_replace("&amp;nbsp;", ' ', $content);
+                            $content = str_replace("&amp;iquest;", ' ', $content);
+                            $content = str_replace("\n", "<br />", $content);
+                            $content = preg_replace("'<br \/>[\t]*?<br \/>'", '', $content);
+
+                            $content = str_replace("/:000", '<img src="http://i02.i.aliimg.com/wimg/feedback/emotions/0.gif" />', $content);
+
+                            $content = preg_replace("'\/\:0+([1-9]+0*)'", "<img src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
+                            $content = (stripslashes(stripslashes($content)));
+
+
+                            $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
+                            if($this->from_name != $item->summary->receiverName){
+
+                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$content;
+                                $html .= '<p class="time"><strong>时间: </strong>'.$datetime.'</p>';
+                                $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
+                                $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'">
+                                    翻译
+                                </button>';
                                 $html .= '</div>';
                             }else{
-                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item->senderName.':</p>'.$item->content;
-                                $html .= '<p class="time"><strong>时间 </strong>XXXX-XX-XX XX:XX </p>';
+                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item->senderName.':</p>'.$content;
+                                $html .= '<p class="time"><strong>时间: </strong> '.$datetime.'</p>';
                                 $html .= '</div>';
                             }
-
-
                         }
                         break;
 
                     case 'ebay':
                         $html = $content;
+                        break;
                     case 'amazon':
                         $html = $content;
+                        break;
                     default :
-                        echo 'invalid message type';
+                        $html = 'invalid message type';
                 }
             }
 
@@ -334,18 +352,63 @@ class MessageModel extends BaseModel{
     }
 
     //渠道信息特殊属性
-/*    public function getChannelMessageFieldsAttribute(){
-        return $this->channel_message_fields;
-        return unserialize(base64_decode($this->channel_message_fields));
-
-    }*/
-
+    public function getMessageFieldsDecodeBase64Attribute(){
+        if($this->channel_message_fields){
+            return unserialize(base64_decode($this->channel_message_fields));
+        }else{
+            return '';
+        }
+    }
+    public function getContentDecodeBase64Attribute(){
+        if($this->content){
+            return unserialize(base64_decode($this->content));
+        }else{
+            return '';
+        }
+    }
     /**
      * 获取消息对应的渠道
      * @return mixed
      */
     public function getChannelDiver(){
         return $this->account->channel->driver;
+    }
+
+    public function findOrderWithMessage(){
+        $order_id = $this->getChannelMessageOrderId();
+        $order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
+        if($order_obj){
+            if($this->relatedOrders()->create(['order_id' => $order_obj->id])){
+                $this->related = 1;
+                $this->save();
+            }
+
+        }
+    }
+
+    public function getChannelMessageOrderId(){
+        $fields_ary = $this->MessageFieldsDecodeBase64;
+        if($fields_ary){
+            switch ($this->getChannelDiver()){
+                case 'ebay':
+                    $order_id = $fields_ary['ItemID'];
+                    break;
+                case 'wish':
+                    $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
+                    $order_obj = OrderModel::where('channel_ordernum','=',$transaction_id)->first();
+                    $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
+                    break;
+                case 'aliexpress':
+                    $order_id = $fields_ary['order_id'];
+                    break;
+                default:
+                    $order_id = '';
+
+            }
+        }else{
+            $order_id = '';
+        }
+        return $order_id;
     }
 
 

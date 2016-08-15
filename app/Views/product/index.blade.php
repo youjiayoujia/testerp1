@@ -394,7 +394,7 @@
                             $('#result-table-'+productId).show();
                         });
                     }else{
-
+                        alert('出错了，请检查下物流分区，汇率是否有误 ');
                     }
                 },
                 error:function () {

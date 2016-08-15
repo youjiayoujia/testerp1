@@ -522,12 +522,12 @@ class TestController extends Controller
             }
         }
     }
+    public function jdtestCrm(){
+        /*        $message_obj = MessageModel::find(36336);
+                //$tt = $message_obj->ChannelMessageFields();
 
-    public function jdtestCrm()
-    {
-        $message_obj = MessageModel::find(36304);
-        dd($message_obj->getChannelDiver());
-        exit;
+                dd($message_obj->MessageFields);exit;
+                exit;*/
 
 
         //渠道测试块
@@ -536,29 +536,29 @@ class TestController extends Controller
                 $fields = unserialize(base64_decode($message_obj->channel_message_fields));
                 dd($fields);exit;*/
 
+        /*
+                 $reply_obj = ReplyModel::find(28569);
 
-        $reply_obj = ReplyModel::find(28569);
-
-        foreach (AccountModel::all() as $account) {
-            if ($account->account == 'rebeauty') { //测试diver
-
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->sendMessages($reply_obj);
-                print_r($messageList);
-                exit;
-
-            }
-        }
-        /*        foreach (AccountModel::all() as $account) {
-                    if($account->account == 'rebeauty'){ //测试diver
+                  foreach (AccountModel::all() as $account) {
+                    if( $account->account == 'wintrade9'){ //测试diver
 
                         $channel = Channel::driver($account->channel->driver, $account->api_config);
-                        $messageList = $channel->getMessages();
+                        $messageList = $channel->sendMessages($reply_obj);
                         print_r($messageList);exit;
 
                     }
                 }*/
+        /*
+         *
+         *
+         */        foreach (AccountModel::all() as $account) {
+            if($account->account == 'jdtest@ebay.com'){ //测试diver
 
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getCases();
+                print_r($messageList);exit;
 
+            }
+        }
     }
 }

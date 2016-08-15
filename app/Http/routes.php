@@ -65,6 +65,11 @@ Route::group(['middleware' => 'auth'], function () {
     //供货商评级
     Route::resource('supplierLevel', 'Product\SupplierLevelController');
     //物流对账
+    Route::get('shipmentCost/destroyRows/{arr}', ['uses' => 'ShipmentCostController@destroyRows', 'as' => 'shipmentCost.destroyRows']);
+    Route::get('shipmentCost/showError/{id}', ['uses' => 'ShipmentCostController@showError', 'as' => 'shipmentCost.showError']);
+    Route::post('shipmentCost/importProcess', ['uses' => 'ShipmentCostController@importProcess', 'as' => 'shipmentCost.importProcess']);
+    Route::get('shipmentCost/import', ['uses' => 'ShipmentCostController@import', 'as' => 'shipmentCost.import']);
+    Route::get('shipmentCost/export', ['uses' => 'ShipmentCostController@export', 'as' => 'shipmentCost.export']);
     Route::resource('shipmentCost', 'ShipmentCostController');
     //供货商
     Route::get('productSupplier/ajaxSupplier',
@@ -200,7 +205,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printInWarehouseOrder/{id}', ['uses' => 'Purchase\PurchaseOrderController@printInWarehouseOrder', 'as' => 'purchaseOrder.printInWarehouseOrder']);
     Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
+    Route::any('purchaseOrder/showpo', ['uses' => 'Purchase\PurchaseOrderController@showpo', 'as' => 'purchase.showpo']);
     Route::any('purchaseOrder/ajaxInWarehouse',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
     Route::any('purchaseOrder/inWarehouse',
@@ -759,5 +766,8 @@ Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
 Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
 Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
+Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
+Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
 Route::resource('spu', 'SpuController');
 

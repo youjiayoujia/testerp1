@@ -1,132 +1,72 @@
 
+﻿<style type="text/css" media=print>
+.noprint{display : none }
+</style>
+<style type="text/css" >
+body{ margin:0;}
+table{ font-family:Arial, Helvetica, sans-serif; border:1px solid #000;}
+.STYLE1 {font-size: 14px;line-height:20px;}
+.STYLE2 {
+    font-size: 16px;
+    font-weight: bold;
+    line-height:20px;
+}
+.PageNext{page-break-after:always; clear:both; height:auto; overflow:auto;}
+</style>
+<!--<p class="noprint" style="margin-left:65%">-->
+<!--    (<span style="font-size:12px">打印背景设置：文件->页面设置->勾选打印背景</span>)<input id="btnPrint" type="button" value="打印" onclick="javascript:window.print();" />-->
+<!--</p>-->
 
-        
-        <div style="width:800px;border:2px solid #000">
-        <div style="text-align:center;margin:0 auto" >
-       <strong>采购单</strong> </div>
-             <div style="width:50%;height:134px;float:left;border:1px solid #000;margin:-1px;">
-             <div style="text-align:center;margin:0 auto" >
-       <strong>供应商信息</strong> </div>
-             <div >
-                <strong>供应商名称</strong>:
-                {{$model->supplier->name ?  $model->supplier->name : '暂无名称'}}
-            </div>
-            <div >
-                <strong>地址</strong>:
-                {{ $model->supplier->supplier_address ? $model->supplier->supplier_address : '暂无地址'}}
-            </div>
-            
-             <div style="width:50%;">
-                <strong>联系电话</strong>: {{ $model->supplier->telephone ? $model->supplier->telephone : '暂无电话'}}
-            </div>
-             <div style="width:50%;">
-            	<strong>联系人</strong>:
-                {{$model->assigner > 0 ? $model->assigner_name : '暂无联系人'}}
-            </div>
-            <div >
-            	<strong>付款方式:
-                @foreach(config('product.product_supplier.pay_type') as $k=>$v)
-                	{{$model->pay_type == $k ? $v : ''}}
-                @endforeach
-                </strong>
-            </div>
-          </div>  
-          <div style="width:50%;height:134px;float:left;border:1px solid #000;margin:-1px;">
-          <div style="text-align:center;margin:0 auto" >
-       <strong>收货资料</strong> </div>
-            <div style="width:50%;">
-                <strong>交货地址</strong>:
-                {{$model->warehouse->warehouse_address}}
-              <!--  物流费{{ $model->total_postage}}+商品采购价格{{ $model->total_purchase_cost}}  总成本{{ $model->total_postage + $model->total_purchase_cost}}-->
-            </div>
-            <div style="width:50%;">
-                <strong>采购联系人</strong>:
-               {{$model->assigner > 0 ? $model->assigner_name : '暂无联系人'}}
-            </div> 
-            <div class="form-group col-lg-4">
-                <strong>仓库名</strong>:
-                {{$model->warehouse->name > 0 ? $model->warehouse->name : '暂无联系人'}}
-            </div>
-            <div class="form-group col-lg-4">
-                <strong>预计到货日期:
-                {{$model->arrival_day}}</strong>
-            </div>
-             </div>
-         
-       
-		<div style="clear:left"></div>
-        
-    <table border="0"  width="100%" cellpadding="0" cellspacing="1" bgcolor="#000">
-    <thead >
-        <tr bgcolor="#fff">
-            <td>序号</td>
-            <td>采购条目ID</td> 
-            <td>单据号</td>
-            <td>SKU</td>
-            <td>产品描述</td> 
-            <td>采购数量</td> 
-            <td>入库数量</td>
-            <td>不良数量</td>
-            <td>采购价格</td>
-            <td>小计</td>           
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($purchaseItems as $k=>$purchaseItem)  
-        <tr bgcolor="#fff"> 
-            <td>{{$k+1}}</td>
-            <td>{{$purchaseItem->id}}</td>
-            
-            <td>{{$purchaseItem->post_coding}}</td>
-            <td>{{$purchaseItem->sku}}</td>
-            <td>{{$purchaseItem->item->c_name}}</td>
-            <td>{{$purchaseItem->purchase_num}}</td>   
-            
-            <td>       	
-             {{$purchaseItem->storage_qty}}
-             </td>
-            <td>
-            {{$purchaseItem->purchase_num - $purchaseItem->arrival_num}}
-            </td>
-            <td>
-              {{$purchaseItem->purchase_cost}}
- 			</td>
-            <td>
-            {{$purchaseItem->purchase_cost * $purchaseItem->purchase_num}}
-            </td>    	
-        </tr>
-        @endforeach 
-        <tr bgcolor="#fff">
-        <td colspan="4"><strong>合计</strong></td>
-        <td>{{$purchase_num_sum}}</td>
-        <td>{{$storage_qty_sum}}</td>
-        <td>{{$purchase_num_sum - $storage_qty_sum}}</td>
-        <td></td>
-        <td>{{$purchaseAccount}} + YF{{$postage_sum}} = 总{{$purchaseAccount + $postage_sum}}</td>
-        </tr>
-        <tr bgcolor="#fff">
-       <td colspan="9"><strong> 备注： {{$model->remark}}</strong></td>
-        </tr> 
-    </tbody>
-    </table>
-        <div class="form-group col-lg-4">
-            <strong>打印日期</strong>:
-            <?php echo date('Y-m-d H:i:s',time());?>
-        </div>
-   </div>
-<input type="button" value="打印" onclick="changeStatus({{$id}});window.print()"/>
+  <table width="100%"  align="center" cellspacing="0" cellpadding="3" border="1">
+  <tr>
+    <td height="41" colspan="9"><div align="center" class="STYLE2">萨拉摩尔采购单</div></td>
+  </tr>
+  
+  <tr>
+    <td height="21" colspan="4"><div align="center" class="STYLE1"><strong>供应商资料</strong></div></td>
+    <td colspan="5"><div align="center" class="STYLE1"><strong>收货资料</strong></div></td>
+  </tr>
+  <tr>
+    <td height="93" colspan="4"><span class="STYLE1">供应商名称：{{$model->supplier->name ?  $model->supplier->name : '暂无名称'}}<br />
+      联系地址：{{ $model->supplier->supplier_address ? $model->supplier->supplier_address : '暂无地址'}}<br />
+      联系电话： {{ $model->supplier->telephone ? $model->supplier->telephone : '暂无电话'}}<br />
+      联系人： {{$model->assigner > 0 ? $model->assigner_name : '暂无联系人'}}<br />
+      <span class="STYLE2">付款方式：{{config('purchase.purchaseOrder.pay_type')[$model->pay_type]}}</span></span></td>
+    <td colspan="5"><span class="STYLE1">交货地址:深圳市龙岗区坂田五和大道（南）41号和堪工业区B3栋四楼<br />
+      采购联系人： {{$model->purchaseUser?$model->purchaseUser->name:''}}<br />
+      仓库信息： {{$model->warehouse?$model->warehouse->name:''}}<br />
+      <span class="STYLE2">预计到货日期：{{date('Y-m-d',time()+($model->supplier?$model->supplier->purchase_time:7)*24*3600)}}</span></span></td>
+  </tr>
 
-    <script src="../../js/jquery.min.js"></script>
-    <script type='text/javascript'>
-        function changeStatus(id){
-            $.ajax({
-                url: "{{ route('changePrintStatus') }}",
-                data: {id: id},
-                dataType: 'json',
-                type: 'get',
-                success: function (result) {
-                    
-                }
-            });
-        }
-    </script>
+  <tr>
+    <td width="35"><div align="center">序号</div></td>
+    <td width="84"><div align="center">单据号</div></td>
+    <td width="35"><div align="center">SKU</div></td>
+    <td width="120"><div align="center">产品描述</div></td>
+    <td width="42"><div style="font-size:10px;" align="center">采购数</div></td>
+    <td width="42"><div style="font-size:10px;" align="center">入库数</div></td>
+    <td width="42"><div style="font-size:10px;" align="center">不良数</div></td>
+    <td width="42"><div style="font-size:10px;" align="center">单价RMB</div></td>
+    <td width="42"><div style="font-size:10px;" align="center">小计RMB</div></td>
+  </tr>
+  @foreach($model->purchaseItem as $key=>$purchase_item)
+      <tr>
+        <td align="center">{{$key+1}}</td>
+        <td align="center">{{$model->id}}</td>
+        <td align="center">{{$purchase_item->sku}}</td>
+        <td align="center" style="font-size:12px">{{$purchase_item->productItem->name}}</td>
+        <td align="center">{{$purchase_item->purchase_num}}</td>
+        <td align="center">{{$purchase_item->storage_qty}}</td>
+        <td align="center">{{$purchase_item->purchase_num - $purchase_item->arrival_num}}</td>
+        <td align="center">{{$purchase_item->purchase_cost}}</td>
+        <td align="center">{{$purchase_item->purchase_cost * $purchase_item->purchase_num}}</td>
+      </tr>
+  @endforeach
+ <tr><td colspan="4"><div align="center">总计</div></td><td align="center" >{{$purchase_num_sum}}</td><td align="center" >{{$storage_qty_sum}}</td><td align="center" >{{$purchase_num_sum - $storage_qty_sum}}</td><td align="center">{{$purchase_cost_sum}} </td><td align="center" >{{$purchaseAccount}} + YF{{$postage_sum}} = 总{{$purchaseAccount + $postage_sum}}</td></tr><tr>
+    <td colspan="9"><div align="center">合计金额(RMB):{{$purchaseAccount}} + YF{{$postage_sum}} = 总{{$purchaseAccount + $postage_sum}}</div></td>
+  </tr>
+  <tr>
+    <td colspan="9">备注：{{$model->remark}}</td>
+  </tr>
+</table><p align="right">【打印时间：2016-08-11 20:18:33】</p>
+

@@ -301,19 +301,19 @@ class ProductModel extends BaseModel
                 
                 //获得productID,插入产品图片
                 $data['product_id'] = $product->id;
-                $channels = ChannelModel::all();
+                //echo '<pre>';
+                //print_r($data);exit;
+                /*$channels = ChannelModel::all();
                 foreach ($channels as $channel) {
                     $data['channel_id'] = $channel->id;
                     $product->productMultiOption()->create($data);
-                }
+                }*/
 
                 //插入产品variation属性
                 if (array_key_exists('variations', $model)) {
                     foreach ($model['variations'] as $variation => $variationValues) {
                         //获得此产品的品类所对应的variation属性
                         $variationModel = $catalog->variations()->where('name', '=', $variation)->get()->first();
-                        echo '<pre>';
-
                         foreach ($variationValues as $value_id => $variationValue) {
                             //获得variation属性对应的属性值
                             $variationValueModel = $variationModel->values()->find($value_id);

@@ -38,18 +38,24 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
             if ($order) {
-                $package = $order->createPackage();
-                if ($order->status == 'PREPARED' && $package) {
-                    $job = new AssignStocks($package);
-                    $job->onQueue('assignStocks');
-                    $this->dispatch($job);
-                    $this->relation_id = $order->id;
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success.';
+                if ($order->status == 'PREPARED') {
+                    $package = $order->createPackage();
+                    if($package) {
+                        $job = new AssignStocks($package);
+                        $job->onQueue('assignStocks');
+                        $this->dispatch($job);
+                        $this->relation_id = $order->id;
+                        $this->result['status'] = 'success';
+                        $this->result['remark'] = 'Success.';
+                    } else {
+                        $this->relation_id = 0;
+                        $this->result['status'] = 'fail';
+                        $this->result['remark'] = 'Fail to create virtual package.';
+                    }
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'fail';
-                    $this->result['remark'] = 'Fail to create virtual package.';
+                    $this->result['remark'] = 'Package status is not PREPARED. Can not create package';
                 }
             } else {
                 $this->relation_id = 0;
@@ -62,9 +68,16 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $this->order['id'] = $oldOrder->id;
                 $order = $orderModel->updateOrder($this->order, $oldOrder);
                 if ($order) {
+                    if ($order->checkBlack()) {
+                        $order->update(['status' => 'REVIEW']);
+                        $order->remark('黑名单订单.');
+                    }
+                    if ($order->status == 'PAID') {
+                        $order->update(['status' => 'PREPARED']);
+                    }
                     $this->relation_id = $oldOrder->id;
                     $this->result['status'] = 'success';
-                    $this->result['remark'] = 'UNPAID to PAID.';
+                    $this->result['remark'] = 'UNPAID to PAID. to PREPARED';
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'fail';

@@ -40,8 +40,9 @@ class getEbayCases extends Command
      */
     public function handle()
     {
-        //
-        $account_name =  $this->argument('accountName');  //渠道名称
+        //暂时注释掉
+
+/*        $account_name =  $this->argument('accountName');  //渠道名称
         $account = AccountModel::where('account',$account_name)->first();
         if(is_object($account)){
             $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -49,6 +50,6 @@ class getEbayCases extends Command
         }else{
             $this->comment('account num maybe worng.');
 
-        }
+        }*/
     }
 }

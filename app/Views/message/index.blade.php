@@ -75,12 +75,8 @@
             <td>{{ $message->id }}</td>
             <td>{{ $message->account->account }}</td>
             <td>
-                {!! $message->label_text !!}
-                @if($message->status=='UNREAD')
-                    <strong>{{ $message->subject }}</strong>
-                @else
-                    {{ $message->subject }}
-                @endif
+                <span class='label label-success'>{{$message->label}}</span>
+               {{ str_limit($message->subject,30) }}
             </td>
             <td>{{ $message->status_text }}</td>
             <td>{{ $message->from_name }}</td>

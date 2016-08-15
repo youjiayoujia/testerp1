@@ -39,7 +39,7 @@ class MessageController extends Controller
         $users=UserModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model->where('label', 'INBOX')),
+            'data' => $this->autoList($this->model,$this->model),
             //'mixedSearchFields' => $this->model->mixed_search,
             'users' => $users,
         ];

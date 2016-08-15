@@ -137,6 +137,12 @@
                     </a>
                 @endif
 
+                @if($purchaseOrder->status ==1)
+                    <a  href="/purchaseOrder/printInWarehouseOrder/{{$purchaseOrder->id}}"  title="入库单" class="btn btn-danger btn-xs" data-url="">
+                         入库单
+                    </a>
+                @endif
+
                 @if($purchaseOrder->status != 4&& $purchaseOrder->write_off==1)
                     <a  href="javascript:" title="核销" class="btn btn-success btn-xs hexiao" data-url="/purchaseOrder/write_off/{{$purchaseOrder->id}}?off={{$purchaseOrder->write_off}}">
                          <span class="glyphicon glyphicon-yen"></span>

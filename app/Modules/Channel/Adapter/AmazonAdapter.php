@@ -323,7 +323,7 @@ Class AmazonAdapter implements AdapterInterface
                 $tempPayLoad = '';
                 $tempAttachment = '';
                 $this->getPayloadNew($tempPayLoad, $tempAttachment, $messagePayload, $service, $message);
-                $returnAry[$j]['content'] = base64_encode(serialize(['amazon' => $this->getMaillContent($tempPayLoad)]));
+                $returnAry[$j]['content'] =  $this->getMaillContent($tempPayLoad);
                 $returnAry[$j]['attachment'] = $tempAttachment;
                 $returnAry[$j]['channel_message_fields'] = '';
             }
@@ -395,7 +395,7 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $body = isset($htmlBody) && $htmlBody != '' ? $htmlBody : $plainBody;
-        return serialize(['amazon' => $body]);
+        return base64_encode(serialize(['amazon' => $body]));
     }
 
     public function getClient($account)

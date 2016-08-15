@@ -212,7 +212,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('purchaseOrder/purchaseExmaine', ['uses' => 'Purchase\PurchaseOrderController@purchaseExmaine', 'as' => 'purchaseExmaine']);
     Route::any('purchaseList/ajaxScan', ['uses' => 'Purchase\PurchaseListController@ajaxScan', 'as' => 'ajaxScan']);
     Route::any('purchaseOrder/recieve', ['uses' => 'Purchase\PurchaseOrderController@recieve', 'as' => 'recieve']);
+    Route::any('purchaseOrder/printInWarehouseOrder/{id}', ['uses' => 'Purchase\PurchaseOrderController@printInWarehouseOrder', 'as' => 'purchaseOrder.printInWarehouseOrder']);
     Route::any('purchaseOrder/printpo', ['uses' => 'Purchase\PurchaseOrderController@printpo', 'as' => 'printpo']);
+    Route::any('purchaseOrder/showpo', ['uses' => 'Purchase\PurchaseOrderController@showpo', 'as' => 'purchase.showpo']);
     Route::any('purchaseOrder/ajaxInWarehouse',
         ['uses' => 'Purchase\PurchaseOrderController@ajaxInWarehouse', 'as' => 'ajaxInWarehouse']);
     Route::any('purchaseOrder/inWarehouse',
@@ -726,6 +728,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('message_log', 'Message\Messages_logController');
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
+    Route::any('ajaxGetTranInfo',
+        ['as' => 'ajaxGetTranInfo', 'uses' => 'MessageController@ajaxGetTranInfo']);
 
 
     //用户路由
@@ -747,6 +751,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('jobFailed', 'Job\FailedController');
     //标记发货规则设置
     Route::resource('orderMarkLogic', 'Order\OrderMarkLogicController');
+    Route::resource('ebayCases','Message\EbayCasesController');
 });
 
 
@@ -768,5 +773,8 @@ Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
 Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
 Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
+Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
+Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
 Route::resource('spu', 'SpuController');
 

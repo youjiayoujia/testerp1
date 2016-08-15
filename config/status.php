@@ -8,6 +8,7 @@
 return [
     'ajax'=>[
         'fail'=> -1,
+        'success' => 1,
     ],
     
 ];

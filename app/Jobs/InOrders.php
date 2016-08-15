@@ -63,6 +63,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                 $this->result['remark'] = 'Fail to put order in.';
             }
         } else {
+            //todo:计算利润率,验证黑名单,生成包裹
             if ($oldOrder->channel_id == 4 && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
                 $this->order['id'] = $oldOrder->id;
                 $order = $orderModel->updateOrder($this->order, $oldOrder);

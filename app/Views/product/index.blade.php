@@ -82,9 +82,9 @@
     <th>产品名称</th>
     <th>分类</th>
     <th>状态</th>
-    <th>选中shop</th>
+    {{-- <th>选中shop</th>
     <th>编辑状态</th>
-    <th>审核状态</th>
+    <th>审核状态</th>--}}
     <th class="sort" data-field="name">名称</th>
     <th class="sort" data-field="c_name">中文名称</th>
     <th>供应商</th>
@@ -107,7 +107,7 @@
             <td><img src="{{ asset($product->dimage) }}" width="100px"></td>
             <td>{{ $product->c_name }}<br>分类：{{ $product->catalog?$product->catalog->all_name:'' }}<br>开发时间：{{ $product->created_at }}<br></td>
             <td>{{ $product->catalog?$product->catalog->all_name:'' }}</td>
-            <td><?php if ($product->edit_status == "") echo "新品上传";if ($product->edit_status == "picked") echo "被选中";if ($product->edit_status == "canceled") echo "取消"; ?></td>
+            <!-- <td><?php if ($product->edit_status == "") echo "新品上传";if ($product->edit_status == "picked") echo "被选中";if ($product->edit_status == "canceled") echo "取消"; ?></td>
             <td><?php if ($product->amazonProduct) echo "amazon,";if ($product->ebayProduct) echo "ebay,";if ($product->aliexpressProduct) echo "aliexpress,";if ($product->b2cProduct) echo "B2C,"; ?></td>
             <?php switch ($product->edit_status) {
             case '':
@@ -145,7 +145,7 @@
             <td>图片不编辑</td>
             <?php
             break;
-            } ?>
+            } ?> -->
             <td>{{config('product.examineStatus')[$product->examine_status?$product->examine_status:'pending']}}</td>
             <td>{{ $product->name }}</td>
             <td>{{ $product->c_name }}</td>
@@ -280,9 +280,9 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
                 {{--@endcan--}}
-                <a href="{{ route('productMultiEdit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
+                <!-- <a href="{{ route('productMultiEdit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 小语言
-                </a>
+                </a> -->
                 <?php if(($product->edit_status == 'picked' || $product->edit_status == 'data_edited' || $product->edit_status == "image_edited" || $product->edit_status == "image_unedited") && $product->examine_status != 'pass'){ ?>
                 {{--<a href="{{ route('EditProduct.edit', ['id'=>$product->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑资料
@@ -394,7 +394,7 @@
                             $('#result-table-'+productId).show();
                         });
                     }else{
-
+                        alert('出错了，请检查下物流分区，汇率是否有误 ');
                     }
                 },
                 error:function () {

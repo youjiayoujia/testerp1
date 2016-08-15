@@ -7,7 +7,7 @@ use App\Models\Channel\AccountModel;
 use Channel;
 
 
-class getEbayCases extends Command
+class GetEbayCases extends Command
 {
     /**
      * The name and signature of the console command.

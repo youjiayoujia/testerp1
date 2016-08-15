@@ -10,17 +10,17 @@ namespace App\Modules\Logistics;
 use Exception;
 use App\Modules\Logistics\Adapter\ChukouyiAdapter;
 use App\Modules\Logistics\Adapter\CoeAdapter;
-<<<<<<< HEAD
 use App\Modules\Logistics\Adapter\szChinaPostAdapter;
 use App\Modules\Logistics\Adapter\WinitAdapter;
 use App\Modules\Logistics\Adapter\FpxAdapter;
 use App\Modules\Logistics\Adapter\SmtAdapter;
-
+use App\Modules\Logistics\Adapter\YwAdapter;
 use App\Modules\Logistics\Adapter\ShunyouAdapter;
 use App\Modules\Logistics\Adapter\ShunfengAdapter;
 use App\Modules\Logistics\Adapter\ShunfenghlAdapter;
 use App\Modules\Logistics\Adapter\EubofflineAdapter;
 use App\Modules\Logistics\Adapter\EubAdapter;
+
 
 
 
@@ -63,12 +63,26 @@ class LogisticsModule
         return new WinitAdapter($config);
     }
     
+    /**
+     * 实例化4px
+     * @param $config
+     * @return object \App\Modules\Logistics\Adapter\FpxDriver
+     */
     public function createFpxDriver($config){
         return new FpxAdapter($config);
     }
     
+    /**
+     * 实例化速卖通线上发货
+     * @param  $config
+     * @return \App\Modules\Logistics\Adapter\SmtAdapter
+     */
     public function createSmtDriver($config){
         return new SmtAdapter($config);
+    }
+    
+    public function createYwDriver($config){
+        return new YwAdapter($config);
     }
 
 

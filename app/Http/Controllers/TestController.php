@@ -106,6 +106,13 @@ class TestController extends Controller
         ->createWarehouseOrder($package);
         exit;
     }
+    
+    public function testYw(){
+        $package = PackageModel::findOrFail(3);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
 
     public function aliexpressOrdersList()
     {

@@ -32,6 +32,33 @@ class ShipmentCostItemModel extends BaseModel
     	'created_at'
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [
+            ],
+            'filterFields' => ['hang_number', 'package_id', 'channel_name'],
+            'filterSelects' => [
+                'type' => ['SINGLE' => '单单', 'SINGLEMULTI' => '单多', 'MULTI' => '多多'],
+                'logistics_id' => $this->getArray('App\Models\LogisticsModel', 'code'),
+
+            ],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
+
     public function parent()
     {
         return $this->belongsTo('App\Models\Package\ShipmentCostModel', 'parent_id', 'id');

@@ -55,7 +55,13 @@ Class AmazonAdapter implements AdapterInterface
             $orderItems = $this->getOrderItems($order->AmazonOrderId);
             return $this->parseOrder($order, $orderItems);
         }
+        
         return false;
+    }
+
+    public function returnTrack($tracking_info)
+    {
+        var_dump($this->config);exit;
     }
 
     /**
@@ -197,12 +203,6 @@ Class AmazonAdapter implements AdapterInterface
             $items[] = $item;
         }
         return $items;
-    }
-
-    public function returnTrack($tracking_info)
-    {
-        // TODO: Implement returnTrack() method.
-        echo "return Amazon Tracking Informations";
     }
 
     /**

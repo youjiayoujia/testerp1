@@ -36,11 +36,11 @@ table.gridtable td {
 	</tr>
 	<tr>
 		<td>付款方式</td>
-		<td>{{$purchase_order->pay_type}}</td>
+		<td>{{config('purchase.purchaseOrder.pay_type')[$purchase_order->pay_type]}}</td>
 	</tr>
 	<tr>
 		<td>付款凭证</td>
-		<td></td>
+		<td>{{$purchase_order->is_certificate?'不需要':'需要'}}</td>
 	</tr>
 	<tr>
 		<td>入库仓库</td>
@@ -62,7 +62,7 @@ table.gridtable td {
 			</tr>
 			@foreach($purchase_order->purchaseItem as $keys=>$item)
 				<tr>
-					<td><img src=""></td>
+					<td><img src="{{ asset($item->productItem->product->dimage) }}" width="100px"></td>
 					<td>{{$item->sku}}</td>
 					<td>{{$item->item->name}}</td>
 					<td></td>
@@ -77,19 +77,19 @@ table.gridtable td {
 	</tr>
 	<tr>
 		<td>订单运费</td>
-		<td>NULL</td>
+		<td>RMB {{$purchase_order->total_postage}} 元人民币</td>
 	</tr>
 	<tr>
 		<td>订单总金额</td>
-		<td>{{$purchase_order->total_purchase_cost}}</td>
+		<td>RMB {{$total_price+$purchase_order->total_postage}} 元人民币</td>
 	</tr>
 	<tr>
 		<td>订单备注</td>
-		<td>{{$purchase_order->pay_type}}</td>
+		<td>{{$purchase_order->remark}}</td>
 	</tr>
 	<tr>
 		<td>订单采购员</td>
-		<td>{{$purchase_order->assigner_name}}</td>
+		<td>{{$purchase_order->purchaseUser->name}}</td>
 	</tr>
 	<tr>
 		<td>收货记录</td>

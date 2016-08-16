@@ -501,7 +501,12 @@ class PurchaseOrderController extends Controller
         if (!$purchase_order) {
             return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
         }
+        $total_price =0;
+        foreach ($purchase_order->purchaseItem as $key => $pitem) {
+            $total_price += $pitem->purchase_num*$pitem->purchase_cost;
+        }
         $response = [
+                'total_price' =>$total_price,
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
             ];

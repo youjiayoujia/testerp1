@@ -61,7 +61,45 @@ Class AmazonAdapter implements AdapterInterface
 
     public function returnTrack($tracking_info)
     {
-        var_dump($this->config);exit;
+        $tmp_ddd = $this->testXML();
+        // $fd = fopen('d:/test.xml', 'w+');
+        // fwrite($fd, $tmp_ddd);
+        // rewind($fd);
+        $this->_config['Action'] = 'SubmitFeed';
+        $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
+        $this->_config['Version'] = '2009-01-01';
+        $this->_config['MarketplaceIdList.Id.1'] = 'ATVPDKIKX0DER';
+        $this->_config['PurgeAndReplace'] = 'false';
+        $this->_config['Merchant'] = 'A3THBIK7QYKUUV';
+        unset($this->_config['SellerId']);
+        unset($this->_config['MarketplaceId.Id.1']);
+        //rewind($fd);
+        $tmp_url = "https://mws.amazonservices.com";
+        $tmp_arr = parse_url($tmp_url);
+        $sign  = 'POST' . "\n";
+        $sign .= $tmp_arr['host'] . "\n";
+        $sign .= "/" . "\n";
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $tmp_header = ["Content-Type: text/xml", "Host: mws.amazonservices.com", "Content-MD5:".base64_encode(md5($this->testXML(), true))];
+        $string1 = $tmp_url."/?".$string;
+
+
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,true);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_POST,1);
+        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false); 
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$tmp_ddd);
+        curl_setopt($ch,CURLOPT_HTTPHEADER, $tmp_header);
+        $res = curl_exec($ch);
+        curl_close($ch);
+        print_r($res);
+        echo "========================================================";
+        var_dump($res);
     }
 
     /**

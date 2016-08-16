@@ -7,6 +7,9 @@
                 <strong>ID</strong>: {{ $model->id }}
             </div>
             <div class="col-lg-4">
+                <strong>优先级</strong>: {{ $model->priority != 0 ? $model->priority : '未设置' }}
+            </div>
+            <div class="col-lg-4">
                 <strong>物流方式简码</strong>: {{ $model->code }}
             </div>
             <div class="col-lg-4">

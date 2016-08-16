@@ -35,12 +35,9 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
     {
         $start = microtime(true);
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
-        var_dump($oldOrder->count());
-        var_dump(!$oldOrder);exit;
         if (!$oldOrder) {
-            var_dump('============');exit;
             $order = $orderModel->createOrder($this->order);
-            var_dump($order->toArray());exit;
+            $order->update(['status' => 'PREPARED']);
             if ($order) {
                 if ($order->status == 'PREPARED') {
                     $package = $order->createPackage();

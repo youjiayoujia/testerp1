@@ -63,7 +63,7 @@ class TestController extends Controller
     // }
     public function test2()
     {
-        $data['channel_ordernum'] = '21223123';
+        $data['channel_ordernum'] = '212223123';
         $data['ordernum'] = '3000';
         $data['channel_account_id'] = '365';
         $data['channel_id'] = '2';

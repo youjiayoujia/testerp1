@@ -52,6 +52,15 @@
                 @endforeach
             </ul>
         </div>
+        <div class="btn-group" role="group">
+            <select class=" btn btn-default dropdown-toggle" style="width: 120px;" name="select-acount-id" id="select-account-id" onchange="getAccountList($(this))" >
+                <option value="none">请选择渠道名</option>
+
+                @foreach($channel_accounts as $account)
+                    <option value="{{ DataList::filtersEncode(['account_id','=',$account->id])}}">{{$account->account}}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
 @stop
 @section('tableHeader')
@@ -136,4 +145,16 @@
         </tr>
 
     @endforeach
+    <link href="{{ asset('css/multiple-select.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/multiple-select.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#select-account-id').select2();
+        });
+        function getAccountList(accountid){
+             if(accountid.val() != 'none'){
+                 window.location.href=accountid.val();
+             }
+        }
+    </script>
 @stop

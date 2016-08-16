@@ -10,6 +10,7 @@
 namespace App\Http\Controllers;
 use App\Models\PaypalsModel;
 use App\Models\PermissionModel;
+use App\Models\PaypalRatesModel;
 
 class PaypalController extends Controller
 {
@@ -20,19 +21,35 @@ class PaypalController extends Controller
         $this->mainTitle = 'paypal';
         $this->viewPath = 'paypal.';
     }
-    public function ShowPaypalRate(){
-        $fee_array = [
-            '固定费'=>config('paypal.fixed_fee'),
-            'PP大成交费'=>config('paypal.transactions_fee_big'),
-            'PP小成交费'=>config('paypal.transactions_fee_small'),
-        ];
+
+    /**
+     * paypal税
+     * @param PaypalRatesModel $paypalRates
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function ShowPaypalRate(PaypalRatesModel $paypalRates){
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'fee_array'=>$fee_array,
+            'rates' => $paypalRates->find(1), //获得paypal税
         ];
 
 
         return view('paypal.paypal_rate',$response);
+    }
+
+    public function updatePaypalRates(PaypalRatesModel $paypalRates){
+        $data = request()->all();
+        $obj = $paypalRates->find(1);
+        $obj->update($data);
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'rates' => $obj, //获得paypal税
+        ];
+
+        return view('paypal.paypal_rate',$response);
+
     }
 
 }

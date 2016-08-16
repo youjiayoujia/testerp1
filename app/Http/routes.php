@@ -571,6 +571,7 @@ Route::group(['middleware' => 'auth'], function () {
     //图片标签
     Route::resource('label', 'LabelController');
     Route::resource('paypal', 'PaypalController');
+    Route::any('updatePaypalRates', ['uses'=>'PaypalController@updatePaypalRates','as' => 'paypal.update_rates']);
     Route::any('ShowPaypalRate', ['uses' => 'PaypalController@ShowPaypalRate', 'as' => 'paypal.ShowPaypalRate']);
     //editOnlineProduct
 

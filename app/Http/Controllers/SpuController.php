@@ -104,7 +104,7 @@ class SpuController extends Controller
      */
     public function saveRemark()
     {
-        $data = request()->all();echo '<pre>';
+        $data = request()->all();
         $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
     }

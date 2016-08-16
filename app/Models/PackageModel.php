@@ -625,6 +625,7 @@ class PackageModel extends BaseModel
             $amount = $this->order->amount; //订单金额
             $amountShipping = $this->order->amount_shipping; //订单运费
             $celeAdmin = $this->order->cele_admin;
+            $shipping = $this->order->shipping;
             //是否通关
             if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
                 $isClearance = 1;

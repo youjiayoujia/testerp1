@@ -11,6 +11,7 @@
 namespace App\Http\Controllers\Logistics;
 
 use App\Http\Controllers\Controller;
+use App\Models\Channel\AccountModel;
 use App\Models\CountriesModel;
 use App\Models\Logistics\RuleModel;
 use App\Models\LogisticsModel;
@@ -42,6 +43,7 @@ class RuleController extends Controller
             'countrySorts' => CountriesSortModel::all(),
             'channels' => ChannelModel::all(), 
             'logisticsLimits' => LimitsModel::all(),
+            'accounts' => AccountModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -80,6 +82,7 @@ class RuleController extends Controller
             'channels' => $model->rule_channels_through,
             'catalogs' => $model->rule_catalogs_through,
             'limits' => $model->rule_limits_through,
+            'accounts' => $model->rule_accounts_through,
         ];
 
         return view($this->viewPath . 'show', $response);
@@ -107,11 +110,12 @@ class RuleController extends Controller
             'countrySorts' => CountriesSortModel::all(),
             'channels_outer' => ChannelModel::all(), 
             'logisticsLimits_outer' => LimitsModel::all(),
-
+            'accounts_outer' => AccountModel::all(),
             'countries' => $model->rule_countries_through,
             'channels' => $model->rule_channels_through,
             'catalogs' => $model->rule_catalogs_through,
             'limits' => $model->rule_limits_through,
+            'accounts' => $model->rule_accounts_through,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -151,6 +155,7 @@ class RuleController extends Controller
         $model->rule_channels_through()->sync([]);
         $model->rule_catalogs_through()->sync([]);
         $model->rule_countries_through()->sync([]);
+        $model->rule_accounts_through()->sync([]);
         $model->destroy($id);
         return redirect($this->mainIndex);
     }

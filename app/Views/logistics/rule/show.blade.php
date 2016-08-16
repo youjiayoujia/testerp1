@@ -12,9 +12,6 @@
             <div class="col-lg-2">
                 <strong>物流方式简码</strong>: {{ $model->logistics->code }}
             </div>
-            <div class="col-lg-2">
-                <strong>优先级</strong>: {{ $model->priority }}
-            </div>
             @if($model->weight_section)
                 <div class="col-lg-2">
                     <strong>重量从(kg)</strong>: {{ $model->weight_from }}
@@ -103,6 +100,22 @@
             <font size='3px' color='red'>物流没限制</font>
         @endif
         </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">销售账号</div>
+        <div class="panel-body">
+            <div class='form-group'>
+                @if($model->account_section)
+                    @foreach($accounts as $account)
+                        <div class='col-lg-2'>
+                            <input type='text' class='form-control' value="{{ $account->account}}">
+                        </div>
+                    @endforeach
+                @else
+                    <font size='3px' color='red'>账号没限制</font>
+                @endif
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

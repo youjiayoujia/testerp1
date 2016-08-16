@@ -11,6 +11,7 @@
 namespace App\Models\Logistics;
 
 use App\Base\BaseModel;
+use App\Models\Channel\AccountModel;
 use App\Models\CountriesModel;
 use App\Models\ChannelModel;
 use App\Models\CatalogModel;
@@ -33,26 +34,24 @@ class RuleModel extends BaseModel
         'order_amount_from',
         'order_amount_to',
         'is_clearance',
-        'priority',
         'type_id',
         'weight_section', 
         'order_amount_section', 
         'catalog_section', 
         'channel_section', 
         'country_section', 
-        'limit_section'
+        'limit_section',
+        'account_section',
     ];
 
     public $rules = [
         'create' => [
             'is_clearance' => 'required',
-            'priority' => 'required',
             'type_id' => 'required',
             'name' => 'required',
         ],
         'update' => [
             'is_clearance' => 'required',
-            'priority' => 'required',
             'type_id' => 'required',
             'name' => 'required',
         ],
@@ -92,6 +91,16 @@ class RuleModel extends BaseModel
     public function rule_channels_through()
     {
         return $this->belongsToMany('App\Models\ChannelModel', 'logistics_rule_channels', 'logistics_rule_id', 'channel_id');
+    }
+
+    public function rule_accounts()
+    {
+        return $this->hasMany('App\Models\Logistics\Rule\AccountModel', 'logistics_rule_id', 'id');
+    }
+
+    public function rule_accounts_through()
+    {
+        return $this->belongsToMany('App\Models\Channel\AccountModel', 'logistics_rule_accounts', 'logistics_rule_id', 'account_id');
     }
 
     public function rule_countries()
@@ -148,6 +157,23 @@ class RuleModel extends BaseModel
         return $str;
     }
 
+    public function getAccountsNameAttribute()
+    {
+        $accounts = $this->accounts;
+        $arr = explode(',', $accounts);
+        $str = '';
+        foreach($arr as $key => $value) {
+            $account = AccountModel::find($value);
+            if($key == 0) {
+                $str = $account->account;
+                continue;
+            }
+            $str .=','.$account->account;
+        }
+
+        return $str;
+    }
+
     public function getCatalogsNameAttribute()
     {
         $catalogs = $this->catalogs;
@@ -180,6 +206,9 @@ class RuleModel extends BaseModel
             foreach($arr['limits'] as $key => $value) {
                 $this->rule_limits_through()->attach([$key => ['type' => $value]]);
             }
+        }
+        if(array_key_exists('account_section', $arr) && array_key_exists('accounts', $arr)) {
+            $this->rule_accounts_through()->attach($arr['accounts']);
         }
     }
 
@@ -225,6 +254,16 @@ class RuleModel extends BaseModel
                 }
                 return false;
                 break;
+
+            case 'account':
+                $accounts = $this->rule_accounts_through;
+                foreach($accounts as $account) {
+                    if($account->pivot->account_id == $id) {
+                        return true;
+                    }
+                }
+                return false;
+                break;
         }
     }
 
@@ -248,6 +287,12 @@ class RuleModel extends BaseModel
         } else {
             $this->update(['channel_section' => '0']);
             $this->rule_channels_through()->sync([]);
+        }
+        if(array_key_exists('account_section', $arr) && array_key_exists('accounts', $arr)) {
+            $this->rule_accounts_through()->sync($arr['accounts']);
+        } else {
+            $this->update(['account_section' => '0']);
+            $this->rule_accounts_through()->sync([]);
         }
         if(array_key_exists('country_section', $arr) && array_key_exists('countrys', $arr)) {
             $this->rule_countries_through()->sync($arr['countrys']);

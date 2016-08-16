@@ -11,6 +11,7 @@ use App\Models\OrderModel;
 use App\Models\UserModel;
 use Tool;
 use Translation;
+use App\Models\Channel\AccountModel;
 
 //use App\Models\Order\PackageModel;
 class MessageModel extends BaseModel{
@@ -46,20 +47,7 @@ class MessageModel extends BaseModel{
 
     public function getLabelTextAttribute()
     {
-        switch ($this->label) {
-            case 'INBOX':
-                $result = "<span class='label label-success'>INBOX</span>";
-                break;
-            case 'SPAM':
-                $result = "<span class='label label-warning'>SPAM</span>";
-                break;
-            case 'TRASH':
-                $result = "<span class='label label-danger'>TRASH</span>";
-                break;
-            default:
-                $result = "<span class='label label-info'>$this->label</span>";
-                break;
-        }
+        $result = "<span class='label label-success'>$this->label</span>";
         return $result;
     }
 
@@ -92,14 +80,33 @@ class MessageModel extends BaseModel{
         }
     }
 
+    /**
+     * 工作流获取下一个message
+     * @param $userId
+     * @return mixed
+     */
     public function getOne($userId)
     {
+        $acounts_ary = $this->getUserAccountIDs($userId);
         return $this
-            ->where('label', 'INBOX')
+            ->whereIn('account_id', $acounts_ary) //用户所属账号的信息
             ->where('status', 'UNREAD')
             ->orWhere(function ($query) use ($userId) {
                 $query->where('assign_id', $userId)->where('status', 'PROCESS')->where('dont_reply','<>',1);
             })->first();
+    }
+
+    public function getUserAccountIDs($userId){
+        if($userId) {
+            $accounts = AccountModel::where('customer_service_id', '=', $userId)->get();
+            if (count($accounts) <> 0) {
+                foreach ($accounts as $key => $account) {
+                    $ids_ary[] = $account->id;
+                }
+                return $ids_ary;
+            }
+        }
+        return false;
     }
 
 
@@ -319,16 +326,16 @@ class MessageModel extends BaseModel{
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
                             if($this->from_name != $item->summary->receiverName){
 
-                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p>'.$item->senderName.':</p>'.$content;
-                                $html .= '<p class="time"><strong>时间: </strong>'.$datetime.'</p>';
+                                $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
+                                $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
                                 $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
                                 $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="'.$content.'">
                                     翻译
                                 </button>';
                                 $html .= '</div>';
                             }else{
-                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p>'.$item->senderName.':</p>'.$content;
-                                $html .= '<p class="time"><strong>时间: </strong> '.$datetime.'</p>';
+                                $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
+                                $html .= '<p class="time"><strong>Time: </strong> '.$datetime.'</p>';
                                 $html .= '</div>';
                             }
                         }
@@ -410,7 +417,5 @@ class MessageModel extends BaseModel{
         }
         return $order_id;
     }
-
-
 
 }

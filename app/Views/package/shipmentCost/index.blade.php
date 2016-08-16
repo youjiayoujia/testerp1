@@ -28,10 +28,10 @@
             <td>{{ $shipmentCost->import_by }}</td>
             <td>{{ $shipmentCost->created_at }}</td>
             <td>
-                <a href="{{ route('shipmentCost.show', ['id'=>$shipmentCost->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('shipmentCostItem.showInfo', ['id'=>$shipmentCost->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
-                <a href="{{ route('shipmentCost.showError', ['id'=>$shipmentCost->id]) }}" class="btn btn-danger btn-xs">
+                <a href="{{ route('shipmentCostError.showError', ['id'=>$shipmentCost->id]) }}" class="btn btn-danger btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 错误信息
                 </a>
             </td>

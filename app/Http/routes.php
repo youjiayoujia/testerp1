@@ -56,6 +56,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockUnhold', 'Stock\UnholdController');
     //入库
     Route::resource('stockIn', 'Stock\InController');
+    //物流对账正确信息详情
+    Route::get('shipmentCostError/showError/{id}', ['uses' => 'ShipmentCostErrorController@showError', 'as' => 'shipmentCostError.showError']);
+    Route::resource('shipmentCostError', 'ShipmentCostErrorController');
+
+    //物流对账正确信息详情
+    Route::get('shipmentCostItem/showInfo/{id}', ['uses' => 'ShipmentCostItemController@showInfo', 'as' => 'shipmentCostItem.showInfo']);
+    Route::resource('shipmentCostItem', 'ShipmentCostItemController');
     //出库
     Route::resource('stockOut', 'Stock\OutController');
     //出入库

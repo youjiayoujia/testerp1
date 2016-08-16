@@ -32,6 +32,22 @@ class ShipmentCostModel extends BaseModel
     	'created_at'
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'filterFields' => [
+            ],
+            'filterSelects' => [
+            ],
+            'sectionSelect' => [
+            ],
+            'relatedSearchFields' => [
+            ],
+            'selectRelatedSearchs' => [
+            ]
+        ];
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Package\ShipmentCostItemModel', 'parent_id', 'id');

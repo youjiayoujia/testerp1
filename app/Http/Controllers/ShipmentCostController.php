@@ -38,9 +38,9 @@ class ShipmentCostController extends Controller
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'items' => $model->items()->paginate('20')
+            'data' => $model->items,
         ];
+        
         return view($this->viewPath . 'show', $response);
     }
 

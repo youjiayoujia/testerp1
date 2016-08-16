@@ -46,7 +46,8 @@ use App\Models\CatalogModel;
 use DB;
 use Excel;
 use App\Models\Message\ReplyModel;
-
+use App\Jobs\Inorders;
+use App\Modules\Channel\Adapter\AmazonAdapter;
 
 class TestController extends Controller
 {
@@ -58,22 +59,42 @@ class TestController extends Controller
     }
     // public function test2()
     // {
-    //     $item = ItemModel::find('1');var_dump($item->toArray());
-    //     $item->out('8', 1, 'ADJUSTMENT', '1');exit;var_dump('ok');
+    //     echo Tool::barcodePrint('123', 'c128', '2', '33');
     // }
     public function test2()
     {
-        $rows[] = [
-            '南京' => '上海',
-            iconv('utf-8', 'gb2312', '武汉市') => iconv('utf-8', 'gb2312', '江苏省懂')
-        ];
-        $name = 'test';
-        Excel::create($name, function ($excel) use ($rows) {
-            $excel->sheet('', function ($sheet) use ($rows) {
-                $sheet->fromArray($rows);
-            }, 'GB2312');
-        })->download('XLS');
+        $data['channel_ordernum'] = '212223123';
+        $data['ordernum'] = '3000';
+        $data['channel_account_id'] = '365';
+        $data['channel_id'] = '2';
+        $data['status'] = 'PREPARED';
+        $data['active'] = 'NORMAL';
+        $data['items'][0]['sku'] = 'MPJ845D';
+        $data['items'][0]['quantity'] = 1;
+        $job = new Inorders($data);
+        $job->onQueue('Inorders');
+        $this->dispatch($job);
     }
+
+    // public function test2()
+    // {
+    //     $account = AccountModel::find(160);
+    //     $single = new AmazonAdapter($account->api_config);
+    //     $single->returnTrack([['1', '123']]);
+    // }
+    // public function test2()
+    // {
+    //     $rows[] = [
+    //         '南京' => '上海',
+    //         iconv('utf-8', 'gb2312', '武汉市') => iconv('utf-8', 'gb2312', '江苏省懂')
+    //     ];
+    //     $name = 'test';
+    //     Excel::create($name, function ($excel) use ($rows) {
+    //         $excel->sheet('', function ($sheet) use ($rows) {
+    //             $sheet->fromArray($rows);
+    //         }, 'GB2312');
+    //     })->download('XLS');
+    // }
 
     public function test1()
     {
@@ -85,7 +106,7 @@ class TestController extends Controller
     public function index()
     {
         set_time_limit(0);
-        $account = AccountModel::find(187);
+        $account = AccountModel::find(28);
         if ($account) {
             //初始化
             $i = 1;
@@ -508,12 +529,12 @@ class TestController extends Controller
             }
         }
     }
+    public function jdtestCrm(){
+        /*        $message_obj = MessageModel::find(36336);
+                //$tt = $message_obj->ChannelMessageFields();
 
-    public function jdtestCrm()
-    {
-        $message_obj = MessageModel::find(36304);
-        dd($message_obj->getChannelDiver());
-        exit;
+                dd($message_obj->MessageFields);exit;
+                exit;*/
 
 
         //渠道测试块
@@ -522,29 +543,29 @@ class TestController extends Controller
                 $fields = unserialize(base64_decode($message_obj->channel_message_fields));
                 dd($fields);exit;*/
 
+        /*
+                 $reply_obj = ReplyModel::find(28569);
 
-        $reply_obj = ReplyModel::find(28569);
-
-        foreach (AccountModel::all() as $account) {
-            if ($account->account == 'rebeauty') { //测试diver
-
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->sendMessages($reply_obj);
-                print_r($messageList);
-                exit;
-
-            }
-        }
-        /*        foreach (AccountModel::all() as $account) {
-                    if($account->account == 'rebeauty'){ //测试diver
+                  foreach (AccountModel::all() as $account) {
+                    if( $account->account == 'wintrade9'){ //测试diver
 
                         $channel = Channel::driver($account->channel->driver, $account->api_config);
-                        $messageList = $channel->getMessages();
+                        $messageList = $channel->sendMessages($reply_obj);
                         print_r($messageList);exit;
 
                     }
                 }*/
+        /*
+         *
+         *
+         */        foreach (AccountModel::all() as $account) {
+            if($account->account == 'jdtest@ebay.com'){ //测试diver
 
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getCases();
+                print_r($messageList);exit;
 
+            }
+        }
     }
 }

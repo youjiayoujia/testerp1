@@ -82,6 +82,7 @@ class PurchaseOrderController extends Controller
     public function store()
     {
         request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
         $this->model->createPurchaseOrder(request()->all());
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
@@ -385,6 +386,7 @@ class PurchaseOrderController extends Controller
             'id' => $id,
             'purchaseItems'=>PurchaseItemModel::where('purchase_order_id',$id)->get(),
             'purchase_num_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_num'),
+            'purchase_cost_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('purchase_cost'),
             'storage_qty_sum'=>PurchaseItemModel::where('purchase_order_id',$id)->sum('storage_qty'),
             'postage_sum'=>PurchasePostageModel::where('purchase_order_id',$id)->sum('postage'),
         ];
@@ -394,6 +396,23 @@ class PurchaseOrderController extends Controller
             }
             $response['purchaseAccount']=$purchaseAccount;
         return view($this->viewPath . 'printOrder', $response);
+    }
+
+    /**
+    * 打印入库单
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function printInWarehouseOrder($id){
+        $model=$this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'printInWarehouseOrder', $response);
     }
 
     /**
@@ -407,7 +426,7 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-    * 收货节面打印采购条目
+    * 收货节面打印选择尺寸
     *
     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
     */
@@ -415,6 +434,22 @@ class PurchaseOrderController extends Controller
         $id = request()->input('id');
         $response['id']= $id;
         return view($this->viewPath . 'printpo', $response);
+    }
+
+    /**
+    * 收货节面打印
+    *
+    * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|null
+    */
+    public function showpo(){
+        $id = request()->input('pp_id');
+        $size = request()->input('labelSize');
+        $po_id = request()->input('po_id');
+        $response['id']= $id;
+        $response['model'] = PurchaseItemModel::where('id',$id)->get()->first();
+        $response['size']= $size;
+        $response['po_id']= $po_id;
+        return view($this->viewPath . 'showpo', $response);
     }
 
     /**

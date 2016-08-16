@@ -80,8 +80,9 @@ return [
         'require_create' => '是否需要采购',
 
         'productSku.skuCode'=>'产品SKU',
-
-
+        'hang_num' => '挂号码',
+        'hang_number' => '挂号码',
+        'package_id' => '包裹id',
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
 
@@ -94,7 +95,8 @@ return [
         'logistics_id' => '物流方式',
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
-        'warehousePosition.name' => '库位'
+        'warehousePosition.name' => '库位',
+        'channel_name' => '渠道名称',
     ],
 ];
 

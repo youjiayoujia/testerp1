@@ -5,6 +5,7 @@
  * Date: 2016-1-4 10:46:32
  */
 namespace App\Http\Controllers;
+use App\Models\ItemModel;
 use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
@@ -22,6 +23,7 @@ use App\Models\Logistics\ZoneModel;
 use App\Models\Catalog\CatalogChannelsModel;
 use App\Models\CurrencyModel;
 use Gate;
+use App\Models\PaypalRatesModel;
 class ProductController extends Controller
 {
     public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel,WarehouseModel $warehouse)
@@ -405,7 +407,12 @@ class ProductController extends Controller
         return json_encode(false);
     }
 
-    public function ajaxReturnPrice(ZoneModel $zone){
+    /**
+     * 产品价格计算
+     * @param ZoneModel $zone
+     * @param ItemModel $items_obj
+     */
+    public function ajaxReturnPrice(ZoneModel $zone,ItemModel  $items_obj,PaypalRatesModel $rates_obj){
         $return_price_array = [];
         $shipment_fee = 0;
         $form_ary =  request()->input();
@@ -415,84 +422,95 @@ class ProductController extends Controller
             $USD_obj = CurrencyModel::where('code','=','RMB')->first(); //美元汇率
             $shipment_fee = $zone->getShipmentFee($form_ary['zone_id'],$form_ary['product_weight']) / $USD_obj->rate;
         }
-        //获取售价
-        $product_obj = $this->model->find($form_ary['product_id']);
-        $channels_rate = $product_obj->catalog->channels;
+        if($shipment_fee != false){
+            //获取售价
+            $product_obj = $items_obj->find($form_ary['product_id']);
+            $channels_rate = $product_obj->catalog->channels;
 
-        foreach ($channels_rate as $item_channel){
+            foreach ($channels_rate as $item_channel){
 
-            if($form_ary['channel_id'] != 'none'){ //如果指定渠道
-                if($item_channel->name != $form_ary['channel_id']) {
-                    continue;
+                if($form_ary['channel_id'] != 'none'){ //如果指定渠道
+                    if($item_channel->name != $form_ary['channel_id']) {
+                        continue;
+                    }
                 }
+                // $item_channel->pivot->rate; //平台税率
+                $channel_fee = 0; //初始化 平台费
+                switch ($item_channel->name){
+                    case '亚马逊-美国':
+                        //AMZ美国站平台费小于1美元，按1美元计算(珠宝及手表分类下，该条件用2美元计算)
+                        $channel_fee = $item_channel->pivot->rate;   //货币单位 美元
+                        if($channel_fee < 1){
+                            $channel_fee = 1;
+                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                                $channel_fee = 2;
+                            }
+                        }
+
+                        break;
+                    case '亚马逊-英国':
+                        //AMZ英国站平台费小于0.5英镑，按0.5英镑计算(珠宝及手表分类下，该条件用1.25英镑计算)
+                        $channel_fee = $item_channel->pivot->rate;   //货币单位 英镑
+                        if($channel_fee < 0.5){
+                            $channel_fee = 0.5;
+                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                                $channel_fee = 1.25;
+                            }
+                        }
+                        //兑换美元
+                        $GBP_obj = CurrencyModel::where('code','=','GBP')->first(); //美元英镑汇率
+                        $channel_fee = $channel_fee / $GBP_obj;
+                        break;
+                    case '亚马逊-欧洲':
+                        $channel_fee = $item_channel->pivot->rate;   //货币单位 欧元
+                        if($channel_fee < 0.5){
+                            $channel_fee = 0.5;
+                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                                $channel_fee = 1.5;
+                            }
+                        }
+                        //兑换美元
+                        $EUR_obj = CurrencyModel::where('code','=','EUR')->first(); //美元欧元汇率
+                        $channel_fee = $channel_fee / $EUR_obj;
+                        break;
+                    case '亚马逊-日本':
+                        //AMZ日本站平台费小于30日元，按30日元计算(珠宝及手表分类下，该条件用50日元计算)
+                        $channel_fee = $item_channel->pivot->rate;   //货币单位 日元
+
+                        if($channel_fee < 30){
+                            $channel_fee = 30;
+                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                                $channel_fee = 50;
+                            }
+                        }
+                        //兑换美元
+                        $JPY_obj = CurrencyModel::where('code','=','JPY')->first(); //美元日元汇率
+                        $channel_fee = $channel_fee / $JPY_obj;
+                        break;
+                    default:
+                        break;
+
+                }
+
+
+                $rates = $rates_obj->find(1);
+
+
+                $sale_price_big =  (($product_obj->purchase_price + $shipment_fee) + $rates->fixed_fee_big + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - $rates->transactions_fee_big );
+                $sale_price_small = (($product_obj->purchase_price + $shipment_fee) + $rates->fixed_fee_small + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - $rates->transactions_fee_small );
+
+                $return_price_array[] = [
+                    'channel_name' => $item_channel->name,
+                    'sale_price_big' => number_format($sale_price_big,2,'.',''),
+                    'sale_price_small' => number_format($sale_price_small,2,'.',''),
+                ];
             }
-           // $item_channel->pivot->rate; //平台税率
-            $channel_fee = 0; //初始化 平台费
-            switch ($item_channel->name){
-                case '亚马逊-美国':
-                    //AMZ美国站平台费小于1美元，按1美元计算(珠宝及手表分类下，该条件用2美元计算)
-                    $channel_fee = $item_channel->pivot->rate;   //货币单位 美元
-                    if($channel_fee < 1){
-                        $channel_fee = 1;
-                        if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
-                            $channel_fee = 2;
-                        }
-                    }
+        }else{
+            print_r(json_encode(['status' => -2,'error_msg' => '计算运费参数错误，请检查。']));
+            return;
 
-                    break;
-                case '亚马逊-英国':
-                    //AMZ英国站平台费小于0.5英镑，按0.5英镑计算(珠宝及手表分类下，该条件用1.25英镑计算)
-                    $channel_fee = $item_channel->pivot->rate;   //货币单位 英镑
-                    if($channel_fee < 0.5){
-                        $channel_fee = 0.5;
-                        if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
-                            $channel_fee = 1.25;
-                        }
-                    }
-                    //兑换美元
-                    $GBP_obj = CurrencyModel::where('code','=','GBP')->first(); //美元英镑汇率
-                    $channel_fee = $channel_fee / $GBP_obj;
-                    break;
-                case '亚马逊-欧洲':
-                    $channel_fee = $item_channel->pivot->rate;   //货币单位 欧元
-                    if($channel_fee < 0.5){
-                        $channel_fee = 0.5;
-                        if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
-                            $channel_fee = 1.5;
-                        }
-                    }
-                    //兑换美元
-                    $EUR_obj = CurrencyModel::where('code','=','EUR')->first(); //美元欧元汇率
-                    $channel_fee = $channel_fee / $EUR_obj;
-                    break;
-                case '亚马逊-日本':
-                    //AMZ日本站平台费小于30日元，按30日元计算(珠宝及手表分类下，该条件用50日元计算)
-                    $channel_fee = $item_channel->pivot->rate;   //货币单位 日元
-
-                    if($channel_fee < 30){
-                        $channel_fee = 30;
-                        if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
-                            $channel_fee = 50;
-                        }
-                    }
-                    //兑换美元
-                    $JPY_obj = CurrencyModel::where('code','=','JPY')->first(); //美元日元汇率
-                    $channel_fee = $channel_fee / $JPY_obj;
-                    break;
-                default:
-                    break;
-
-            }
-
-            $sale_price_big =  (($product_obj->purchase_price + $shipment_fee) + config('paypal.fixed_fee') + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - config('paypal.transactions_fee_big') );
-            $sale_price_small = (($product_obj->purchase_price + $shipment_fee) + config('paypal.fixed_fee') + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - config('paypal.transactions_fee_small') );
-
-            $return_price_array[] = [
-                'channel_name' => $item_channel->name,
-                'sale_price_big' => $sale_price_big,
-                'sale_price_small' => $sale_price_small,
-            ];
         }
+
 
 
 

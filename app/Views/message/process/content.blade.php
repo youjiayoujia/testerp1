@@ -24,7 +24,7 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-lg-12">
-                                            <?php echo $content; ?>
+                    <?php echo $content; ?>
                     {{--{{$content}}--}}
                     {{--<iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$message->id]) }}"></iframe>--}}
             </div>

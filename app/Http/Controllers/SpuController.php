@@ -8,7 +8,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SpuModel;
 use App\Models\UserModel;
-
+use App\Models\ChannelModel;
 
 class SpuController extends Controller
 {
@@ -107,6 +107,66 @@ class SpuController extends Controller
         $data = request()->all();echo '<pre>';
         $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
+    }
+
+    /**
+     * 小语言编辑
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function spuMultiEdit()
+    {
+
+        $data = request()->all();
+        $language = config('product.multi_language');
+        $model = $this->model->find($data['id']);
+        $default = $model->spuMultiOption->where("channel_id",ChannelModel::all()->first()->id)->first()->toArray();
+        
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' =>$this->model->find($data['id']),
+            'languages' => config('product.multi_language'),
+            'channels' => ChannelModel::all(),
+            'id' => $data['id'],
+            'default' =>$default,
+        ];
+        return view($this->viewPath . 'language', $response);
+    }
+
+    /**
+     * 小语言更新
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function spuMultiUpdate()
+    {
+        $data = request()->all();
+        //echo '<pre>';
+        //print_r($data);exit;
+        $spuModel = $this->model->find($data['spu_id']);
+        $spuModel->updateMulti($data);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '编辑成功.'));
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function spuInfo()
+    {
+        $channel_id = request()->input("channel_id");
+        $language = request()->input("language");
+        $spu_id = request()->input("spu_id");
+        $model = $this->model->find($spu_id);
+        $info = $model->spuMultiOption->where("channel_id",(int)$channel_id)->first()->toArray();
+        $result['name'] = $info[$language."_name"];
+        $result['description'] = $info[$language."_description"];
+        $result['keywords'] = $info[$language."_keywords"];
+        return $result;
     }
 
 }

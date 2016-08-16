@@ -54,13 +54,31 @@ class SpuModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'developer');
     }
 
-    /*public function productFeatureValue()
+    public function spuMultiOption()
     {
-        return $this->hasMany('App\Models\Product\ProductFeatureValueModel','spu_id');
+        return $this->hasMany('App\Models\Spu\SpuMultiOptionModel', 'spu_id');
     }
 
-    public function ProductManyToFeaturevalues()
-    {
-        return $this->belongsToMany('App\Models\Catalog\FeatureValueModel', 'product_feature_values', 'spu_id', 'feature_value_id')->withTimestamps();
-    }*/
+    /**
+     * 更新多渠道多语言信息
+     * 2016年6月3日10:43:18 YJ
+     * @param array data 修改的信息
+     */
+    public function updateMulti($data)
+    {   
+        foreach ($data['info'] as $channel_id => $language) {
+            $arr = [];
+            $pre = $language['language'];
+            foreach ($language as $prefix => $value) {
+                $arr[$pre."_".$prefix] = $value;
+            }
+            
+            $model = $this->spuMultiOption->where("channel_id", (int)$channel_id)->first();
+            if($model){
+                $model->update($arr);
+            }
+           
+        }
+        //
+    }
 }

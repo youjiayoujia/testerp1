@@ -149,7 +149,7 @@ class LogisticsController extends Controller
             'emailTemplates' => EmailTemplateModel::all(),
             'templates' => TemplateModel::all(),
             'arr' => $arr,
-
+            'channels' => ChannelModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

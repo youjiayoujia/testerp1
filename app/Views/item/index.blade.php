@@ -33,6 +33,7 @@
     <th>采购负责人</th>
     <th>开发负责人</th>
     <th>供应商</th>
+    <th>售价</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>更新时间</th>
     <th>操作</th>
@@ -81,6 +82,129 @@
             <td>{{ $item->product->purchaseAdminer?$item->product->purchaseAdminer->name:''}}</td>
             <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>
             <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
+            <td>{{--<button class ="btn btn-success" >计算</button>--}}
+                <a href="javascript:" class="btn btn-success btn-xs" data-toggle="modal" data-target="#myModal_{{$item->id}}">
+                    计算
+                </a>
+
+
+
+                <div class="modal fade" id="myModal_{{$item->id}}" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document" style="width:710px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">计算售价</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form id="compute-form-{{$item->id}}">
+                                    <div class="form-group form-inline sets" id="setkey_0">
+                                        <table class="table table-bordered">
+                                            <tr>
+                                                <td>当前分类：</td>
+                                                <td colspan="2">{{ $item->catalog?$item->catalog->all_name:'' }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>产品名称：</td>
+                                                <td colspan="2">{{ $item->c_name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>产品重量：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 60px;" disabled>
+                                                        <span class="input-group-addon">Kg</span>
+                                                    </div>
+
+                                                </td>
+                                                <td>{{--打包：--}}</td>
+                                                <td>
+                                                    {{--   <div class="input-group">
+                                                           <input type="text" class="form-control" style="width: 60px;">
+                                                           <span class="input-group-addon">个</span>
+                                                       </div>--}}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    物流分类：
+                                                    <select class="form-control logistics-catalog-{{$item->id}}" style="width: 150px;" name="logistics-catalog-{{$item->id}}" id="logistics-catalog-{{$item->id}}" onchange="changeSelectVlaue($(this),'catalog',{{$item->id}})">
+                                                        <option value="none">请选择</option>
+                                                    </select>
+                                                    <script>
+                                                        $('#logistics-catalog-{{$item->id}}').select2({
+                                                            ajax: {
+                                                                url: "{{ route('ajaxReutrnCatalogs') }}",
+                                                                dataType: 'json',
+                                                                delay: 250,
+                                                                data: function (params) {
+                                                                    return {
+                                                                        name:params.term,
+                                                                    };
+                                                                },
+                                                                results: function(data, page) {
+                                                                }
+                                                            },
+                                                        });
+                                                    </script>
+                                                </td>
+                                                <td>
+                                                    物流：
+                                                    <select class="form-control" onchange="changeSelectVlaue($(this),'logistics',{{$item->id}})" id="logistics-{{$item->id}}" style="width: 150px;">
+                                                        <option value="none">请选择</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    物流分区：
+                                                    <select class="form-control" name="division" id="zones-{{$item->id}}" style="width: 150px;">
+                                                        <option value="none">请选择</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    渠道名称:
+                                                    <select class="form-control" id="channel-{{$item->id}}">
+                                                        <option value="none">请选择</option>
+                                                        @foreach($Compute_channels as $channel)
+                                                            <option value="{{$channel->name}}">{{$channel->name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    利润率：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
+                                                </td>
+                                                <td>{{--汇率：XXXX--}}</td>
+                                            </tr>
+                                        </table>
+                                        <div class=" text-right">
+                                            <input type="button" name="查询" class="form-control btn-primary" placeholder="属性名" value="查 询" onclick="doComputePrice({{$item->id}})">
+                                        </div>
+                                        <br/>
+                                        <table class="table table-bordered table-striped table-hover sortable" style="display: none;" id="result-table-{{$item->id}}">
+                                            <thead>
+                                            <tr>
+                                                <th>序号</th>
+                                                <th>渠道名</th>
+                                                <th>大PP价格（单位：美元）</th>
+                                                <th>小PP价格（单位：美元）</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="result-price-{{$item->id}}">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
             <td>{{ $item->updated_at }}</td>
             <td>{{ $item->created_at }}</td>
             <td>
@@ -136,6 +260,8 @@
 @stop
 
 @section('childJs')
+    <link href="{{ asset('css/multiple-select.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/multiple-select.js') }}"></script>
     <script type="text/javascript">
         $('.batchedit').click(function () {
             var checkbox = document.getElementsByName("tribute_id");
@@ -186,6 +312,90 @@
                 }
             })
         });
+
+        function changeSelectVlaue(selected,type,productId){
+            var id = selected.val();
+            if(id){
+                $.ajax({
+                    url: "{{route('product.ajaxReturnLogistics')}}",
+                    data: {id: id,type:type},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function ($returnInfo) {
+                        if($returnInfo != {{config('status.ajax.fail')}}){
+                            switch(type){
+                                case 'catalog':
+                                    $('#logistics-'+productId).html('');
+                                    $('#logistics-'+productId).append('<option value="none"> 请选择 </option>');
+                                    $.each($returnInfo,function (index,item) {
+                                        $('#logistics-'+productId).append('<option value="' + item.id + '">' + item.code + '</option>');
+                                    });
+                                case 'logistics':
+                                    $('#zones-'+productId).html('');
+                                    $('#zones-'+productId).append('<option value="none"> 请选择 </option>');
+                                    $.each($returnInfo,function (index,item) {
+                                        $('#zones-'+productId).append('<option value="' + item.id + '">' + item.zone + '</option>');
+                                    });
+                                default:
+                                    return false;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        /**
+         * 计算价格
+         * @param productId
+         */
+        function doComputePrice(productId){
+
+            var zone_id = $('#zones-'+productId).val();
+            var channel_id = $('#channel-'+productId).val();
+            var profit_id = $('#profit-'+productId).val();
+            var product_weight = $('#weight-'+productId).val();
+
+            if(zone_id == 'none'){
+                alert('物流分区不能为空');
+                return false;
+            }
+            if(profit_id == ''){
+                alert('利润率不能为空');
+                return false;
+            }
+            if(product_weight == ''){
+                alert('产品重量不能为空');
+                return false;
+            }
+
+            var html = '';
+            $.ajax({
+                url: "{{  route('product.ajaxReturnPrice') }}",
+                dataType: 'json',
+                'type': 'get',
+                data: {product_id:productId,zone_id:zone_id,channel_id:channel_id,profit_id:profit_id,product_weight:product_weight},
+                success:function (returnInfo){
+
+                    if(returnInfo['status'] == 1){
+                        $.each(returnInfo['data'],function (i ,item) {
+                            html += '<tr>';
+                            html += '<td>'+(i+1)+'</td><td>'+item.channel_name+'</td><td>'+item.sale_price_big+'</td><td>'+item.sale_price_small+'</td>';
+                            html += '</tr>';
+
+                            $('#result-price-'+productId).html(html);
+                            $('#result-table-'+productId).show();
+                        });
+                    }else{
+                        alert('出错了，请检查下物流分区，汇率是否有误 ');
+                    }
+                },
+                error:function () {
+
+                }
+            });
+
+        }
 
     </script>
 @stop

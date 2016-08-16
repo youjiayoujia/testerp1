@@ -76,16 +76,8 @@ class GetOrders extends Command
                     if (isset($response['error'])) {
                         $result['status'] = 'fail';
                         $result['remark'] = '[' . $response['error']['code'] . '] ' . $response['error']['message'] . '.';
-                        $end = microtime(true);
-                        $lasting = round($end - $start, 3);
-                        $commandLog->update([
-                            'data' => serialize($response['error']),
-                            'lasting' => $lasting,
-                            'total' => $total,
-                            'result' => $result['status'],
-                            'remark' => $result['remark'],
-                        ]);
-                        $this->error($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页失败, 耗时 ' . $lasting . ' 秒');
+                        $result['data'] = serialize($response['error']);
+                        $this->error($account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页失败');
                         $this->error($result['remark']);
                     } else {
                         foreach ($response['orders'] as $order) {
@@ -101,18 +93,20 @@ class GetOrders extends Command
                         $nextToken = $response['nextToken'];
                         $result['status'] = 'success';
                         $result['remark'] = 'Success.';
-                        $end = microtime(true);
-                        $lasting = round($end - $start, 3);
-                        $commandLog->update([
-                            'data' => serialize($response['orders']),
-                            'lasting' => $lasting,
-                            'total' => $total,
-                            'result' => $result['status'],
-                            'remark' => $result['remark'],
-                        ]);
-                        $this->info($account->alias . ':' . $account->id . ' 抓取第 ' . $i . ' 页成功, 耗时 ' . $lasting . ' 秒');
+                        $result['data'] = serialize($response['orders']);
+                        $this->info($account->alias . ':' . $account->id . ' 抓取第 ' . $i . ' 页成功');
                         $i++;
                     }
+                    $end = microtime(true);
+                    $lasting = round($end - $start, 3);
+                    $this->info('Lasting ' . $lasting . 's.');
+                    $commandLog->update([
+                        'data' => $result['data'],
+                        'lasting' => $lasting,
+                        'total' => $total,
+                        'result' => $result['status'],
+                        'remark' => $result['remark'],
+                    ]);
                 } while ($nextToken);
             } else {
                 $this->error('Account is not exist.');

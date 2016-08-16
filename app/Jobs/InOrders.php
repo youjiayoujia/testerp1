@@ -37,6 +37,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         $oldOrder = $orderModel->where('channel_ordernum', $this->order['channel_ordernum'])->first();
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
+            $order->update(['status' => 'PREPARED']);
             if ($order) {
                 if ($order->status == 'PREPARED') {
                     $package = $order->createPackage();
@@ -66,7 +67,9 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             //todo:计算利润率,验证黑名单,生成包裹
             if ($oldOrder->channel_id == 4 && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
                 $this->order['id'] = $oldOrder->id;
+                var_dump('123');exit;
                 $order = $orderModel->updateOrder($this->order, $oldOrder);
+                var_dump($order->toArray());exit;
                 if ($order) {
                     if ($order->checkBlack()) {
                         $order->update(['status' => 'REVIEW']);

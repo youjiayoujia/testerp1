@@ -16,7 +16,7 @@ use App\Models\Logistics\BelongsToModel;
 use App\Models\Sellmore\ShipmentModel as smShipment;
 use App\Models\Logistics\ChannelNameModel;
 use APp\Models\Sellmore\LogisticsModel as smChannelLogistics;
-use App\Models\Channel\LogisticsModel as channelLogistics;
+use App\Models\Channel\LogisticsModel as kChannelLogistics;
 
 
 class ChannelLogistics extends Command
@@ -244,14 +244,14 @@ class ChannelLogistics extends Command
         $len = 100;
         $start = 0;
         $originNum = 0;
-        $wishes = channelLogistics::skip($start)->take($len)->get();
+        $wishes = kChannelLogistics::skip($start)->take($len)->get();
         while ($wishes->count()) {
             $start += $len;
             foreach ($wishes as $wish) {
                 $originNum++;
                 $channelName = smChannelLogistics::create(['id' => $wish->id, 'name' => $wish->methodTitle]);
             }
-            $wishes = channelLogistics::skip($start)->take($len)->get();
+            $wishes = kChannelLogistics::skip($start)->take($len)->get();
         }
         $this->info('Transfer [smChannelLogistics]: Origin:'.$originNum);
     }

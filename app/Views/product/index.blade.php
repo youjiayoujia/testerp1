@@ -14,7 +14,7 @@
             <li><a href="javascript:" class="batchedit" data-name="declared">申报资料</a></li>
         </ul>
     </div>
-    <div class="btn-group">
+    <!-- <div class="btn-group">
         <a href="javascript:" data-channel="1" data-name="Amazon" class="btn btn-success choseShop">
             选中
         </a>
@@ -52,9 +52,9 @@
             <li><a href="{{ DataList::filtersEncode(['examine_status','=','notpass']) }}">审核不通过</a></li>
             <li><a href="{{ DataList::filtersEncode(['examine_status','=','revocation']) }}">撤销审核</a></li>
         </ul>
-    </div>
+    </div> -->
 
-    <div class="btn-group" role="group">
+    <!-- <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 查询编辑状态
             <span class="caret"></span>
@@ -65,7 +65,7 @@
             <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_edited']) }}">图片已编辑</a></li>
             <li><a href="{{ DataList::filtersEncode(['edit_status','=','image_unedited']) }}">图片不编辑</a></li>
         </ul>
-    </div>
+    </div> -->
     {{--@can('check','product_admin,product_staff|add')--}}
     <!-- <div class="btn-group">
         <a class="btn btn-success" href="{{ route(request()->segment(1).'.create') }}">
@@ -296,9 +296,9 @@
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
                 </a>
                 <?php //if($product->edit_status == "image_unedited" || $product->edit_status == "image_edited"){ ?>
-                <a href="{{ route('ExamineProduct.edit', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
+                <!-- <a href="{{ route('ExamineProduct.edit', ['id'=>$product->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 查看并审核
-                </a>
+                </a> -->
                 <?php //} ?>
 {{--@can('check','product_admin,product_staff|delete')--}}
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"

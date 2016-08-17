@@ -12,7 +12,7 @@
             @include('message.process.reply')
         </div>
         <div class="col-lg-4">
-            {{--@include('message.process.operate')--}}
+            @include('message.process.operate')
             @if($message->related)
                 @include('message.process.orders')
             @else

@@ -290,16 +290,27 @@ class MessageModel extends BaseModel{
             foreach($this->ContentDecodeBase64 as $key => $content){
                 switch ($key){
                     case 'wish':
+                       //dd($content);
+                       //dd($content);
                         foreach ($content as $k => $item){
                            if(!empty($item['Reply']['message'])){
                                if($item['Reply']['sender'] != 'merchant'){
-                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>用户名：</strong>'.$this->from_name.':</p>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
-                                   $html .= '<div class="alert-danger"><strong>Wish翻译: </strong><p>'.$item['Reply']['translated_message'].'</p><p>'.$item['Reply']['translated_message_zh'].'</p></div>';
+                                   if($item['Reply']['sender'] == 'wish support'){
+                                       $this->from_name = $item['Reply']['sender'];
+                                   }
+                                   $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender：</strong>'.$this->from_name.':</p><strong>Content: </strong>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
+
+                                   if(isset($item['Reply']['translated_message']) && isset($item['Reply']['translated_message_zh'])){
+                                       $html .= '<div class="alert-danger"><strong>Wish翻译: </strong><p>'.$item['Reply']['translated_message'].'</p><p>'. $item['Reply']['translated_message_zh'].'</p></div>';
+                                   }else{
+
+                                   }
+
                                    $html .= '</div>';
                                }else{
-                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p>'.$item['Reply']['message'];
-                                   $html .= '<p class="time"><strong>时间：</strong>'.$item['Reply']['date'].'</p>';
+                                   $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right"><p><strong>用户名：</strong>'.$item['Reply']['sender'].':</p><strong>Content: </strong>'.$item['Reply']['message'];
+                                   $html .= '<p class="time"><strong>Time：</strong>'.$item['Reply']['date'].'</p>';
                                    $html .= '</div>';
                                }
                            }
@@ -310,22 +321,17 @@ class MessageModel extends BaseModel{
                         $message_content = array_reverse($content->result); //逆序
                         foreach ($message_content as $k => $item){
                             $content = $item->content;
-
                             $content = str_replace("&nbsp;", ' ', $content);
                             $content = str_replace("&amp;nbsp;", ' ', $content);
                             $content = str_replace("&amp;iquest;", ' ', $content);
                             $content = str_replace("\n", "<br />", $content);
                             $content = preg_replace("'<br \/>[\t]*?<br \/>'", '', $content);
-
                             $content = str_replace("/:000", '<img src="http://i02.i.aliimg.com/wimg/feedback/emotions/0.gif" />', $content);
-
                             $content = preg_replace("'\/\:0+([1-9]+0*)'", "<img src='http://i02.i.aliimg.com/wimg/feedback/emotions/\\1.gif' />", $content);
                             $content = (stripslashes(stripslashes($content)));
 
-
                             $datetime = date('Y-m-d H:i:s',$item->gmtCreate/1000);
                             if($this->from_name != $item->summary->receiverName){
-
                                 $html .= '<div class="alert alert-warning col-md-10" role="alert"><p><strong>Sender: </strong>'.$item->senderName.':</p><strong>Content: </strong>'.$content;
                                 $html .= '<p class="time"><strong>Time: </strong>'.$datetime.'</p>';
                                 $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
@@ -348,7 +354,7 @@ class MessageModel extends BaseModel{
                         $html = $content;
                         break;
                     default :
-                        $html = 'invalid message type';
+                        $html = 'crm was make a big mistake';
                 }
             }
 
@@ -382,15 +388,17 @@ class MessageModel extends BaseModel{
     }
 
     public function findOrderWithMessage(){
-        $order_id = $this->getChannelMessageOrderId();
-        $order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
-        if($order_obj){
-            if($this->relatedOrders()->create(['order_id' => $order_obj->id])){
-                $this->related = 1;
-                $this->save();
+        $order_id = $this->getChannelMessageOrderId(); //根据平台参数获取关联订单号
+        if(!empty($order_id)){
+            //$order_obj = OrderModel::where('channel_ordernum','=',$order_id)->first();
+            if(!empty($order_id)){
+                if($this->relatedOrders()->create(['order_id' => $order_id])){
+                    $this->related = 1;
+                    $this->save();
+                }
             }
-
         }
+
     }
 
     public function getChannelMessageOrderId(){
@@ -399,23 +407,80 @@ class MessageModel extends BaseModel{
             switch ($this->getChannelDiver()){
                 case 'ebay':
                     $order_id = $fields_ary['ItemID'];
+                    if(!empty($order_id)){
+                        $order_obj = OrderModel::where('transaction_number','=',$order_id)->first();
+                        $order_id = empty($order_obj) ? '' : $order_obj->id;
+                    }else{
+                        $order_id = '';
+                    }
                     break;
                 case 'wish':
                     $transaction_id = $fields_ary['order_items'][0]['Order']['transaction_id'];  //wish交易号
-                    $order_obj = OrderModel::where('channel_ordernum','=',$transaction_id)->first();
+                    $order_obj = OrderModel::where('transaction_number','=',$transaction_id)->first();
                     $order_id = empty($order_obj) ? '' : $order_obj->id;   //根据 orders 表 交易号
                     break;
                 case 'aliexpress':
-                    $order_id = $fields_ary['order_id'];
+                    if(!empty($fields_ary['order_id'])){
+                        $order_obj = OrderModel::where('channel_ordernum','=',$fields_ary['order_id'])->first();
+                        $order_id = (!empty($order_obj)) ? $order_obj->id : '';
+                    }else{
+                        $order_id = '';
+                    }
                     break;
                 default:
                     $order_id = '';
-
             }
         }else{
             $order_id = '';
         }
         return $order_id;
     }
+
+    /**
+     * 渠道参数信息
+     */
+    public function getChannelParamsAttribute(){
+        $html = '';
+        $channel = $this->getChannelDiver();
+        switch ($channel){
+            case 'aliexpress':
+                $content = $this->ContentDecodeBase64;
+                foreach ($content['aliexpress']->result as $message){
+                    $type = $message->messageType;
+                    break;
+                }
+                $files = $this->MessageFieldsDecodeBase64;
+                $html .= '<p>Message type:'.$this->label.'</p>';
+                $html .= '<p>Detail type:'.$type.'</p>';
+                $html .= '<p>Order id:'.$files['order_id'].'</p>';
+                $html .= '<p>Order url:<a href="'.$files['order_url'].'">'.$files['order_url'].'</a></p>';
+                break;
+            case 'wish':
+                $files = $this->MessageFieldsDecodeBase64;
+                if($files){
+                    $html .= '<p><strong>Transaction id</strong>:'.$files['order_items'][0]['Order']['transaction_id'].'</p>';
+                    $html .= '<p><strong>语言</strong>:'.$files['locale'].'</p>';
+                }else{
+                    $html .= '<p>暂无</p>';
+                }
+                break;
+            case 'ebay':
+                $files = $this->MessageFieldsDecodeBase64;
+                if(!empty($files)){
+                    $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
+                    $html .= '<p><strong>Ebay链接</strong>:<a herf="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
+
+                }
+
+                break;
+
+            default:
+                $html = '';
+        }
+
+        return $html;
+    }
+
+
 
 }

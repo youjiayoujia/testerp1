@@ -526,7 +526,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-
+                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -550,7 +550,7 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
                         $message_list[$j]['to'] = '客服';
-                        $message_list[$j]['date'] = substr($item['messageTime'],0,-3);
+                        $message_list[$j]['date'] = $this->changetime($item['messageTime']);
                         $message_list[$j]['subject'] = $item['lastMessageContent'];
                         $message_list[$j]['attachment'] = ''; //附件
                         $message_list[$j]['labels'] = '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
@@ -594,7 +594,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $j++;
             }
         }
-        return (!empty($message_list)) ? $message_list : false;
+        return (!empty($message_list)) ? array_reverse($message_list) : false;
     }
     
 
@@ -1400,6 +1400,9 @@ Class AliexpressAdapter implements AdapterInterface
         }
 
     }
-
+   public function changetime($time){
+       $time = date('Y-m-d H:i:s', substr($time, 0, 10));
+       return $time;
+   }
 
 }

@@ -83,8 +83,7 @@ class TransferLogistics extends Command
                 $originNum++;
                 $shipment = [
                     'id' => $smShipment->shipmentID,
-                    'code' => $smShipment->shipmentTitle,
-                    'name' => $smShipment->shipmentDescription,
+                    'name' => $smShipment->shipmentTitle,
                     'warehouse_id' => $smShipment->shipment_warehouse_id == '1025' ? '2' : '1',
                     'logistics_catalog_id' => $smShipment->shipmentCategoryID,
                     'docking' => 'CODE',

@@ -32,15 +32,15 @@ table.gridtable td {
 	</tr>
 	<tr>
 		<td>下单时间</td>
-		<td></td>
+		<td>{{$purchase_order->created_at}}</td>
 	</tr>
 	<tr>
 		<td>付款方式</td>
-		<td>{{$purchase_order->pay_type}}</td>
+		<td>{{config('purchase.purchaseOrder.pay_type')[$purchase_order->pay_type]}}</td>
 	</tr>
 	<tr>
 		<td>付款凭证</td>
-		<td></td>
+		<td>{{$purchase_order->is_certificate?'不需要':'需要'}}</td>
 	</tr>
 	<tr>
 		<td>入库仓库</td>
@@ -65,7 +65,7 @@ table.gridtable td {
 				@foreach($item->arrivalLog as $log)
 					<tr>
 						<td><input type="checkbox" {{$log->good_num?'disabled':''}}></td>
-						<td><img src="" alt=""></td>
+						<td><img src="{{ asset($item->productItem->product->dimage) }}" width="100px"></td>
 						<td>{{$item->sku}}</td>
 						<td>{{$item->item->name}}<br><span style="color:gray">到货时间：{{$log->created_at}}</span><br><span style="color:gray">质检时间：{{$log->quality_time}}</span></td>
 						<td></td>
@@ -82,11 +82,11 @@ table.gridtable td {
 	
 	<tr>
 		<td>订单备注</td>
-		<td>{{$purchase_order->pay_type}}</td>
+		<td>{{$purchase_order->remark}}</td>
 	</tr>
 	<tr>
 		<td>订单采购员</td>
-		<td>{{$purchase_order->assigner_name}}</td>
+		<td>{{$purchase_order->purchaseUser->name}}</td>
 	</tr>
 
 	<tr>

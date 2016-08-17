@@ -49,7 +49,6 @@ use App\Models\Message\ReplyModel;
 use App\Jobs\Inorders;
 use App\Modules\Channel\Adapter\AmazonAdapter;
 
-
 class TestController extends Controller
 {
     private $itemModel;
@@ -62,26 +61,27 @@ class TestController extends Controller
     // {
     //     echo Tool::barcodePrint('123', 'c128', '2', '33');
     // }
-    // public function test2()
-    // {
-    //     $data['channel_ordernum'] = '2123123';
-    //     $data['ordernum'] = '3000';
-    //     $data['channel_account_id'] = '365';
-    //     $data['channel_id'] = '2';
-    //     $data['status'] = 'PREPARED';
-    //     $data['active'] = 'NORMAL';
-    //     $data['items'][0]['sku'] = 'MPJ845D';
-    //     $data['items'][0]['quantity'] = 1;
-    //     $job = new Inorders($data);
-    //     $job->onQueue('Inorders');
-    //     $this->dispatch($job);
-    // }
-
     public function test2()
     {
-        $single = new AmazonAdapter(['serviceUrl' => 'http:://baidu.com', 'GmailSecret' => '1', 'GmailToken' => '2', 'account_id' => '3']);
-        $single->returnTrack(['a' => 'b']);
+        $data['channel_ordernum'] = '212223123';
+        $data['ordernum'] = '3000';
+        $data['channel_account_id'] = '365';
+        $data['channel_id'] = '2';
+        $data['status'] = 'PREPARED';
+        $data['active'] = 'NORMAL';
+        $data['items'][0]['sku'] = 'MPJ845D';
+        $data['items'][0]['quantity'] = 1;
+        $job = new Inorders($data);
+        $job->onQueue('Inorders');
+        $this->dispatch($job);
     }
+
+    // public function test2()
+    // {
+    //     $account = AccountModel::find(160);
+    //     $single = new AmazonAdapter($account->api_config);
+    //     $single->returnTrack([['1', '123']]);
+    // }
     // public function test2()
     // {
     //     $rows[] = [

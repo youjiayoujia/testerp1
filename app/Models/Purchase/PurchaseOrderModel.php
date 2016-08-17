@@ -24,7 +24,7 @@ class PurchaseOrderModel extends BaseModel
         'create' => [
             'supplier_id' => 'required',
             'warehouse_id' => 'required',
-            'item.0.name' => 'required',
+            'item.0.sku' => 'required',
             'item.0.purchase_num' => 'required',
             'item.0.purchase_cost' => 'required',
         ],

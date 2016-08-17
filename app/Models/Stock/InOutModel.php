@@ -122,6 +122,9 @@ class InOutModel extends BaseModel
             case 'PACKAGE':
                 return $this->packageItem ? (($this->packageItem->package ? ($this->packageItem->package->order ? $this->packageItem->package->order->ordernum : '') : ''). ' : ' . ($this->packageItem->package ? $this->packageItem->package->id : '')) : '';
                 break;
+            case 'CANCLE':
+                return $this->relation_id;
+                break;
         }
     }
 

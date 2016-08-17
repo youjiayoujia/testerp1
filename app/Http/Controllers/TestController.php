@@ -37,7 +37,7 @@ use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
 
 use App\Models\PickListModel;
-
+use App\Models\WarehouseModel;
 use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
@@ -57,24 +57,26 @@ class TestController extends Controller
     {
         $this->itemModel = $itemModel;
     }
-    // public function test2()
-    // {
-    //     echo Tool::barcodePrint('123', 'c128', '2', '33');
-    // }
     public function test2()
     {
-        $data['channel_ordernum'] = '212223123';
-        $data['ordernum'] = '3000';
-        $data['channel_account_id'] = '365';
-        $data['channel_id'] = '2';
-        $data['status'] = 'PREPARED';
-        $data['active'] = 'NORMAL';
-        $data['items'][0]['sku'] = 'MPJ845D';
-        $data['items'][0]['quantity'] = 1;
-        $job = new Inorders($data);
-        $job->onQueue('Inorders');
-        $this->dispatch($job);
+        $package = PackageModel::find('17');
+
+        $package->realTimeLogistics();
     }
+    // public function test2()
+    // {
+    //     $data['channel_ordernum'] = '1111';
+    //     $data['ordernum'] = '3000';
+    //     $data['channel_account_id'] = '365';
+    //     $data['channel_id'] = '2';
+    //     $data['status'] = 'PAID';
+    //     $data['active'] = 'NORMAL';
+    //     $data['items'][0]['sku'] = 'MPJ845D';
+    //     $data['items'][0]['quantity'] = 1;
+    //     $job = new Inorders($data);
+    //     $job->onQueue('Inorders');
+    //     $this->dispatch($job);
+    // }
 
     // public function test2()
     // {

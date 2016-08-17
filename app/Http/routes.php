@@ -646,7 +646,7 @@ Route::group(['middleware' => 'auth'], function () {
     
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
    
- 
+    Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
  

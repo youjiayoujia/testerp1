@@ -22,8 +22,7 @@ class CreateSmtProductListTable extends Migration
             $table->decimal('productPrice')->comment('产品价格');
             $table->decimal('productMinPrice')->comment('最小价');
             $table->decimal('productMaxPrice')->comment('最大价');
-            $table->enum('productStatusType', ['0'=>'waitPost', '1'=>'newData','2'=>'onSelling','3'=>'offline'])->comment('0待发布  ,1草稿, 2上架 ,3下架');
-            $table->dateTime('wsOfflineDate')->comment('到期时间');
+            $table->string('productStatusType')->comment('商品业务状态，目前提供4种，输入参数分别是：上架:onSelling ；下架:offline ；审核中:auditing ；审核不通过:editingRequired。');
             $table->integer('groupId')->comment('商品分组id');
             $table->integer('categoryId')->comment('商品分类id');
             $table->integer('packageLength')->comment('长度');

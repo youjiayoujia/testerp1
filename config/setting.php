@@ -80,7 +80,9 @@ return [
         'require_create' => '是否需要采购',
 
         'productSku.skuCode'=>'产品SKU',
-
+        'skuCode' => 'SKU Code',
+        'token_id' => '请选择帐号',
+        'user_id' => '刊登人员',
 
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',

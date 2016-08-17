@@ -360,6 +360,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => 'SMT在线数据监控',
+                'url' => 'smtMonitor.index',
+                'icon' => '',
+            ],
+            [
                 'name' => 'ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',

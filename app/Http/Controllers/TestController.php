@@ -532,6 +532,10 @@ class TestController extends Controller
         }
     }
     public function jdtestCrm(){
+
+
+
+
         /*        $message_obj = MessageModel::find(36336);
                 //$tt = $message_obj->ChannelMessageFields();
 
@@ -560,14 +564,29 @@ class TestController extends Controller
         /*
          *
          *
-         */        foreach (AccountModel::all() as $account) {
-            if($account->account == 'jdtest@ebay.com'){ //测试diver
+         */
+        foreach (AccountModel::all() as $account) {
+            if($account->account == '15899691882@163.com'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->getCases();
+                $messageList = $channel->getMessages();
                 print_r($messageList);exit;
 
             }
         }
+
+
+/*        $userId =  request()->user()->id;
+        $accounts = AccountModel::where('customer_service_id','=',$userId)->get();
+        if(count($accounts) <> 0){
+
+            foreach ($accounts as $key => $account){
+                $ids_ary[] = $account->id;
+            }
+
+            return $ids_ary;
+
+        }
+        exit;*/
     }
 }

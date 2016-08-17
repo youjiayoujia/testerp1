@@ -38,11 +38,10 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
         if (!$oldOrder) {
             $order = $orderModel->createOrder($this->order);
             $order = $orderModel->find($order->id);
-            $buf = $orderModel->find($order->id);
             if ($order) {
                 if ($order->status == 'PREPARED') {
                     $package = $order->createPackage();
-                    if($package) {
+                    if ($package) {
                         $job = new AssignStocks($package);
                         $job->onQueue('assignStocks');
                         $this->dispatch($job);

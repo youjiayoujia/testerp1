@@ -754,7 +754,6 @@ Class WishAdapter implements AdapterInterface
             $url = 'https://merchant.wish.com/api/v2/ticket/get-action-required?'.http_build_query($initArray);
             $jsonData = $this->getCurlData($url);
             $apiReturn = json_decode($jsonData,true);
-            //print_r($apiReturn);exit;
             if(empty($apiReturn['data'])){
                 break;
             }
@@ -770,7 +769,7 @@ Class WishAdapter implements AdapterInterface
                 //$return_array[$j]['order_info']      = serialize(['wish' => $gd['Ticket']['items']]);
                 $return_array[$j]['to']         = 'wish账号';
                 $return_array[$j]['labels']     = '';
-                $return_array[$j]['label']      = 'INBOX';
+                $return_array[$j]['label']      = 'Wish消息';
                 $return_array[$j]['date']       = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['attachment'] = ''; //附件
                 //$return_array[$j]['asdasd']   	 	 = addslashes($gd['Ticket']['label']);//邮件标题（英文）

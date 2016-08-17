@@ -842,16 +842,12 @@ class EbayAdapter implements AdapterInterface
                                     ';
                     $content_detail = $this->buildEbayBody($member_xlm_dom,'GetMyMessages');
 
-
-
-
-
                     $message_lists[$order]['message_id'] = $message->MessageID;
                     $message_lists[$order]['from_name'] = $message->Sender;
                     $message_lists[$order]['from'] = $message->SendingUserID;
                     $message_lists[$order]['to'] = $message->SendToName;
                     $message_lists[$order]['labels'] = '';
-                    $message_lists[$order]['label'] = 'INBOX';
+                    $message_lists[$order]['label'] = 'Ebay';
                     $message_lists[$order]['date'] = $message->ReceiveDate;
                     $message_lists[$order]['subject'] = $message->Subject;
                     $message_lists[$order]['attachment'] = ''; //附件
@@ -868,7 +864,7 @@ class EbayAdapter implements AdapterInterface
 
         }
 
-        return (!empty($message_lists)) ?  $message_lists : false;
+        return (!empty($message_lists)) ?  array_reverse($message_lists) : false;
 
     }
 
@@ -1059,9 +1055,6 @@ class EbayAdapter implements AdapterInterface
                                 $content = base64_encode(serialize($content));
                             }
                         }
-
-
-
 
                         $case_detail_ary = [
                             'tran_price' => $case_detail->item->transactionPrice,

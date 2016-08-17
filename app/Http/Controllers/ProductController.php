@@ -5,6 +5,7 @@
  * Date: 2016-1-4 10:46:32
  */
 namespace App\Http\Controllers;
+use App\Models\ItemModel;
 use App\Models\ProductModel;
 use App\Models\CatalogModel;
 use App\Models\Product\SupplierModel;
@@ -22,6 +23,7 @@ use App\Models\Logistics\ZoneModel;
 use App\Models\Catalog\CatalogChannelsModel;
 use App\Models\CurrencyModel;
 use Gate;
+use App\Models\PaypalRatesModel;
 class ProductController extends Controller
 {
     public function __construct(ProductModel $product,SupplierModel $supplier,CatalogModel $catalog,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel,WarehouseModel $warehouse)
@@ -405,7 +407,12 @@ class ProductController extends Controller
         return json_encode(false);
     }
 
-    public function ajaxReturnPrice(ZoneModel $zone){
+    /**
+     * 产品价格计算
+     * @param ZoneModel $zone
+     * @param ItemModel $items_obj
+     */
+    public function ajaxReturnPrice(ZoneModel $zone,ItemModel  $items_obj,PaypalRatesModel $rates_obj){
         $return_price_array = [];
         $shipment_fee = 0;
         $form_ary =  request()->input();
@@ -417,7 +424,7 @@ class ProductController extends Controller
         }
         if($shipment_fee != false){
             //获取售价
-            $product_obj = $this->model->find($form_ary['product_id']);
+            $product_obj = $items_obj->find($form_ary['product_id']);
             $channels_rate = $product_obj->catalog->channels;
 
             foreach ($channels_rate as $item_channel){
@@ -485,13 +492,17 @@ class ProductController extends Controller
 
                 }
 
-                $sale_price_big =  (($product_obj->purchase_price + $shipment_fee) + config('paypal.fixed_fee') + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - config('paypal.transactions_fee_big') );
-                $sale_price_small = (($product_obj->purchase_price + $shipment_fee) + config('paypal.fixed_fee') + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - config('paypal.transactions_fee_small') );
+
+                $rates = $rates_obj->find(1);
+
+
+                $sale_price_big =  (($product_obj->purchase_price + $shipment_fee) + $rates->fixed_fee_big + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - $rates->transactions_fee_big );
+                $sale_price_small = (($product_obj->purchase_price + $shipment_fee) + $rates->fixed_fee_small + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - $rates->transactions_fee_small );
 
                 $return_price_array[] = [
                     'channel_name' => $item_channel->name,
-                    'sale_price_big' => $sale_price_big,
-                    'sale_price_small' => $sale_price_small,
+                    'sale_price_big' => number_format($sale_price_big,2,'.',''),
+                    'sale_price_small' => number_format($sale_price_small,2,'.',''),
                 ];
             }
         }else{

@@ -26,6 +26,6 @@ class LabelModel extends BaseModel
 	        ]
 	    ];
 	    
-	public $searchFields = ['name', 'id'];
+	public $searchFields = ['name'=>'名称','group_id'=>'组别'];
 
 }

@@ -12,6 +12,7 @@ use App\Models\Message\AccountModel;
 use App\Models\Message\Message_logModel;
 use App\Models\Message\ReplyModel;
 use App\Jobs\SendMessages;
+use App\Models\Channel\AccountModel as Channel_account;
 use Translation;
 
 
@@ -40,7 +41,8 @@ class MessageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model,$this->model),
-            //'mixedSearchFields' => $this->model->mixed_search,
+            'mixedSearchFields' => $this->model->mixed_search,
+            'channel_accounts' => Channel_account::all(),
             'users' => $users,
         ];
         return view($this->viewPath . 'index', $response);
@@ -75,6 +77,9 @@ class MessageController extends Controller
             }
 
             $emailarr=config('user.email');
+/*           dd($message->MessageFieldsDecodeBase64);
+            dd($message->ChannelParams);*/
+
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
                 'message' => $message,

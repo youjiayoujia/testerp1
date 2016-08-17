@@ -526,33 +526,34 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-                //print_r($message_array);exit;
+                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
-                        //最后一条消息是自己这边发送的 或者 卖家账号为空 跳过
-                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
+                        // 或者  跳过
+                        /**
+                         * 去除三种状态的消息
+                         * 1.最后一条消息是商家发送的
+                         * 2.卖家账号为空
+                         * 3.dealStat 处理状态(0未处理,1已处理)
+                         *
+                         */
+                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId']) || $item['dealStat'] == 1){
                             continue;
                         }
 
                         /**
                          * 获取信息详情
                          */
-
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
-
-                        print_r(json_decode($detailArrJson));
-                        //$detail_array = json_decode($detailArrJson);
-                        //$detail_array = (array)$detail_array;
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
-                        $message_list[$j]['to'] = '收信人';
-                        $message_list[$j]['labels'] = '';
-                        $message_list[$j]['label'] = 'INBOX';
-                        $message_list[$j]['date'] = $item['messageTime'];
-                        $message_list[$j]['subject'] = '信息描述';
+                        $message_list[$j]['to'] = '客服';
+                        $message_list[$j]['date'] = $this->changetime($item['messageTime']);
+                        $message_list[$j]['subject'] = $item['lastMessageContent'];
                         $message_list[$j]['attachment'] = ''; //附件
+                        $message_list[$j]['labels'] = '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
 
                         $message_list[$j]['message_type'] = $Sources;
                         $message_list[$j]['rank'] = $item['rank'];
@@ -562,19 +563,24 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['readStat'] = $item['readStat'];
 
                         if($Sources == 'order_msg'){
+                            $message_list[$j]['label'] = '订单留言';
                             $temp_message = json_decode($detailArrJson);
-
+                            foreach ($temp_message->result as $get_one_detail){
+                                $temp_oreder_url = $get_one_detail->summary->orderUrl;
+                                $message_list[$j]['labels'] = isset($get_one_detail->messageType) ? $get_one_detail->messageType : '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
+                                break;
+                            }
                             $message_fields_ary = [
                                 'message_type' => $Sources, //消息类型
                                 'order_id' => $item['channelId'], //消息类型
-                                'order_url' => $temp_message->summary->orderUrl,
+                                'order_url' => $temp_oreder_url,
                             ];
                         }else{
+                            $message_list[$j]['label'] = '站内信';
                             $message_fields_ary = [
                                 'message_type' => $Sources, //消息类型
                                 'order_id' => '',
                                 'order_url' =>'',
-
                             ];
                         }
 
@@ -588,7 +594,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $j++;
             }
         }
-        return (!empty($message_list)) ? $message_list : false;
+        return (!empty($message_list)) ? array_reverse($message_list) : false;
     }
     
 
@@ -1394,6 +1400,9 @@ Class AliexpressAdapter implements AdapterInterface
         }
 
     }
-
+   public function changetime($time){
+       $time = date('Y-m-d H:i:s', substr($time, 0, 10));
+       return $time;
+   }
 
 }

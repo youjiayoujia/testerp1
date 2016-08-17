@@ -77,6 +77,8 @@ class MessageController extends Controller
             }
 
             $emailarr=config('user.email');
+/*           dd($message->MessageFieldsDecodeBase64);
+            dd($message->ChannelParams);*/
 
             $response = [
                 'metas' => $this->metas(__FUNCTION__),

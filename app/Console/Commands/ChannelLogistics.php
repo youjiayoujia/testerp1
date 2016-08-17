@@ -245,12 +245,11 @@ class ChannelLogistics extends Command
         $start = 0;
         $originNum = 0;
         $wishes = smChannelLogistics::skip($start)->take($len)->get();
-        var_dump($wishes->count());exit;
         while ($wishes->count()) {
             $start += $len;
             foreach ($wishes as $wish) {
                 $originNum++;
-                $channelName = kChannelLogistics::create(['id' => $wish->id, 'name' => $wish->methodTitle]);
+                kChannelLogistics::create(['id' => $wish->id, 'name' => $wish->methodTitle]);
             }
             $wishes = smChannelLogistics::skip($start)->take($len)->get();
         }

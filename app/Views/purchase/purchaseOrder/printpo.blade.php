@@ -7,7 +7,7 @@
 	<br />
 	采购单据号:
 
-	<input name='po_id' type='text' id='po_id' size='10' /><br/><span style='font-weight:bold;color:red;font-size:10px;'>*如果从产品管理打印sku条码,请输入正确的采购单号!!!</span><br/>
+	<input name='po_id' value='{{$po_id}}' type='text' id='po_id' size='10' /><br/><span style='font-weight:bold;color:red;font-size:10px;'>*如果从产品管理打印sku条码,请输入正确的采购单号!!!</span><br/>
 	<input name="pp_id" type="hidden" id="pID" value="{{$id}}" />
 	<input type="radio" name="labelSize" value="big" />生成大标签(70mmx29mm)<br/>
 	<input type="radio" name="labelSize" value="small" checked="checked"/>生成小标签(50mmx25mm)<br/>

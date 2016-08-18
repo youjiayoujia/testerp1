@@ -29,13 +29,14 @@ use App\Models\SkuPublishRecords;
 use Illuminate\Support\Facades\Redirect;
 
 
+
 class SmtController extends Controller{
-   public function __construct(smtProductList $smtProductList){ 
+   public function __construct(smtProductList $smtProductList,smtProductUnit $smtProductUnit){ 
        $this->viewPath = "publish.smt.";
        $this->model = $smtProductList;
        $this->smtProductDetailModel = new smtProductDetail();
        $this->smtProductSkuModel = new smtProductSku();
-       $this->smtProductUnitModel = new smtProductUnit();
+       $this->smtProductUnitModel = $smtProductUnit;
        $this->channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
        $this->mainIndex = route('smt.index');
        $this->mainOnlineIndex = route('smt.onlineProductIndex');

@@ -15,7 +15,7 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@testSmt');
+Route::get('test1', 'TestController@testYw');
 Route::get('test2', 'TestController@test2');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -391,6 +391,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
+    Route::get('all/{id}', ['uses' => 'Logistics\TemplateController@all', 'as' => 'all']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
     Route::get('errorList/exportException/{arr}',
@@ -663,7 +664,7 @@ Route::group(['middleware' => 'auth'], function () {
     
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
    
- 
+    Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
  

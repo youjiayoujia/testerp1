@@ -54,7 +54,7 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                     }
                 } else {
                     $this->relation_id = 0;
-                    $this->result['status'] = 'fail';
+                    $this->result['status'] = 'success';
                     $this->result['remark'] = 'Package status is not PREPARED. Can not create package';
                 }
             } else {

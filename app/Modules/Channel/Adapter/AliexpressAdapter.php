@@ -517,7 +517,7 @@ Class AliexpressAdapter implements AdapterInterface
         $msgSourcesArr =array('message_center','order_msg');
         $method = 'api.queryMsgRelationList';
         $filter = 'readStat';
-        $pageSize = 5; //每页个数
+        $pageSize = 100; //每页个数
         $j = 0;
         $message_list = [];
 
@@ -526,7 +526,6 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -535,10 +534,10 @@ Class AliexpressAdapter implements AdapterInterface
                          * 去除三种状态的消息
                          * 1.最后一条消息是商家发送的
                          * 2.卖家账号为空
-                         * 3.dealStat 处理状态(0未处理,1已处理)
+                         *
                          *
                          */
-                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId']) || $item['dealStat'] == 1){
+                        if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
                             continue;
                         }
 
@@ -587,11 +586,11 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
+                        $j++;
                     }
                 }else{
                     break;
                 }
-                $j++;
             }
         }
         return (!empty($message_list)) ? array_reverse($message_list) : false;
@@ -1352,6 +1351,38 @@ Class AliexpressAdapter implements AdapterInterface
         $str = str_replace(';', ' ', $str);
         $str = str_replace(',', ' ', $str);
         return trim($str);
+    }
+    
+    /**
+     * 获取在线数据
+     * @param $currentPage 每页查询商品数量
+     * @param $pageSize 需要商品的当前页数
+     */
+    public function getOnlineProduct($currentPage,$pageSize){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findProductInfoListQuery/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['pageSize'] = $pageSize;
+        $parameter['currentPage'] = $currentPage;
+        $parameter['productStatusType'] = 'onSelling';
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);         
+       
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);        
+        return json_decode($result,true);
+    }
+    
+    /**
+     * 根据商品id查询单个商品的详细信息
+     * @param $productId
+     */
+    public function findAeProductById($productId){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findAeProductById/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $productId;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
     }
     
    

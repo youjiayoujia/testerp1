@@ -4,7 +4,6 @@
     <th>名称</th>
     <th class="sort" data-field="type_id">物流方式</th>
     <th>物流方式简码</th>
-    <th class="sort" data-field="priority">优先级</th>
     <th class="sort" data-field="weight_from">重量从(kg)</th>
     <th class="sort" data-field="weight_to">重量至(kg)</th>
     <th class="sort" data-field="order_amount_from">起始订单金额($)</th>
@@ -21,7 +20,6 @@
             <td>{{ $rule->name }}</td>
             <td>{{ $rule->logistics ? $rule->logistics->name : '' }}</td>
             <td>{{ $rule->logistics ? $rule->logistics->code : '' }}</td>
-            <td>{{ $rule->priority }}</td>
             <td>{{ $rule->weight_from }}</td>
             <td>{{ $rule->weight_to }}</td>
             <td>{{ $rule->order_amount_from }}</td>

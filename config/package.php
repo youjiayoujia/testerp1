@@ -12,5 +12,6 @@ return  [
     'PRINTED' => '打印面单',
     'PACKED' => '已包装',
     'SHIPPED' => '运输中',
-    'ERROR' => '异常'
+    'ERROR' => '异常',
+    'CANCLE' => '包裹取消'
 ];

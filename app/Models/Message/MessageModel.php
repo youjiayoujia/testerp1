@@ -481,6 +481,15 @@ class MessageModel extends BaseModel{
         return $html;
     }
 
+    public function getMessageAccountNameAttribute()
+    {
+       $obj = $this->account;
+        if(!empty($obj)){
+            return  $obj->account;
+        }else{
+            return '平台账号';
+        }
+    }
 
 
 }

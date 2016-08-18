@@ -1,6 +1,7 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
+    <th class="sort" data-field="priority">优先级</th>
     <th>物流方式简码</th>
     <th>物流方式名称</th>
     <th>仓库</th>
@@ -20,6 +21,7 @@
     @foreach($data as $logistics)
         <tr>
             <td>{{ $logistics->id }}</td>
+            <td>{{ $logistics->priority != 0 ? $logistics->priority : '' }}</td>
             <td>{{ $logistics->code }}</td>
             <td>{{ $logistics->name }}</td>
             <td>{{ $logistics->warehouse ? $logistics->warehouse->name : '' }}</td>

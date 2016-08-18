@@ -160,7 +160,7 @@ class StockController extends Controller
     {
         Cache::store('file')->forever('stockIOStatus', '0');
         $first = TakingModel::orderBy('id', 'desc')->first();
-        if($first->check_status == '0') {
+        if($first && $first->check_status == '0') {
             return redirect(route('stockTaking.index'))->with('alert', $this->alert('danger', '请先完成之前盘点'));
         }
         $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
@@ -239,12 +239,15 @@ class StockController extends Controller
     {
         if(request()->ajax()) {
             $sku = trim(request()->input('sku'));
-            $skus = ItemModel::where('sku', 'like', '%'.$sku.'%')->get();
-            $total = $skus->count();
+            $warehouseId = trim(request('warehouse_id'));
+            $stocks = $this->model->whereHas('item', function($query) use ($sku){
+                $query = $query->where('sku', 'like', '%'.$sku.'%');
+            })->get();
+            $total = $stocks->count();
             $arr = [];
-            foreach($skus as $key => $sku) {
-                $arr[$key]['id'] = $sku->id;
-                $arr[$key]['text'] = $sku->sku;
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->item_id;
+                $arr[$key]['text'] = $stock->item->sku;
             }
             if($total)
                 return json_encode(['results' => $arr, 'total' => $total]);

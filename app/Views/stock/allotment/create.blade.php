@@ -99,6 +99,7 @@
                               return {
                                 sku: params.term, // search term
                                 page: params.page,
+                                'warehouse_id': $('#out_warehouse_id').val(),
                               };
                             },
                             results: function(data, page) {
@@ -129,6 +130,7 @@
                   return {
                     sku: params.term, // search term
                     page: params.page,
+                    'warehouse_id': $('#out_warehouse_id').val(),
                   };
                 },
                 results: function(data, page) {

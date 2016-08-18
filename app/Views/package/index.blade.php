@@ -17,7 +17,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $package)
-        <tr class="primary">
+        <tr class="dark-{{ $package->status_color }}">
             <td><input type='checkbox' name='single[]' class='single'></td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
@@ -98,7 +98,7 @@
                                 <input type='text' class='form-control package_num' placeholder='需要拆分的包裹数'>
                             </div>
                             <div class='col-lg-1'>
-                                <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button> 
+                                <button type='button' class='btn btn-primary confirm_quantity' name=''>确认</button>
                             </div>
                         </div>
                         <div class='split_package'></div>
@@ -232,7 +232,7 @@
                 } else {
                     alert('数量不能小于1');
                 }
-                
+
             })
 
             $(document).on('click', '.split', function(){

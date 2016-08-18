@@ -104,6 +104,7 @@
                               return {
                                 sku: params.term, // search term
                                 page: params.page,
+                                'warehouse_id': $('#warehouse_id').val()
                               };
                             },
                             results: function(data, page) {

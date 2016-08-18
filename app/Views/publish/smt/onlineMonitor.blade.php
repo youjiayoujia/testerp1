@@ -26,10 +26,10 @@
         <th>{{$item->product->accounts->account}}</th>
         <th>{{$item->productId}}</th>
         <th>{{$item->product->subject}}</th>
-        <th></th>
-        <th></th>
+        <th>{{$item->skuCode}}</th>
+        <th>{{$item->smtSkuCode}}</th>
         <th>{{$item->products->c_name}}</th>
-        <th></th>
+        <th>{{$item->product->quantitySold1}}</th>
         <th>{{$item->updated_at}}</th>
         <th>{{$item->product->userInfo->name}}</th>
         <th></th>

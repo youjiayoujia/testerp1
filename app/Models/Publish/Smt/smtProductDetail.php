@@ -2,9 +2,9 @@
 
 namespace App\Models\Publish\Smt;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Base\BaseModel;
 
-class smtProductDetail extends Model
+class smtProductDetail extends BaseModel
 {
     protected $table = 'smt_product_detail';
 

@@ -46,6 +46,7 @@ class GetAliexpressProduct extends Command
             $channel = Channel::driver($account->channel->driver, $account->api_config);
            
             $flag = true;
+            $start = microtime(true);
             $currentPage = 1;
             $productDetail = array();
             $product = array();
@@ -60,6 +61,8 @@ class GetAliexpressProduct extends Command
                         $product['subject'] = $productInfo['subject'];
                         $product['productPrice'] = $productInfo['productPrice'];
                         $product['productStatusType'] = $productInfo['productStatusType'];
+                        $product['ownerMemberId'] = $productInfo['ownerMemberId'];
+                        $product['ownerMemberSeq'] = $productInfo['ownerMemberSeq'];
                         $product['wsOfflineDate'] = $productInfo['wsOfflineDate'];
                         $product['groupId'] = array_key_exists('groupId', $productInfo) ? $productInfo['groupId'] : '';
                         $product['categoryId'] = $productInfo['categoryId'];
@@ -69,6 +72,10 @@ class GetAliexpressProduct extends Command
                         $product['grossWeight'] = $productInfo['grossWeight'];
                         $product['deliveryTime'] = $productInfo['deliveryTime'];
                         $product['wsValidNum'] = $productInfo['wsValidNum'];
+                        $product['productMinPrice'] = $productItem['productMinPrice'];
+                        $product['productMaxPrice'] = $productItem['productMaxPrice'];
+                        $productItem['gmtCreate'] = $productItem['gmtCreate'];
+                        $productItem['gmtModified'] = $productItem['gmtModified'];
                         $res = smtProductList::where('productId', $productItem['productId'])->first();
                         if ($res) {
                             smtProductList::where('productId', $productItem['productId'])->update($product);
@@ -119,10 +126,9 @@ class GetAliexpressProduct extends Command
                 }else{
                     $flag = false;
                 }
-               
             }
-
-
+            $end = microtime(true);
+            echo '耗时' . round($end - $start, 3) . '秒';
 
         }
     }

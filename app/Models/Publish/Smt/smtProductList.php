@@ -36,7 +36,8 @@ class smtProductList extends BaseModel
         'synchronizationTime',   
         'isRemove',
         'old_token_id',
-        'old_productId'
+        'old_productId',
+        'quantitySold1'
     ];
   
     public $searchFields = ['subject'=>'标题','productId'=>'产品ID'];

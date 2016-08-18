@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 use App\Models\SpuModel;
 use App\Models\UserModel;
 use App\Models\ChannelModel;
+use App\Models\Spu\SpuMultiOptionModel;
 
 class SpuController extends Controller
 {
@@ -104,7 +105,7 @@ class SpuController extends Controller
      */
     public function saveRemark()
     {
-        $data = request()->all();echo '<pre>';
+        $data = request()->all();
         $this->model->find($data['spu_id'])->update(['remark'=>$data['remark']]);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '备注添加成功'));
     }
@@ -167,6 +168,28 @@ class SpuController extends Controller
         $result['description'] = $info[$language."_description"];
         $result['keywords'] = $info[$language."_keywords"];
         return $result;
+    }
+
+    /**
+     * 小语言
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function insertLan()
+    {
+        $spus = $this->model->all();
+
+        foreach ($spus as $spu) {
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>1]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>2]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>3]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>4]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>5]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>6]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>7]);
+            SpuMultiOptionModel::create(['spu_id'=>$spu->id,'channel_id'=>8]);
+        }
     }
 
 }

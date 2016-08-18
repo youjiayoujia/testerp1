@@ -160,7 +160,7 @@ class StockController extends Controller
     {
         Cache::store('file')->forever('stockIOStatus', '0');
         $first = TakingModel::orderBy('id', 'desc')->first();
-        if($first->check_status == '0') {
+        if($first && $first->check_status == '0') {
             return redirect(route('stockTaking.index'))->with('alert', $this->alert('danger', '请先完成之前盘点'));
         }
         $taking = TakingModel::create(['taking_id'=>'PD'.time()]);

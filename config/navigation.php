@@ -370,6 +370,11 @@ return [
                 'icon' => '',
             ],
             [
+            'name' => 'smt销售代码设置',
+            'url' => 'smtSellerCode.index',
+            'icon' => '',
+            ],
+            [
                 'name' => 'ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',

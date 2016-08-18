@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
-use App\models\Publish\Smt\afterSalesService;
+use App\Models\Publish\Smt\afterSalesService;
 
 class AfterSalesServiceController extends Controller
 {

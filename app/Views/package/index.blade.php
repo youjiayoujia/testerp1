@@ -17,7 +17,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $package)
-        <tr class="{{ $package->status_color }}">
+        <tr class="brand-{{ $package->status_color }}">
             <td><input type='checkbox' name='single[]' class='single'></td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>

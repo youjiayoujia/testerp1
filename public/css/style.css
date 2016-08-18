@@ -135,18 +135,18 @@ th:hover:not([data-sort=false]) {
     height: 400px;
 }
 
-.dark-info {
+.table > tbody > tr.dark-info {
     background-color: #c4e3f3;
 }
 
-.dark-warning {
+.table > tbody > tr.dark-warning {
     background-color: #faf2cc;
 }
 
-.dark-success {
+.table > tbody > tr.dark-success {
     background-color: #d0e9c6;
 }
 
-.dark-danger {
+.table > tbody > tr.dark-danger {
     background-color: #ebcccc;
 }

@@ -90,9 +90,9 @@
                 <a href="{{ route('item.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑
                 </a>
-                <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
+                <!-- <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
                     <span class="glyphicon glyphicon-pencil"></span> 打印
-                </a>
+                </a> -->
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">

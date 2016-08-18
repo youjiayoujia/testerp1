@@ -181,6 +181,13 @@ class TestController extends Controller
             ->createWarehouseOrder($package);
         exit;
     }
+    
+    public function testYw(){
+        $package = PackageModel::findOrFail(3);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
+        exit;
+    }
 
     public function aliexpressOrdersList()
     {
@@ -566,8 +573,9 @@ class TestController extends Controller
          *
          */
         foreach (AccountModel::all() as $account) {
-            if($account->account == '15899691882@163.com'){ //测试diver
+            if($account->account == 'darli04@126.com'){ //测试diver
 
+                //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
                 print_r($messageList);exit;

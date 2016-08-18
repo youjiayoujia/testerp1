@@ -365,6 +365,16 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => 'SMT在线数据监控',
+                'url' => 'smtMonitor.index',
+                'icon' => '',
+            ],
+            [
+            'name' => 'smt销售代码设置',
+            'url' => 'smtSellerCode.index',
+            'icon' => '',
+            ],
+            [
                 'name' => 'ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',

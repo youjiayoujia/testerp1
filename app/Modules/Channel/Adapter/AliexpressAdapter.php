@@ -526,6 +526,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
+                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
@@ -1351,6 +1352,38 @@ Class AliexpressAdapter implements AdapterInterface
         $str = str_replace(';', ' ', $str);
         $str = str_replace(',', ' ', $str);
         return trim($str);
+    }
+    
+    /**
+     * 获取在线数据
+     * @param $currentPage 每页查询商品数量
+     * @param $pageSize 需要商品的当前页数
+     */
+    public function getOnlineProduct($currentPage,$pageSize){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findProductInfoListQuery/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['pageSize'] = $pageSize;
+        $parameter['currentPage'] = $currentPage;
+        $parameter['productStatusType'] = 'onSelling';
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);         
+       
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);        
+        return json_decode($result,true);
+    }
+    
+    /**
+     * 根据商品id查询单个商品的详细信息
+     * @param $productId
+     */
+    public function findAeProductById($productId){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findAeProductById/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $productId;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
     }
     
    

@@ -17,7 +17,7 @@ class FpxAdapter extends BasicAdapter{
                 "unitPrice" => $unitPrice,                      //单价  
             ));   
         }
-   
+        list($name,$productCode) =  explode(',',$package->logistics->logistics_code);
         $arrs = array(    
             "city" => $package->shipping_city,//城市 【***】
             "consigneeEmail" => $package->order->email,//收件人Email
@@ -27,7 +27,7 @@ class FpxAdapter extends BasicAdapter{
             "destinationCountryCode" => $package->shipping_country,//目的国家二字代码，参照国家代码表
             "initialCountryCode" => 'CN',               //起运国家二字代码，参照国家代码表【***】
             "orderNo" => 'LME' . $package->order_id,    //客户订单号码，由客户自己定义【***】
-            "productCode" => 'CQ',                      //产品代码，指DHL、新加坡小包挂号、联邮通挂号等，参照产品代码表 【***】    不确定字段在哪个表中
+            "productCode" => $productCode,                      //产品代码，指DHL、新加坡小包挂号、联邮通挂号等，参照产品代码表 【***】    不确定字段在哪个表中,如何获取，暂时固定
             "returnSign" => 'Y',                        //小包退件标识 Y: 发件人要求退回 N: 无须退回(默认)
             "stateOrProvince" => $package->shipping_state,//州  /  省 【***】
             "street" => $package->shipping_address .' '. $package->shipping_address1,//街道【***】

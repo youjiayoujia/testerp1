@@ -15,7 +15,7 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@testSmt');
+Route::get('test1', 'TestController@testYw');
 Route::get('test2', 'TestController@test2');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -663,8 +663,8 @@ Route::group(['middleware' => 'auth'], function () {
     });
     
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
-   
- 
+    Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');
+    Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
  

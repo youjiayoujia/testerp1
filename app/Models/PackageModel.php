@@ -707,6 +707,7 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
+                ->orderBy('id', 'desc')
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中

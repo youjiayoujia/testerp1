@@ -21,7 +21,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $order)
-        <tr class="{{ $order->status_color }}">
+        <tr class="dark-{{ $order->status_color }}">
             <td>
                 <input type="checkbox" name="tribute_id" value="{{$order->id}}">
             </td>
@@ -43,14 +43,14 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                @if($order->status == 'PACKED')
-                    <div>{{ $order->calculateProfitProcess() }}</div>
-                    <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                    <div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>
-                    <div>平台费: {{ '' }}USD</div>
-                    <div>毛利润: {{ '' }}USD</div>
-                @else
-                @endif
+                {{--@if($order->status == 'PACKED')--}}
+                    {{--<div>{{ $order->calculateProfitProcess() }}</div>--}}
+                    {{--<div>产品成本: {{ $order->all_item_cost }} RMB</div>--}}
+                    {{--<div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>--}}
+                    {{--<div>平台费: {{ '' }}USD</div>--}}
+                    {{--<div>毛利润: {{ '' }}USD</div>--}}
+                {{--@else--}}
+                {{--@endif--}}
             </td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
@@ -132,7 +132,7 @@
                 </div>
             </td>
         </tr>
-        <tr class="collapse in collapseExample{{$order->id}}">
+        <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
             <td colspan="30" class="row">
                 <div class="col-lg-6">
                     <div class="row">

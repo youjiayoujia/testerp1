@@ -100,6 +100,9 @@ class PackageModel extends BaseModel
             case 'NEW':
                 $color = 'info';
                 break;
+            case 'NEED':
+                $color = 'warning';
+                break;
             case 'ASSIGNED':
                 $color = 'info';
                 break;
@@ -667,7 +670,7 @@ class PackageModel extends BaseModel
                 }
             }
             //查看对应的物流方式是否是所属仓库
-            $warehouse = $this->warehouse_id ? WarehouseModel::find($warehouse_id) : WarehouseModel::where('name', '深圳仓')->first();
+            $warehouse = $this->warehouse_id ? WarehouseModel::find($this->warehouse_id) : WarehouseModel::where('name', '深圳仓')->first();
             if (!$warehouse->logisticsIn($rule->type_id)) {
                 continue;
             }
@@ -704,6 +707,7 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
+                ->orderBy('id', 'desc')
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中

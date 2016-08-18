@@ -19,10 +19,11 @@
             <td>{{ $smtProductList->id }}</td>
             <td>
                 <?php
-                    if(!empty($smtProductList->details->imageURLs)){    
+                    if(!empty($smtProductList->details->imageURLs)){
                         $imagesUrlArr = explode(';', $smtProductList->details->imageURLs);
-                        $firstImageURL = array_shift($imagesUrlArr);                        
-                    }                  
+                        $firstImageURL = array_shift($imagesUrlArr);
+                    }
+
                 ?>
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
             </td>
@@ -33,13 +34,10 @@
                     $skuCodeArr = array();
                     
                     foreach ($smtProductList->productSku as $productSkuItem){
-                    
-                        if($productSkuItem->skuCode){                                           
-                            array_push($skuCodeArr, $productSkuItem->skuCode);
-                        }
+                        echo $productSkuItem->skuCode.'<br/>';
+                       
                     }                    
-                    $skuCode = implode(',', $skuCodeArr);
-                    echo $skuCode;                    
+                            
                 ?>            
             </td>
            

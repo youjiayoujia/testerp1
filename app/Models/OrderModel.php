@@ -26,7 +26,7 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items', 'remark'];
 
-    private $canPackageStatus = ['PREPARED', 'NEED'];
+    private $canPackageStatus = ['PREPARED'];
 
     public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 

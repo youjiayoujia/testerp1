@@ -20,11 +20,6 @@
             </select>
         </div>
         <div class="form-group col-lg-3">
-            <label for="priority" class="control-label">优先级</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="priority" placeholder="优先级" name='priority' value="{{ old('priority') ? old('priority') : $model->priority }}">
-        </div>
-        <div class="form-group col-lg-3">
             <label for="is_clearance">是否通关</label>
             <div class="radio">
                 <label>
@@ -159,6 +154,34 @@
         </div>
     </div>
 
+    <div class="modal fade" id="accounts" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        销售账号
+                    </h4>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class='form-group row'>
+                            @foreach($accounts_outer as $account)
+                                <div class='col-lg-3'>
+                                    <input type='checkbox' name='accounts[]' value="{{ $account->id }}" {{ $model->innerType('account', $account->id) ? 'checked' : '' }}><font size='3px'>{{ $account->account }}</font>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class='form-group col-lg-1'>
             <h5>重量(kg)<input type='checkbox' class='weight_section' name='weight_section' value='1' {{ $model->weight_section ? 'checked' : '' }}></h5>
@@ -206,6 +229,11 @@
             <label for="countrys" class="control-label">物流限制:</label>
             <input type='checkbox' class='limit_section' name='limit_section' value='1' {{ $model->limit_section ? 'checked' : ''}}>
             <button type="button" class="btn btn-success limit_button" data-toggle="modal" data-target="#logistics_limit" {{ !$model->limit_section ? 'disabled' : ''}}>物流限制</button>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="accounts" class="control-label">销售账号:</label>
+            <input type='checkbox' class='account_section' name='account_section' value='1' {{ $model->account_section ? 'checked' : '' }}>
+            <button type="button" class="btn btn-success account_button" data-toggle="modal" data-target="#accounts" {{ !$model->account_section ? 'disabled' : '' }}>销售账号</button>
         </div>
     </div>
 @stop
@@ -270,6 +298,14 @@
                 $('.limit_button').prop('disabled', false);
             } else {
                 $('.limit_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.account_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.account_button').prop('disabled', false);
+            } else {
+                $('.account_button').prop('disabled', true);
             }
         });
     });

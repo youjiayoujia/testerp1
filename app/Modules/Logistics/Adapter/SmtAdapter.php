@@ -175,12 +175,11 @@ class SmtAdapter extends BasicAdapter
                    $data['channel_listnum'] = $result['result']['intlTracking'];
                    $data['warehouseOrderId'] = $result['result']['warehouseOrderId'];
                    OrderModel::where('id',$package->order->id)->update($data);
-                   return;
-               }
-               
+                   return array('code' => 'success', 'result' => $result['result']['intlTracking'] );                                     
+               }               
            }
        }else{
-           echo 12;
+           return array('code' => 'error','result' => 'error description.');                  
        }
         
     }

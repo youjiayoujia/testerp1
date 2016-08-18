@@ -21,7 +21,7 @@
 @stop
 @section('tableBody')
     @foreach($data as $order)
-        <tr class="{{ $order->status_color }}">
+        <tr class="dark-{{ $order->status_color }}">
             <td>
                 <input type="checkbox" name="tribute_id" value="{{$order->id}}">
             </td>
@@ -132,7 +132,7 @@
                 </div>
             </td>
         </tr>
-        <tr class="collapse in collapseExample{{$order->id}}">
+        <tr class="collapse in collapseExample{{$order->id}} {{ $order->status_color }}">
             <td colspan="30" class="row">
                 <div class="col-lg-6">
                     <div class="row">

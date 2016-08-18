@@ -44,15 +44,15 @@ body,
 }
 
 .result {
-    font-size:270px;
+    font-size: 270px;
 }
 
 .result_cname {
-    font-size:100px;
+    font-size: 100px;
 }
 
 .result_sku {
-    font-size:100px;
+    font-size: 100px;
 }
 
 .inboxImage {
@@ -130,6 +130,23 @@ th:hover:not([data-sort=false]) {
     background-color: #e5e5e5;
 
 }
+
 .mailcontent {
     height: 400px;
+}
+
+.dark-info {
+    background-color: #c4e3f3;
+}
+
+.dark-warning {
+    background-color: #faf2cc;
+}
+
+.dark-success {
+    background-color: #d0e9c6;
+}
+
+.dark-danger {
+    background-color: #ebcccc;
 }

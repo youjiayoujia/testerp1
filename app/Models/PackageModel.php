@@ -625,7 +625,8 @@ class PackageModel extends BaseModel
             $amount = $this->order->amount; //订单金额
             $amountShipping = $this->order->amount_shipping; //订单运费
             $celeAdmin = $this->order->cele_admin;
-            $shipping = $this->order->shipping;
+            $shipping = $this->order->shipping; //订单物流
+            $account = $this->channelAccount->account; //销售账号
             //是否通关
             if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
                 $isClearance = 1;
@@ -649,6 +650,20 @@ class PackageModel extends BaseModel
                     $flag = 0;
                     foreach ($countries as $country) {
                         if ($country->code == $this->shipping_country) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue;
+                    }
+                }
+                //是否在物流方式账号中
+                if ($rule->account_section) {
+                    $accounts = $rule->rule_accounts_through;
+                    $flag = 0;
+                    foreach ($accounts as $account) {
+                        if ($account->id == $this->channel_account_id) {
                             $flag = 1;
                             break;
                         }

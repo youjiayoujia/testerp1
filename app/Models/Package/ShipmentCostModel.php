@@ -32,21 +32,7 @@ class ShipmentCostModel extends BaseModel
     	'created_at'
     ];
 
-    public function getMixedSearchAttribute()
-    {
-        return [
-            'filterFields' => [
-            ],
-            'filterSelects' => [
-            ],
-            'sectionSelect' => [
-            ],
-            'relatedSearchFields' => [
-            ],
-            'selectRelatedSearchs' => [
-            ]
-        ];
-    }
+    public $searchFields = ['id' => 'ID', 'shipmentCostNum' => '批次号'];
 
     public function items()
     {

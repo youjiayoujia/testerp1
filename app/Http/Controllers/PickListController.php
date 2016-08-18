@@ -72,7 +72,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'size' => "100*100",
-            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('1'),
+            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
             'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 

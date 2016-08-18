@@ -95,6 +95,18 @@
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') ? old('driver') : $model->driver }}">
         </div>
+        <div class="form-group col-lg-2">
+            <label for="priority" class="control-label">优先级</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="priority" placeholder="优先级" name='priority' value="{{ old('priority') ? old('priority') : $model->priority }}">
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="logistics_code" class="control-label">物流编码</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="logistics_code" placeholder="物流编码" name='logistics_code' value="{{ old('logistics_code') ? old('logistics_code') : $model->logistics_code }}">
+        </div>
+    </div>
+    <div class="row">
         <div class='form-group col-lg-4'>
             <label for="logistics_limits">物流限制</label>
             <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
@@ -103,13 +115,6 @@
                     <option value="{{ $limit->id }}" {{ $model->hasLimits($limit->id) ? 'selected' : ''}}>{{$limit->name}}</option>
                 @endforeach
             </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="form-group col-lg-2">
-            <label for="logistics_code" class="control-label">物流编码</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="logistics_code" placeholder="物流编码" name='logistics_code' value="{{ old('logistics_code') ? old('logistics_code') : $model->logistics_code }}">
         </div>
         <div class="form-group col-lg-3">
             <label for="is_enable" class="control-label">是否启用</label>

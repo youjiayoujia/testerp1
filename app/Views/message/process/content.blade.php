@@ -11,7 +11,7 @@
             转发(暂时不要点)
         </button>
         -->
-        收信人:{{$message->to}}
+        To:{{$message->MessageAccountName}}
         <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
             <small class="glyphicon glyphicon-list"></small>
         </a>

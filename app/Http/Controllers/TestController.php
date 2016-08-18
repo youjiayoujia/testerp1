@@ -6,6 +6,7 @@
  * Time: 上午9:19
  */
 namespace App\Http\Controllers;
+
 header('Content-type: text/html; charset=UTF-8');
 
 use App\Models\ChannelModel;
@@ -24,7 +25,6 @@ use App\Models\Publish\Ebay\EbayFeedBackModel;
 use App\Models\Publish\Ebay\EbaySpecificsModel;
 
 
-
 use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\LogisticsModel;
@@ -37,14 +37,17 @@ use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
 
 use App\Models\PickListModel;
-
+use App\Models\WarehouseModel;
 use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
 use App\Models\Log\CommandModel as CommandLog;
 use App\Models\CatalogModel;
 use DB;
+use Excel;
 use App\Models\Message\ReplyModel;
+use App\Jobs\Inorders;
+use App\Modules\Channel\Adapter\AmazonAdapter;
 
 class TestController extends Controller
 {
@@ -54,15 +57,46 @@ class TestController extends Controller
     {
         $this->itemModel = $itemModel;
     }
-    // public function test2()
-    // {
-    //     $item = ItemModel::find('1');var_dump($item->toArray());
-    //     $item->out('8', 1, 'ADJUSTMENT', '1');exit;var_dump('ok');
-    // }
     public function test2()
     {
-        echo DNS1D::getBarcodeHTML('123', 'C128', '3', '33');exit;
+        $package = PackageModel::find('17');
+
+        $package->realTimeLogistics();
     }
+    // public function test2()
+    // {
+    //     $data['channel_ordernum'] = '1111';
+    //     $data['ordernum'] = '3000';
+    //     $data['channel_account_id'] = '365';
+    //     $data['channel_id'] = '2';
+    //     $data['status'] = 'PAID';
+    //     $data['active'] = 'NORMAL';
+    //     $data['items'][0]['sku'] = 'MPJ845D';
+    //     $data['items'][0]['quantity'] = 1;
+    //     $job = new Inorders($data);
+    //     $job->onQueue('Inorders');
+    //     $this->dispatch($job);
+    // }
+
+    // public function test2()
+    // {
+    //     $account = AccountModel::find(160);
+    //     $single = new AmazonAdapter($account->api_config);
+    //     $single->returnTrack([['1', '123']]);
+    // }
+    // public function test2()
+    // {
+    //     $rows[] = [
+    //         '南京' => '上海',
+    //         iconv('utf-8', 'gb2312', '武汉市') => iconv('utf-8', 'gb2312', '江苏省懂')
+    //     ];
+    //     $name = 'test';
+    //     Excel::create($name, function ($excel) use ($rows) {
+    //         $excel->sheet('', function ($sheet) use ($rows) {
+    //             $sheet->fromArray($rows);
+    //         }, 'GB2312');
+    //     })->download('XLS');
+    // }
 
     public function test1()
     {
@@ -73,37 +107,78 @@ class TestController extends Controller
 
     public function index()
     {
-        $package = PackageModel::findOrFail(3931);
-        $trackingNumber = Logistics::driver($package->logistics->driver, $package->logistics->api_config)->getTracking($package);
-        var_dump($trackingNumber);
-        exit;
+        set_time_limit(0);
+        $account = AccountModel::find(28);
+        if ($account) {
+            //初始化
+            $i = 1;
+            $startDate = date("Y-m-d H:i:s", strtotime('-' . $account->sync_days . ' days'));
+            $endDate = date("Y-m-d H:i:s", time() - 300);
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $nextToken = '';
+            do {
+                $start = microtime(true);
+                $total = 0;
+                $orderList = $channel->listOrders(
+                    $startDate, //开始日期
+                    $endDate, //截止日期
+                    $account->api_status, //订单状态
+                    $account->sync_pages, //每页数量
+                    $nextToken //下一页TOKEN
+                );
+                foreach ($orderList['orders'] as $order) {
+                    $order['channel_id'] = $account->channel->id;
+                    $order['channel_account_id'] = $account->id;
+                    $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
+                    $order['operator'] = $account->operator ? $account->operator->id : 0;
+                    $job = new InOrders($order);
+                    $job = $job->onQueue('inOrders');
+                    $this->dispatch($job);
+                    $total++;
+                }
+                $nextToken = $orderList['nextToken'];
+                //todo::Adapter->error()
+                $result['status'] = 'success';
+                $result['remark'] = 'Success.';
+                $end = microtime(true);
+                $lasting = round($end - $start, 3);
+                echo $account->alias . ':' . $account->id . ' 抓取取第 ' . $i . ' 页, 耗时 ' . $lasting . ' 秒';
+                $i++;
+            } while ($nextToken);
+        } else {
+            echo 'Account is not exist.';
+        }
     }
-    
-    public function testChinaPost(){
+
+    public function testChinaPost()
+    {
         $package = PackageModel::findOrFail(2);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->getTracking($package);
+            ->getTracking($package);
         exit;
     }
-    
-    public function testWinit(){
+
+    public function testWinit()
+    {
         $package = PackageModel::findOrFail(2);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->getTracking($package);
+            ->getTracking($package);
         exit;
     }
-    
-    public function test4px(){
+
+    public function test4px()
+    {
         $package = PackageModel::findOrFail(2);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->getTracking($package);
+            ->getTracking($package);
         exit;
     }
-    
-    public function testSmt(){
+
+    public function testSmt()
+    {
         $package = PackageModel::findOrFail(2);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
-        ->createWarehouseOrder($package);
+            ->createWarehouseOrder($package);
         exit;
     }
     
@@ -328,41 +403,37 @@ class TestController extends Controller
     {
 
 
-        $accountId= 201;
+        $accountId = 201;
         $account = AccountModel::findOrFail($accountId);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
-        $startDate = date('Y-m-d',strtotime('-2 day'));
+        $startDate = date('Y-m-d', strtotime('-2 day'));
         $page = 0;
         $is_do = true;
-        do{
-            $result = $channel->getChangedOrders($startDate,$page,$pageSize=500);
-            if($result){
+        do {
+            $result = $channel->getChangedOrders($startDate, $page, $pageSize = 500);
+            if ($result) {
                 $page++;
-                foreach($result as $re) {
+                foreach ($result as $re) {
                     if ($re['Order']['state'] == 'REFUNDED') { //退款状态
                         var_dump($re);
                     }
 
                 }
-            }else{
+            } else {
                 $is_do = false;
             }
-        }while($is_do);
+        } while ($is_do);
 
 
-
-
-
-
-      /*  $result = $channel->GetFeedback();
-        foreach($result as $re){
-            $re['channel_account_id'] = $accountId;
-            $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$accountId])->first();
-            if(empty($feedback)){
-                echo 11;
-                EbayFeedBackModel::create($re);
-            }
-        }*/
+        /*  $result = $channel->GetFeedback();
+          foreach($result as $re){
+              $re['channel_account_id'] = $accountId;
+              $feedback = EbayFeedBackModel::where(['feedback_id'=>$re['feedback_id'],'channel_account_id'=>$accountId])->first();
+              if(empty($feedback)){
+                  echo 11;
+                  EbayFeedBackModel::create($re);
+              }
+          }*/
 
         $packages = PackageModel::where('order_id', 12914)->get();
         foreach ($packages as $package) {
@@ -468,46 +539,61 @@ class TestController extends Controller
         }
     }
     public function jdtestCrm(){
-        $message_obj = MessageModel::find(36304);
-        dd($message_obj->getChannelDiver());
-        exit;
+
+
+
+
+        /*        $message_obj = MessageModel::find(36336);
+                //$tt = $message_obj->ChannelMessageFields();
+
+                dd($message_obj->MessageFields);exit;
+                exit;*/
 
 
         //渠道测试块
 
-/*        $message_obj = MessageModel::find(36259);
-        $fields = unserialize(base64_decode($message_obj->channel_message_fields));
-        dd($fields);exit;*/
+        /*        $message_obj = MessageModel::find(36259);
+                $fields = unserialize(base64_decode($message_obj->channel_message_fields));
+                dd($fields);exit;*/
 
+        /*
+                 $reply_obj = ReplyModel::find(28569);
 
-         $reply_obj = ReplyModel::find(28569);
+                  foreach (AccountModel::all() as $account) {
+                    if( $account->account == 'wintrade9'){ //测试diver
 
-          foreach (AccountModel::all() as $account) {
-            if( $account->account == 'rebeauty'){ //测试diver
+                        $channel = Channel::driver($account->channel->driver, $account->api_config);
+                        $messageList = $channel->sendMessages($reply_obj);
+                        print_r($messageList);exit;
 
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->sendMessages($reply_obj);
-                print_r($messageList);exit;
-
-            }
-        }
-/*        foreach (AccountModel::all() as $account) {
-            if($account->account == 'rebeauty'){ //测试diver
+                    }
+                }*/
+        /*
+         *
+         *
+         */
+        foreach (AccountModel::all() as $account) {
+            if($account->account == '15899691882@163.com'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getMessages();
                 print_r($messageList);exit;
 
             }
-        }*/
+        }
 
 
+/*        $userId =  request()->user()->id;
+        $accounts = AccountModel::where('customer_service_id','=',$userId)->get();
+        if(count($accounts) <> 0){
 
+            foreach ($accounts as $key => $account){
+                $ids_ary[] = $account->id;
+            }
 
+            return $ids_ary;
 
-
-
-
-
+        }
+        exit;*/
     }
 }

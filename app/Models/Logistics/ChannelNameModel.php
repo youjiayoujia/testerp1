@@ -20,7 +20,7 @@ class ChannelNameModel extends BaseModel
         'channel_id', 'name'
     ];
 
-    public $searchFields = ['name'];
+    public $searchFields = ['name' => '名称'];
 
     public $rules = [
         'create' => [

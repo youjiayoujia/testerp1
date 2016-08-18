@@ -36,6 +36,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetLazadaPackageId::class,
         \App\Console\Commands\GetFeedBack::class,
         \App\Console\Commands\SentFeedBack::class,
+        \App\Console\Commands\GetEbayCases::class,
     ];
 
     /**

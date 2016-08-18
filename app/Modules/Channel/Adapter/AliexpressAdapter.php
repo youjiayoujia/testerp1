@@ -517,7 +517,7 @@ Class AliexpressAdapter implements AdapterInterface
         $msgSourcesArr =array('message_center','order_msg');
         $method = 'api.queryMsgRelationList';
         $filter = 'readStat';
-        $pageSize = 5;
+        $pageSize = 100; //每页个数
         $j = 0;
         $message_list = [];
 
@@ -526,33 +526,33 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-
-
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
-                        //最后一条消息是自己这边发送的 或者 卖家账号为空 跳过
+                        // 或者  跳过
+                        /**
+                         * 去除三种状态的消息
+                         * 1.最后一条消息是商家发送的
+                         * 2.卖家账号为空
+                         *
+                         *
+                         */
                         if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
                             continue;
                         }
 
-
                         /**
                          * 获取信息详情
                          */
-
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
-                        //$detail_array = json_decode($detailArrJson);
-                        //$detail_array = (array)$detail_array;
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
-                        $message_list[$j]['to'] = '收信人';
-                        $message_list[$j]['labels'] = '';
-                        $message_list[$j]['label'] = 'INBOX';
-                        $message_list[$j]['date'] = $item['messageTime'];
-                        $message_list[$j]['subject'] = '信息描述';
+                        $message_list[$j]['to'] = '客服';
+                        $message_list[$j]['date'] = $this->changetime($item['messageTime']);
+                        $message_list[$j]['subject'] = $item['lastMessageContent'];
                         $message_list[$j]['attachment'] = ''; //附件
+                        $message_list[$j]['labels'] = '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
 
                         $message_list[$j]['message_type'] = $Sources;
                         $message_list[$j]['rank'] = $item['rank'];
@@ -562,29 +562,38 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['readStat'] = $item['readStat'];
 
                         if($Sources == 'order_msg'){
+                            $message_list[$j]['label'] = '订单留言';
+                            $temp_message = json_decode($detailArrJson);
+                            foreach ($temp_message->result as $get_one_detail){
+                                $temp_oreder_url = $get_one_detail->summary->orderUrl;
+                                $message_list[$j]['labels'] = isset($get_one_detail->messageType) ? $get_one_detail->messageType : '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
+                                break;
+                            }
                             $message_fields_ary = [
-                                'message_type'=> $Sources, //消息类型
-                                'order_id'=> $item['channelId'] //消息类型
+                                'message_type' => $Sources, //消息类型
+                                'order_id' => $item['channelId'], //消息类型
+                                'order_url' => $temp_oreder_url,
                             ];
                         }else{
+                            $message_list[$j]['label'] = '站内信';
                             $message_fields_ary = [
-                                'message_type'=> $Sources, //消息类型
-                                'order_id'=> ''
-
+                                'message_type' => $Sources, //消息类型
+                                'order_id' => '',
+                                'order_url' =>'',
                             ];
                         }
 
                         $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
 
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
+                        $j++;
                     }
                 }else{
                     break;
                 }
-                $j++;
             }
         }
-        return (!empty($message_list)) ? $message_list : false;
+        return (!empty($message_list)) ? array_reverse($message_list) : false;
     }
     
 
@@ -1021,11 +1030,43 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $detail;
     }
-    
-    
 
-    public function sendMessages($replyMessage){
-        
+    public function sendMessages($replyMessage)
+    {
+        // TODO: Implement sendMessages() method.
+        $message_obj = $replyMessage->message;
+        if(!empty($message_obj)){
+            $ChannelMessageFields = unserialize(base64_decode($message_obj->channel_message_fields));
+            // step1:发信息
+            $send_param = [];
+            $channelId = rawurlencode($message_obj->message_id);
+            $buyerId = rawurlencode($message_obj->from);
+            $msgSources = rawurlencode($ChannelMessageFields['message_type']);
+            $content = rawurlencode($replyMessage->content);
+
+            $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
+            $api_return =  $this->getJsonData('api.addMsg', $send_param);
+            $api_return_array = json_decode($api_return,true);
+
+            if(isset($api_return_array['result']["isSuccess"])){
+                if($api_return_array['result']["isSuccess"]){
+                    //step2: 更新消息为已读
+                    $update_param = [];
+                    $update_param['channelId'] = $message_obj->message_id;
+                    $update_param['msgSources'] = $ChannelMessageFields['message_type'];
+                    $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
+
+                    $replyMessage->status = 'SENT';
+                }else{
+                    $replyMessage->status = 'FAIL';
+                }
+            }
+        }else{
+            $replyMessage->status = 'FAIL';
+        }
+        $replyMessage->save();
+
+        return $replyMessage->status== 'SENT' ? true : false;
     }
     
     /**
@@ -1346,5 +1387,53 @@ Class AliexpressAdapter implements AdapterInterface
     
    
 
+    /**
+     * 纠纷
+     */
+    public function getIssues(){
+
+        $issue_ary = array(
+            'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
+            'SELLER_REFUSE_REFUND', //卖家拒绝纠
+            // 'ACCEPTISSUE', //卖家接受纠纷     相当于完成了的纠纷
+            // 'WAIT_BUYER_SEND_GOODS', //等待买家发货
+            //  'WAIT_SELLER_RECEIVE_GOODS', // 买家发货，等待卖家收货
+            'ARBITRATING', // 仲裁中
+            //   'SELLER_RESPONSE_ISSUE_TIMEOUT' // 卖家响应纠纷超时  对应相关超时的不需要获取
+        );
+        $page = 1;
+        $page_size = 10;
+
+
+        foreach ($issue_ary as $issue){
+            for($i = 1 ; $i>0; $i++){
+
+                $method = 'api.queryIssueList';
+                $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
+                $issue_list = json_decode($this->getJsonData($method, $para));
+                if(isset($issue_list->success)) {
+                    foreach ($issue_list->dataList as $item) {
+
+                        $detail_param = "issueId=".$item->id;
+                        $issue_detail = json_decode($this->getJsonData('api.queryIssueDetail',$detail_param));
+                        dd($issue_detail);exit;
+/*                        DB::beginTransaction();
+
+                        DB::commit();*/
+
+                    }
+                }else{
+                    break;
+                }
+
+            }
+
+        }
+
+    }
+   public function changetime($time){
+       $time = date('Y-m-d H:i:s', substr($time, 0, 10));
+       return $time;
+   }
 
 }

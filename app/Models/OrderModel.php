@@ -26,7 +26,7 @@ class OrderModel extends BaseModel
 
     protected $guarded = ['items', 'remark'];
 
-    private $canPackageStatus = ['PREPARED', 'NEED'];
+    private $canPackageStatus = ['PREPARED'];
 
     public $searchFields = ['ordernum' => '订单号', 'channel_ordernum' => '渠道订单号', 'email' => '邮箱', 'by_id' => '买家ID'];
 
@@ -388,13 +388,14 @@ class OrderModel extends BaseModel
             $order->update(['status' => 'REVIEW', 'customer_remark' => $data['remark']]);
         }
         //黑名单需审核
-        if ($order->checkBlack()) {
+        if ($order->status != 'UNPAID' && $order->checkBlack()) {
             $order->update(['status' => 'REVIEW']);
             $order->remark('黑名单订单.');
         }
         if ($order->status == 'PAID') {
             $order->update(['status' => 'PREPARED']);
         }
+
         return $order;
     }
 
@@ -427,6 +428,7 @@ class OrderModel extends BaseModel
             $this->save();
             return false;
         }
+
         return true;
     }
 
@@ -434,21 +436,21 @@ class OrderModel extends BaseModel
     {
         $package = [];
         //channel
-        $package['channel_id'] = $this->channel_id;
-        $package['channel_account_id'] = $this->channel_account_id;
+        $package['channel_id'] = $this->channel_id ? $this->channel_id : '';
+        $package['channel_account_id'] = $this->channel_account_id ? $this->channel_account_id : '';
         //type
         // $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
         // $package['weight'] = collect($packageItems)->sum('weight');
-        $package['email'] = $this->email;
-        $package['shipping_firstname'] = $this->shipping_firstname;
-        $package['shipping_lastname'] = $this->shipping_lastname;
-        $package['shipping_address'] = $this->shipping_address;
-        $package['shipping_address1'] = $this->shipping_address1;
-        $package['shipping_city'] = $this->shipping_city;
-        $package['shipping_state'] = $this->shipping_state;
-        $package['shipping_country'] = $this->shipping_country;
-        $package['shipping_zipcode'] = $this->shipping_zipcode;
-        $package['shipping_phone'] = $this->shipping_phone;
+        $package['email'] = $this->email ? $this->email : '';
+        $package['shipping_firstname'] = $this->shipping_firstname ? $this->shipping_firstname : '';
+        $package['shipping_lastname'] = $this->shipping_lastname ? $this->shipping_lastname : '';
+        $package['shipping_address'] = $this->shipping_address ? $this->shipping_address : '';
+        $package['shipping_address1'] = $this->shipping_address1 ? $this->shipping_address1 : '';
+        $package['shipping_city'] = $this->shipping_city ? $this->shipping_city : '';
+        $package['shipping_state'] = $this->shipping_state ? $this->shipping_state : '';
+        $package['shipping_country'] = $this->shipping_country ? $this->shipping_country : '';
+        $package['shipping_zipcode'] = $this->shipping_zipcode ? $this->shipping_zipcode : '';
+        $package['shipping_phone'] = $this->shipping_phone ? $this->shipping_phone : '';
         $package['status'] = 'NEW';
         $package = $this->packages()->create($package);
         if ($package) {

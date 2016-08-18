@@ -3,7 +3,7 @@
     <div class="text-center">
         <div class="row">
             <div class="col-lg-4">
-                <a type="button" class="btn btn-info" href="{{ route('order.putNeedQueue') }}">
+                <a type="button" class="btn btn-info" href="{{ route('package.putNeedQueue') }}">
                     Do Package <span class="badge">{{ $packageNum }}</span>
                 </a>
             </div>
@@ -108,7 +108,7 @@
         <div class="row">
             <div class="col-lg-4">
                 <a type="button" class="btn btn-success" href="{{ route('package.shipping') }}">
-                    执行发货 <span class="badge">{{ $packageShipping }}</span>
+                    出库复检 <span class="badge">{{ $packageShipping }}</span>
                 </a>
             </div>
             <div class="col-lg-2 text-left">
@@ -119,3 +119,4 @@
         </div>
     </div>
 @stop
+@section('detailTitle')@parent <font color='red'>(面单打印不产生出入库信息)</font> @stop

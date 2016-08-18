@@ -15,6 +15,8 @@ use App\Models\Sellmore\JoomLogisticsModel as smJoomLogistics;
 use App\Models\Logistics\BelongsToModel;
 use App\Models\Sellmore\ShipmentModel as smShipment;
 use App\Models\Logistics\ChannelNameModel;
+use App\Models\Sellmore\LogisticsModel as smChannelLogistics;
+use App\Models\Channel\LogisticsModel as kChannelLogistics;
 
 
 class ChannelLogistics extends Command
@@ -59,7 +61,7 @@ class ChannelLogistics extends Command
             $start += $len;
             foreach ($dhgates as $dhgate) {
                 $originNum++;
-                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name]);
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name, 'logistics_key' => $dhgate->logsitics_key]);
                 $arr = [];
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
@@ -81,7 +83,30 @@ class ChannelLogistics extends Command
             $start += $len;
             foreach ($dhgates as $dhgate) {
                 $originNum++;
-                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name]);
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name, 'logistics_key' => $dhgate->logistics_name]);
+                $arr = [];
+                if ($dhgate->logisticses) {
+                    foreach ($dhgate->logisticses as $logistics) {
+                        $arr[] = $logistics->shipmentID;
+                    }
+                }
+                $channelName->logistics()->sync($arr);
+            }
+            $dhgates = smLazadaLogistics::skip($start)->take($len)->get();
+        }
+        $this->info('Transfer [smLazadaLogistics]: Origin:'.$originNum);
+
+        /*****************************/
+        $len = 100;
+        $start = 0;
+        $originNum = 0;
+        $id = ChannelModel::where(['name' => 'Lazada'])->first()->id;
+        $dhgates = smLazadaLogistics::skip($start)->take($len)->get();
+        while ($dhgates->count()) {
+            $start += $len;
+            foreach ($dhgates as $dhgate) {
+                $originNum++;
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name, 'logistics_key' => $dhgate->logistics_name]);
                 $arr = [];
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
@@ -103,7 +128,7 @@ class ChannelLogistics extends Command
             $start += $len;
             foreach ($dhgates as $dhgate) {
                 $originNum++;
-                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name]);
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name, 'logistics_key' => $dhgate->logistics_name]);
                 $arr = [];
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
@@ -125,7 +150,7 @@ class ChannelLogistics extends Command
             $start += $len;
             foreach ($wishes as $wish) {
                 $originNum++;
-                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $wish->logistics_name]);
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $wish->logistics_name, 'logistics_key' => $wish->logistics_name]);
                 $arr = [];
                 if ($wish->logisticses) {
                     foreach ($wish->logisticses as $logistics) {
@@ -144,7 +169,7 @@ class ChannelLogistics extends Command
         $originNum = 0;
         $smShipments = smShipment::all()->groupBy('shipmentCdiscountCodeID');
         foreach($smShipments as $key => $value) {
-            $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key]);
+            $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key, 'logistics_key' => $key]);
             $logisticses = $channelname->logisticsCdiscount;
             $arr = [];
             foreach($logisticses as $logistics) {
@@ -161,7 +186,7 @@ class ChannelLogistics extends Command
         $originNum = 0;
         $smShipments = smShipment::all()->groupBy('shipmentAMZCode');
         foreach($smShipments as $key => $value) {
-            $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key]);
+            $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key, 'logistics_key' => $key]);
             $logisticses = $channelname->logisticsCdiscount;
             $arr = [];
             foreach($logisticses as $logistics) {
@@ -181,7 +206,7 @@ class ChannelLogistics extends Command
             $start += $len;
             foreach ($wishes as $wish) {
                 $originNum++;
-                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $wish->logistics_name]);
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $wish->logistics_name, 'logistics_key' => $wish->logistics_name]);
                 $arr = [];
                 if ($wish->logisticses) {
                     foreach ($wish->logisticses as $logistics) {
@@ -202,7 +227,7 @@ class ChannelLogistics extends Command
         foreach($smShipments as $key => $value) {
             $channelname = ChannelNameModel::where(['channel_id' => $id, 'name' => $key])->first();
             if(!$channelname) {
-                $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key]);
+                $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key, 'logistics_key' => $key]);
             }
             $logisticses = $channelname->logisticsEbay;
             $arr = [];
@@ -215,5 +240,20 @@ class ChannelLogistics extends Command
             $channelname->update(['name' => $key['name']]);
         }
         $this->info('Transfer [smShipment-Ebay]: Origin:'.$originNum);
+
+        $len = 100;
+        $start = 0;
+        $originNum = 0;
+        $wishes = smChannelLogistics::skip($start)->take($len)->get();
+
+        while ($wishes->count()) {
+            $start += $len;
+            foreach ($wishes as $wish) {
+                $originNum++;
+                kChannelLogistics::create(['id' => $wish->methodID, 'name' => $wish->methodTitle]);
+            }
+            $wishes = smChannelLogistics::skip($start)->take($len)->get();
+        }
+        $this->info('Transfer [smChannelLogistics]: Origin:'.$originNum);
     }
 }

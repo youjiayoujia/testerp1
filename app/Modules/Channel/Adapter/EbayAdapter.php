@@ -10,6 +10,9 @@ namespace App\Modules\Channel\Adapter;
 
 use Tool;
 use App\Models\OrderModel;
+use App\Models\Message\Issues\EbayCasesListsModel;
+use App\Models\Message\Issues\EbayCasesDetailsModel;
+
 
 set_time_limit(1800);
 
@@ -601,6 +604,21 @@ class EbayAdapter implements AdapterInterface
 
     }
 
+    /**
+     * case XML DOM
+     */
+    public function buildcaseBody($xml,$call){
+        $this->serverUrl = 'https://svcs.ebay.com/services/resolution/v1/ResolutionCaseManagementService';  //cases API地址
+        $this->verb = $call;
+        $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="http://www.ebay.com/marketplace/resolution/v1/services">';
+        $requestXmlBody .= $xml;
+        $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
+
+        $result = $this->sendHttpRequest($requestXmlBody,'Resolution');
+        $response = simplexml_load_string($result);
+
+        return $response;
+    }
 
     private function buildEbayHeaders()
     {
@@ -617,9 +635,67 @@ class EbayAdapter implements AdapterInterface
         return $headers;
     }
 
-    public function sendHttpRequest($requestBody)
+
+/*    public function sendHttpRequestMessage($requestBody, $mode='Trading') {
+        //build eBay headers using variables passed via constructor
+        if (strcasecmp($mode, 'Trading') === 0) {       //交易API的头信息
+            $headers = $this->buildEbayHeaders();
+        }elseif (strcasecmp($mode, 'Resolution') === 0){//resolution Api头信息
+            $headers = $this->buildEbayResolutionHeaders();
+        }elseif (strcasecmp($mode, 'Return') === 0){ //return case Api头信息
+            $headers = $this->buildEbayReturnHeaders();
+        }else {
+            $headers = $this->buildEbayHeaders();
+        }
+        $connection = curl_init();
+        curl_setopt($connection, CURLOPT_VERBOSE, 1);
+        //set the server we are using (could be Sandbox or Production server)
+        curl_setopt($connection, CURLOPT_URL, $this->serverUrl);
+        //stop CURL from verifying the peer's certificate
+        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
+        //set the headers using the array of headers
+        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
+        //set method as POST
+        curl_setopt($connection, CURLOPT_POST, 1);
+        //set the XML body of the request
+        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
+        //set it to return the transfer as a string from curl_exec
+        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($connection, CURLOPT_TIMEOUT, 250);
+        //Send the Request
+        $response = curl_exec($connection);
+        //$error = curl_error($connection);
+        //close the connection
+        curl_close($connection);
+        return $response;
+    }*/
+
+    /**
+     * cases 使用的头部
+     * 创建resolution API的头信息
+     * @return multitype:
+     */
+    private function buildEbayResolutionHeaders(){
+        $headers = array(
+            'X-EBAY-SOA-SERVICE-NAME: ResolutionCaseManagementService',
+            'X-EBAY-SOA-OPERATION-NAME: '.$this->verb,
+            'X-EBAY-SOA-SERVICE-VERSION: 1.1.0',
+            'X-EBAY-SOA-SECURITY-TOKEN: '.$this->requestToken,
+            'X-EBAY-SOA-REQUEST-DATA-FORMAT: XML'
+        );
+        return $headers;
+    }
+
+    public function sendHttpRequest($requestBody,$type=false)
     {
-        $headers = $this->buildEbayHeaders();
+        if($type == 'Resolution'){ //case 头部
+            $headers = $this->buildEbayResolutionHeaders();
+        }else{
+            $headers = $this->buildEbayHeaders();
+
+        }
         //print_r($headers);
 
         $connection = curl_init();
@@ -658,6 +734,8 @@ class EbayAdapter implements AdapterInterface
         //2.获取消息
         $call = 'GetMyMessages';
         $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
+
+
         $headers_count = $message_ary->Summary->TotalMessageCount;
         $headers_pages_count = ceil($headers_count / 100); //统计页数
 
@@ -671,54 +749,113 @@ class EbayAdapter implements AdapterInterface
                                 <StartTime>' . $time_begin . '</StartTime>
                                 <EndTime>' . $time_end . '</EndTime>';
             $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
+
+
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
                     /*
-                     *             message 数据格式 样例
-                                    SimpleXMLElement Object
-                                    (
-                                        [Sender] => priya.suryavanshi
-                                        [SendingUserID] => 774805616
-                                        [RecipientUserID] => wintrade9
-                                        [SendToName] => wintrade9
-                                        [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                                        [MessageID] => 80473418726
-                                        [ExternalMessageID] => 1340213839016
-                                        [Flagged] => false
-                                        [Read] => false
-                                        [ReceiveDate] => 2016-08-04T09:16:42.000Z
-                                        [ExpirationDate] => 2017-08-04T09:16:42.000Z
-                                        [ItemID] => 222123713737
-                                        [ResponseDetails] => SimpleXMLElement Object
-                                        (
-                                             [ResponseEnabled] => true
-                                             [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
-                                        )
+                        message 数据格式 样例
+                        SimpleXMLElement Object
+                        (
+                            [Sender] => priya.suryavanshi
+                            [SendingUserID] => 774805616
+                            [RecipientUserID] => wintrade9
+                            [SendToName] => wintrade9
+                            [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                            [MessageID] => 80473418726
+                            [ExternalMessageID] => 1340213839016
+                            [Flagged] => false
+                            [Read] => false
+                            [ReceiveDate] => 2016-08-04T09:16:42.000Z
+                            [ExpirationDate] => 2017-08-04T09:16:42.000Z
+                            [ItemID] => 222123713737
+                            [ResponseDetails] => SimpleXMLElement Object
+                            (
+                                 [ResponseEnabled] => true
+                                 [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
+                            )
 
-                                        [Folder] => SimpleXMLElement Object
-                                        (
-                                            [FolderID] => 0
-                                         )
+                            [Folder] => SimpleXMLElement Object
+                            (
+                                [FolderID] => 0
+                             )
 
-                                        [MessageType] => ResponseToASQQuestion
-                                        [Replied] => false
-                                        [ItemEndTime] => 2016-08-18T08:16:14.000Z
-                                        [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                                    )*/
+                            [MessageType] => ResponseToASQQuestion
+                            [Replied] => false
+                            [ItemEndTime] => 2016-08-18T08:16:14.000Z
+                            [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                        )*/
+
+
+
+                    /**消息详情
+                     *  call GetMyMessages
+                     * SimpleXMLElement Object
+                    (
+                    [Timestamp] => 2016-08-12T03:16:10.880Z
+                    [Ack] => Success
+                    [Version] => 963
+                    [Build] => E963_CORE_APIMSG_17909225_R1
+                    [Messages] => SimpleXMLElement Object
+                    (
+                    [Message] => SimpleXMLElement Object
+                    (
+                            [Timestamp] => 2016-08-12T03:16:10.880Z
+                            [Ack] => Success
+                            [Version] => 963
+                            [Build] => E963_CORE_APIMSG_17909225_R1
+                            [Messages] => SimpleXMLElement Object
+                            (
+                            [Message] => SimpleXMLElement Object
+                            (
+                            [Sender] => csfeedback@ebay.com
+                            [RecipientUserID] => wintrade9
+                            [Subject] => wintrade9锛屾垜浠湪姝ゆ彁閱掓偍鐢?3 鍒嗛挓鏃堕棿鍒嗕韩鎮ㄥ杩戞湡 eBay 鏀寔浣撻獙鐨勫弽棣堟剰瑙
+
+                            [MessageID] => 80624164816
+                            [Text] =>          邮件富文本（html）
+                            [Flagged] => false
+                            [Read] => false
+                            [ReceiveDate] => 2016-08-12T01:39:56.000Z
+                            [ExpirationDate] => 2016-08-13T07:00:00.000Z
+                            [ResponseDetails] => SimpleXMLElement Object
+                            (
+                            [ResponseEnabled] => false
+                            )
+
+                            [Folder] => SimpleXMLElement Object
+                            (
+                            [FolderID] => 0
+                            )
+
+                            [Replied] => false
+                            )
+                     * )
+
+                     */
+
+                    $member_xlm_dom = '
+                                    <WarningLevel>High</WarningLevel>
+                                    <DetailLevel>ReturnMessages</DetailLevel>
+                                    <MessageIDs><MessageID>'.$message->MessageID.'</MessageID>
+                                    </MessageIDs>                    
+                                    ';
+                    $content_detail = $this->buildEbayBody($member_xlm_dom,'GetMyMessages');
 
                     $message_lists[$order]['message_id'] = $message->MessageID;
                     $message_lists[$order]['from_name'] = $message->Sender;
                     $message_lists[$order]['from'] = $message->SendingUserID;
                     $message_lists[$order]['to'] = $message->SendToName;
                     $message_lists[$order]['labels'] = '';
-                    $message_lists[$order]['label'] = 'INBOX';
+                    $message_lists[$order]['label'] = 'Ebay';
                     $message_lists[$order]['date'] = $message->ReceiveDate;
                     $message_lists[$order]['subject'] = $message->Subject;
                     $message_lists[$order]['attachment'] = ''; //附件
-                    $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$message->Subject]));
+                    $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID,
-                        'ExternalMessageID' =>(string)$message->ExternalMessageID,
+                        'ItemID' => (string)$message->ItemID, //应该是订单号
+                        'ExternalMessageID' => (string)$message->ExternalMessageID,
+                        'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
                     $order += 1;
@@ -727,8 +864,24 @@ class EbayAdapter implements AdapterInterface
 
         }
 
-        return (!empty($message_lists)) ?  $message_lists : false;
+        return (!empty($message_lists)) ?  array_reverse($message_lists) : false;
 
+    }
+
+    public function createMemberMessageXML($page) {
+        $this->input_str = '
+                            <RequesterCredentials>
+                            <eBayAuthToken>' . $this->userToken . '</eBayAuthToken>
+                            </RequesterCredentials>
+                            <WarningLevel>High</WarningLevel>
+                            <MailMessageType>All</MailMessageType>
+                            <EndCreationTime>' . $this->time_e . '</EndCreationTime>
+                            <StartCreationTime>' . $this->time_b . '</StartCreationTime>
+                            <Pagination>
+                                <EntriesPerPage>100</EntriesPerPage>
+                                <PageNumber>' . $page . '</PageNumber>
+                            </Pagination>
+        ';
     }
 
     public function sendMessages($replyMessage)
@@ -755,6 +908,183 @@ class EbayAdapter implements AdapterInterface
 
             return $content->Ack == 'Success' ? true : false;
         }
+    }
+
+    /**
+     * 获取纠纷
+     */
+    public function getCases(){
+
+        /**
+         * status   先写死   所有状态都获取
+         * time 写死 7天
+         *
+         */
+
+        $time_end = date('Y-m-d\TH:i:s.000\Z', time());
+        $time_begin = date('Y-m-d\TH:i:s.000\Z', strtotime('-7 day'));
+        $page = 1;
+        $cases_xml = '<creationDateRangeFilter>
+                     <fromDate>'.$time_begin.'</fromDate>
+                     <toDate>'.$time_end.'</toDate>
+                     </creationDateRangeFilter>
+                     <paginationInput>
+                        <entriesPerPage>100</entriesPerPage>
+                        <pageNumber>'.$page.'</pageNumber>
+                     </paginationInput>
+                     <sortOrder>CREATION_DATE_DESCENDING</sortOrder>';
+
+
+        $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
+
+
+        /**SimpleXMLElement Object
+        (
+        [ack] => Success
+        [version] => 1.3.0
+        [timestamp] => 2016-08-12T07:48:15.322Z
+        [cases] => SimpleXMLElement Object
+                                    (
+                                    [caseSummary] => Array
+                                    (
+                                    [0] => SimpleXMLElement Object
+                                    (
+                                    [caseId] => SimpleXMLElement Object
+                                    (
+                                    [id] => 685784541
+                                    [type] => UPI
+                                    )
+
+                                    [user] => SimpleXMLElement Object
+                                    (
+                                    [userId] => pandaserveyou
+                                    [role] => SELLER
+                                    )
+
+                                    [otherParty] => SimpleXMLElement Object
+                                    (
+                                    [userId] => deis-br
+                                    [role] => BUYER
+                                    )
+
+                                    [status] => SimpleXMLElement Object
+                                    (
+                                    [UPIStatus] => OTHER_PARTY_RESPONSE_DUE
+                                    )
+
+                                    [item] => SimpleXMLElement Object
+                                    (
+                                    [itemId] => 172218797476
+                                    [itemTitle] => Original Andrea Hair Growth Pilatory Essence Oil Baldness Alopecia anti Loss
+                                    [transactionId] => 1578377865007
+                                    )
+
+                                    [caseQuantity] => 2
+                                    [caseAmount] => 1.85
+                                    [respondByDate] => 2016-10-08T16:12:15.000Z
+                                    [creationDate] => 2016-08-11T22:11:10.000Z
+                                    [lastModifiedDate] => 2016-08-11T22:11:10.000Z
+        )
+         */
+        if($usercases->ack == 'Success'){
+
+
+            foreach ($usercases->cases->caseSummary as $case){
+
+                $buyer = '';
+                $seller = '';
+                if((string)$case->user->role == 'BUYER'){
+                    $buyer = (string)$case->user->userId;
+                }
+                if((string)$case->user->role == 'SELLER'){
+                    $seller = (string)$case->user->userId;
+                }
+
+                if((string)$case->otherParty->role == 'BUYER'){
+                    $buyer = (string)$case->user->userId;
+                }
+                if((string)$case->otherParty->role == 'SELLER'){
+                    $seller = (string)$case->user->userId;
+                }
+
+                $status = array_values((array)$case->status);
+                if($case->lastModifiedDate){
+                    $modify_date = (string)$case->lastModifiedDate;
+                }else{
+                    $modify_date = '';
+                }
+                $case_new_ary = [
+                    'case_id'        => (string)$case->caseId->id,
+                    'status'         => $status[0],
+                    'type'           => (string)$case->caseId->type,
+                    'seller_id'      => $seller,
+                    'buyer_id'       => $buyer,
+                    'item_id'        => (string)$case->item->itemId,
+                    'item_title'     => (string)$case->item->itemTitle,
+                    'transaction_id' => (string)$case->item->transactionId,
+                    'case_quantity'  => (int)$case->caseQuantity,
+                    'case_amount'    => (float)$case->caseAmount,
+                    'respon_date'    => (string)$case->respondByDate,
+                    'creation_date'  => (string)$case->creationDate,
+                    'creation_date'  => (string)$case->creationDate,
+                    'last_modify_date'=> $modify_date,
+                ];
+
+                //获取case 详情	 获取EBP_INR，EBP_SNAD， RETURN三类的详情
+
+                $valid_type = ['EBP_INR','EBP_SNAD','RETURN'];
+
+                if(in_array($case->caseId->type,$valid_type)){
+                    $case_detail_ary = [];
+                    $content = '';
+                    $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
+                    if($case_detail->ack == 'Success'){
+
+                        if($case_detail->caseDetail->responseHistory){
+                            $detail = (array)$case_detail->caseDetail;
+
+                            if(isset($detail['responseHistory'])){  //若包括消息
+                                foreach ($detail['responseHistory'] as $note){
+                                    $content []= [
+                                        'role' =>(string)$note->author->role,
+                                        'activity' => (string)$note->activity,
+                                        'creationDate'=> (string)$note->creationDate,
+                                        'note' => (string)$note->note,
+                                    ];
+                                }
+                                $content = base64_encode(serialize($content));
+                            }
+                        }
+
+                        $case_detail_ary = [
+                            'tran_price' => $case_detail->item->transactionPrice,
+                            'tran_date' => $case_detail->item->transactionDate,
+                            'tran_date' => $case_detail->item->transactionDate,
+                            'global_id' => $case_detail->item->globalId,
+                            'open_reason'=> $case_detail->caseDetail->openReason,
+                            'decision'=> $case_detail->caseDetail->decision,
+                            'fvf_credited'=> $case_detail->caseDetail->FVFCredited,
+                            'agreed_renfund_amount'=> $case_detail->caseDetail->agreedRefundAmount,
+                            'buyer_expection'=> $case_detail->caseDetail->initialBuyerExpectation,
+                            'content' => $content,
+                        ];
+                    }
+                }
+
+                $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
+                if(empty($list_obj)){
+                    EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary));
+                    echo '导入成功';
+                }
+            }
+        }
+    }
+
+    public function createCaseDetailXml($caseId,$caseType){
+        return '<caseId>
+					<id>'.$caseId.'</id>
+					<type>'.$caseType.'</type>
+				</caseId>';
     }
 
 

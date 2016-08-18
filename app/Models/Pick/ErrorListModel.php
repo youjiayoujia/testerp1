@@ -22,7 +22,7 @@ class ErrorListModel extends BaseModel
      */
     protected $fillable = ['item_id', 'packageNum', 'warehouse_position_id', 'warehouse_id', 'quantity', 'created_at'];
 
-    public $searchFields = [];
+    public $searchFields = ['id' => 'ID'];
     // 规则验证
     public $rules = [
         'create' => [
@@ -40,7 +40,10 @@ class ErrorListModel extends BaseModel
             ],
             'sectionSelect' => [
             ],
-            'relatedSearchFields' => [
+            'relatedSearchFields' => [ 
+                'item' => ['sku'], 
+                'warehouse' => ['name'], 
+                'warehousePosition' => ['name']
             ],
             'selectRelatedSearchs' => [
             ]

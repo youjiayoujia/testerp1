@@ -5,7 +5,7 @@
             'IN.PRODUCE' => '做货入库',
             'IN.ALLOTMENT' => '调拨入库',
             'IN.BOUNCE' => '退件入库',
-            'IN.PACKAGE_CANCLE' => 'package取消入库',
+            'IN.CANCLE' => 'package取消入库',
             'IN.INVENTORY_PROFIT' => '盘盈入库',
             'IN.ADJUSTMENT' => '调整入库',
             'IN.MAKE_ACCOUNT' => '开帐入库', 

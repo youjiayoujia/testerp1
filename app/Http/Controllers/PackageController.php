@@ -22,6 +22,7 @@ use App\Jobs\AssignLogistics;
 use App\Models\WarehouseModel;
 use DB;
 use Exception;
+use App\Jobs\AssignStocks;
 
 class PackageController extends Controller
 {
@@ -31,6 +32,24 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+    }
+
+    public function putNeedQueue()
+    {
+        $len = 1000;
+        $start = 0;
+        $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+        while ($packages->count()) {
+            foreach ($packages as $package) {
+                $job = new AssignStocks($package);
+                $job->onQueue('assignStocks');
+                $this->dispatch($job);
+            }
+            $start += $len;
+            unset($packages);
+            $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+        }
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
     }
 
     /**
@@ -59,7 +78,7 @@ class PackageController extends Controller
     {
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
-            'packageNum' => $this->model->whereIn('status', ['NEED', 'NEW'])->count(),
+            'packageNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
@@ -71,7 +90,7 @@ class PackageController extends Controller
                 ['PACKAGEING', 'PICKING'])->count(),
             'multiInbox' => PickListModel::where('type', 'MULTI')->where('status', 'PICKING')->count(),
             'multiPack' => PickListModel::where('type', 'MULTI')->whereIn('status', ['INBOXED', 'PACKAGEING'])->count(),
-            'packageShipping' => $this->model->where('status', 'PACKED')->count(),
+            'packageShipping' => $this->model->where('status', 'SHIPPED')->count(),
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
@@ -121,57 +140,69 @@ class PackageController extends Controller
         $errors = [];
         $warehouse_id = request('stock_warehouse_id');
         if(request('type') == 'only') {
-            foreach($arr as $key => $tracking_no) {
-                $model = $this->model->where('tracking_no', $tracking_no)->first();
-                if(!$model) {
-                    $errors[$key]['id'] = $tracking_no;
-                    $errors[$key]['remark'] = '对应包裹不存在';
-                    continue;
-                }
-                DB::beginTransaction();
-                try {
+            DB::beginTransaction();
+            try {
+                foreach($arr as $key => $tracking_no) {
+                    $model = $this->model->where('tracking_no', $tracking_no)->first();
+                    if(!$model) {
+                        $errors[$key]['id'] = $tracking_no;
+                        $errors[$key]['remark'] = '对应包裹不存在';
+                        continue;
+                    }
                     foreach($model->items as $packageItem) {
                         $stock = StockModel::where(['item_id' => $packageItem->item_id, 'warehouse_id' => $warehouse_id])->first();
+                        if(!$stock) {
+                            $errors[$key]['id'] = $tracking_no;
+                            $errors[$key]['remark'] = '仓库对应库位有问题';
+                            continue;
+                        }
                         $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
                     }
                     $model->update(['status' => 'CANCLE']);
-                } catch(Exception $e) {
-                    $errors[$key]['id'] = $tracking_no;
-                    $errors[$key]['remark'] = '仓库对应库位有问题'; 
-                    DB::rollback();
                 }
-                DB::commit();
+                if(count($errors)) {
+                    throw new Exception('导入数据有问题');
+                }
+            } catch(Exception $e) {
+                DB::rollback();
             }
+            DB::commit();
         } else {
-            foreach($arr as $key => $tracking_no) {
-                $model = $this->model->where('tracking_no', $tracking_no)->first();
-                if(!$model) {
-                    $errors[$key]['id'] = $tracking_no;
-                    $errors[$key]['remark'] = '对应包裹不存在';
-                    continue;
-                }
-                foreach($model->items as $packageItem) {
-                    $stock = StockModel::where(['item_id' => $packageItem->item_id, 'warehouse_id' => $warehouse_id])->first();
-                    if(!$stock) {
+            DB::beginTransaction();
+            try {
+                foreach($arr as $key => $tracking_no) {
+                    $model = $this->model->where('tracking_no', $tracking_no)->first();
+                    if(!$model) {
                         $errors[$key]['id'] = $tracking_no;
-                        $errors[$key]['remark'] = '仓库对应库位有问题'; 
-                        continue 2;
+                        $errors[$key]['remark'] = '对应包裹不存在';
+                        continue;
                     }
+                    foreach($model->items as $packageItem) {
+                        $stock = StockModel::where(['item_id' => $packageItem->item_id, 'warehouse_id' => $warehouse_id])->first();
+                        if(!$stock) {
+                            $errors[$key]['id'] = $tracking_no;
+                            $errors[$key]['remark'] = '仓库对应库位有问题'; 
+                            continue;
+                        }
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
+                    }
+                    if(request('trackingNo') == 'on') {
+                        $model->update(['tracking_no' => '']);
+                    }
+                    if(request('logistics_id') != 'auto') {
+                        $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
+                    } else {
+                        $model->update(['status' => 'NEW']);
+                    }
+                    $model->update(['warehouse_id' => request('from_warheouse_id')]);
                 }
-                foreach($model->items as $packageItem) {
-                    $stock = StockModel::where(['item_id' => $packageItem->item_id, 'warehouse_id' => $warehouse_id])->first();
-                    $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
+                if(count($errors)) {
+                    throw new Exception('导入数据有问题');
                 }
-                if(request('trackingNo') == 'on') {
-                    $model->update(['tracking_no' => '']);
-                }
-                if(request('logistics_id') != 'auto') {
-                    $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
-                } else {
-                    $model->update(['status' => 'NEW']);
-                }
-                $model->update(['warehouse_id' => request('from_warheouse_id')]);
+            } catch(Exception $e) {
+                DB::rollback();
             }
+            DB::commit();
         }
 
         $response = [
@@ -182,6 +213,8 @@ class PackageController extends Controller
         return view($this->viewPath.'returnErrors', $response);
         
     }
+
+   
 
     public function returnSplitPackage()
     {
@@ -424,7 +457,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->where('status', 'NEW')
+            ->where('status', 'WAITASSIGN')
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {
@@ -434,6 +467,7 @@ class PackageController extends Controller
                 $this->dispatch($job);
             }
             $start += $len;
+            unset($packages);
             $packages = $this->model
                 ->where('status', 'NEW')
                 ->where('is_auto', '1')
@@ -451,7 +485,7 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model
-            ->where('status', 'ASSIGNED')
+            ->whereIn('status', ['ASSIGNED','TRACKINGFAILED'])
             ->where('is_auto', '1')
             ->skip($start)->take($len)->get();
         while ($packages->count()) {
@@ -464,6 +498,7 @@ class PackageController extends Controller
                 }
             }
             $start += $len;
+            unlink($packages);
             $packages = $this->model
                 ->where('status', 'ASSIGNED')
                 ->where('is_auto', '1')
@@ -723,17 +758,13 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
-        if (!in_array($package->logistics_id, $logistic_id)) {
-            return json_encode('logistic_error');
-        }
         $package->update([
-            'status' => 'SHIPPED',
             'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => '2',
+            'shipper_id' => request()->user()->id,
             'actual_weight' => $weight
         ]);
-        foreach ($package->items as $packageitem) {
-            $packageitem->orderItem->update(['status' => 'SHIPPED']);
+        if (!in_array($package->logistics_id, $logistic_id)) {
+            return json_encode('logistic_error');
         }
 
         return json_encode(true);

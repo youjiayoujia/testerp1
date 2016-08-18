@@ -172,15 +172,6 @@ $(document).ready(function(){
                     if(quantity > picked_quantity) {
                         extern_flag = 1;
                         package_id = tmp.data('id');
-                        sku = tmp.find('.sku').text();
-                        $.ajax({
-                            url:"{{ route('pickList.packageItemUpdate')}}",
-                            data:{package_id:package_id, sku:sku},
-                            dataType:'json',
-                            type:'get',
-                            success:function(result) {
-                            }
-                        });
                         tmp.find('.picked_quantity').text(picked_quantity + 1);
                         if(parseInt(tmp.find('.picked_quantity').text()) == quantity) {
                             needId = tmp.data('id');
@@ -202,8 +193,16 @@ $(document).ready(function(){
                                     $('#barcode')[0].contentWindow.focus();
                                     $('#barcode')[0].contentWindow.print();
                                 });
-                                return false;
                             }
+                            sku = tmp.find('.sku').text();
+                            $.ajax({
+                                url:"{{ route('pickList.packageItemUpdate')}}",
+                                data:{package_id:package_id, sku:sku},
+                                dataType:'json',
+                                type:'get',
+                                success:function(result) {
+                                }
+                            });
                         }
                     }
                 }

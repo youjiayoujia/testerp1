@@ -24,49 +24,60 @@ interface AdapterInterface
      * @param $endDate
      * @param array $status呵da
      * @param int $perPage
-     * @return $orderArray
+     * @return $orderArray or $errorArray
      *
      * 返回数据格式:
+     * ****************************************************
+     * 成功:
      * [
+     *  'orders' =>
      *      [
-     *          'channel_ordernum' => '',
-     *          'email' => '',
-     *          'amount' => '',
-     *          'currency' => '',
-     *          'status' => '',
-     *          'payment' => '',
-     *          'shipping' => '',
-     *          'shipping_firstname' => '',
-     *          'shipping_lastname' => '',
-     *          'shipping_address' => '',
-     *          'shipping_address1' => '',
-     *          'shipping_city' => '',
-     *          'shipping_state' => '',
-     *          'shipping_country' => '',
-     *          'shipping_zipcode' => '',
-     *          'shipping_phone' => '',
-     *          'payment_date' => '',
-     *          'create_time' => '',
-     *          'items' => [
-     *              [
-     *                  'sku' => '',
-     *                  'channel_sku' => '',
-     *                  'quantity' => '',
-     *                  'price' => '',
-     *                  'currency' => '',
-     *              ],
-     *              [
-     *                  'sku' => '',
-     *                  'channel_sku' => '',
-     *                  'quantity' => '',
-     *                  'price' => '',
-     *                  'currency' => '',
-     *              ],
-     *          ]
+     *          [
+     *              'channel_ordernum' => '',
+     *              'email' => '',
+     *              'amount' => '',
+     *              'currency' => '',
+     *              'status' => '',
+     *              'payment' => '',
+     *              'shipping' => '',
+     *              'shipping_firstname' => '',
+     *              'shipping_lastname' => '',
+     *              'shipping_address' => '',
+     *              'shipping_address1' => '',
+     *              'shipping_city' => '',
+     *              'shipping_state' => '',
+     *              'shipping_country' => '',
+     *              'shipping_zipcode' => '',
+     *              'shipping_phone' => '',
+     *              'payment_date' => '',
+     *              'create_time' => '',
+     *              'items' => [
+     *                  [
+     *                      'sku' => '',
+     *                      'channel_sku' => '',
+     *                      'quantity' => '',
+     *                      'price' => '',
+     *                      'currency' => '',
+     *                  ],
+     *                  [
+     *                      Same As above ...
+     *                  ],
+     *              ]
+     *          ],
+     *          [
+     *              Same As above ...
+     *          ],
      *      ],
+     *  'nextToken' => ''
+     * ]
+     * **************************************************
+     * 失败:
+     * [
+     *  'error' =>
      *      [
-     *          Same As above ...
-     *      ],
+     *          'code' => '',
+     *          'message' => ''
+     *      ]
      * ]
      */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = null);
@@ -118,6 +129,5 @@ interface AdapterInterface
     public function getMessages();
 
     public function sendMessages($replyMessage);
-
 
 }

@@ -235,7 +235,7 @@ class PackageModel extends BaseModel
     {
         $items = $this->setPackageItems();
         if ($items) {
-            $this->createPackageDetail($items);
+            return $this->createPackageDetail($items);
         } else {
             if ($this->status == 'NEW') {
                 foreach ($this->items as $item) {
@@ -250,7 +250,7 @@ class PackageModel extends BaseModel
                 $this->update(['status' => 'NEED']);
                 $this->order->update(['status' => 'NEED']);
                 return true;
-            } elseif ($this->status == 'NEED') {
+            } else {
                 if (strtotime($this->created_at) < strtotime('-3 days')) {
                     $arr = $this->explodePackage();
                     if ($arr) {
@@ -260,6 +260,7 @@ class PackageModel extends BaseModel
                 }
             }
         }
+        
         return false;
     }
 
@@ -396,7 +397,7 @@ class PackageModel extends BaseModel
      */
     public function setPackageItems()
     {
-        if ($this->count() > 1) { //多产品
+        if ($this->items->count() > 1) { //多产品
             $packageItem = $this->setMultiPackageItem();
         } else { //单产品
             $packageItem = $this->setSinglePackageItem();
@@ -502,8 +503,7 @@ class PackageModel extends BaseModel
                             $packageItem['warehouse_position_id'],
                             $packageItem['quantity'],
                             'PACKAGE',
-                            $newPackageItem->id,
-                            $key);
+                            $newPackageItem->id);
                     } catch (Exception $e) {
                         DB::rollBack();
                     }
@@ -522,8 +522,7 @@ class PackageModel extends BaseModel
                                 $packageItem['warehouse_position_id'],
                                 $packageItem['quantity'],
                                 'PACKAGE',
-                                $newPackageItem->id,
-                                $key);
+                                $newPackageItem->id);
                         } catch (Exception $e) {
                             DB::rollBack();
                         }
@@ -570,7 +569,7 @@ class PackageModel extends BaseModel
     public function canAssignLogistics()
     {
         //判断订单状态
-        if ($this->status != 'NEW') {
+        if ($this->status != 'WAITASSIGN') {
             return false;
         }
 
@@ -618,6 +617,69 @@ class PackageModel extends BaseModel
     /**
      * 自动分配物流方式
      */
+    public function realTimeLogistics()
+    {
+        //匹配物流方式
+        $weight = $this->weight; //包裹重量
+        $amount = $this->order->amount; //订单金额
+        $amountShipping = $this->order->amount_shipping; //订单运费
+        $celeAdmin = $this->order->cele_admin;
+        //是否通关
+        if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
+            $isClearance = 1;
+        } else {
+            $isClearance = 0;
+        }
+        $rules = RuleModel::
+        where(function ($query) use ($weight) {
+            $query->where('weight_from', '<=', $weight)
+                ->where('weight_to', '>=', $weight)->orwhere('weight_section', '0');
+        })->where(function ($query) use ($amount) {
+            $query->where('order_amount_from', '<=', $amount)
+                ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
+        })->where(['is_clearance' => $isClearance])
+            ->get();
+        foreach ($rules as $rule) {
+            //是否在物流方式国家中
+            if ($rule->country_section) {
+                $countries = $rule->rule_countries_through;
+                $flag = 0;
+                foreach ($countries as $country) {
+                    if ($country->code == $this->shipping_country) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+            //是否有物流限制
+            if ($rule->limit_section && $this->shipping_limits) {
+                $shipping_limits = $this->shipping_limits->toArray();
+                $limits = $rule->rule_limits_through;
+                foreach ($limits as $limit) {
+                    if (in_array($limit->id, $shipping_limits)) {
+                        if ($limit->pivot->type == '3') {
+                            continue 2;
+                        }
+                    }
+                }
+            }
+            //查看对应的物流方式是否是所属仓库
+            $warehouse = $this->warehouse_id ? WarehouseModel::find($warehouse_id) : WarehouseModel::where('name', '深圳仓')->first();
+            if (!$warehouse->logisticsIn($rule->type_id)) {
+                continue;
+            }
+            //物流查询链接
+            $trackingUrl = $rule->logistics->url;
+            $is_auto = ($rule->logistics->docking == 'MANUAL' ? '0' : '1');
+            
+            return $rule->logistics->code;
+        }
+        return false;
+    }
+
     public function assignLogistics()
     {
         if ($this->canAssignLogistics()) {
@@ -626,6 +688,8 @@ class PackageModel extends BaseModel
             $amount = $this->order->amount; //订单金额
             $amountShipping = $this->order->amount_shipping; //订单运费
             $celeAdmin = $this->order->cele_admin;
+            $shipping = $this->order->shipping; //订单物流
+            $account = $this->channelAccount->account; //销售账号
             //是否通关
             if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
                 $isClearance = 1;
@@ -640,7 +704,6 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-                ->orderBy('priority', 'desc')
                 ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式国家中
@@ -649,6 +712,20 @@ class PackageModel extends BaseModel
                     $flag = 0;
                     foreach ($countries as $country) {
                         if ($country->code == $this->shipping_country) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue;
+                    }
+                }
+                //是否在物流方式账号中
+                if ($rule->account_section) {
+                    $accounts = $rule->rule_accounts_through;
+                    $flag = 0;
+                    foreach ($accounts as $account) {
+                        if ($account->id == $this->channel_account_id) {
                             $flag = 1;
                             break;
                         }

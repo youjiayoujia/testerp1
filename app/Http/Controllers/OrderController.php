@@ -100,22 +100,7 @@ class OrderController extends Controller
         return json_encode(false);
     }
 
-    public function putNeedQueue()
-    {
-        $len = 1000;
-        $start = 0;
-        $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
-        while ($orders->count()) {
-            foreach ($orders as $order) {
-                $job = new DoPackage($order);
-                $job->onQueue('doPackages');
-                $this->dispatch($job);
-            }
-            $start += $len;
-            $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
-        }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
-    }
+    
 
     /**
      * 保存数据

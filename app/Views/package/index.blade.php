@@ -27,7 +27,7 @@
             <td>{{ $package->status_name }}</td>
             <td>{{ $package->type == 'SINGLE' ? '单单' : ($package->type == 'SINGLEMULTI' ? '单多' : '多多') }}</td>
             <td>{{ $package->weight }}</td>
-            <td>{{ $package->logistics ? $package->logistics->code : '' }}</td>
+            <td>{{ $package->logistics ? $package->logistics->code : '' }}<font color='gray'>{{ $package->realTimeLogistics()}}</font></td>
             <td>{{ $package->tracking_no }}</td>
             <td>{{ $package->is_auto ? '自动' : '手动' }}</td>
             <td>{{ $package->created_at }}</td>
@@ -143,7 +143,7 @@
     </div>
     <div class="btn-group">
         <a class="btn btn-success" href="{{ route('package.shipping') }}">
-            执行发货
+            出库复检
         </a>
     </div>
     <div class="btn-group">

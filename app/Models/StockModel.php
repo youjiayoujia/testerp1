@@ -125,7 +125,7 @@ class StockModel extends BaseModel
      */
     public function stockOut()
     {
-        return $this->hasMany('App\Models\Stock\OutModel', 'stock_id', 'id');
+        return $this->hasMany('App\Models\Stock\InOutModel', 'stock_id', 'id');
     }
 
     /**
@@ -249,7 +249,8 @@ class StockModel extends BaseModel
         $this->stockOut()->create([
             'quantity' => $quantity,
             'amount' => $quantity * $price,
-            'type' => $type,
+            'outer_type' => 'OUT',
+            'inner_type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
         ]);

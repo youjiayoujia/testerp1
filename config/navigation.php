@@ -146,6 +146,11 @@ return [
                     'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流对账',
+                    'url' => 'shipmentCost.index',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [
@@ -400,6 +405,18 @@ return [
                 [
                     'name' => '信息模板',
                     'url' => 'messageTemplate.index',
+                    'icon' => '',
+                ],
+            ],
+            '平台纠纷' => [
+                [
+                    'name' => 'ebay cases',
+                    'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'aliexpress issues',
+                    'url' => 'ebayCases.index',
                     'icon' => '',
                 ],
             ],

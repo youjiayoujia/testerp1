@@ -141,7 +141,7 @@ class AdjustmentController extends Controller
         {
             $stock = StockModel::where(['item_id' => $adjustmentform->item_id, 'warehouse_position_id' => $adjustmentform->warehouse_position_id])->first();
             if($stock) {
-                $access_quantity[] = $stock->available_quantity;
+                $access_quantity[] = $stock->available_quantity + $adjustmentform->quantity;
             } else {
                 $access_quantity[] = 0;
             }

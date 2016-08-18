@@ -397,8 +397,9 @@ class PickListController extends Controller
                     $item->picked_quantity += 1;
                     $item->save();
                 }
-                if($item->picked_quantity != $item->quantity)
+                if($item->picked_quantity != $item->quantity) {
                     $flag = 0;
+                }
             }
             if($flag == 1) {
                 $package->status = 'SHIPPED';

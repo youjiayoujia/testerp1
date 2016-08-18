@@ -1,6 +1,6 @@
 <?php
 
-namespace App\models\Publish\Smt;
+namespace App\Models\Publish\Smt;
 
 use Illuminate\Database\Eloquent\Model;
 

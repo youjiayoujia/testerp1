@@ -278,7 +278,7 @@ Class LazadaAdapter implements AdapterInterface
                 'quantity' => $v['item_count'],
                 'price' => $v['item_price'],
                 'orders_item_number' => $v['OrderItemId'],
-                'currency' => $lazada_currency_type,
+                'currency' => $lazada_currency_type, 
                 'channel_order_id' => $result['channel_ordernum'],
                 'transaction_id' => $v['comment_text']
             ];

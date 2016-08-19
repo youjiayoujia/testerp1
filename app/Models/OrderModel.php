@@ -45,6 +45,20 @@ class OrderModel extends BaseModel
         ],
     ];
 
+    public function getOrderWeightAttribute()
+    {
+        $items = $this->items;
+        $weight = 0;
+        foreach($items as $item) {
+            $oldItem = $item->item;
+            if(!$oldItem) {
+                $weight += $oldItem->weight;
+            }
+        }
+
+        return $weight;
+    }
+
     public function rule($request)
     {
         $arr = [
@@ -439,8 +453,8 @@ class OrderModel extends BaseModel
         $package['channel_id'] = $this->channel_id ? $this->channel_id : '';
         $package['channel_account_id'] = $this->channel_account_id ? $this->channel_account_id : '';
         //type
-        // $package['type'] = collect($packageItems)->count() > 1 ? 'MULTI' : (collect($packageItems)->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
-        // $package['weight'] = collect($packageItems)->sum('weight');
+        $package['type'] = $this->items->count() > 1 ? 'MULTI' : ($this->items->first()['quantity'] > 1 ? 'SINGLEMULTI' : 'SINGLE');
+        $package['weight'] = $this->order_weight;
         $package['email'] = $this->email ? $this->email : '';
         $package['shipping_firstname'] = $this->shipping_firstname ? $this->shipping_firstname : '';
         $package['shipping_lastname'] = $this->shipping_lastname ? $this->shipping_lastname : '';

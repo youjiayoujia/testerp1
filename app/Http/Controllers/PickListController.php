@@ -72,7 +72,7 @@ class PickListController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'size' => "100*100",
-            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('1'),
+            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
             'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
@@ -397,8 +397,9 @@ class PickListController extends Controller
                     $item->picked_quantity += 1;
                     $item->save();
                 }
-                if($item->picked_quantity != $item->quantity)
+                if($item->picked_quantity != $item->quantity) {
                     $flag = 0;
+                }
             }
             if($flag == 1) {
                 $package->status = 'SHIPPED';

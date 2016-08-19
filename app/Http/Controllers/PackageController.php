@@ -498,7 +498,7 @@ class PackageController extends Controller
                 }
             }
             $start += $len;
-            unlink($packages);
+            unset($packages);
             $packages = $this->model
                 ->where('status', 'ASSIGNED')
                 ->where('is_auto', '1')

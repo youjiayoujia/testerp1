@@ -21,6 +21,12 @@ use App\Modules\Logistics\Adapter\ShunfenghlAdapter;
 use App\Modules\Logistics\Adapter\EubofflineAdapter;
 use App\Modules\Logistics\Adapter\EubAdapter;
 
+use App\Modules\Logistics\Adapter\WishyouAdapter;
+use App\Modules\Logistics\Adapter\BpostAdapter;
+use App\Modules\Logistics\Adapter\YuntuAdapter;
+use App\Modules\Logistics\Adapter\kuaiyouAdapter;
+use App\Modules\Logistics\Adapter\MalaixiyaAdapter;
+use App\Modules\Logistics\Adapter\DiouAdapter;
 
 
 
@@ -125,6 +131,44 @@ class LogisticsModule
      */
     public function createEubDriver($config){
         return new EubAdapter($config);
+    }
+	/*
+	*wish_you驱动
+	*@param $config
+    *@return WishyouAdapter
+	*/
+	public function createWishyouDriver($config)
+    {
+        return new WishyouAdapter($config);
+    }
+	/*
+	*Malaixiya驱动
+	*@param $config
+    *@return MalaixiyaAdapter
+	*/
+	public function createMalaixiyaDriver($config)
+    {
+        return new MalaixiyaAdapter($config);
+    }
+	
+	/*
+	*Yuntu驱动
+	*@param $config
+    *@return YuntuAdapter
+	*/
+	public function createYuntuDriver($config)
+    {
+        return new YuntuAdapter($config);
+    }
+	
+	/*
+	*Diou驱动
+	*@param $config
+    *@return BpostAdapter
+	*/
+	public function createDiouDriver($config)
+    {
+        return new DiouAdapter($config);
     }
 
 }

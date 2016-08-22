@@ -80,6 +80,12 @@ return [
         'require_create' => '是否需要采购',
 
         'productSku.skuCode'=>'产品SKU',
+        'product.token_id' => '帐号',
+        'product.multiattribute' => '=属性=',
+        'product.productStatusType' => '平台状态',
+        'product.productStatus' => '商品状态',
+        'ipmSkuStock' => '可售库存',
+        'is_erp' => 'sku是否匹配',
 
         'hang_num' => '挂号码',
         'hang_number' => '挂号码',

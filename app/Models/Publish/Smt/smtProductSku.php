@@ -32,20 +32,30 @@ class smtProductSku extends BaseModel
                 'lowerPrice',
                 'discountRate'
                 ];
-    public $searchFields = ['productId'=>'Product ID'];
+    public $searchFields = ['productId'=>'Product ID','skuCode'=>'SKU Code'];
     
     public function getMixedSearchAttribute()
     {
         return [
             
-            'filterFields' => ['skuCode'=>'skuCode'],
+            'filterFields' => [],
             /*'filterSelects' => [ 
                 'token_id' => 
                 'user_id' => $this->getArray('App\Models\UserModel','name'),
              ],*/
-            'relatedSearchFields' => ['channel' => ['name']],
-            'selectRelatedSearchs' => [
-                'product' => ['token_id' => $this->getArray('App\Models\Channel\AccountModel','account')],
+            
+            'relatedSearchFields' => [],
+            'selectRelatedSearchs' => [              
+                'product' => [
+                    'token_id' => $this->getArray('App\Models\Channel\AccountModel','account'),
+                    'multiattribute' => config('smt_product.multiattribute'),
+                    'productStatusType' => config('smt_product.productStatusType'), 
+                    'productStatus' => config('smt_product.productStatus'),
+                    ]
+            ],
+            'filterSelects' => [
+                'is_erp' => config('smt_product.is_erp'),
+                'ipmSkuStock' => config('smt_product.skuStockStatus'),
             ]
             
         ];

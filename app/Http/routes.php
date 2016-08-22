@@ -661,10 +661,19 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('ajaxSmtAfterServiceList',
            ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']);           
     });
-    
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
-    Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');
+    
+    Route::post('smtMonitor/editSingleSkuStock',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@editSingleSkuStock', 'as' => 'smtMonitor.editSingleSkuStock']);
+    Route::post('smtMonitor/editSingleSkuPrice',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@editSingleSkuPrice', 'as' => 'smtMonitor.editSingleSkuPrice']);
+    Route::post('smtMonitor/manualUpdateProductInfo',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@manualUpdateProductInfo', 'as' => 'smtMonitor.manualUpdateProductInfo']);
+    
     Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
+    Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');
+    
+   
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
  

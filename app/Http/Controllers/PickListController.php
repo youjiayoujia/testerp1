@@ -389,6 +389,11 @@ class PickListController extends Controller
         $package_id = trim(request()->input('package_id'));
         $sku = trim(request()->input('sku'));
         $package = PackageModel::find($package_id);
+        $order = $package->order;
+        if($order->status == 'REVIEW') {
+            $package->update(['status' => 'ERROR']);
+            return json_encode(false);
+        }
         if($package) {
             $items = $package->items;
             $flag = 1;

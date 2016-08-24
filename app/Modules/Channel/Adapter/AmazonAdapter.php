@@ -62,16 +62,16 @@ Class AmazonAdapter implements AdapterInterface
 
     public function returnTrack($tracking_info = '')
     {
-        $tmp_ddd = $this->getXML($tracking_info);
-        exit;
-        $this->config['Action'] = 'SubmitFeed';
-        $this->config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
-        $this->config['Version'] = '2009-01-01';
-        $this->config['MarketplaceIdList.Id.1'] = 'ATVPDKIKX0DER';
-        $this->config['PurgeAndReplace'] = 'false';
-        $this->config['Merchant'] = 'A3THBIK7QYKUUV';
-        unset($this->_config['SellerId']);
-        unset($this->_config['MarketplaceId.Id.1']);
+        // $tmp_ddd = $this->getXML($tracking_info);
+        // exit;
+        $this->_config['Action'] = 'SubmitFeed';
+        $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
+        $this->_config['Version'] = '2009-01-01';
+        $this->_config['MarketplaceIdList.Id.1'] = 'ATVPDKIKX0DER';
+        $this->_config['PurgeAndReplace'] = 'false';
+        $this->_config['Merchant'] = 'A3THBIK7QYKUUV';
+        unset($this->config['SellerId']);
+        unset($this->config['MarketplaceId.Id.1']);
         var_dump($this->config);
         exit;
         $tmp_url = "https://mws.amazonservices.com";
@@ -158,7 +158,7 @@ Class AmazonAdapter implements AdapterInterface
      *
      *
      */
-//A3THBIK7QYKUUV account id  marchant_id就是account_id
+    //A3THBIK7QYKUUV account id  marchant_id就是account_id
     public function getXML($arr)
     {
         $str = "<?xml version='1.0' encoding='UTF-8'?>

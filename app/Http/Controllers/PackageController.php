@@ -413,6 +413,11 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode(false);
         }
+        $order = $package->order;
+        if($order->status == 'REVIEW') {
+            $package->update(['status' => 'ERROR']);
+            return json_encode(false);
+        }
         $items = $package->items;
         foreach ($items as $item) {
             $item->update(['picked_quantity' => $item->quantity]);

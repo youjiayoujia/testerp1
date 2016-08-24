@@ -194,6 +194,9 @@ $(document).ready(function(){
                                     dataType:'json',
                                     type:'get',
                                     success:function(result) {
+                                        if(!result) {
+                                            return false;
+                                        }
                                     }
                                 });
                                 $("."+id).find('.status').text('已包装');
@@ -238,6 +241,9 @@ $(document).ready(function(){
                                 dataType:'json',
                                 type:'get',
                                 success:function(result) {
+                                    if(!result) {
+                                        return false;
+                                    }
                                 }
                             });
                             tmp.find('.status').text('已包装');

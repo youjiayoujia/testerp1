@@ -22,7 +22,7 @@
 @section('tableBody')
       @foreach($data as $item)
       <tr>
-        <th><input type='checkbox' name='single[]' class='single' value="<?php echo $item->productId . ',' .  $item->smtSkuCode;?>"></th>
+        <th><input type='checkbox' name='single[]' class='single' data-productId="{{$item->productId}}"   value="<?php echo $item->productId . ',' .  $item->smtSkuCode;?>"></th>
         <th>{{$item->product->accounts->account}}</th>
         <th><a href="{{$item->product->product_url}}" target="_Blank">{{$item->productId}}</a></th>
         <th>{{$item->product->subject}}</th>
@@ -71,7 +71,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title text-left" id="myModalLabel">修改在线产品可售库存</h4>
+                    <h4 class="modal-title text-left" id="myModalLabel">修改在线产品价格</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -89,7 +89,7 @@
                             <label for="account" class='control-label'>增加</label>
                          </div>
                         <div class="form-group col-lg-4">
-                            <input type='text' class="form-control" id="skuStock" name="skuPrice">
+                            <input type='text' class="form-control"  name="skuPrice">
                             <input type="hidden" name="productId" value="{{$item->productId}}">
                             <input type="hidden" name="account_id" value="{{$item->product->token_id}}">
                             <input type="hidden" name="skuId" value="{{$item->sku_active_id}}">
@@ -122,7 +122,7 @@
                             <div class="form-group col-lg-12">
                                 <label for="account" class='control-label'>修改SKU: {{$item->smtSkuCode}}  的在线可售库存</label>
                                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                <input type='text' class="form-control" placeholder="0~99999之间" id="skuStock" name="ipmSkuStock">
+                                <input type='text' class="form-control" placeholder="0~99999之间"  name="ipmSkuStock">
                                 <input type="hidden" name="productId" value="{{$item->productId}}">
                                 <input type="hidden" name="account_id" value="{{$item->product->token_id}}">
                                 <input type="hidden" name="skuId" value="{{$item->sku_active_id}}">
@@ -141,7 +141,86 @@
 @stop
 @section('tableToolButtons')
     <div class="btn-group" role="group">
-        <input class="form-control lr" id="lr" placeholder="利润" name="lr">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            批量操作
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:" onclick="setProductSkuPrice()">修改价格</a></li>
+            <li><a href="javascript:" data-type="No" onclick="setProductSkuStockStatus(this)">批量调无货</a></li>
+            <li><a href="javascript:" data-type="Yes" onclick="setProductSkuStockStatus(this)">批量调有货</a></li>
+            <li><a href="javascript:" data-type="offline" onclick="changeProductStatus(this)">批量下架</a></li>
+            <li><a href="javascript:" data-type="online"  onclick="changeProductStatus(this)">批量上架</a></li>
+            <li><a href="javascript:" onclick="setProductSkuStock()">批量调可售库存</a></li>
+        </ul>
+    </div>
+    <div class="modal fade" id="setSkuPrice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{ route('smtMonitor.batchEditSkuPrice')}}" method="POST">
+                {!! csrf_field() !!}
+                 <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-left" id="myModalLabel">批量修改在线产品价格</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">                      
+                        <div class="form-group col-lg-4">
+                        <label for="account" class='control-label'>按</label>
+                            <select name="type">
+                                <option value="amount">金额</option>
+                                <option value="realprice">固定价格</option>
+                                <option value="percent">百分比</option>                                    
+                            </select>                              
+                            <label for="account" class='control-label'>增加</label>
+                         </div>
+                        <div class="form-group col-lg-4">
+                            <input type='text' class="form-control"  name="skuPrice">                          
+                            <input type="hidden" name="products">
+                        </div>
+                    </div>
+                </div>
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+               </form>
+            </div>
+        </div>
+      </div>      
+    <div class="modal fade" id="setSkuStock" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{ route('smtMonitor.batchEditSkuStock')}}" method="POST">
+                {!! csrf_field() !!}
+                 <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-left" id="myModalLabel">批量修改在线产品可售库存</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                            <div class="form-group col-lg-12">                              
+                                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                <input type='text' class="form-control" placeholder="0~99999之间" id="skuStock" name="ipmSkuStock">
+                                <input type="hidden" name="products">                                
+                            </div>
+                     </div>
+                </div>
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+               </form>
+            </div>
+        </div>
+      </div>       
+    <!-- 
+    <div class="btn-group" role="group">
+        <input class="form-control lr" id="lr" placeholder="价格" name="lr">
     </div>
     <div class="btn-group" role="group">
         <select class="form-control sx" name="sx" id="sx">
@@ -152,6 +231,7 @@
             <option value="between">区间</option>
         </select>
     </div>
+    -->
       <div class="btn-group">
             <a class="btn btn-success export" href="javascript:" id="manual_update">
                手动更新
@@ -215,7 +295,7 @@ function operator(id,type,e){
 
 $("#manual_update").click(function () {
 	var productIds = $('input[name="single[]"]:checked').map(function(){
-		return $(this).val();
+		return $(this).attr('data-productId');
 	}).get().join(' ');
 
 	//var token = '<?php echo csrf_token(); ?>';
@@ -228,6 +308,7 @@ $("#manual_update").click(function () {
         data: {productIds: productIds},
         dataType: 'json',
         type: 'post',
+        //async: false,
         success: function (result) {
             console.log(result);
             //alert(result.Msg);
@@ -235,5 +316,93 @@ $("#manual_update").click(function () {
         }
     });
 });
+
+
+
+function changeProductStatus(obj){
+	var productIds = $('input[name="single[]"]:checked').map(function(){
+		return $(this).attr('data-productId');
+	}).get().join(',');
+	if (!productIds){
+		alert('请先勾选信息', 'alert-warning');
+		return false;
+	}
+
+	var type = $(obj).data('type');
+	$.ajax({
+		url: "{{ route('smtMonitor.ajaxOperateOnlineProductStatus') }}",
+        data: {productIds: productIds,type:type},
+        dataType: 'json',
+        type: 'post',
+        beforeSend: function(){
+        	layer.alert("正在批量下架，请稍等......！请不要刷新页面！！！");        	
+        },
+        success: function (result) {  
+            $.each(result,function(index,value){
+            	alert(value.Msg);
+             });         	         
+            window.location.reload();
+        }
+	});
+}
+
+function setProductSkuStock(){
+	var productIds = $('input[name="single[]"]:checked').map(function(){
+		return $(this).val();
+	}).get().join(' ');
+	
+	if (!productIds){
+		alert('请先勾选信息', 'alert-warning');
+		return false;
+	}
+	$('input[name="products"]').val(productIds);
+
+	$('#setSkuStock').modal({
+		keyboard: false
+	});
+}
+
+function setProductSkuPrice(){
+	var productIds = $('input[name="single[]"]:checked').map(function(){
+		return $(this).val();
+	}).get().join(' ');
+	
+	if (!productIds){
+		alert('请先勾选信息', 'alert-warning');
+		return false;
+	}
+	$('input[name="products"]').val(productIds);
+
+	$('#setSkuPrice').modal({
+		keyboard: false,
+	});
+}
+
+function setProductSkuStockStatus(obj){
+	var productIds = $('input[name="single[]"]:checked').map(function(){
+		return $(this).val();
+	}).get().join(',');
+	if (!productIds){
+		alert('请先勾选信息', 'alert-warning');
+		return false;
+	}
+
+	var type = $(obj).data('type');
+	$.ajax({
+		url: "{{ route('smtMonitor.ajaxOperateProductSkuStockStatus') }}",
+        data: {productIds: productIds,type:type},
+        dataType: 'json',
+        type: 'post',
+        beforeSend: function(){
+        	layer.alert("正在批量操作，请稍等......！请不要刷新页面！！！");        	
+        },
+        success: function (result) {  
+            $.each(result,function(index,value){
+            	alert(value.Msg);
+             });         	         
+            window.location.reload();
+        }
+	});
+}
 </script>
 @stop

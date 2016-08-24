@@ -26,7 +26,7 @@ return [
         '1' => '大于0',
     ],
     
-    'productStatus' => [
+    'status' => [
         'selling' => '在售',
         'sellWaiting' => '待售',
         'cleaning' => '清库存中',

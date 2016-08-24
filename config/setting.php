@@ -83,7 +83,8 @@ return [
         'product.token_id' => '帐号',
         'product.multiattribute' => '=属性=',
         'product.productStatusType' => '平台状态',
-        'product.productStatus' => '商品状态',
+        'product.user_id' => '刊登人员',
+        'products.status' => '商品状态',
         'ipmSkuStock' => '可售库存',
         'is_erp' => 'sku是否匹配',
 

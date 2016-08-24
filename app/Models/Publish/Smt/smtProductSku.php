@@ -47,11 +47,14 @@ class smtProductSku extends BaseModel
             'relatedSearchFields' => [],
             'selectRelatedSearchs' => [              
                 'product' => [
-                    'token_id' => $this->getArray('App\Models\Channel\AccountModel','account'),
+                    'token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','account'),
                     'multiattribute' => config('smt_product.multiattribute'),
-                    'productStatusType' => config('smt_product.productStatusType'), 
-                    'productStatus' => config('smt_product.productStatus'),
-                    ]
+                    'productStatusType' => config('smt_product.productStatusType'),     
+                    'user_id' => $this->getArray('App\Models\UserModel','name'),
+                    ],
+                'products' =>[
+                    'status' => config('smt_product.status'),
+                ]
             ],
             'filterSelects' => [
                 'is_erp' => config('smt_product.is_erp'),
@@ -72,10 +75,10 @@ class smtProductSku extends BaseModel
     
     public function getAccountNumber($model, $name)
     {
-        $channel_id =  ChannelModel::where('driver','aliexpress')->first()->id;
+        $channel =  ChannelModel::where('driver','aliexpress')->first();
         $arr = [];
-        $inner_models = $model::where('channel_id',$channel_id)->get();
-        foreach ($inner_models as $key => $single) {
+        $inner_models = $model::where('channel_id',$channel->id)->get();
+        foreach ($inner_models as $single) {
             $arr[$single->id] = $single->$name;
         }
         return $arr;
@@ -90,6 +93,7 @@ class smtProductSku extends BaseModel
         }
         return $arr;
     }
+    
     
    
 }

@@ -669,6 +669,14 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Publish\Smt\SmtOnlineMonitorController@editSingleSkuPrice', 'as' => 'smtMonitor.editSingleSkuPrice']);
     Route::post('smtMonitor/manualUpdateProductInfo',
         ['uses' => 'Publish\Smt\SmtOnlineMonitorController@manualUpdateProductInfo', 'as' => 'smtMonitor.manualUpdateProductInfo']);
+    Route::post('smtMonitor/ajaxOperateOnlineProductStatus',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@ajaxOperateOnlineProductStatus', 'as' => 'smtMonitor.ajaxOperateOnlineProductStatus']);
+    Route::post('smtMonitor/batchEditSkuStock',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@batchEditSkuStock', 'as' => 'smtMonitor.batchEditSkuStock']);
+    Route::post('smtMonitor/batchEditSkuPrice',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@batchEditSkuPrice', 'as' => 'smtMonitor.batchEditSkuPrice']);
+    Route::post('smtMonitor/ajaxOperateProductSkuStockStatus',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@ajaxOperateProductSkuStockStatus', 'as' => 'smtMonitor.ajaxOperateProductSkuStockStatus']);
     
     Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
     Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');

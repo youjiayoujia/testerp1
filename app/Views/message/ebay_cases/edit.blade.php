@@ -33,19 +33,19 @@
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-                                    Option one is this and that&mdash;be sure to include why it's great
+                                    Add tracking details
                                 </label>
                             </div>
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                    Option two can be something else and selecting it will deselect option one
+                                    Refund the buyer
                                 </label>
                             </div>
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                    Option two can be something else and selecting it will deselect option one
+                                    Send a message to the buyer
                                 </label>
                                 <button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="">
                                     选择

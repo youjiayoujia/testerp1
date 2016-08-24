@@ -1,5 +1,38 @@
 @extends('common.table')
-@section('tableToolButtons')@stop
+@section('tableToolButtons')
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Case状态(Status)
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach($status as $item)
+                <li>
+                    <a href="{{ DataList::filtersEncode(['status','=',$item->status]) }}">{{ $item->status }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Case类型(Type)
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach($types as $item)
+                <li>
+                    <a href="{{ DataList::filtersEncode(['status','=',$item->type]) }}">{{ $item->type }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@stop
 
 @section('tableHeader')
 

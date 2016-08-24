@@ -597,4 +597,16 @@ class TestController extends Controller
         }
         exit;*/
     }
+    public function testEbayCases(){
+        foreach (AccountModel::all() as $account) {
+            if($account->account == 'pandaserveyou'){ //测试diver
+
+                //dd($account);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getMessages();
+                print_r($messageList);exit;
+
+            }
+        }
+    }
 }

@@ -30,11 +30,11 @@ class EbayCasesController extends Controller
      */
     public function index()
     {
-        //
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
-
+            'metas'    => $this->metas(__FUNCTION__),
+            'data'     => $this->autoList($this->model),
+            'status'   => $this->model->distinct()->get(['status']),
+            'types'     => $this->model->distinct()->get(['type']),
         ];
         return view($this->viewPath . 'index',$response);
     }

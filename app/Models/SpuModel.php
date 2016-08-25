@@ -73,7 +73,7 @@ class SpuModel extends BaseModel
                 $arr[$pre."_".$prefix] = $value;
             }
             
-            $model = $this->spuMultiOption->where("channel_id", (int)$channel_id)->first();
+            $model = $this->spuMultiOption()->where("channel_id", $channel_id)->first();
             if($model){
                 $model->update($arr);
             }

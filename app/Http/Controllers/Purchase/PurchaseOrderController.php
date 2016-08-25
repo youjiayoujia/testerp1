@@ -436,6 +436,7 @@ class PurchaseOrderController extends Controller
         $po_id = $p_item->purchaseOrder->id;
         $response['id']= $id;
         $response['po_id']= $po_id;
+        $response['from'] = 'purchase';
         return view($this->viewPath . 'printpo', $response);
     }
 
@@ -448,11 +449,22 @@ class PurchaseOrderController extends Controller
         $id = request()->input('pp_id');
         $size = request()->input('labelSize');
         $po_id = request()->input('po_id');
-        $response['id']= $id;
-        $response['model'] = PurchaseItemModel::where('id',$id)->get()->first();
-        $response['size']= $size;
-        $response['po_id']= $po_id;
-        return view($this->viewPath . 'showpo', $response);
+        $from = request()->input('from');
+        if($from=='purchase'){
+            $response['id']= $id;
+            $response['model'] = PurchaseItemModel::where('id',$id)->get()->first();
+            $response['size']= $size;
+            $response['po_id']= $po_id;
+            return view($this->viewPath . 'showpo', $response);
+        }
+        if($from=='sku'){
+            $response['id']= $id;
+            $response['model'] = ItemModel::find($id);
+            $response['size']= $size;
+            $response['po_id']= $po_id;
+            return view('item.skushowpo', $response);
+        }
+        
     }
 
     /**
@@ -804,7 +816,7 @@ class PurchaseOrderController extends Controller
             //计算总价
             $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
             //计算采购价和系统价格是否一致
-            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = '':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致';
+            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = '':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致;';
            
         }
         

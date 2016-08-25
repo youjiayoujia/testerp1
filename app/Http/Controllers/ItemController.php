@@ -189,6 +189,7 @@ class ItemController extends Controller
         $item_id = request()->input("id");
         $model = $this->model->find($item_id);
         $response['model']= $model;
+        $response['from'] = 'sku';
         return view($this->viewPath . 'printsku', $response);
     }
 

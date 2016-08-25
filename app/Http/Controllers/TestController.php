@@ -57,12 +57,12 @@ class TestController extends Controller
     {
         $this->itemModel = $itemModel;
     }
-    public function test2()
-    {
-        $package = PackageModel::find('17');
+    // public function test2()
+    // {
+    //     $package = PackageModel::find('17');
 
-        $package->realTimeLogistics();
-    }
+    //     $package->realTimeLogistics();
+    // }
     // public function test2()
     // {
     //     $data['channel_ordernum'] = '1111';
@@ -78,12 +78,12 @@ class TestController extends Controller
     //     $this->dispatch($job);
     // }
 
-    // public function test2()
-    // {
-    //     $account = AccountModel::find(160);
-    //     $single = new AmazonAdapter($account->api_config);
-    //     $single->returnTrack([['1', '123']]);
-    // }
+    public function test2()
+    {
+        $account = AccountModel::find(1);
+        $single = new AmazonAdapter($account->api_config);
+        $single->returnTrack([['1', '123']]);
+    }
     // public function test2()
     // {
     //     $rows[] = [

@@ -80,7 +80,7 @@ class PackageController extends Controller
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEED')->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
-            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->count(),
+            'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
             'pickNum' => $this->model->where(['status' => 'PROCESSING', 'is_auto' => '1'])->count(),
             'printNum' => PickListModel::where('status', 'NONE')->count(),
@@ -90,7 +90,7 @@ class PackageController extends Controller
                 ['PACKAGEING', 'PICKING'])->count(),
             'multiInbox' => PickListModel::where('type', 'MULTI')->where('status', 'PICKING')->count(),
             'multiPack' => PickListModel::where('type', 'MULTI')->whereIn('status', ['INBOXED', 'PACKAGEING'])->count(),
-            'packageShipping' => $this->model->where('status', 'SHIPPED')->count(),
+            'packageShipping' => $this->model->where('status', 'PACKED')->count(),
             'packageException' => $this->model->where('status', 'ERROR')->count(),
             'assignFailed' => $this->model->where('status', 'ASSIGNFAILED')->count(),
         ];
@@ -411,6 +411,11 @@ class PackageController extends Controller
         $package_id = trim(request('package_id'));
         $package = $this->model->find($package_id);
         if (!$package) {
+            return json_encode(false);
+        }
+        $order = $package->order;
+        if($order->status == 'REVIEW') {
+            $package->update(['status' => 'ERROR']);
             return json_encode(false);
         }
         $items = $package->items;
@@ -756,18 +761,48 @@ class PackageController extends Controller
         $logistic_id = request()->input('logistic_id');
         $package = PackageModel::where(['tracking_no' => $track_no, 'status' => 'PACKED'])->first();
         if (!$package) {
-            return json_encode(false);
+            return json_encode('error');
         }
+        DB::beginTransaction();
+        try {
+            foreach($package->items as $packageItem) {
+                $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                                            $packageItem->quantity,
+                                            'PACKAGE',
+                                            $packageItem->id);
+                $packageItem->orderItem->update(['status' => 'SHIPPED']);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return json_encode('unhold');
+        }
+        DB::commit();
         $package->update([
             'shipped_at' => date('Y-m-d h:i:s', time()),
             'shipper_id' => request()->user()->id,
-            'actual_weight' => $weight
+            'actual_weight' => $weight,
+            'status' => 'SHIPPED',
         ]);
+        $order = $package->order;
+        $buf = 1;
+        foreach($order->packages as $childPackage) {
+            if($childPackage->status != 'SHIPPED') {
+                $buf = 0;
+            }
+        }
+        if($buf) {
+            foreach($package->items as $packageItem) {
+                $packageItem->orderItem->update(['status' => 'SHIPPED']);
+            }
+            $order->update(['status' => 'SHIPPED']);
+        } else {
+            $order->update(['status' => 'PARTIAL']);
+        }
         if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');
         }
 
-        return json_encode(true);
+        return json_encode('success');
     }
 
     /**

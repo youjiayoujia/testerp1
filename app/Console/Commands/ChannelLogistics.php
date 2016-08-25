@@ -61,7 +61,7 @@ class ChannelLogistics extends Command
             $start += $len;
             foreach ($dhgates as $dhgate) {
                 $originNum++;
-                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name, 'logistics_key' => $dhgate->logsitics_key]);
+                $channelName = ChannelNameModel::create(['channel_id' => $id, 'name' => $dhgate->logistics_name, 'logistics_key' => $dhgate->logistics_key]);
                 $arr = [];
                 if ($dhgate->logisticses) {
                     foreach ($dhgate->logisticses as $logistics) {
@@ -225,10 +225,7 @@ class ChannelLogistics extends Command
         $originNum = 0;
         $smShipments = smShipment::all()->groupBy('shipmentCarrierInfo');
         foreach($smShipments as $key => $value) {
-            $channelname = ChannelNameModel::where(['channel_id' => $id, 'name' => $key])->first();
-            if(!$channelname) {
-                $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => $key, 'logistics_key' => $key]);
-            }
+            $channelname = ChannelNameModel::create(['channel_id' => $id, 'name' => unserialize($key)['name'], 'logistics_key' => unserialize($key)['name']]);
             $logisticses = $channelname->logisticsEbay;
             $arr = [];
             foreach($logisticses as $logistics) {

@@ -402,6 +402,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::post('pickList/confirmPickBy',
+        ['uses' => 'PickListController@confirmPickBy', 'as' => 'pickList.confirmPickBy']);
     Route::any('pickList/printPackageDetails/{id}/{status}',
         ['uses' => 'PickListController@printPackageDetails', 'as' => 'pickList.printPackageDetails']);
     Route::any('pickList/printException/',

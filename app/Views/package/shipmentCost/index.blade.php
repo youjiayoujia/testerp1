@@ -25,7 +25,7 @@
             <td>{{ $shipmentCost->theory_shipment_cost }}</td>
             <td>{{ $shipmentCost->items->count() }}</td>
             <td>{{ $shipmentCost->average_price }}</td>
-            <td>{{ $shipmentCost->import_by }}</td>
+            <td>{{ $shipmentCost->importBy ? $shipmentCost->importBy->name : '' }}</td>
             <td>{{ $shipmentCost->created_at }}</td>
             <td>
                 <a href="{{ route('shipmentCostItem.showInfo', ['id'=>$shipmentCost->id]) }}" class="btn btn-info btn-xs">

@@ -382,7 +382,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'allotmentforms' => $allotmentforms,
-            'barcode' => Tool::barcodePrint($model->allotment_id, "C128"),
+            'barcode' => Tool::barcodePrint($model->allotment_id, 'c128'),
         ];
 
         return view($this->viewPath.'printAllotment', $response);

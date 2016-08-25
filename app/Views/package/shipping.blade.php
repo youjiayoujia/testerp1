@@ -94,11 +94,12 @@ $(document).ready(function(){
                 success:function(result) {
                     $('.holder').text('');
                     $('.holder_weight').text('');
-                    if(result == false) {
+                    if(result == 'error') {
                         $('.holder_weight').text('package不存在');
                         $('.trackno').val('');
                         $('.weight').val('');
                         $('.weight').focus();
+                        $('.holder').html("<span class='glyphicon glyphicon-remove'></span>");
                         return false;
                     }
                     if(result == 'logistic_error') {
@@ -106,10 +107,19 @@ $(document).ready(function(){
                         $('.trackno').val('');
                         $('.weight').val('');
                         $('.weight').focus();
-                        return;
+                        $('.holder').html("<span class='glyphicon glyphicon-remove'></span>");
+                        return false;
                     }
-                    if(result == true) {
-                        $('.holder').text('发送成功');
+                    if(result == 'unhold') {
+                        $('.holder_weight').text('unhold时数据有误');
+                        $('.trackno').val('');
+                        $('.weight').val('');
+                        $('.weight').focus();
+                        $('.holder').html("<span class='glyphicon glyphicon-remove'></span>");
+                        return false;
+                    }
+                    if(result == "success") {
+                        $('.holder').html("<span class='glyphicon glyphicon-ok'></span>");
                         $('.holder_weight').text('重量保存成功');
                         $('.trackno').val('');
                         $('.weight').val('');

@@ -55,7 +55,7 @@ class TransferLogistics extends Command
                 $originNum++;
                 $shipmentCategory = [
                     'id' => $smShipmentCategory->shipmentCatID,
-                    'name' => $smShipmentCategory->shipmentCatName
+                    'code' => $smShipmentCategory->shipmentCatName
                 ];
                 $exist = CatalogModel::where(['id' => $smShipmentCategory->shipmentCatID])->first();
                 if($exist) {

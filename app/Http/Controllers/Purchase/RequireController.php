@@ -85,7 +85,7 @@ class RequireController extends Controller
 			$data['purchase_cost']=$sumtrend->item->purchase_price;
 			$data['supplier_id']=$v->supplier_id ? $v->supplier_id : 0;
 			$data['purchase_num']=$sumtrend->need_purchase_num;
-			$data['user_id']=$v->product->purchase_adminer;
+			$data['user_id']=request()->user()->id;
 			$data['lack_num']=$data['purchase_num'];
 			//print_r($data);exit;
 			if($data['purchase_num']>0){

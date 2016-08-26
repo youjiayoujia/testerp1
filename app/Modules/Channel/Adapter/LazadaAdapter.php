@@ -31,23 +31,7 @@ Class LazadaAdapter implements AdapterInterface
         $this->config['Version'] = $this->version;
     }
 
-    /**
-     * 获取单个订单内容
-     * @param $orderID
-     * @return array|bool
-     */
-    public function getOrder($orderID)
-    {
-        $request['Action'] = 'GetOrder';
-        $request['AmazonOrderId.Id.1'] = $orderID;
-        $response = $this->setRequest('Orders', $request);
-        $order = $response->GetOrderResult->Orders->Order;
-        if ($order) {
-            $orderItems = $this->getOrderItems($order->AmazonOrderId);
-            return $this->parseOrder($order, $orderItems);
-        }
-        return false;
-    }
+
 
     /**
      * 获取订单列表
@@ -293,7 +277,8 @@ Class LazadaAdapter implements AdapterInterface
                 'channel_sku' => $v['channel_sku'],
                 'quantity' => $v['item_count'],
                 'price' => $v['item_price'],
-                'currency' => $lazada_currency_type,
+                'orders_item_number' => $v['OrderItemId'],
+                'currency' => $lazada_currency_type, 
                 'channel_order_id' => $result['channel_ordernum'],
                 'transaction_id' => $v['comment_text']
             ];

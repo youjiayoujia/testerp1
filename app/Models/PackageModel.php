@@ -624,9 +624,9 @@ class PackageModel extends BaseModel
     {
         //匹配物流方式
         $weight = $this->weight; //包裹重量
-        $amount = $this->order->amount; //订单金额
-        $amountShipping = $this->order->amount_shipping; //订单运费
-        $celeAdmin = $this->order->cele_admin;
+        $amount = $this->order ? $this->order->amount : ''; //订单金额
+        $amountShipping = $this->order ? $this->order->amount_shipping : ''; //订单运费
+        $celeAdmin = $this->order ? $this->order->cele_admin : '';
         //是否通关
         if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
             $isClearance = 1;

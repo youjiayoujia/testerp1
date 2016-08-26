@@ -187,6 +187,18 @@ $(document).ready(function(){
                             if(flag) {
                                 out_js = 1;
                                 id = tmp.data('id');
+                                sku = tmp.find('.sku').text();
+                                $.ajax({
+                                    url:"{{ route('pickList.packageItemUpdate')}}",
+                                    data:{package_id:package_id, sku:sku},
+                                    dataType:'json',
+                                    type:'get',
+                                    success:function(result) {
+                                        if(!result) {
+                                            return false;
+                                        }
+                                    }
+                                });
                                 $("."+id).find('.status').text('已包装');
                                 $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
                                 $('#barcode').load(function(){
@@ -194,15 +206,7 @@ $(document).ready(function(){
                                     $('#barcode')[0].contentWindow.print();
                                 });
                             }
-                            sku = tmp.find('.sku').text();
-                            $.ajax({
-                                url:"{{ route('pickList.packageItemUpdate')}}",
-                                data:{package_id:package_id, sku:sku},
-                                dataType:'json',
-                                type:'get',
-                                success:function(result) {
-                                }
-                            });
+                            
                         }
                     }
                 }
@@ -230,6 +234,18 @@ $(document).ready(function(){
                         });
                         if(flag) {
                             out_js = 1;
+                            sku = tmp.find('.sku').text();
+                            $.ajax({
+                                url:"{{ route('pickList.packageItemUpdate')}}",
+                                data:{package_id:package_id, sku:sku},
+                                dataType:'json',
+                                type:'get',
+                                success:function(result) {
+                                    if(!result) {
+                                        return false;
+                                    }
+                                }
+                            });
                             tmp.find('.status').text('已包装');
                             $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
                             $('#barcode').load(function(){
@@ -238,15 +254,6 @@ $(document).ready(function(){
                             });
                         }
                     }
-                    sku = tmp.find('.sku').text();
-                    $.ajax({
-                        url:"{{ route('pickList.packageItemUpdate')}}",
-                        data:{package_id:package_id, sku:sku},
-                        dataType:'json',
-                        type:'get',
-                        success:function(result) {
-                        }
-                    });
                     needId = tmp.data('id');
                     arr = new Array();
                     i=0;

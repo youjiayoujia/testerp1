@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\Job;
-use App\Jobs\AssignStocks;
+use App\Jobs\DoPackages;
 use App\Models\OrderModel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -39,23 +39,16 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             $order = $orderModel->createOrder($this->order);
             if ($order) {
                 if ($order->status == 'PREPARED') {
-                    $package = $order->createPackage();
-                    if ($package) {
-                        $job = new AssignStocks($package);
-                        $job->onQueue('assignStocks');
-                        $this->dispatch($job);
-                        $this->relation_id = $order->id;
-                        $this->result['status'] = 'success';
-                        $this->result['remark'] = 'Success.';
-                    } else {
-                        $this->relation_id = 0;
-                        $this->result['status'] = 'fail';
-                        $this->result['remark'] = 'Fail to create virtual package.';
-                    }
+                    $job = new DoPackages($order);
+                    $job->onQueue('doPackages');
+                    $this->dispatch($job);
+                    $this->relation_id = $order->id;
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success.';
                 } else {
                     $this->relation_id = 0;
                     $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Package status is not PREPARED. Can not create package';
+                    $this->result['remark'] = 'Order status is not PREPARED. Can not create package';
                 }
             } else {
                 $this->relation_id = 0;

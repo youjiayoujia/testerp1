@@ -23,12 +23,9 @@ class AlterPackageAddStatus extends Migration
                     'TRACKINGFAILED',
                     'PROCESSING',
                     'PICKING',
-                    'PICKED',
-                    'PRINTED',
                     'PACKED',
                     'SHIPPED',
                     'ERROR',
-                    'CANCLE',
                 ])->default('NEW')->comment('状态');
         });
     }

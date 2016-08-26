@@ -522,7 +522,7 @@ class ItemModel extends BaseModel
                 ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
-                ->sum('order_items.quantitys');
+                ->sum('order_items.quantity');
 
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')

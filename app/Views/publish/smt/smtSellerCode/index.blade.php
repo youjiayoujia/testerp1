@@ -8,9 +8,9 @@
 @section('tableBody')
     @foreach($data as $sellerCode)
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{$sellerCode->id}}</td>
+            <td>{{$sellerCode->sale_code}}</td>
+            <td>{{$sellerCode->User->name}}</td>
 
                 <td>
                 <a href="{{ route('smtSellerCode.edit', ['id'=>$sellerCode->id]) }}" class="btn btn-warning btn-xs">

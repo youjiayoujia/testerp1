@@ -35,7 +35,7 @@ class CreateSmtProductListTable extends Migration
             $table->integer('packageLength')->comment('长度');
             $table->integer('packageWidth')->comment('宽度');
             $table->integer('packageHeight')->comment('高度');
-            $table->integer('grossWeight')->comment('重量');
+            $table->string('grossWeight')->comment('重量');
             $table->smallInteger('deliveryTime')->comment('多久发货');
             $table->smallInteger('wsValidNum')->comment('刊登天数,到期后自动下架');
             $table->tinyInteger('multiattribute')->comment('0为单属性，1为多属性');

@@ -80,6 +80,18 @@ return [
         'require_create' => '是否需要采购',
 
         'productSku.skuCode'=>'产品SKU',
+        'product.token_id' => '帐号',
+        'product.multiattribute' => '=属性=',
+        'product.productStatusType' => '平台状态',
+        'product.user_id' => '刊登人员',
+        'products.status' => '商品状态',
+        'products.c_name' => '商品中文名',
+        'ipmSkuStock' => '可售库存',
+        'is_erp' => 'sku是否匹配',
+        'price.skuPrice' => '价格',
+        'price.profitRate' => '利润率',
+        
+         'token_id' => '渠道帐号',
 
         'hang_num' => '挂号码',
         'hang_number' => '挂号码',

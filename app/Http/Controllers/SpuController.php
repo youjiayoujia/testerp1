@@ -163,7 +163,7 @@ class SpuController extends Controller
         $language = request()->input("language");
         $spu_id = request()->input("spu_id");
         $model = $this->model->find($spu_id);
-        $info = $model->spuMultiOption->where("channel_id",(int)$channel_id)->first()->toArray();
+        $info = $model->spuMultiOption()->where("channel_id",$channel_id)->first()->toArray();
         $result['name'] = $info[$language."_name"];
         $result['description'] = $info[$language."_description"];
         $result['keywords'] = $info[$language."_keywords"];

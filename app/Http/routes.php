@@ -56,6 +56,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockUnhold', 'Stock\UnholdController');
     //入库
     Route::resource('stockIn', 'Stock\InController');
+
+    //建议采购
+    Route::get('suggestForm/createForms', ['uses' => 'Oversea\SuggestFormController@createForms', 'as' => 'suggestForm.createForms']);
+    Route::resource('suggestForm', 'Oversea\SuggestFormController');
+
     //物流对账正确信息详情
     Route::get('shipmentCostError/showError/{id}', ['uses' => 'ShipmentCostErrorController@showError', 'as' => 'shipmentCostError.showError']);
     Route::resource('shipmentCostError', 'ShipmentCostErrorController');

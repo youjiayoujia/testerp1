@@ -221,7 +221,7 @@ return [
             '海外仓模块' => [
                 [
                     'name' => '海外仓销量',
-                    'url' => 'package.index',
+                    'url' => 'suggestForm.index',
                     'icon' => '',
                 ],
             ],

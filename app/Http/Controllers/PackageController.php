@@ -23,8 +23,6 @@ use App\Models\WarehouseModel;
 use DB;
 use Exception;
 use App\Jobs\AssignStocks;
-use App\Jobs\PlaceLogistics;
-
 
 class PackageController extends Controller
 {

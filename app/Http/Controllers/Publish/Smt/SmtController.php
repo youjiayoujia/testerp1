@@ -42,31 +42,55 @@ class SmtController extends Controller{
        $this->mainOnlineIndex = route('smt.onlineProductIndex');
    }
    
+   /**
+    * 草稿列表
+    */
    public function index(){
        request()->flash();
-       $this->mainTitle='SMT待发布产品';
+       $this->mainTitle='SMT产品草稿';
+       $list = $this->model->where('productStatusType','newData');
        $response = [
            'metas' => $this->metas(__FUNCTION__),
-           'data' => $this->autoList($this->model->where('productStatusType','waitPost')),
+           'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
+           'type' => 'newData',
        ];
        return view($this->viewPath . 'index', $response);
    }
    
-   public function onlineProductIndex(){
+   /**
+    * 待发布产品列表
+    * @return Ambigous <\Illuminate\View\View, \Illuminate\Contracts\View\Factory>
+    */
+   public function waitPostList(){
        request()->flash();
-       $this->mainTitle='SMT在线产品';
+       $this->mainTitle='SMT待发布产品';
+       $list = $this->model->where('productStatusType','waitPost');
        $response = [
            'metas' => $this->metas(__FUNCTION__),
-           'data' => $this->autoList($this->model->where('productStatusType','!=','waitPost')),
+           'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
-           'type' => 'online',
+           'type' => 'waitPost',
        ];
        return view($this->viewPath . 'index', $response);
    }
+   
+   /**
+    * 在线产品列表
+    */
+   public function onlineProductIndex(){
+       request()->flash();
+       $this->mainTitle='SMT在线产品';
+       $list = $this->model->whereIn('productStatusType',['onSelling','offline','auditing','editingRequired']);
+       $response = [
+           'metas' => $this->metas(__FUNCTION__),
+           'data' => $this->autoList($this->model,$list),
+           'mixedSearchFields' => $this->model->mixed_search,
+       ];
+       return view($this->viewPath . 'onlinIndex', $response);
+   }
       
-   public function create()
-   {
+   public function create()   {
        
        $this->mainTitle='SMT产品';
        $response = [
@@ -1342,7 +1366,7 @@ class SmtController extends Controller{
     public function batchDel(){
         $productIds = input::get('productIds');
         if (!empty($productIds)){
-            $productIdArr = explode(',', $productIds);           
+            $productIdArr = explode(',', $productIds);  
             foreach ($productIdArr as $id){
                 $rs = $this->draftDel($id);
                 if ($rs['status']){
@@ -1908,6 +1932,19 @@ html;
    
        $this->ajax_return('',1,$returnarr);
    
+   }
+   
+   /**
+    * 批量保存为待发布状态
+    */
+   public function changeStatusToWait(){
+       $product_ids = request()->input('product_ids');
+      
+       $product_ids_arr = explode(',', $product_ids);
+       foreach($product_ids_arr as $product_id) {      
+           $this->model->where('productId',$product_id)->update(['productStatusType' => 'waitPost']);
+       }
+       return 1;
    }
    
 }

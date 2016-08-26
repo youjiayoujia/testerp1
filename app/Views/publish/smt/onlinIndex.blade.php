@@ -1,21 +1,20 @@
 @extends('common.table')
 @section('tableHeader')
     <th><input type='checkbox' name='select_all' class='select_all'></th>
-    <th class="sort" data-field="id">产品ID</th>
     <th>图片</th>
     <th>账号</th>   
+    <th>产品ID</th>
     <th>SKU</th>
-    <th>单价</th> 
-    <th>状态</th> 
     <th>标题</th>
-    <th>关键词</th>
+    <th>近30天销售</th>
+    <th>刊登人员</th>
+    <th>刊登时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
      @foreach($data as $smtProductList)
         <tr>
             <td><input type='checkbox' name='single[]' class='single' value="{{$smtProductList->productId}}"></td>
-            <td>{{ $smtProductList->productId }}</td>
             <td>
                 <?php
                     if(!empty($smtProductList->details->imageURLs)){
@@ -27,6 +26,7 @@
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
             </td>
             <td>{{ $smtProductList->accounts ? $smtProductList->accounts->account : ''}}</td>
+            <td>{{ $smtProductList->productId }}</td>
             <td>
                 <?php 
                     $skuCodeArr = array();
@@ -37,81 +37,37 @@
                     }                                             
                 ?>            
             </td>
-            <td>{{ $smtProductList->productPrice}}</td>
-            <td>{{ $smtProductList->productStatusType == 'waitPost' ? '待发布' : '草稿'}}</td>
-            <td>{{ $smtProductList->subject }}</td>
-      
-            
-            <td>{{ $smtProductList->details ? $smtProductList->details->keyword : ''}} </td>
-            <!-- 
-            <td>{{ $smtProductList->details ? $smtProductList->details->productMoreKeywords1 : ''}}</td>
-            <td>{{ $smtProductList->details ? $smtProductList->details->productMoreKeywords2 : ''}}</td>
-            
+            <td>{{ $smtProductList->subject }}</td>    
+            <td>{{ $smtProductList->quantitySold1 }}</td>       
             <td>{{ $smtProductList->userInfo ? $smtProductList->userInfo->name : ''}}</td>
-            <td>{{ $smtProductList->updated_at }}</td>
-             -->
-            <td>                                      
-               <a href="{{ route('smt.edit', ['id'=>$smtProductList->productId]) }}" class="btn btn-warning btn-xs">
-                    <span class="glyphicon glyphicon-pencil"></span> 编辑
-               </a>
-               <a href="javascript:" class="btn btn-danger btn-xs delete_item"
-                   data-id="{{ $smtProductList->productId }}"
-                   data-url="{{ route('smt.destroy', ['id' => $smtProductList->productId]) }}">
-                    <span class="glyphicon glyphicon-trash"></span> 删除                    
-               </a>                                        
+            <td>{{ $smtProductList->gmtCreate}}</td>
+            <td>   
+                  
+                    <a href="{{ route('smt.editOnlineProduct', ['id'=>$smtProductList->productId]) }}"
+                       class="btn btn-warning btn-xs">
+                        <span class="glyphicon glyphicon-pencil"></span> 编辑在线信息
+                    </a>
+                     @if( $smtProductList->productStatusType == 'onSelling' || $smtProductList->productStatusType == 'offline')
+                    <a onclick="operator('<?php echo $smtProductList->productId;  ?>' ,'online',this)" class="btn btn-danger btn-xs  <?php   if($smtProductList->productStatusType=='offline'){echo "hidden"; }      ?>">
+                        <span class="glyphicon glyphicon-pencil "></span> 下架
+                    </a>
+
+                    <a onclick="operator('<?php echo $smtProductList->productId;  ?>' ,'offline',this)"  class="btn btn-success btn-xs <?php   if($smtProductList->productStatusType=='onSelling'){echo "hidden"; }      ?>">
+                        <span class="glyphicon glyphicon-pencil  "></span> 上架
+                    </a>
+                    @endif
+                                    
             </td>
         </tr>
      @endforeach
 @stop
 @section('tableToolButtons')
-    @if($type == 'waitPost')
-        <div class="btn-group">
-            <a class="btn btn-success export" href="{{route('smt.index')}}">
-                查看草稿列表
-            </a>
-        </div>              
-         <div class="btn-group">
-            <a class="btn btn-success export" href="javascript:">
-                批量生产草稿
-            </a>
-        </div>
-      
-     @else
-        <div class="btn-group">
-            <a class="btn btn-success export" href="{{route('smt.waitPost')}}">
-                查看待发布产品列表
-            </a>
-        </div>
-        <div class="btn-group">
-            <a class="btn btn-success export" href="javascript:" id="batch_wait">
-             批量保存为待发布
-            </a>
-        </div>
         
-        
-     @endif
-         <div class="btn-group">
-                <a class="btn btn-success export" href="javascript:">
-                    批量修改
-                </a>
-           </div>
-     
-        <div class="btn-group">
-            <a class="btn btn-success export" href="javascript:" id="batch_del">
-                批量删除
-            </a>
-        </div>
-        <div class="btn-group">
-            <a class="btn btn-success export" href="javascript:" id="batch_post">
-                批量发布
-            </a>
-        </div>
         <div class="btn-group">
             <a class="btn btn-success export" href="{{ route('smt.create') }}">
-               新增
+              批量修改
             </a>
         </div>
-       
 
 @stop
 @section('childJs')
@@ -126,32 +82,6 @@ $(document).ready(function(){
             $('.single').prop('checked', false);
         }
     });
-})
-
-$("#batch_wait").on('click',function(){
-	var product_ids = $('input[name="single[]"]:checked').map(function(){
-		return $(this).val();
-	}).get().join(',');
-
-	if (!product_ids){
-		alert('请先选择行', 'alert-warning');
-		return false;
-	}
-
-	if (confirm('确定要批量保存为待发布?')){
-		$.ajax({
-			url: "{{route('smt.changeStatusToWait')}}",
-			data: {product_ids : product_ids},
-			dataType : 'json',
-			type : 'get',
-			success : function(result){
-				window.location.reload();
-			}
-		})
-	}
-
-	
-	
 })
 
 $(document).on('click', '#batch_post', function(){
@@ -196,6 +126,7 @@ $(document).on('click', '#batch_del', function(){
 	var productIds = $('input[name="single[]"]:checked').map(function(){
 		return $(this).val();
 	}).get().join(',');
+
 	if (!productIds){
 		alert('请先选择行', 'alert-warning');
 		return false;
@@ -211,9 +142,13 @@ $(document).on('click', '#batch_del', function(){
 		type: 'post',
 		dataType: 'json',
 		async: true,
-		success:function(result){
-			alert(result.msg);
-			window.location.reload();
+		success:function(data){
+			if(typeof(data) == "string"){
+				data = JSON.prase(data);
+			}
+			if(data.status){
+				alert(data.info);
+			}
 		}
 	});	 	
 });

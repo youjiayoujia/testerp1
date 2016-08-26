@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Publish\Smt;
 
 use App\Http\Controllers\Controller;
-use App\models\Publish\Smt\smtProductSku;
-use App\models\Publish\Smt\smtProductGroup;
+use App\Models\Publish\Smt\smtProductSku;
+use App\Models\Publish\Smt\smtProductGroup;
 use App\Models\Publish\Smt\smtProductDetail;
 use App\Models\Publish\Smt\smtProductList;
 use App\Models\Publish\Smt\smtFreightTemplate;

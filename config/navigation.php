@@ -371,6 +371,11 @@ return [
             [
 
                 'name' => 'SMT待发布产品列表',
+                'url' => 'smt.waitPost',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT产品草稿列表',
                 'url' => 'smt.index',
                 'icon' => '',
             ],

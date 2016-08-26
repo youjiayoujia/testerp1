@@ -29,6 +29,8 @@ class CreateEbayCasesListsTable extends Migration
             $table->string('last_modify_date')->commit('修改日期')->nullable();
             $table->integer('assign_id')->commit('处理人')->nullable();
             $table->integer('account_id')->commit('渠道账号')->nullable();
+            $table->enum('process_status', ['UNREAD', 'PROCESS', 'COMPLETE'])->commit('case处理状态')->defalut('UNREAD');
+            $table->integer('related_order_id')->commit('关联的订单号')->nullable();
 
             $table->string('global_id')->nullable();
             $table->string('open_reason')->nullable();

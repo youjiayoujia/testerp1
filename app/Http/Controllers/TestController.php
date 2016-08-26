@@ -603,7 +603,7 @@ class TestController extends Controller
 
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->getMessages();
+                $messageList = $channel->getCases();
                 print_r($messageList);exit;
 
             }

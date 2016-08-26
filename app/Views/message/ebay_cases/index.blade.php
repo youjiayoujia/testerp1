@@ -61,9 +61,21 @@
             <td>{{$case->transaction_id}}</td>
             <td>{{$case->creation_date}}</td>
             <td>
-                <a href="ebayCases/{{$case->id}}/edit" class="btn btn-primary btn-xs">
-                    <span class="glyphicon glyphicon-play"></span> 开始处理
-                </a>
+                @if($case->process_status == 'UNREAD')
+                    <a href="ebayCases/{{$case->id}}/edit" class="btn btn-primary btn-xs">
+                        <span class="glyphicon glyphicon-play"></span> 开始处理
+                    </a>
+                @endif
+                @if($case->process_status == 'PROCESS')
+                    <a href="ebayCases/{{$case->id}}/edit" class="btn btn-warning btn-xs">
+                        <span class="glyphicon glyphicon-pause"></span> 继续处理
+                    </a>
+                @endif
+                @if($case->process_status == 'COMPLETE')
+                    <a href="" class="btn btn-info btn-xs">
+                        <span class="glyphicon glyphicon-eye-open"></span> 查看
+                    </a>
+                @endif
             </td>
         </tr>
     @endforeach

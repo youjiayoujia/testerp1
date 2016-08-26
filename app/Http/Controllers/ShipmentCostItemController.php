@@ -18,7 +18,7 @@ class ShipmentCostItemController extends Controller
     public function __construct(ShipmentCostItemModel $shipmentCost)
     {
         $this->model = $shipmentCost;
-        $this->mainIndex = route('shipmentCostItem.index');
+        $this->mainIndex = route('shipmentCost.index');
         $this->mainTitle = '物流对账';
         $this->viewPath = 'package.shipmentCost.';
     }

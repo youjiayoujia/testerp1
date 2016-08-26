@@ -656,6 +656,11 @@ class PackageController extends Controller
         $logistics = LogisticsModel::find($logistics_id);
         $is_auto = ($logistics->docking == 'MANUAL' ? '0' : '1');
         $model->update(['logistics_id' => $logistics_id, 'status' => 'ASSIGNED', 'is_auto' => $is_auto]);
+        if($is_auto) {
+            $job = new PlaceLogistics($model);
+            $job = $job->onQueue('placeLogistics');
+            $this->dispatch($job);
+        }
         return json_encode(true);
     }
 

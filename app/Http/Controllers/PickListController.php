@@ -79,6 +79,17 @@ class PickListController extends Controller
         return view($this->viewPath.'print', $response);
     }
 
+    public function confirmPickBy()
+    {
+        $model = $this->model->find(request('pickId'));
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->update(['pick_by' => request('pickBy')]);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
+    }
+
     public function printPackageDetails($id, $status)
     {
         $model = $this->model->find($id);

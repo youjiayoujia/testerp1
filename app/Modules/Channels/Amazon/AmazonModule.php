@@ -52,6 +52,41 @@ class AmazonModule extends BaseChannelModule
         $url = $this->getFinalUrl();
         $this->visitUrl($url);
     }
+
+    
+    public function getProductInfo()
+    {
+        $this->serviceUrl = "https://mws.amazonservices.com/Products/2011-10-01?";
+        $this->_config['Action'] = 'GetMatchingProductForId';
+        $this->_config['IdType'] = 'SellerSKU';  
+        $this->_config['Version'] = '2011-10-01';
+        $this->_config['IdList.Id.1'] = '606*TS0074W2[SUNUS]';
+        unset($this->_config['MarketplaceId.Id.1']);
+        $this->_config['MarketplaceId'] = 'ATVPDKIKX0DER';
+        //var_dump($this->_config);exit;
+        $url = $this->getFinalUrl();
+        //var_dump($url);exit;
+        $this->visitUrl($url);
+    }
+
+    /**
+     * 库存，有两个totalSupplyQuantity,InStockSupplyQuantity 
+     *
+     */
+    public function listSupplier()
+    {
+        $this->serviceUrl = "https://mws.amazonaws.com/FulfillmentInventory/2010-10-01?";
+        $this->_config['Action'] = 'ListInventorySupply';
+        $this->_config['Version'] = '2010-10-01';
+        $this->_config['SellerSkus.member.1'] = '606*TS0074W2[SUNUS]';
+        $this->_config['SellerSkus.member.2'] = '606*TS0074W1[SUNUS]';
+        $this->_config['ResponseGroup'] = 'Detail';
+        unset($this->_config['MarketplaceId.Id.1']);
+        $this->_config['MarketplaceId'] = 'ATVPDKIKX0DER';
+        //var_dump($this->_config);exit;
+        $url = $this->getFinalUrl();
+        $this->visitUrl($url);
+    }
 /*************************************************************************************/
 /**
  * $model = new AmazonModule();

@@ -20,6 +20,6 @@ class TestController extends Controller
     public function test()
     {
         $model = new AmazonModule();
-        $model->returnTracking();
+        $model->listSupplier();
     }
 }

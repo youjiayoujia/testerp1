@@ -39,16 +39,16 @@ return [
 
     'modules' =>[
         'amazon' => [
-            'AWSAccessKeyId' => 'AKIAJE7QKBLWVEGMZRJQ',
+            'AWSAccessKeyId' => 'AKIAJV5BH3ZQG46ZRALQ',
             'SignatureVersion' => '2',
             'MarketplaceId.Id.1' => 'ATVPDKIKX0DER',
-            'SellerId' => 'A3THBIK7QYKUUV',
+            'SellerId' => 'A2UWZA8JOQYEBT',
             'SignatureMethod' => 'HmacSHA256',
             'Timestamp' => gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time()),
             'Version' => '2013-09-01',
         ],
     ],
 
-    'AWS_SECRET_ACCESS_KEY' => 'gH13dKCgTtBloKPhHFIBmDTv/sbNoUNJkWIMK/Je',
+    'AWS_SECRET_ACCESS_KEY' => '0CLC6sf20PN27a+vvEiv8z5gMc2yWj3pTCYYu6Dz',
 ];
 

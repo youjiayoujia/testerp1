@@ -8,6 +8,7 @@ use App\Models\Publish\Smt\smtProductSku;
 use Illuminate\Support\Facades\Input;
 use App\Models\Channel\AccountModel;
 use App\Models\Publish\Smt\smtProductList;
+use App\Models\ProductModel;
 
 
 class SmtOnlineMonitorController extends Controller
@@ -26,9 +27,12 @@ class SmtOnlineMonitorController extends Controller
     public function index()
     {
         $this->mainTitle='速卖通在线数量监控';
+        $list = $this->model->whereHas('product',function($query){
+            $query = $query->whereIn('productStatusType',['onSelling','offline','auditing','editingRequired']);
+        });
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList($this->model,$list),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'onlineMonitor', $response);
@@ -73,7 +77,7 @@ class SmtOnlineMonitorController extends Controller
         }
         $account = AccountModel::findOrFail($account_id);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
-        
+        $smtProductObj = new SmtProductsController();
         //获取商品的最新信息
         $last_product_Info = $channel->findAeProductById($data['productId']);
         if(array_key_exists('error_code', $last_product_Info)){
@@ -94,9 +98,16 @@ class SmtOnlineMonitorController extends Controller
                     $price = $v['skuPrice'] * (1 + $skuPrice/100);
                 }
                 $v['skuPrice'] = sprintf('%.2f', round($price, 2));
+                /*$skuCode = smtProductSku::where('smtSkuCode',$v['skuCode'])->first()->skuCode;
+                if($skuCode){
+                    $profitRate = $smtProductObj->_setProfitRate($data['productId'], $skuCode, $v['skuPrice']);
+                }else {
+                   $profitRate = 0; 
+                }*/
             }
         }
         $data['skuPrice'] = $price;
+    
         $result = $channel->editSingleSkuPrice($data);
         if(array_key_exists('success',$result) && $result['success']){
             $where = ['productId' => $data['productId'], 'sku_active_id' => $data['skuId']];
@@ -104,7 +115,7 @@ class SmtOnlineMonitorController extends Controller
             $this->model->where($where)->update($updateData);
             return redirect($this->mainIndex)->with('alert', $this->alert('success',  '产品'.$data['productId'].'的价格修改成功 !'));
         }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '的价格修改失败:'.$result['error_message']));
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '产品'.$data['productId'].'的价格修改失败:'.$result['error_message']));
         }
     }
     
@@ -200,30 +211,41 @@ class SmtOnlineMonitorController extends Controller
         $product_info = Input::get('products');
         $impSkuStock = Input::get('impSkuStock');
         $arr = explode(' ', $product_info); 
-        foreach ($arr as  $item){
-            $singleSkuArr = explode(',', $item);
-            $productId = $singleSkuArr[0];
-            $smtSkuCode = $singleSkuArr[1];
-            $skuInfo = $this->model->where('smtSkuCode',$smtSkuCode)->first();           
-            $token_id = $skuInfo->product->token_id;
+        $product_ids = $this->formatProductArray($arr);
+ 
+        foreach($product_ids as $value){
+            $productId = $value['product_id'];
+            $smtSkuCode = array_unique($value['sku']);
+            $product_skus = $this->model->whereIn('smtSkuCode', $smtSkuCode)->get()->toArray();
+            $skuStocks = array();
+            foreach($product_skus as  $row){
+                $skuStocks[$row['sku_active_id']] = $impSkuStock;
+            }   
             
-            $data['skuId'] = $skuInfo->sku_active_id;
-            $data['ipmSkuStock'] = $impSkuStock;
-            $data['productId'] = $productId;
             //获取渠道帐号信息
+            $token_id = smtProductList::where('productId',$productId)->first()->token_id;         
             $account = AccountModel::findOrFail($token_id);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
-            $result = $channel->editSingleSkuStock($data);
+            
+            $data['skuStocks'] = json_encode($skuStocks);
+            $data['productId'] = $productId;
+            $api = 'api.editMutilpleSkuStocks';          
+            $result = $channel->getJsonDataUsePostMethod($api,$data);         
+            $result = json_decode($result,true);
             if(array_key_exists('success',$result) && $result['success']){
-                $where = ['productId' => $data['productId'], 'sku_active_id' => $data['skuId']];
-                $updateData = ['ipmSkuStock' => $data['ipmSkuStock'],'updated' => date('Y:m:d H:i:s',time())];
-                $this->model->where($where)->update($updateData);
+                foreach ($product_skus as $item){
+                    $where = ['productId' => $data['productId'], 'sku_active_id' => $item['sku_active_id']];
+                    $updateData = ['ipmSkuStock' => $impSkuStock];
+                    $this->model->where($where)->update($updateData);
+                }                
                 $flag = true;
             }else{
                 return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '库存修改失败:'.$result['error_message']));
-            }           
-        }
-        return redirect($this->mainIndex)->with('alert', $this->alert('success',  '操作成功 !'));
+            }
+        
+        }                 
+        
+        return redirect($this->mainIndex)->with('alert', $this->alert('success',  '批量操作成功 !'));
     }
     
     /**
@@ -314,6 +336,21 @@ class SmtOnlineMonitorController extends Controller
             }
         }
             return $response;
+    }
+    
+    /**
+     * 对传入的数组进行格式化
+     */
+    public function formatProductArray($product_id){
+        foreach ($product_id as $value) {
+            list($v[0], $v[1]) = explode(',', $value);
+            $p_ids[$v[0]][] = $v[1];
+        }
+        foreach ($p_ids as $key => $value) {
+            $product_ids[] = array('product_id' => $key, 'sku' => $value);
+        }
+        
+        return $product_ids;
     }
    
 }

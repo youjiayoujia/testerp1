@@ -205,7 +205,7 @@
                     <div class="row">
                             <div class="form-group col-lg-12">                              
                                 <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                <input type='text' class="form-control" placeholder="0~99999之间" id="skuStock" name="ipmSkuStock">
+                                <input type='text' class="form-control" placeholder="0~99999之间" id="skuStock" name="impSkuStock">
                                 <input type="hidden" name="products">                                
                             </div>
                      </div>
@@ -260,7 +260,7 @@ function operator(id,type,e){
 	var msg;
     if (type == 'online') {
         msg = '亲，您真的想让商品：' + id + ' 下架吗？';
-    } else if (sales_status == 'offline') {
+    } else if (type == 'offline') {
         msg = '亲，您真的想让商品：' + id + ' 上架吗？';
     }
 	layer.confirm(msg,function(){

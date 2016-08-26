@@ -36,15 +36,7 @@ class smtProductSku extends BaseModel
     
     public function getMixedSearchAttribute()
     {
-        return [
-            
-            'filterFields' => [],
-            /*'filterSelects' => [ 
-                'token_id' => 
-                'user_id' => $this->getArray('App\Models\UserModel','name'),
-             ],*/
-            
-            'relatedSearchFields' => [],
+        return [                       
             'selectRelatedSearchs' => [              
                 'product' => [
                     'token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','account'),
@@ -59,6 +51,9 @@ class smtProductSku extends BaseModel
             'filterSelects' => [
                 'is_erp' => config('smt_product.is_erp'),
                 'ipmSkuStock' => config('smt_product.skuStockStatus'),
+            ],
+            'sectionSelect' => [
+                'price' => ['skuPrice','profitRate'],
             ]
             
         ];

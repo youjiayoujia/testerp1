@@ -617,32 +617,39 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
     // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
    
-    Route::get('smt/onlineProductIndex',
-        ['uses' => 'Publish\Smt\SmtController@onlineProductIndex', 'as' => 'smt.onlineProductIndex']);
-    Route::get('smt/showChildCategory',
-        ['uses' => 'Publish\Smt\SmtController@showChildCategory', 'as' => 'smt.showChildCategory']);
-    Route::get('smt/showCommandCategoryList',
-        ['uses' => 'Publish\Smt\SmtController@showCommandCategoryList', 'as' => 'smt.showCommandCategoryList']);
-    Route::post('smt/doAction',
-        ['uses' => 'Publish\Smt\SmtController@doAction', 'as' => 'smt.doAction']);
-    Route::post('smt/create',
-        ['uses' => 'Publish\Smt\SmtController@addProduct', 'as' => 'smt.addProduct']);
-    Route::post('smt/batchPost',
-        ['uses' => 'Publish\Smt\SmtController@batchPost', 'as' => 'smt.batchPost']);   
-    Route::post('smt/recommendProductList',
-        ['uses' => 'Publish\Smt\SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
-    Route::post('smt/batchDel',
-        ['uses' => 'Publish\Smt\SmtController@batchDel', 'as' => 'smt.batchDel']);   
-    Route::post('smt/ajaxUploadDirImage',
-        ['uses' => 'Publish\Smt\SmtController@ajaxUploadDirImage', 'as' => 'smt.ajaxUploadDirImage']);  
-    Route::post('smt/ajaxUploadOneCustomPic',
-        ['uses' => 'Publish\Smt\SmtController@ajaxUploadOneCustomPic', 'as' => 'smt.ajaxUploadOneCustomPic']);  
-    Route::post('smt/getskuinfo',
-        ['uses' => 'Publish\Smt\SmtController@getskuinfo', 'as' => 'smt.getskuinfo']);
-    Route::get('smt/editOnlineProduct',
-        ['uses' => 'Publish\Smt\SmtController@editOnlineProduct', 'as' => 'smt.editOnlineProduct']);
-    Route::get('smt/ajaxOperateOnlineProduct',
-        ['uses' => 'Publish\Smt\SmtController@ajaxOperateOnlineProduct', 'as' => 'smt.ajaxOperateOnlineProduct']);    
+    Route::group(['prefix' => 'smt', 'namespace' => 'Publish\Smt'],function(){
+        Route::get('onlineProductIndex',
+            ['uses' => 'SmtController@onlineProductIndex', 'as' => 'smt.onlineProductIndex']);
+        Route::get('showChildCategory',
+            ['uses' => 'SmtController@showChildCategory', 'as' => 'smt.showChildCategory']);
+        Route::get('showCommandCategoryList',
+            ['uses' => 'SmtController@showCommandCategoryList', 'as' => 'smt.showCommandCategoryList']);
+        Route::post('doAction',
+            ['uses' => 'SmtController@doAction', 'as' => 'smt.doAction']);
+        Route::post('create',
+            ['uses' => 'SmtController@addProduct', 'as' => 'smt.addProduct']);
+        Route::post('smt/batchPost',
+            ['uses' => 'SmtController@batchPost', 'as' => 'smt.batchPost']);
+        Route::post('recommendProductList',
+            ['uses' => 'SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
+        Route::post('batchDel',
+            ['uses' => 'SmtController@batchDel', 'as' => 'smt.batchDel']);
+        Route::post('ajaxUploadDirImage',
+            ['uses' => 'SmtController@ajaxUploadDirImage', 'as' => 'smt.ajaxUploadDirImage']);
+        Route::post('ajaxUploadOneCustomPic',
+            ['uses' => 'SmtController@ajaxUploadOneCustomPic', 'as' => 'smt.ajaxUploadOneCustomPic']);
+        Route::post('getskuinfo',
+            ['uses' => 'SmtController@getskuinfo', 'as' => 'smt.getskuinfo']);
+        Route::get('editOnlineProduct',
+            ['uses' => 'SmtController@editOnlineProduct', 'as' => 'smt.editOnlineProduct']);
+        Route::get('ajaxOperateOnlineProduct',
+            ['uses' => 'SmtController@ajaxOperateOnlineProduct', 'as' => 'smt.ajaxOperateOnlineProduct']);
+        Route::get('waitPost',
+            ['uses' => 'SmtController@waitPostList', 'as' => 'smt.waitPost']);
+        Route::get('changeStatusToWait',
+            ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
+    });
+   
     Route::resource('smt', 'Publish\Smt\SmtController');
     
     Route::group(['prefix' => 'smtProduct', 'namespace' => 'Publish\Smt'],function(){

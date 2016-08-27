@@ -211,6 +211,22 @@ return [
             ],
         ],
     ],
+    //仓储导航
+    [
+        'name' => '海外仓',
+        'icon' => 'home',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '海外仓模块' => [
+                [
+                    'name' => '海外仓销量',
+                    'url' => 'suggestForm.index',
+                    'icon' => '',
+                ],
+            ],
+        ],
+    ],
     //物流导航
     [
         'name' => '物流',

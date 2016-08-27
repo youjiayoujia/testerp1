@@ -18,7 +18,7 @@ class ShipmentCostErrorController extends Controller
     public function __construct(ShipmentCostErrorModel $shipmentCost)
     {
         $this->model = $shipmentCost;
-        $this->mainIndex = route('shipmentCostError.index');
+        $this->mainIndex = route('shipmentCost.index');
         $this->mainTitle = '物流对账';
         $this->viewPath = 'package.shipmentCost.';
     }

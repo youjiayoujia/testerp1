@@ -44,6 +44,11 @@ class ShipmentCostModel extends BaseModel
         return $this->hasMany('App\Models\Package\ShipmentCostErrorModel', 'parent_id', 'id');
     }
 
+    public function importBy()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'import_by', 'id');
+    }
+
     public function importProcess($file, $userId)
     {
         $path = config('setting.excelPath');
@@ -66,7 +71,6 @@ class ShipmentCostModel extends BaseModel
         $outer_all_cost = 0;
         $outer_theory_cost = 0;
         $average_price = '';
-
         foreach ($arr as $key => $value) {
         	if(!$key) {
         		continue;

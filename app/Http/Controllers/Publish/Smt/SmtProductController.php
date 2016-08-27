@@ -358,6 +358,7 @@ class SmtProductController extends Controller
      */
     public function getLocalProductGroupList($token_id){
         $result = $this->Smt_product_group_model->where('token_id',$token_id)->get()->toArray();
+        $rs = array();
         if($result){
             foreach ($result as $row) {
                 if ($row['parent_id'] == '0') { //说明是一级产品分组

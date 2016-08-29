@@ -12,10 +12,14 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function up()
     {
-        Schema::create('smt_product_unit', function (Blueprint $table) {
+          Schema::create('smt_product_unit', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->comment('单位中文名称');
             $table->string('name_en')->comment('单位英文名称');
+          
+            $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 
@@ -26,6 +30,6 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('smt_product_unit');
     }
 }

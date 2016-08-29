@@ -58,11 +58,11 @@
             <td>{{ $item->weight }}kg</td>
             <td>{{ $item->warehouse?$item->warehouse->name:'' }}<br>{{ $item->warehousePosition?$item->warehousePosition->name:'' }}</td>
             <td>{{ $item->product?$item->product->declared_en:'' }}<br>{{ $item->product?$item->product->declared_cn:'' }}<br>
-                    $<?php 
+                    $<?php
                         if($item->product){
                                 if($item->product->declared_value>0){
                                     echo $item->product->declared_value;
-                                }elseif(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);} 
+                                }elseif(($item->purchase_price/6)<1){echo 1;}elseif(($item->purchase_price/6)>25){echo 25;}else{echo round($item->purchase_price/6);}
                         }
                     ?>
             </td>
@@ -227,12 +227,12 @@
     @endforeach
 
         <!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" 
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
    aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
-            <button type="button" class="close" 
+            <button type="button" class="close"
                data-dismiss="modal" aria-hidden="true">
                   &times;
             </button>
@@ -242,9 +242,9 @@
          </div>
              <form action="{{ route('item.uploadSku') }}" method="post" enctype="multipart/form-data">
                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                 <input type="file" name="upload" >  
+                 <input type="file" name="upload" >
                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" 
+                    <button type="button" class="btn btn-default"
                        data-dismiss="modal">关闭
                     </button>
                     <button type="submit" class="btn btn-primary" >
@@ -255,7 +255,7 @@
         </div>
     </div>
 </div>
-    
+
 
 @stop
 
@@ -291,7 +291,7 @@
         }
 
         $('.batchdelete').click(function () {
-            
+
             var url = "{{route('item.batchDelete')}}";
 
             var checkbox = document.getElementsByName("tribute_id");

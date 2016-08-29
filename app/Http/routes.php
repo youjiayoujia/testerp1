@@ -602,11 +602,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
+
     Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
     Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
     Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
     Route::resource('ebayDetail','Publish\Ebay\EbayDetailController');
-
+    Route::any('ebay/batchUpdate', ['uses' => 'Publish\Ebay\EbayDataMonitorController@batchUpdate', 'as' => 'ebay.batchUpdate']);
+    Route::any('ebay/productBatchEdit', ['uses' => 'Publish\Ebay\EbayDataMonitorController@productBatchEdit', 'as' => 'ebay.productBatchEdit']);
+    Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
 
     Route::post('wish/editOnlineProductStore',
@@ -793,6 +796,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 //getEbayInfo
+Route::any('getEbayProduct', ['uses' => 'TestController@getEbayProduct']);
 Route::any('testPaypal', ['uses' => 'TestController@testPaypal']);
 Route::any('testLazada', ['uses' => 'TestController@testLazada']);
 Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);

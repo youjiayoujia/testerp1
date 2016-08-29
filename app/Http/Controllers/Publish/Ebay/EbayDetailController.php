@@ -12,6 +12,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ChannelModel;
 use App\Models\Publish\Ebay\EbaySiteModel;
 use App\Models\Publish\Ebay\EbayShippingModel;
+use App\Models\Publish\Ebay\EbayCategoryModel;
+
 
 class EbayDetailController extends Controller
 {
@@ -24,7 +26,9 @@ class EbayDetailController extends Controller
         $this->ebayShipping = $ebayShipping;
     }
 
-
+    /*
+     * 获取可用站点
+     */
     public function getEbaySite(){
 
 
@@ -44,8 +48,11 @@ class EbayDetailController extends Controller
         }else{
 
         }
-        var_dump($result);
+
     }
+    /*
+     * 退货政策
+     */
     public function getEbayReturnPolicy(){
 
         $accountID =9;
@@ -66,6 +73,9 @@ class EbayDetailController extends Controller
         }
     }
 
+    /*
+     * 获得对应站点的运输方式
+     */
     public function getEbayShipping(){
         $accountID =9;
         $site = 3;
@@ -88,6 +98,40 @@ class EbayDetailController extends Controller
             echo 'false';
         }
     }
+
+    /*
+     * 获取对应站点的分类
+     */
+    public function getEbayCategory(){
+        $accountId= 378;
+        $site = 0;
+        $account = AccountModel::findOrFail($accountId);
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $category_result = EbayCategoryModel::where(['site'=>$site,'category_level'=>1])->get();
+        if(empty($category_result)){
+            $result = $channel->getEbayCategoryList(1,'',$site);
+            if($result){
+                foreach($result as $re){
+                    EbayCategoryModel::create($re);
+                }
+            }
+        }else{
+            EbayCategoryModel::where('site',$site)->where('category_level','!=',1)->delete();
+            foreach($category_result as $category ){
+                $result = $channel->getEbayCategoryList(6,$category->category_id,$site);
+                if($result){
+                    foreach($result as $re){
+                        EbayCategoryModel::create($re);
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
+
 
 
 

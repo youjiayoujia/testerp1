@@ -8,7 +8,7 @@
         </div>
         <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <select name='warehouse_id' id='warehouse_id' class='form-control'>
+            <select name='warehouse_id' id='warehouse_id' flag='false' class='form-control'>
                 <option value=''>请选择仓库</option>
                 @foreach($warehouses as $warehouse)
                     <option value={{ $warehouse->id }} {{ old('warehouse_id') ? old('warehouse_id') == $warehouse->id ? 'selected' : '' : ''}}>{{ $warehouse->name }}</option>
@@ -104,6 +104,7 @@
                               return {
                                 sku: params.term, // search term
                                 page: params.page,
+                                'warehouse_id': $('#warehouse_id').val()
                               };
                             },
                             results: function(data, page) {
@@ -173,7 +174,7 @@
             type = block.find('.type').val();
             access_quantity = block.find('.access_quantity').val();
             quantity = block.find('.quantity').val();
-            if(quantity && $type == 'OUT') {
+            if(quantity && type == 'OUT') {
                 if(parseInt(quantity) > parseInt(access_quantity)) {
                     alert('数量超出可用数量');
                     tmp.val('');
@@ -299,12 +300,11 @@
         });
 
         $(document).on('change', '#warehouse_id', function(){
-            $('.warehouse_position_id').val('');
-            $('.type').val('IN');
-            $('.unit_price').attr('readonly', false);
-            $('.quantity').val('');
-            $('.unit_price').val('');
-            $('.sku').val('');
+            flag = $(this).attr('flag');
+            $(this).attr('flag', 'true');
+            if(flag == 'true') {
+                location.reload();
+            }
         });
         
         $('#check_time').cxCalendar();

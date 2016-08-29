@@ -492,17 +492,19 @@
 
     {{--<script src="{{ asset('plugins/UEditor/ueditor.config.js') }}"></script>
     <script src="{{ asset('plugins/UEditor/ueditor.all.js') }}"></script>--}}
-    <script src="{{ asset('plugins/Ueditor/umeditor.config.js') }}"></script>
-    <script src="{{ asset('plugins/Ueditor/umeditor.min.js') }}"></script>
-    <script src="{{ asset('plugins/Ueditor/lang/zh-cn/zh-cn.js') }}"></script>
-    <link href="{{ asset('plugins/Ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+    <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+    <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <script type='text/javascript'>
 
 
-        var ue = UM.getEditor('content', {
+        var content = UM.getEditor('content', {
             initialFrameHeight: 500,
             initialFrameWidth:1200
         });
+        content.setWidth("100%");
+        $(".edui-body-container").css("width", "98%");
         /* ue.ready(function() {
          ue.setContent('<p>hello!</p>'); //ture 追加内容
          });*/

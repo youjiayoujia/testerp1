@@ -17,6 +17,8 @@ use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
 use App\Models\CatalogModel;
 use Excel;
+use App\Models\ChannelModel;
+
 
 class ItemController extends Controller
 {
@@ -242,5 +244,17 @@ class ItemController extends Controller
         }
 
         return 1;
+    }
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'Compute_channels' => ChannelModel::all(),
+
+        ];
+        return view($this->viewPath . 'index', $response);
     }
 }

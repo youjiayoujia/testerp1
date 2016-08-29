@@ -100,22 +100,7 @@ class OrderController extends Controller
         return json_encode(false);
     }
 
-    public function putNeedQueue()
-    {
-        $len = 1000;
-        $start = 0;
-        $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
-        while ($orders->count()) {
-            foreach ($orders as $order) {
-                $job = new DoPackage($order);
-                $job->onQueue('doPackages');
-                $this->dispatch($job);
-            }
-            $start += $len;
-            $orders = $this->model->where(['status' => 'NEED'])->skip($start)->take($len)->get();
-        }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
-    }
+    
 
     /**
      * 保存数据
@@ -171,6 +156,16 @@ class OrderController extends Controller
             'currencys' => CurrencyModel::all(),
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    public function invoice($id)
+    {
+        $model = $this->model->find($id);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'germanInvoice', $response);
     }
 
     /**
@@ -318,6 +313,11 @@ class OrderController extends Controller
                 }
             }
         }
+        if($this->model->find($id)->packages) {
+            foreach($this->model->find($id)->packages as $package) {
+                $package->delete();
+            }
+        }
 
         return redirect($this->mainIndex);
     }
@@ -461,6 +461,11 @@ class OrderController extends Controller
             if($this->model->find($id)) {
                 $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
             }
+            if($this->model->find($id)->packages) {
+                foreach($this->model->find($id)->packages as $package) {
+                    $package->delete();
+                }
+            }
         }
         return 1;
     }
@@ -470,6 +475,11 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
+        if($this->model->find($id)->packages) {
+            foreach($this->model->find($id)->packages as $package) {
+                $package->delete();
+            }
+        }
 
         return redirect($this->mainIndex);
     }

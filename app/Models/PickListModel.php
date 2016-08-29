@@ -173,7 +173,7 @@ class PickListModel extends BaseModel
         if($query->count()) {
             $picklists = $query->orderBy('warehouse_position_id')->get()->chunk($listItemQuantity);
             foreach($picklists as $picklist) {
-                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'pick_by'=>request()->user()->id, 'logistic_id'=>$logistic_id]);
+                $obj = $this->create(['type'=>'SINGLE', 'status'=>'NONE', 'logistic_id'=>$logistic_id]);
                 $obj->update(['picknum' => 'P'.'1'.'0'.str_pad($obj->id, '7', '0', STR_PAD_LEFT)]);
                 foreach($picklist as $picklistItem) {
                     $picklistItem->picklist_id = $obj->id;

@@ -282,11 +282,12 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">SKU信息</div>
+
         <div class="panel-body" id="itemDiv">
-            <div class='row'>
-                <div class="form-group col-sm-2"></div>
+            <div class='row' id="sku_detail">
+                <div class="form-group col-sm-2">(点击相应文字可批量设置)</div>
                 <div class="form-group col-sm-2">
-                    <label for="sku" class='control-label'>sku</label>
+                    <label for="sku" class='control-label' onclick="batch_setting('prefix')">sku</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-2">
@@ -294,30 +295,30 @@
 
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="quantity" class='control-label'>数量</label>
+                    <label for="quantity" class='control-label' onclick="batch_setting('quantity')">数量</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="price" class='control-label'>单价</label>
+                    <label for="price" class='control-label' onclick="batch_setting('price')" >单价</label>
                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="status" class='control-label'>颜色</label>
+                    <label for="status" class='control-label' onclick="batch_setting('color')" >颜色</label>
 
                 </div>
                 <div class="form-group col-sm-1">
-                    <label for="status" class='control-label'>尺寸</label>
+                    <label for="status" class='control-label' onclick="batch_setting('size')" >尺寸</label>
 
                 </div>
             </div>
 
             @if(isset($details))
                 @foreach($details as $detail)
-
+                    <div>
                     <div class="row">
                         <div class="form-group col-sm-2"></div>
                         <div class="form-group col-sm-2">
-                            <input type="text" class="form-control sku" placeholder="sku" name="arr[sku][]"
+                            <input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]"
                                    value="{{$detail->sku}}">
                         </div>
                         <div class="form-group col-sm-2 image">
@@ -337,23 +338,25 @@
                         </div>
 
                         <div class="form-group col-sm-1">
-                            <input type="text" class="form-control " placeholder="数量" name="arr[quantity][]"
+                            <input type="text" class="form-control  quantity" placeholder="数量" name="arr[quantity][]"
                                    value="{{$detail->inventory}}">
                         </div>
                         <div class="form-group col-sm-1">
-                            <input type="text" class="form-control " placeholder="单价" name="arr[price][]"
+                            <input type="text" class="form-control  price" placeholder="单价" name="arr[price][]"
                                    value="{{$detail->price}}">
                         </div>
                         <div class="form-group col-sm-1">
-                            <input type="text" class="form-control " placeholder="颜色" name="arr[color][]"
+                            <input type="text" class="form-control  color" placeholder="颜色" name="arr[color][]"
                                    value="{{$detail->color}}">
                         </div>
                         <div class="form-group col-sm-1">
-                            <input type="text" class="form-control " placeholder="尺码" name="arr[size][]"
+                            <input type="text" class="form-control  size" placeholder="尺码" name="arr[size][]"
                                    value="{{$detail->size}}">
                         </div>
                         <button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i
                                     class="glyphicon glyphicon-trash"></i></button>
+                        <button type="button" class="btn " onclick="up_row(this)"  title="上移"><i class="glyphicon glyphicon-arrow-up"></i></button>
+                        <button type="button" class="btn " onclick="down_row(this)"  title="下移"><i class="glyphicon glyphicon-arrow-down"></i></button>
                         <button type="button" class="btn btn-success zhankai " title="设置多账号价格"
                                 onclick="add_account_price(this)"><i class="glyphicon glyphicon-plus"></i></button>
                     </div>
@@ -368,8 +371,8 @@
                                        name="account_price[{{$account_id}}][]" placeholder="产品价格">
                             </div>
                         </div>
-                        ';
 
+                    </div>
                     </div>
                 @endforeach
 
@@ -487,7 +490,7 @@
 @section('formButton')
     <div class="text-center">
         <button type="submit" name="save" class="btn btn-success submit_btn ">保存为草稿</button>
-        <button type="submit" name="editAndPost" class="btn btn-success submit_btn ">保存并且发布</button>
+        <button type="submit" name="editAndPost" class="btn btn-primary  submit_btn ">保存并且发布</button>
     </div>
 
 @show{{-- 表单按钮 --}}
@@ -498,16 +501,17 @@
 
    {{-- <script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
     <script src="{{ asset('plugins/UEditor/umeditor.js') }}"></script>--}}
-   <script src="{{ asset('plugins/Ueditor/umeditor.config.js') }}"></script>
-   <script src="{{ asset('plugins/Ueditor/umeditor.min.js') }}"></script>
-   <script src="{{ asset('plugins/Ueditor/lang/zh-cn/zh-cn.js') }}"></script>
-   <link href="{{ asset('plugins/Ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+   <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+   <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+   <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+   <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <script type='text/javascript'>
 
         var content = UM.getEditor('content',{
-            initialFrameHeight:500,
-            initialFrameWidth:1200
+            initialFrameHeight:500
         });
+        content.setWidth("100%");
+        $(".edui-body-container").css("width", "98%");
      /*   var ue = UE.getEditor('container', {
             initialFrameHeight: 500
         });*/
@@ -525,10 +529,10 @@
 
 
         $('#addItem').click(function () {
-            var html = '<div class="row">' +
+            var html = '<div><div class="row">' +
                     '<div class="form-group col-sm-2"></div>' +
                     '<div class="form-group col-sm-2">' +
-                    '<input type="text" class="form-control sku" placeholder="sku" name="arr[sku][]">' +
+                    '<input type="text" class="form-control prefix" placeholder="sku" name="arr[sku][]">' +
                     '</div>' +
                     '<div class="form-group col-sm-2 image">' + '<div class="form-group col-sm-2">' +
                     '<input type="hidden" value="" name="arr[main_image][]">' +
@@ -538,18 +542,20 @@
                     '</a>' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control "  placeholder="数量" name="arr[quantity][]" >' +
+                    '<input type="text" class="form-control  quantity"  placeholder="数量" name="arr[quantity][]" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control "  placeholder="单价" name="arr[price][]" >' +
+                    '<input type="text" class="form-control  price"  placeholder="单价" name="arr[price][]" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control "  placeholder="颜色" name="arr[color][]" >' +
+                    '<input type="text" class="form-control  color"  placeholder="颜色" name="arr[color][]" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1">' +
-                    '<input type="text" class="form-control "  placeholder="尺码" name="arr[size][]" >' +
+                    '<input type="text" class="form-control  size"  placeholder="尺码" name="arr[size][]" >' +
                     '</div>' +
                     '<button type="button" class="btn btn-danger bt_right" title="删除该SKU"><i class="glyphicon glyphicon-trash"></i></button>' +
+                    '<button type="button" class="btn " onclick="up_row(this)"  title="上移"><i class="glyphicon glyphicon-arrow-up"></i></button>' +
+                    '<button type="button" class="btn " onclick="down_row(this)"  title="下移"><i class="glyphicon glyphicon-arrow-down"></i></button>' +
                     '<button type="button" class="btn btn-success zhankai " title="设置多账号价格" onclick="add_account_price(this)"><i class="glyphicon glyphicon-plus"></i></button>' +
                     '</div>';
 
@@ -572,7 +578,7 @@
                 }
             });
 
-            account_info = account_info + '</div>';
+            account_info = account_info + '</div></div>';
             $('#itemDiv').append(html + account_info);
         });
 
@@ -727,6 +733,45 @@
                 $(mark).parent().next().addClass("hidden");
                 $(mark).addClass("zhankai");
 
+            }
+        }
+
+
+        function up_row(e){
+            var objParentTR = $(e).parent().parent();
+            var prevTR = objParentTR.prev();
+            var id = prevTR.attr('id');
+            if (prevTR.length > 0&&id !='sku_detail') {
+                prevTR.insertAfter(objParentTR);
+            }
+        }
+
+        function down_row(e){
+            var objParentTR = $(e).parent().parent();
+            var nextTR = objParentTR.next();
+            if (nextTR.length > 0) {
+                nextTR.insertBefore(objParentTR);
+            }
+        }
+
+        function batch_setting(key){
+            var str = prompt("请输入"+key+"(前缀不需要*)");
+            if (str) {
+                $("."+key).each(function(){
+                    var old_val = $(this).val();
+                    if(key=='prefix'){
+                        old_val=old_val.split("*");
+                        if(old_val[1]){
+                            $(this).val(str+'*'+old_val[1]);
+
+                        }else{
+                            $(this).val(str+'*'+old_val[0]);
+                        }
+                    }else{
+                        $(this).val(str);
+                    }
+
+                })
             }
         }
     </script>

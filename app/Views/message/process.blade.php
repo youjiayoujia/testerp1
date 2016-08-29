@@ -12,6 +12,7 @@
             @include('message.process.reply')
         </div>
         <div class="col-lg-4">
+            @include('message.process.operate')
             @if($message->related)
                 @include('message.process.orders')
             @else
@@ -39,6 +40,52 @@
 @stop
 @section('pageJs')
     <script type="text/javascript">
+        $(document).ready(function () {
+            $('.btn-translation').click(function(){
+                text =changeSome($(this).attr('need-translation-content'),1);
+                if(tran_content = getTransInfo(text)){
+                    $(this).prev().show().addClass('alert-success');
+                    $(this).prev().children('.content').text(tran_content);
+                    $(this).hide();
+                }else{
+                    $(this).prev().show().addClass('alert-danger');
+                    $(this).prev().children('.content').text('翻译失败');
+                    $(this).hide();
+
+                }
+            });
+        });
+
+        function changeSome(text,type){
+            if(type==1){
+
+                text=text.replace(/\?/g, "^");
+            }
+            if(type==2){
+                text=text.replace(/\^/g, "?");
+            }
+
+            return text;
+        }
+
+        function getTransInfo(content) {
+            var tran_info = false;
+            $.ajax({
+                url: "{{route('ajaxGetTranInfo')}}",
+                data: 'content=' + content,
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if(data.status == {{config('status.ajax.success')}}){
+                        tran_info = changeSome( data.info,2);
+                    }else{
+                        tran_info = false;
+                    }
+                }
+            });
+            return tran_info;
+        }
+
         function changeChildren(parent) {
             $('#loadingDiv').show();
             $('#children').html('');
@@ -79,7 +126,10 @@
             $('#loadingDiv').hide();
         }
 
-        function changeTemplate(template) {
+        /**
+         * type mail邮件 或者 text文本
+         */
+        function changeTemplate(template,type) {
             $('#loadingDiv').show();
             $.post(
                     '{{ route('messageTemplate.ajaxGetTemplate') }}',
@@ -90,7 +140,12 @@
                         if (response != 'error') {
                             //替换字符串
                             response['content']=response['content'].replace("署名", assign_name);
-                            editor.setContent(response['content']);
+
+                            if(type == 'email'){
+                                editor.setContent(response['content']);
+                            }else if(type == 'text'){
+                                $('#textcontent').val(response['content']);
+                            }
                             /*
                             $('#templateContent').html('<div class="form-group"><textarea rows="16" name="content" style="width:100%;height:400px;">'+response['content']+'</textarea></div>');
                             */

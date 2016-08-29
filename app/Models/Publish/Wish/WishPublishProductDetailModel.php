@@ -37,8 +37,8 @@ class WishPublishProductDetailModel extends BaseModel
 
     protected $rules = [];
 
-    public function detail()
+    public function ebayPublishProduct()
     {
-        return $this->belongsTo('App\Models\Publish\Wish\WishPublishProductDetailModel', 'product_id', 'id');
+        return $this->belongsTo('App\Models\Publish\Wish\WishPublishProductModel','product_id');
     }
 }

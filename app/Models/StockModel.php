@@ -125,7 +125,7 @@ class StockModel extends BaseModel
      */
     public function stockOut()
     {
-        return $this->hasMany('App\Models\Stock\OutModel', 'stock_id', 'id');
+        return $this->hasMany('App\Models\Stock\InOutModel', 'stock_id', 'id');
     }
 
     /**
@@ -208,7 +208,7 @@ class StockModel extends BaseModel
     {
         $this->available_quantity -= $quantity;
         if ($this->available_quantity < 0) {
-            throw new Exception('hold时，可用数量为负了');
+            throw new Exception('');
         }
         $this->hold_quantity += $quantity;
         $this->save();
@@ -232,12 +232,12 @@ class StockModel extends BaseModel
     {
         $price = $this->unit_cost;
         if($this->unit_cost <= 0) {
-            echo "<script>alert('单价不是正数，出错');</script>";
+            throw new Exception('');
         }
         $this->hold_quantity -= $quantity;
         $this->all_quantity -= $quantity;
         if ($this->hold_quantity < 0) {
-            echo "<script>alert('unhold时，hold数量为负了');</script>";
+            throw new Exception('');
         }
         $this->save();
         $this->stockUnhold()->create([
@@ -249,7 +249,8 @@ class StockModel extends BaseModel
         $this->stockOut()->create([
             'quantity' => $quantity,
             'amount' => $quantity * $price,
-            'type' => $type,
+            'outer_type' => 'OUT',
+            'inner_type' => $type,
             'relation_id' => $relation_id,
             'remark' => $remark
         ]);

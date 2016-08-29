@@ -10,7 +10,7 @@
                 <strong>渠道</strong>: {{ $model->channel ? $model->channel->name : '' }}
             </div>
             <div class="col-lg-4">
-                <strong>ID</strong>: {{ $model->name }}
+                <strong>名字</strong>: {{ $model->name }}
             </div>
         </div>
     </div>

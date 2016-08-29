@@ -10,7 +10,11 @@
     <div class='row'>
         <div class="form-group col-lg-4">
             <label for="type" class='control-label'>物流方式</label>
-            <input type='text' name='type' class='form-control' value="{{ old('type') }}">
+            <select name='type' class='form-control logistics'>
+                @foreach($logisticses as $logistics)
+                    <option value="{{ $logistics->code }}">{{$logistics->code}}</option>
+                @endforeach
+            </select>
         </div>
         <div class="form-group col-lg-4">
             <label for="code" class='control-label'>物流号</label>
@@ -21,4 +25,11 @@
             <input type='text' name='fee' class='form-control' value="{{ old('fee') }}">
         </div>
     </div> 
+@stop
+@section('pageJs')
+<script type='text/javascript'>
+$(document).ready(function(){
+    $('.logistics').select2();
+})
+</script>
 @stop

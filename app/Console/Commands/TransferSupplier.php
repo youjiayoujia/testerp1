@@ -62,7 +62,6 @@ class TransferSupplier extends Command
                     'bank_account' => $smSupplier->suppliers_bank,
                     'bank_code' => $smSupplier->suppliers_card_number,
                     'examine_status' => $smSupplier->suppliers_status,
-                    'email' => $smSupplier->supplier_email ? $smSupplier->supplier_email : '',
                     'created_at' => $smSupplier->create_time,
                     'updated_at' => $smSupplier->modify_time,
                 ];

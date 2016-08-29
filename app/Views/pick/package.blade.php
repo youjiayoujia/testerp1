@@ -172,15 +172,6 @@ $(document).ready(function(){
                     if(quantity > picked_quantity) {
                         extern_flag = 1;
                         package_id = tmp.data('id');
-                        sku = tmp.find('.sku').text();
-                        $.ajax({
-                            url:"{{ route('pickList.packageItemUpdate')}}",
-                            data:{package_id:package_id, sku:sku},
-                            dataType:'json',
-                            type:'get',
-                            success:function(result) {
-                            }
-                        });
                         tmp.find('.picked_quantity').text(picked_quantity + 1);
                         if(parseInt(tmp.find('.picked_quantity').text()) == quantity) {
                             needId = tmp.data('id');
@@ -196,14 +187,26 @@ $(document).ready(function(){
                             if(flag) {
                                 out_js = 1;
                                 id = tmp.data('id');
+                                sku = tmp.find('.sku').text();
+                                $.ajax({
+                                    url:"{{ route('pickList.packageItemUpdate')}}",
+                                    data:{package_id:package_id, sku:sku},
+                                    dataType:'json',
+                                    type:'get',
+                                    success:function(result) {
+                                        if(!result) {
+                                            return false;
+                                        }
+                                    }
+                                });
                                 $("."+id).find('.status').text('已包装');
                                 $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
                                 $('#barcode').load(function(){
                                     $('#barcode')[0].contentWindow.focus();
                                     $('#barcode')[0].contentWindow.print();
                                 });
-                                return false;
                             }
+                            
                         }
                     }
                 }
@@ -231,6 +234,18 @@ $(document).ready(function(){
                         });
                         if(flag) {
                             out_js = 1;
+                            sku = tmp.find('.sku').text();
+                            $.ajax({
+                                url:"{{ route('pickList.packageItemUpdate')}}",
+                                data:{package_id:package_id, sku:sku},
+                                dataType:'json',
+                                type:'get',
+                                success:function(result) {
+                                    if(!result) {
+                                        return false;
+                                    }
+                                }
+                            });
                             tmp.find('.status').text('已包装');
                             $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
                             $('#barcode').load(function(){
@@ -239,15 +254,6 @@ $(document).ready(function(){
                             });
                         }
                     }
-                    sku = tmp.find('.sku').text();
-                    $.ajax({
-                        url:"{{ route('pickList.packageItemUpdate')}}",
-                        data:{package_id:package_id, sku:sku},
-                        dataType:'json',
-                        type:'get',
-                        success:function(result) {
-                        }
-                    });
                     needId = tmp.data('id');
                     arr = new Array();
                     i=0;

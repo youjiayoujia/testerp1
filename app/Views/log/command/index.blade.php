@@ -30,24 +30,28 @@
         <tr class="collapse" id="collapseExample{{ $log->id }}">
             <td colspan="10">
                 @if($log->data)
-                    @foreach(unserialize($log->data) as $item)
-                        @foreach($item as $key => $value)
-                            @if(is_array($value))
-                                <dl class="dl-horizontal">
-                                    <dt>{{ $key }}</dt>
-                                    <dd>
-                                        <pre>{{ var_dump($value) }}</pre>
-                                    </dd>
-                                </dl>
-                            @else
-                                <dl class="dl-horizontal">
-                                    <dt>{{ $key }}</dt>
-                                    <dd>{{ $value }}</dd>
-                                </dl>
-                            @endif
+                    @if($log->result=='success')
+                        @foreach(unserialize($log->data) as $item)
+                            @foreach($item as $key => $value)
+                                @if(is_array($value))
+                                    <dl class="dl-horizontal">
+                                        <dt>{{ $key }}</dt>
+                                        <dd>
+                                            <pre>{{ var_dump($value) }}</pre>
+                                        </dd>
+                                    </dl>
+                                @else
+                                    <dl class="dl-horizontal">
+                                        <dt>{{ $key }}</dt>
+                                        <dd>{{ $value }}</dd>
+                                    </dl>
+                                @endif
+                            @endforeach
+                            <div class="divider"></div>
                         @endforeach
-                        <div class="divider"></div>
-                    @endforeach
+                    @else
+                        <pre>{{ var_dump(unserialize($log->data)) }}</pre>
+                    @endif
                 @endif
             </td>
         </tr>

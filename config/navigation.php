@@ -163,6 +163,11 @@ return [
                     'url' => 'package.returnGoods',
                     'icon' => '',
                 ],
+                [
+                    'name' => '物流对账',
+                    'url' => 'shipmentCost.index',
+                    'icon' => '',
+                ],
             ],
             '仓储' => [
                 [
@@ -223,6 +228,22 @@ return [
             ],
         ],
     ],
+    //仓储导航
+    [
+        'name' => '海外仓',
+        'icon' => 'home',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '海外仓模块' => [
+                [
+                    'name' => '海外仓销量',
+                    'url' => 'suggestForm.index',
+                    'icon' => '',
+                ],
+            ],
+        ],
+    ],
     //物流导航
     [
         'name' => '物流',
@@ -247,6 +268,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '收款信息',
+                    'url' => 'logisticsCollectionInfo.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '物流商',
                     'url' => 'logisticsSupplier.index',
                     'icon' => '',
@@ -254,16 +280,6 @@ return [
                 [
                     'name' => '物流方式',
                     'url' => 'logistics.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '跟踪号',
-                    'url' => 'logisticsCode.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '物流分区报价',
-                    'url' => 'logisticsZone.index',
                     'icon' => '',
                 ],
                 [
@@ -340,26 +356,57 @@ return [
         'type' => '',
         'subnavigations' => [
             [
-                'name' => 'wish草稿列表',
+                'name' => 'Wish草稿列表',
                 'url' => 'wish.index',
                 'icon' => '',
             ],
             [
-                'name' => 'wish在线数据列表',
+                'name' => 'Wish在线数据列表',
                 'url' => 'wish.indexOnlineProduct',
                 'icon' => '',
             ],
             [
-                'name' => 'wish销售代码设置',
+                'name' => 'Wish销售代码设置',
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
             [
-                'name' => 'ebay站点信息',
+
+                'name' => 'SMT待发布产品列表',
+                'url' => 'smt.waitPost',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT产品草稿列表',
+                'url' => 'smt.index',
+                'icon' => '',
+            ],
+            [
+            
+                'name' => 'SMT在线产品列表',
+                'url' => 'smt.onlineProductIndex',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT在线数据监控',
+                'url' => 'smtMonitor.index',
+                'icon' => '',
+            ],
+            [
+            'name' => 'smt销售代码设置',
+            'url' => 'smtSellerCode.index',
+            'icon' => '',
+            ],
+            [
+                'name' => 'Ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'Ebay数据监控',
+                'url' => 'ebayProduct.index',
+                'icon' => '',
+            ],
         ],
     ],
     //CRM导航
@@ -390,6 +437,18 @@ return [
                 [
                     'name' => '信息模板',
                     'url' => 'messageTemplate.index',
+                    'icon' => '',
+                ],
+            ],
+            '平台纠纷' => [
+                [
+                    'name' => 'ebay cases',
+                    'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'aliexpress issues',
+                    'url' => 'ebayCases.index',
                     'icon' => '',
                 ],
             ],

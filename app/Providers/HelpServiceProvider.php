@@ -30,5 +30,9 @@ class HelpServiceProvider extends ServiceProvider
         $this->app->singleton('tool', function () {
             return new \App\Helps\Tool;
         });
+
+        $this->app->singleton('translation', function () {
+            return new \App\Helps\Translation;
+        });
     }
 }

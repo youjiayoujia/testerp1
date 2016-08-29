@@ -20,9 +20,9 @@ use App\Models\Stock\AllotmentFormModel;
 use App\Models\Stock\OutRepository;
 use App\Models\StockModel;
 use App\Models\Stock\AllotmentLogisticsModel;
-use App\Models\Stock\InModel;
-use App\Models\Stock\OutModel;
+use App\Models\Stock\InOutModel;
 use Tool;
+use App\Models\LogisticsModel;
 
 class AllotmentController extends Controller
 {
@@ -48,8 +48,8 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $this->model->find($id),
             'allotments' =>$this->model->find($id)->allotmentforms,
-            'stockins' => InModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
-            'stockouts' => OutModel::where(['type'=>'ALLOTMENT', 'relation_id'=>$id])->with('stock')->get(),
+            'stockins' => InOutModel::where(['inner_type'=>'ALLOTMENT', 'outer_type' => 'IN', 'relation_id'=>$id])->with('stock')->get(),
+            'stockouts' => InOutModel::where(['inner_type'=>'ALLOTMENT', 'outer_type' => 'OUT', 'relation_id'=>$id])->with('stock')->get(),
             'logisticses' => AllotmentLogisticsModel::where('allotment_id', $id)->get(),
         ];
 
@@ -249,6 +249,7 @@ class AllotmentController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
+            'logisticses' => LogisticsModel::all(),
         ];
 
         return view($this->viewPath.'checkout', $response);
@@ -381,7 +382,7 @@ class AllotmentController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'allotmentforms' => $allotmentforms,
-            'barcode' => Tool::barcodePrint($model->allotment_id, "C128"),
+            'barcode' => Tool::barcodePrint($model->allotment_id, 'c128'),
         ];
 
         return view($this->viewPath.'printAllotment', $response);

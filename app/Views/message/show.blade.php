@@ -21,7 +21,7 @@
 					<span class="" style="color:red;float:right;margin-right: 10px;font-size: 15px;"></span>
                 </div>
 
-                <div class="panel-body mailcontent">
+                <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="embed-responsive embed-responsive-16by9">

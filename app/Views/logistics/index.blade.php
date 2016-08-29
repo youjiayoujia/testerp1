@@ -1,16 +1,17 @@
 @extends('common.table')
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
+    <th class="sort" data-field="priority">优先级</th>
     <th>物流方式简码</th>
     <th>物流方式名称</th>
     <th>仓库</th>
     <th>物流商</th>
     <th>物流商物流方式</th>
-    <th>物流追踪网址</th>
     <th>驱动名</th>
     <th>对接方式</th>
     <th class="sort" data-field="pool_quantity">号码池数量(未用/已用/总数)</th>
     <th>物流限制</th>
+    <th>物流编码</th>
     <th>是否启用</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -20,16 +21,17 @@
     @foreach($data as $logistics)
         <tr>
             <td>{{ $logistics->id }}</td>
+            <td>{{ $logistics->priority != 0 ? $logistics->priority : '' }}</td>
             <td>{{ $logistics->code }}</td>
             <td>{{ $logistics->name }}</td>
             <td>{{ $logistics->warehouse ? $logistics->warehouse->name : '' }}</td>
             <td>{{ $logistics->supplier ? $logistics->supplier->name : '' }}</td>
             <td>{{ $logistics->type }}</td>
-            <td>{{ $logistics->url }}</td>
             <td>{{ $logistics->driver }}</td>
             <td>{{ $logistics->docking_name }}</td>
             <td>{{ $logistics->pool_quantity }}</td>
             <td>{{ $logistics->limit($logistics->limit) }}</td>
+            <td>{{ $logistics->logistics_code }}</td>
             <td>{{ $logistics->is_enable == '1' ? '是' : '否' }}</td>
             <td>{{ $logistics->created_at }}</td>
             <td>{{ $logistics->updated_at }}</td>
@@ -50,6 +52,9 @@
                         <span class="glyphicon glyphicon-eye-open"></span> 追踪号
                     </a>
                 @endif
+                <a href="{{ route('logisticsZone.one', ['id'=>$logistics->id]) }}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-eye-open"></span> 分区报价
+                </a>
             </td>
         </tr>
     @endforeach

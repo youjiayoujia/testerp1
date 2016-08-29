@@ -71,12 +71,23 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'size' => "100*100",
-            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('1'),
+            'size' => $model->logistics ? ($model->logistics->template ? $model->logistics->template->size : '暂无面单尺寸信息') : '暂无面单尺寸信息',
+            'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
             'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);
+    }
+
+    public function confirmPickBy()
+    {
+        $model = $this->model->find(request('pickId'));
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->update(['pick_by' => request('pickBy')]);
+
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
     }
 
     public function printPackageDetails($id, $status)
@@ -389,6 +400,11 @@ class PickListController extends Controller
         $package_id = trim(request()->input('package_id'));
         $sku = trim(request()->input('sku'));
         $package = PackageModel::find($package_id);
+        $order = $package->order;
+        if($order->status == 'REVIEW') {
+            $package->update(['status' => 'ERROR']);
+            return json_encode(false);
+        }
         if($package) {
             $items = $package->items;
             $flag = 1;
@@ -397,18 +413,33 @@ class PickListController extends Controller
                     $item->picked_quantity += 1;
                     $item->save();
                 }
-                if($item->picked_quantity != $item->quantity)
+                if($item->picked_quantity != $item->quantity) {
                     $flag = 0;
+                }
             }
             if($flag == 1) {
                 $package->status = 'PACKED';
+                $package->save();
                 $picklistItems = $package->picklistItems;
                 foreach($picklistItems as $picklistItem) {
                     $picklistItem->packed_quantity += $picklistItem->packages->where('id', $package->id)->first()->items()->where('item_id', $picklistItem->item_id)->first()->quantity;
                     $picklistItem->save();
                 }
-                $package->save();
+                $order = $package->order;
+                $buf = 1;
+                foreach($order->packages as $childPackage) {
+                    if($childPackage->status != 'PACKED') {
+                        $buf = 0;
+                    }
+                }
+                if($buf) {
+                    foreach($package->items as $packageItem) {
+                        $packageItem->orderItem->update(['status' => 'PACKED']);
+                    }
+                    $order->update(['status' => 'PACKED']);
+                }
             }
+
             return json_encode('1');
         }
 
@@ -450,7 +481,7 @@ class PickListController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'channels' => ChannelModel::all(),
-            'logisticses' => LogisticsModel::all(),
+            'logisticses' => LogisticsModel::all()->groupBy('template.size'),
             'count' => PackageModel::where('status','PROCESSING')->count(),
         ];
 

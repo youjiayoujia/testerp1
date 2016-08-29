@@ -10,7 +10,10 @@ namespace App\Modules\Channel\Adapter;
 
 use App\Models\OrderModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Channel\AccountModel;
+use App\models\Publish\Smt\smtCategoryAttribute;
 use App\Models\Message\MessageModel;
+
 
 set_time_limit(1800);
 
@@ -39,7 +42,14 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
-
+    /** 获取订单
+     * @param $startDate 开始时间
+     * @param $endDate 结束时间
+     * @param array $status 订单状态
+     * @param int $perPage 页码
+     * @param string $nextToken
+     * @return array
+     */
     public function listOrders($startDate, $endDate, $status = [], $perPage = 10, $nextToken = '')
     {
         if (empty($nextToken)) {
@@ -84,6 +94,14 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
+    /**获取订单(暂时没有用)
+     * @param $startDate
+     * @param $endDate
+     * @param $status
+     * @param int $page
+     * @param int $perPage
+     * @return mixed
+     */
     public function listOrdersOther($startDate, $endDate, $status, $page = 1, $perPage = 10)
     {
 
@@ -98,7 +116,10 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
-
+    /** 获取订单详情
+     * @param $orderID 订单号
+     * @return mixed
+     */
     public function getOrder($orderID)
     {
         $param = "orderId=" . $orderID;
@@ -106,25 +127,22 @@ Class AliexpressAdapter implements AdapterInterface
         return json_decode($orderjson, true);
     }
 
+    /** 回传追踪号
+     * @param $tracking_info 需要上传的信息
+     * @return array
+     */
     public function returnTrack($tracking_info)
     {
         $return = [];
         $action = 'api.sellerShipment';
         $app_url = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
+
         $tracking_info['access_token'] = $this->_access_token;
         $tracking_info['_aop_signature'] = $this->getApiSignature($api_info, $tracking_info);
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $tracking_info);
         $result = json_decode($result,true);
-    /*    $rand_id = rand(1, 10);
-        if ($rand_id > 3) {
-            $result['success'] = 'Falie';
 
-        } else {
-            $result['success'] = 'true';
-
-        }*/
-        var_dump($result);
         if (isset($result['success']) && ($result['success'] == 'true')) {
             $return['status'] = true;
             $return['info'] = 'Success';
@@ -134,11 +152,42 @@ Class AliexpressAdapter implements AdapterInterface
             $return['info'] = isset($result['error_message']) ? $result['error_message'] : "error";
         }
         return $return;
+    }
 
+    /** 获取需要评价的订单
+     * @param int $currentPage 页码
+     * @param int $pageSize 页数
+     * @return bool
+     */
+    public function getSellerEvaluationOrderList($currentPage=1, $pageSize=100){
+        $param ="currentPage=$currentPage&pageSize=$pageSize";
+        $result = $this->getJsonData('api.evaluation.querySellerEvaluationOrderList', $param);
+        $result = json_decode($result,true);
+        if(isset($result['listResult'])||!empty($result['listResult'])){
+            return     $result['listResult'];
+        }else{
+            return false;
+        }
+    }
 
+    /** 评价订单
+     * @param $orderID 订单号
+     * @param string $text 内容
+     * @param int $score 评分
+     */
+    public function evaluateOrder($orderID,$text='Excellent buyer, welcome! Any questions please contact us.',$score=5){
+        $feedbackContent = rawurlencode($text);//评价的内容
+        $param = "orderId=$orderID&score=$score&feedbackContent=$feedbackContent";
+        $result = $this->getJsonData("api.evaluation.saveSellerFeedback", $param);
+        var_dump($result);
     }
 
 
+    /** 订单信息的组装
+     * @param $list
+     * @param $orderDetail
+     * @return array
+     */
     public function parseOrder($list, $orderDetail)
     {
 
@@ -167,9 +216,8 @@ Class AliexpressAdapter implements AdapterInterface
         $orderInfo['amount_shipping'] = $ship_price;
         $orderInfo['shipping'] = $orderProductArr['logisticsServiceName'];
         $orderInfo['remark'] = $order_remark ? addslashes(implode('<br />', $order_remark)) : ''; //订单备注
-        $orderInfo['shipping_firstname'] = $orderDetail['receiptAddress'] ['contactPerson'];
-/*        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];*/
-        $orderInfo['shipping_lastname'] = '';
+        $orderInfo['shipping_firstname'] = $orderDetail['buyerInfo']['firstName'];
+        $orderInfo['shipping_lastname'] = $orderDetail['buyerInfo']['lastName'];
         $orderInfo['shipping_address'] = $orderDetail ["receiptAddress"] ["detailAddress"];
         $orderInfo['shipping_address1'] = isset($orderDetail ["receiptAddress"] ["address2"]) ? $orderDetail ["receiptAddress"] ["address2"] : '';
         $orderInfo['shipping_city'] = $orderDetail ["receiptAddress"] ["city"];
@@ -226,7 +274,7 @@ Class AliexpressAdapter implements AdapterInterface
 
     }
 
-    /**
+    /** 支付时间 转换
      * @param $paytime
      * @return bool|string
      */
@@ -258,7 +306,7 @@ Class AliexpressAdapter implements AdapterInterface
             $sign = $this->getApiSign($apiInfo, $app_parameter_url);
             $sign_url = "&_aop_signature=$sign"; //签名参数
         }
-        //组装URL
+        //组装URL  
         $get_url = $app_url . $apiInfo . '?' . $app_parameter_url . $sign_url;
         //if ( $this->debug ) echo $get_url. "\n";
         $result = $this->getCurlData($get_url);
@@ -321,6 +369,7 @@ Class AliexpressAdapter implements AdapterInterface
     {
         $code_arr = explode("&", $strcode);//去掉&
         $newcode_arr = array();
+
         foreach ($code_arr as $key => $val) {
             $code_narr = explode("=", $val);//分割=
             $newcode_arr [$code_narr [0]] = $code_narr [1];//重组数组
@@ -440,14 +489,35 @@ Class AliexpressAdapter implements AdapterInterface
         curl_close($curl); // 关闭CURL会话
         return $tmpInfo; // 返回数据
     }
+       
 
+
+    /**
+     * API交互，POST方式
+     * @param  [type] $api [description]
+     * @param  [type] $arr [description]
+     * @return [type]      [description]
+     */
+    public function getJsonDataUsePostMethod($action, $parameter){
+        //接口URL
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        //apiinfo	aliexpress.open
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey . "";
+        $parameter['access_token'] = $this->_access_token;
+    
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        //参数
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return $result;
+    }
+    
     public function getMessages()
     {
 
         $msgSourcesArr =array('message_center','order_msg');
         $method = 'api.queryMsgRelationList';
         $filter = 'readStat';
-        $pageSize = 5;
+        $pageSize = 100; //每页个数
         $j = 0;
         $message_list = [];
 
@@ -456,31 +526,34 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
+                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
-                        //最后一条消息是自己这边发送的 或者 卖家账号为空 跳过
+                        // 或者  跳过
+                        /**
+                         * 去除三种状态的消息
+                         * 1.最后一条消息是商家发送的
+                         * 2.卖家账号为空
+                         *
+                         *
+                         */
                         if($item['lastMessageIsOwn'] == true || empty($item['otherLoginId'])){
                             continue;
                         }
 
-
                         /**
                          * 获取信息详情
                          */
-
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
-                        //$detail_array = json_decode($detailArrJson);
-                        //$detail_array = (array)$detail_array;
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
-                        $message_list[$j]['to'] = '收信人';
-                        $message_list[$j]['labels'] = '';
-                        $message_list[$j]['label'] = 'INBOX';
-                        $message_list[$j]['date'] = $item['messageTime'];
-                        $message_list[$j]['subject'] = '信息描述';
+                        $message_list[$j]['to'] = '客服';
+                        $message_list[$j]['date'] = $this->changetime($item['messageTime']);
+                        $message_list[$j]['subject'] = $item['lastMessageContent'];
                         $message_list[$j]['attachment'] = ''; //附件
+                        $message_list[$j]['labels'] = '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
 
                         $message_list[$j]['message_type'] = $Sources;
                         $message_list[$j]['rank'] = $item['rank'];
@@ -489,43 +562,499 @@ Class AliexpressAdapter implements AdapterInterface
                         $message_list[$j]['unreadCount'] = $item['unreadCount'];
                         $message_list[$j]['readStat'] = $item['readStat'];
 
+                        if($Sources == 'order_msg'){
+                            $message_list[$j]['label'] = '订单留言';
+                            $temp_message = json_decode($detailArrJson);
+                            foreach ($temp_message->result as $get_one_detail){
+                                $temp_oreder_url = $get_one_detail->summary->orderUrl;
+                                $message_list[$j]['labels'] = isset($get_one_detail->messageType) ? $get_one_detail->messageType : '' ; //消息类别(product/order/member/store)不同的消息类别，typeId为相应的值，如messageType为product,typeId为productId,对应summary中有相应的附属性信，如果为product,则有产品相关的信息
+                                break;
+                            }
+                            $message_fields_ary = [
+                                'message_type' => $Sources, //消息类型
+                                'order_id' => $item['channelId'], //消息类型
+                                'order_url' => $temp_oreder_url,
+                            ];
+                        }else{
+                            $message_list[$j]['label'] = '站内信';
+                            $message_fields_ary = [
+                                'message_type' => $Sources, //消息类型
+                                'order_id' => '',
+                                'order_url' =>'',
+                            ];
+                        }
+
+                        $message_list[$j]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+
                         $message_list[$j]['content'] = base64_encode(serialize(['aliexpress' => json_decode($detailArrJson)]));
+                        $j++;
                     }
                 }else{
                     break;
                 }
-                $j++;
             }
         }
+        return (!empty($message_list)) ? array_reverse($message_list) : false;
+    }
+    
 
-        return (!empty($message_list)) ? $message_list : false;
+    
+    /**
+     * 同步分类在线产品属性2:新API，
+     * 缺点：目前只获取了主要属性，不知道属性是否有子属性，需要再判断
+     * @param $token_id
+     * @param $category_id
+     * @param string $parentAttrValueList
+     * @return bool
+     */
+    public function getChildAttributesResultByPostCateIdAndPath($token_id, $category_id, $parentAttrValueList=''){        
+        if ($token_id && $category_id){
+            //获取账号的信息
+            $tokenInfo = AccountModel::where('id',$token_id)->get();
+            if ($tokenInfo) {
+                $api    = 'getChildAttributesResultByPostCateIdAndPath';
+                $result = $this->getJsonData($api, 'cateId=' . $category_id.(!empty($parentAttrValueList) ? '&parentAttrValueList='.$parentAttrValueList : ''));                
+                $rs = json_decode($result, true);           
+                if (array_key_exists('success', $rs) && $rs['success']) { //返回成功了
+                    //判断分类ID是否存在，不存在就插入，存在就UPdate
+                    $options = array(
+                        'category_id'      => $category_id,
+                        'attribute'        => serialize($rs['attributes']),
+                        'last_update_time' => date('Y-m-d H:i:s')
+                    );
+                    
+                    $category_attribute = smtCategoryAttribute::where('category_id',$category_id)->first();
+                    $smtCategoryAttribute = new smtCategoryAttribute;
+                    if ($category_attribute) {
+                        $options['id'] = $category_attribute->id;
+                        $smtCategoryAttribute->update($options);
+                    } else {
+                        $smtCategoryAttribute->create($options);
+                    }
+                    return $rs['attributes'];
+                }else {
+                    return false;
+                }
+            }else {
+                return false;
+            }
+        }else {
+            return false;
+        }
+    }
+    
+    /**
+     * 过滤输出速卖通刊登的数据,排除Notice错误
+     * @param $key
+     * @param $data
+     * @param $returnArray:是否返回数组
+     * @return string
+     */
+    public function filterData($key, $data, $returnArray=false){
+        return $data && array_key_exists($key, $data) ? $data[$key] : ($returnArray ? array() : '');
+    }
+    
+    /**
+     * 解析属性并返回 --这礼现在不解析SKU属性
+     * $array:属性数组
+     * @param $att:属性数值，循环后的一维数组
+     * @param $pid:父属性ID
+     * @param bool $isSku:是否SKU属性
+     * @param array $array
+     * @param array $array2
+     * @return string
+     */
+    public function parseAttribute($att, $pid, $isSku=false, $array=array(), $array2=array()){
+        $child_string      = ''; //属性值的子属性
+        $customized_string = ''; //自定义属性
+        $product_attribute = '';
+        $required          = $att['required'] ? true : false; //必要？
+        $required_string   = $att['required'] ? '<span class="red">*</span>' : '';        //必要属性
+        $key_string        = $att['keyAttribute'] ? '<span class="green">！</span>' : '';  //关键属性
+        $attribute_string  = ''; //属性显示方式
+        $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
+        $other_string      = '';//其他属性
+         
+        $inputType         = $att['inputType']; //属性值的类型
+        $units             = array_key_exists('units', $att) ? $att['units'] : array(); //单位
+         
+        switch ($att['attributeShowTypeValue']){
+            case 'check_box': //复选框
+                $attribute_string = '<div class="row"><div class="col-sm-6">';
+                $attribute_string .= '<ul class="list-inline">';
+                foreach ($att['values'] as $item):
+                $checked = false;
+                if (!empty($array)){
+                    foreach ($array as $row){ //判断是否存在这个属性ID和值ID
+                        if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
+                        if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                    }
+                }
+                 
+                $attribute_string .= '<li>';
+                $attribute_string .= '<label class="checkbox-inline">';
+                $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].'][]').'" '.($checked ? 'checked' : '').'/>'.$item['names']['zh'];
+                $attribute_string .= '</label>';
+                $attribute_string .= '</li>';
+                endforeach;
+                $attribute_string .= '</ul>';
+                $attribute_string .= '</div></div>';
+                break;
+            case 'list_box': //下拉列表
+                $attribute_string = '<div class="row"><div class="col-sm-8">';
+                $attribute_string .= '<select name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id']).']" class="form-control" '.($required ? 'datatype="*"' : '').' attr_id="'.$att['id'].'">';
+                $attribute_string .= '<option value="">---请选择---</option>';
+                foreach ($att['values'] as $item):
+                $checked = false;
+                if (!empty($array)){
+                    foreach ($array as $row){
+                        if (empty($row['attrNameId']) || $att['id'] != $row['attrNameId']) continue;
+                        if ($row['attrValueId'] == $item['id']) {$checked = true;break;}
+                    }
+                }
+                 
+                //lang=0,说明没有子属性了
+                $attribute_string .= '<option value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" lang="'.(!empty($item['attributes']) ? 0 : 1).'" attr_value_id="'.$item['id'].'" '.($checked ? 'selected="selected"' : '').'>'.$item['names']['zh'].'('.$item['names']['en'].')'.'</option>';
+                if (!empty($item['attributes'])){ //值还有子属性
+                    foreach ($item['attributes'] as $i){
+                        $child_string .= $this->parseAttribute($i, $item['id'], $isSku, $array);
+                    }
+                }
+                $customized_string .= '<tr class="hide tr-p-'.$att['id'].'-'.$item['id'].'"><td>'.$item['names']['zh'].'</td>'.($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" /></td>' : '').($att['customizedPic'] ? '<td><a href="javascript: void(0);" class="btn btn-defaut btn-xs">选择图片</a><a href="" class="view-custom-image"></a><a href="" class="del-custom-image">删除</a><input type="hidden" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="" /></td>' : '').'</tr>';
+                endforeach;
+                $attribute_string .= '</select>';
+                $attribute_string .= '</div></div>';
+                if (array_key_exists($att['id'], $array2) && $array2[$att['id']]){
+                    $other_string .= '<div class="form-group">';
+                    $other_string .= '<div class="col-sm-10 col-sm-offset-2">';
+                    $other_string .= '<input type="text" name="otherAttributeTxt['.$att['id'].']" class="form-control" value="'.$array2[$att['id']]['attrValue'].'"/>';
+                    $other_string .= '</div>';
+                    $other_string .= '</div></div>';
+                }
+                break;
+            case 'group_table': //复选框 再有子复选框 --待扩展
+                $attribute_string = '<div class="row"><div class="col-sm-6">';
+                $attribute_string .= '<ul class="list-inline">';
+                foreach ($att['values'] as $item):
+                $attribute_string .= '<li class="col-sm-4 no-padding-left groupTab">';
+                $attribute_string .= '<label class="checkbox-inline">';
+                $attribute_string .= '<input type="checkbox" value="'.($isSku ? $item['id'] : $item['id'].'-'.$item['names']['en']).'" name="'.($isSku ? '' : 'sysAttrValueIdAndValue['.$att['id'].']').'"/>'.$item['names']['zh'];
+                $attribute_string .= '</label>';
+                $attribute_string .= '</li>';
+                endforeach;
+                $attribute_string .= '</ul>';
+                $attribute_string .= '</div></div>';
+                break;
+            case 'input':
+            default:
+                //验证信息类型及错误信息
+                if ($inputType == 'NUMBER') {
+                    $dataType = 'num';
+                } else {
+                    $dataType = '*';
+                }
+                //看看是否有单位
+                $inputValue = $this->filterData($att['id'], $array2) ? $array2[$att['id']]['attrValue'] : '';
+                if ($units) {
+                    $input = '';
+                    $u = '';
+                    if ($inputValue){
+                        list($input, $u) = explode(' ', $inputValue);
+                    }
+                     
+                    $attribute_string = '<div class="row"><div class="col-sm-6">';
+                    $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="'.$input.'" />';
+                    $attribute_string .= '</div>';
+                     
+                    //单位处理
+                    $attribute_string .= '<div class="col-sm-2">';
+                    $attribute_string .= '<select name="sysAttrIdAndUnit['.$att['id'].']" class="form-control">';
+                    foreach ($units as $unit){
+                        $attribute_string .= '<option value="'.$unit['unitName'].'" '.($u == $unit['unitName'] ? 'selected="selected"' : '').'>'.$unit['unitName'].'</option>';
+                    }
+                    $attribute_string .= '</select>';
+                    $attribute_string .= '</div></div>';
+                } else {
+                    $attribute_string = '<div class="row"><div class="col-sm-8">';
+                    $attribute_string .= '<input type="text" class="form-control" name="sysAttrIdAndValueName[' . $att['id'] . ']" ' . ($dataType ? 'datatype="' . $dataType . '" ' : ' ') . ($required ? '' : 'ignore="ignore" ') . ($dataType == 'n' ? 'errormsg="请输入数字" ' : '') . ' value="' .$inputValue. '" />';
+                    $attribute_string .= '</div></div>';
+                }
+                break;
+        }
+        $product_attribute .= '<div class="form-group p-'.$pid.' '.($pid > 0 && !$this->filterData($att['id'], $array) ? 'hide' : '').' '.($isSku ? 's_attr' : 'p_attr').'" attr_id="'.$att['id'].'" custome="'.(($att['customizedName'] || $att['customizedPic']) ? '1' : '0').'">';
+        $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
+        $product_attribute .= $attribute_string;
+        $product_attribute .= '</div>';
+         
+        //还要添加些内容，比如自定义属性的设置
+        if($customized_flag){ //自定义名称或者图片
+            $product_attribute .= '<div class="form-group hide">';
+            $product_attribute .= '<div class="col-sm-offset-2 col-sm-10">';
+            $product_attribute .= '<table class="table table-bordered table-vcenter" id="custome-'.$att['id'].'">';
+            $product_attribute .= '<thead><tr><th>'.$att['names']['zh'].'</th>'.($att['customizedName'] ? '<th>自定义名称</th>' : '').($att['customizedName'] ? '<th>图片（无图片可以不填）</th>' : '').'</tr></thead>';
+            $product_attribute .= '<tbody>'.$customized_string.'</tbody>';
+            $product_attribute .= '</table>';
+            $product_attribute .= '</div>';
+            $product_attribute .= '</div>';
+        }
+         
+        return $product_attribute.$other_string.$child_string;
+    }
+    
+    /**
+     * 解析SKU属性 --应该都是check_box这个类型的
+     * @param $att   属性数组
+     * @param $array 多属性的值列表
+     * @param $token_id 账号
+     * @return string
+     */
+    function parseSkuAttribute($att, $array, $token_id){
+        $child_string      = ''; //属性值的子属性
+        $customized_string = ''; //自定义属性
+        $product_attribute = '';
+        $required          = $att['required'] ? true : false; //必要？
+        $required_string   = $att['required'] ? '<span class="red">*</span>' : '';         //必要属性
+        $key_string        = $att['keyAttribute'] ? '<span class="green">！</span>' : '';  //关键属性
+        $customized_flag   = ($att['customizedName'] || $att['customizedPic']) ? true : false; //自定义
+    
+        $attribute_string = '<div class="row"><div class="col-sm-8">';
+        $attribute_string .= '<ul class="list-inline">';
+        foreach ($att['values'] as $k => $item):
+        $attribute_string .= '<li>';
+        $attribute_string .= '<label class="checkbox-inline">';
+        $attribute_string .= '<input type="checkbox" name="'.$att['id'].'" value="'.$item['id'].'" '.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ?  'checked' : '').(($required && $k == 0) ? ' datatype="*" nullmsg="'.$att['names']['zh'].'不能为空"' : '').' />'.$item['names']['zh'];
+        $attribute_string .= '</label>';
+        $attribute_string .= '</li>';
+        //自定义名称或图片
+        $customized_string .= '<tr class="'.(array_key_exists($item['id'], $this->filterData($att['id'], $array, true)) ? '' : 'hide').' tr-p-'.$att['id'].'-'.$item['id'].'">'
+            .'<td>'.$item['names']['zh'].'</td>'
+                .($att['customizedName'] ? '<td><input type="text" name="customizedName['.$att['id'].'_'.$item['id'].']" value="'.($this->filterData($att['id'], $array, true) && $this->filterData($item['id'], $array[$att['id']]) ? $array[$att['id']][$item['id']]['propertyValueDefinitionName'] : '').'" /></td>' : '')
+                .'<td><span class="customize-pic pull-right">'
+                    .(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? '<img src="'.$array[$att['id']][$item['id']]['skuImage'].'" width="30" height="30" /><a href="javascript: void(0);" class="del-custom-image">删除</a>' : '').'</span>'
+                        .'<a href="javascript: void(0);" class="btn btn-default btn-xs add-custom-image pull-left" lang="'.$att['id'].'_'.$item['id'].'">选择图片</a>'
+                            .'<a href="javascript: void(0);" class="btn btn-default btn-xs copyToCust" onclick="copyToHere(this, \'pic-detail\');" >详情图片</a>'
+                                .'<input type="hidden" class="customized-pic-input customizedPic-'.$att['id'].'_'.$item['id'].'" name="customizedPic['.$att['id'].'_'.$item['id'].']" value="'.(($this->filterData($att['id'], $array) && $this->filterData($item['id'], $array[$att['id']]) && $array[$att['id']][$item['id']]['skuImage']) ? $array[$att['id']][$item['id']]['skuImage'] : '').'" /></td>'
+                                    .'</tr>';
+        endforeach;
+        $attribute_string .= '</ul>';
+        $attribute_string .= '</div></div>';
+    
+        $product_attribute .= '<div class="form-group  s_attr" attr_id="'.$att['id'].'" custome="'.(($att['customizedName'] || $att['customizedPic']) ? '1' : '0').'">';
+        $product_attribute .= '<label class="col-sm-2 control-label">'.$required_string.$key_string.$att['names']['zh'].'：</label>';
+        $product_attribute .= $attribute_string;
+        $product_attribute .= '</div>';
+    
+        //还要添加些内容，比如自定义属性的设置
+        if($customized_flag){ //自定义名称或者图片
+            $product_attribute .= '<div class="form-group '.($this->filterData($att['id'], $array) ? '' : 'hide').'">';
+            $product_attribute .= '<div class="col-sm-offset-2 col-sm-10">';
+            $product_attribute .= '<table class="table table-bordered table-vcenter" id="custome-'.$att['id'].'">';
+            $product_attribute .= '<thead><tr><th>'.$att['names']['zh'].'</th>'.($att['customizedName'] ? '<th>自定义名称</th>' : '').($att['customizedName'] ? '<th>图片（无图片可以不填）</th>' : '').'</tr></thead>';
+            $product_attribute .= '<tbody>'.$customized_string.'</tbody>';
+            $product_attribute .= '</table>';
+            $product_attribute .= '</div>';
+            $product_attribute .= '</div>';
+        }
+    
+        return $product_attribute.$child_string;
+    }
+    
+    function accounterFormat($string) {
+        $string = trim($string);
+        $newString = $string;
+        if ($string == '速卖通' || $string == '线下交易' || $string == '网站' || $string == 'ebay补货' || strlen($string) <= 4 || substr_count($string, '@') > 0) {
+            //
+        } else {
+            $newString = substr($string, 0, 4) . '****' . substr($string, strlen($string) - 1, 1);
+            if ( $string == 'happy-store2013' )  $newString = 'h***st***3';
+            if($string=='happyfish2012')$newString='happ**fish**2';
+            if($string=='happycow2012')$newString='happ**cow**2';
+            if($string=='happywill2013')$newString='happ**will**3';
+            if($string=='pandamotos2012')$newString='pand**tos**2';
+            if($string=='pandacars2012')$newString='pand**car**2';
+    
+        }
+        return $newString;
+    }
+    
+    /**
+     * SKU列表显示排序
+     * @param $skus
+     * @param $sortAtt
+     * @param $attVal
+     * @return array
+     */
+    function sortSkuAttr($skus, $sortAtt, $attVal){
+        $newSkus = array();
+        $sKarr = array(); //所有键值
+        foreach ($skus as $sku){
+            $aeopSKUProperty = unserialize($sku['aeopSKUProperty']);
+            $trClassArr = array();
+            foreach ($sortAtt as $k1 => $sa){
+                $matchFlag = false;
+                $saVal = '';
+                if($aeopSKUProperty){
+                    foreach ($aeopSKUProperty as $Property){
+                        if ($sa == $Property['skuPropertyId']){ //分类信息
+                            $saVal = $Property['propertyValueId'];
+                    
+                            foreach ($attVal[$sa] as $k2 => $av){
+                                if ($av == $saVal){
+                                    $sKarr[$k1][$k2] = $saVal;
+                                    break;
+                                }
+                            }
+                            $matchFlag = true;
+                            break;
+                        }
+                    }    
+                    $trClassArr[] = $saVal;
+                    
+                    if (!$matchFlag) $sKarr[$k1] = array();
+                    ksort($sKarr[$k1]);
+                }                              
+            }
+            $skus[implode('_', $trClassArr)] = $sku;
+        }
+        
+        $newTrSortArr = $this->combineDika($sKarr); //行显示的排序数组
+  
+        foreach ($newTrSortArr as $ns){
+            if (array_key_exists($ns, $skus->toArray())){                
+                $newSkus[] = $skus[$ns];
+            }
+        }
+        return $newSkus; //返回排序后的新的SKU列表
+    }
+    
+    /**
+     * 对SMTSKU进行去前后缀处理
+     * @param $smtSkuCode
+     * @param $erpFlag:是否解析成ERPSKU
+     * @return string
+     */
+    public function rebuildSmtSku($smtSkuCode, $erpFlag=false){
+        // 去掉SKU的销售代码
+        $n = strpos($smtSkuCode, '*');
+        $sku_new = $n !== false ? substr($smtSkuCode, $n+1) : $smtSkuCode;
+    
+        // 去除sku的帐户代码
+        $m = strpos($sku_new, '#');
+        $sku_new = $m !== false ? substr($sku_new, 0, $m) : $sku_new;
+        if ($erpFlag) {
+            $sku_new = str_ireplace('{YY}', '', $sku_new);
+        }
+        return trim($sku_new);
+    }
+    
+    /**
+     * 多个数组的笛卡儿积
+     * @param $data
+     * @return array
+     */
+    public function combineDika($data)
+    {
+        $cnt    = count($data);
+        $result = array();
+        if ($cnt == 0) return $result;
+        $result = $data[0];
+        for ($i = 1; $i < $cnt; $i++) {
+            $result = $this->combineArray($result, $data[$i]);
+        }
+        return $result;
+    }
+    
+    /**
+     * 两个数组的笛卡尔积
+     * @param $arr1
+     * @param $arr2
+     * @return array
+     */
+    public function combineArray($arr1,$arr2) {
+        $result = array();
+        if (!empty($arr1)) {
+            foreach ($arr1 as $item1) {
+                if (!empty($arr2)) {
+                    foreach ($arr2 as $item2) {
+                        $result[] = $item1 . '_' . $item2;
+                    }
+                } else {
+                    $result[] = $item1 . '_';
+                }
+            }
+        } else {
+            if (!empty($arr2)) {
+                foreach ($arr2 as $item2) {
+                    $result[] = '_' . $item2;
+                }
+            } else {
+                $result[] = '_';
+            }
+        }
+    
+        return $result;
+    }
+    
+    /**
+    * 把SMT的module替换成图片，这样才能显示成图片的占位符
+    * @param $detail
+    * @return mixed
+    */
+    public function replaceSmtModuleToImg($detail){
+        preg_match_all('/<kse:widget.*><\/kse:widget>/i', $detail, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $m) {
+                $pic    = '<img class="kse-widget" data="' . rawurlencode($m) . '" src="http://style.aliexpress.com/js/5v/lib/kseditor/plugins/widget/images/widget1.png"/>';
+                $detail = str_replace($m, $pic, $detail);
+                unset($pic);
+            }
+        }
+        return $detail;
+    }
+    /**
+     * 替换SMT描述的特殊图片成module:   ske:widget
+     * @param $str
+     * @return mixed
+     */
+    public function replaceSmtImgToModule($str){
+        $detail = $str;
+        preg_match_all('/<img\s*[^>]*class=\s*\"\s*kse-widget\s*\"[^>]*\/>/i', $str, $matches);
+        if (!empty($matches[0])) {
+            foreach ($matches[0] as $match) {
+                //匹配出属性的值
+                preg_match('/data\s*=\s*"([^>^"]*)"/i', $match, $data);
+                $widget = rawurldecode($data[1]);
+                $detail = str_replace($match, $widget, $detail);
+                unset($data);
+            }
+            unset($matches);
+        }
+        return $detail;
     }
 
     public function sendMessages($replyMessage)
     {
         // TODO: Implement sendMessages() method.
-        //echo $this->_access_token;
         $message_obj = $replyMessage->message;
-
         if(!empty($message_obj)){
-
-             // step1:发信息
-
+            $ChannelMessageFields = unserialize(base64_decode($message_obj->channel_message_fields));
+            // step1:发信息
             $send_param = [];
-            $send_param['channelId'] = $message_obj->message_id;
-            $send_param['buyerId'] = $message_obj->from;
-            $send_param['msgSources'] = $message_obj->'消息类型';
-            $send_param['content'] = $replyMessage->content;
+            $channelId = rawurlencode($message_obj->message_id);
+            $buyerId = rawurlencode($message_obj->from);
+            $msgSources = rawurlencode($ChannelMessageFields['message_type']);
+            $content = rawurlencode($replyMessage->content);
 
-            $api_return =  $this->getJsonData('api.addMsg',http_build_query($send_param));
+            $send_param ="channelId=$channelId&buyerId=$buyerId&msgSources=$msgSources&content=$content";
+            $api_return =  $this->getJsonData('api.addMsg', $send_param);
             $api_return_array = json_decode($api_return,true);
+
             if(isset($api_return_array['result']["isSuccess"])){
                 if($api_return_array['result']["isSuccess"]){
-
                     //step2: 更新消息为已读
                     $update_param = [];
                     $update_param['channelId'] = $message_obj->message_id;
-                    $update_param['msgSources'] = $message_obj->'消息类型';
+                    $update_param['msgSources'] = $ChannelMessageFields['message_type'];
                     $this->getJsonData('api.updateMsgRead',http_build_query($update_param));
 
                     $replyMessage->status = 'SENT';
@@ -540,6 +1069,401 @@ Class AliexpressAdapter implements AdapterInterface
 
         return $replyMessage->status== 'SENT' ? true : false;
     }
+    
+    /**
+     * 速卖通上传图片到图片银行或临时目录专用
+     * @param  [type] $action     api名称
+     * @param  [type] $fileName   若为数组格式array('srcFileName' => $filename),字符串格式则为srcFileName=$filename
+     * @param  [type] $fileStream 图片流,二进制文件
+     * @return [type]             [description]
+     */
+   /*  public function uploadBankImage($action, $file, $fileName=''){
+        //接口URL
+        $app_url  = 'http://'.self::GWURL.'/fileapi/param2/'.$this->_version.'/aliexpress.open/'.$action.'/'.$this->_appkey.'?access_token='.$this->_access_token;
+        $param    = '';
+        
+        $parameter_arr['_access_token'] = $this->_access_token;
+        $_aop_signature = $this->getApiSignature($app_url,$parameter_arr);
+        $fileName = ($fileName ? $fileName : time()).'.jpg';
+        if ($action == 'api.uploadImage') {
+            $param = '&fileName='.$fileName.'&_aop_signature='.$_aop_signature;
+        }elseif ($action == 'api.uploadTempImage') {
+            $param = '&srcFileName='.$fileName;
+        }
+        $data = file_get_contents($file);
+        $ch   = curl_init ();
+        curl_setopt($ch, CURLOPT_URL, $app_url.$param);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-from-urlencoded'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $result = curl_exec($ch);
+        if (curl_error($ch)) {
+            //$this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error ( $ch )); //异常错误
+        }
+        curl_close($ch);
+        //$this->setCurlErrorLog($result);
+        return json_decode($result, true);
+    } */
+    
+    public function updateProductPublishState($action,$productId){
+        $app_url  = "http://" . self::GWURL . "/openapi/";       
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;  
+        $parameter['productIds'] = $productId;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+       
+     
+        //参数
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+ 
+        return json_decode($result,true);
+    }
+    
+    public function uploadBankImage($action, $file, $fileName=''){
+        //接口URL
+        $app_url = "http://" . self::GWURL . "/fileapi/";
+        //apiinfo	aliexpress.open
+        $apiInfo = "param2/" . $this->_version . "/aliexpress.open/{$action}/" . $this->_appkey;
+        $parameter= '';
+        $fileName = ($fileName ? rawurlencode($fileName) : time().rand(1000, 9999)).'.jpg';
+        if ($action == 'api.uploadImage') {
+            $param = 'fileName='.$fileName;
+        }elseif ($action == 'api.uploadTempImage') {
+            $param = 'srcFileName='.$fileName;
+        }
+        //参数
+        $app_parameter_url = $param."&access_token=" . $this->_access_token;
+    
+        $sign_url = '';
+    
+        //获取对应URL的签名
+        $sign     = $this->getApiSign ( $apiInfo, $app_parameter_url );
+        $sign_url = "&_aop_signature=$sign"; //签名参数
+    
+        //组装URL
+        $get_url = $app_url . $apiInfo . '?' . $app_parameter_url . $sign_url;
+    
+        $data = file_get_contents($file);
+        $ch   = curl_init ();
+        curl_setopt($ch, CURLOPT_URL, $get_url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-from-urlencoded'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $result = curl_exec($ch);
+        if (curl_error($ch)) {
+            $this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error ( $ch )); //异常错误
+        }
+        curl_close($ch);
+        return json_decode($result, true);
+    }
+    
+        /**
+     * 获取定义的平台信息
+     * @param string $platType
+     * @return array
+     */
+    public function getDefinedPlatInfo($platType = 'SMT'){
+        $platArray = $this->defineProductPublishPlatArray();
+        foreach ($platArray as $plat){
+            if (strtoupper($plat['platType']) == strtoupper($platType)){
+                return $plat;
+            }
+        }
+        return array();
+    }
+    
+    public function defineProductPublishPlatArray( )
+    {
+        $array = array(
+            array(
+                'platID' => '101',
+                'platTitle' => 'eBay.us',
+                'platType' => 'USD',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '102',
+                'platTitle' => 'eBay.au',
+                'platType' => 'AUD',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '103',
+                'platTitle' => 'eBay.uk',
+                'platType' => 'GBP',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '104',
+                'platTitle' => 'eBay.de',
+                'platType' => 'EUR',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '105',
+                'platTitle' => 'eBay.fr',
+                'platType' => 'EUR',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '106',
+                'platTitle' => 'eBay.ca',
+                'platType' => 'C',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '199',
+                'platTitle' => 'eBay.other',
+                'platType' => 'ebay.other',
+                'platTypeID' => '1'
+            ),
+            array(
+                'platID' => '201',
+                'platTitle' => 'Amazon.de',
+                'platType' => 'Amazon.de',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '202',
+                'platTitle' => 'Amazon.uk',
+                'platType' => 'Amazon.uk',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '203',
+                'platTitle' => 'Amazon.us',
+                'platType' => 'Amazon.us',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '204',
+                'platTitle' => 'Amazon.ca',
+                'platType' => 'Amazon.ca',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '205',
+                'platTitle' => 'Amazon.fr',
+                'platType' => 'Amazon.fr',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '299',
+                'platTitle' => 'Amazon.other',
+                'platType' => 'Amazon.other',
+                'platTypeID' => '3'
+            ),
+            array(
+                'platID' => '301',
+                'platTitle' => 'Aliexpress',
+                'platType' => 'SMT',
+                'platTypeID' => '6'
+            ),
+            array(
+                'platID' => '401',
+                'platTitle' => 'DHgate',
+                'platType' => 'DHgate',
+                'platTypeID' => '4'
+            ),
+            array(
+                'platID' => '501',
+                'platTitle' => '网站',
+                'platType' => 'B2C',
+                'platTypeID' => '5'
+            )
+        );
+        return $array;
+    }
+    
+    /**
+     * 对速卖通的SKU属性进行排序处理 --基本属性不进行处理
+     * @param $attribute
+     * @return mixed
+     */
+    public function sortAttribute($attribute){
+        if ($attribute) {
+            $spec = array();
+            $temp = array();
+            foreach ($attribute as $key => $row) {
+                if ($row['sku']){ //是SKU属性
+                    $spec[$key] = $row['spec']; //用来排序的数组
+                    $temp[$key] = $row;
+                    unset($attribute[$key]);
+                }
+            }
+            array_multisort($spec, SORT_ASC, $temp); //对SKU属性数组进行排序
+            $attribute = array_merge($attribute, $temp); //合并排序后的信息
+        }
+        return $attribute;
+    }
+    
+    
+    /**
+     * 解析SKU成ERP内的SKU
+     * @param $skuCode
+     * @param $erpFlag:解析成ERP SKu(主要是去掉海外仓的标识)
+     * @return array
+     */
+    public function buildSysSku($skuCode, $erpFlag=false){
+        // 处理带销售代码的SKU：B702B#Y6 及海外仓标识
+        $skus = $this->rebuildSmtSku($skuCode, $erpFlag);
+    
+        $sku_list = explode('+', $skus); // 处理组合的SKU：DA0090+DA0170+DA0137
+        $sku_arr  = array();
+        foreach ($sku_list as $value) {
+            $len       = strpos($value, '('); // 处理有捆绑的SKU：MHM330(12)
+            $sku_new   = $len ? substr($value, 0, $len) : $value;
+            $sku_arr[] = $sku_new;
+        }
+        return !empty($sku_arr) ? $sku_arr : array();
+    }
+    
+    /**
+     * 获取SKU属性中的海外仓发货属性ID,没有就返回0
+     * @param $aeopSKUProperty
+     * @return int
+     */
+    public function checkProductSkuAttrIsOverSea($aeopSKUProperty){
+        $valId = 0;
+        if (!empty($aeopSKUProperty)){
+             
+            foreach ($aeopSKUProperty as $property){
+                if ($property['skuPropertyId'] == 200007763){ //发货地的属性ID
+                    $valId = $property['propertyValueId'];
+                    break;
+                }
+            }
+        }
+        return $valId;
+    }
+    
+    /**
+     * 标点过滤函数 --主要是针对关键字
+     * @param unknown $str
+     * @return unknown
+     */
+    function filterForSmtProduct($str){
+        $str = str_replace(';', ' ', $str);
+        $str = str_replace(',', ' ', $str);
+        return trim($str);
+    }
+    
+    /**
+     * 获取在线数据
+     * @param $currentPage 每页查询商品数量
+     * @param $pageSize 需要商品的当前页数
+     */
+    public function getOnlineProduct($productStatus = 'onSelling',$currentPage,$pageSize){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findProductInfoListQuery/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['pageSize'] = $pageSize;
+        $parameter['currentPage'] = $currentPage;
+        $parameter['productStatusType'] = $productStatus;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);         
+       
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);        
+        return json_decode($result,true);
+    }
+    
+    /**
+     * 根据商品id查询单个商品的详细信息
+     * @param $productId
+     */
+    public function findAeProductById($productId){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findAeProductById/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $productId;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
+    }
+    
+    /**
+     * 编辑商品单个SKU库存
+     * @param  $productId  商品ID
+     * @param  $skuStock   库存
+     */
+    public function editSingleSkuStock($data){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.editSingleSkuStock/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $data['productId'];
+        $parameter['ipmSkuStock'] = $data['ipmSkuStock'];
+        $parameter['skuId'] = $data['skuId'];
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
+    }
+    
+    public function editSingleSkuPrice($data){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.editSingleSkuPrice/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $data['productId'];
+        $parameter['skuPrice'] = $data['skuPrice'];
+        $parameter['skuId'] = $data['skuId'];
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
+    }
+    
+   
 
+    /**
+     * 纠纷
+     */
+    public function getIssues(){
+
+        $issue_ary = array(
+            'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
+            'SELLER_REFUSE_REFUND', //卖家拒绝纠
+            // 'ACCEPTISSUE', //卖家接受纠纷     相当于完成了的纠纷
+            // 'WAIT_BUYER_SEND_GOODS', //等待买家发货
+            //  'WAIT_SELLER_RECEIVE_GOODS', // 买家发货，等待卖家收货
+            'ARBITRATING', // 仲裁中
+            //   'SELLER_RESPONSE_ISSUE_TIMEOUT' // 卖家响应纠纷超时  对应相关超时的不需要获取
+        );
+        $page = 1;
+        $page_size = 10;
+
+
+        foreach ($issue_ary as $issue){
+            for($i = 1 ; $i>0; $i++){
+
+                $method = 'api.queryIssueList';
+                $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
+                $issue_list = json_decode($this->getJsonData($method, $para));
+                if(isset($issue_list->success)) {
+                    foreach ($issue_list->dataList as $item) {
+
+                        $detail_param = "issueId=".$item->id;
+                        $issue_detail = json_decode($this->getJsonData('api.queryIssueDetail',$detail_param));
+                        dd($issue_detail);exit;
+/*                        DB::beginTransaction();
+
+                        DB::commit();*/
+
+                    }
+                }else{
+                    break;
+                }
+
+            }
+
+        }
+
+    }
+   public function changetime($time){
+       $time = date('Y-m-d H:i:s', substr($time, 0, 10));
+       return $time;
+   }
 
 }

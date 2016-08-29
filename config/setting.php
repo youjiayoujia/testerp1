@@ -78,8 +78,28 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
+
+        'productSku.skuCode'=>'产品SKU',
+        'product.token_id' => '帐号',
+        'product.multiattribute' => '=属性=',
+        'product.productStatusType' => '平台状态',
+        'product.user_id' => '刊登人员',
+        'products.status' => '商品状态',
+        'products.c_name' => '商品中文名',
+        'ipmSkuStock' => '可售库存',
+        'is_erp' => 'sku是否匹配',
+        'price.skuPrice' => '价格',
+        'price.profitRate' => '利润率',
+        
+         'token_id' => '渠道帐号',
+
+        'hang_num' => '挂号码',
+        'hang_number' => '挂号码',
+        'package_id' => '包裹id',
+
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
+
         'by_id' => '买家ID',
         'profit_rate' => '利润率',
         'items.item.status' => 'SKU状态',
@@ -89,7 +109,22 @@ return [
         'logistics_id' => '物流方式',
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
+        'warehousePosition.name' => '库位',
 
+        'item_id'=>'Ebay ItemID',
+        'seller_id' =>'销售人员',
+        'ebayProduct.site_name'=>'Ebay站点',
+        'ebayProduct.paypal_email_address'=>'PayPal',
+        'ebayProduct.currency'=>'币种',
+        'ebayProduct.account_id'=>'账号',
+        'ebayProduct.listing_type'=>'类型',
+        'ebayProduct.multi_attribute'=>'多属性',
+        'price.start_price'=>'价格',
+        'time.start_time' => '上架时间',
+        'sku'=>'EbaySku',
+        'erp_sku' =>'ErpSku',
+        'price.quantity_sold'=>'销量',
+        'channel_name' => '渠道名称',
     ],
 ];
 

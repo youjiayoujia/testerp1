@@ -56,15 +56,19 @@
             </label>
         </div>
     </div>
-    <div class='form-group'>
-        <div class='checkbox'>
-            @foreach($logisticses as $logistics)
-            <label class='col-lg-3'>
-                <input type='checkbox' name='logistics[]' class='logistics' value="{{$logistics->id}}" checked='true'>{{$logistics->code}}
-            </label>
-        @endforeach
+    @foreach($logisticses as $key => $logistics)
+    <h4><font color='red'>面单尺寸:{{$logistics->first()->template ? $logistics->first()->template->size : '暂无尺寸'}}</font></h4>
+        <div class='form-group'>
+            <div class='checkbox'> 
+                @foreach($logistics as $single)
+                <label class='col-lg-3'>
+                    <input type='checkbox' name='logistics[]' class='logistics' value="{{$single->id}}" checked='true'>{{$single->code}}
+                </label>
+                @endforeach
+            </div>
         </div>
-    </div>
+    <br/>
+    @endforeach
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success">生成拣货单</button>

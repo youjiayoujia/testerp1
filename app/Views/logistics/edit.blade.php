@@ -55,11 +55,6 @@
     </div>
     <div class='row'>
         <div class="form-group col-lg-2">
-            <label for="url" class="control-label">物流追踪网址</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="url" placeholder="物流追踪网址" name='url' value="{{ old('url') ? old('url') : $model->url}}">
-        </div>
-        <div class="form-group col-lg-2">
             <label for="logistics_catalog_id">物流分类</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select class="form-control" name="logistics_catalog_id" id="logistics_catalog_id">
@@ -95,6 +90,23 @@
                 @endforeach
             </select>
         </div>
+        <div class="form-group col-lg-2">
+            <label for="driver" class="control-label">驱动名</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') ? old('driver') : $model->driver }}">
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="priority" class="control-label">优先级</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="priority" placeholder="优先级" name='priority' value="{{ old('priority') ? old('priority') : $model->priority }}">
+        </div>
+        <div class="form-group col-lg-2">
+            <label for="logistics_code" class="control-label">物流编码</label>
+            <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <input class="form-control" id="logistics_code" placeholder="物流编码" name='logistics_code' value="{{ old('logistics_code') ? old('logistics_code') : $model->logistics_code }}">
+        </div>
+    </div>
+    <div class="row">
         <div class='form-group col-lg-4'>
             <label for="logistics_limits">物流限制</label>
             <select class='form-control logistics_limits' name='logistics_limits[]' multiple>
@@ -103,13 +115,6 @@
                     <option value="{{ $limit->id }}" {{ $model->hasLimits($limit->id) ? 'selected' : ''}}>{{$limit->name}}</option>
                 @endforeach
             </select>
-        </div>
-    </div>
-    <div class="row">
-        <div class="form-group col-lg-2">
-            <label for="driver" class="control-label">驱动名</label>
-            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input class="form-control" id="driver" placeholder="驱动名" name='driver' value="{{ old('driver') ? old('driver') : $model->driver }}">
         </div>
         <div class="form-group col-lg-3">
             <label for="is_enable" class="control-label">是否启用</label>
@@ -129,91 +134,97 @@
     <div class="panel panel-default">
         <div class="panel-heading">承运商信息</div>
         <div class="panel-body">
-            <div class='col-lg-3'>
-                <label>Amazon承运商</label>
-                <select name='merchant[amazon_merchant]' class='form-control amazon_merchant'>
+            @foreach($arr as $key1 => $singles)
+            <div class='form-group col-lg-3'>
+                <label>{{$key1}}</label>
+                <select name='merchant[{{$key1}}_merchant]' class='form-control merchant'>
                     <option value=''></option>
-                    @foreach($amazons as $key => $single)
+                    @foreach($singles as $key => $single)
                         <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
                     @endforeach
                 </select>
+                <input type='text' class='form-control' name='{{$key1}}_merchant_name' placeholder='备选框'>
+                <input type='hidden' name='{{$key1}}_merchant_channelId' value={{ $single->channel_id }}>
             </div>
-            <div class='col-lg-3'>
-                <label>ebay承运商</label>
-                <select name='merchant[ebay_merchant]' class='form-control ebay_merchant'>
-                    <option value=''></option>
-                    @foreach($ebays as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+            @endforeach
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">渠道是否回传</div>
+        <div class="panel-body">
+            @if($channels->count() == $logisticsChannels->count())
+                @foreach($channels as $channel)
+                    @foreach($logisticsChannels as $logisticsChannel)
+                        @if($channel->id == $logisticsChannel->channel_id)
+                            <div class="form-group col-lg-2">
+                                <label for="channel_id[{{ $channel->id }}]" class="control-label">{{ $channel->name }}平台</label>
+                                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="channel_id[{{ $channel->id }}]" value="1" {{ $logisticsChannel->is_up == '1' ? 'checked' : '' }}>上传
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="channel_id[{{ $channel->id }}]" value="0" {{ $logisticsChannel->is_up == '0' ? 'checked' : '' }}>不上传
+                                    </label>
+                                </div>
+                            </div>
+                        @endif
                     @endforeach
-                </select>
-            </div>
-            <div class='col-lg-3'>
-                <label>wish承运商</label>
-                <select name='merchant[wish_merchant]' class='form-control wish_merchant'>
-                    <option value=''></option>
-                    @foreach($wishes as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
+                @endforeach
+            @endif
+            @if($logisticsChannels->count() == 0)
+                @foreach($channels as $channel)
+                    <div class="form-group col-lg-2">
+                        <label for="channel_id[{{ $channel->id }}]" class="control-label">{{ $channel->name }}平台</label>
+                        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="channel_id[{{ $channel->id }}]" value="1">上传
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="channel_id[{{ $channel->id }}]" value="0" checked>不上传
+                            </label>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">物流追踪网址</div>
+        <div class="panel-body">
+            @if($channels->count() == $logisticsChannels->count())
+                @foreach($channels as $channel)
+                    @foreach($logisticsChannels as $logisticsChannel)
+                        @if($channel->id == $logisticsChannel->channel_id)
+                            <div class="form-group col-lg-2">
+                                <label for="url[{{ $channel->id }}]" class="control-label">{{ $channel->name }}追踪网址</label>
+                                <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                <input class="form-control" id="url[{{ $channel->id }}]" placeholder="追踪网址" name='url[{{ $channel->id }}]' value="{{ old('url[' . $channel->id . ']') ? old('url[' . $channel->id . ']') : $logisticsChannel->url }}">
+                            </div>
+                        @endif
                     @endforeach
-                </select>
-            </div>
-            <div class='col-lg-3'>
-                <label>lazada承运商</label>
-                <select name='merchant[lazada_merchant]' class='form-control lazada_merchant'>
-                    <option value=''></option>
-                    @foreach($lazadas as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='col-lg-3'>
-                <label>dhgate承运商</label>
-                <select name='merchant[dhgate_merchant]' class='form-control dhgate_merchant'>
-                    <option value=''></option>
-                    @foreach($dhgates as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='col-lg-3'>
-                <label>cdiscount承运商</label>
-                <select name='merchant[cdiscount_merchant]' class='form-control cdiscount_merchant'>
-                    <option value=''></option>
-                    @foreach($cdiscounts as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='col-lg-3'>
-                <label>速卖通承运商</label>
-                <select name='merchant[aliExpress_merchant]' class='form-control aliExpress_merchant'>
-                    <option value=''></option>
-                    @foreach($aliExpresses as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class='col-lg-3'>
-                <label>joom承运商</label>
-                <select name='merchant[joom_merchant]' class='form-control joom_merchant'>
-                    <option value=''></option>
-                    @foreach($jooms as $key => $single)
-                        <option value="{{ $single->channel_id.','.$single->name }}" {{ $model->inType($single->id) ? 'selected' : '' }}>{{$single->name}}</option>
-                    @endforeach
-                </select>
-            </div>
+                @endforeach
+            @endif
+            @if($logisticsChannels->count() == 0)
+                @foreach($channels as $channel)
+                    <div class="form-group col-lg-2">
+                        <label for="url[{{ $channel->id }}]" class="control-label">{{ $channel->name }}追踪网址</label>
+                        <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                        <input class="form-control" id="url[{{ $channel->id }}]" placeholder="追踪网址" name='url[{{ $channel->id }}]' value="{{ old('url[' . $channel->id . ']') }}">
+                    </div>
+                @endforeach
+            @endif
         </div>
     </div>
 @stop
 <script type="text/javascript">
     $(document).ready(function() {
-        $('.ebay_merchant').select2();
-        $('.cdiscount_merchant').select2();
-        $('.aliExpress_merchant').select2();
-        $('.joom_merchant').select2();
-        $('.dhgate_merchant').select2();
-        $('.lazada_merchant').select2();
-        $('.wish_merchant').select2();
-        $('.amazon_merchant').select2();
+        $('.merchant').select2();
         $('.logistics_limits').select2();
 
         $('.logistics_supplier_id').select2();

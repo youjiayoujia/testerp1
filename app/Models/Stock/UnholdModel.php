@@ -86,6 +86,8 @@ class UnholdModel extends BaseModel
             return $this->stockAllotment ? $this->stockAllotment->allotment_id : '';
         if($this->type == 'MAKE_ACCOUNT')
             return '库存导入';
+        if($this->type == 'PACKAGE')
+            return '包裹ItemId:'.$this->relation_id;
     }
 
     /**

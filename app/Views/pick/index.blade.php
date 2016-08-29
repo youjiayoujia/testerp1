@@ -39,6 +39,13 @@
                     <span class="glyphicon glyphicon-pencil"></span> 分拣
                 </a>
                 @endif
+                @if($pickList->status == 'PACKAGEING' || $pickList->status == 'PICKING')
+                <button class="btn btn-info btn-xs pickBy"
+                        data-toggle="modal"
+                        data-target="#pickBy">
+                        绑定拣货人员
+                </button>
+                @endif
                 @if(($pickList->status == 'PICKING' && $pickList->type != 'MULTI') || $pickList->status == 'PACKAGEING' || ($pickList->status == 'INBOXED' && $pickList->type == 'MULTI'))
                 <a href="{{ route('pickList.package', ['id'=>$pickList->id]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 包装
@@ -54,6 +61,29 @@
             </td>
         </tr>
     @endforeach
+    <div class="modal fade" id="pickBy" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="panel panel-default">
+                    <div class="panel-heading">拣货人</div>
+                    <div class="panel-body">
+                    <div class='row'>
+                    <form action="{{ route('pickList.confirmPickBy') }}" method='POST'>
+                        {!! csrf_field() !!}
+                        <div class='form-group col-lg-4'>
+                            <input type='text' class='form-control col-lg-2' name='pickBy' placeholder='拣货人id'>
+                            <input type='hidden' name='pickId' class='pickId' value="">
+                        </div>
+                        <div class='form-group col-lg-2'>
+                            <button type='submit' class='btn btn-info'>确认</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <iframe src='' id='iframe_print' style='display:none'></iframe>
 @stop
 @section('tableToolButtons')
@@ -89,6 +119,11 @@ $(document).ready(function(){
             $('.single').prop('checked', false);
         }
     });
+
+    $('.pickBy').click(function(){
+        id = $(this).parent().parent().find('td:eq(1)').text();
+        $('.pickId').val(id);
+    })
 
     $('.multiPrint').click(function(){
         $.each($('.single'), function(){

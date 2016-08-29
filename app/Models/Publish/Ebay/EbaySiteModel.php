@@ -17,7 +17,6 @@ class EbaySiteModel extends BaseModel
     protected $fillable = [
         'site',
         'site_id',
-        'detail_version',
         'returns_accepted',
         'returns_with_in',
         'shipping_costpaid_by',
@@ -44,5 +43,16 @@ class EbaySiteModel extends BaseModel
         return $this->is_use==1 ? '是' : '否';
     }
 
+    /**
+     * 返回可以站点信息
+     */
+    public function getSite($key='site',$value='site'){
+        $return = [];
+        $result = $this->where('is_use',1)->get();
+        foreach($result as $re){
+            $return[$re[$key]] = $re[$value];
+        }
+        return $return;
+    }
 
 }

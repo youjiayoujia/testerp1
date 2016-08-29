@@ -255,7 +255,7 @@ class Tool
         return false;
     }
 
-<<<<<<< HEAD
+
 
     /** 获取对应的erp SKU
      * @param $wishSku
@@ -312,6 +312,4 @@ class Tool
 
 
     }
-=======
->>>>>>> master
 }

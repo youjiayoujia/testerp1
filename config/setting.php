@@ -110,7 +110,6 @@ return [
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
         'warehousePosition.name' => '库位',
-<<<<<<< HEAD
 
         'item_id'=>'Ebay ItemID',
         'seller_id' =>'销售人员',
@@ -124,11 +123,8 @@ return [
         'time.start_time' => '上架时间',
         'sku'=>'EbaySku',
         'erp_sku' =>'ErpSku',
-        'price.quantity_sold'=>'销量'
-
-=======
+        'price.quantity_sold'=>'销量',
         'channel_name' => '渠道名称',
->>>>>>> master
     ],
 ];
 

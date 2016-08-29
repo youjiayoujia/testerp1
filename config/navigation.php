@@ -386,9 +386,6 @@ return [
                 'icon' => '',
             ],
             [
-<<<<<<< HEAD
-                'name' => 'Ebay站点信息',
-=======
                 'name' => 'SMT在线数据监控',
                 'url' => 'smtMonitor.index',
                 'icon' => '',
@@ -399,8 +396,7 @@ return [
             'icon' => '',
             ],
             [
-                'name' => 'ebay站点信息',
->>>>>>> master
+                'name' => 'Ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',
             ],

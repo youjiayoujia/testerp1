@@ -40,5 +40,13 @@ class PaypalsModel extends BaseModel
     {
         return $this->is_enable==1 ? '是' : '否';
     }
+    public function getPayPal($key='id'){
+        $retrun =[];
+        $result=    $this->where('is_enable',1)->get();
+        foreach($result as $re){
+            $retrun[$re[$key]] = $re['paypal_email_address'];
+        }
+       return $retrun;
+    }
 
 }

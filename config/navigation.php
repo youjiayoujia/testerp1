@@ -338,17 +338,17 @@ return [
         'type' => '',
         'subnavigations' => [
             [
-                'name' => 'wish草稿列表',
+                'name' => 'Wish草稿列表',
                 'url' => 'wish.index',
                 'icon' => '',
             ],
             [
-                'name' => 'wish在线数据列表',
+                'name' => 'Wish在线数据列表',
                 'url' => 'wish.indexOnlineProduct',
                 'icon' => '',
             ],
             [
-                'name' => 'wish销售代码设置',
+                'name' => 'Wish销售代码设置',
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
@@ -365,11 +365,15 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => 'ebay站点信息',
+                'name' => 'Ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'Ebay数据监控',
+                'url' => 'ebayProduct.index',
+                'icon' => '',
+            ],
         ],
     ],
     //CRM导航

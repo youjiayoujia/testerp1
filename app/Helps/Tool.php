@@ -254,4 +254,61 @@ class Tool
         }
         return false;
     }
+
+
+    /** 获取对应的erp SKU
+     * @param $wishSku
+     * @param $type
+     * @return string
+     */
+    public function getErpSkuBySku($sku, $type=1)
+    {
+
+        $tmpSku = explode('+', $sku);
+        $returnSku = array();
+        foreach ($tmpSku as $k => $sku) {
+            if (stripos($sku, '[') !== false) {
+                $sku = preg_replace('/\[.*\]/', '', $sku);
+            }
+            if (stripos($sku, '(') !== false) {
+                $sku = preg_replace('/\(.*\)/', '', $sku);
+            }
+            if ($type == 2) {
+
+                $prePart = substr($sku, 0, 1);
+                $suffPart = substr($sku, 4);
+                $sku = $prePart . $suffPart;
+                $newSku = $sku;
+            } else {
+
+                $tmpErpSku = explode('*', $sku);
+                $i = count($tmpErpSku) - 1;
+                $newSku = $tmpErpSku[$i];
+            }
+
+            $newSku =explode("#",$newSku);
+            $newSku =$newSku[0];
+            $returnSku[] = $newSku;
+
+        }
+
+        return implode('+', $returnSku);
+
+    }
+
+    public function getSellCode($wishSku, $type=1)
+    {
+        if ($type == 2) {
+
+            $tmpErpSku = substr($wishSku, 1, 3);
+
+            return $tmpErpSku;
+        } else {
+
+            $tmpErpSku = explode('*', $wishSku);
+            return $tmpErpSku[0];
+        }
+
+
+    }
 }

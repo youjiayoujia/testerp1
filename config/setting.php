@@ -94,7 +94,22 @@ return [
         'logistics_id' => '物流方式',
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
-        'warehousePosition.name' => '库位'
+        'warehousePosition.name' => '库位',
+
+        'item_id'=>'Ebay ItemID',
+        'seller_id' =>'销售人员',
+        'ebayProduct.site_name'=>'Ebay站点',
+        'ebayProduct.paypal_email_address'=>'PayPal',
+        'ebayProduct.currency'=>'币种',
+        'ebayProduct.account_id'=>'账号',
+        'ebayProduct.listing_type'=>'类型',
+        'ebayProduct.multi_attribute'=>'多属性',
+        'price.start_price'=>'价格',
+        'time.start_time' => '上架时间',
+        'sku'=>'EbaySku',
+        'erp_sku' =>'ErpSku',
+        'price.quantity_sold'=>'销量'
+
     ],
 ];
 

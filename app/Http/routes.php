@@ -308,6 +308,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
+    Route::resource('CatalogRatesChannel', 'Channel\CatalogRatesChannelController');
     //渠道账号路由
     Route::any('channelAccount/getAccountUser',
         ['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);

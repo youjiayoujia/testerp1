@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Message\Issues\EbayCasesListsModel;
+use App\Modules\Channel\Adapter\EbayAdapter;
 
 class EbayCasesController extends Controller
 {
@@ -126,7 +127,8 @@ class EbayCasesController extends Controller
      */
     public function MessageToBuyer(){
         $request = request()->input();
-        dd($request);
+        $ebay = new EbayAdapter($this->model->find(request()->input('id'))->account->ApiConfig);
+        
     }
 
     /**

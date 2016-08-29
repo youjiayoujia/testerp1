@@ -136,6 +136,7 @@
                                     <form class="form-horizontal" action="{{route('MessageToBuyer')}}">
                                         {!! csrf_field() !!}
                                         <label>comments: </label>
+                                        <input type="hidden" name="id" value="{{$case->id}}">
                                         <textarea class="form-control" rows="3" name="messgae_content"></textarea>
                                         <div class="row">
                                             <div class="col-lg-12">

@@ -14,11 +14,14 @@ class EbayCasesListsModel extends BaseModel{
     public $searchFields =[];
     protected $guarded = [];
 
+    public function account()
+    {
+        return $this->hasOne('App\Models\Channel\AccountModel', 'id', 'account_id');
+    }
 
     public function getCaseContentAttribute(){
         $html = '';
         $note = unserialize(base64_decode($this->content));
-
 
         //dd($note);
 

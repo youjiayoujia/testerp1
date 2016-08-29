@@ -397,7 +397,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
-    Route::get('all/{id}', ['uses' => 'Logistics\TemplateController@all', 'as' => 'all']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
     Route::get('errorList/exportException/{arr}',
@@ -602,11 +601,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
+
     Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
     Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
     Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
     Route::resource('ebayDetail','Publish\Ebay\EbayDetailController');
-
+    Route::any('ebay/batchUpdate', ['uses' => 'Publish\Ebay\EbayDataMonitorController@batchUpdate', 'as' => 'ebay.batchUpdate']);
+    Route::any('ebay/productBatchEdit', ['uses' => 'Publish\Ebay\EbayDataMonitorController@productBatchEdit', 'as' => 'ebay.productBatchEdit']);
+    Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
 
     Route::post('wish/editOnlineProductStore',
@@ -793,6 +795,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 
 //getEbayInfo
+Route::any('getEbayProduct', ['uses' => 'TestController@getEbayProduct']);
 Route::any('testPaypal', ['uses' => 'TestController@testPaypal']);
 Route::any('testLazada', ['uses' => 'TestController@testLazada']);
 Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);

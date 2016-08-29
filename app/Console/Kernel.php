@@ -25,7 +25,11 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\ChannelLogistics::class,
         \App\Console\Commands\TransferUser::class,
         \App\Console\Commands\GetWishProduct::class,
+<<<<<<< HEAD
         \App\Console\Commands\GetEbayProduct::class,
+=======
+        \App\Console\Commands\GetAliexpressProduct::class,
+>>>>>>> master
         //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
@@ -36,6 +40,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetLazadaPackageId::class,
         \App\Console\Commands\GetFeedBack::class,
         \App\Console\Commands\SentFeedBack::class,
+        \App\Console\Commands\GetEbayCases::class,
     ];
 
     /**

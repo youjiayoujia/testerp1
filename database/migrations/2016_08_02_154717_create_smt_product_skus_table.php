@@ -36,6 +36,7 @@ class CreateSmtProductSkusTable extends Migration
             $table->tinyInteger('updated');
             $table->tinyInteger('discountRate')->comment('按原价和最低售价计算的折扣率');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

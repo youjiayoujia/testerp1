@@ -379,7 +379,7 @@
                 success: function (result) {
                     for(var el in result){ 
                         var temp = ''
-                        temp = result[el]['price']+';'+result[el]['quantity']
+                        temp = result[el]['price']+result[el]['quantity']
                         $("#pitem_warn_"+el).text(temp);
                         //$("#pitem_warn_"+el).text(result[el]['quantity']);
                     } 

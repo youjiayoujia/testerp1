@@ -32,6 +32,8 @@ class ShipmentCostModel extends BaseModel
     	'created_at'
     ];
 
+    public $searchFields = ['id' => 'ID', 'shipmentCostNum' => '批次号'];
+
     public function items()
     {
         return $this->hasMany('App\Models\Package\ShipmentCostItemModel', 'parent_id', 'id');
@@ -40,6 +42,11 @@ class ShipmentCostModel extends BaseModel
     public function errors()
     {
         return $this->hasMany('App\Models\Package\ShipmentCostErrorModel', 'parent_id', 'id');
+    }
+
+    public function importBy()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'import_by', 'id');
     }
 
     public function importProcess($file, $userId)
@@ -64,7 +71,6 @@ class ShipmentCostModel extends BaseModel
         $outer_all_cost = 0;
         $outer_theory_cost = 0;
         $average_price = '';
-
         foreach ($arr as $key => $value) {
         	if(!$key) {
         		continue;

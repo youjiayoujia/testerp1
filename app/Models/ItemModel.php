@@ -276,9 +276,9 @@ class ItemModel extends BaseModel
         $stock = $this->getStock($warehousePosistionId);
         if ($quantity) {
             $cost = $amount / $quantity;
-            if ($flag && $this->cost && ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3)) {
+            /*if ($flag && $this->cost && ($cost < $this->cost * 0.6 || $cost > $this->cost * 1.3)) {
                 throw new Exception('入库单价不在原单价0.6-1.3范围内');
-            }
+            }*/
             if($this->all_quantity + $quantity) {
                 $this->update([
                     'cost' => round((($this->all_quantity * $this->cost + $amount) / ($this->all_quantity + $quantity)), 3)
@@ -511,7 +511,7 @@ class ItemModel extends BaseModel
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-7 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
@@ -519,7 +519,7 @@ class ItemModel extends BaseModel
             //14天销量
             $fourteenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-14 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');
@@ -527,7 +527,7 @@ class ItemModel extends BaseModel
             //30天销量
             $thirtyDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])
-                ->where('orders.create_time', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
+                ->where('orders.created_at', '>', date('Y-m-d H:i:s', strtotime('-30 day')))
                 ->where('order_items.quantity', '<', 5)
                 ->where('order_items.item_id', $item['id'])
                 ->sum('order_items.quantity');

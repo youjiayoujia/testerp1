@@ -1,4 +1,4 @@
-<div class="panel panel-info">
+<div class="panel panel-primary">
     <div class="panel-heading">
         {!! $message->label_text !!}
         <strong>{{ $message->subject }}</strong><br/>
@@ -11,7 +11,7 @@
             转发(暂时不要点)
         </button>
         -->
-        原邮箱:{{$message->to}}
+        To:{{$message->MessageAccountName}}
         <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
             <small class="glyphicon glyphicon-list"></small>
         </a>
@@ -24,7 +24,7 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-lg-12">
-                                            <?php echo $content; ?>
+                    <?php echo $content; ?>
                     {{--{{$content}}--}}
                     {{--<iframe class="embed-responsive-item" src="{{ route('message.content', ['id'=>$message->id]) }}"></iframe>--}}
             </div>

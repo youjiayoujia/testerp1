@@ -15,7 +15,7 @@
  * 注意a/b  b  a.b 这三部分的样式就OK了
  *
  */
-Route::get('test1', 'TestController@testSmt');
+Route::get('test1', 'TestController@testYw');
 Route::get('test2', 'TestController@test2');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
@@ -56,6 +56,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockUnhold', 'Stock\UnholdController');
     //入库
     Route::resource('stockIn', 'Stock\InController');
+
+    //建议采购
+    Route::get('suggestForm/createForms', ['uses' => 'Oversea\SuggestFormController@createForms', 'as' => 'suggestForm.createForms']);
+    Route::resource('suggestForm', 'Oversea\SuggestFormController');
+
+    //物流对账正确信息详情
+    Route::get('shipmentCostError/showError/{id}', ['uses' => 'ShipmentCostErrorController@showError', 'as' => 'shipmentCostError.showError']);
+    Route::resource('shipmentCostError', 'ShipmentCostErrorController');
+
+    //物流对账正确信息详情
+    Route::get('shipmentCostItem/showInfo/{id}', ['uses' => 'ShipmentCostItemController@showInfo', 'as' => 'shipmentCostItem.showInfo']);
+    Route::resource('shipmentCostItem', 'ShipmentCostItemController');
     //出库
     Route::resource('stockOut', 'Stock\OutController');
     //出入库
@@ -295,6 +307,7 @@ Route::group(['middleware' => 'auth'], function () {
     //item路由
     Route::get('item.getModel', ['uses' => 'ItemController@getModel', 'as' => 'item.getModel']);
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
+    //Route::any('item/skushowpo', ['uses' => 'Purchase\PurchaseOrderController@showpo', 'as' => 'purchase.skushowpo']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::any('item/uploadSku', ['uses' => 'ItemController@uploadSku', 'as' => 'item.uploadSku']);
     Route::any('item/batchDelete', ['uses' => 'ItemController@batchDelete', 'as' => 'item.batchDelete']);
@@ -384,6 +397,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
+    Route::get('all/{id}', ['uses' => 'Logistics\TemplateController@all', 'as' => 'all']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
     Route::get('errorList/exportException/{arr}',
@@ -393,6 +407,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::post('pickList/confirmPickBy',
+        ['uses' => 'PickListController@confirmPickBy', 'as' => 'pickList.confirmPickBy']);
     Route::any('pickList/printPackageDetails/{id}/{status}',
         ['uses' => 'PickListController@printPackageDetails', 'as' => 'pickList.printPackageDetails']);
     Route::any('pickList/printException/',
@@ -571,6 +587,7 @@ Route::group(['middleware' => 'auth'], function () {
     //图片标签
     Route::resource('label', 'LabelController');
     Route::resource('paypal', 'PaypalController');
+    Route::any('updatePaypalRates', ['uses'=>'PaypalController@updatePaypalRates','as' => 'paypal.update_rates']);
     Route::any('ShowPaypalRate', ['uses' => 'PaypalController@ShowPaypalRate', 'as' => 'paypal.ShowPaypalRate']);
     //editOnlineProduct
 
@@ -611,32 +628,39 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode', 'Publish\Wish\WishSellerCodeController');
     // Route::any('wishPublish',['uses'=>'Publish\Wish\WishPublishController@index','as'=>'wishPublish']);
    
-    Route::get('smt/onlineProductIndex',
-        ['uses' => 'Publish\Smt\SmtController@onlineProductIndex', 'as' => 'smt.onlineProductIndex']);
-    Route::get('smt/showChildCategory',
-        ['uses' => 'Publish\Smt\SmtController@showChildCategory', 'as' => 'smt.showChildCategory']);
-    Route::get('smt/showCommandCategoryList',
-        ['uses' => 'Publish\Smt\SmtController@showCommandCategoryList', 'as' => 'smt.showCommandCategoryList']);
-    Route::post('smt/doAction',
-        ['uses' => 'Publish\Smt\SmtController@doAction', 'as' => 'smt.doAction']);
-    Route::post('smt/create',
-        ['uses' => 'Publish\Smt\SmtController@addProduct', 'as' => 'smt.addProduct']);
-    Route::post('smt/batchPost',
-        ['uses' => 'Publish\Smt\SmtController@batchPost', 'as' => 'smt.batchPost']);   
-    Route::post('smt/recommendProductList',
-        ['uses' => 'Publish\Smt\SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
-    Route::post('smt/batchDel',
-        ['uses' => 'Publish\Smt\SmtController@batchDel', 'as' => 'smt.batchDel']);   
-    Route::post('smt/ajaxUploadDirImage',
-        ['uses' => 'Publish\Smt\SmtController@ajaxUploadDirImage', 'as' => 'smt.ajaxUploadDirImage']);  
-    Route::post('smt/ajaxUploadOneCustomPic',
-        ['uses' => 'Publish\Smt\SmtController@ajaxUploadOneCustomPic', 'as' => 'smt.ajaxUploadOneCustomPic']);  
-    Route::post('smt/getskuinfo',
-        ['uses' => 'Publish\Smt\SmtController@getskuinfo', 'as' => 'smt.getskuinfo']);
-    Route::get('smt/editOnlineProduct',
-        ['uses' => 'Publish\Smt\SmtController@editOnlineProduct', 'as' => 'smt.editOnlineProduct']);
-    Route::get('smt/ajaxOperateOnlineProduct',
-        ['uses' => 'Publish\Smt\SmtController@ajaxOperateOnlineProduct', 'as' => 'smt.ajaxOperateOnlineProduct']);    
+    Route::group(['prefix' => 'smt', 'namespace' => 'Publish\Smt'],function(){
+        Route::get('onlineProductIndex',
+            ['uses' => 'SmtController@onlineProductIndex', 'as' => 'smt.onlineProductIndex']);
+        Route::get('showChildCategory',
+            ['uses' => 'SmtController@showChildCategory', 'as' => 'smt.showChildCategory']);
+        Route::get('showCommandCategoryList',
+            ['uses' => 'SmtController@showCommandCategoryList', 'as' => 'smt.showCommandCategoryList']);
+        Route::post('doAction',
+            ['uses' => 'SmtController@doAction', 'as' => 'smt.doAction']);
+        Route::post('create',
+            ['uses' => 'SmtController@addProduct', 'as' => 'smt.addProduct']);
+        Route::post('smt/batchPost',
+            ['uses' => 'SmtController@batchPost', 'as' => 'smt.batchPost']);
+        Route::post('recommendProductList',
+            ['uses' => 'SmtController@recommendProductList', 'as' => 'smt.recommendProductList']);
+        Route::post('batchDel',
+            ['uses' => 'SmtController@batchDel', 'as' => 'smt.batchDel']);
+        Route::post('ajaxUploadDirImage',
+            ['uses' => 'SmtController@ajaxUploadDirImage', 'as' => 'smt.ajaxUploadDirImage']);
+        Route::post('ajaxUploadOneCustomPic',
+            ['uses' => 'SmtController@ajaxUploadOneCustomPic', 'as' => 'smt.ajaxUploadOneCustomPic']);
+        Route::post('getskuinfo',
+            ['uses' => 'SmtController@getskuinfo', 'as' => 'smt.getskuinfo']);
+        Route::get('editOnlineProduct',
+            ['uses' => 'SmtController@editOnlineProduct', 'as' => 'smt.editOnlineProduct']);
+        Route::get('ajaxOperateOnlineProduct',
+            ['uses' => 'SmtController@ajaxOperateOnlineProduct', 'as' => 'smt.ajaxOperateOnlineProduct']);
+        Route::get('waitPost',
+            ['uses' => 'SmtController@waitPostList', 'as' => 'smt.waitPost']);
+        Route::get('changeStatusToWait',
+            ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
+    });
+   
     Route::resource('smt', 'Publish\Smt\SmtController');
     
     Route::group(['prefix' => 'smtProduct', 'namespace' => 'Publish\Smt'],function(){
@@ -655,10 +679,27 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('ajaxSmtAfterServiceList',
            ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']);           
     });
-    
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
+    
+    Route::post('smtMonitor/editSingleSkuStock',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@editSingleSkuStock', 'as' => 'smtMonitor.editSingleSkuStock']);
+    Route::post('smtMonitor/editSingleSkuPrice',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@editSingleSkuPrice', 'as' => 'smtMonitor.editSingleSkuPrice']);
+    Route::post('smtMonitor/manualUpdateProductInfo',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@manualUpdateProductInfo', 'as' => 'smtMonitor.manualUpdateProductInfo']);
+    Route::post('smtMonitor/ajaxOperateOnlineProductStatus',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@ajaxOperateOnlineProductStatus', 'as' => 'smtMonitor.ajaxOperateOnlineProductStatus']);
+    Route::post('smtMonitor/batchEditSkuStock',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@batchEditSkuStock', 'as' => 'smtMonitor.batchEditSkuStock']);
+    Route::post('smtMonitor/batchEditSkuPrice',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@batchEditSkuPrice', 'as' => 'smtMonitor.batchEditSkuPrice']);
+    Route::post('smtMonitor/ajaxOperateProductSkuStockStatus',
+        ['uses' => 'Publish\Smt\SmtOnlineMonitorController@ajaxOperateProductSkuStockStatus', 'as' => 'smtMonitor.ajaxOperateProductSkuStockStatus']);
+    
+    Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
+    Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');
+    
    
- 
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
  
@@ -724,6 +765,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('message_log', 'Message\Messages_logController');
     //回复队列路由
     Route::resource('messageReply', 'Message\ReplyController');
+    Route::any('ajaxGetTranInfo',
+        ['as' => 'ajaxGetTranInfo', 'uses' => 'MessageController@ajaxGetTranInfo']);
 
 
     //用户路由
@@ -745,6 +788,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('jobFailed', 'Job\FailedController');
     //标记发货规则设置
     Route::resource('orderMarkLogic', 'Order\OrderMarkLogicController');
+    Route::resource('ebayCases','Message\EbayCasesController');
 });
 
 
@@ -770,5 +814,6 @@ Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'sav
 Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
 Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
 Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
+Route::any('spu/insertLan', ['uses' => 'SpuController@insertLan', 'as' => 'spu.insertLan']);
 Route::resource('spu', 'SpuController');
 

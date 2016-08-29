@@ -85,6 +85,7 @@ class GetOrders extends Command
                             $order['channel_account_id'] = $account->id;
                             $order['customer_service'] = $account->customer_service ? $account->customer_service->id : 0;
                             $order['operator'] = $account->operator ? $account->operator->id : 0;
+                            $order['active'] = 'NORMAL';
                             $job = new InOrders($order);
                             $job = $job->onQueue('inOrders');
                             $this->dispatch($job);

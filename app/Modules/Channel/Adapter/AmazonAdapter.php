@@ -15,6 +15,7 @@ use Google_Service_Gmail_Message;
 use Google_Client;
 use Google_Service_Gmail;
 use Tool;
+use App\Models\PackageModel;
 use Google_Service_Gmail_ModifyMessageRequest;
 
 Class AmazonAdapter implements AdapterInterface
@@ -55,7 +56,131 @@ Class AmazonAdapter implements AdapterInterface
             $orderItems = $this->getOrderItems($order->AmazonOrderId);
             return $this->parseOrder($order, $orderItems);
         }
+        
         return false;
+    }
+
+
+    /**
+     * [['package_id', 'trackingNum']]
+     */
+    public function returnTrack($tracking_info = '')
+    {
+        $productXml = $this->getXML($tracking_info, $this->config['SellerId']);
+        $this->_config['Action'] = 'SubmitFeed';
+        $this->_config['FeedType'] = '_POST_ORDER_FULFILLMENT_DATA_';
+        $this->_config['Version'] = '2009-01-01';
+        $this->_config['MarketplaceIdList.Id.1'] = 'ATVPDKIKX0DER';
+        $this->_config['PurgeAndReplace'] = 'false';
+        $this->_config['Merchant'] = $this->config['SellerId'];
+        $this->_config['AWSAccessKeyId'] = $this->config['AWSAccessKeyId'];
+        $this->_config['SignatureVersion'] = '2';
+        $this->_config['SignatureMethod'] = 'HmacSHA256';
+        $this->_config['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+        $tmp_arr = parse_url($this->serviceUrl);
+        $sign  = 'POST' . "\n";
+        $sign .= $tmp_arr['host'] . "\n";
+        $sign .= "/" . "\n";
+        $config = $this->_config;
+        $url = array();
+        foreach ($config as $key => $val) {
+            $key = str_replace("%7E", "~", rawurlencode($key));
+            $val = str_replace("%7E", "~", rawurlencode($val));
+            $url[] = "{$key}={$val}";
+        }
+        sort($url);
+        $tmp_sigtoString = implode('&', $url);
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, $this->config['AWS_SECRET_ACCESS_KEY'], true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $tmp_header = ["Content-Type: text/xml", "Host: mws.amazonservices.com", "Content-MD5:".base64_encode(md5($this->testXML(), true))];
+        $string1 = $tmp_url."/?".$string;
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,true);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch,CURLOPT_POST,1);
+        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false); 
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$productXml);
+        curl_setopt($ch,CURLOPT_HTTPHEADER, $tmp_header);
+        $res = curl_exec($ch);
+        curl_close($ch);
+        var_dump($res);
+    }
+
+    public function getXML($arr, $sellerId)
+    {
+        $str = "<?xml version='1.0' encoding='UTF-8'?>
+    <AmazonEnvelope xsi:noNamespaceSchemaLocation='amzn-envelope.xsd' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+        <Header>
+            <DocumentVersion>1.01</DocumentVersion>
+            <MerchantIdentifier>".$sellerId."</MerchantIdentifier>
+        </Header>
+        <MessageType>OrderFulfillment</MessageType>";
+        foreach($arr as $key => $value)
+        {
+            $package = PackageModel::where('id', $value[0])->first();
+            if(!$package) {
+                continue;
+            }
+            $CarrierName = $package->logistics->channelName()->where('channel_id', $package->channel_id)->first();
+            if(!$CarrierName) {
+                continue;
+            }
+            $CarrierName = $CarrierName->logistics_key;
+            $amazonOrderId = $package->order->channel_ordernum;
+            $object = $this->getOrderItems($amazonOrderId);
+            $str .= $this->getSingleXML(($key+1),$object, $value[1], $amazonOrderId, $CarrierName);
+        }
+    
+        $str .= "</AmazonEnvelope>";
+        return $str;
+    }
+
+    //测试下就OK,大体框架出来了  CarriName   ShippingMethod两个值需要赋值
+    public function getSingleXML($i, $object, $tracking_num, $amazonOrderId, $CarrierName)
+    {
+        $str = "<Message>
+            <MessageID>".$i."</MessageID>
+            <OrderFulfillment>
+                <AmazonOrderID>".$amazonOrderId."</AmazonOrderID>
+                <FulfillmentDate>".gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time())."</FulfillmentDate>
+                <FulfillmentData>
+                    <CarrierName>".$CarrierName."</CarrierName>
+                    <ShippingMethod>e-package</ShippingMethod>
+                    <ShipperTrackingNumber>".$tracking_num."</ShipperTrackingNumber>
+                </FulfillmentData>";
+        foreach($object as $key => $value) {
+            $str .= "<Item>
+                    <AmazonOrderItemCode>".$value['orderItemId']."</AmazonOrderItemCode>
+                    <Quantity>".$value['quantity']."</Quantity>
+                </Item>";
+        }
+        $str .= "</OrderFulfillment>
+            </Message>";
+
+        return $str;
+    }
+
+    /**
+     * 将url参数数组转成url格式 
+     *
+     * @param none
+     * @return string
+     *
+     */
+    private function signArrToString()
+    {
+        $config = $this->_config;
+        $url = array();
+        foreach ($config as $key => $val) {
+            $key = str_replace("%7E", "~", rawurlencode($key));
+            $val = str_replace("%7E", "~", rawurlencode($val));
+            $url[] = "{$key}={$val}";
+        }
+        sort($url);
+        $string = implode('&', $url);
+        return $string;
     }
 
     /**
@@ -194,15 +319,10 @@ Class AmazonAdapter implements AdapterInterface
             $item['price'] = (float)$orderItem->ItemPrice->Amount / $total;
             $item['quantity'] = (int)$orderItem->QuantityOrdered * $sku['qty'];
             $item['currency'] = (string)$orderItem->ItemPrice->CurrencyCode;
+            $item['orderItemId'] = (string)$orderItem->OrderItemId;
             $items[] = $item;
         }
         return $items;
-    }
-
-    public function returnTrack($tracking_info)
-    {
-        // TODO: Implement returnTrack() method.
-        echo "return Amazon Tracking Informations";
     }
 
     /**
@@ -323,7 +443,7 @@ Class AmazonAdapter implements AdapterInterface
                 $tempPayLoad = '';
                 $tempAttachment = '';
                 $this->getPayloadNew($tempPayLoad, $tempAttachment, $messagePayload, $service, $message);
-                $returnAry[$j]['content'] = base64_encode(serialize(['amazon' => $this->getMaillContent($tempPayLoad)]));
+                $returnAry[$j]['content'] =  $this->getMaillContent($tempPayLoad);
                 $returnAry[$j]['attachment'] = $tempAttachment;
                 $returnAry[$j]['channel_message_fields'] = '';
             }
@@ -395,7 +515,7 @@ Class AmazonAdapter implements AdapterInterface
             }
         }
         $body = isset($htmlBody) && $htmlBody != '' ? $htmlBody : $plainBody;
-        return serialize(['amazon' => $body]);
+        return base64_encode(serialize(['amazon' => $body]));
     }
 
     public function getClient($account)

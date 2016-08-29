@@ -9,14 +9,14 @@ use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use Illuminate\Support\Facades\Input;
 
-use App\models\Publish\Smt\smtServiceTemplate;
-use App\models\Publish\Smt\smtProductGroup;
-use App\models\Publish\Smt\smtProductUnit;
-use App\models\Publish\Smt\smtProductModule;
-use App\models\Publish\Smt\afterSalesService;
-use App\models\Publish\Smt\smtFreightTemplate;
-use App\models\Publish\Smt\smtCategoryAttribute;
-use App\models\Publish\Smt\smtTemplates;
+use App\Models\Publish\Smt\smtServiceTemplate;
+use App\Models\Publish\Smt\smtProductGroup;
+use App\Models\Publish\Smt\smtProductUnit;
+use App\Models\Publish\Smt\smtProductModule;
+use App\Models\Publish\Smt\afterSalesService;
+use App\Models\Publish\Smt\smtFreightTemplate;
+use App\Models\Publish\Smt\smtCategoryAttribute;
+use App\Models\Publish\Smt\smtTemplates;
 use App\Models\Publish\Smt\smtUserSaleCode;
 use Illuminate\Support\Facades\DB;
 use App\Models\Publish\Smt\smtProductDetail;
@@ -29,43 +29,68 @@ use App\Models\SkuPublishRecords;
 use Illuminate\Support\Facades\Redirect;
 
 
+
 class SmtController extends Controller{
-   public function __construct(smtProductList $smtProductList){ 
+   public function __construct(smtProductList $smtProductList,smtProductUnit $smtProductUnit){ 
        $this->viewPath = "publish.smt.";
        $this->model = $smtProductList;
        $this->smtProductDetailModel = new smtProductDetail();
        $this->smtProductSkuModel = new smtProductSku();
-       $this->smtProductUnitModel = new smtProductUnit();
+       $this->smtProductUnitModel = $smtProductUnit;
        $this->channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
        $this->mainIndex = route('smt.index');
        $this->mainOnlineIndex = route('smt.onlineProductIndex');
    }
    
+   /**
+    * 草稿列表
+    */
    public function index(){
        request()->flash();
-       $this->mainTitle='SMT待发布产品';
+       $this->mainTitle='SMT产品草稿';
+       $list = $this->model->where('productStatusType','newData');
        $response = [
            'metas' => $this->metas(__FUNCTION__),
-           'data' => $this->autoList($this->model->where('productStatusType','waitPost')),
+           'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
+           'type' => 'newData',
        ];
        return view($this->viewPath . 'index', $response);
    }
    
-   public function onlineProductIndex(){
+   /**
+    * 待发布产品列表
+    * @return Ambigous <\Illuminate\View\View, \Illuminate\Contracts\View\Factory>
+    */
+   public function waitPostList(){
        request()->flash();
-       $this->mainTitle='SMT在线产品';
+       $this->mainTitle='SMT待发布产品';
+       $list = $this->model->where('productStatusType','waitPost');
        $response = [
            'metas' => $this->metas(__FUNCTION__),
-           'data' => $this->autoList($this->model->where('productStatusType','!=','waitPost')),
+           'data' => $this->autoList($this->model,$list),
            'mixedSearchFields' => $this->model->mixed_search,
-           'type' => 'online',
+           'type' => 'waitPost',
        ];
        return view($this->viewPath . 'index', $response);
    }
+   
+   /**
+    * 在线产品列表
+    */
+   public function onlineProductIndex(){
+       request()->flash();
+       $this->mainTitle='SMT在线产品';
+       $list = $this->model->whereIn('productStatusType',['onSelling','offline','auditing','editingRequired']);
+       $response = [
+           'metas' => $this->metas(__FUNCTION__),
+           'data' => $this->autoList($this->model,$list),
+           'mixedSearchFields' => $this->model->mixed_search,
+       ];
+       return view($this->viewPath . 'onlinIndex', $response);
+   }
       
-   public function create()
-   {
+   public function create()   {
        
        $this->mainTitle='SMT产品';
        $response = [
@@ -1341,7 +1366,7 @@ class SmtController extends Controller{
     public function batchDel(){
         $productIds = input::get('productIds');
         if (!empty($productIds)){
-            $productIdArr = explode(',', $productIds);           
+            $productIdArr = explode(',', $productIds);  
             foreach ($productIdArr as $id){
                 $rs = $this->draftDel($id);
                 if ($rs['status']){
@@ -1907,6 +1932,19 @@ html;
    
        $this->ajax_return('',1,$returnarr);
    
+   }
+   
+   /**
+    * 批量保存为待发布状态
+    */
+   public function changeStatusToWait(){
+       $product_ids = request()->input('product_ids');
+      
+       $product_ids_arr = explode(',', $product_ids);
+       foreach($product_ids_arr as $product_id) {      
+           $this->model->where('productId',$product_id)->update(['productStatusType' => 'waitPost']);
+       }
+       return 1;
    }
    
 }

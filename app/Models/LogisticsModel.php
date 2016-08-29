@@ -35,6 +35,7 @@ class LogisticsModel extends BaseModel
         'limit',
         'driver',
         'logistics_code',
+        'priority',
     ];
 
     public $rules = [
@@ -50,6 +51,7 @@ class LogisticsModel extends BaseModel
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
+            'priority' => 'required|unique:logisticses,priority',
         ],
         'update' => [
             'code' => 'required',
@@ -63,6 +65,7 @@ class LogisticsModel extends BaseModel
             'logistics_template_id' => 'required',
             'is_enable' => 'required',
             'driver' => 'required',
+            'priority' => 'required|unique:logisticses,priority',
         ],
     ];
 

@@ -211,6 +211,22 @@ return [
             ],
         ],
     ],
+    //仓储导航
+    [
+        'name' => '海外仓',
+        'icon' => 'home',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '海外仓模块' => [
+                [
+                    'name' => '海外仓销量',
+                    'url' => 'suggestForm.index',
+                    'icon' => '',
+                ],
+            ],
+        ],
+    ],
     //物流导航
     [
         'name' => '物流',
@@ -355,6 +371,11 @@ return [
             [
 
                 'name' => 'SMT待发布产品列表',
+                'url' => 'smt.waitPost',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT产品草稿列表',
                 'url' => 'smt.index',
                 'icon' => '',
             ],
@@ -365,7 +386,21 @@ return [
                 'icon' => '',
             ],
             [
+<<<<<<< HEAD
                 'name' => 'Ebay站点信息',
+=======
+                'name' => 'SMT在线数据监控',
+                'url' => 'smtMonitor.index',
+                'icon' => '',
+            ],
+            [
+            'name' => 'smt销售代码设置',
+            'url' => 'smtSellerCode.index',
+            'icon' => '',
+            ],
+            [
+                'name' => 'ebay站点信息',
+>>>>>>> master
                 'url' => 'ebayDetail.index',
                 'icon' => '',
             ],
@@ -404,6 +439,18 @@ return [
                 [
                     'name' => '信息模板',
                     'url' => 'messageTemplate.index',
+                    'icon' => '',
+                ],
+            ],
+            '平台纠纷' => [
+                [
+                    'name' => 'ebay cases',
+                    'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'aliexpress issues',
+                    'url' => 'ebayCases.index',
                     'icon' => '',
                 ],
             ],

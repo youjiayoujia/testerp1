@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLogisticsesTable extends Migration
+class DeleteLogisticsRulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AddLogisticsesTable extends Migration
      */
     public function up()
     {
-        Schema::table('logisticses', function (Blueprint $table) {
-            $table->string('driver')->comment('驱动名')->nullable()->default(NULL)->after('url');
+        Schema::table('logistics_rules', function (Blueprint $table) {
+            $table->dropColumn('priority');
         });
     }
 
@@ -24,8 +24,8 @@ class AddLogisticsesTable extends Migration
      */
     public function down()
     {
-        Schema::table('logisticses', function (Blueprint $table) {
-            $table->dropColumn('driver');
+        Schema::table('logistics_rules', function (Blueprint $table) {
+            //
         });
     }
 }

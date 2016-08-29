@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLogisticsesTable extends Migration
+class AddLogisticsRulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,8 @@ class AddLogisticsesTable extends Migration
      */
     public function up()
     {
-        Schema::table('logisticses', function (Blueprint $table) {
-            $table->string('logistics_code')->comment('物流编码')->nullable()->default(NULL)->after('limit');
+        Schema::table('logistics_rules', function (Blueprint $table) {
+            $table->enum('account_section', ['0', '1'])->comment('账号区间')->default('0');
         });
     }
 
@@ -24,8 +24,8 @@ class AddLogisticsesTable extends Migration
      */
     public function down()
     {
-        Schema::table('logisticses', function (Blueprint $table) {
-            $table->dropColumn('logistics_code');
+        Schema::table('logistics_rules', function (Blueprint $table) {
+            $table->dropColumn('account_section');
         });
     }
 }

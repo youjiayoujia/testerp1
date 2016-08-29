@@ -40,7 +40,7 @@ class ProductModel extends BaseModel
         ]
     ];
 
-    public $searchFields = ['name', 'id', 'c_name', 'model'];
+    public $searchFields = ['name'=>'英文名', 'id'=>'id', 'c_name'=>'中文名', 'model'=>'model'];
 
     /**
      * The attributes that are mass assignable.
@@ -226,8 +226,17 @@ class ProductModel extends BaseModel
 
     public function getDimageAttribute()
     {
-        if ($this->image) {
-            return $this->image->path . $this->image->name;
+        $arr = array('1'=>'8','2'=>'9');
+        if (count($this->imageAll)) {
+            foreach ($this->imageAll as $key => $image) {
+                $temp = [];
+                foreach ($image->labels as  $label) {
+                    $temp[] = $label->pivot->label_id;
+                }
+                if(count(array_intersect($arr,$temp))==2){
+                    return $image->path . $image->name;
+                }
+            }    
         }
         return '/default.jpg';
     }
@@ -248,9 +257,10 @@ class ProductModel extends BaseModel
             //创建spu，,并插入数据
             //$spuobj = SpuModel::create(['spu' => Tool::createSku($catalog->code, $code_num)]);
             $spuobj = SpuModel::where('product_require_id',$data['require_id'])->get()->first();
-            //echo '<pre>';
-            //print_r($data);exit;
+            
+            $data['purchase_adminer'] = $spuobj->purchase;
             $data['spu_id'] = $spuobj->id;
+            
             $az = array(
                 'A',
                 'B',

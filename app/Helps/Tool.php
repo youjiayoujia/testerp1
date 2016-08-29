@@ -19,7 +19,7 @@ class Tool
 
     public function barcodePrint($content, $type = 'C128', $width = '3', $height='33')
     {
-        return DNS1D::getBarcodeHTML($content, $type, $width, $height);
+        echo DNS1D::getBarcodeSVG($content, $type, $width, $height);
     }
 
     public function getFileExtension($fileName)
@@ -255,6 +255,7 @@ class Tool
         return false;
     }
 
+<<<<<<< HEAD
 
     /** 获取对应的erp SKU
      * @param $wishSku
@@ -311,4 +312,6 @@ class Tool
 
 
     }
+=======
+>>>>>>> master
 }

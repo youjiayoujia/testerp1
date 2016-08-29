@@ -746,7 +746,7 @@ Class WishAdapter implements AdapterInterface
     {
         $j = 0; //信息条数
         $initArray = [];
-        $initArray['limit'] = 5; //每页数量
+        $initArray['limit'] = 100; //每页数量
         $return_array = [];
         for($i=1; $i>0;$i++){
             $initArray['start'] = ($i-1)*$initArray['limit'];
@@ -760,27 +760,72 @@ Class WishAdapter implements AdapterInterface
             foreach($apiReturn['data'] as $gd){
 
                 $return_array[$j]['message_id']      = $gd['Ticket']['id']; //message_id
-                $return_array[$j]['subject']		 = addslashes($gd['Ticket']['subject']);//邮件标题（发件人本地语言）
+                $return_array[$j]['subject']		 = addslashes($gd['Ticket']['state']);//信息描述
                 $return_array[$j]['date'] 	  	     = str_replace('T',' ',$gd['Ticket']['open_date']);//发件人发邮件的时间
                 $return_array[$j]['from_name'] 	  	 = str_replace('T',' ',$gd['Ticket']['UserInfo']['name']);//用户名
                 $return_array[$j]['from'] 	  	     = str_replace('T',' ',$gd['Ticket']['UserInfo']['id']);//用户Id
 
                 $return_array[$j]['content'] 	  	 = base64_encode(serialize(['wish' => $gd['Ticket']['replies']]));   //信息内容
-                $return_array[$j]['order_info']      = serialize(['wish' => $gd['Ticket']['items']]);
-                $return_array[$j]['to']         = '收信人';
+                //$return_array[$j]['order_info']      = serialize(['wish' => $gd['Ticket']['items']]);
+                $return_array[$j]['to']         = 'wish账号';
                 $return_array[$j]['labels']     = '';
-                $return_array[$j]['label']      = 'INBOX';
-                $return_array[$j]['date']       = $gd['Ticket']['open_date'];
+                $return_array[$j]['label']      = 'Wish消息';
+                $return_array[$j]['date']       = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['attachment'] = ''; //附件
                 //$return_array[$j]['asdasd']   	 	 = addslashes($gd['Ticket']['label']);//邮件标题（英文）
                // $return_array[$j]['sublabel']	 	 = addslashes($gd['Ticket']['sublabel']);
                 $return_array[$j]['state']  		 	 = $gd['Ticket']['state'];//wish邮件状态说明
                 $return_array[$j]['stateID']		 	 = $gd['Ticket']['state_id'];//wish邮件状态ID
-                $return_array[$j]['orderInfo']	  	     = serialize($gd['Ticket']['items']);//wish订单信息
-                $return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
+               // $return_array[$j]['orderInfo']	  	     = serialize($gd['Ticket']['items']);//wish订单信息
+               //$return_array[$j]['last_update_date']    = str_replace('T',' ',$gd['Ticket']['last_update_date']);//最后更新时间，邮件发送时间取该值
                 $return_array[$j]['photo_proof']		 = $gd['Ticket']['photo_proof'];//邮件是否包含图片
 
-                $return_array[$j]['channel_message_fields'] = '';
+                /**
+                 *订单信息 结构
+                 * [Order] => Array
+                                    (
+                                    [sku] => 025*MHM100B
+                                    [shipping_provider] => HongKongPost
+                                    [last_updated] => 2016-08-11T03:09:05
+                                    [product_id] => 5530b2bacea3082e7c58b68b
+                                    [order_time] => 2016-06-18T01:55:10
+                                    [color] => black &amp; silver
+                                    [price] => 5.99
+                                    [shipping_cost] => 1.7
+                                    [shipping] => 2.0
+                                    [ShippingDetail] => Array
+                                    (
+                                    [phone_number] => 60439566
+                                    [city] => Heredia
+                                    [name] => Lenin Jesus Vives Bogantes
+                                    [country] => CR
+                                    [street_address2] => Casa 285
+                                    [street_address1] => Costa Rica Heredia San Rafael San Josecito Condominio Vilas Del Sendero
+                                    [zipcode] => 40502
+                                    )
+
+                                    [shipped_date] => 2016-06-20
+                                    [order_id] => 5764a9fea6987d5f03e01b6e
+                                    [state] => SHIPPED
+                                    [cost] => 5.09
+                                    [variant_id] => 5530b2bacea3082e7c58b68f
+                                    [order_total] => 6.79
+                                    [buyer_id] => 5761e95bb2215652251939de
+                                    [product_image_url] => https://contestimg.wish.com/api/webimage/5530b2bacea3082e7c58b68b-normal.jpg?cache_buster=343787a54fc7288356849c0aa1d985d9
+                                    [product_name] => Classic Men's PU Leather band Skeleton Mechanical Sports Army Wrist Watch cool
+                                    [transaction_id] => 5764a9fd8478c51a6f8de770   //订单号
+                                    [quantity] => 1
+                                    )
+
+                )
+                 */
+
+                $return_array[$j]['channel_message_fields'] = base64_encode(serialize(
+                    [
+                        'order_items'    => $gd['Ticket']['items'] ,   //订单信息
+                        'locale'         => $gd['Ticket']['UserInfo']['locale'], // 区域
+                    ]
+                ));
 
 
 
@@ -798,18 +843,6 @@ Class WishAdapter implements AdapterInterface
     {
 
         $message_obj = $replyMessage->message;
-
-        $replyMessage->content = "Thanks for your concern.
-
-    We double checked that the buyer ordered a green one, and we shipped it out accordingly, so we shouldn't be asked to resend it again, could you please kindly check it?
-
-I look forward to hearing from you sincerely.
-
-Regards";
-
-
-
-
         $param['id'] = $message_obj->message_id;
         $param['access_token'] = $this->access_token;
         $param['reply'] = $replyMessage->content;
@@ -818,13 +851,16 @@ Regards";
         $result_json = $this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/reply',$param);
         $result_ary = json_decode($result_json,true);
 
-        print_r($result_ary);exit;
-
         if(!empty($result_ary['data']) && $result_ary['data']['success']==1){
             $replyMessage->status = 'SENT';
         }else{
             $replyMessage->status = 'FAIL';
         }
         return $replyMessage->status== 'SENT' ? true : false;
+    }
+
+
+    public function changeMessageState(){
+
     }
 }

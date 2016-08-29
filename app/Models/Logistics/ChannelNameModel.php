@@ -17,7 +17,7 @@ class ChannelNameModel extends BaseModel
     protected $table = 'logistics_channel_names';
 
     protected $fillable = [
-        'channel_id', 'name'
+        'channel_id', 'name', 'logistics_key'
     ];
 
     public $searchFields = ['name' => '名称'];

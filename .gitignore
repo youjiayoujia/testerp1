@@ -19,3 +19,8 @@ public/uploads
 #Hook
 public/hook
 ~
+
+#zendstuio setting
+.buildpath
+.settings/
+.project

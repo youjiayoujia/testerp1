@@ -82,6 +82,7 @@ class PurchaseOrderController extends Controller
     public function store()
     {
         request()->flash();
+        $this->validate(request(), $this->model->rules('create'));
         $this->model->createPurchaseOrder(request()->all());
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '添加成功.'));
@@ -431,7 +432,11 @@ class PurchaseOrderController extends Controller
     */
     public function printpo(){
         $id = request()->input('id');
+        $p_item = PurchaseItemModel::find($id)->first();
+        $po_id = $p_item->purchaseOrder->id;
         $response['id']= $id;
+        $response['po_id']= $po_id;
+        $response['from'] = 'purchase';
         return view($this->viewPath . 'printpo', $response);
     }
 
@@ -444,11 +449,22 @@ class PurchaseOrderController extends Controller
         $id = request()->input('pp_id');
         $size = request()->input('labelSize');
         $po_id = request()->input('po_id');
-        $response['id']= $id;
-        $response['model'] = PurchaseItemModel::where('id',$id)->get()->first();
-        $response['size']= $size;
-        $response['po_id']= $po_id;
-        return view($this->viewPath . 'showpo', $response);
+        $from = request()->input('from');
+        if($from=='purchase'){
+            $response['id']= $id;
+            $response['model'] = PurchaseItemModel::where('id',$id)->get()->first();
+            $response['size']= $size;
+            $response['po_id']= $po_id;
+            return view($this->viewPath . 'showpo', $response);
+        }
+        if($from=='sku'){
+            $response['id']= $id;
+            $response['model'] = ItemModel::find($id);
+            $response['size']= $size;
+            $response['po_id']= $po_id;
+            return view('item.skushowpo', $response);
+        }
+        
     }
 
     /**
@@ -500,7 +516,12 @@ class PurchaseOrderController extends Controller
         if (!$purchase_order) {
             return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
         }
+        $total_price =0;
+        foreach ($purchase_order->purchaseItem as $key => $pitem) {
+            $total_price += $pitem->purchase_num*$pitem->purchase_cost;
+        }
         $response = [
+                'total_price' =>$total_price,
                 'purchase_order' => $purchase_order,
                 'id'=>$id,
             ];
@@ -795,7 +816,7 @@ class PurchaseOrderController extends Controller
             //计算总价
             $total_price += $purchaseItemModel->purchase_cost*$purchaseItemModel->purchase_num;
             //计算采购价和系统价格是否一致
-            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = '':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致';
+            $purchaseItemModel->purchase_cost==$purchaseItemModel->item->purchase_price?$data[$purchaseItemModel->id]['price'] = '':$data[$purchaseItemModel->id]['price'] = '采购价和系统价格不一致;';
            
         }
         

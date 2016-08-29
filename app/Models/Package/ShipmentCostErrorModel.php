@@ -23,6 +23,30 @@ class ShipmentCostErrorModel extends BaseModel
         'created_at'
     ];
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [
+            ],
+            'filterFields' => ['hang_num', 'channel_name'],
+            'filterSelects' => [
+            ],
+            'selectRelatedSearchs' => [
+            ],
+            'sectionSelect' => [],
+        ];
+    }
+
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
+
     public function parent()
     {
         return $this->belongsTo('App\Models\Package\ShipmentCostModel', 'parent_id', 'id');

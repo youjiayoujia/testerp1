@@ -37,7 +37,7 @@ use App\Jobs\DoPackage;
 use App\Jobs\SendMessages;
 
 use App\Models\PickListModel;
-
+use App\Models\WarehouseModel;
 use DNS1D;
 use App\Models\Channel\ChannelsModel;
 use App\Models\Sellmore\ShipmentModel;
@@ -47,7 +47,7 @@ use DB;
 use Excel;
 use App\Models\Message\ReplyModel;
 use App\Jobs\Inorders;
-
+use App\Modules\Channel\Adapter\AmazonAdapter;
 
 class TestController extends Controller
 {
@@ -59,21 +59,30 @@ class TestController extends Controller
     }
     // public function test2()
     // {
-    //     echo Tool::barcodePrint('123', 'c128', '2', '33');
+    //     $package = PackageModel::find('17');
+
+    //     $package->realTimeLogistics();
     // }
+    // public function test2()
+    // {
+    //     $data['channel_ordernum'] = '1111';
+    //     $data['ordernum'] = '3000';
+    //     $data['channel_account_id'] = '365';
+    //     $data['channel_id'] = '2';
+    //     $data['status'] = 'PAID';
+    //     $data['active'] = 'NORMAL';
+    //     $data['items'][0]['sku'] = 'MPJ845D';
+    //     $data['items'][0]['quantity'] = 1;
+    //     $job = new Inorders($data);
+    //     $job->onQueue('Inorders');
+    //     $this->dispatch($job);
+    // }
+
     public function test2()
     {
-        $data['channel_ordernum'] = '2123123';
-        $data['ordernum'] = '3000';
-        $data['channel_account_id'] = '365';
-        $data['channel_id'] = '2';
-        $data['status'] = 'PREPARED';
-        $data['active'] = 'NORMAL';
-        $data['items'][0]['sku'] = 'MPJ845D';
-        $data['items'][0]['quantity'] = 1;
-        $job = new Inorders($data);
-        $job->onQueue('Inorders');
-        $this->dispatch($job);
+        $account = AccountModel::find(1);
+        $single = new AmazonAdapter($account->api_config);
+        $single->returnTrack([['1', '123']]);
     }
     // public function test2()
     // {
@@ -170,6 +179,13 @@ class TestController extends Controller
         $package = PackageModel::findOrFail(2);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
             ->createWarehouseOrder($package);
+        exit;
+    }
+    
+    public function testYw(){
+        $package = PackageModel::findOrFail(3);
+        Logistics::driver($package->logistics->driver, $package->logistics->api_config)
+        ->getTracking($package);
         exit;
     }
 
@@ -522,12 +538,16 @@ class TestController extends Controller
             }
         }
     }
+    public function jdtestCrm(){
 
-    public function jdtestCrm()
-    {
-        $message_obj = MessageModel::find(36304);
-        dd($message_obj->getChannelDiver());
-        exit;
+
+
+
+        /*        $message_obj = MessageModel::find(36336);
+                //$tt = $message_obj->ChannelMessageFields();
+
+                dd($message_obj->MessageFields);exit;
+                exit;*/
 
 
         //渠道测试块
@@ -536,30 +556,46 @@ class TestController extends Controller
                 $fields = unserialize(base64_decode($message_obj->channel_message_fields));
                 dd($fields);exit;*/
 
+        /*
+                 $reply_obj = ReplyModel::find(28569);
 
-        $reply_obj = ReplyModel::find(28569);
-
-        foreach (AccountModel::all() as $account) {
-            if ($account->account == 'rebeauty') { //测试diver
-
-                $channel = Channel::driver($account->channel->driver, $account->api_config);
-                $messageList = $channel->sendMessages($reply_obj);
-                print_r($messageList);
-                exit;
-
-            }
-        }
-        /*        foreach (AccountModel::all() as $account) {
-                    if($account->account == 'rebeauty'){ //测试diver
+                  foreach (AccountModel::all() as $account) {
+                    if( $account->account == 'wintrade9'){ //测试diver
 
                         $channel = Channel::driver($account->channel->driver, $account->api_config);
-                        $messageList = $channel->getMessages();
+                        $messageList = $channel->sendMessages($reply_obj);
                         print_r($messageList);exit;
 
                     }
                 }*/
+        /*
+         *
+         *
+         */
+        foreach (AccountModel::all() as $account) {
+            if($account->account == 'darli04@126.com'){ //测试diver
+
+                //dd($account);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getMessages();
+                print_r($messageList);exit;
+
+            }
+        }
 
 
+/*        $userId =  request()->user()->id;
+        $accounts = AccountModel::where('customer_service_id','=',$userId)->get();
+        if(count($accounts) <> 0){
+
+            foreach ($accounts as $key => $account){
+                $ids_ary[] = $account->id;
+            }
+
+            return $ids_ary;
+
+        }
+        exit;*/
     }
 
     /*

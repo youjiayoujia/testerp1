@@ -3,6 +3,7 @@
 namespace App\Models\Publish\Smt;
 
 use App\Base\BaseModel;
+use App\Models\ChannelModel;
 
 class smtProductList extends BaseModel
 {
@@ -39,8 +40,8 @@ class smtProductList extends BaseModel
         'old_productId',
         'quantitySold1'
     ];
-  
-    public $searchFields = ['subject'=>'标题','productId'=>'产品ID'];
+    
+    public $searchFields = ['productId'=>'产品ID','subject'=>'标题'];
     
     public $rules = [];
     
@@ -49,7 +50,7 @@ class smtProductList extends BaseModel
         return [
             'relatedSearchFields' => ['productSku' => ['skuCode']],
             'filterFields' => [],
-            'filterSelects' => [],
+            'filterSelects' => ['token_id' => $this->getAccountNumber('App\Models\Channel\AccountModel','account')],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];
@@ -72,4 +73,14 @@ class smtProductList extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'user_id', 'id');
     }
     
+    public function getAccountNumber($model, $name)
+    {
+        $channel =  ChannelModel::where('driver','aliexpress')->first();
+        $arr = [];
+        $inner_models = $model::where('channel_id',$channel->id)->get();
+        foreach ($inner_models as $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
+    }
 }

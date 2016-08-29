@@ -19,6 +19,7 @@ use App\Models\Order\RefundModel;
 use App\Models\Channel\ProductModel as ChannelProduct;
 use App\Models\Order\BlacklistModel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Oversea\ChannelSaleModel;
 
 class OrderModel extends BaseModel
 {
@@ -390,12 +391,21 @@ class OrderModel extends BaseModel
                     $orderItem['item_id'] = $item->id;
                 }
             }
-            if (!isset($orderItem['item_id'])) {
-                $orderItem['item_id'] = 0;
-                $order->update(['status' => 'REVIEW']);
-                $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
-            }
+            // if (!isset($orderItem['item_id'])) {
+            //     $orderItem['item_id'] = 0;
+            //     $order->update(['status' => 'REVIEW']);
+            //     $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
+            // }
             $order->items()->create($orderItem);
+        }
+        if($order->status == 'COMPLETE' && $order->fulfill_by == 'AFN') {
+            foreach($order->items as $orderItem) {
+                ChannelSaleModel::create(['item_id' => $orderItem->item_id,
+                                          'channel_sku' => $orderItem->channel_sku,
+                                          'quantity' => $orderItem->quantity,
+                                          'account_id' => $order->channel_account_id,
+                                          'create_time' => $order->create_time]);
+            }
         }
         //客户备注需审核
         if (isset($data['remark']) and !empty($data['remark'])) {

@@ -57,12 +57,12 @@ class TestController extends Controller
     {
         $this->itemModel = $itemModel;
     }
-    public function test2()
-    {
-        $package = PackageModel::find('17');
+    // public function test2()
+    // {
+    //     $package = PackageModel::find('17');
 
-        $package->realTimeLogistics();
-    }
+    //     $package->realTimeLogistics();
+    // }
     // public function test2()
     // {
     //     $data['channel_ordernum'] = '1111';
@@ -78,12 +78,12 @@ class TestController extends Controller
     //     $this->dispatch($job);
     // }
 
-    // public function test2()
-    // {
-    //     $account = AccountModel::find(160);
-    //     $single = new AmazonAdapter($account->api_config);
-    //     $single->returnTrack([['1', '123']]);
-    // }
+    public function test2()
+    {
+        $account = AccountModel::find(1);
+        $single = new AmazonAdapter($account->api_config);
+        $single->returnTrack([['1', '123']]);
+    }
     // public function test2()
     // {
     //     $rows[] = [
@@ -597,6 +597,7 @@ class TestController extends Controller
         }
         exit;*/
     }
+
     public function testEbayCases(){
         foreach (AccountModel::all() as $account) {
             if($account->account == 'pandaserveyou'){ //测试diver
@@ -607,6 +608,34 @@ class TestController extends Controller
                 print_r($messageList);exit;
 
             }
+        }
+    }
+    
+    /*
+     * 同步ebay信息
+     */
+    public function getEbayProduct(){
+        $account = AccountModel::find(378);
+        if ($account) {
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $is_do =true;
+            $i=1;
+            while($is_do) {
+                $productList = $channel->getSellerEvents($i);
+                exit;
+                if ($productList) {
+                    foreach($productList as $key=> $itemId){
+                        $channel->getProductDetail($itemId);
+                        if($key==10){
+                            exit;
+                        }
+                    }
+                    $i++;
+                }else{
+                    $is_do=false;
+                }
+            }
+
         }
     }
 }

@@ -492,10 +492,10 @@
 
     {{--<script src="{{ asset('plugins/UEditor/ueditor.config.js') }}"></script>
     <script src="{{ asset('plugins/UEditor/ueditor.all.js') }}"></script>--}}
-    <script src="{{ asset('plugins/Ueditor/umeditor.config.js') }}"></script>
-    <script src="{{ asset('plugins/Ueditor/umeditor.min.js') }}"></script>
-    <script src="{{ asset('plugins/Ueditor/lang/zh-cn/zh-cn.js') }}"></script>
-    <link href="{{ asset('plugins/Ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+    <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+    <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+    <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <script type='text/javascript'>
 
 

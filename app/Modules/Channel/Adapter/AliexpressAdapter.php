@@ -1359,13 +1359,13 @@ Class AliexpressAdapter implements AdapterInterface
      * @param $currentPage 每页查询商品数量
      * @param $pageSize 需要商品的当前页数
      */
-    public function getOnlineProduct($currentPage,$pageSize){
+    public function getOnlineProduct($productStatus = 'onSelling',$currentPage,$pageSize){
         $app_url  = "http://" . self::GWURL . "/openapi/";
         $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findProductInfoListQuery/" . $this->_appkey;
         $parameter['access_token'] = $this->_access_token;
         $parameter['pageSize'] = $pageSize;
         $parameter['currentPage'] = $currentPage;
-        $parameter['productStatusType'] = 'onSelling';
+        $parameter['productStatusType'] = $productStatus;
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);         
        
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);        
@@ -1381,6 +1381,35 @@ Class AliexpressAdapter implements AdapterInterface
         $api_info = "param2/" . $this->_version . "/aliexpress.open/api.findAeProductById/" . $this->_appkey;
         $parameter['access_token'] = $this->_access_token;
         $parameter['productId'] = $productId;
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
+    }
+    
+    /**
+     * 编辑商品单个SKU库存
+     * @param  $productId  商品ID
+     * @param  $skuStock   库存
+     */
+    public function editSingleSkuStock($data){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.editSingleSkuStock/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $data['productId'];
+        $parameter['ipmSkuStock'] = $data['ipmSkuStock'];
+        $parameter['skuId'] = $data['skuId'];
+        $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
+        $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
+        return json_decode($result,true);
+    }
+    
+    public function editSingleSkuPrice($data){
+        $app_url  = "http://" . self::GWURL . "/openapi/";
+        $api_info = "param2/" . $this->_version . "/aliexpress.open/api.editSingleSkuPrice/" . $this->_appkey;
+        $parameter['access_token'] = $this->_access_token;
+        $parameter['productId'] = $data['productId'];
+        $parameter['skuPrice'] = $data['skuPrice'];
+        $parameter['skuId'] = $data['skuId'];
         $parameter['_aop_signature'] = $this->getApiSignature($api_info, $parameter);
         $result = $this->postCurlHttpsData ( $app_url.$api_info,  $parameter);
         return json_decode($result,true);

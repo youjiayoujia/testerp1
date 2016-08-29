@@ -28,18 +28,18 @@
             </ul>
         <div class="row">
             <div class="form-group col-lg-12">
-                <input type='text' class="form-control {{$channel->id}}_myname" id="" placeholder="标题" name='info[{{$channel->id}}][name]' value="{{$default['en_name']}}">
+                <input type='text' class="form-control {{$channel->id}}_myname" id="" placeholder="标题" name='info[{{$channel->id}}][name]' value="{{$key?'':$default['en_name']}}">
             </div>
         
             <div class="form-group  col-lg-12">    
-                <input type='text' class="form-control {{$channel->id}}_mykeywords" id="" placeholder="关键词" name='info[{{$channel->id}}][keywords]' value="{{$default['en_keywords']}}">
+                <input type='text' class="form-control {{$channel->id}}_mykeywords" id="" placeholder="关键词" name='info[{{$channel->id}}][keywords]' value="{{$key?'':$default['en_keywords']}}">
             </div>
         </div> 
         <div class="row">
             <div class="col-lg-12" id="templateContent_{{$key}}">
                 <label for="" >描述：</label>
                 <div class="form-group">
-                    <textarea class="form-control {{$channel->id}}_mydescription" id="editor_{{$key}}" rows="16" placeholder="标题" name="info[{{$channel->id}}][description]" style="width:100%;height:400px;">{{ $default['en_description']}}</textarea>
+                    <textarea class="form-control {{$channel->id}}_mydescription" id="editor_{{$key}}" rows="16" placeholder="标题" name="info[{{$channel->id}}][description]" style="width:100%;height:400px;">{{ $key?'':$default['en_description']}}</textarea>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
                 //alert(channel_id);
                 $("."+channel_id+"_myname").val(result['name']);
                 $("."+channel_id+"_mykeywords").val(result['keywords']);
-                $("."+channel_id+"_mydescription").text(result['description']);
+                $("."+channel_id+"_mydescription").html(result['description']);
             }
         });
     })
@@ -93,7 +93,7 @@
             success: function (result) {
                 $("."+channel_id+"_myname").val(result['name']);
                 $("."+channel_id+"_mykeywords").val(result['keywords']);
-                $("."+channel_id+"_mydescription").text(result['description']);
+                $("."+channel_id+"_mydescription").html(result['description']);
             }
         });
     })

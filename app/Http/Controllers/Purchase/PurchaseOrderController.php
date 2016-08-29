@@ -619,6 +619,14 @@ class PurchaseOrderController extends Controller
         if (!$purchase_order) {
             return redirect(route('recieve'))->with('alert', $this->alert('danger','采购单号不存在.'));
         }
+        foreach($purchase_order->purchaseItem as $purchase_item){
+            if(!$purchase_item->productItem->warehousePosition){
+                return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请先添加库位.'));
+            }
+            if(!$purchase_item->productItem->warehousePosition->name){
+                return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请先添加库位.'));
+            }
+        }
         $response = [
                 'purchase_order' => $purchase_order,
                 'id'=>$id,

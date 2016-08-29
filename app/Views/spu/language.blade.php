@@ -77,7 +77,7 @@
                 //alert(channel_id);
                 $("."+channel_id+"_myname").val(result['name']);
                 $("."+channel_id+"_mykeywords").val(result['keywords']);
-                $("."+channel_id+"_mydescription").text(result['description']);
+                $("."+channel_id+"_mydescription").html(result['description']);
             }
         });
     })
@@ -93,7 +93,7 @@
             success: function (result) {
                 $("."+channel_id+"_myname").val(result['name']);
                 $("."+channel_id+"_mykeywords").val(result['keywords']);
-                $("."+channel_id+"_mydescription").text(result['description']);
+                $("."+channel_id+"_mydescription").html(result['description']);
             }
         });
     })

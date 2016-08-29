@@ -18,7 +18,7 @@
             <td>{{ $template->updated_at }}</td>
             <td>{{ $template->created_at }}</td>
             <td>
-                <a href="{{ route('all', ['id'=>$template->id]) }}" class="btn btn-info btn-xs">
+                <a href="{{ route('view', ['id'=>$template->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 面单模版
                 </a>
                 <a href="{{ route('logisticsTemplate.show', ['id'=>$template->id]) }}" class="btn btn-info btn-xs">

@@ -38,16 +38,6 @@ class TemplateController extends Controller
         return view($this->viewPath . 'tpl.' . explode('.', $model->view)[0], $response);
     }
 
-    public function all($id) {
-        $model = $this->model->find($id);
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'model' => $model,
-            'id' => $id,
-        ];
-        return view($this->viewPath . 'tpl.all', $response);
-    }
-
     /**
      * 保存
      */

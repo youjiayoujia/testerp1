@@ -313,6 +313,11 @@ class OrderController extends Controller
                 }
             }
         }
+        if($this->model->find($id)->packages) {
+            foreach($this->model->find($id)->packages as $package) {
+                $package->delete();
+            }
+        }
 
         return redirect($this->mainIndex);
     }
@@ -456,6 +461,11 @@ class OrderController extends Controller
             if($this->model->find($id)) {
                 $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
             }
+            if($this->model->find($id)->packages) {
+                foreach($this->model->find($id)->packages as $package) {
+                    $package->delete();
+                }
+            }
         }
         return 1;
     }
@@ -465,6 +475,11 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
+        if($this->model->find($id)->packages) {
+            foreach($this->model->find($id)->packages as $package) {
+                $package->delete();
+            }
+        }
 
         return redirect($this->mainIndex);
     }

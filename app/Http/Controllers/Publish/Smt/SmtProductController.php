@@ -83,7 +83,7 @@ class SmtProductController extends Controller
                     $options['group_name']       = trim($row['groupName']);
                     $options['last_update_time'] = date('Y-m-d H:i:s');
                     //判断产品分组是否存在
-                    $id = $this->Smt_product_group_model->where(['token_id'=>$token_id,'group_id'=>$row['groupId']])->first()->toArray();
+                    $id = $this->Smt_product_group_model->where(['token_id'=>$token_id,'group_id'=>$row['groupId']])->first();
                     if (!$id) { //不存在插入
                         $this->Smt_product_group_model->create($options);
                     } else { //存在就变更
@@ -157,6 +157,7 @@ class SmtProductController extends Controller
         
         }          
         $flag = false; //是否同步成功
+
         $ChannelModule = new ChannelModule();    
         foreach ($token_array as $t) {
             $smtApi = $ChannelModule->driver($t->channel->driver, $t->api_config);    
@@ -172,14 +173,13 @@ class SmtProductController extends Controller
                         'freightSettingList' => serialize($freight_info['freightSettingList']),
                         'last_update_time'   => date('Y-m-d H:i:s')
                     );
-                    $Info = $this->Smt_freight_template_model->where(['token_id'=>$t['id'],'templateId'=>$row['templateId']])->first()->toArray();
+                    $Info = $this->Smt_freight_template_model->where(['token_id'=>$t['id'],'templateId'=>$row['templateId']])->first();                   
                     if (!$Info) {
                         $this->Smt_freight_template_model->create($options);
                     } else {//更新下数据
                         $options['id'] = $Info['id'];
                         $this->Smt_freight_template_model->update($options);
-                    }
-    
+                    }    
                     unset($freight_info);
                     unset($id);
                     unset($options);
@@ -501,6 +501,72 @@ class SmtProductController extends Controller
     public function ajax_return($info='', $status=1, $data='') {
         $result = array('data' => $data, 'info' => $info, 'status' => $status);
         exit( json_encode($result) );
+    }
+    
+    /**
+     * 批量修改产品
+     */
+    public function batchModifyProducts(){
+        $productIds = request()->input('operateProductIds');
+        $from       = request()->input('from'); //判断数据来源
+        
+        $productList = array();
+        $productDetail = array();
+        if (!empty($productIds)) { //产品ID非空
+        
+            //获取产品信息并显示出来(图片，标题，关键词，单位，重量，尺寸，产品信息模块，服务模板，运费模板，零售价，产品id，分类id)
+            $productIdArr = explode(',', $productIds);        
+            $product_info = $this->model->whereIn('productId',$productIdArr)->get();
+            $token_id = 0;
+            if(count($product_info)){
+                $temp = array();
+                foreach($product_info as $row){                                     
+                    $temp[] = $row->token_id;                                    
+                }
+                $temp = array_unique($temp);
+                $token_id =  count($temp) == 1 ? array_shift($temp) : false;
+            }
+            if (!$token_id){
+                $data = array(
+                    'error' => '选择的产品无账号或不在同一个账号，请重新选择'
+                );
+            }else {
+                dd($productList);
+                $productList   = $product_info->toArray();
+                $productDetail = $productList->details->toArray();
+        
+        
+                
+                $freightList = smtFreightTemplate::where('token_id',$token_id)->get();
+                 
+                //服务模板
+                $serveList = smtServiceTemplate::where('token_id',$token_id)->get();
+                
+                //产品分组
+                $product_group = new SmtProductController();
+                $groupList = $product_group->getLocalProductGroupList($token_id);                
+                //单位列表
+                $unitList = $this->smtProductUnitModel->getAllUnit();                                                                                 
+        
+                $data = array( //传过去的数据
+                    'productIds'    => $productIds,
+                    'productList'   => $productList,
+                    'productDetail' => $productDetail,
+                    'unitList'      => $unitList,
+                    'freightList'   => $freightList,
+                    'serveList'     => $serveList,
+                    'groupList'     => $groupList,
+                    'token_id'      => $token_id,
+                    'from'          => $from
+                );
+            }
+        }else {
+            $data = array(
+                'error' => '请先选择要修改的产品'
+            );
+        }
+     
+        return view($this->viewPath . 'smtProduct/batch_modify', $data);
     }
     
     

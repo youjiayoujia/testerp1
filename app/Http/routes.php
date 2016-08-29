@@ -674,7 +674,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('ajaxGetPlatTemplateList',
             ['uses' => 'SmtProductController@ajaxGetPlatTemplateList', 'as' => 'smtProduct.ajaxGetPlatTemplateList']);
         Route::post('ajaxSmtAfterServiceList',
-           ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']);           
+           ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']); 
+        Route::post('batchModifyProducts',
+            ['uses' => 'SmtProductController@batchModifyProducts', 'as' => 'smtProduct.batchModifyProducts']);
+  
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     

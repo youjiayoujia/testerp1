@@ -501,10 +501,10 @@
 
    {{-- <script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
     <script src="{{ asset('plugins/UEditor/umeditor.js') }}"></script>--}}
-   <script src="{{ asset('plugins/Ueditor/umeditor.config.js') }}"></script>
-   <script src="{{ asset('plugins/Ueditor/umeditor.min.js') }}"></script>
-   <script src="{{ asset('plugins/Ueditor/lang/zh-cn/zh-cn.js') }}"></script>
-   <link href="{{ asset('plugins/Ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+   <script src="{{ asset('plugins/ueditor/umeditor.config.js') }}"></script>
+   <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
+   <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+   <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
     <script type='text/javascript'>
 
         var content = UM.getEditor('content',{

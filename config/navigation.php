@@ -211,6 +211,22 @@ return [
             ],
         ],
     ],
+    //仓储导航
+    [
+        'name' => '海外仓',
+        'icon' => 'home',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '海外仓模块' => [
+                [
+                    'name' => '海外仓销量',
+                    'url' => 'suggestForm.index',
+                    'icon' => '',
+                ],
+            ],
+        ],
+    ],
     //物流导航
     [
         'name' => '物流',
@@ -338,23 +354,28 @@ return [
         'type' => '',
         'subnavigations' => [
             [
-                'name' => 'wish草稿列表',
+                'name' => 'Wish草稿列表',
                 'url' => 'wish.index',
                 'icon' => '',
             ],
             [
-                'name' => 'wish在线数据列表',
+                'name' => 'Wish在线数据列表',
                 'url' => 'wish.indexOnlineProduct',
                 'icon' => '',
             ],
             [
-                'name' => 'wish销售代码设置',
+                'name' => 'Wish销售代码设置',
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
             [
 
                 'name' => 'SMT待发布产品列表',
+                'url' => 'smt.waitPost',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT产品草稿列表',
                 'url' => 'smt.index',
                 'icon' => '',
             ],
@@ -375,11 +396,15 @@ return [
             'icon' => '',
             ],
             [
-                'name' => 'ebay站点信息',
+                'name' => 'Ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'Ebay数据监控',
+                'url' => 'ebayProduct.index',
+                'icon' => '',
+            ],
         ],
     ],
     //CRM导航

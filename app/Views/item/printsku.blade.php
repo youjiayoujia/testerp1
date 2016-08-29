@@ -14,7 +14,7 @@
 	<input type="radio" name="labelSize" value="middle" />生成标签(40mm x 15mm)<br/>
 	<input type="radio" name="labelSize" value="middleSmall" />生成标签(40mm x 20mm)<br/>
 	<input name="submint" type="submit" id="submint" value="生成" style="width:100px;"/>
-
+	<input type="hidden" value='{{$from}}' name='from'> 
 </form>
 </td>
 </tr>

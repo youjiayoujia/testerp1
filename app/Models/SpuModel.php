@@ -68,17 +68,19 @@ class SpuModel extends BaseModel
     {   
         foreach ($data['info'] as $channel_id => $language) {
             $arr = [];
+            $pre=[];
             $pre = $language['language'];
             foreach ($language as $prefix => $value) {
                 $arr[$pre."_".$prefix] = $value;
             }
             
-            $model = $this->spuMultiOption->where("channel_id", (int)$channel_id)->first();
+            $model = $this->spuMultiOption()->where("channel_id", $channel_id)->first();
             if($model){
-                $model->update($arr);
+                if($arr[$pre."_name"]!=''||$arr[$pre."_keywords"]!=''||$arr[$pre."_description"]!=''){
+                    $model->update($arr);
+                }   
             }
            
         }
-        //
     }
 }

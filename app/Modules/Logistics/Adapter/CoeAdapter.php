@@ -15,6 +15,13 @@ class CoeAdapter extends BasicAdapter
         $this->config = $package->logistics->api_config;
 
         $result = [];
+		if($package->tracking_no){
+			$result = [
+                    'code' => 'error',
+                    'result' => 'Sorry, tracking numbers already exist'
+                ];
+			return $result;
+		}
         $response = $this->doUpload($package);
         if ($response['status'] != 0) {
             preg_match('/<jobNo.*>(.*)<\/jobNo>/isU', $response['msg'], $shippingcode);

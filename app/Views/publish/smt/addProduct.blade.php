@@ -1866,7 +1866,7 @@ $template['name'].'</option>';
             });
         }
     
-    /*
+    
      //表单验证
         $('.validate_form').Validform({
             btnSubmit: '.submit_btn',
@@ -1888,7 +1888,7 @@ $template['name'].'</option>';
                }
             }
         });
-       */ 
+       
         
       	/*		 	   
         var _editor= new UM.Editor();       

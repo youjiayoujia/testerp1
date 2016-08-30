@@ -241,6 +241,16 @@ return [
                     'url' => 'suggestForm.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '申请表',
+                    'url' => 'report.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '发货',
+                    'url' => 'report.shipment',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

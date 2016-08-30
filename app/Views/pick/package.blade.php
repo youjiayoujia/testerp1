@@ -284,6 +284,7 @@ $(document).ready(function(){
         }
         if(!extern_flag) {
             $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
+            return false;
         }
     });
 });

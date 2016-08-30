@@ -23,27 +23,6 @@
             </div>
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    Cases详情
-                </div>
-
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-
-                        <ul class="list-group">
-                            <li class="list-group-item ">ItemID: {{$case->case_id}}</li>
-                            <li class="list-group-item ">总金额：{{$case->case_amount}}</li>
-                            <li class="list-group-item ">数量：{{$case->case_quantity}}</li>
-                            <li class="list-group-item ">最后回复时间：{{$case->last_modify_date}}</li>
-
-                        </ul>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="panel panel-primary">
-                <div class="panel-heading">
                     处理
                 </div>
 
@@ -157,9 +136,46 @@
         </div>
 
         <div class="col-lg-4">
-            @if($case->related_order_id)
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Cases详情
+                </div>
+
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <ul class="list-group">
+                                <li class="list-group-item ">ItemID: {{$case->case_id}}</li>
+                                <li class="list-group-item ">总金额：{{$case->case_amount}}</li>
+                                <li class="list-group-item ">数量：{{$case->case_quantity}}</li>
+                                <li class="list-group-item ">最后回复时间：{{$case->last_modify_date}}</li>
+
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        @if($case->related_order_id)
                 @include('message.ebay_cases.order')
-            @endif
+            @else
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        订单信息
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <p>无订单信息</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+        @endif
         </div>
 @stop
 @section('pageJs')

@@ -1136,7 +1136,6 @@ class SmtController extends Controller{
             if($draft_skus){
                 $draft_skus = $draft_skus->toArray();
             }
-            dd($draft_skus);
             //查询草稿详情
             $draft_detail = $draft_info->details;
             //已选择的分类
@@ -1167,6 +1166,9 @@ class SmtController extends Controller{
             }
             //对属性进行排序处理
             $category_attributes = $smtApi->sortAttribute($category_attributes);
+            var_dump($category_attributes);
+            echo "<hr/>";
+            dd($draft_skus);
             //获取运费模版
             $freight = smtFreightTemplate::where('token_id',$token_id)->get();
            

@@ -1136,6 +1136,7 @@ class SmtController extends Controller{
             if($draft_skus){
                 $draft_skus = $draft_skus->toArray();
             }
+            dd($draft_skus);
             //查询草稿详情
             $draft_detail = $draft_info->details;
             //已选择的分类

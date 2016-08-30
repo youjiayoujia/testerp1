@@ -110,6 +110,23 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
+            '收货质检' => [
+               [
+                    'name' => '包裹收货扫描',
+                    'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购收货和入库',
+                    'url' => 'recieve',
+                    'icon' => '',
+                ],
+            ],
             '发货' => [
                 [
                     'name' => '包裹',
@@ -294,21 +311,6 @@ return [
                 [
                     'name' => '采购单',
                     'url' => 'purchaseOrder.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包裹收货扫描',
-                    'url' => 'purchaseList.create',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包裹收货列表',
-                    'url' => 'purchaseList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '采购收货和入库',
-                    'url' => 'recieve',
                     'icon' => '',
                 ],
                 /*[

@@ -76,11 +76,14 @@
                 <a href="{{ route('productSupplier.edit', ['id'=>$supplier->id]) }}" title="编辑" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-{{--                <a href="javascript:" class="btn btn-danger btn-xs delete_item" title="删除"
-                   data-id="{{ $supplier->id }}"
-                   data-url="{{ route('productSupplier.destroy', ['id' => $supplier->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </a>--}}
+
+                @if($supplier->examine_status == 'newData' || $supplier->examine_status == 0)
+                    <a href="javascript:" class="btn btn-danger btn-xs delete_item" title="删除"
+                       data-id="{{ $supplier->id }}"
+                       data-url="{{ route('productSupplier.destroy', ['id' => $supplier->id]) }}">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+                @endif;
             </td>
         </tr>
     @endforeach

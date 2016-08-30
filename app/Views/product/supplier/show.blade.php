@@ -45,6 +45,9 @@
             <div class="col-lg-4">
                 <strong>评级描述</strong>: {{ $model->levelByName ? $model->levelByName->description : '' }}
             </div>
+            <div class="col-lg-4">
+                <strong>审核材料</strong>:<a href="../../{{config('product.product_supplier.file_path')}}{{$model->qualifications}}" target="_blank">{{$model->qualifications}}</a>
+            </div>
         </div>
     </div>
     <div class="panel panel-default">

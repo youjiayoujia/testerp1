@@ -49,7 +49,7 @@
             <input type='text' class="form-control" id="purchase_time" placeholder="采购周期" name='purchase_time' value="{{ old('purchase_time') ? old('purchase_time') : $model->purchase_time }}">
         </div>
        <div class="form-group col-lg-3">
-            <label for="name" class='control-label'>开户行</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
+            <label for="name" class='control-label'>开户行</label>
             <input type='text' class="form-control" id="bank_account" placeholder="开户行" name='bank_account' value="{{ old('bank_account') ? old('bank_account') : $model->bank_account }}">
         </div>
         <div class="form-group col-lg-3">

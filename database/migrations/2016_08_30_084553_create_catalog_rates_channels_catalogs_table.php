@@ -30,6 +30,6 @@ class CreateCatalogRatesChannelsCatalogsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('catalog_rates_channels');
+        Schema::drop('catalog_rates_channels_catalogs');
     }
 }

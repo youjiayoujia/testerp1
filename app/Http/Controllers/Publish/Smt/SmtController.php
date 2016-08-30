@@ -551,11 +551,9 @@ class SmtController extends Controller{
                //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
                $per_sku['smtSkuCode'] = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] ;
                $newSkus = $smtApi->buildSysSku($per_sku['skuCode']);
-               var_dump($newSkus);
                foreach($newSkus as $sku){
                    $per_sku['skuCode'] = (($valId > 0 && $valId != 201336100) ? '{YY}' : '').$sku;
                    $per_sku['skuMark'] = $productId . ':' . $per_sku['skuCode']; 
-                   dd($per_sku);
                    $sku_res = $this->smtProductSkuModel->create($per_sku);
                    if (!$sku_res->id){
                        $sku_flag = false;
@@ -1137,6 +1135,7 @@ class SmtController extends Controller{
             if($draft_skus){
                 $draft_skus = $draft_skus->toArray();
             }
+            dd($draft_skus);
             //查询草稿详情
             $draft_detail = $draft_info->details;
             //已选择的分类

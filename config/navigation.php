@@ -344,7 +344,14 @@ return [
                     'url' => 'channelAccount.index',
                     'icon' => '',
                 ],
-            ]
+            ],
+            '其他' =>[
+                [
+                    'name' => '产品分类渠道',
+                    'url'  => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ]
+            ],
         ],
     ],
     [

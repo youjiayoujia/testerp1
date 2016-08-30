@@ -166,9 +166,11 @@ class AccountModel extends BaseModel
             case 'ebay':
                 $config = [
                     'requestToken' => $this->ebay_token,
-                    'devID' => $this->ebay_developer_devid,
-                    'appID' => $this->ebay_developer_appid,
-                    'certID' => $this->ebay_developer_certid,
+                    'devID'        => $this->ebay_developer_devid,
+                    'appID'        => $this->ebay_developer_appid,
+                    'certID'       => $this->ebay_developer_certid,
+                    'accountName'    => $this->account,
+                    'accountID'    => $this->id
                 ];
                 break;
             case 'cdiscount':

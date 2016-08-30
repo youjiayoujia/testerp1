@@ -314,6 +314,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
+    Route::resource('CatalogRatesChannel', 'Channel\CatalogRatesChannelController');
     //渠道账号路由
     Route::any('channelAccount/getAccountUser',
         ['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
@@ -791,6 +792,7 @@ Route::group(['middleware' => 'auth'], function () {
     //标记发货规则设置
     Route::resource('orderMarkLogic', 'Order\OrderMarkLogicController');
     Route::resource('ebayCases','Message\EbayCasesController');
+    Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
 });
 
 
@@ -808,6 +810,8 @@ Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
+Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
+
 //spu
 Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);

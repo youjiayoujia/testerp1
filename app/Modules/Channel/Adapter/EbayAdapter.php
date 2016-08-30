@@ -36,6 +36,8 @@ class EbayAdapter implements AdapterInterface
         $this->certID = $config["certID"];
         $this->serverUrl = 'https://api.ebay.com/ws/api.dll';
         $this->compatLevel = '745';
+        $this->accountID   = $config['accountID'];
+        $this->accountName = $config['accountName'];
 
     }
 
@@ -1168,12 +1170,12 @@ class EbayAdapter implements AdapterInterface
 
     public function getMessages()
     {
-        $message_lists = [];
+        $message_lists =[];
         $order = 0;
         // 1.封装message 的XML DOM
         $before_day = 1;
         $time_begin = date("Y-m-d H:i:s", time() - (86400 * $before_day));
-        $time_end = date('Y-m-d H:i:s');
+        $time_end   = date('Y-m-d H:i:s');
         $arr = explode(' ', $time_end);
         $time_end = $arr[0] . 'T' . $arr[1] . '.000Z';
         $arr = explode(' ', $time_begin);
@@ -1185,17 +1187,13 @@ class EbayAdapter implements AdapterInterface
                             <EndTime>' . $time_end . '</EndTime>';
         //2.获取消息
         $call = 'GetMyMessages';
-<<<<<<< HEAD
-        $message_ary = $this->buildEbayBody($message_xml_dom, $call);
-=======
         $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
 
 
->>>>>>> master
         $headers_count = $message_ary->Summary->TotalMessageCount;
         $headers_pages_count = ceil($headers_count / 100); //统计页数
 
-        for ($index = 1; $index <= $headers_pages_count; $index++) {
+        for($index = 1 ; $index <= $headers_pages_count ; $index ++){
             $content_xml_dom = '<WarningLevel>High</WarningLevel>
                                 <DetailLevel>ReturnHeaders</DetailLevel>
                                 <Pagination>
@@ -1204,17 +1202,11 @@ class EbayAdapter implements AdapterInterface
                                 </Pagination>        
                                 <StartTime>' . $time_begin . '</StartTime>
                                 <EndTime>' . $time_end . '</EndTime>';
-<<<<<<< HEAD
-            $content = $this->buildEbayBody($content_xml_dom, 'GetMyMessages');
-            if (isset($content->Messages->Message)) {
-                foreach ($content->Messages->Message as $message) {
-=======
             $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
 
 
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
->>>>>>> master
                     /*
                         message 数据格式 样例
                         SimpleXMLElement Object
@@ -1313,18 +1305,11 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['date'] = $message->ReceiveDate;
                     $message_lists[$order]['subject'] = $message->Subject;
                     $message_lists[$order]['attachment'] = ''; //附件
-<<<<<<< HEAD
-                    $message_lists[$order]['content'] = base64_encode(serialize(['ebay' => (string)$message->Subject]));
-                    $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID,
-                        'ExternalMessageID' => (string)$message->ExternalMessageID,
-=======
                     $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
                         'ItemID' => (string)$message->ItemID, //应该是订单号
                         'ExternalMessageID' => (string)$message->ExternalMessageID,
                         'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
->>>>>>> master
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
                     $order += 1;
@@ -1333,13 +1318,9 @@ class EbayAdapter implements AdapterInterface
 
         }
 
-<<<<<<< HEAD
-        return (!empty($message_lists)) ? $message_lists : false;
-=======
         return (!empty($message_lists)) ?  array_reverse($message_lists) : false;
 
     }
->>>>>>> master
 
     public function createMemberMessageXML($page) {
         $this->input_str = '
@@ -1361,7 +1342,7 @@ class EbayAdapter implements AdapterInterface
     {
         $message_obj = $replyMessage->message; //关联关系  获取用户邮件
 
-        if (!empty($message_obj)) {
+        if(!empty($message_obj)){
             $fields = unserialize(base64_decode($message_obj->channel_message_fields)); //渠道特殊值
             //1.封装XML DOM
             $reply_xml_dom = '<RequesterCredentials>
@@ -1377,7 +1358,7 @@ class EbayAdapter implements AdapterInterface
                               <RecipientID>' . $message_obj->from_name . '</RecipientID>
                               </MemberMessage>';
 
-            $content = $this->buildEbayBody($reply_xml_dom, 'AddMemberMessageRTQ');
+            $content = $this->buildEbayBody($reply_xml_dom,'AddMemberMessageRTQ');
 
             return $content->Ack == 'Success' ? true : false;
         }
@@ -1409,7 +1390,6 @@ class EbayAdapter implements AdapterInterface
 
 
         $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
-
 
         /**SimpleXMLElement Object
         (
@@ -1494,13 +1474,14 @@ class EbayAdapter implements AdapterInterface
                     'buyer_id'       => $buyer,
                     'item_id'        => (string)$case->item->itemId,
                     'item_title'     => (string)$case->item->itemTitle,
-                    'transaction_id' => (string)$case->item->transactionId,
+                    //'transaction_id' => (string)$case->item->transactionId,
                     'case_quantity'  => (int)$case->caseQuantity,
                     'case_amount'    => (float)$case->caseAmount,
                     'respon_date'    => (string)$case->respondByDate,
                     'creation_date'  => (string)$case->creationDate,
-                    'creation_date'  => (string)$case->creationDate,
                     'last_modify_date'=> $modify_date,
+                    'account_id'      => $this->accountID,
+                    'process_status'  => 'UNREAD'
                 ];
 
                 //获取case 详情	 获取EBP_INR，EBP_SNAD， RETURN三类的详情
@@ -1512,10 +1493,10 @@ class EbayAdapter implements AdapterInterface
                     $content = '';
                     $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
                     if($case_detail->ack == 'Success'){
-
+                        $transaction_id = ''; //交易号
                         if($case_detail->caseDetail->responseHistory){
                             $detail = (array)$case_detail->caseDetail;
-
+                            //dd($detail);
                             if(isset($detail['responseHistory'])){  //若包括消息
                                 foreach ($detail['responseHistory'] as $note){
                                     $content []= [
@@ -1527,11 +1508,11 @@ class EbayAdapter implements AdapterInterface
                                 }
                                 $content = base64_encode(serialize($content));
                             }
-                        }
+                            $transaction_id = isset($case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId) ? (string)$case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId : '';
 
+                        }
                         $case_detail_ary = [
                             'tran_price' => $case_detail->item->transactionPrice,
-                            'tran_date' => $case_detail->item->transactionDate,
                             'tran_date' => $case_detail->item->transactionDate,
                             'global_id' => $case_detail->item->globalId,
                             'open_reason'=> $case_detail->caseDetail->openReason,
@@ -1540,14 +1521,17 @@ class EbayAdapter implements AdapterInterface
                             'agreed_renfund_amount'=> $case_detail->caseDetail->agreedRefundAmount,
                             'buyer_expection'=> $case_detail->caseDetail->initialBuyerExpectation,
                             'content' => $content,
+                            'transaction_id' => $transaction_id,
                         ];
                     }
-                }
+                    $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
+                    if(empty($list_obj)){
+                        EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary)); //合并list和detail 创建记录
+                        echo 'add one';
+                    }else{
+                        echo $case->caseId->id.'exist insert into ERP';
+                    }
 
-                $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
-                if(empty($list_obj)){
-                    EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary));
-                    echo '导入成功';
                 }
             }
         }
@@ -1559,6 +1543,25 @@ class EbayAdapter implements AdapterInterface
 					<type>'.$caseType.'</type>
 				</caseId>';
     }
+
+    /**
+     * 
+     * 创建offerOtherSolution API发送的XML信息
+     *
+     * @param  [type] $caseArray [description]
+     * @return [type]            [description]
+     */
+    public function createSolutionXml($caseArray){
+        $this->input_str = '
+		<caseId>
+		<id>'.$caseArray['caseId'].'</id>
+		<type>'.$caseArray['caseType'].'</type>
+		</caseId>
+		<messageToBuyer>'.htmlspecialchars($caseArray['messageToBuyer']).'</messageToBuyer>
+		';
+    }
+
+
 
 
 }

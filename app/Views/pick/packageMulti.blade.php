@@ -218,6 +218,7 @@ $(document).ready(function(){
         });
         if(flag == 0) {
             $('.notFindSku').text('根据所有sku匹配不到包裹信息');
+            return false;
         }
     });
 });

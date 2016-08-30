@@ -72,6 +72,11 @@ class HoldModel extends BaseModel
         return $this->belongsTo('App\Models\Stock\AdjustmentModel', 'relation_id', 'id');
     }
 
+    public function report()
+    {
+        return $this->belongsTo('App\Models\Oversea\ReportModel', 'relation_id', 'id');
+    }
+
     /**
      * accessor get the relation name 
      *
@@ -88,6 +93,8 @@ class HoldModel extends BaseModel
             return '库存导入';
         if($this->type == 'PACKAGE')
             return '包裹Item Id:'.$this->relation_id;
+        if($this->type == 'FBA')
+            return '申请表id:'.$this->relation_id;
     }
 
     /**

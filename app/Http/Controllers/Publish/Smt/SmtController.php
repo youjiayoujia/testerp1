@@ -466,7 +466,8 @@ class SmtController extends Controller{
                    $valId                      = $smtApi->checkProductSkuAttrIsOverSea($per_sku['aeopSKUProperty']); //海外仓属性ID
                    $per_sku['aeopSKUProperty'] = $per_sku['aeopSKUProperty'] ? serialize($per_sku['aeopSKUProperty']) : '';
                    $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
-                   $per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : ''). $per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+                   //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : ''). $per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+                   $per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : ''). $per_sku['skuCode'] ;
                    $per_sku['updated']         = 1; //这些都是修改过的
                    $per_sku['isRemove']        = 0; //未被删除的
                    $per_sku['overSeaValId']    = $valId;

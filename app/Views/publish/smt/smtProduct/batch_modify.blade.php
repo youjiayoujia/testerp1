@@ -653,7 +653,9 @@
     </div>
 
 </div>
-<script src="<?php echo static_url('theme/common/layer/layer.min.js')?>"></script>
+@section('childJs')
+<link href="{{ asset('plugins/layer/skin/layer.css')}}" type="text/css" rel="stylesheet">
+<script src="{{ asset('plugins/layer/layer.js') }}"></script>
 <script type="text/javascript">
     /**没有封装成函数，暂时先集成在系统中吧**/
     var moreProducts = {}; //全局变量，存储获取更多产品时的产品信息

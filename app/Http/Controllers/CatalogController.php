@@ -11,6 +11,8 @@ namespace App\Http\Controllers;
 use App\Models\CatalogModel;
 use App\Models\ChannelModel;
 use App\Models\Catalog\CatalogChannelsModel;
+use App\Models\Channel\CatalogRatesModel;
+use App\Models\Catalog\RatesChannelsModel;
 use Excel;
 
 class CatalogController extends Controller
@@ -30,10 +32,10 @@ class CatalogController extends Controller
      */
     public function create()
     {
-        $channels = ChannelModel::all();
+        $CatalogRatesModel = CatalogRatesModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'channels' => $channels,
+            'CatalogRatesModel' => $CatalogRatesModel,
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -110,7 +112,7 @@ class CatalogController extends Controller
 
     public function index(){
         request()->flash();
-        $channels = ChannelModel::all();
+        $channels = CatalogRatesModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->model),
@@ -178,7 +180,7 @@ class CatalogController extends Controller
         $catalogIds = explode(',',$filtersArray[0]);
         $channelIds = explode(',',$filtersArray[1]);
         $catalogs = $this->model->whereIn('id',$catalogIds)->get();
-        $channels = ChannelModel::whereIn('id',$channelIds)->get();
+        $channels = CatalogRatesModel::whereIn('id',$channelIds)->get();
         $response =[
             'metas' => $this->metas(__FUNCTION__),
             'catalogs' => $catalogs,
@@ -201,12 +203,12 @@ class CatalogController extends Controller
         $channelIds = explode(',',$filtersArray[1]);
         foreach ($catalogIds as $catalogId){
             foreach ($channelIds as $channelId){
-                $CatalogChannel = CatalogChannelsModel::where('catalog_id','=',$catalogId)->where('channel_id','=',$channelId)->first();
+                $CatalogChannel = RatesChannelsModel::where('catalog_id','=',$catalogId)->where('channel_id','=',$channelId)->first();
                 if(isset($requestArray[$channelId]) && !empty($CatalogChannel)){
                     $CatalogChannel->rate = $requestArray[$channelId];
                     $CatalogChannel->save();
                 }else{
-                    $obj = new CatalogChannelsModel;
+                    $obj = new RatesChannelsModel;
                     $obj->rate = $requestArray[$channelId];
                     $obj->catalog_id = $catalogId;
                     $obj->channel_id = $channelId;
@@ -230,7 +232,7 @@ class CatalogController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $channels = ChannelModel::all();
+        $channels = CatalogRatesModel::all();
         foreach ($channels as $channel){
             $channels_all[$channel->id] = $channel;
         }
@@ -261,7 +263,7 @@ class CatalogController extends Controller
             ]
         ];
 
-        $channels = ChannelModel::all();
+        $channels = CatalogRatesModel::all();
         foreach ($channels as $channel){
             $rows[0][$channel->name] = '20,40';
         }

@@ -280,8 +280,8 @@ text-align: left;
                 <select name="productUnit" id="productUnit" class="form-control" datatype="n" nullmsg="单位不能为空" errormsg="单位的值类型错误">
                     <?php
                         
-                            if ($draft_info){ //产品ID
-                                $unitId = $draft_detail['productUnit'];
+                            if ($smtApi->filterData('productId',$draft_info)){ //产品ID
+                                $unitId = $smtApi->filterData('productUnit',$draft_detail);
                             }else {
                                 $unitId = '100000015';
                             }
@@ -429,7 +429,8 @@ text-align: left;
              <?php             
                 
                 //产品属性
-                $aeopAeProductPropertys = $draft_detail ? ( $draft_detail['aeopAeProductPropertys'] ? unserialize($draft_detail['aeopAeProductPropertys']) : array() ): array();
+                //$aeopAeProductPropertys = $draft_detail ? ( $draft_detail['aeopAeProductPropertys'] ? unserialize($draft_detail['aeopAeProductPropertys']) : array() ): array();
+                $aeopAeProductPropertys = $smtApi->filterData('aeopAeProductPropertys', $draft_detail) ? unserialize($draft_detail['aeopAeProductPropertys']) : array();
                 //这个产品属性组装下
                 $propertyArray  = array();
                 $propertyArray2 = array();
@@ -700,7 +701,7 @@ text-align: left;
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="productStock" name="productStock"
                                datatype="numrange" min="1" max="999999" nullmsg="库存值为1-999999之间" errormsg="库存错误"
-                               value="<?php echo $draft_skus && $smtApi->filterData('ipmSkuStock', $draft_skus[0]) ? $draft_skus[0]['ipmSkuStock'] : 0; ?>"/>
+                               value="<?php $first_sku = array_shift($draft_skus); echo $draft_skus && $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
                     </div>
                     </div>
                 </div>
@@ -710,9 +711,9 @@ text-align: left;
                    
                     <div class="col-sm-3">	
                         <?php
-                        $skuCode = ''; //SKU代码信息
-                        if (!empty($draft_skus) && !empty($draft_skus[0]['smtSkuCode'])){
-                            $skuCode = $smtApi->rebuildSmtSku($draft_skus[0]['smtSkuCode']);
+                        $skuCode = ''; //SKU代码信息              
+                        if (!empty($draft_skus) && !empty($first_sku['smtSkuCode'])){
+                            $skuCode = $smtApi->rebuildSmtSku($first_sku['smtSkuCode']);
                         }
                         ?>	
                          <input type="text" class="form-control" id="productCode" name="productCode" placeholder="商品编码" value="<?php echo $skuCode;?>">    

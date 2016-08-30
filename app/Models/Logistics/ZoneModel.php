@@ -153,6 +153,7 @@ class ZoneModel extends BaseModel
 
     /**
      * 运费计算
+     * 单位： 人民币/kg
      * 说明：运费 = 首重费用 + [(总重 - 首重) ÷ 续重] * 续重费用 + 操作费
      * @param $zoneId
      */

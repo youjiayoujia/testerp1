@@ -47,7 +47,7 @@
         <div class="panel-heading">渠道费率</div>
         <div class="panel-body">
             <div class="form-group">
-                @foreach($channels as $channel)
+                @foreach($CatalogRatesModel as $channel)
                     <div class="row">
                         <div class="col-md-4">
                             <label for="size">渠道</label>

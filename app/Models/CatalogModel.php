@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Base\BaseModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\ChannelModel;
+use App\Models\Channel\CatalogRatesModel;
 use Tool;
 
 class CatalogModel extends BaseModel
@@ -52,9 +53,14 @@ class CatalogModel extends BaseModel
         return $name;
     }
 
-    public function channels()
+    /*public function channels()
     {
         return $this->belongsToMany('App\Models\ChannelModel','catalog_channels','catalog_id','channel_id')->withPivot('rate', 'flat_rate')->withTimestamps();
+    }*/
+
+    public function channels()
+    {
+        return $this->belongsToMany('App\Models\Channel\CatalogRatesModel','catalog_rates_channels_catalogs','catalog_id','channel_id')->withPivot('rate', 'flat_rate')->withTimestamps();
     }
 
     public function createCatalog($data,$extra=[])
@@ -253,7 +259,7 @@ class CatalogModel extends BaseModel
                     //多对多写入费率
                     foreach ($item['channel_rate'] as $key => $item_channel_value){
                         if($item_channel_value){ //若设置了对应渠道的费率
-                            $channel_obj = ChannelModel::where('name','=',$key)->first();
+                            $channel_obj = CatalogRatesModel::where('name','=',$key)->first();
                             $channel_ary['channel_id'] = $channel_obj->id;
                             $rate_ary = explode(',',$item_channel_value);
                             $catalog_obj->channels()->attach($channel_ary,['rate'=>$rate_ary[0],'flat_rate'=>$rate_ary[1]]);

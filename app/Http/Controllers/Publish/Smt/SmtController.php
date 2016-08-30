@@ -549,8 +549,8 @@ class SmtController extends Controller{
                $per_sku['aeopSKUProperty'] = $per_sku['aeopSKUProperty'] ? serialize($per_sku['aeopSKUProperty']) : '';
                $per_sku['productId']       = $productId;
                $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
-               $per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
-              
+               //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+               $per_sku['smtSkuCode']($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] ;
                $newSkus = $smtApi->buildSysSku($per_sku['skuCode']);
                foreach($newSkus as $sku){
                    $per_sku['skuCode'] = (($valId > 0 && $valId != 201336100) ? '{YY}' : '').$sku;

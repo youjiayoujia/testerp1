@@ -373,7 +373,6 @@ class SmtController extends Controller{
        $customizedName = array_key_exists('customizedName', $posts) ? $posts['customizedName'] : array();
        //自定义SKU图片信息
        $customizedPic = array_key_exists('customizedPic', $posts) ? $posts['customizedPic'] : array();
-       
        //最小价格
        $productMinPrice = 0;
        //最大价格
@@ -550,11 +549,13 @@ class SmtController extends Controller{
                $per_sku['productId']       = $productId;
                $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
                //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
-               $per_sku['smtSkuCode']($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] ;
+               $per_sku['smtSkuCode'] = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] ;
                $newSkus = $smtApi->buildSysSku($per_sku['skuCode']);
+               var_dump($newSkus);
                foreach($newSkus as $sku){
                    $per_sku['skuCode'] = (($valId > 0 && $valId != 201336100) ? '{YY}' : '').$sku;
                    $per_sku['skuMark'] = $productId . ':' . $per_sku['skuCode']; 
+                   dd($per_sku);
                    $sku_res = $this->smtProductSkuModel->create($per_sku);
                    if (!$sku_res->id){
                        $sku_flag = false;
@@ -1166,7 +1167,7 @@ class SmtController extends Controller{
             }
             //对属性进行排序处理
             $category_attributes = $smtApi->sortAttribute($category_attributes);
-            dd($draft_skus);
+            
             //获取运费模版
             $freight = smtFreightTemplate::where('token_id',$token_id)->get();
            

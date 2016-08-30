@@ -33,7 +33,7 @@ class CatalogRatesModel extends BaseModel{
     ];
 
     protected $rules = [
-        'create' => ['name' => 'required|unique:channels,name'],
-        'update' => ['name' => 'required|unique:channels,name,{id}']
+        'create' => ['name' => 'required|unique:catalog_rates_channels,name'],
+        'update' => ['name' => 'required|unique:catalog_rates_channels,name,{id}']
     ];
 }

@@ -1170,12 +1170,12 @@ class EbayAdapter implements AdapterInterface
 
     public function getMessages()
     {
-        $message_lists = [];
+        $message_lists =[];
         $order = 0;
         // 1.封装message 的XML DOM
         $before_day = 1;
         $time_begin = date("Y-m-d H:i:s", time() - (86400 * $before_day));
-        $time_end = date('Y-m-d H:i:s');
+        $time_end   = date('Y-m-d H:i:s');
         $arr = explode(' ', $time_end);
         $time_end = $arr[0] . 'T' . $arr[1] . '.000Z';
         $arr = explode(' ', $time_begin);
@@ -1187,17 +1187,13 @@ class EbayAdapter implements AdapterInterface
                             <EndTime>' . $time_end . '</EndTime>';
         //2.获取消息
         $call = 'GetMyMessages';
-<<<<<<< HEAD
-        $message_ary = $this->buildEbayBody($message_xml_dom, $call);
-=======
         $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
 
 
->>>>>>> master
         $headers_count = $message_ary->Summary->TotalMessageCount;
         $headers_pages_count = ceil($headers_count / 100); //统计页数
 
-        for ($index = 1; $index <= $headers_pages_count; $index++) {
+        for($index = 1 ; $index <= $headers_pages_count ; $index ++){
             $content_xml_dom = '<WarningLevel>High</WarningLevel>
                                 <DetailLevel>ReturnHeaders</DetailLevel>
                                 <Pagination>
@@ -1206,17 +1202,11 @@ class EbayAdapter implements AdapterInterface
                                 </Pagination>        
                                 <StartTime>' . $time_begin . '</StartTime>
                                 <EndTime>' . $time_end . '</EndTime>';
-<<<<<<< HEAD
-            $content = $this->buildEbayBody($content_xml_dom, 'GetMyMessages');
-            if (isset($content->Messages->Message)) {
-                foreach ($content->Messages->Message as $message) {
-=======
             $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
 
 
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
->>>>>>> master
                     /*
                         message 数据格式 样例
                         SimpleXMLElement Object
@@ -1315,18 +1305,11 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['date'] = $message->ReceiveDate;
                     $message_lists[$order]['subject'] = $message->Subject;
                     $message_lists[$order]['attachment'] = ''; //附件
-<<<<<<< HEAD
-                    $message_lists[$order]['content'] = base64_encode(serialize(['ebay' => (string)$message->Subject]));
-                    $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID,
-                        'ExternalMessageID' => (string)$message->ExternalMessageID,
-=======
                     $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
                         'ItemID' => (string)$message->ItemID, //应该是订单号
                         'ExternalMessageID' => (string)$message->ExternalMessageID,
                         'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
->>>>>>> master
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
                     $order += 1;
@@ -1335,13 +1318,9 @@ class EbayAdapter implements AdapterInterface
 
         }
 
-<<<<<<< HEAD
-        return (!empty($message_lists)) ? $message_lists : false;
-=======
         return (!empty($message_lists)) ?  array_reverse($message_lists) : false;
 
     }
->>>>>>> master
 
     public function createMemberMessageXML($page) {
         $this->input_str = '
@@ -1363,7 +1342,7 @@ class EbayAdapter implements AdapterInterface
     {
         $message_obj = $replyMessage->message; //关联关系  获取用户邮件
 
-        if (!empty($message_obj)) {
+        if(!empty($message_obj)){
             $fields = unserialize(base64_decode($message_obj->channel_message_fields)); //渠道特殊值
             //1.封装XML DOM
             $reply_xml_dom = '<RequesterCredentials>
@@ -1379,7 +1358,7 @@ class EbayAdapter implements AdapterInterface
                               <RecipientID>' . $message_obj->from_name . '</RecipientID>
                               </MemberMessage>';
 
-            $content = $this->buildEbayBody($reply_xml_dom, 'AddMemberMessageRTQ');
+            $content = $this->buildEbayBody($reply_xml_dom,'AddMemberMessageRTQ');
 
             return $content->Ack == 'Success' ? true : false;
         }

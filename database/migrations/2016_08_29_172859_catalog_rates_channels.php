@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSmtProductUnitTable extends Migration
+class CatalogRatesChannels extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,11 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function up()
     {
-        Schema::create('smt_product_unit', function (Blueprint $table) {
+        Schema::create('catalog_rates_channels', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('单位中文名称');
-            $table->string('name_en')->comment('单位英文名称');
+            $table->string('name')->comment('渠道名称')->default("");
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -26,6 +27,6 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('catalog_rates_channels');
     }
 }

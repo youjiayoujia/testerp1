@@ -14,7 +14,6 @@ use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Models\Message\Issues\EbayCasesDetailsModel;
 
 
-set_time_limit(1800);
 
 class EbayAdapter implements AdapterInterface
 {
@@ -37,6 +36,8 @@ class EbayAdapter implements AdapterInterface
         $this->certID = $config["certID"];
         $this->serverUrl = 'https://api.ebay.com/ws/api.dll';
         $this->compatLevel = '745';
+        $this->accountID   = $config['accountID'];
+        $this->accountName = $config['accountName'];
 
     }
 
@@ -63,7 +64,7 @@ class EbayAdapter implements AdapterInterface
             }
             $nextToken++;
         } else {
-            var_dump($response);
+            //var_dump($response);
             $nextToken = '';
         }
         return ['orders' => $returnOrders, 'nextToken' => $nextToken];
@@ -590,6 +591,459 @@ class EbayAdapter implements AdapterInterface
 
     }
 
+    /** 获取在线的listting
+     * @param int $page
+     * @param int $pageSize
+     * @param int $site
+     * @return array|bool
+     */
+    public function getOnlineProduct($page = 1, $pageSize = 200, $site = 0)
+    {
+        $return = [];
+        $xml = '';
+        //  $xml .= '<DetailLevel>ReturnAll</DetailLevel>';
+        $xml .= '<ErrorLanguage>en_US</ErrorLanguage>';
+        $xml .= '<MessageID>1000</MessageID>';
+        $xml .= '<OutputSelector>ActiveList</OutputSelector>';
+        $xml .= '<OutputSelector>ShippingDetails</OutputSelector>';
+        $xml .= '<Version>' . $this->compatLevel . '</Version>';
+        $xml .= '<ActiveList>';
+        $xml .= '<Pagination>';
+        $xml .= '<EntriesPerPage>' . $pageSize . '</EntriesPerPage>';
+        $xml .= '<PageNumber>' . $page . '</PageNumber>';
+        $xml .= '</Pagination>';
+        $xml .= '</ActiveList>';
+        $xml .= '<HideVariations>false</HideVariations>';
+        $response = $this->buildEbayBody($xml, 'GetMyeBaySelling', $site);
+        if(isset($response->ActiveList->PaginationResult->TotalNumberOfPages)&&($page>(int)$response->ActiveList->PaginationResult->TotalNumberOfPages)){
+            return false;
+        }
+        if (isset($response->ActiveList->ItemArray->Item) && !empty($response->ActiveList->ItemArray->Item)) {
+            foreach ($response->ActiveList->ItemArray->Item as $item) {
+                $return[] = (string)$item->ItemID;
+            }
+            return $return;
+        } else {
+            return false;
+        }
+    }
+
+    public function getSellerEvents($start_time='',$end_time='',$site = 0){
+        $return = [];
+        $xml = '';
+        $xml .=' <EndTimeFrom>'.$start_time.'T00:00:00.000Z</EndTimeFrom><EndTimeTo>'.$end_time.'T00:00:00.000Z</EndTimeTo>';
+        $response = $this->buildEbayBody($xml, 'GetSellerEvents', $site);
+        if(isset($response->ItemArray)&&!empty($response->ItemArray)&&$response->Ack == 'Success'){
+            foreach($response->ItemArray->Item as $item){
+                $return[] =$item->ItemID;
+            }
+            return $return;
+        }else{
+            return false;
+        }
+    }
+
+    /** 获取item 详情
+     * @param $itemId
+     * @param int $site
+     * @return array|bool
+     */
+    public function getProductDetail($itemId, $site = 0)
+    {
+        $return = [];
+        //$itemId = 122059295599;//122077657433	;
+        $xml = '';
+        $xml .= '<ItemID>' . $itemId . '</ItemID>';
+        $xml .= '<DetailLevel>ReturnAll</DetailLevel>';
+        $xml .= '<IncludeItemSpecifics>true</IncludeItemSpecifics>';
+        $response = $this->buildEbayBody($xml, 'GetItem', $site);
+        if ($response->Ack == 'Success') {
+            $list_info = [];
+            $sku_info = [];
+            $list_info['item_id'] = (string)$response->Item->ItemID;
+            $list_info['currency'] = (string)$response->Item->Currency;
+            $list_info['country'] = (string)$response->Item->Country;
+            $list_info['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+            $list_info['view_item_url'] = (string)$response->Item->ListingDetails->ViewItemURL;
+            $list_info['listing_duration'] = (string)$response->Item->ListingDuration;
+            $list_info['listing_type'] = (string)$response->Item->ListingType;
+            $list_info['location'] = (string)$response->Item->Location;
+            $list_info['postal_code'] = (string)$response->Item->PostalCode;
+            $list_info['payment_methods'] = (string)$response->Item->PaymentMethods;
+            $list_info['paypal_email_address'] = (string)$response->Item->PayPalEmailAddress;
+            $list_info['primary_category'] = (string)$response->Item->PrimaryCategory->CategoryID;
+            $list_info['secondary_category'] = (string)$response->Item->SecondaryCategory->CategoryID;
+            $list_info['private_listing'] = (string)$response->Item->PrivateListing;
+            $list_info['dispatch_time_max'] = (string)$response->Item->DispatchTimeMax;
+            $list_info['start_price'] = (float)$response->Item->StartPrice;
+            $list_info['quantity'] = (int)$response->Item->Quantity-(int)$response->Item->SellingStatus->QuantitySold;
+            $list_info['reserve_price'] = (float)$response->Item->ReservePrice;
+            $list_info['buy_it_now_price'] = (float)$response->Item->BuyItNowPrice;
+            $list_info['title'] = (string)$response->Item->Title;
+            $list_info['sub_title'] = (string)$response->Item->SubTitle;
+            $list_info['sku'] = (string)$response->Item->SKU;
+            $list_info['site_name'] = (string)$response->Item->Site;
+            $list_info['site'] = config('ebaysite.site_name_id')[$list_info['site_name']];
+            $list_info['quantity_sold'] = (int)$response->Item->SellingStatus->QuantitySold;
+            $list_info['store_category_id'] = (string)$response->Item->Storefront->StoreCategoryID;
+
+            //ConditionID
+            $list_info['condition_id'] = (string)$response->Item->ConditionID;
+            $list_info['condition_description'] = (string)$response->Item->ConditionDescription;
+
+            $list_info['picture_details'] = isset($response->Item->PictureDetails->PictureURL) ? json_encode((array)$response->Item->PictureDetails->PictureURL) : '';
+            //ItemSpecifics
+            $ItemSpecifics = isset($response->Item->ItemSpecifics->NameValueList) ? $response->Item->ItemSpecifics->NameValueList : '';
+            $item_specifics = [];
+            if (!empty($ItemSpecifics)) {
+                foreach ($ItemSpecifics as $specifics) {
+                    $item_specifics[(string)$specifics->Name] = (string)$specifics->Value;
+                }
+            }
+            unset($ItemSpecifics);
+
+
+            $list_info['item_specifics'] = json_encode($item_specifics);
+            unset($item_specifics);
+
+
+            $Variations = isset($response->Item->Variations->Variation) ? $response->Item->Variations->Variation : '';
+            if (!empty($Variations)) {
+                $i = 0;
+                foreach ($Variations as $variation) {
+                    $sku_info[$i]['sku'] = (string)$variation->SKU;
+                    $sku_info[$i]['start_price'] = (float)$variation->StartPrice;
+                    $sku_info[$i]['quantity'] = (int)$variation->Quantity-(int)$variation->SellingStatus->QuantitySold;
+                    $sku_info[$i]['erp_sku'] = (string)$variation->SKU;
+                    $sku_info[$i]['quantity_sold'] = isset($variation->SellingStatus->QuantitySold) ? (int)$variation->SellingStatus->QuantitySold : 0;
+                    $sku_info[$i]['item_id'] = (string)$response->Item->ItemID;
+                    $sku_info[$i]['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+                    $variation_specifics = [];
+                    if (isset($variation->VariationSpecifics)) {
+                        if (isset($variation->VariationSpecifics->NameValueList[0])) {
+                            foreach ($variation->VariationSpecifics->NameValueList as $nameList) {
+                                $variation_specifics[(string)$nameList->Name] = (string)$nameList->Value;
+                            }
+                        } else {
+                            $variation_specifics[(string)$variation->VariationSpecifics->NameValueList->Name] = (string)$variation->VariationSpecifics->NameValueList->Value;
+                        }
+                    }
+                    if (isset($variation->VariationProductListingDetails)) {
+                        $VariationProductListingDetails = (array)$variation->VariationProductListingDetails;
+                        foreach ($VariationProductListingDetails as $key => $value) {
+                            $variation_specifics[(string)$key] = (string)$value;
+                        }
+                    }
+                    $sku_info[$i]['variation_specifics'] = $variation_specifics;
+                    $i++;
+                }
+            } else {
+                $sku_info[0]['sku'] = (string)$response->Item->SKU;
+                $sku_info[0]['start_price'] = (float)$response->Item->StartPrice;;
+                $sku_info[0]['quantity'] = (int)$response->Item->Quantity-(int)$response->Item->SellingStatus->QuantitySold;
+                $sku_info[0]['erp_sku'] = (string)$response->Item->SKU;;
+                $sku_info[0]['quantity_sold'] = (int)$response->Item->SellingStatus->QuantitySold;
+                $sku_info[0]['item_id'] = (string)$response->Item->ItemID;
+                $sku_info[0]['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+            }
+            $VariationPicture = isset($response->Item->Variations->Pictures) ? $response->Item->Variations->Pictures : '';
+            $variation_picture = [];
+            if (!empty($VariationPicture)) {
+                $key = (string)$VariationPicture->VariationSpecificName;
+                foreach ($VariationPicture->VariationSpecificPictureSet as $Variation) {
+                    $variation_picture[$key][(string)$Variation->VariationSpecificValue] = (string)$Variation->PictureURL;
+                }
+            }
+            unset($VariationPicture);
+            $list_info['variation_picture'] = json_encode($variation_picture);
+            unset($variation_picture);
+            $VariationSpecificsSet = isset($response->Item->Variations->VariationSpecificsSet) ? $response->Item->Variations->VariationSpecificsSet : '';
+            $variation_specifics = [];
+            if (!empty($VariationSpecificsSet)) {
+
+                if (isset($VariationSpecificsSet->NameValueList[0])) {
+                    foreach ($VariationSpecificsSet->NameValueList as $nameList) {
+                        $key = (string)$nameList->Name;
+                        foreach ($nameList->Value as $value) {
+                            $variation_specifics[$key][] = (string)$value;
+                        }
+                    }
+                } else {
+                    $key = (string)$VariationSpecificsSet->NameValueList->Name;
+                    foreach ($VariationSpecificsSet->NameValueList->Value as $value) {
+                        $variation_specifics[$key][] = (string)$value;
+                    }
+                }
+            }
+            unset($VariationSpecificsSet);
+            $list_info['variation_specifics'] = json_encode($variation_specifics);
+            unset($variation_specifics);
+            $return_policy = [];
+            $return_policy['ReturnsAcceptedOption'] = isset($response->Item->ReturnPolicy->ReturnsAcceptedOption) ? (string)$response->Item->ReturnPolicy->ReturnsAcceptedOption : '';
+            $return_policy['ReturnsWithinOption'] = isset($response->Item->ReturnPolicy->ReturnsWithinOption) ? (string)$response->Item->ReturnPolicy->ReturnsWithinOption : '';
+            $return_policy['RefundOption'] = isset($response->Item->ReturnPolicy->RefundOption) ? (string)$response->Item->ReturnPolicy->RefundOption : '';
+            $return_policy['ShippingCostPaidByOption'] = isset($response->Item->ReturnPolicy->ShippingCostPaidByOption) ? (string)$response->Item->ReturnPolicy->ShippingCostPaidByOption : '';
+            $return_policy['Description'] = isset($response->Item->ReturnPolicy->Description) ? (string)$response->Item->ReturnPolicy->Description : '';
+            $return_policy['ExtendedHolidayReturns'] = isset($response->Item->ReturnPolicy->ExtendedHolidayReturns) ? (string)$response->Item->ReturnPolicy->ExtendedHolidayReturns : '';
+            $list_info['return_policy'] = json_encode($return_policy);
+            $shipping_details = [];
+            if (isset($response->Item->ShippingDetails->ShippingServiceOptions[0])) { //多个国内运输选项
+                foreach ($response->Item->ShippingDetails->ShippingServiceOptions as $ShippingServiceOptions) {
+                    $key = (int)$ShippingServiceOptions->ShippingServicePriority;
+                    $shipping_details['Shipping'][$key]['ShippingService'] = (string)$ShippingServiceOptions->ShippingService;
+                    $shipping_details['Shipping'][$key]['ShippingServiceCost'] = (float)$ShippingServiceOptions->ShippingServiceCost;
+                    $shipping_details['Shipping'][$key]['ShippingServiceAdditionalCost'] = (float)$ShippingServiceOptions->ShippingServiceAdditionalCost;
+                }
+            } else {
+                $ShippingServiceOptions = $response->Item->ShippingDetails->ShippingServiceOptions;
+                $shipping_details['Shipping'][1]['ShippingService'] = (string)$ShippingServiceOptions->ShippingService;
+                $shipping_details['Shipping'][1]['ShippingServiceCost'] = (float)$ShippingServiceOptions->ShippingServiceCost;
+                $shipping_details['Shipping'][1]['ShippingServiceAdditionalCost'] = (float)$ShippingServiceOptions->ShippingServiceAdditionalCost;
+            }
+            if (isset($response->Item->ShippingDetails->InternationalShippingServiceOption[0])) { //多个国际运输选项
+                foreach ($response->Item->ShippingDetails->InternationalShippingServiceOption as $InternationalShippingServiceOption) {
+                    $key = (int)$InternationalShippingServiceOption->ShippingServicePriority;
+                    $shipping_details['InternationalShipping'][$key]['ShippingService'] = (string)$InternationalShippingServiceOption->ShippingService;
+                    $shipping_details['InternationalShipping'][$key]['ShippingServiceCost'] = (float)$InternationalShippingServiceOption->ShippingServiceCost;
+                    $shipping_details['InternationalShipping'][$key]['ShippingServiceAdditionalCost'] = (float)$InternationalShippingServiceOption->ShippingServiceAdditionalCost;
+                    $shipToLocation = [];
+                    if(isset($InternationalShippingServiceOption->ShipToLocation[0])){
+                        foreach($InternationalShippingServiceOption->ShipToLocation as $location){
+                            $shipToLocation[]=(string)$location;
+                        }
+                    }else{
+                        $shipToLocation[] = (string)$InternationalShippingServiceOption->ShipToLocation;
+                    }
+
+
+                    $shipping_details['InternationalShipping'][$key]['ShipToLocation'] = $shipToLocation;
+                }
+            } else {
+                $InternationalShippingServiceOption = $response->Item->ShippingDetails->InternationalShippingServiceOption;
+                $shipping_details['InternationalShipping'][1]['ShippingService'] = (string)$InternationalShippingServiceOption->ShippingService;
+                $shipping_details['InternationalShipping'][1]['ShippingServiceCost'] = (float)$InternationalShippingServiceOption->ShippingServiceCost;
+                $shipping_details['InternationalShipping'][1]['ShippingServiceAdditionalCost'] = (float)$InternationalShippingServiceOption->ShippingServiceAdditionalCost;
+                $shipping_details['InternationalShipping'][1]['ShipToLocation'] = (string)$InternationalShippingServiceOption->ShipToLocation;
+
+
+
+            }
+            $shipping_details['ExcludeShipToLocation'] = (array)$response->Item->ShippingDetails->ExcludeShipToLocation;
+            $list_info['shipping_details'] = json_encode($shipping_details);
+            if(isset($response->Item->OutOfStockControl)&&((string)$response->Item->OutOfStockControl=='true')){
+                $list_info['is_out_control'] = 1;
+            }
+            unset($shipping_details);
+            $return['sku_info']=$sku_info;
+            $return['list_info']=$list_info;
+            return $return;
+        } else {
+            return false;
+        }
+    }
+
+    /** 开启无货在线
+     * @param $itemId
+     * @param $is_out_stock
+     * @param int $site
+     * @return mixed
+     */
+    public function changeOutOfStock($itemId,$is_out_stock,$site = 0){
+        $xml = '';
+        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><OutOfStockControl>'.$is_out_stock.'</OutOfStockControl></Item>';
+        $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
+        if ($response->Ack == 'Success') {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+    /** 处理天数
+     * @param $itemId
+     * @param $day
+     * @param int $site
+     * @return mixed
+     */
+    public function changeProcessingDays($itemId,$day,$site = 0){
+        $xml = '';
+        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><DispatchTimeMax>'.$day.'</DispatchTimeMax></Item>';
+        $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
+        if ($response->Ack == 'Success') {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+    /** 改PAYPAL
+     * @param $itemId
+     * @param $paypal
+     * @param int $site
+     * @return mixed
+     */
+    public function changePayPal($itemId,$paypal,$site = 0){
+        $xml = '';
+        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><PayPalEmailAddress>'.$paypal.'</PayPalEmailAddress></Item>';
+        $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
+        if ($response->Ack == 'Success') {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+    /** 修改在线广告的价格
+     * @param $itemId
+     * @param $sku
+     * @param int $is_mul
+     * @param int $site
+     * @return array
+     */
+    public function changePrice($itemId,$sku,$is_mul=0,$site=0){
+        $return =[];
+        $xml='';
+        if($is_mul){
+            foreach($sku as $key=> $v){
+                $xml .= '<InventoryStatus>';
+                $xml .= '<ItemID>' . $itemId . '</ItemID>';
+                $xml .= '<SKU>'.$key.'</SKU>';
+                $xml .= '<StartPrice>'.$v.'</StartPrice>';
+                $xml .= '</InventoryStatus>';
+            }
+        }else{
+            foreach($sku as $key=> $v){
+                $xml .= '<InventoryStatus>';
+                $xml .= '<ItemID>' . $itemId . '</ItemID>';
+                $xml .= '<StartPrice>'.$v.'</StartPrice>';
+                $xml .= '</InventoryStatus>';
+            }
+        }
+        $response = $this->buildEbayBody($xml, 'ReviseInventoryStatus', $site);
+        if ($response->Ack == 'Success'||$response->Ack=='Warning') {
+            $return['status'] = true;
+            $return['info'] = isset($response->Errors->LongMessage)?'Success'.(string)$response->Errors->LongMessage:'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+    /** 修改在线广告的数量 ReviseInventoryStatus
+     * @param $itemId
+     * @param $sku
+     * @param int $is_mul
+     * @param int $site
+     * @return array
+     */
+    public function changeQuantity($itemId,$sku,$is_mul=0,$site=0){
+        $return =[];
+        $xml='';
+        if($is_mul){
+            foreach($sku as $key=> $v){
+                $xml .= '<InventoryStatus>';
+                $xml .= '<ItemID>' . $itemId . '</ItemID>';
+                $xml .= '<SKU>'.$key.'</SKU>';
+                $xml .= '<Quantity>'.$v.'</Quantity>';
+                $xml .= '</InventoryStatus>';
+            }
+        }else{
+            foreach($sku as $key=> $v){
+                $xml .= '<InventoryStatus>';
+                $xml .= '<ItemID>'.$itemId.'</ItemID>';
+                $xml .= '<Quantity>'.$v.'</Quantity>';
+                $xml .= '</InventoryStatus>';
+            }
+        }
+        $response = $this->buildEbayBody($xml, 'ReviseInventoryStatus', $site);
+        if ($response->Ack == 'Success'||$response->Ack=='Warning') {
+            $return['status'] = true;
+            $return['info'] = isset($response->Errors->LongMessage)?'Success'.(string)$response->Errors->LongMessage:'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+    /** 修改在线广告的国内第一运费 和 国际第一运输运费
+     * @param $itemId
+     * @param $ship_info
+     * @param int $site
+     * @return array
+     */
+    public function changeShippingFee($itemId,$ship_info,$site=0){
+        $return =[];
+        $xml = '';
+        $xml .='<Item><ItemID>'.$itemId.'</ItemID><ShippingDetails>';
+            foreach($ship_info['Shipping'] as $key=>$shipping){
+                $xml .='<ShippingServiceOptions>';
+                $xml .='<ShippingService>'.$shipping['ShippingService'].'</ShippingService>';
+                $xml .='<ShippingServiceAdditionalCost>'.sprintf("%.2f",$shipping['ShippingServiceAdditionalCost']).'</ShippingServiceAdditionalCost>';
+                $xml .='<ShippingServiceCost>'. sprintf("%.2f",$shipping['ShippingServiceCost']).'</ShippingServiceCost>';
+                $xml .='<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
+                $xml .='</ShippingServiceOptions>';
+            }
+            foreach($ship_info['InternationalShipping'] as $key=>$shipping){
+                $xml .='<InternationalShippingServiceOption>';
+                $xml .='<ShippingService>'.$shipping['ShippingService'].'</ShippingService>';
+                $xml .='<ShippingServiceAdditionalCost>'.sprintf("%.2f",$shipping['ShippingServiceAdditionalCost']).'</ShippingServiceAdditionalCost>';
+                $xml .='<ShippingServiceCost>'.sprintf("%.2f",$shipping['ShippingServiceCost']).'</ShippingServiceCost>';
+                $xml .='<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
+                foreach($shipping['ShipToLocation'] as $location){
+                    $xml .='<ShipToLocation>'.$location.'</ShipToLocation>';
+                }
+                $xml .='</InternationalShippingServiceOption>';
+            }
+            if(!empty($ship_info['ExcludeShipToLocation'])){
+                foreach($ship_info['ExcludeShipToLocation'] as $exclude)
+                $xml .= '<ExcludeShipToLocation>'.$exclude.'</ExcludeShipToLocation>';
+            }
+        $xml .='</ShippingDetails></Item>';
+        $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
+        if ($response->Ack == 'Success') {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+    /** 下架
+     * @param $itemId
+     * @param string $reason
+     * @param int $site
+     * @return array
+     */
+    public function endItems($itemId,$reason='NotAvailable Sorry',$site = 0){
+        $return =[];
+        $xml = '';
+        $xml .= '<EndingReason>'.$reason.'</EndingReason>';
+        $xml .= '<ItemID>'.$itemId.'</ItemID>';
+        $response = $this->buildEbayBody($xml, 'EndItem', $site);
+        if ($response->Ack == 'Success') {
+            $return['status'] = true;
+            $return['info'] = 'Success';
+        }else{
+            $return['status'] = false;
+            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+        }
+        return $return;
+    }
+
+
 
     public function  buildEbayBody($xml, $call, $site = 0)
     {
@@ -937,7 +1391,6 @@ class EbayAdapter implements AdapterInterface
 
         $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
 
-
         /**SimpleXMLElement Object
         (
         [ack] => Success
@@ -1021,13 +1474,14 @@ class EbayAdapter implements AdapterInterface
                     'buyer_id'       => $buyer,
                     'item_id'        => (string)$case->item->itemId,
                     'item_title'     => (string)$case->item->itemTitle,
-                    'transaction_id' => (string)$case->item->transactionId,
+                    //'transaction_id' => (string)$case->item->transactionId,
                     'case_quantity'  => (int)$case->caseQuantity,
                     'case_amount'    => (float)$case->caseAmount,
                     'respon_date'    => (string)$case->respondByDate,
                     'creation_date'  => (string)$case->creationDate,
-                    'creation_date'  => (string)$case->creationDate,
                     'last_modify_date'=> $modify_date,
+                    'account_id'      => $this->accountID,
+                    'process_status'  => 'UNREAD'
                 ];
 
                 //获取case 详情	 获取EBP_INR，EBP_SNAD， RETURN三类的详情
@@ -1039,10 +1493,10 @@ class EbayAdapter implements AdapterInterface
                     $content = '';
                     $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
                     if($case_detail->ack == 'Success'){
-
+                        $transaction_id = ''; //交易号
                         if($case_detail->caseDetail->responseHistory){
                             $detail = (array)$case_detail->caseDetail;
-
+                            //dd($detail);
                             if(isset($detail['responseHistory'])){  //若包括消息
                                 foreach ($detail['responseHistory'] as $note){
                                     $content []= [
@@ -1054,11 +1508,11 @@ class EbayAdapter implements AdapterInterface
                                 }
                                 $content = base64_encode(serialize($content));
                             }
-                        }
+                            $transaction_id = isset($case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId) ? (string)$case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId : '';
 
+                        }
                         $case_detail_ary = [
                             'tran_price' => $case_detail->item->transactionPrice,
-                            'tran_date' => $case_detail->item->transactionDate,
                             'tran_date' => $case_detail->item->transactionDate,
                             'global_id' => $case_detail->item->globalId,
                             'open_reason'=> $case_detail->caseDetail->openReason,
@@ -1067,14 +1521,17 @@ class EbayAdapter implements AdapterInterface
                             'agreed_renfund_amount'=> $case_detail->caseDetail->agreedRefundAmount,
                             'buyer_expection'=> $case_detail->caseDetail->initialBuyerExpectation,
                             'content' => $content,
+                            'transaction_id' => $transaction_id,
                         ];
                     }
-                }
+                    $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
+                    if(empty($list_obj)){
+                        EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary)); //合并list和detail 创建记录
+                        echo 'add one';
+                    }else{
+                        echo $case->caseId->id.'exist insert into ERP';
+                    }
 
-                $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
-                if(empty($list_obj)){
-                    EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary));
-                    echo '导入成功';
                 }
             }
         }
@@ -1086,6 +1543,25 @@ class EbayAdapter implements AdapterInterface
 					<type>'.$caseType.'</type>
 				</caseId>';
     }
+
+    /**
+     * 
+     * 创建offerOtherSolution API发送的XML信息
+     *
+     * @param  [type] $caseArray [description]
+     * @return [type]            [description]
+     */
+    public function createSolutionXml($caseArray){
+        $this->input_str = '
+		<caseId>
+		<id>'.$caseArray['caseId'].'</id>
+		<type>'.$caseArray['caseType'].'</type>
+		</caseId>
+		<messageToBuyer>'.htmlspecialchars($caseArray['messageToBuyer']).'</messageToBuyer>
+		';
+    }
+
+
 
 
 }

@@ -110,6 +110,23 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
+            '收货质检' => [
+               [
+                    'name' => '包裹收货扫描',
+                    'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购收货和入库',
+                    'url' => 'recieve',
+                    'icon' => '',
+                ],
+            ],
             '发货' => [
                 [
                     'name' => '包裹',
@@ -306,21 +323,6 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '包裹收货扫描',
-                    'url' => 'purchaseList.create',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包裹收货列表',
-                    'url' => 'purchaseList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '采购收货和入库',
-                    'url' => 'recieve',
-                    'icon' => '',
-                ],
                 /*[
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
@@ -354,7 +356,14 @@ return [
                     'url' => 'channelAccount.index',
                     'icon' => '',
                 ],
-            ]
+            ],
+            '其他' =>[
+                [
+                    'name' => '产品分类渠道',
+                    'url'  => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ]
+            ],
         ],
     ],
     [
@@ -364,17 +373,17 @@ return [
         'type' => '',
         'subnavigations' => [
             [
-                'name' => 'wish草稿列表',
+                'name' => 'Wish草稿列表',
                 'url' => 'wish.index',
                 'icon' => '',
             ],
             [
-                'name' => 'wish在线数据列表',
+                'name' => 'Wish在线数据列表',
                 'url' => 'wish.indexOnlineProduct',
                 'icon' => '',
             ],
             [
-                'name' => 'wish销售代码设置',
+                'name' => 'Wish销售代码设置',
                 'url' => 'wishSellerCode.index',
                 'icon' => '',
             ],
@@ -406,11 +415,15 @@ return [
             'icon' => '',
             ],
             [
-                'name' => 'ebay站点信息',
+                'name' => 'Ebay站点信息',
                 'url' => 'ebayDetail.index',
                 'icon' => '',
             ],
-
+            [
+                'name' => 'Ebay数据监控',
+                'url' => 'ebayProduct.index',
+                'icon' => '',
+            ],
         ],
     ],
     //CRM导航

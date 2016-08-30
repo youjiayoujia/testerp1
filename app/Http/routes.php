@@ -327,6 +327,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('item', 'ItemController');
     //渠道路由
     Route::resource('channel', 'ChannelController');
+    Route::resource('CatalogRatesChannel', 'Channel\CatalogRatesChannelController');
     //渠道账号路由
     Route::any('channelAccount/getAccountUser',
         ['uses' => 'Channel\AccountController@getAccountUser', 'as' => 'getAccountUser']);
@@ -410,7 +411,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('logisticsEmailTemplate', 'Logistics\EmailTemplateController');
     Route::resource('logisticsTemplate', 'Logistics\TemplateController');
     Route::get('view/{id}', ['uses' => 'Logistics\TemplateController@view', 'as' => 'view']);
-    Route::get('all/{id}', ['uses' => 'Logistics\TemplateController@all', 'as' => 'all']);
     Route::get('templateMsg/{id}', ['uses' => 'PackageController@templateMsg', 'as' => 'templateMsg']);
     //拣货单异常
     Route::get('errorList/exportException/{arr}',
@@ -615,11 +615,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
+
     Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
     Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
     Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
     Route::resource('ebayDetail','Publish\Ebay\EbayDetailController');
-
+    Route::any('ebay/batchUpdate', ['uses' => 'Publish\Ebay\EbayDataMonitorController@batchUpdate', 'as' => 'ebay.batchUpdate']);
+    Route::any('ebay/productBatchEdit', ['uses' => 'Publish\Ebay\EbayDataMonitorController@productBatchEdit', 'as' => 'ebay.productBatchEdit']);
+    Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
 
     Route::post('wish/editOnlineProductStore',
@@ -687,7 +690,10 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('ajaxGetPlatTemplateList',
             ['uses' => 'SmtProductController@ajaxGetPlatTemplateList', 'as' => 'smtProduct.ajaxGetPlatTemplateList']);
         Route::post('ajaxSmtAfterServiceList',
-           ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']);           
+           ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']); 
+        Route::post('batchModifyProducts',
+            ['uses' => 'SmtProductController@batchModifyProducts', 'as' => 'smtProduct.batchModifyProducts']);
+  
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     
@@ -799,10 +805,12 @@ Route::group(['middleware' => 'auth'], function () {
     //标记发货规则设置
     Route::resource('orderMarkLogic', 'Order\OrderMarkLogicController');
     Route::resource('ebayCases','Message\EbayCasesController');
+    Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
 });
 
 
 //getEbayInfo
+Route::any('getEbayProduct', ['uses' => 'TestController@getEbayProduct']);
 Route::any('testPaypal', ['uses' => 'TestController@testPaypal']);
 Route::any('testLazada', ['uses' => 'TestController@testLazada']);
 Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);
@@ -815,6 +823,8 @@ Route::any('lazadaOrdersList', ['uses' => 'TestController@lazadaOrdersList']);
 Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList']);
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
+Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
+
 //spu
 Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
 Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);

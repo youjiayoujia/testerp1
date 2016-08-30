@@ -597,4 +597,45 @@ class TestController extends Controller
         }
         exit;*/
     }
+
+    public function testEbayCases(){
+        foreach (AccountModel::all() as $account) {
+            if($account->account == 'pandaserveyou'){ //测试diver
+
+                //dd($account);
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                $messageList = $channel->getCases();
+                print_r($messageList);exit;
+
+            }
+        }
+    }
+    
+    /*
+     * 同步ebay信息
+     */
+    public function getEbayProduct(){
+        $account = AccountModel::find(378);
+        if ($account) {
+            $channel = Channel::driver($account->channel->driver, $account->api_config);
+            $is_do =true;
+            $i=1;
+            while($is_do) {
+                $productList = $channel->getSellerEvents($i);
+                exit;
+                if ($productList) {
+                    foreach($productList as $key=> $itemId){
+                        $channel->getProductDetail($itemId);
+                        if($key==10){
+                            exit;
+                        }
+                    }
+                    $i++;
+                }else{
+                    $is_do=false;
+                }
+            }
+
+        }
+    }
 }

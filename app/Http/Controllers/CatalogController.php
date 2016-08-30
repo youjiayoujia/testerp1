@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\CatalogModel;
 use App\Models\ChannelModel;
 use App\Models\Catalog\CatalogChannelsModel;
+use App\Models\Channel\CatalogRatesModel;
 use Excel;
 
 class CatalogController extends Controller
@@ -30,10 +31,10 @@ class CatalogController extends Controller
      */
     public function create()
     {
-        $channels = ChannelModel::all();
+        $CatalogRatesModel = CatalogRatesModel::all();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'channels' => $channels,
+            'CatalogRatesModel' => $CatalogRatesModel,
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -230,7 +231,7 @@ class CatalogController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $channels = ChannelModel::all();
+        $channels = CatalogRatesModel::all();
         foreach ($channels as $channel){
             $channels_all[$channel->id] = $channel;
         }

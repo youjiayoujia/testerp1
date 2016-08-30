@@ -62,6 +62,10 @@
             </td>
         </tr>
      @endforeach
+     <form name="batchModify" action="{{route('smtProduct.batchModifyProducts',['_token'=>csrf_token()])}}" method="post" target="newWindow" onsubmit="openNewSpecifiedWindow('newWindow2')">
+		<input type="hidden" name="operateProductIds" value="" id="operateProductIds"/>
+		<input type="hidden" name="from" value="draft"/>
+	</form>
 @stop
 @section('tableToolButtons')
     @if($type == 'waitPost')
@@ -91,7 +95,7 @@
         
      @endif
          <div class="btn-group">
-                <a class="btn btn-success export" href="javascript:">
+                <a class="btn btn-success export" href="javascript:" id="batch_modify">
                     批量修改
                 </a>
            </div>
@@ -173,19 +177,16 @@ $(document).on('click', '#batch_post', function(){
 			type: 'post',
 			dataType: 'json',
 			async: true,
-			success:function(data){				
-				/*if(typeof(data) == "object"){
-					data = JSON.stringify(data);					
-				}*/
-				
+			success:function(data){			
+				var str = '';
 				$.each(data,function(name, value){
 					if(value.status){
-						alert(value.info);
+						str = str + value.info + " ";
 					}else{
-						alert(value.info);
+						str =str + value.info + "  ";
 					}
 				});
-				
+				layer.alert(str);
 			}
 		});	 
 
@@ -248,5 +249,27 @@ function operator(id,type,e){
 		    });
 	});   
 }
+
+//批量修改
+$('#batch_modify').on('click', function(e){
+	var productIds = $('input[name="single[]"]:checked').map(function() {
+		return $(this).val();
+	}).get().join(',');
+	if (productIds == ''){
+		layer.msg('请先选择产品');
+		return false;
+	}
+
+	//赋值下 --选择的产品就是需要批量修改的
+	$('#operateProductIds').val(productIds);
+
+	document.forms.batchModify.submit();
+});
+
+function openNewSpecifiedWindow( windowName )
+{
+	window.open('',windowName,'width=700,height=400,menubar=no,scrollbars=no');
+}
+
 </script>
 @stop

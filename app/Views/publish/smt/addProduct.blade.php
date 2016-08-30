@@ -429,8 +429,8 @@ text-align: left;
              <?php             
                 
                 //产品属性
-                //$aeopAeProductPropertys = $draft_detail ? ( $draft_detail['aeopAeProductPropertys'] ? unserialize($draft_detail['aeopAeProductPropertys']) : array() ): array();
-                $aeopAeProductPropertys = $smtApi->filterData('aeopAeProductPropertys', $draft_detail) ? unserialize($draft_detail['aeopAeProductPropertys']) : array();
+                $aeopAeProductPropertys = $draft_detail ? ( $draft_detail['aeopAeProductPropertys'] ? unserialize($draft_detail['aeopAeProductPropertys']) : array() ): array();
+                //$aeopAeProductPropertys = $smtApi->filterData('aeopAeProductPropertys', $draft_detail) ? unserialize($draft_detail['aeopAeProductPropertys']) : array();
                 //这个产品属性组装下
                 $propertyArray  = array();
                 $propertyArray2 = array();
@@ -1882,10 +1882,10 @@ $template['name'].'</option>';
                     	   $('#id').val(productId);
                        }
                    }
-                   
+                   showxbtips(data.info);
                    location.href = "{{route('smt.index')}}";
                } else {
-                   layer.alert(data.info, 'alert-warning');
+            	   showxbtips(data.info, 'alert-warning');
                }
             }
         });

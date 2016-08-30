@@ -20,7 +20,9 @@ use App\Models\Stock\InModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
 use App\Models\Order\ItemModel as OrderItemModel;
+use App\Models\Package\ItemModel as PackageItemModel;
 use Tool;
+use App\Jobs\Job;
 
 class PurchaseOrderController extends Controller
 {
@@ -651,8 +653,6 @@ class PurchaseOrderController extends Controller
             $purchase_item = $arrivel_log->purchaseItem;
             
             if($purchase_item->item->warehouse_position==''){
-                //echo json_encode($purchase_item->item->sku);exit;
-                //return view($this->viewPath . 'recieve', $response);
                 return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
             }else{
                 $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
@@ -671,6 +671,17 @@ class PurchaseOrderController extends Controller
                 $purchase_item->update($datas);
                 $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
                 
+            } 
+            //need包裹分配库存
+            $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
+            if(count($packageItem)>0){
+                foreach($packageItem->package as $package){
+                    if($package->status=='NEED'){
+                        $job = new AssignStocks($this->package);
+                        $job = $job->onQueue('assignStocks');
+                        $this->dispatch($job);
+                    }
+                }
             }       
         }
         
@@ -682,8 +693,6 @@ class PurchaseOrderController extends Controller
             }
         }
         $purchasrOrder->update(['status'=>$p_status]);
-        /*$p_id = (int)$p_id;
-        echo json_encode($p_id);*/
         $response = [
             'metas' => $this->metas(__FUNCTION__),
         ];

@@ -70,7 +70,8 @@
             <label for="url">上传审核资料</label>
                 @if($model->qualifications && $model->type == 0)
                     <br/>
-                    <filearea id="filearea"><a href="../../{{config('product.product_supplier.file_path')}}{{$model->qualifications}}" target="_blank">{{$model->qualifications}}</a>
+                    <filearea id="filearea">
+                        <a href="../../{{config('product.product_supplier.file_path')}}{{$model->qualifications}}" target="_blank">{{$model->qualifications}}</a>
                      &nbsp;&nbsp;<a class="glyphicon glyphicon-remove" href="javascript:void(0)" onclick="deleteFile()" ></a>
                     </filearea>
                 @else

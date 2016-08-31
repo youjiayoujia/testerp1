@@ -119,6 +119,22 @@
         </div>
     </div>
     <div class="panel panel-default">
+        <div class="panel-heading">运输方式</div>
+        <div class="panel-body">
+            <div class='form-group'>
+                @if($model->transport_section)
+                    @foreach($transports as $transport)
+                        <div class='col-lg-2'>
+                            <input type='text' class='form-control' value="{{ $transport->name}}">
+                        </div>
+                    @endforeach
+                @else
+                    <font size='3px' color='red'>运输没限制</font>
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
         <div class="panel-heading">日志信息</div>
         <div class="panel-body">
             <div class="col-lg-6">

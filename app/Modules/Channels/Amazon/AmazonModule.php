@@ -93,7 +93,7 @@ class AmazonModule extends BaseChannelModule
         $this->serviceUrl = "https://mws.amazonaws.com";
         $this->_config['Action'] = 'RequestReport';
         $this->_config['Version'] = '2009-01-01';
-        $this->_config['ReportType'] = '_GET_AMAZON_FULFILLED_SHIPMENTS_DATA_';
+        $this->_config['ReportType'] = '_GET_FBA_MYI_ALL_INVENTORY_DATA_';
         //var_dump($this->_config);exit;
         $tmp_url = "https://mws.amazonservices.com";
         $tmp_arr = parse_url($tmp_url);

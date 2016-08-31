@@ -691,8 +691,6 @@ class PackageModel extends BaseModel
             $amount = $this->order->amount; //订单金额
             $amountShipping = $this->order->amount_shipping; //订单运费
             $celeAdmin = $this->order->cele_admin;
-            $shipping = $this->order->shipping; //订单物流
-            $account = $this->channelAccount->account; //销售账号
             //是否通关
             if ($amount > $amountShipping && $amount > 0.1 && $celeAdmin == null) {
                 $isClearance = 1;
@@ -710,6 +708,20 @@ class PackageModel extends BaseModel
                 ->orderBy('id', 'desc')
                 ->get();
             foreach ($rules as $rule) {
+                //是否在物流方式产品分类中
+                if ($rule->catalog_section) {
+                    $catalogs = $rule->rule_catalogs_through;
+                    $flag = 0;
+                    foreach ($catalogs as $catalog) {
+                        if ($catalog->id == $this->items->item->catalog_id) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue;
+                    }
+                }
                 //是否在物流方式国家中
                 if ($rule->country_section) {
                     $countries = $rule->rule_countries_through;
@@ -730,6 +742,20 @@ class PackageModel extends BaseModel
                     $flag = 0;
                     foreach ($accounts as $account) {
                         if ($account->id == $this->channel_account_id) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue;
+                    }
+                }
+                //是否在物流方式运输方式中
+                if ($rule->transport_section) {
+                    $transports = $rule->rule_transports_through;
+                    $flag = 0;
+                    foreach ($transports as $transport) {
+                        if ($transport->id == $this->order->shipping) {
                             $flag = 1;
                             break;
                         }

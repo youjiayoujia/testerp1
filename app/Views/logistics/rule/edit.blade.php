@@ -51,8 +51,8 @@
                     <div class="panel-body">
                         <div class='form-group row'>
                         @foreach($catalogs_outer as $catalog)
-                            <div class='col-lg-3'>
-                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='3px'>{{ $catalog->name }}</font>
+                            <div class='col-lg-4'>
+                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='2px'>{{ $catalog->name }}</font>
                             </div>
                         @endforeach
                         </div>
@@ -171,8 +171,8 @@
                     <div class="panel-body">
                         <div class='form-group row'>
                             @foreach($accounts_outer as $account)
-                                <div class='col-lg-3'>
-                                    <input type='checkbox' name='accounts[]' value="{{ $account->id }}" {{ $model->innerType('account', $account->id) ? 'checked' : '' }}><font size='3px'>{{ $account->account }}</font>
+                                <div class='col-lg-6'>
+                                    <input type='checkbox' name='accounts[]' value="{{ $account->id }}" {{ $model->innerType('account', $account->id) ? 'checked' : '' }}><font size='2px'>{{ $account->account }}</font>
                                 </div>
                             @endforeach
                         </div>

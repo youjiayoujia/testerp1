@@ -110,6 +110,23 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
+            '收货质检' => [
+               [
+                    'name' => '包裹收货扫描',
+                    'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购收货和入库',
+                    'url' => 'recieve',
+                    'icon' => '',
+                ],
+            ],
             '发货' => [
                 [
                     'name' => '包裹',
@@ -224,6 +241,16 @@ return [
                     'url' => 'suggestForm.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '申请表',
+                    'url' => 'report.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '发货',
+                    'url' => 'report.shipment',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -296,21 +323,6 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '包裹收货扫描',
-                    'url' => 'purchaseList.create',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包裹收货列表',
-                    'url' => 'purchaseList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '采购收货和入库',
-                    'url' => 'recieve',
-                    'icon' => '',
-                ],
                 /*[
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
@@ -344,7 +356,14 @@ return [
                     'url' => 'channelAccount.index',
                     'icon' => '',
                 ],
-            ]
+            ],
+            '其他' =>[
+                [
+                    'name' => '产品分类渠道',
+                    'url'  => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ]
+            ],
         ],
     ],
     [

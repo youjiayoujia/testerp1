@@ -74,22 +74,6 @@ class WarehouseController extends Controller
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
-        if(request()->input('is_available') == '0')
-        {
-            if($model->positions) {
-                $positions = $model->positions;
-                foreach($positions as $position)
-                {
-                    if($position->stock) {
-                        $stocks = $position->stocks;
-                        foreach($stocks as $stock) {
-                            $stock->delete();
-                        }
-                    }
-                    $position->update(['is_available' => '0']);
-                }
-            }
-        }
         $to = serialize($model);
         $this->eventLog(request()->user()->id, '仓库信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
@@ -107,21 +91,7 @@ class WarehouseController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        if($model->position) {
-            $positions = $model->positions;
-            foreach($positions as $position)
-            {
-                if($position->stock) {
-                    $stocks = $position->stocks;
-                    foreach($stocks as $stock) {
-                        $stock->delete();
-                    }
-                }
-                $position->update(['is_available' => '0']);
-            }
-        }
         $model->destroy($id);
-        
         return redirect($this->mainIndex);
     }
 }

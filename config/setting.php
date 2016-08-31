@@ -30,6 +30,23 @@ return [
         'create' => '新增',
         'edit' => '编辑',
     ],
+
+    'oversea' => [
+        'status' => [
+            'NEW' => '未处理',
+            'FAIL' => '审核未通过',
+            'PASS' => '审核通过',
+            'PICKING' => '分拣中',
+            'PACKING' => '包装中',
+            'PACKED' => '包装完成',
+            'SHIPPED' => '已发货',
+        ],
+        'print_status' => [
+            'UNPRINT' => '未打印',
+            'PRINTED' => '已打印'
+        ]
+    ],
+
     //库位excel地址
     'excelPath' => './uploads/excel/',
     'stockExcelPath' => './uploads/stockExcel/',
@@ -125,6 +142,7 @@ return [
         'erp_sku' =>'ErpSku',
         'price.quantity_sold'=>'销量',
         'channel_name' => '渠道名称',
+        'account.account' => '渠道帐号'
     ],
 ];
 

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSmtProductUnitTable extends Migration
+class CreateBoxForms extends Migration
 {
     /**
      * Run the migrations.
@@ -12,14 +12,14 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function up()
     {
-          Schema::create('smt_product_unit', function (Blueprint $table) {
+        Schema::create('oversea_box_forms', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->comment('单位中文名称');
-            $table->string('name_en')->comment('单位英文名称');
-          
+            $table->integer('parent_id')->comment('父id')->default(0);
+            $table->string('sku')->comment('sku')->default(0);
+            $table->string('fnsku')->comment('fnsku')->default(0);
+            $table->integer('quantity')->comment('数量')->default(0);
             $table->timestamps();
             $table->softDeletes();
-
         });
     }
 
@@ -30,6 +30,6 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function down()
     {
-        Schema::drop('smt_product_unit');
+        Schema::drop('oversea_box_forms');
     }
 }

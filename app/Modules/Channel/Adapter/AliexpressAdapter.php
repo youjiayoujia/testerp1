@@ -920,7 +920,7 @@ Class AliexpressAdapter implements AdapterInterface
         $newTrSortArr = $this->combineDika($sKarr); //行显示的排序数组
   
         foreach ($newTrSortArr as $ns){
-            if (array_key_exists($ns, $skus->toArray())){                
+            if (array_key_exists($ns, $skus)){                
                 $newSkus[] = $skus[$ns];
             }
         }

@@ -177,19 +177,16 @@ $(document).on('click', '#batch_post', function(){
 			type: 'post',
 			dataType: 'json',
 			async: true,
-			success:function(data){				
-				/*if(typeof(data) == "object"){
-					data = JSON.stringify(data);					
-				}*/
-				
+			success:function(data){			
+				var str = '';
 				$.each(data,function(name, value){
 					if(value.status){
-						alert(value.info);
+						str = str + value.info + " ";
 					}else{
-						alert(value.info);
+						str =str + value.info + "  ";
 					}
 				});
-				
+				layer.alert(str);
 			}
 		});	 
 

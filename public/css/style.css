@@ -150,3 +150,7 @@ th:hover:not([data-sort=false]) {
 .table > tbody > tr.dark-danger {
     background-color: #ebcccc;
 }
+
+.tabhide{
+    display: none;
+}

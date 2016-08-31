@@ -38,9 +38,9 @@
                 运单号:
             </td>
             <td> 
-                <div>采购单状态：{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
-                <div>审核状态：{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</div><br>
-                <div>核销状态：{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</div>
+                <div>{{config('purchase.purchaseOrder.status')[$purchaseOrder->status]}}</div><br>
+                <div>{{config('purchase.purchaseOrder.examineStatus')[$purchaseOrder->examineStatus]}}</div><br>
+                <div>{{config('purchase.purchaseOrder.write_off')[$purchaseOrder->write_off]}}</div>
             </td>
             <td>{{config('purchase.purchaseOrder.close_status')[$purchaseOrder->close_status]}}</td>   
     		<td>{{ $purchaseOrder->purchaseUser?$purchaseOrder->purchaseUser->name:'' }}
@@ -171,11 +171,11 @@
 				<a href="/purchaseOrder/printOrder/{{$purchaseOrder->id}}" title="打印" class="btn btn-primary btn-xs">
                     <span class="glyphicon glyphicon-print"></span>
                 </a>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                <!-- <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $purchaseOrder->id }}"
                    data-url="{{ route('purchaseOrder.destroy', ['id' => $purchaseOrder->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span>
-                </a> 
+                </a>  -->
             </td>
         </tr>
         <!-- 模态框（Modal） -->

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Message\Issues\EbayCasesListsModel;
+use App\Modules\Channel\Adapter\EbayAdapter;
 
 class EbayCasesController extends Controller
 {
@@ -30,11 +31,11 @@ class EbayCasesController extends Controller
      */
     public function index()
     {
-        //
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
-
+            'metas'    => $this->metas(__FUNCTION__),
+            'data'     => $this->autoList($this->model),
+            'status'   => $this->model->distinct()->get(['status']),
+            'types'     => $this->model->distinct()->get(['type']),
         ];
         return view($this->viewPath . 'index',$response);
     }
@@ -80,20 +81,21 @@ class EbayCasesController extends Controller
     public function edit($id)
     {
         $data = $this->model->find($id);
-
-
-
-        $data->CaseContent;
-
         if(empty($data)){
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        if($data->process_status != 'COMPLETE' && $data->process_status != 'PROCESS'){
+            $data->process_status = 'PROCESS';
+            $data->save();
+        }
+
+        $refund_resaon = config('order.reason');
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'case'  => $data,
 
         ];
-
         return view($this->viewPath . 'edit',$response);
     }
 
@@ -119,4 +121,29 @@ class EbayCasesController extends Controller
     {
         //
     }
+
+    /**
+     * case回复：给用户回复消息
+     */
+    public function MessageToBuyer(){
+        $request = request()->input();
+        $ebay = new EbayAdapter($this->model->find(request()->input('id'))->account->ApiConfig);
+        
+    }
+
+    /**
+     * case回复：提供客户追踪信息
+     */
+    public function AddTrackingDetails(){
+        echo '回复追踪消息';
+    }
+
+    /**
+     * case 回复： 退款
+     */
+    public function RefundBuyer(){
+        echo '退款';
+    }
+
+
 }

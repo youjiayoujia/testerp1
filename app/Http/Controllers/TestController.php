@@ -20,6 +20,8 @@ class TestController extends Controller
     public function test()
     {
         $model = new AmazonModule();
-        $model->listSupplier();
+        // $id = $model->requestReport();
+        $tmp = $model->getReportRequestList('52985017044');
+        // $model->getReport('2724550960017044');
     }
 }

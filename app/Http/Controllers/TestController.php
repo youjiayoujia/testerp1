@@ -614,7 +614,6 @@ class TestController extends Controller
         foreach (AccountModel::all() as $account) {
             if($account->account == 'pandaserveyou'){ //测试diver
 
-                //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();
                 print_r($messageList);exit;

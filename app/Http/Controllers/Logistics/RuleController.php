@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Channel\AccountModel;
 use App\Models\CountriesModel;
 use App\Models\Logistics\RuleModel;
+use App\Models\Logistics\TransportModel;
 use App\Models\LogisticsModel;
 use App\Models\CatalogModel;
 use App\Models\ChannelModel;
@@ -44,6 +45,7 @@ class RuleController extends Controller
             'channels' => ChannelModel::all(), 
             'logisticsLimits' => LimitsModel::all(),
             'accounts' => AccountModel::all(),
+            'transports' => TransportModel::all(),
         ];
 
         return view($this->viewPath . 'create', $response);
@@ -83,6 +85,7 @@ class RuleController extends Controller
             'catalogs' => $model->rule_catalogs_through,
             'limits' => $model->rule_limits_through,
             'accounts' => $model->rule_accounts_through,
+            'transports' => $model->rule_transports_through,
         ];
 
         return view($this->viewPath . 'show', $response);
@@ -111,11 +114,13 @@ class RuleController extends Controller
             'channels_outer' => ChannelModel::all(), 
             'logisticsLimits_outer' => LimitsModel::all(),
             'accounts_outer' => AccountModel::all(),
+            'transports_outer' => TransportModel::all(),
             'countries' => $model->rule_countries_through,
             'channels' => $model->rule_channels_through,
             'catalogs' => $model->rule_catalogs_through,
             'limits' => $model->rule_limits_through,
             'accounts' => $model->rule_accounts_through,
+            'transports' => $model->rule_transports_through,
         ];
 
         return view($this->viewPath . 'edit', $response);
@@ -156,6 +161,7 @@ class RuleController extends Controller
         $model->rule_catalogs_through()->sync([]);
         $model->rule_countries_through()->sync([]);
         $model->rule_accounts_through()->sync([]);
+        $model->rule_transports_through()->sync([]);
         $model->destroy($id);
         return redirect($this->mainIndex);
     }

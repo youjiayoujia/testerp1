@@ -55,14 +55,14 @@ class SupplierModel extends BaseModel
             /*'purchase_id' => 'required|integer',*/
             'telephone' => 'required|max:256|digits_between:8,11',
             'purchase_time' => 'required|integer',
-            'bank_account' => 'required|string',
+            /*'bank_account' => 'required|string',*/
         ],
         'update' => [
 /*            'name' => 'required|max:128',*/
             /*'purchase_id' => 'required|integer',*/
             'telephone' => 'required|max:256|digits_between:8,11',
             'purchase_time' => 'required|integer',
-            'bank_account' => 'required|string',
+            /*'bank_account' => 'required|string',*/
 
         ]
     ];

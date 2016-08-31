@@ -1131,7 +1131,7 @@ class SmtController extends Controller{
             }
     
             //查询草稿SKU信息
-            $draft_skus = $this->smtProductSkuModel->where(['productId'=>$id])->get();
+            $draft_skus = $this->smtProductSkuModel->where('productId',$id)->get();
             if($draft_skus){
                 $draft_skus = $draft_skus->toArray();
             }

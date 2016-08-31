@@ -414,13 +414,12 @@ class ProductController extends Controller
      */
     public function ajaxReturnPrice(ZoneModel $zone,ItemModel  $items_obj,PaypalRatesModel $rates_obj){
         $return_price_array = [];
-        $shipment_fee = 0;
+        $shipment_fee = false;
         $form_ary =  request()->input();
         //dd($form_ary);exit;
         //获取运费
         if(isset($form_ary['zone_id'])){
-            $USD_obj = CurrencyModel::where('code','=','RMB')->first(); //美元汇率
-            $shipment_fee = $zone->getShipmentFee($form_ary['zone_id'],$form_ary['product_weight']) / $USD_obj->rate;
+            $shipment_fee = $zone->getShipmentFee($form_ary['zone_id'],$form_ary['product_weight']);   //人民币运费
         }
         if($shipment_fee != false){
             //获取售价
@@ -437,67 +436,76 @@ class ProductController extends Controller
                 // $item_channel->pivot->rate; //平台税率
                 $channel_fee = 0; //初始化 平台费
                 switch ($item_channel->name){
-                    case '亚马逊-美国':
+                    case '亚马逊美国':
                         //AMZ美国站平台费小于1美元，按1美元计算(珠宝及手表分类下，该条件用2美元计算)
-                        $channel_fee = $item_channel->pivot->rate;   //货币单位 美元
+
+                        $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
+
                         if($channel_fee < 1){
                             $channel_fee = 1;
-                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                            if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 2;
                             }
                         }
 
                         break;
-                    case '亚马逊-英国':
+                    case '亚马逊英国':
                         //AMZ英国站平台费小于0.5英镑，按0.5英镑计算(珠宝及手表分类下，该条件用1.25英镑计算)
-                        $channel_fee = $item_channel->pivot->rate;   //货币单位 英镑
+                        $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
+                        $GBP_obj = CurrencyModel::where('code','=','GBP')->first(); //美元英镑汇率
+                        $channel_fee = $GBP_obj->rate * $channel_fee; //平台费 GBP
                         if($channel_fee < 0.5){
                             $channel_fee = 0.5;
-                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                            if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 1.25;
                             }
                         }
-                        //兑换美元
-                        $GBP_obj = CurrencyModel::where('code','=','GBP')->first(); //美元英镑汇率
-                        $channel_fee = $channel_fee / $GBP_obj;
+                        $channel_fee = $channel_fee / $GBP_obj->rate; // 平台费USD
                         break;
-                    case '亚马逊-欧洲':
-                        $channel_fee = $item_channel->pivot->rate;   //货币单位 欧元
+                    case '亚马逊欧洲':
+                        $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
+                        $EUR_obj = CurrencyModel::where('code','=','EUR')->first(); //美元欧元汇率
+                        $channel_fee = $EUR_obj->rate * $channel_fee; //平台费 EUR
                         if($channel_fee < 0.5){
                             $channel_fee = 0.5;
-                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                            if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 1.5;
                             }
                         }
                         //兑换美元
-                        $EUR_obj = CurrencyModel::where('code','=','EUR')->first(); //美元欧元汇率
-                        $channel_fee = $channel_fee / $EUR_obj;
+                        $channel_fee = $channel_fee / $EUR_obj->rate; // 平台费USD
                         break;
-                    case '亚马逊-日本':
+                    case '亚马逊日本':
                         //AMZ日本站平台费小于30日元，按30日元计算(珠宝及手表分类下，该条件用50日元计算)
-                        $channel_fee = $item_channel->pivot->rate;   //货币单位 日元
-
+                        $channel_fee = $product_obj->purchase_price * $item_channel->pivot->rate / 100; // 平台费USD
+                        $JPY_obj = CurrencyModel::where('code','=','JPY')->first(); //美元日元汇率
+                        $channel_fee = $JPY_obj->rate * $channel_fee; //平台费 JPY
                         if($channel_fee < 30){
                             $channel_fee = 30;
-                            if($product_obj->cname == '珠宝' || $product_obj->cname == '手表'){
+                            if($this->IsWatchAndJewelry($product_obj->cname)){
                                 $channel_fee = 50;
                             }
                         }
                         //兑换美元
-                        $JPY_obj = CurrencyModel::where('code','=','JPY')->first(); //美元日元汇率
-                        $channel_fee = $channel_fee / $JPY_obj;
+                        $channel_fee = $channel_fee / $JPY_obj->rate; // 平台费USD
                         break;
                     default:
                         break;
 
                 }
 
+                $rates = $rates_obj->find(1); //paypal固定税率
+                /*
+                 *  美元售价 =分子/分母
+                 *  分子=(成本价+总运费)/美元汇率+PP固定费用
+                 *  分母=1-利润率-成交费率-PP成交费用
+                 */
+                $USD_obj = CurrencyModel::where('code','=','RMB')->first(); //美元->人民币 汇率
 
-                $rates = $rates_obj->find(1);
+                 $channel_flag_rate = empty($item_channel->pivot->flag_rate) ? 0 : $item_channel->pivot->flag_rate; //渠道固定费
 
-
-                $sale_price_big =  (($product_obj->purchase_price + $shipment_fee) + $rates->fixed_fee_big + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - $rates->transactions_fee_big );
-                $sale_price_small = (($product_obj->purchase_price + $shipment_fee) + $rates->fixed_fee_small + $channel_fee) / (1 - $form_ary['profit_id']/100 - $item_channel->pivot->rate - $rates->transactions_fee_small );
+                $sale_price_big =  (($product_obj->purchase_price + $shipment_fee)/$USD_obj->rate + $rates->fixed_fee_big + $channel_fee + $channel_flag_rate) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_big );
+                $sale_price_small = (($product_obj->purchase_price + $shipment_fee)/$USD_obj->rate + $rates->fixed_fee_small + $channel_fee + $channel_flag_rate ) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate / 100- $rates->transactions_fee_small );
 
                 $return_price_array[] = [
                     'channel_name' => $item_channel->name,
@@ -508,7 +516,6 @@ class ProductController extends Controller
         }else{
             print_r(json_encode(['status' => -2,'error_msg' => '计算运费参数错误，请检查。']));
             return;
-
         }
 
 
@@ -582,6 +589,28 @@ class ProductController extends Controller
                 return json_encode(false);
         }
         return json_encode(false);
+    }
+
+
+    /**
+     * 检查产品品类是否未手表和珠宝
+     * @param bool $name
+     * @return bool
+     */
+    public function IsWatchAndJewelry($name=false){
+
+        $effective = [
+                      '松珠','裸钻','精细珠宝','男士珠宝','首饰盒组织者',
+                      '时尚珠宝','手表','批发地段','复古与古董珠宝','儿童首饰',
+                      '订婚和婚礼','珠宝及手表--其他','手工制作，工匠珠宝','珠宝设计与维修'
+                     ];
+            if(in_array($name,$effective)){
+                return true;
+            }else{
+                return false;
+            }
+
+
     }
 
 }

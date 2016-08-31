@@ -89,6 +89,45 @@ class StockController extends Controller
         return view($this->viewPath.'showStockInfo', $response);
     }
 
+    public function overseaSku()
+    {
+        $sku = request('sku');
+        $stocks = $this->model->whereHas('warehouse', function($query){
+            $query = $query->where('type', 'fbaLocal');
+        })->whereHas('item', function($query) use ($sku){
+            $query = $query->where('sku', 'like', '%'.$sku.'%');
+        })->distinct()->with('item')->get(['item_id']);
+        $total = $stocks->count();
+        $arr = [];
+        foreach($stocks as $key => $stock) {
+            $arr[$key]['id'] = $stock->item_id;
+            $arr[$key]['text'] = $stock->item->sku;
+        }
+        if($total)
+            return json_encode(['results' => $arr, 'total' => $total]);
+        else 
+            return json_encode('false');
+    }
+
+    public function overseaPosition()
+    {
+        if(request()->ajax()) {
+            $item_id = trim(request()->input('item_id'));
+            $obj = StockModel::where(['item_id'=>$item_id])->whereHas('warehouse', function($query){
+                $query = $query->where('type', 'fbaLocal');
+            })->with('position')->get();
+            if(!count($obj)) {
+                return json_encode('none');
+            }
+            $arr[] = $obj;
+            $arr[] = $obj->first()->available_quantity;
+            
+            return json_encode($arr);
+        }
+
+        return json_encode('false');
+    }
+
     public function changePosition()
     {
         $id = request('id');

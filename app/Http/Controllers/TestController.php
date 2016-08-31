@@ -82,8 +82,10 @@ class TestController extends Controller
     {
         $account = AccountModel::find(1);
         $single = new AmazonAdapter($account->api_config);
-        $single->returnTrack([['1', '123']]);
+        // var_dump($single->requestReport());
+        $single->getReportRequestList('52994017044');
     }
+    
     // public function test2()
     // {
     //     $rows[] = [

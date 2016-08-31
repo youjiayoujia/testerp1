@@ -83,7 +83,17 @@ class TestController extends Controller
         $account = AccountModel::find(1);
         $single = new AmazonAdapter($account->api_config);
         // var_dump($single->requestReport());
-        $single->getReportRequestList('52994017044');
+        // $single->getReportRequestList('52997017044');
+        $buf = $single->getReport('2724553088017044');
+        $arr = explode("\n", $buf);
+        foreach($arr as $value) {
+            $buf = explode("\t", $value);
+            var_dump($buf);exit;
+        }
+        echo "<pre>";
+        print_r($arr);
+        echo "</pre>";
+        exit;
     }
     
     // public function test2()

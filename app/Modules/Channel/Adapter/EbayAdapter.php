@@ -1388,60 +1388,10 @@ class EbayAdapter implements AdapterInterface
                      </paginationInput>
                      <sortOrder>CREATION_DATE_DESCENDING</sortOrder>';
 
-
         $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
 
-        /**SimpleXMLElement Object
-        (
-        [ack] => Success
-        [version] => 1.3.0
-        [timestamp] => 2016-08-12T07:48:15.322Z
-        [cases] => SimpleXMLElement Object
-                                    (
-                                    [caseSummary] => Array
-                                    (
-                                    [0] => SimpleXMLElement Object
-                                    (
-                                    [caseId] => SimpleXMLElement Object
-                                    (
-                                    [id] => 685784541
-                                    [type] => UPI
-                                    )
-
-                                    [user] => SimpleXMLElement Object
-                                    (
-                                    [userId] => pandaserveyou
-                                    [role] => SELLER
-                                    )
-
-                                    [otherParty] => SimpleXMLElement Object
-                                    (
-                                    [userId] => deis-br
-                                    [role] => BUYER
-                                    )
-
-                                    [status] => SimpleXMLElement Object
-                                    (
-                                    [UPIStatus] => OTHER_PARTY_RESPONSE_DUE
-                                    )
-
-                                    [item] => SimpleXMLElement Object
-                                    (
-                                    [itemId] => 172218797476
-                                    [itemTitle] => Original Andrea Hair Growth Pilatory Essence Oil Baldness Alopecia anti Loss
-                                    [transactionId] => 1578377865007
-                                    )
-
-                                    [caseQuantity] => 2
-                                    [caseAmount] => 1.85
-                                    [respondByDate] => 2016-10-08T16:12:15.000Z
-                                    [creationDate] => 2016-08-11T22:11:10.000Z
-                                    [lastModifiedDate] => 2016-08-11T22:11:10.000Z
-        )
-         */
         if($usercases->ack == 'Success'){
-
-
+            
             foreach ($usercases->cases->caseSummary as $case){
 
                 $buyer = '';
@@ -1474,7 +1424,7 @@ class EbayAdapter implements AdapterInterface
                     'buyer_id'       => $buyer,
                     'item_id'        => (string)$case->item->itemId,
                     'item_title'     => (string)$case->item->itemTitle,
-                    //'transaction_id' => (string)$case->item->transactionId,
+                    'transaction_id' => (string)$case->item->transactionId,
                     'case_quantity'  => (int)$case->caseQuantity,
                     'case_amount'    => (float)$case->caseAmount,
                     'respon_date'    => (string)$case->respondByDate,
@@ -1493,7 +1443,7 @@ class EbayAdapter implements AdapterInterface
                     $content = '';
                     $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
                     if($case_detail->ack == 'Success'){
-                        $transaction_id = ''; //交易号
+                       // $transaction_id = ''; //paypal交易号
                         if($case_detail->caseDetail->responseHistory){
                             $detail = (array)$case_detail->caseDetail;
                             //dd($detail);
@@ -1508,7 +1458,7 @@ class EbayAdapter implements AdapterInterface
                                 }
                                 $content = base64_encode(serialize($content));
                             }
-                            $transaction_id = isset($case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId) ? (string)$case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId : '';
+                           // $transaction_id = isset($case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId) ? (string)$case_detail->caseDetail->paymentDetail->moneyMovement->paypalTransactionId : '';
 
                         }
                         $case_detail_ary = [
@@ -1521,7 +1471,7 @@ class EbayAdapter implements AdapterInterface
                             'agreed_renfund_amount'=> $case_detail->caseDetail->agreedRefundAmount,
                             'buyer_expection'=> $case_detail->caseDetail->initialBuyerExpectation,
                             'content' => $content,
-                            'transaction_id' => $transaction_id,
+                            //'transaction_id' => $transaction_id,
                         ];
                     }
                     $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();

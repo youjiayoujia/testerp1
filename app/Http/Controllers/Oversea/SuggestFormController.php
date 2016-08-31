@@ -9,7 +9,7 @@
 namespace App\Http\Controllers\Oversea;
 
 use App\Http\Controllers\Controller;
-use App\Models\Oversea\SuggestFormModel;;
+use App\Models\Oversea\SuggestFormModel;
 use App\Models\Oversea\ChannelSaleModel;
 
 class SuggestFormController extends Controller

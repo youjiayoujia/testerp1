@@ -292,6 +292,8 @@ class ReportController extends Controller
     {
         $id = request('id');
         $model = $this->model->find($id);
+        $model->quantity += 1;
+        $model->save();
         if(!$model) {
             return json_encode(false);
         }
@@ -349,12 +351,30 @@ class ReportController extends Controller
         $boxNum = request('boxNum');
         $logistics = request('logistics');
         $tracking_no = request('tracking_no');
-        $box = BoxModel::where(['boxNum' => $boxNum, 'status' => 'PACKING'])->first();
+        $box = BoxModel::where(['boxNum' => $boxNum, 'status' => '0'])->first();
         if(!$box) {
             return json_encode(false);
         }
         $box->update(['logistics_id' => $logistics, 'status' => '1', 'tracking_no' => $tracking_no]);
-
+        $report = $box->report;
+        $flag = 1;
+        foreach($report->boxes as $singleBox) {
+            if(!$singleBox->status) {
+                $flag = 0;
+            }
+            foreach($singleBox->forms as $form) {
+                $reportForm = $report->forms()->where('sku', $form->sku)->first();
+                if(!$reportForm) {
+                    continue;
+                }
+                $reportForm->item->holdout($reportForm->warehouse_position_id, $form->quantity, 'FBA', $report->id);
+                $reportForm->out_quantity += $form->quantity;
+                $reportForm->save();
+            }
+        }
+        if($flag) {
+            $report->update(['status' => 'SHIPPED']);
+        }
         return json_encode(true);
     }
 }

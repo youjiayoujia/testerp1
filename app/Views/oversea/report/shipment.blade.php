@@ -39,7 +39,7 @@ $(document).ready(function(){
                 {boxNum:boxNum, logistics:logistics, tracking_no:tracking_no},
                     function(result){
                         if(result == 'false') {
-                            $('.buf').html("<font color='red'>根据shipmentId找不到对应箱子</font>");
+                            $('.buf').html("<font color='red'>根据boxNum找不到对应箱子</font>");
                             return false;
                         }
                         $('.buf').html("<font color='green'>已发货</font>");

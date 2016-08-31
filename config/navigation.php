@@ -251,6 +251,11 @@ return [
                     'url' => 'report.shipment',
                     'icon' => '',
                 ],
+                [
+                    'name' => '海外仓箱子',
+                    'url' => 'box.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

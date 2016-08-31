@@ -176,7 +176,7 @@
                                             </tr>
                                         </table>
                                         <div class=" text-right">
-                                            <input type="button" value="取 消" class="form-control btn-info" data-dismiss="modal" aria-label="Close">
+                                            <input type="button" value="取 消" class="form-control btn-default" data-dismiss="modal" aria-label="Close">
                                             <input type="button" name="查询" class="form-control btn-primary" placeholder="属性名" value="查 询" onclick="doComputePrice({{$item->id}})">
                                         </div>
                                         <br/>

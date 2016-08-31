@@ -128,7 +128,12 @@ class EbayCasesController extends Controller
     public function MessageToBuyer(){
         $request = request()->input();
         $ebay = new EbayAdapter($this->model->find(request()->input('id'))->account->ApiConfig);
-        
+        $case_obj = $this->model->find($request['id']);
+        $caseAry['caseType'] = $case_obj->type;
+        $caseAry['caseId'] = $case_obj->id;
+        $caseAry['messageToBuyer'] = trim($request['messgae_content']);
+
+        $ebay->offerOtherSolution($caseAry);
     }
 
     /**

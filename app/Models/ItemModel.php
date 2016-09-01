@@ -476,8 +476,6 @@ class ItemModel extends BaseModel
     public function createPurchaseNeedData()
     {
         ini_set('memory_limit', '2048M');
-        //echo '<pre>';
-        //print_r($this->find(['1','2']));exit;
         $items = $this->all();
         $requireModel = new RequireModel();
         foreach ($items as $item) {
@@ -597,10 +595,16 @@ class ItemModel extends BaseModel
             $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
                 ->whereIn('packages.status', ['NEED'])
                 ->where('package_items.item_id', $item['id'])
-                ->first(['packages.created_at'])
-                ->toArray();
+                ->first(['packages.created_at']);
+
+            if($firstNeedItem){
+                $firstNeedItem = $firstNeedItem->toArray();
+                $data['owe_day'] = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+            }else{
+                $data['owe_day'] = 0;
+            }
             //继续添加字段插入
-            $data['owe_day'] = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+            
             
             if ($thisModel) {
                 $thisModel->update($data);

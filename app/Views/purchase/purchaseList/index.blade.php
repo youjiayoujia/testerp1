@@ -21,7 +21,7 @@
             <td>{{$_result->user?$_result->user->name:''}}</td>
             <td>{{$_result->updated_at}}</td>
             <td>
-                <a href="javascript:" class="btn btn-danger btn-xs delete_item" data-id="{{$_result->id}}">
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item" data-url="{{ route('purchaseList.destroy', ['id' => $_result->id]) }}" data-id="{{$_result->id}}">
                     <span class="glyphicon glyphicon-trash"></span> 删除关联
                 </a>
             </td>

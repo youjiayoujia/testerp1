@@ -12,7 +12,7 @@ class CreateSmtProductSkusTable extends Migration
      */
     public function up()
     {
-       Schema::create('smt_product_skus', function (Blueprint $table) {
+        Schema::create('smt_product_skus', function (Blueprint $table) {
             $table->increments('id');
             $table->string('skuMark')->comment('格式为 productId-skuCode，主要是更新数据时候做唯一标识');
             $table->string('skuCode')->comment('产品SKU');
@@ -47,6 +47,6 @@ class CreateSmtProductSkusTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('smt_product_skus');
     }
 }

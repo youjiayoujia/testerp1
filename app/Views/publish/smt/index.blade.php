@@ -22,9 +22,10 @@
                         $imagesUrlArr = explode(';', $smtProductList->details->imageURLs);
                         $firstImageURL = array_shift($imagesUrlArr);
                     }
-
                 ?>
+                 @if(!empty($firstImageURL))
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
+                 @endif
             </td>
             <td>{{ $smtProductList->accounts ? $smtProductList->accounts->account : ''}}</td>
             <td>

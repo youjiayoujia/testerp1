@@ -69,7 +69,7 @@ table.gridtable td {
 						<td>{{$item->sku}}</td>
 						<td>{{$item->item->name}}<br><span style="color:gray">到货时间：{{$log->created_at}}</span><br><span style="color:gray">质检时间：{{$log->quality_time}}</span></td>
 						<td></td>
-						<td>{{$log->arrival_num}}</td>
+						<td><input type="text" name="arrival_num_{{$log->id}}" id="arrival_num_{{$log->id}}" value="{{$log->arrival_num}}"></td>
 						<td><input type="text" {{$log->good_num?'disabled':''}} name="goodnum_{{$log->id}}" id="goodnum_{{$log->id}}" value="{{$log->good_num}}"></td>
 						<td><input type="text" name="badnum_{{$log->id}}" id="badnum_{{$log->id}}" value="{{$log->bad_num}}"></td>
 					</tr>
@@ -86,7 +86,7 @@ table.gridtable td {
 	</tr>
 	<tr>
 		<td>订单采购员</td>
-		<td>{{$purchase_order->purchaseUser->name}}</td>
+		<td>{{$purchase_order->purchaseUser?$purchase_order->purchaseUser->name:''}}</td>
 	</tr>
 
 	<tr>
@@ -113,32 +113,29 @@ table.gridtable td {
         var data = "";
         var p_id = "{{$id}}";
         var url = "{{ route('updateArriveLog') }}";
+        var flag = 0;
+        var num_contorl = 0;
 		$("input[name^='goodnum_']").each(function(){
 			id = $(this).attr("name");
             if($(this).val()!=0&&($(this).attr("disabled")!='disabled')){
                 id = id.substr(8);
+                if($("#goodnum_"+id).val()!=$("#badnum_"+id).val()){
+					flag = 1;
+				}
+				if($("#arrival_num_"+id).val()<$("#goodnum_"+id).val()){
+					num_contorl = 1;
+				}
                 data += id+":"+$(this).val();
                 data +=":"+$('#badnum_'+id).val()+",";
             }   
 　　　　});
-		window.location.href=url+"?data="+data+"&p_id="+p_id;
-
-        /*$.ajax({
-            url:"{{ route('updateArriveLog') }}",
-            data:{data:data,p_id:$("#ajaxp_id").val()},
-            dataType:'json',
-            type:'get',
-            success:function(result){
-                if(typeof(result)=='string'){
-                    alert("sku:"+result+"库位不存在");return;
-                }
-                $("#p_id").val(result);
-                javascript:document.getElementById("p_id").focus();
-                var e = jQuery.Event("keydown");//模拟一个键盘事件
-                e.keyCode =13;//keyCode=13是回车
-                $("#p_id").trigger(e); 
-            }
-        });   */                      
+		if(flag==1){
+			alert('两次输入数量不一致');return;
+		}
+		if(num_contorl==1){
+			alert('优品数量大于到货数量');return;
+		}
+		window.location.href=url+"?data="+data+"&p_id="+p_id;                    
 	});
 </script>
 

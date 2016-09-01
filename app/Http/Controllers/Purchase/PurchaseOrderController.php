@@ -656,7 +656,7 @@ class PurchaseOrderController extends Controller
                 return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
             }else{
                 $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
-                $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
+                $filed['bad_num'] =  $filed['good_num'];
                 $filed['quality_time'] = date('Y-m-d H:i:s',time());
                 
                 $arrivel_log->update($filed);

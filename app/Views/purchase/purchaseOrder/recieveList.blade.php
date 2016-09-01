@@ -89,7 +89,7 @@ table.gridtable td {
 	</tr>
 	<tr>
 		<td>订单采购员</td>
-		<td>{{$purchase_order->purchaseUser->name}}</td>
+		<td>{{$purchase_order->purchaseUser?$purchase_order->purchaseUser->name:''}}</td>
 	</tr>
 	<tr>
 		<td>收货记录</td>

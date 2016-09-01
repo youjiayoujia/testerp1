@@ -21,7 +21,7 @@
 
                 </div>
             </div>
-            <div class="panel panel-primary">
+            <div class="panel panel-danger">
                 <div class="panel-heading">
                     处理
                 </div>
@@ -29,61 +29,78 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <ul class="nav nav-tabs nav-justified">
-                                <li role="presentation" class="process-tab" tabindex="1"><a href="javascript:void(0);">Add tracking details</a></li>
-                                <li role="presentation" class="process-tab" tabindex="2"><a href="javascript:void(0);" >Refund the buyer</a></li>
-                                <li role="presentation" class="process-tab" tabindex="3"><a href="javascript:void(0);">Send a message to the buyer</a></li>
+                            <ul class="nav nav-pills" role="tablist">
+                                <li role="presentation" class="active"><a href="#tracking" aria-controls="tracking" role="tab" data-toggle="tab">Add tracking details</a></li>
+                                <li role="presentation"><a  href="#refund" aria-controls="refund" role="tab" data-toggle="tab" >Refund the buyer</a></li>
+                                <li role="presentation"><a  href="#message" aria-controls="message" role="tab" data-toggle="tab">Send a message to the buyer</a></li>
                             </ul>
                         </div>
                     </div>
                     <!--case 操作表单begin-->
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="panel panel-success tab-content tabhide" tabindex="1">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Add tracking details:</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <form class="form-horizontal">
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="optionsRadios" value="option1" checked="">
-                                                有跟踪号
-                                            </label>
-                                        </div>
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="optionsRadios" value="option1" checked="">
-                                                没有跟踪号
-                                            </label>
-                                        </div>
+                        <div class="col-lg-12 tab-content">
 
-                                        <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">trackingNumber*</label>
-                                            <div class="col-sm-10">
-                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="inputEmail3" class="col-sm-2 control-label">carrier*</label>
-                                            <div class="col-sm-10">
-                                                <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
-                                            </div>
-                                        </div>
-                                        <label>comments: </label>
-                                        <textarea class="form-control" rows="3"></textarea>
-                                        <div class="row">
-                                            <div class="col-lg-12">
 
-                                            <button type="button" class="btn btn-primary" style="float: right">提交</button>
+                            <div tabindex="1" id="tracking" role="tabpanel" class="tab-pane active">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Add tracking details</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <form class="form-horizontal track-form" action="{{route('AddTrackingDetails')}}">
+                                            {!! csrf_field() !!}
+                                            <input type="hidden" name="is_tracked" value="10"><!--是否追踪号-->
+                                            <input type="hidden" name="id" value="{{$case->id}}">
+                                            <div>
+                                                <ul class="nav nav-tabs" role="tablist">
+                                                    <li role="presentation" class="active istracked" track="10"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">有追踪号</a></li>
+                                                    <li role="presentation" class="istracked" track="-10"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">没有追踪号</a></li>
+                                                </ul>
+                                                <div class="tab-content">
+                                                    <div role="tabpanel" class="tab-pane active" id="home">
+                                                        <div class="form-group">
+                                                            <label for="inputEmail3" class="col-sm-2 control-label">trackingNumber<small class="text-danger glyphicon glyphicon-asterisk"></small></label>
+                                                            <div class="col-sm-10">
+                                                                <input type="email" class="form-control" id="inputEmail3" name="trackingNumber" placeholder="trackingNumber">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="inputEmail3" class="col-sm-2 control-label">carrier<small class="text-danger glyphicon glyphicon-asterisk"></small></label>
+                                                            <div class="col-sm-10">
+                                                                <input type="email" class="form-control" id="inputEmail3" name="carrier"  placeholder="carrier">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div role="tabpanel" class="tab-pane" id="profile">
+                                                        <div class="form-group">
+                                                            <label for="inputEmail3" class="col-sm-2 control-label">carrierUsed<small class="text-danger glyphicon glyphicon-asterisk"></small></label>
+                                                            <div class="col-sm-10">
+                                                                <input type="email" class="form-control" id="inputEmail3" name="carrierUsed" placeholder="carrierUsed">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="inputEmail3" class="col-sm-2 control-label">shippedDate<small class="text-danger glyphicon glyphicon-asterisk"></small></label>
+                                                            <div class="col-sm-10">
+                                                                <input type="email" class="form-control" id="inputEmail3" name="shippedDate" placeholder="shippedDate">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </form>
+                                            <label>comments: </label>
+                                            <textarea class="form-control" rows="3" name="comments"></textarea>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <button type="button" class="btn btn-success do-tracking" style="float: right">提交</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
 
 
-                            <div class="panel panel-danger tab-content tabhide" tabindex="2">
+                            <div role="tabpanel" class="tab-pane panel-default" id="refund">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Refund the buyer:</h3>
                                 </div>
@@ -100,14 +117,14 @@
                                         <div class="row">
                                             <div class="col-lg-12">
 
-                                                <button type="button" class="btn btn-primary" style="float: right">提交</button>
+                                                <button type="button" class="btn btn-success" style="float: right">提交</button>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
 
-                            <div class="panel panel-success tab-content tabhide" tabindex="3">
+                            <div role="tabpanel" class="tab-pane panel-default" id="message">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Send a message to the buyer:</h3>
                                 </div>
@@ -120,7 +137,7 @@
                                         <div class="row">
                                             <div class="col-lg-12">
 
-                                                <button type="submit" class="btn btn-primary" style="float: right">提交</button>
+                                                <button type="submit" class="btn btn-success" style="float: right">提交</button>
                                             </div>
                                         </div>
                                     </form>
@@ -158,7 +175,7 @@
                 </div>
             </div>
 
-        @if($case->related_order_id)
+        @if($case_order_info)
                 @include('message.ebay_cases.order')
             @else
                 <div class="panel panel-primary">
@@ -169,7 +186,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <p>无订单信息</p>
+                                <p>ERP暂时没有匹配到订单信息┭┮﹏┭┮</p>
                             </div>
 
                         </div>
@@ -181,7 +198,33 @@
 @section('pageJs')
     <script>
         $(document).ready(function(){
-            $('.process-tab').click(function () {
+            $('.istracked').click(function(){
+                var is_tracked = $(this).attr('track');
+                $("input[name='is_tracked']").val(is_tracked);
+            });
+            $('.do-tracking').click(function(){
+
+                if($("input[name='is_tracked']").val() == 10){
+                    if($("input[name='trackingNumber']").val() == ''){
+                        alert('trackingNumber 不能为空');
+                    }
+                    if($("input[name='carrier']").val() == ''){
+                        alert('carrier 不能为空');
+                    }
+                }else if($("input[name='is_tracked']").val() == -10){
+                    if($("input[name='carrierUsed']").val() == ''){
+                        alert('carrierUsed 不能为空');
+                    }
+                    if($("input[name='shippedDate']").val() == ''){
+                        alert('shippedDate 不能为空');
+                    }
+                }
+
+                $('.track-form').submit();
+            });
+
+
+/*            $('.process-tab').click(function () {
                 var index = $(this).attr('tabindex');
                 $('.process-tab').removeClass('active');
                 $(this).addClass('active');
@@ -192,7 +235,9 @@
                         return;
                     }
                 });
-            });
+            });*/
+
+
         });
     </script>
 

@@ -88,12 +88,10 @@ class EbayCasesController extends Controller
             $data->process_status = 'PROCESS';
             $data->save();
         }
-
-        $refund_resaon = config('order.reason');
-
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'case'  => $data,
+            'case_order_info' => $data->CaseOrderInfo
 
         ];
         return view($this->viewPath . 'edit',$response);
@@ -133,14 +131,50 @@ class EbayCasesController extends Controller
         $caseAry['caseId'] = $case_obj->id;
         $caseAry['messageToBuyer'] = trim($request['messgae_content']);
 
-        $ebay->offerOtherSolution($caseAry);
+        if($ebay->offerOtherSolution($caseAry)){
+            $case_obj->assign_id = request()->user()->id;
+            $case_obj->process_status = 'COMPLETE';
+            $case_obj->save();
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '处理成功.'));
+
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '处理失败.'));
+        }
     }
 
     /**
      * case回复：提供客户追踪信息
      */
     public function AddTrackingDetails(){
-        echo '回复追踪消息';
+
+        $request = request()->input();
+        $ebay = new EbayAdapter($this->model->find($request['id'])->account->ApiConfig);
+        $case_obj = $this->model->find($request['id']);
+
+        $caseId = $case_obj->id;
+        $caseType = $case_obj->type;
+        $comments = $request['comments'];
+
+
+        if($request['is_tracked'] == 10){
+            $trackingNumber = $request['trackingNumber'];
+            $carrierUsed = $request['carrier'];
+            $result = $ebay->provideTrackingInfo(compact('caseId','caseType','comments','trackingNumber','carrierUsed'));
+
+        }else{
+            $carrierUsed = $request['carrierUsed'];
+            $shippedDate = $request['shippedDate'];
+            $result = $ebay->provideTrackingInfo(compact('caseId','caseType','comments','shippedDate','carrierUsed'));
+        }
+
+        if($result){
+            $case_obj->assign_id = request()->user()->id;
+            $case_obj->process_status = 'COMPLETE';
+            $case_obj->save();
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '处理成功.'));
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '处理失败.'));
+        }
     }
 
     /**

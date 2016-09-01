@@ -14,6 +14,7 @@ use App\Models\Message\ReplyModel;
 use App\Jobs\SendMessages;
 use App\Models\Channel\AccountModel as Channel_account;
 use Translation;
+use Excel;
 
 
 class MessageController extends Controller
@@ -366,6 +367,37 @@ class MessageController extends Controller
         }
 
     }*/
+
+    /**
+     * 速卖通批量留言（订单留言）
+     */
+    public function aliexpressReturnOrderMessages(){
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            //'rates' => $paypalRates->find(1), //获得paypal税
+        ];
+
+        return view('message.others.index',$response);
+
+    }
+
+
+    public function aliexpressCsvFormat(){
+        $rows = [
+            [
+                '订单号'=>'',
+            ]
+        ];
+
+        $this->exportExcel($rows, 'smtCSV');
+    }
+    public function  exportExcel($rows,$name){
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
 
 
 

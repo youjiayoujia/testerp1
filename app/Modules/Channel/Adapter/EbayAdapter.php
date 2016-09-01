@@ -1438,9 +1438,75 @@ class EbayAdapter implements AdapterInterface
     public function offerOtherSolution($paramAry){
 
         $xml = $this->createSolutionXml($paramAry);
-        $content = $this->buildEbayBody($xml,'offerOtherSolution');
-        dd($content);
+        $content = $this->buildcaseBody($xml,'offerOtherSolution');
+        if($content->Ack =='Success' || $content->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
 
+    }
+
+    /**
+     * 创建跟踪号输入
+     * @param unknown $caseArray
+     */
+    public function createTrackingXml($caseArray){
+        $this->input_str = '
+			  <carrierUsed>'.$caseArray['carrierUsed'].'</carrierUsed>
+			  <caseId>
+			    <id>'.$caseArray['caseId'].'</id>
+			    <type>'.$caseArray['caseType'].'</type>
+			  </caseId>
+			  <trackingNumber>'.$caseArray['trackingNumber'].'</trackingNumber>
+			  ';
+        if ($caseArray['comments']) {
+            $this->input_str .= '<comments>'.htmlspecialchars($caseArray['comments']).'</comments>';
+        }
+    }
+
+    /**
+     * 提供追踪信息
+     */
+    public function provideTrackingInfo($paramAry){
+        $xml     = $this->createTrackingXml($paramAry);
+        $content = $this->buildcaseBody($xml,'provideTrackingInfo');
+        if($content->Ack =='Success' || $content->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 提供发货信息
+     */
+    public function provideShippingInfo($paramAry){
+        $xml     = $this->createShippingXml($paramAry);
+        $content = $this->buildcaseBody($xml,'provideShippingInfo');
+        if($content->Ack =='Success' || $content->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 创建发货相关的XML信息
+     * @param unknown $array
+     */
+    public function createShippingXml($array){
+        $shippedDate = date('Y-m-d\TH:i:s.000\Z', strtotime($array['shippedDate']));
+        $this->input_str = '
+			  <carrierUsed>'.$array['carrierUsed'].'</carrierUsed>
+			  <caseId>
+			    <id>'.$array['caseId'].'</id>
+			    <type>'.$array['caseType'].'</type>
+			  </caseId>
+			  <shippedDate>'.$shippedDate.'</shippedDate>';
+        if ($array['comments']) {
+            $this->input_str .= '<comments>'.htmlspecialchars($array['comments']).'</comments>';
+        }
     }
 
 

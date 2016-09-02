@@ -502,6 +502,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('updateNormal', ['uses' => 'OrderController@updateNormal', 'as' => 'updateNormal']);
     Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
     Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
+
+    Route::post('editUpdate/{id}', ['uses' => 'OrderController@editUpdate', 'as' => 'editUpdate']);
+
     Route::any('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::get('remark/{id}', ['uses' => 'OrderController@remark', 'as' => 'remark']);
     Route::post('remarkUpdate/{id}', ['uses' => 'OrderController@remarkUpdate', 'as' => 'remarkUpdate']);

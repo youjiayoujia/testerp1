@@ -157,9 +157,15 @@
                 </div>
                 <div class="col-lg-6 text-right">
                     @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW' || $order->status == 'NEED')
-                        <a href="{{ route('order.edit', ['id'=>$order->id]) }}" class="btn btn-danger btn-xs">
-                            <span class="glyphicon glyphicon-pencil"></span> 编辑
-                        </a>
+                        {{--<a href="{{ route('order.edit', ['id'=>$order->id]) }}" class="btn btn-danger btn-xs">--}}
+                            {{--<span class="glyphicon glyphicon-pencil"></span> 编辑--}}
+                        {{--</a>--}}
+                        <button class="btn btn-danger btn-xs"
+                                data-toggle="modal"
+                                data-target="#edit{{ $order->id }}"
+                                title="编辑">
+                            <span class="glyphicon glyphicon-link"></span> 编辑
+                        </button>
                     @endif
                     @if($order->status == 'UNPAID' || $order->status == 'PAID' || $order->status == 'PREPARED' || $order->status == 'REVIEW')
                         <button class="btn btn-danger btn-xs"
@@ -223,6 +229,82 @@
                 </div>
             </td>
         </tr>
+        <div class="modal fade" id="edit{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{ route('editUpdate', ['id' => $order->id])}}" method="POST">
+                        {!! csrf_field() !!}
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_firstname" class='control-label'>发货名字</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_firstname" placeholder="发货名字" name='shipping_firstname' value="{{ old('shipping_firstname') ? old('shipping_firstname') : $order->shipping_firstname }}">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_lastname" class='control-label'>发货姓氏</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_lastname" placeholder="发货姓氏" name='shipping_lastname' value="{{ old('shipping_lastname') ? old('shipping_lastname') : $order->shipping_lastname }}">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_phone" class='control-label'>发货电话</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_phone" placeholder="发货电话" name='shipping_phone' value="{{ old('shipping_phone') ? old('shipping_phone') : $order->shipping_phone }}">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_country" class='control-label'>国家</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select name="shipping_country" class="form-control shipping_country" id="shipping_country">
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->code }}" {{ $country->code == $order->shipping_country ? 'selected' : ''}}>{{ $country->code }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_country" class='control-label'>发货国家/地区</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <select name="shipping_country" class="form-control shipping_country" id="shipping_country">
+                                        @foreach($countries as $country)
+                                            <option value="{{ $country->code }}" {{ $country->code == $order->shipping_country ? 'selected' : ''}}>{{ $country->code }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_zipcode" class='control-label'>发货邮编</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_zipcode" placeholder="发货邮编" name='shipping_zipcode' value="{{ old('shipping_zipcode') ? old('shipping_zipcode') : $order->shipping_zipcode }}">
+                                </div>
+                                <div class="form-group col-lg-2">
+                                    <label for="shipping_address" class='control-label'>发货地址</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_address" placeholder="发货地址" name='shipping_address' value="{{ old('shipping_address') ? old('shipping_address') : $order->shipping_address }}">
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <label for="shipping_city" class='control-label'>发货城市</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_city" placeholder="发货城市" name='shipping_city' value="{{ old('shipping_city') ? old('shipping_city') : $order->shipping_city }}">
+                                </div>
+                                <div class="form-group col-lg-12">
+                                    <label for="shipping_state" class='control-label'>发货省/州</label>
+                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
+                                    <input class="form-control" id="shipping_state" placeholder="发货省/州" name='shipping_state' value="{{ old('shipping_state') ? old('shipping_state') : $order->shipping_state }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="modal fade" id="withdraw{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

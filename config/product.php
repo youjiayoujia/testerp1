@@ -42,4 +42,11 @@ return [
         'type'=>['线下','线上','做货'],
 		'file_path' => 'uploads/product/supplier/', //审核文件路径
 	],
+
+	'supplier_examine_status' =>[
+		'0' => '待审核',
+		'1' => '待复审',
+		'2' => '审核通过',
+		'3' => '审核不通过',
+	],
 ];

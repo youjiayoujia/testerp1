@@ -471,10 +471,17 @@ return [
             ],
             '平台批量操作' => [
                 [
-                    'name' => '速卖通批量留言（订单留言）',
+                    'name' => 'Aliexpress批量订单留言',
                     'url' => 'aliexpressReturnOrderMessages',
                     'icon' => '',
                 ],
+            ],
+            '评论列表' =>[
+                [
+                    'name' => 'Ebay feedBack',
+                    'url'  => 'ebayFeedBack.index',
+                    'icon' => '',
+                ]
             ],
         ]
     ],

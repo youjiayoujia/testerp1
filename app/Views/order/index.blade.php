@@ -77,12 +77,22 @@
                     <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
                 </address>
                 @if($order->customer_remark)
+                    <div class="divider"></div>
                     <div class="text-danger">
                         {{ $order->customer_remark }}
                     </div>
                 @endif
+                @if($order->remarks)
+                    @foreach($order->remarks as $remark)
+                        <div class="divider"></div>
+                        <div class="text-danger">
+                            {{ $remark->remark }}
+                        </div>
+                    @endforeach
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
+                        <div class="divider"></div>
                         <div class="text-danger">
                             <label>退款ID:</label>{{ $refund->id }}
                             <label>退款金额:</label>{{ $refund->refund_amount }}

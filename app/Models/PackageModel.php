@@ -705,8 +705,7 @@ class PackageModel extends BaseModel
                 $query->where('order_amount_from', '<=', $amount)
                     ->where('order_amount_to', '>=', $amount)->orwhere('order_amount_section', '0');
             })->where(['is_clearance' => $isClearance])
-                ->orderBy('id', 'desc')
-                ->get();
+              ->get();
             foreach ($rules as $rule) {
                 //是否在物流方式产品分类中
                 if ($rule->catalog_section) {

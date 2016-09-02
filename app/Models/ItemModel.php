@@ -501,7 +501,8 @@ class ItemModel extends BaseModel
             $quantity = $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->get() ? $requireModel->where('is_require', 1)->where('item_id',
                 $item->id)->sum('quantity') : 0;
-            $xu_kucun = $data['all_quantity'] - $quantity;
+            //$xu_kucun = $data['all_quantity'] - $quantity;
+            $xu_kucun = $item->available_quantity;
             //7天销量
             $sevenDaySellNum = OrderItemModel::leftjoin('orders', 'orders.id', '=', 'order_items.order_id')
                 ->whereIn('orders.status', ['PAID', 'PREPARED', 'NEED', 'PACKED', 'SHIPPED', 'COMPLETE'])

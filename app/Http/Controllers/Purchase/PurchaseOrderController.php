@@ -589,11 +589,12 @@ class PurchaseOrderController extends Controller
             $purchaseOrderModel = $this->model->find($p_id);
             foreach($purchaseOrderModel->purchaseItem as $p_item){
                 if($p_item->purchase_num!=$p_item->arrival_num){
+                    $arrival_num = $p_item->lack_num;
                     $p_item->update(['arrival_num'=>$p_item->purchase_num,'lack_num'=>0]);
                     $filed['purchase_item_id'] = $p_item->id;
                     $filed['sku'] = $p_item->sku;
                     $filed['status'] =2;
-                    $filed['arrival_num'] = $p_item->lack_num;
+                    $filed['arrival_num'] = $arrival_num;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
             }

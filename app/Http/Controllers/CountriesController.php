@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CountriesModel;
+use BarcodeGen;
 use App\Models\CountriesSortModel;
 
 class CountriesController extends Controller
@@ -42,5 +43,10 @@ class CountriesController extends Controller
             'sorts' => CountriesSortModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
+    }
+
+    public function barcodePrint($content, $height = 50, $orientation = 'horizontal', $type = 'code128', $length = 1)
+    {
+        return BarcodeGen::generate([$content, $height, $orientation, $type, $length])->response('png');
     }
 }

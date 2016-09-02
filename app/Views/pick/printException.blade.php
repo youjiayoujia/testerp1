@@ -4,9 +4,7 @@
     <div class='text-center'>
     <div class='row'>
         <div class='form-group col-lg-offset-3'>
-            <div class='col-lg-offset-3'>
-            {{ print_r($barcodes[$key]) }}
-            </div>
+            <img src="{{ route('barcodeGen', ['content' => $key ])}}">
             <p>包裹号:{{ $key }}</p>
         </div>
     </div>

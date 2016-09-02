@@ -23,6 +23,7 @@
     <th class="sort" data-field="fourteen_sales">近14天销量</th>
     <th class="sort" data-field="seven_sales">近7天销量</th>
     <th class="sort" data-field="need_purchase_num">建议采购数量</th>
+    <th class="sort" data-field="owe_day">欠货天数</th>
     <th>趋势系数</th>
     <th>平均利润率</th>
     <th class="sort" data-field="refund_rate">退款率</th>
@@ -52,6 +53,7 @@
             <td>{{$item->fourteen_sales}}</td>
             <td>{{$item->seven_sales}}</td>
             <td>{{$item->need_purchase_num>0?$item->need_purchase_num:0}}</td>
+            <td>{{$item->owe_day}}</td>
             <td>@if($item->thrend == 1)
             	上涨
             @elseif($item->thrend == 2)

@@ -148,7 +148,6 @@ class SupplierController extends Controller
     }
 	
 	public function beExamine(){
-        dd(request()->input());
 		$channel_id = request()->input('channel_id');
         $product_id_str = request()->input('product_ids');
         $product_id_arr = explode(',',$product_id_str);

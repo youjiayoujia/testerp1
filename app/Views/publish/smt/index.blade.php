@@ -22,9 +22,10 @@
                         $imagesUrlArr = explode(';', $smtProductList->details->imageURLs);
                         $firstImageURL = array_shift($imagesUrlArr);
                     }
-
                 ?>
+                 @if(!empty($firstImageURL))
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
+                 @endif
             </td>
             <td>{{ $smtProductList->accounts ? $smtProductList->accounts->account : ''}}</td>
             <td>
@@ -62,7 +63,7 @@
             </td>
         </tr>
      @endforeach
-     <form name="batchModify" action="{{route('smtProduct.batchModifyProducts',['_token'=>csrf_token()])}}" method="post" target="newWindow" onsubmit="openNewSpecifiedWindow('newWindow2')">
+     <form name="batchModify" action="{{route('smtProduct.batchModifyProducts',['_token'=>csrf_token()])}}" method="post" target="_blank" onsubmit="openNewSpecifiedWindow('newWindow2')">
 		<input type="hidden" name="operateProductIds" value="" id="operateProductIds"/>
 		<input type="hidden" name="from" value="draft"/>
 	</form>
@@ -262,7 +263,6 @@ $('#batch_modify').on('click', function(e){
 
 	//赋值下 --选择的产品就是需要批量修改的
 	$('#operateProductIds').val(productIds);
-
 	document.forms.batchModify.submit();
 });
 

@@ -1207,87 +1207,6 @@ class EbayAdapter implements AdapterInterface
 
             if(isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message){
-                    /*
-                        message 数据格式 样例
-                        SimpleXMLElement Object
-                        (
-                            [Sender] => priya.suryavanshi
-                            [SendingUserID] => 774805616
-                            [RecipientUserID] => wintrade9
-                            [SendToName] => wintrade9
-                            [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                            [MessageID] => 80473418726
-                            [ExternalMessageID] => 1340213839016
-                            [Flagged] => false
-                            [Read] => false
-                            [ReceiveDate] => 2016-08-04T09:16:42.000Z
-                            [ExpirationDate] => 2017-08-04T09:16:42.000Z
-                            [ItemID] => 222123713737
-                            [ResponseDetails] => SimpleXMLElement Object
-                            (
-                                 [ResponseEnabled] => true
-                                 [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
-                            )
-
-                            [Folder] => SimpleXMLElement Object
-                            (
-                                [FolderID] => 0
-                             )
-
-                            [MessageType] => ResponseToASQQuestion
-                            [Replied] => false
-                            [ItemEndTime] => 2016-08-18T08:16:14.000Z
-                            [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                        )*/
-
-
-
-                    /**消息详情
-                     *  call GetMyMessages
-                     * SimpleXMLElement Object
-                    (
-                    [Timestamp] => 2016-08-12T03:16:10.880Z
-                    [Ack] => Success
-                    [Version] => 963
-                    [Build] => E963_CORE_APIMSG_17909225_R1
-                    [Messages] => SimpleXMLElement Object
-                    (
-                    [Message] => SimpleXMLElement Object
-                    (
-                            [Timestamp] => 2016-08-12T03:16:10.880Z
-                            [Ack] => Success
-                            [Version] => 963
-                            [Build] => E963_CORE_APIMSG_17909225_R1
-                            [Messages] => SimpleXMLElement Object
-                            (
-                            [Message] => SimpleXMLElement Object
-                            (
-                            [Sender] => csfeedback@ebay.com
-                            [RecipientUserID] => wintrade9
-                            [Subject] => wintrade9锛屾垜浠湪姝ゆ彁閱掓偍鐢?3 鍒嗛挓鏃堕棿鍒嗕韩鎮ㄥ杩戞湡 eBay 鏀寔浣撻獙鐨勫弽棣堟剰瑙
-
-                            [MessageID] => 80624164816
-                            [Text] =>          邮件富文本（html）
-                            [Flagged] => false
-                            [Read] => false
-                            [ReceiveDate] => 2016-08-12T01:39:56.000Z
-                            [ExpirationDate] => 2016-08-13T07:00:00.000Z
-                            [ResponseDetails] => SimpleXMLElement Object
-                            (
-                            [ResponseEnabled] => false
-                            )
-
-                            [Folder] => SimpleXMLElement Object
-                            (
-                            [FolderID] => 0
-                            )
-
-                            [Replied] => false
-                            )
-                     * )
-
-                     */
-
                     $member_xlm_dom = '
                                     <WarningLevel>High</WarningLevel>
                                     <DetailLevel>ReturnMessages</DetailLevel>
@@ -1510,6 +1429,89 @@ class EbayAdapter implements AdapterInterface
 		<messageToBuyer>'.htmlspecialchars($caseArray['messageToBuyer']).'</messageToBuyer>
 		';
     }
+
+    /**
+     * 提供其他的解决方案      send a message
+     * @param  [type] $caseArray [description]
+     * @return [type]            [description]
+     */
+    public function offerOtherSolution($paramAry){
+
+        $xml = $this->createSolutionXml($paramAry);
+        $content = $this->buildcaseBody($xml,'offerOtherSolution');
+        if($content->Ack =='Success' || $content->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    /**
+     * 创建跟踪号输入
+     * @param unknown $caseArray
+     */
+    public function createTrackingXml($caseArray){
+        $this->input_str = '
+			  <carrierUsed>'.$caseArray['carrierUsed'].'</carrierUsed>
+			  <caseId>
+			    <id>'.$caseArray['caseId'].'</id>
+			    <type>'.$caseArray['caseType'].'</type>
+			  </caseId>
+			  <trackingNumber>'.$caseArray['trackingNumber'].'</trackingNumber>
+			  ';
+        if ($caseArray['comments']) {
+            $this->input_str .= '<comments>'.htmlspecialchars($caseArray['comments']).'</comments>';
+        }
+    }
+
+    /**
+     * 提供追踪信息
+     */
+    public function provideTrackingInfo($paramAry){
+        $xml     = $this->createTrackingXml($paramAry);
+        $content = $this->buildcaseBody($xml,'provideTrackingInfo');
+        if($content->Ack =='Success' || $content->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 提供发货信息
+     */
+    public function provideShippingInfo($paramAry){
+        $xml     = $this->createShippingXml($paramAry);
+        $content = $this->buildcaseBody($xml,'provideShippingInfo');
+        if($content->Ack =='Success' || $content->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 创建发货相关的XML信息
+     * @param unknown $array
+     */
+    public function createShippingXml($array){
+        $shippedDate = date('Y-m-d\TH:i:s.000\Z', strtotime($array['shippedDate']));
+        $this->input_str = '
+			  <carrierUsed>'.$array['carrierUsed'].'</carrierUsed>
+			  <caseId>
+			    <id>'.$array['caseId'].'</id>
+			    <type>'.$array['caseType'].'</type>
+			  </caseId>
+			  <shippedDate>'.$shippedDate.'</shippedDate>';
+        if ($array['comments']) {
+            $this->input_str .= '<comments>'.htmlspecialchars($array['comments']).'</comments>';
+        }
+    }
+
+
+
+
 
 
 

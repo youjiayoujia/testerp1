@@ -6,6 +6,7 @@
  */
 namespace App\Http\Controllers;
 use App\Models\Message\MessageModel;
+use App\Models\OrderModel;
 use App\Models\UserModel;
 use App\Models\Message\Template\TypeModel;
 use App\Models\Message\AccountModel;
@@ -14,6 +15,8 @@ use App\Models\Message\ReplyModel;
 use App\Jobs\SendMessages;
 use App\Models\Channel\AccountModel as Channel_account;
 use Translation;
+use Excel;
+use App\Modules\Channel\Adapter\AliexpressAdapter;
 
 
 class MessageController extends Controller
@@ -366,6 +369,72 @@ class MessageController extends Controller
         }
 
     }*/
+
+    /**
+     * 速卖通批量留言（订单留言）
+     */
+    public function aliexpressReturnOrderMessages(){
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            //'rates' => $paypalRates->find(1), //获得paypal税
+        ];
+
+        return view('message.others.index',$response);
+
+    }
+
+
+    public function aliexpressCsvFormat(){
+        $rows = [
+            [
+                'aliexpress orderID'=>'',
+            ]
+        ];
+
+        $this->exportExcel($rows, 'smtCSV');
+    }
+    public function  exportExcel($rows,$name){
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+    public function doSendAliexpressMessages(){
+        $comments = request()->input('comments');
+        $total = 0;
+        $error_order_id = '';
+
+        if(isset($_FILES['excel']['tmp_name']) && !empty($comments) ){
+            $channel_orderids = Excel::load($_FILES['excel']['tmp_name'])->all()->toArray();
+            if(is_array($channel_orderids)){
+                foreach ($channel_orderids as $channel_orderid){
+                    $channel_ordernum = (string)$channel_orderid['aliexpress_orderid'];
+                    if(!empty($channel_ordernum)){
+                        $order_obj = OrderModel::where('channel_ordernum','=',$channel_ordernum)->first();
+
+                        if(!empty($order_obj)){
+                            $Adapter = new AliexpressAdapter($order_obj->channelAccount->apiConfig);
+                            $orderId = $order_obj->channel_ordernum;
+                            $buyId   = $order_obj->aliexpress_loginId;
+                            $result  = $Adapter->addMessageNew(compact('orderId','buyId','comments'));
+                            $result ? $total += 1 : $error_order_id = $error_order_id.$orderId.';' ;
+                        }
+                    }
+                }
+            }
+        }else{
+            return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('danger', '文件和评论内容不能为空'));
+        }
+
+
+        return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('success', '成功发送'.$total.'条数据;失败条目aliexpress订单号:('.$error_order_id.')'));
+
+
+
+
+
+    }
 
 
 

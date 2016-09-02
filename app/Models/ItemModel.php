@@ -7,6 +7,7 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Purchase\RequireModel;
 use App\Models\Purchase\PurchasesModel;
 use App\Models\Order\ItemModel as OrderItemModel;
+use App\Models\Package\ItemModel as PackageItemModel;
 use Exception;
 
 class ItemModel extends BaseModel
@@ -474,18 +475,9 @@ class ItemModel extends BaseModel
 
     public function createPurchaseNeedData()
     {
+        ini_set('memory_limit', '2048M');
         $items = $this->all();
         $requireModel = new RequireModel();
-        /*$array = RequireModel::groupBy('item_id')
-            ->selectRaw('item_id, sum(quantity) as sum')
-            ->where('is_require', 1)
-            ->get()
-            ->toArray();
-
-        foreach ($array as $require_key => $require_val) {
-            $requireArray[$require_val['item_id']] = $require_val['sum'];
-        }*/
-
         foreach ($items as $item) {
             $data['item_id'] = $item->id;
             $data['sku'] = $item->sku;
@@ -493,9 +485,11 @@ class ItemModel extends BaseModel
             $zaitu_num = 0;
             foreach ($item->purchase as $purchaseItem) {
                 if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
-                    if (!$purchaseItem->purchaseOrder->write_off) {
-                        $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
-                    }
+                    if($purchaseItem->purchaseOrder){
+                        if (!$purchaseItem->purchaseOrder->write_off) {
+                            $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
+                        }
+                    }  
                 }
             }
             $data['zaitu_num'] = $zaitu_num;
@@ -597,6 +591,20 @@ class ItemModel extends BaseModel
             $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
             $data['user_id'] = $item->product->purchase_adminer;
+
+            $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+                ->whereIn('packages.status', ['NEED'])
+                ->where('package_items.item_id', $item['id'])
+                ->first(['packages.created_at']);
+
+            if($firstNeedItem){
+                $firstNeedItem = $firstNeedItem->toArray();
+                $data['owe_day'] = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+            }else{
+                $data['owe_day'] = 0;
+            }
+            //继续添加字段插入
+            
             
             if ($thisModel) {
                 $thisModel->update($data);

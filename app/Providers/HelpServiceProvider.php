@@ -35,8 +35,8 @@ class HelpServiceProvider extends ServiceProvider
             return new \App\Helps\Translation;
         });
 
-        // $this->app->singleton('barcodeGen', function () {
-        //     return new \PicoPrime\BarcodeGen\BarcodeGenerator;
-        // });
+        $this->app->singleton('barcodeGen', function () {
+            return new \PicoPrime\BarcodeGen\BarcodeGenerator;
+        });
     }
 }

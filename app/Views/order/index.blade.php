@@ -96,7 +96,8 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>
+                            <div class="col-lg-1">{{ $orderItem->item ? $orderItem->item->product_id : '' }}</div>
+                            {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             @if($orderItem->item)
                                 <div class="col-lg-2">
                                     <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">

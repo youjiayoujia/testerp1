@@ -16,7 +16,7 @@ use App\Models\Channel\AccountModel;
 use App\Modules\Channel\ChannelModule;
 use App\Models\ChannelModel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
-
+use App\Models\Publish\Smt\smtProductUnit;
 
 
 class SmtProductController extends Controller
@@ -37,6 +37,7 @@ class SmtProductController extends Controller
         $this->Smt_service_template_model = new smtServiceTemplate();
         $this->Smt_template_model = new smtTemplates();
         $this->Smt_product_model = new smtProductModule();
+        $this->smt_product_unit_model = new smtProductUnit();
         $this->viewPath = 'publish.smt.';
         $this->channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
     }
@@ -531,30 +532,17 @@ class SmtProductController extends Controller
                     'error' => '选择的产品无账号或不在同一个账号，请重新选择'
                 );
             }else {
-                dd($productList);
-                $productList   = $product_info->toArray();
-                $productDetail = $productList->details->toArray();
-        
-        
-                
-                $freightList = smtFreightTemplate::where('token_id',$token_id)->get();
-                 
-                //服务模板
-                $serveList = smtServiceTemplate::where('token_id',$token_id)->get();
-                
-                //产品分组
-                $product_group = new SmtProductController();
-                $groupList = $product_group->getLocalProductGroupList($token_id);                
-                //单位列表
-                $unitList = $this->smtProductUnitModel->getAllUnit();                                                                                 
+                $productList   = $product_info;                                                  
+                $product_group = new SmtProductController();    //产品分组
+                $groupList = $product_group->getLocalProductGroupList($token_id); 
+                $freightList = $product_group->getLocalFreightTemplateList($token_id);                              
+                $unitList = $this->smt_product_unit_model->getAllUnit();       //单位列表                                                                            
         
                 $data = array( //传过去的数据
                     'productIds'    => $productIds,
-                    'productList'   => $productList,
-                    'productDetail' => $productDetail,
+                    'productList'   => $productList,                   
                     'unitList'      => $unitList,
-                    'freightList'   => $freightList,
-                    'serveList'     => $serveList,
+                    'freightList'   => $freightList,                    
                     'groupList'     => $groupList,
                     'token_id'      => $token_id,
                     'from'          => $from
@@ -565,7 +553,7 @@ class SmtProductController extends Controller
                 'error' => '请先选择要修改的产品'
             );
         }
-     
+
         return view($this->viewPath . 'smtProduct/batch_modify', $data);
     }
     

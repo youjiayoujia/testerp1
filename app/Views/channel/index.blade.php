@@ -3,10 +3,6 @@
     <th class="sort" data-field="id">ID</th>
     <th>名称</th>
     <th>API类型</th>
-    <th>固定费用类型</th>
-    <th>固定费用值</th>
-    <th>费率类型</th>
-    <th>费率值</th>
     <th>描述</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th class="sort" data-field="updated_at">更新时间</th>
@@ -18,10 +14,6 @@
             <td>{{ $channel->id }}</td>
             <td>{{ $channel->name }}</td>
             <td>{{ $channel->drive }}</td>
-            <td>{{ $channel->flat_rate == 'channel' ? '渠道' : '品类' }}</td>
-            <td>{{ $channel->flat_rate_value }}</td>
-            <td>{{ $channel->rate == 'channel' ? '渠道' : '品类' }}</td>
-            <td>{{ $channel->rate_value }}</td>
             <td>{{ $channel->brief }}</td>
             <td>{{ $channel->created_at }}</td>
             <td>{{ $channel->updated_at }}</td>

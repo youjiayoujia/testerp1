@@ -43,4 +43,9 @@ class BoxFormModel extends BaseModel
             'sectionSelect' => [],
         ];
     }
+
+    public function item()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'sku', 'sku');
+    }
 }

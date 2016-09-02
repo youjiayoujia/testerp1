@@ -251,6 +251,16 @@ return [
                     'url' => 'report.shipment',
                     'icon' => '',
                 ],
+                [
+                    'name' => '海外仓箱子',
+                    'url' => 'box.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'fba库存信息',
+                    'url' => 'fbaStock.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

@@ -1,7 +1,7 @@
 <?php
 namespace App\Helps;
 
-use DNS1D;
+use BarcodeGen;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Tool
@@ -17,9 +17,9 @@ class Tool
         }
     }
 
-    public function barcodePrint($content, $type = 'C128', $width = '3', $height='33')
+    public function barcodePrint($content, $height = 50, $orientation = 'horizontal', $type = 'code128', $length = 1)
     {
-        echo DNS1D::getBarcodeSVG($content, $type, $width, $height);
+        return BarcodeGen::generate([$content, $height, $orientation, $type, $length])->response('png');
     }
 
     public function getFileExtension($fileName)

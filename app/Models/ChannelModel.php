@@ -28,10 +28,6 @@ class ChannelModel extends BaseModel
         'driver',
         'brief',
         'created_at',
-        'flat_rate',
-        'rate',
-        'flat_rate_value',
-        'rate_value'
     ];
 
     public $searchFields = ['name' => '名称'];

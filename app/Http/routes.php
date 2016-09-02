@@ -16,7 +16,8 @@
  *
  */
 Route::get('test1', 'TestController@testYw');
-Route::get('test2', 'TestController@test2');
+Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
+Route::get('test3', 'TestController@test3');
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -31,6 +32,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('countries', 'CountriesController');
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
+
 
     Route::resource('eventChild', 'EventChildController');
     //3宝package
@@ -56,6 +58,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('stockUnhold', 'Stock\UnholdController');
     //入库
     Route::resource('stockIn', 'Stock\InController');
+    //Fba库存信息
+    Route::get('fbaStock/updateStock', ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
+    Route::resource('fbaStock', 'Oversea\StockController');
+
+    //海外仓箱子
+    Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
+    Route::resource('box', 'Oversea\BoxController');
     //申请表
     Route::get('report/sendExec', ['uses' => 'Oversea\ReportController@sendExec', 'as' => 'report.sendExec']);
     Route::get('report/shipment', ['uses' => 'Oversea\ReportController@shipment', 'as' => 'report.shipment']);
@@ -420,6 +429,9 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::get('pickList/pickCode/{id}',
+        ['uses' => 'PickListController@pickCode', 'as' => 'pickList.pickCode']);
+
     Route::post('pickList/confirmPickBy',
         ['uses' => 'PickListController@confirmPickBy', 'as' => 'pickList.confirmPickBy']);
     Route::any('pickList/printPackageDetails/{id}/{status}',

@@ -28,7 +28,8 @@
         <tr class="collapse" id="collapseExample{{ $log->id }}">
             <td colspan="10">
                 @if($log->data)
-                    @foreach(unserialize($log->data) as $key => $value)
+
+                    @foreach(unserialize(preg_replace('!s:(\d+):"(.*?)";!se', '"s:".strlen("$2").":\"$2\";"', $log->data)) as $key => $value)
                         @if(is_array($value))
                             <dl class="dl-horizontal">
                                 <dt>{{ $key }}</dt>

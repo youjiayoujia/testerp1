@@ -225,7 +225,7 @@ return [
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
         'Translation' => App\Facades\Translation::class,
-        'BarcodeGen' => App\Facades\BarcodeGen::class,
+        // 'BarcodeGen' => App\Facades\BarcodeGen::class,
     ],
 
 ];

@@ -63,7 +63,8 @@ class TestController extends Controller
 
     public function test2()
     {
-        return Tool::barcodePrint('test1111');
+        // return Tool::barcodePrint('test1111');
+        var_dump(unserialize(''));
     }
 
     public function test3()

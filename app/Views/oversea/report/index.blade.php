@@ -28,7 +28,7 @@
             <td>{{ config('setting.oversea.print_status')[$report->print_status] }}</td>
             <td>{{ $report->inStock_status ? $report->inStock_status : '暂无入库状态' }}</td>
             <td>{{ $report->quantity }}</td>
-            <td>{{ $report->from_address }}</td>
+            <td>{{ $report->shipping_address }}</td>
             <td>{{ $report->account ? $report->account->account : '' }}</td>
             <td>{{ $report->created_at }}</td>
             <td>

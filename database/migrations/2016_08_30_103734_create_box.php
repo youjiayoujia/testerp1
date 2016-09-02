@@ -15,6 +15,7 @@ class CreateBox extends Migration
         Schema::create('oversea_boxs', function (Blueprint $table) {
             $table->increments('id');
             $table->string('boxNum')->comment('箱号')->default(NULL);
+            $table->float('fee')->commen('物流费')->default(0);
             $table->integer('logistics_id')->comment('物流方式')->default(0);
             $table->string('tracking_no')->comment('追踪号')->default(NULL);
             $table->decimal('length', 6, 2)->comment('长')->default(0);

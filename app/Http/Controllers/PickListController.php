@@ -152,6 +152,25 @@ class PickListController extends Controller
         return view($this->viewPath.'choosePickList', $response);
     }
 
+    public function pickCode($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $arr = [];
+        foreach($model->pickListItem as $single) {
+            $arr[] = Tool::barcodePrint($single->items->sku);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'arr' => $arr,
+        ];
+
+        return view($this->viewPath.'code', $response);
+    }
+
     public function processBase()
     {
         $flag = request('flag');

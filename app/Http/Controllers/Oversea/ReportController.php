@@ -94,11 +94,30 @@ class ReportController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $all_weight = 0;
+        $volumn = 0;
+        $arr = [];
+        foreach($model->forms as $form) {
+            $all_weight += $form->out_quantity * $form->item->cost;
+        }
+        foreach($model->boxes as $box) {
+            $sum = 0;
+            foreach($box->forms as $form) {
+                $sum += $form->item->cost * $form->quantity;
+            }
+            $arr[] = $sum;
+            $volumn += ($box->length * $box->width * $box->height)/5000;
+        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'forms' => $model->forms,
-            'boxes' => $model->boxes
+            'boxes' => $model->boxes,
+            'all_weight' => $all_weight,
+            'actual_weight' => $model->forms->sum('weight'),
+            'volumn' => $volumn,
+            'fee' => $model->boxes->sum('fee'),
+            'arr' => $arr,
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -292,10 +311,12 @@ class ReportController extends Controller
     {
         $id = request('id');
         $model = $this->model->find($id);
+        $model->quantity += 1;
+        $model->save();
         if(!$model) {
             return json_encode(false);
         }
-        $box = $model->boxes()->create(['length' => 2, 'width' => 2, 'height' => 2, 'boxNum' => 'box'.strtotime('now')]);
+        $box = $model->boxes()->create(['boxNum' => 'box'.strtotime('now')]);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $box,
@@ -349,12 +370,31 @@ class ReportController extends Controller
         $boxNum = request('boxNum');
         $logistics = request('logistics');
         $tracking_no = request('tracking_no');
-        $box = BoxModel::where(['boxNum' => $boxNum, 'status' => 'PACKING'])->first();
+        $fee = request('fee');
+        $box = BoxModel::where(['boxNum' => $boxNum, 'status' => '0'])->first();
         if(!$box) {
             return json_encode(false);
         }
         $box->update(['logistics_id' => $logistics, 'status' => '1', 'tracking_no' => $tracking_no]);
-
+        $report = $box->report;
+        $flag = 1;
+        foreach($report->boxes as $singleBox) {
+            if(!$singleBox->status) {
+                $flag = 0;
+            }
+            foreach($singleBox->forms as $form) {
+                $reportForm = $report->forms()->where('sku', $form->sku)->first();
+                if(!$reportForm) {
+                    continue;
+                }
+                $reportForm->item->holdout($reportForm->warehouse_position_id, $form->quantity, 'FBA', $report->id);
+                $reportForm->out_quantity += $form->quantity;
+                $reportForm->save();
+            }
+        }
+        if($flag) {
+            $report->update(['status' => 'SHIPPED']);
+        }
         return json_encode(true);
     }
 }

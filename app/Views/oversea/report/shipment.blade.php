@@ -2,21 +2,25 @@
 @section('formAction') {{ route('report.store') }} @stop
 @section('formBody')
 <div class='row'>
-    <div class="form-group col-lg-4">
-        <label>boxNum</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+    <div class="form-group col-lg-3">
+        <label>boxNum</label>
         <input type='text' class="form-control boxNum" name='boxNum'>
     </div>
-    <div class="form-group col-lg-4">
-        <label>物流方式</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+    <div class="form-group col-lg-3">
+        <label>物流方式</label>
         <select name='logistics_id' class='form-control logistics'>
         @foreach($logisticses as $logistics)
             <option value="{{ $logistics->id }}">{{ $logistics->code }}</option>
         @endforeach
         </select>
     </div>
-    <div class="form-group col-lg-4">
-        <label>追踪号</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+    <div class="form-group col-lg-3">
+        <label>追踪号</label>
         <input type='text' class="form-control tracking_no" name='tracking_no'>
+    </div>
+    <div class="form-group col-lg-3">
+        <label>物流费</label>
+        <input type='text' class="form-control fee" name='fee'>
     </div>
 </div>
 @stop
@@ -33,10 +37,11 @@ $(document).ready(function(){
         boxNum = $('.boxNum').val();
         logistics = $('.logistics').val();
         tracking_no = $('.tracking_no').val();
+        fee = $('.fee').val();
         if(boxNum && logistics && tracking_no) {
             $.get(
                 "{{ route('report.sendExec')}}",
-                {boxNum:boxNum, logistics:logistics, tracking_no:tracking_no},
+                {boxNum:boxNum, logistics:logistics, tracking_no:tracking_no, fee:fee},
                     function(result){
                         if(result == 'false') {
                             $('.buf').html("<font color='red'>根据boxNum找不到对应箱子</font>");

@@ -22,6 +22,21 @@ class BoxController extends Controller
         $this->viewPath = 'oversea.box.';
     }
 
+    public function boxSub()
+    {
+        $id = request('boxId');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return json_encode(false);
+        }
+        $weight = request('weight');
+        $volumn = request('volumn');
+        $arr = explode('*', $volumn);
+        $model->update(['length' => $arr[0], 'width' => $arr[1], 'height' => $arr[2], 'weight' => $weight]);
+        
+        return json_encode(true);
+    }
+
     /**
      * 详情
      *

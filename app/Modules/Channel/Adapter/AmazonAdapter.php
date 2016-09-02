@@ -89,8 +89,10 @@ Class AmazonAdapter implements AdapterInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
         $res = curl_exec($ch);
         curl_close($ch);
-        var_dump($res);exit;
         $result_string = simplexml_load_string($res);
+        echo "<pre>";
+        print_r($result_string);
+        echo "</pre>";
         $reportRequestId = $result_string->RequestReportResult->ReportRequestInfo->ReportRequestId;
 
         return (string)$reportRequestId;
@@ -128,8 +130,9 @@ Class AmazonAdapter implements AdapterInterface
         echo "<pre>";
         print_r($result_string);
         echo "</pre>";
+        $reportId = (string)$result_string->GetReportRequestListResult->ReportRequestInfo->GeneratedReportId;
 
-        return $result_string;
+        return $reportId;
     }
 
     public function getReport($id) 

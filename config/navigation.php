@@ -256,6 +256,11 @@ return [
                     'url' => 'box.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => 'fba库存信息',
+                    'url' => 'fbaStock.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

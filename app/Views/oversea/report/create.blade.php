@@ -3,12 +3,12 @@
 @section('formBody')
 <div class='row'>
     <div class="form-group col-lg-4">
-        <label for="fba_address" class='control-label'>fba地址</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+        <label for="fba_address" class='control-label'>fba地址</label>
         <input type='text' class="form-control" placeholder="fba地址" name='fba_address' value="{{ old('fba_address') }}">
     </div>
-    <div class="form-group col-lg-4">
-        <label for='from_address'>发货地址</label>
-        <input type='text' class="form-control" placeholder="发货地址" name='from_address' value="{{ old('from_address') }}">
+    <div class='form-group col-lg-4'> 
+        <label for='渠道帐号'>shipment名称</label> 
+        <input type='text' class="form-control" placeholder="shipment 名称" name='shipment_name' value="{{ old('shipment_name') }}">
     </div>
     <div class='form-group col-lg-4'> 
         <label for='渠道帐号'>渠道帐号</label> 
@@ -20,24 +20,55 @@
     </div>
 </div>
 <div class='row'>
-    <div class="form-group col-lg-3">
-        <label for="fba_address" class='control-label'>plan Id</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
+    <div class="form-group col-lg-4">
+        <label for="fba_address" class='control-label'>plan Id</label>
         <input type='text' class="form-control" placeholder="plan Id" name='plan_id' value="{{ old('plan_id') }}">
     </div>
-    <div class="form-group col-lg-3">
+    <div class="form-group col-lg-4">
         <label for='from_address'>shipment Id</label>
         <input type='text' class="form-control" placeholder="shipment Id" name='shipment_id' value="{{ old('shipment_id') }}">
     </div>
-    <div class='form-group col-lg-3'> 
+    <div class='form-group col-lg-4'> 
         <label for='渠道帐号'>reference Id</label> 
         <input type='text' class="form-control" placeholder="reference Id" name='reference_id' value="{{ old('reference_id') }}">
     </div>
-    <div class='form-group col-lg-3'> 
-        <label for='渠道帐号'>shipment名称</label> 
-        <input type='text' class="form-control" placeholder="shipment 名称" name='shipment_name' value="{{ old('shipment_name') }}">
+</div>
+<div class='row'>
+    <div class="form-group col-lg-3">
+        <label>收货人姓</label>
+        <input type='text' class="form-control" placeholder="姓" name='shipping_firstname' value="{{ old('shipping_firstname') }}">
+    </div>
+    <div class="form-group col-lg-3">
+        <label>收货人名</label>
+        <input type='text' class="form-control" placeholder="名" name='shipping_lastname' value="{{ old('shipping_lastname') }}">
+    </div>
+    <div class="form-group col-lg-3">
+        <label>收货地址</label>
+        <input type='text' class="form-control" placeholder="收货地址" name='shipping_address' value="{{ old('shipping_address') }}">
+    </div>
+    <div class="form-group col-lg-3">
+        <label>城市</label>
+        <input type='text' class="form-control" placeholder="城市" name='shipping_city' value="{{ old('shipping_city') }}">
     </div>
 </div>
-
+<div class='row'>
+    <div class="form-group col-lg-3">
+        <label>省(州)</label>
+        <input type='text' class="form-control" placeholder="省(州)" name='shipping_state' value="{{ old('shipping_state') }}">
+    </div>
+    <div class="form-group col-lg-3">
+        <label>国家</label>
+        <input type='text' class="form-control" placeholder="国家" name='shipping_country' value="{{ old('shipping_country') }}">
+    </div>
+    <div class="form-group col-lg-3">
+        <label>邮编</label>
+        <input type='text' class="form-control" placeholder="邮编" name='shipping_zipcode' value="{{ old('shipping_zipcode') }}">
+    </div>
+    <div class="form-group col-lg-3">
+        <label>电话</label>
+        <input type='text' class="form-control" placeholder="电话" name='shipping_phone' value="{{ old('shipping_phone') }}">
+    </div>
+</div>
 <div class="panel panel-info">
     <div class="panel-heading">列表</div>
     <div class="panel-body add_row">

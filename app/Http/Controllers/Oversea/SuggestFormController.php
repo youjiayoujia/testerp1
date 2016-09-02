@@ -1,6 +1,6 @@
 <?php
 /**
- * Ã‡Ã¾ÂµÃ€Â¿Ã˜Ã–Ã†Ã†Ã·
+ * 采购需求
  *
  * 2016-01-04
  * @author: Vincent<nyewon@gmail.com>
@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Oversea;
 use App\Http\Controllers\Controller;
 use App\Models\Oversea\SuggestFormModel;
 use App\Models\Oversea\ChannelSaleModel;
+use App\Models\Oversea\StockModel;
 
 class SuggestFormController extends Controller
 {
@@ -37,15 +38,26 @@ class SuggestFormController extends Controller
                 }
                 $single = $singleItems->first();
                 $model = $this->model->where(['item_id' => $single->item_id, 'account_id' => $single->account_id])->first();
+                $stock = StockModel::where(['channel_sku' => $single->channel_sku, 'account_id' => $single->account_id])->first();
+                if(!$stock) {
+                    continue;
+                }
                 if(!$model) {
                     $model = $this->model->create(['item_id' => $single->item_id,
                                           'channel_sku' => $single->channel_sku,
+                                          'fnsku' => $stock->fnsku,
+                                          'fba_all_quantity' => $stock->afn_warehouse_quantity,
+                                          'fba_available_quantity' => $stock->afn_fulfillable_quantity,
                                           'sales_in_seven' => $sevenSales,
                                           'sales_in_fourteen' => $fourteenSales,
                                           'account_id' => $single->account_id,
                                           'suggest_quantity' => 20]);
                 } else {
-                    $model->update(['sales_in_seven' => $sevenSales, 'sales_in_fourteen' => $fourteenSales]);
+                    $model->update(['sales_in_seven' => $sevenSales,
+                                    'fnsku' => $stock->fnsku,
+                                    'fba_all_quantity' => $stock->afn_warehouse_quantity,
+                                    'fba_available_quantity' => $stock->afn_fulfillable_quantity,
+                                    'sales_in_fourteen' => $fourteenSales]);
                 }
             }
         }

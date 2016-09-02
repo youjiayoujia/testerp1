@@ -4,6 +4,7 @@
     <th>shipmentId</th>
     <th>箱号</th>
     <th>重量</th>
+    <th>体积(cm3)</th>
     <th>物流方式</th>
     <th>追踪号</th>
     <th>状态</th>
@@ -18,6 +19,7 @@
             <td>{{ $box->report ? $box->report->shipment_id : '' }}</td>
             <td>{{ $box->boxNum }}</td>
             <td>{{ $box->weight }}</td>
+            <td>{{ $box->length.'*'.$box->width.'*'.$box->height }}</td>
             <td>{{ $box->logistics ? $box->logistics->code : '' }}</td>
             <td>{{ $box->tracking_no }}</td>
             <td>{{ $box->status ? '已发货' : '未发货' }}</td>

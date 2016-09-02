@@ -11,7 +11,7 @@
         </div>
         <div class='form-group col-lg-2'>
             <label>发货地址</label>
-            <input type='text' class='form-control' value={{ $model->from_address }}>
+            <input type='text' class='form-control' value={{ $model->shipping_address }}>
         </div>
     </div>
     <div class='row'>
@@ -99,6 +99,28 @@
             </table>
         </div>
     </div>
+    <div class="modal fade" id="box_info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="panel panel-default">
+                    <div class="panel-heading">箱子信息</div>
+                    <div class="panel-body">
+                        <div class='form-group col-lg-6'>
+                            <label>体积(cm3):</label>
+                            <input type='text' class='form-control box_volumn' name='volumn' placeholder='a*v*c'>
+                        </div>
+                        <div class='form-group col-lg-6'>
+                            <label>重量(kg):</label>
+                            <input type='text' class='form-control box_actWeight' name='weight'>
+                        </div>
+                        <div class='form-group col-lg-6'>
+                            <a href="javascript:" class='btn btn-info box_sub'>提交</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class='row'>
         <iframe id='barcode' style='display:none'></iframe>
     </div>
@@ -117,6 +139,20 @@ $(document).on('keypress', function (event) {
 });
 
 $(document).ready(function(){
+    $(document).on('click', '.box_sub', function(){
+        volumn = $('.box_volumn').val();
+        weight = $('.box_actWeight').val();
+        boxId = $('.boxId').val();
+        $.get(
+            "{{ route('box.boxSub')}}",
+            {volumn:volumn,weight:weight,boxId:boxId},
+            function(result){
+                $('.box_volumn').val('');
+                $('.box_actWeight').val('');
+            });
+        $('.box_info').click();
+    });
+
     $(document).on('click', '.cz', function(){
         block = $(this).parent().parent();
         id = block.data('id');

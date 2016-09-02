@@ -25,6 +25,7 @@ class BoxModel extends BaseModel
      */
     protected $fillable = [
         'boxNum',
+        'fee',
         'logistics_id',
         'tracking_no',
         'width',

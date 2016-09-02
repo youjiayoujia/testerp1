@@ -71,7 +71,7 @@ table.gridtable td {
 						<td></td>
 						<td><input type="text" name="arrival_num_{{$log->id}}" id="arrival_num_{{$log->id}}" value="{{$log->arrival_num}}"></td>
 						<td><input type="text" {{$log->good_num?'disabled':''}} name="goodnum_{{$log->id}}" id="goodnum_{{$log->id}}" value="{{$log->good_num}}"></td>
-						<td><input type="text" name="badnum_{{$log->id}}" id="badnum_{{$log->id}}" value="{{$log->bad_num}}"></td>
+						<td><input type="text" {{$log->good_num?'disabled':''}} name="badnum_{{$log->id}}" id="badnum_{{$log->id}}" value="{{$log->bad_num}}"></td>
 					</tr>
 					<?php $i++; ?>
 				@endforeach

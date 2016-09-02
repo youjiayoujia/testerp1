@@ -8,7 +8,7 @@ class BarcodeGen extends Facade
 
     protected static function getFacadeAccessor()
     {
-        return 'barcodeGen';
+        // return 'barcodeGen';
     }
 
 }

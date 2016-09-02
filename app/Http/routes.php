@@ -672,6 +672,8 @@ Route::group(['middleware' => 'auth'], function () {
             ['uses' => 'SmtController@waitPostList', 'as' => 'smt.waitPost']);
         Route::get('changeStatusToWait',
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
+        Route::post('batchModify',
+            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);        
     });
    
     Route::resource('smt', 'Publish\Smt\SmtController');
@@ -691,8 +693,11 @@ Route::group(['middleware' => 'auth'], function () {
             ['uses' => 'SmtProductController@ajaxGetPlatTemplateList', 'as' => 'smtProduct.ajaxGetPlatTemplateList']);
         Route::post('ajaxSmtAfterServiceList',
            ['uses' => 'AfterSalesServiceController@ajaxSmtAfterServiceList', 'as' => 'afterSales.ajaxSmtAfterServiceList']); 
-        Route::post('batchModifyProducts',
-            ['uses' => 'SmtProductController@batchModifyProducts', 'as' => 'smtProduct.batchModifyProducts']);
+        Route::get('batchModifyProduct',
+            ['uses' => 'SmtProductController@batchModifyProduct', 'as' => 'smtProduct.batchModifyProduct']);
+        Route::post('synchronizationProduct',
+            ['uses' => 'SmtProductController@synchronizationProduct', 'as' => 'smtProduct.synchronizationProduct']);
+        
   
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');

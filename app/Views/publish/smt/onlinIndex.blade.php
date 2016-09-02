@@ -43,8 +43,8 @@
             <td>{{ $smtProductList->gmtCreate}}</td>
             <td>   
                   
-                    <a href="{{ route('smt.editOnlineProduct', ['id'=>$smtProductList->productId]) }}"
-                       class="btn btn-warning btn-xs">
+                    <a href="javascript:void(0)"
+                       class="btn btn-warning btn-xs" id="editOnline" data-id = "{{$smtProductList->productId}}">
                         <span class="glyphicon glyphicon-pencil"></span> 编辑在线信息
                     </a>
                      @if( $smtProductList->productStatusType == 'onSelling' || $smtProductList->productStatusType == 'offline')
@@ -183,5 +183,33 @@ function operator(id,type,e){
 		    });
 	});   
 }
+
+$(document).on('click','#editOnline',function(){
+	var product_id = $(this).data('id');
+	if(confirm('是否要线同步广告，本次同步不计算利润率')){
+		$.ajax({
+			url: "{{route('smtProduct.synchronizationProduct')}}",
+			data: 'product_id='+product_id,
+			type: 'POST',
+			dataType: 'JSON',
+			beforeSend: function(){
+				showtips('产品:'+product_id+'同步中...', 'alert-success');
+			},
+			success: function(data){
+				if (data.status){
+					showtips('同步成功', 'alert-success');
+					targetBtn.trigger('click');
+				}else {
+					showtips('同步失败'+data.info);
+					targetBtn.trigger('click');
+				}
+			}
+		});
+	}else{		
+		var url = "{{route('smt.editOnlineProduct')}}";
+		window.location.href = url + '?id=' + product_id;
+	}	
+	
+})
 </script>
 @stop

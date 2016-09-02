@@ -280,8 +280,8 @@ text-align: left;
                 <select name="productUnit" id="productUnit" class="form-control" datatype="n" nullmsg="单位不能为空" errormsg="单位的值类型错误">
                     <?php
                         
-                            if ($draft_info){ //产品ID
-                                $unitId = $draft_detail['productUnit'];
+                            if ($smtApi->filterData('productId',$draft_info)){ //产品ID
+                                $unitId = $smtApi->filterData('productUnit',$draft_detail);
                             }else {
                                 $unitId = '100000015';
                             }
@@ -391,9 +391,11 @@ text-align: left;
                 <label for="subject" class="right">产品图片:</label>
             </div>
             <div class="col-sm-10">	
-                <div>
+                <div>      
+                    
                     <a href="javascript:void(0);" class="btn btn-default btn-sm from_local" lang="main">从我的电脑选取</a>                                    
                     &nbsp;&nbsp;
+                    <script type="text/plain" id="myEditor"></script>
                     <a class="btn btn-xs btn-primary pic-del-all" title="全部删除"><i class="glyphicon glyphicon-trash"></i></a>
                 </div>
                 <ul class="list-inline pic-main" id="se-water-add">
@@ -428,6 +430,7 @@ text-align: left;
                 
                 //产品属性
                 $aeopAeProductPropertys = $draft_detail ? ( $draft_detail['aeopAeProductPropertys'] ? unserialize($draft_detail['aeopAeProductPropertys']) : array() ): array();
+                //$aeopAeProductPropertys = $smtApi->filterData('aeopAeProductPropertys', $draft_detail) ? unserialize($draft_detail['aeopAeProductPropertys']) : array();
                 //这个产品属性组装下
                 $propertyArray  = array();
                 $propertyArray2 = array();
@@ -698,7 +701,7 @@ text-align: left;
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="productStock" name="productStock"
                                datatype="numrange" min="1" max="999999" nullmsg="库存值为1-999999之间" errormsg="库存错误"
-                               value="<?php echo $draft_skus && $smtApi->filterData('ipmSkuStock', $draft_skus[0]) ? $draft_skus[0]['ipmSkuStock'] : 0; ?>"/>
+                               value="<?php $first_sku = array_shift($draft_skus); echo $draft_skus && $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
                     </div>
                     </div>
                 </div>
@@ -708,9 +711,9 @@ text-align: left;
                    
                     <div class="col-sm-3">	
                         <?php
-                        $skuCode = ''; //SKU代码信息
-                        if (!empty($draft_skus) && !empty($draft_skus[0]['smtSkuCode'])){
-                            $skuCode = $smtApi->rebuildSmtSku($draft_skus[0]['smtSkuCode']);
+                        $skuCode = ''; //SKU代码信息              
+                        if (!empty($draft_skus) && !empty($first_sku['smtSkuCode'])){
+                            $skuCode = $smtApi->rebuildSmtSku($first_sku['smtSkuCode']);
                         }
                         ?>	
                          <input type="text" class="form-control" id="productCode" name="productCode" placeholder="商品编码" value="<?php echo $skuCode;?>">    
@@ -884,13 +887,12 @@ $template['name'].'</option>';
 
 @show{{-- 表单按钮 --}}
 @section('pageJs')
-<!-- 
-<link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
-<script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
-<script src="{{ asset('plugins/UEditor/umeditor.js') }}"></script>
-<script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
--->
 
+
+<script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
+{{--<script src="{{ asset('plugins/ueditor/umeditor.js') }}"></script>--}}
+<script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
+<link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
 <script src="{{ asset('plugins/kindeditor/kindeditor.js') }}"></script>
 <script src="{{ asset('plugins/layer/layer.js') }}"></script>
 <script type="text/javascript">
@@ -898,8 +900,9 @@ $template['name'].'</option>';
     var token_id; //账号ID
     var skuObj;   //SKU对象,全部模糊查询查出的
     var productProperty; //用来保存属性的json信息                        
-
+	
     /**自定义kindeditor插件开始,样式类ke-icon-module**/
+	
     KindEditor.plugin('module', function (K) {
         var self = this, name = 'module', lang = self.lang(name + '.');
         self.clickToolbar(name, function () {
@@ -943,9 +946,9 @@ $template['name'].'</option>';
             var iframe = K('.ke-textarea', dialog.div);            
         });
     });
-
+	
     /**自定义kindeditor插件结束**/
-
+	
     KindEditor.ready(function (K) {
         var editor = K.create("[name=detail]", {
             'uploadJson': '{{route('upload',['_token' => csrf_token(),'token_id'=> $token_id])}}',
@@ -1858,7 +1861,7 @@ $template['name'].'</option>';
             });
         }
     
-    /*
+    
      //表单验证
         $('.validate_form').Validform({
             btnSubmit: '.submit_btn',
@@ -1873,19 +1876,13 @@ $template['name'].'</option>';
                     	   $('#id').val(productId);
                        }
                    }
-                   
                    showxbtips(data.info);
+                   location.href = "{{route('smt.index')}}";
                } else {
-                   showxbtips(data.info, 'alert-warning');
+            	   showxbtips(data.info, 'alert-warning');
                }
             }
-        });
-        
-      */
-
-    /*var ue = UM.getEditor('detail', {
-    	initialFrameWidth: 1000,
-        initialFrameHeight: 300
-    });*/
+        });       
+           
 </script>
 @stop

@@ -1223,6 +1223,9 @@ class SmtController extends Controller{
         
             //查询草稿SKU信息
             $draft_skus = $this->smtProductSkuModel->where(['productId'=>$id,'isRemove'=>0])->get();
+            if($draft_skus){
+                $draft_skus = $draft_skus->toArray();
+            }
             //查询草稿详情
             $draft_detail = $draft_info->details;
             
@@ -1950,6 +1953,40 @@ html;
            $this->model->where('productId',$product_id)->update(['productStatusType' => 'waitPost']);
        }
        return 1;
+   }
+   
+   /**
+    * 批量修改待发布产品
+    */
+   public function batchModify(){
+       $productIds = request()->input('productIds');
+       $productInfo = request()->input('products');
+       $productIdArr = explode(',', $productIds);
+       $string = '';
+       foreach($productIdArr as $productId){
+           if(array_key_exists($productId, $productInfo)){
+               $tmp = array();
+               $tmp = $productInfo[$productId];
+               $product = array();
+               $detail = array();
+               $product['grossWeight']= $tmp['grossWeight'];
+               $product['productPrice'] = $tmp['productPrice'];
+               $product['packageLength'] = $tmp['packageLength'];
+               $product['packageWidth'] = $tmp['packageWidth'];
+               $product['packageHeight'] = $tmp['packageHeight'];
+               $this->model->where('productId',$productId)->update($product);
+
+               $detail['keyword'] = $tmp['keyword'];
+               $detail['productMoreKeywords1'] = $tmp['productMoreKeywords1'];
+               $detail['productMoreKeywords2'] = $tmp['productMoreKeywords2'];
+               $detail['productUnit'] = $tmp['productUnit'];
+               $detail['promiseTemplateId'] = $tmp['promiseTemplateId'];
+               $detail['freightTemplateId'] = $tmp['freightTemplateId'];
+               $this->smtProductDetailModel->where('productId',$productId)->update($detail);
+               $string .= $productId. '更新成功!';
+           }
+       }       
+       return redirect($this->mainIndex)->with('alert', $this->alert('success', $string));
    }
    
 }

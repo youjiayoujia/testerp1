@@ -322,7 +322,7 @@ class ReturnTrack extends Job implements SelfHandling, ShouldQueue
         }
         $this->relation_id = $this->package->order_id;
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('ReturnTrack', serialize($show_data));
+        $this->log('ReturnTrack', base64_encode(serialize($show_data)));
 
 
     }

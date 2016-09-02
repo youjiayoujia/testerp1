@@ -73,7 +73,6 @@ class PickListController extends Controller
             'model' => $model,
             'size' => $model->logistics ? ($model->logistics->template ? $model->logistics->template->size : '暂无面单尺寸信息') : '暂无面单尺寸信息',
             'picklistitemsArray' => $model->pickListItem()->orderBy('sku')->get()->chunk('25'),
-            'barcode' => Tool::barcodePrint($model->picknum, "C128"),
         ];
 
         return view($this->viewPath.'print', $response);
@@ -158,14 +157,9 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $arr = [];
-        foreach($model->pickListItem as $single) {
-            $arr[] = Tool::barcodePrint($single->items->sku);
-        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'arr' => $arr,
         ];
 
         return view($this->viewPath.'code', $response);
@@ -236,19 +230,19 @@ class PickListController extends Controller
         $arr = explode(',', request('arr'));
         $buf = [];
         foreach($arr as $key => $value) {
-            $tmp = explode('.', $value);
-            $buf[$tmp[0]][$tmp[1]] = $tmp[2];
+            if($value) {
+                $tmp = explode('.', $value);
+                $buf[$tmp[0]][$tmp[1]] = $tmp[2];
+            }
         }
         $barcodes = [];
         $packages = [];
         foreach($buf as $key => $barcode) {
-            $barcodes[$key] = Tool::barcodePrint($key);
             $packages[$key] = PackageModel::find($key);
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'buf' => $buf,
-            'barcodes' => $barcodes,
             'packages' => $packages
         ];
 

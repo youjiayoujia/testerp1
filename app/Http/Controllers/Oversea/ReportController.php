@@ -225,7 +225,6 @@ class ReportController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'formArray' => $model->forms->chunk('25'),
-            'barcode' => Tool::barcodePrint($model->id, 'c128'),
         ];
 
         return view($this->viewPath.'print', $response);

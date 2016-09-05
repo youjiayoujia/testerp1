@@ -17,6 +17,7 @@ use App\Models\Channel\AccountModel as Channel_account;
 use Translation;
 use Excel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
+use App\Modules\Channel\Adapter\WishAdapter;
 
 
 class MessageController extends Controller
@@ -79,8 +80,8 @@ class MessageController extends Controller
             }
 
             $emailarr=config('user.email');
-/*           dd($message->MessageFieldsDecodeBase64);
-            dd($message->ChannelParams);*/
+/*           dd($message->MessageFieldsDecodeBase64);*/
+            //dd($message->ChannelParams);
 
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
@@ -234,6 +235,32 @@ class MessageController extends Controller
             }
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));
         }
+    }
+
+    public function WishSupportReplay($id){
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        $account = Channel_account::find($message->account_id);
+
+        $adapter = new WishAdapter($account->apiConfig);
+
+        if($adapter->ReplayWishSupport($message->message_id)){
+            $message->assign_id=request()->user()->id;
+            $message->required=0;
+            $message->status="COMPLETE";
+            $message->save();
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败'));
+        }
+        if ($this->workflow == 'keeping') {
+            return redirect(route('message.process'))
+                ->with('alert', $this->alert('success', '上条信息已成功回复.'));
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功'));
+        }
+
     }
 
     /**

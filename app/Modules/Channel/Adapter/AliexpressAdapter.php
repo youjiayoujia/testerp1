@@ -526,13 +526,12 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
                         // 或者  跳过
                         /**
-                         * 去除三种状态的消息
+                         * 去除种状态的消息
                          * 1.最后一条消息是商家发送的
                          * 2.卖家账号为空
                          *
@@ -546,6 +545,9 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+
+                        dd(json_decode($detailArrJson));
+
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];

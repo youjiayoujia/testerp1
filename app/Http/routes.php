@@ -741,6 +741,10 @@ Route::group(['middleware' => 'auth'], function () {
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
+    //wish support
+    Route::any('message/{id}/WishSupportReplay',
+        ['as' => 'message.WishSupportReplay', 'uses' => 'MessageController@WishSupportReplay']);
+    
     //无需回复
     Route::any('message/{id}/notRequireReply',
         ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
@@ -823,6 +827,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
+    Route::resource('refoundCenter','RefoundCenterController');
 });
 
 

@@ -106,7 +106,15 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">{{ $orderItem->item ? $orderItem->item->product_id : '' }}</div>
+                            <div class="col-lg-1">
+                                ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
+                                <br>
+                                @if($order->channel)
+                                    @if($order->channel->driver == 'ebay')
+                                        ebay站点: {{ $order->shipping_country }}
+                                    @endif
+                                @endif
+                            </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             @if($orderItem->item)
                                 <div class="col-lg-2">
@@ -213,6 +221,11 @@
                                 title="包裹">
                             <span class="glyphicon glyphicon-link"></span> 包裹
                         </button>
+                    @endif
+                    @if($order->status == 'CANCEL')
+                        <a href="javascript:" class="btn btn-primary btn-xs recover" data-id="{{ $order->id }}">
+                            <span class="glyphicon glyphicon-pencil"></span> 恢复订单
+                        </a>
                     @endif
                     <a href="{{ route('invoice', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 德国发票
@@ -662,6 +675,22 @@
                     var order_id = $(this).data('id');
                     $.ajax({
                         url: "{{ route('updateNormal') }}",
+                        data: {order_id: order_id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            //恢复订单
+            $('.recover').click(function () {
+                if (confirm("确认恢复订单?")) {
+                    var order_id = $(this).data('id');
+                    $.ajax({
+                        url: "{{ route('updateRecover') }}",
                         data: {order_id: order_id},
                         dataType: 'json',
                         type: 'get',

@@ -365,6 +365,16 @@
             <div class="create" id="addItem"><i class="glyphicon glyphicon-plus"></i><strong>新增产品</strong></div>
         </div>
     </div>
+    @if($model->customer_remark)
+        <div class="panel panel-primary">
+            <div class="panel-heading">客户留言</div>
+            <div class="panel-body">
+                <div class='row text-danger'>
+                    <div class="col-lg-12"><font size='4px'>{{ $model->customer_remark }}</font></div>
+                </div>
+            </div>
+        </div>
+    @endif
 @stop
 @section('pageJs')
     <script type='text/javascript'>

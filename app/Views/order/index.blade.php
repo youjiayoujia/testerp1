@@ -222,6 +222,11 @@
                             <span class="glyphicon glyphicon-link"></span> 包裹
                         </button>
                     @endif
+                    @if($order->status == 'CANCEL')
+                        <a href="javascript:" class="btn btn-primary btn-xs recover" data-id="{{ $order->id }}">
+                            <span class="glyphicon glyphicon-pencil"></span> 恢复订单
+                        </a>
+                    @endif
                     <a href="{{ route('invoice', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 德国发票
                     </a>
@@ -670,6 +675,22 @@
                     var order_id = $(this).data('id');
                     $.ajax({
                         url: "{{ route('updateNormal') }}",
+                        data: {order_id: order_id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            //恢复订单
+            $('.recover').click(function () {
+                if (confirm("确认恢复订单?")) {
+                    var order_id = $(this).data('id');
+                    $.ajax({
+                        url: "{{ route('updateRecover') }}",
                         data: {order_id: order_id},
                         dataType: 'json',
                         type: 'get',

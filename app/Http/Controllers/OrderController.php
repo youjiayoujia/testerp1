@@ -448,6 +448,15 @@ class OrderController extends Controller
         return 1;
     }
 
+    //恢复订单
+    public function updateRecover()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['status' => 'REVIEW']);
+
+        return 1;
+    }
+
     /**
      * 批量撤单
      *

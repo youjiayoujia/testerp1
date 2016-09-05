@@ -500,6 +500,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('updateStatus', ['uses' => 'OrderController@updateStatus', 'as' => 'updateStatus']);
     Route::get('updatePrepared', ['uses' => 'OrderController@updatePrepared', 'as' => 'updatePrepared']);
     Route::get('updateNormal', ['uses' => 'OrderController@updateNormal', 'as' => 'updateNormal']);
+    Route::get('updateRecover', ['uses' => 'OrderController@updateRecover', 'as' => 'updateRecover']);
     Route::get('withdraw/{id}', ['uses' => 'OrderController@withdraw', 'as' => 'withdraw']);
     Route::post('withdrawUpdate/{id}', ['uses' => 'OrderController@withdrawUpdate', 'as' => 'withdrawUpdate']);
     Route::any('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);

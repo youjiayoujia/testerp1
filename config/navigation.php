@@ -461,6 +461,22 @@ return [
             ],
         ]
     ],
+    //报表导航
+    [
+        'name' => '报表',
+        'icon' => 'list-alt',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '采购报表' => [
+                [
+                    'name' => '采购数据统计',
+                    'url' => 'message.index',
+                    'icon' => '',
+                ],
+            ],
+        ]
+    ],
     //监控导航
     [
         'name' => '监控',

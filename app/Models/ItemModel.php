@@ -56,6 +56,7 @@ class ItemModel extends BaseModel
         'warehouse_position',
         'status',
         'is_available',
+        'purchase_adminer',
         'remark',
         'cost',
     ];
@@ -63,6 +64,11 @@ class ItemModel extends BaseModel
     public function product()
     {
         return $this->belongsTo('App\Models\ProductModel', 'product_id');
+    }
+
+    public function purchaseAdminer()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase_adminer');
     }
 
     public function catalog()

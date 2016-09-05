@@ -352,60 +352,6 @@ class ProductController extends Controller
         $result['keywords'] = $info[$language."_keywords"];
         return $result;
     }
-    /**
-     * 批量更新
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function changePurchaseAdmin($product_id)
-    {
-        $user_name = request()->input('manual_name');
-        $user_id = request()->input('purchase_adminer');
-        $model = $this->model->find($product_id);
-        if($user_id){
-            $model->update(['purchase_adminer'=>$user_id]);
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
-        }else{
-            $userModel = UserModel::where('name',$user_name)->first();
-            if($userModel){
-                $model->update(['purchase_adminer'=>$userModel->id]);
-                return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
-            }else{
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
-            }
-        }
-
-    }
-    /**
-     * 获取供应商信息
-     */
-    public function ajaxSupplierUser()
-    {
-        $product_id = request()->input('product_id');
-        $model = $this->model->find($product_id);
-        $user_array = ProductModel::where('supplier_id',$model->supplier_id)->distinct()->get();
-        $in = [];
-        foreach ($user_array as $array) {
-            $in[] = $array->purchase_adminer;
-        }
-
-        if(request()->ajax()) {
-            $user = trim(request()->input('user'));
-            $buf = UserModel::where('name', 'like', '%'.$user.'%')->whereIn('id',$in)->get();
-            $total = $buf->count();
-            $arr = [];
-            foreach($buf as $key => $value) {
-                $arr[$key]['id'] = $value->id;
-                $arr[$key]['text'] = $value->name;
-            }
-            if($total)
-                return json_encode(['results' => $arr, 'total' => $total]);
-            else
-                return json_encode(false);
-        }
-        return json_encode(false);
-    }
 
     /**
      * 产品价格计算

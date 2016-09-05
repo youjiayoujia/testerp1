@@ -842,6 +842,25 @@ class PurchaseOrderController extends Controller
        
         return $data;
     }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseStaticstics()
+    {
+        
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'staticsticsIndex', $response);
+    }
         
 }
 

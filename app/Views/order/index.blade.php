@@ -106,7 +106,15 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">{{ $orderItem->item ? $orderItem->item->product_id : '' }}</div>
+                            <div class="col-lg-1">
+                                ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
+                                <br>
+                                @if($order->channel)
+                                    @if($order->channel->driver == 'ebay')
+                                        ebay站点: {{ $order->shipping_country }}
+                                    @endif
+                                @endif
+                            </div>
                             {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             @if($orderItem->item)
                                 <div class="col-lg-2">

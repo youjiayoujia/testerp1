@@ -82,6 +82,6 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             }
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('InOrders', serialize($this->order));
+        $this->log('InOrders', base64_encode(serialize($this->order)));
     }
 }

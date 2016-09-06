@@ -63,6 +63,6 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
             }
         } 
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('DoPackages', serialize($this->order));
+        $this->log('DoPackages', base64_encode(serialize($this->order)));
     }
 }

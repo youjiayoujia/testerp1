@@ -18,7 +18,12 @@
 @section('tableBody')
     @foreach($data as $package)
         <tr class="dark-{{ $package->status_color }}">
-            <td><input type='checkbox' name='single[]' class='single'></td>
+            <td>
+                <input type='checkbox' name='single[]' class='single'>
+                @if($package->order->packages->count() > 1)
+                    <span class='glyphicon glyphicon-adjust'></span>
+                @endif
+            </td>
             <td>{{ $package->id }}</td>
             <td>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
             <td>{{ $package->warehouse ? $package->warehouse->name : '' }}</td>

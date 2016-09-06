@@ -929,8 +929,10 @@ class PackageController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 'model' => $model,
             ];
+
             return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
         }
+        
         return false;
     }
 

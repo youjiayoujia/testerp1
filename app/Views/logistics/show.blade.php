@@ -31,7 +31,7 @@
                 <strong>物流分类</strong>: {{ $model->logistics_catalog_id == '0' ? '未选择' : $model->catalog->name }}
             </div>
             <div class="col-lg-4">
-                <strong>回邮模版</strong>: {{ $model->logistics_email_template_id == '0' ? '未选择' : $model->emailTemplate->customer }}
+                <strong>回邮模版</strong>: {{ $model->logistics_email_template_id == '0' ? '未选择' : $model->emailTemplate->name }}
             </div>
             <div class="col-lg-4">
                 <strong>面单模版</strong>: {{ $model->logistics_template_id == '0' ? '未选择' : $model->template->name }}

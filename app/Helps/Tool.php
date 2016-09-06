@@ -1,7 +1,6 @@
 <?php
 namespace App\Helps;
 
-use BarcodeGen;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Tool
@@ -15,11 +14,6 @@ class Tool
         } elseif (!is_writable($directory)) {
             throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
         }
-    }
-
-    public function barcodePrint($content, $height = 50, $orientation = 'horizontal', $type = 'code128', $length = 1)
-    {
-        return BarcodeGen::generate([$content, $height, $orientation, $type, $length])->response('png');
     }
 
     public function getFileExtension($fileName)

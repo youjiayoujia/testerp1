@@ -5,9 +5,7 @@
         <div class='form-group col-lg-2'>
             <label>sku</label>
             <input type='text' class='form-control' value={{ $single->items->sku }}>
-        </div>
-        <div class='form-group col-lg-2'>
-            {!!$arr[$key]!!}
+            <img src="{{ route('barcodeGen', ['content' => $single->items->sku])}}">
         </div>
     </div>
 @endforeach

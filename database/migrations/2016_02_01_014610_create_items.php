@@ -33,6 +33,7 @@ class CreateItems extends Migration
             $table->string('purchase_url')->nullable();
             $table->decimal('purchase_price', 7, 2)->nullable();
             $table->decimal('purchase_carriage', 5, 2)->nullable();
+            $table->integer('purchase_adminer')->nullable();
             $table->float('cost')->nullable()->default(null);
             $table->string('product_size')->nullable();
             $table->string('package_size')->nullable();

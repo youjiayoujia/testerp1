@@ -589,11 +589,12 @@ class PurchaseOrderController extends Controller
             $purchaseOrderModel = $this->model->find($p_id);
             foreach($purchaseOrderModel->purchaseItem as $p_item){
                 if($p_item->purchase_num!=$p_item->arrival_num){
+                    $arrival_num = $p_item->lack_num;
                     $p_item->update(['arrival_num'=>$p_item->purchase_num,'lack_num'=>0]);
                     $filed['purchase_item_id'] = $p_item->id;
                     $filed['sku'] = $p_item->sku;
                     $filed['status'] =2;
-                    $filed['arrival_num'] = $p_item->lack_num;
+                    $filed['arrival_num'] = $arrival_num;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
             }
@@ -840,6 +841,25 @@ class PurchaseOrderController extends Controller
         $total_price>2000?$data[0]['total_price'] = '采购单总金额大于2000':$data[0]['total_price'] = '';
        
         return $data;
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseStaticstics()
+    {
+        
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'staticsticsIndex', $response);
     }
         
 }

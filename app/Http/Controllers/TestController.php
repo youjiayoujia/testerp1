@@ -64,7 +64,7 @@ class TestController extends Controller
     public function test2()
     {
         // return Tool::barcodePrint('test1111');
-        var_dump(unserialize(''));
+        var_dump(base64_encode(serialize('你好')));
     }
 
     public function test3()

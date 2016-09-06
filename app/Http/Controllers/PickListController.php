@@ -219,8 +219,7 @@ class PickListController extends Controller
                     'package' => $model,
                 ];
                 return view($this->viewPath.'forceOut', $response);
-
-                exit;
+                break;
         }
         
     }

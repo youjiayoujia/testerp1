@@ -92,6 +92,8 @@ Route::group(['middleware' => 'auth'], function () {
     //出库
     Route::resource('stockOut', 'Stock\OutController');
     //出入库
+    Route::post('inOut/exportResult', ['uses' => 'Stock\InOutController@exportResult', 'as' => 'inOut.exportResult']);
+    Route::get('inOut/export', ['uses' => 'Stock\InOutController@export', 'as' => 'inOut.export']);
     Route::resource('stockInOut', 'Stock\InOutController');
     //供货商变更历史
     Route::resource('supplierChangeHistory', 'Product\SupplierChangeHistoryController');
@@ -192,6 +194,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::get('stock/ajaxAllSku', ['uses' => 'StockController@ajaxAllSku', 'as' => 'stock.ajaxAllSku']);
     Route::get('stock/overseaPosition', ['uses' => 'StockController@overseaPosition', 'as' => 'stock.overseaPosition']);
     Route::get('stock/overseaSku', ['uses' => 'StockController@overseaSku', 'as' => 'stock.overseaSku']);
     Route::get('stock/changePosition', ['uses' => 'StockController@changePosition', 'as' => 'stock.changePosition']);

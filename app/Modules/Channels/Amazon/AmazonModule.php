@@ -53,6 +53,37 @@ class AmazonModule extends BaseChannelModule
         $this->visitUrl($url);
     }
 
+    public function listInShipment()
+    {
+        $this->serviceUrl = "https://mws.amazonservices.com/FulfillmentInboundShipment/2010-10-01?";
+        $this->_config['Action'] = 'ListInboundShipments';
+        $this->_config['ShipmentStatusList.member.1'] = 'CHECKED_IN';
+        $this->_config['ShipmentIdList.member.1'] = 'FBA44JV8R';
+        $this->_config['Version'] = '2010-10-01';
+        $tmp_arr = parse_url($this->serviceUrl);
+        $sign  = 'GET' . "\n";
+        $sign .= $tmp_arr['host'] . "\n";
+        $sign .= $tmp_arr['path'] . "\n";
+        var_dump($sign);exit;
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, config('setting.AWS_SECRET_ACCESS_KEY'), true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $string1 = $this->serviceUrl."/?".$string;
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,0);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
+        $res = curl_exec($ch);
+        curl_close($ch);
+        echo "<pre>";
+        var_dump($res);
+        echo "</pre>";
+        
+        return $res;
+    }
+
     
     public function getProductInfo()
     {
@@ -182,8 +213,12 @@ class AmazonModule extends BaseChannelModule
         echo "<pre>";
         print_r($res);
         echo "</pre>";
+
         return $res;
+
     }
+
+
 /*************************************************************************************/
 /**
  * $model = new AmazonModule();

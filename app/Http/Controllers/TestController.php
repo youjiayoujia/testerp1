@@ -22,6 +22,6 @@ class TestController extends Controller
         $model = new AmazonModule();
         // $id = $model->requestReport();
         // $tmp = $model->getReportRequestList('52988017044');
-        $model->getReport('2727391194017044');
+        $model->listInShipment();
     }
 }

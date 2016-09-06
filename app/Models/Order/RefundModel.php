@@ -48,5 +48,29 @@ class RefundModel extends BaseModel
         $arr = config('order.refund');
         return $arr[$this->refund];
     }
+    public function getProcessStatusNameAttribute(){
+        return config('refund.process')[$this->process_status];
+    }
+
+    public function Order(){
+        return $this->hasOne('App\Models\OrderModel','id','order_id');
+    }
+    public function getSKUsAttribute(){
+        $items = $this->Order->items;
+        $sku ='';
+        foreach ($items as $item){
+            if($item->is_refund == '1'){
+                $sku = empty($sku) ? $item->sku : $sku.','.$item->sku;
+            }
+        }
+        return $sku;
+    }
+
+    public function getPaidTimeAttribute(){
+        return $this->Order->payment_date;
+    }
+    public function getChannelNameAttribute(){
+        return $this->Order->channel->name;
+    }
 
 }

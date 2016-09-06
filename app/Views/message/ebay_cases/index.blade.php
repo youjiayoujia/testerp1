@@ -27,7 +27,7 @@
         <ul class="dropdown-menu">
             @foreach($types as $item)
                 <li>
-                    <a href="{{ DataList::filtersEncode(['status','=',$item->type]) }}">{{ $item->type }}</a>
+                    <a href="{{ DataList::filtersEncode(['type','=',$item->type]) }}">{{ $item->type }}</a>
                 </li>
             @endforeach
         </ul>

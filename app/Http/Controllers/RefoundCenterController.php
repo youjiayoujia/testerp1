@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Order\RefundModel;
+use App\Models\PaypalsModel;
+use App\Modules\Paypal\PaypalApi;
 
 
 class RefoundCenterController extends Controller
@@ -26,9 +28,11 @@ class RefoundCenterController extends Controller
      */
     public function index()
     {
+
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'metas'   => $this->metas(__FUNCTION__),
+            'data'    => $this->autoList($this->model),
+            'paypals' => PaypalsModel::where('is_enable','=','1')->get(),
            // 'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index',$response);
@@ -75,6 +79,8 @@ class RefoundCenterController extends Controller
     public function edit($id)
     {
         //
+        $refund = $this->model->find($id);
+        dd($refund->SKUs);
     }
 
     /**
@@ -98,5 +104,80 @@ class RefoundCenterController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * paypal退款
+     */
+    public function doPaypalRefund(){
+        $form = request()->input();
+
+        $refund = $this->model->find($form['id']);
+        dd($form);
+
+
+        $newArray                  = array();
+
+        $newArray['TRANSACTIONID'] = 'TRANSACTIONID 参数';
+        $newArray['REFUNDTYPE']    = ( $refund['refundType'] === 'FULL' ) ? 'Full' : 'Partial';
+        $newArray['CURRENCYCODE']  = $refund['refund_currency'];
+        $newArray['NOTE']          = $refund['memo'];
+        if ( $refund['refundType'] == 'PARTIAL' ) {
+            $newArray['AMT'] = $refund['refund_amount'];
+        }
+
+
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
 }

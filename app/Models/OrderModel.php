@@ -130,6 +130,58 @@ class OrderModel extends BaseModel
         return $arr;
     }
 
+    public function updateRule($request)
+    {
+        $arr = [
+            'amount_shipping' => 'required',
+            'shipping_firstname' => 'required',
+            'shipping_lastname' => 'required',
+            'shipping_address' => 'required',
+            'shipping_city' => 'required',
+            'shipping_state' => 'required',
+            'shipping_country' => 'required',
+            'shipping_zipcode' => 'required',
+            'shipping_phone' => 'required',
+        ];
+
+        $buf = $request->all();
+        $buf = $buf['arr'];
+        foreach ($buf as $key => $val) {
+            if ($key == 'sku') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.sku.' . $k] = 'required';
+                }
+            }
+            if ($key == 'quantity') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.quantity.' . $k] = 'required';
+                }
+            }
+            if ($key == 'price') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.price.' . $k] = 'required';
+                }
+            }
+            if ($key == 'status') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.status.' . $k] = 'required';
+                }
+            }
+            if ($key == 'ship_status') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.ship_status.' . $k] = 'required';
+                }
+            }
+            if ($key == 'is_gift') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.is_gift.' . $k] = 'required';
+                }
+            }
+        }
+
+        return $arr;
+    }
+
     public function getMixedSearchAttribute()
     {
         foreach (ChannelModel::all() as $channel) {

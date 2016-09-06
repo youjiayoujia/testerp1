@@ -27,7 +27,7 @@ class LogisticsController extends Controller
     {
         $this->model = $logistics;
         $this->mainIndex = route('logistics.index');
-        $this->mainTitle = '物流';
+        $this->mainTitle = '物流方式';
         $this->viewPath = 'logistics.';
     }
 

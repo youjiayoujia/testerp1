@@ -32,6 +32,7 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+        $this->middleware('StockIOStatus');
     }
 
     public function putNeedQueue()

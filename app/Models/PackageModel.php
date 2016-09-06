@@ -721,6 +721,20 @@ class PackageModel extends BaseModel
                         continue;
                     }
                 }
+                //是否在物流方式渠道中
+                if ($rule->channel_section) {
+                    $channels = $rule->rule_channels_through;
+                    $flag = 0;
+                    foreach ($channels as $channel) {
+                        if ($channel->id == $this->channel_id) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue;
+                    }
+                }
                 //是否在物流方式国家中
                 if ($rule->country_section) {
                     $countries = $rule->rule_countries_through;
@@ -754,7 +768,7 @@ class PackageModel extends BaseModel
                     $transports = $rule->rule_transports_through;
                     $flag = 0;
                     foreach ($transports as $transport) {
-                        if ($transport->id == $this->order->shipping) {
+                        if (!$this->order->shipping || $transport->name == $this->order->shipping) {
                             $flag = 1;
                             break;
                         }

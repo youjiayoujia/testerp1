@@ -198,7 +198,8 @@ class OrderModel extends BaseModel
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
-                'active' => config('order.active')
+                'active' => config('order.active'),
+                'is_chinese' => config('order.is_chinese')
             ],
             'sectionSelect' => [
                 'price' => ['amount'],

@@ -178,21 +178,21 @@ class PickListController extends Controller
                 return $this->printPickList($model->id);
                 break;
             case 'single':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKING', 'PICKED', 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKING', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'singleMulti':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKING', 'PICKED', 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKING', 'PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'inbox':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI'])->whereIn('status', ['PICKED', 'PICKING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'MULTI'])->where('status', 'PICKING')->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }

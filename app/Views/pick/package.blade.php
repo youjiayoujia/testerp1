@@ -111,7 +111,7 @@
         </div>
     </div>
     <div class='row'>
-        <iframe id='barcode' style='display:none'></iframe>
+        <iframe id='barcode' style='display:none;width:100px;height:130px'></iframe>
     </div>
 @stop
 @section('formButton')
@@ -127,6 +127,8 @@ $(document).on('keypress', function (event) {
 });
 
 $(document).ready(function(){
+    $('.searchsku').focus();
+
     $('.printException').click(function(){
         arr = new Array();
         i=0;
@@ -221,6 +223,23 @@ $(document).ready(function(){
                 if(tmp.find('.sku').text() == val && parseInt(tmp.find('.quantity').text()) >  parseInt(tmp.find('.picked_quantity').text())) {
                     old_flag = 1;
                     tmp.find('.picked_quantity').text(parseInt(tmp.find('.picked_quantity').text()) + 1);
+                    sku = tmp.find('.sku').text();
+                    $.ajax({
+                        url:"{{ route('pickList.packageItemUpdate')}}",
+                        data:{package_id:package_id, sku:sku},
+                        dataType:'json',
+                        type:'get',
+                        success:function(result) {
+                            if(!result) {
+                                return false;
+                            }
+                        }
+                    });
+                    $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                    $('#barcode').load(function(){
+                        $('#barcode')[0].contentWindow.focus();
+                        $('#barcode')[0].contentWindow.print();
+                    });
                     if(parseInt(tmp.find('.picked_quantity').text()) == parseInt(tmp.find('.quantity').text())) {
                         needId = tmp.data('id');
                         flag = 1;
@@ -234,24 +253,7 @@ $(document).ready(function(){
                         });
                         if(flag) {
                             out_js = 1;
-                            sku = tmp.find('.sku').text();
-                            $.ajax({
-                                url:"{{ route('pickList.packageItemUpdate')}}",
-                                data:{package_id:package_id, sku:sku},
-                                dataType:'json',
-                                type:'get',
-                                success:function(result) {
-                                    if(!result) {
-                                        return false;
-                                    }
-                                }
-                            });
                             tmp.find('.status').text('已包装');
-                            $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
-                            $('#barcode').load(function(){
-                                $('#barcode')[0].contentWindow.focus();
-                                $('#barcode')[0].contentWindow.print();
-                            });
                         }
                     }
                     needId = tmp.data('id');

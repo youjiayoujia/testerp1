@@ -33,26 +33,33 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        $start = microtime(true);
-        $this->package->assignLogistics();
-        if ($this->package->status == 'ASSIGNED') {
-            //计算订单利润率
-            $orderRate = $this->package->order->calculateProfitProcess();
-            if ($orderRate > 0) {
-                $job = new PlaceLogistics($this->package);
-                $job = $job->onQueue('placeLogistics');
-                $this->dispatch($job);
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Success.';
+        if(!Cache::store('file')->get('stockIOStatus')) {
+            $this->result['status'] = 'fail';
+            $this->result['remark'] = 'stockTaking , stock is locked.';
+            $this->lasting = round(microtime(true) - $start, 3);
+            $this->log('AssignLogistics');
+        } else {
+            $start = microtime(true);
+            $this->package->assignLogistics();
+            if ($this->package->status == 'ASSIGNED') {
+                //计算订单利润率
+                $orderRate = $this->package->order->calculateProfitProcess();
+                if ($orderRate > 0) {
+                    $job = new PlaceLogistics($this->package);
+                    $job = $job->onQueue('placeLogistics');
+                    $this->dispatch($job);
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Success.';
+                } else {
+                    $this->result['status'] = 'fail';
+                    $this->result['remark'] = "Order rate isn't more than 0.";
+                }
             } else {
                 $this->result['status'] = 'fail';
-                $this->result['remark'] = "Order rate isn't more than 0.";
+                $this->result['remark'] = 'Fail to assign logistics.';
             }
-        } else {
-            $this->result['status'] = 'fail';
-            $this->result['remark'] = 'Fail to assign logistics.';
+            $this->lasting = round(microtime(true) - $start, 3);
+            $this->log('AssignLogistics');
         }
-        $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('AssignLogistics');
     }
 }

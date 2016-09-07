@@ -554,7 +554,7 @@ return [
         'subnavigations' => [
             [
                 'name' => '退款中心',
-                'url' => 'refoundCenter.index',
+                'url' => 'refundCenter.index',
                 'icon' => 'glyphicon glyphicon-loc',
             ],
         ],

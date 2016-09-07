@@ -72,5 +72,56 @@ class RefundModel extends BaseModel
     public function getChannelNameAttribute(){
         return $this->Order->channel->name;
     }
+    public function getOrderRemarksAttribute(){
+        $remarks = $this->Order->remarks;
+        $html = '<ul>';
+        if(!$remarks->isEmpty()){
+            foreach ($remarks as $remark){
+                $html .= "<li>{$remark->remark} {$remark->created_at}</li>";
+            }
+        }else{
+
+        }
+
+        $html .= '</ul>';
+        return $html;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

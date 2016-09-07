@@ -9,14 +9,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Order\RefundModel;
 use App\Models\PaypalsModel;
 use App\Modules\Paypal\PaypalApi;
+use App\Models\CurrencyModel;
 
 
-class RefoundCenterController extends Controller
+
+class RefundCenterController extends Controller
 {
     public function __construct(RefundModel $refund)
     {
         $this->model = $refund;
-        $this->mainIndex = route('refoundCenter.index');
+        $this->mainIndex = route('refundCenter.index');
         $this->mainTitle = '退款中心';
         $this->viewPath = 'refund.';
     }
@@ -79,8 +81,10 @@ class RefoundCenterController extends Controller
     public function edit($id)
     {
         //
+
         $refund = $this->model->find($id);
-        dd($refund->SKUs);
+        $currency = CurrencyModel::all();
+        return view($this->viewPath . 'edit',compact('refund','currency'));
     }
 
     /**
@@ -93,6 +97,7 @@ class RefoundCenterController extends Controller
     public function update($id)
     {
         //
+        dd(request()->input());
     }
 
     /**
@@ -111,20 +116,41 @@ class RefoundCenterController extends Controller
      */
     public function doPaypalRefund(){
         $form = request()->input();
+        if(!empty($form['paypal_id']) && !empty($form['password']) && !empty($form['id'])){
 
-        $refund = $this->model->find($form['id']);
-        dd($form);
+            $paypal = PaypalsModel::find($form['paypal_id']);
 
+            if($paypal->paypal_paddword == $form['password']){
 
-        $newArray                  = array();
+                $refund = $this->model->find($form['id']);
+                $refund->Order->transaction_number;
 
-        $newArray['TRANSACTIONID'] = 'TRANSACTIONID 参数';
-        $newArray['REFUNDTYPE']    = ( $refund['refundType'] === 'FULL' ) ? 'Full' : 'Partial';
-        $newArray['CURRENCYCODE']  = $refund['refund_currency'];
-        $newArray['NOTE']          = $refund['memo'];
-        if ( $refund['refundType'] == 'PARTIAL' ) {
-            $newArray['AMT'] = $refund['refund_amount'];
+                $paramAry = array();
+                $paramAry['TRANSACTIONID'] = $refund->Order->transaction_number;
+                $paramAry['REFUNDTYPE']    = ( $refund['refundType'] === 'FULL' ) ? 'Full' : 'Partial';
+                $paramAry['CURRENCYCODE']  = $refund['refund_currency'];
+                if(!empty($refund['memo'])){
+                    $paramAry['NOTE'] = $refund['memo'];
+                }
+                if ( $refund['refundType'] == 'PARTIAL' ) {
+                    $paramAry['AMT'] = $refund['refund_amount'];
+                }
+                $paypalApi = new PaypalApi($paypal->ApiConfig);
+                if($paypalApi->apiRefund($paramAry)){
+                    $refund->process_status = 'COMPLETE';
+                    $refund->save();
+                    return redirect($this->mainIndex)->with('alert', $this->alert('success', '退款成功！'));
+                }else{
+                    return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败，请联系IT！'));
+                }
+            }else{
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', 'Paypal密码错误'));
+            }
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '参数不完整'));
         }
+
+
 
 
 

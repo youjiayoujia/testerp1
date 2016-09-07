@@ -45,6 +45,9 @@ class CreateOrderRefunds extends Migration
                     'COMPLETE',
                     'INVALID',
                 ])->comment('操作状态')->default('PENDING');
+            $table->string('user_paypal_account')->nullable()->comment('用户paypal账号');
+            $table->integer('customer_id')->nullable()->comment('客服ID');
+            $table->integer('refund_voucher')->nullable()->comment('退款凭证');
             $table->timestamps();
             $table->softDeletes();
         });

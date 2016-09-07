@@ -53,7 +53,7 @@
             <a href="" class="btn btn-info btn-xs" title="查看">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </a>
-            <a href="" class="btn btn-warning btn-xs" title="编辑">
+            <a href="{{ route('refundCenter.edit', ['id'=>$item->id])}}" class="btn btn-warning btn-xs" title="编辑">
                 <span class="glyphicon glyphicon-pencil"></span>
             </a>
             <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal7" title="API设置">
@@ -84,27 +84,47 @@
                                 <div class="col-lg-4"><label>买家ID：</label>{{$item->Order->by_id}}</div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-lg-12"><label>订单备注：</label></div>
-                            </div>
+
                             <div class="row">
                                 <div class="col-lg-8"><label>退款金额：<span class="label label-danger">{{$item->refund_currency}}</span>{{$item->refund_amount}}</label></div>
-                                <div class="col-lg-4"><label>国家：</label></div>
+                                <div class="col-lg-4"><label>国家：</label>{{$item->Order->currency}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-8"><label>交易号ID：</label></div>
+                                <div class="col-lg-8"><label>交易号ID：</label>{{$item->Order->transaction_number}}</div>
                                 <div class="col-lg-4"><label>销售账号：</label>{{$item->Order->channelAccount->account}}</div>
                             </div>
+                        <div class="row">
+                            <div class="col-lg-12"><label>订单备注：</label>
+                                {!! $item->OrderRemarks !!}
+                            </div>
+                        </div>
                             <div class="row">
-                                <div class="col-lg-12"><label>退款原因：</label>{{$item->ReasonName}}</div>
+                                <div class="col-lg-12 alert alert-danger" ><label>退款原因：</label>{{$item->ReasonName}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-12"><label>Memo（英文）：</label>{{$item->memo}}</div>
+                                <div class="col-lg-12"><label>Memo（英文）：
+                                    </label>
+                                    @if($item->memo)
+                                        {{$item->memo}}
+                                    @else
+                                        无
+                                    @endif
+                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-12"><label>退款备注：</label>{{$item->detail_reason}}</div>
+                                <div class="col-lg-12"><label>退款备注：</label>
+                                    @if($item->detail_reason)
+                                        {{$item->detail_reason}}
+                                    @else
+                                        无
+                                    @endif
+                                </div>
                             </div>
-
+                        <div class="row">
+                            <div class="col-lg-12"><label>查看截图：</label>
+                                <a href="../../{{$item->image}}" target="_blank"><span class="glyphicon glyphicon-paperclip"></span></a>
+                            </div>
+                        </div>
 
                             <div class="row">
                                 <div class="col-lg-6"><label>Paypal账号：</label>
@@ -132,7 +152,8 @@
             </div>
         </div>
 
-
+        <!--编辑model-->
+        <!---->
 
     </tr>
 @endforeach

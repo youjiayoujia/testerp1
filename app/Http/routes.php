@@ -830,8 +830,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
-    Route::resource('refoundCenter','RefoundCenterController');
-    Route::any('doPaypalRefund',['uses' =>'RefoundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
+    Route::resource('refundCenter','RefundCenterController');
+    Route::any('doPaypalRefund',['uses' =>'RefundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
 
 });
 

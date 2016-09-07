@@ -10,6 +10,7 @@ use App\Models\StockModel;
 use App\Models\PackageModel;
 use App\Models\ItemModel;
 use App\Models\Order\ItemModel as OrderItemModel;
+use App\Models\Purchase\PurchasesModel;
 
 class RequireModel extends BaseModel
 {
@@ -148,12 +149,69 @@ class RequireModel extends BaseModel
             
     }
 
-        //加入采购需求表中
     public function intoPurchaseRequire($item_id,$needPurchaseNum){
         if(PurchaseRequireModel::where('item_id',$item_id)->count()){
             PurchaseRequireModel::where('item_id',$item_id)->update(['quantity'=>$needPurchaseNum,'status'=>0]);
         }else{
             PurchaseRequireModel::create(['quantity'=>$needPurchaseNum,'item_id'=>$item_id]);
         }       
+    }
+
+    //一键生成采购单
+    public function createAllPurchaseOrder(){
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        $needPurchases=PurchasesModel::where('require_create',1)->get();
+        
+        //print_r($needPurchases);exit;
+        foreach ($needPurchases as $key => $purchases) {
+            $itemModel = $purchases->item;
+            $data['type']=0;
+            $data['warehouse_id']=$itemModel->warehouse_id ? $itemModel->warehouse_id : 0;
+            $data['sku']=$itemModel->sku;
+            $data['item_id']=$itemModel->id;
+            $data['purchase_cost']=$itemModel->purchase_price;
+            $data['supplier_id']=$itemModel->supplier_id ? $itemModel->supplier_id : 0;
+            $data['purchase_num']=$purchases->need_purchase_num;
+            $data['user_id']=request()->user()?request()->user()->id:'1';
+            $data['lack_num']=$data['purchase_num'];
+
+            if($data['purchase_num']>0){
+                $p_item = PurchaseItemModel::create($data);
+                $fillRequireNum = $this->where("item_id",$itemModel->id)->where('is_require','1')->get()->sum('quantity');
+                $fillRequireArray =  $this->where("item_id",$itemModel->id)->get();
+                if($fillRequireNum <=$data['purchase_num']){
+                    $this->where("item_id",$itemModel->id)->update(['is_require'=>'0']);
+                }else{
+                    $temp_quantity = 0;
+                    foreach ($fillRequireArray as $value) {
+                        $temp_quantity += $value->quantity;
+                        if($temp_quantity>$data['purchase_num']){
+                            $require_id = $value->id;break;
+                        }
+                    }
+                        
+                    $this->where("id",'<',$require_id)->where('item_id',$v->id)->update(['is_require'=>'0','purchase_item_id'=>$p_item->id]);
+                    
+                }
+            }
+            
+            $purchases->update(['require_create'=>'0']);
+        }
+        $warehouse_supplier=PurchaseItemModel::select('id','warehouse_id','supplier_id','user_id')->where('purchase_order_id',0)->where('active_status',0)->where('supplier_id','<>','0')->groupBy('warehouse_id')->groupBy('supplier_id')->groupBy('user_id')->get()->toArray();
+        
+        if(isset($warehouse_supplier)){
+            foreach($warehouse_supplier as $key=>$v){
+                $data['warehouse_id']=$v['warehouse_id'] ? $v['warehouse_id'] : 0;       
+                $data['supplier_id']=$v['supplier_id'] ? $v['supplier_id'] : 0;
+                $supplier=SupplierModel::find($v['supplier_id']);
+                $data['assigner']=$supplier->purchase_id ? $supplier->purchase_id : 0;
+                $purchaseOrder=PurchaseOrderModel::create($data);
+                $purchaseOrderId=$purchaseOrder->id; 
+                if($purchaseOrderId >0){
+                    PurchaseItemModel::where('warehouse_id',$v['warehouse_id'])->where('user_id',$v['user_id'])->where('supplier_id',$v['supplier_id'])->where('purchase_order_id',0)->update(['purchase_order_id'=>$purchaseOrderId]); 
+                }                
+            }       
+        }     
     }
 }

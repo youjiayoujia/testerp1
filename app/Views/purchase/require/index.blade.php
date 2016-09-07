@@ -104,10 +104,8 @@
             }
         });
 		$('#aKeyToGenerate').click(function(){
-			var purchase_ids='';
 			 $.ajax({
-                    url:'addPurchaseOrder',
-                    data:{purchase_ids:purchase_ids},
+                    url:'{{ route("purchaseRequire.createAllPurchaseOrder") }}',
                     dataType:'json',
                     type:'get',
                     success:function(result){

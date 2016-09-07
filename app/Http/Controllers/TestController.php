@@ -61,11 +61,11 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
     }
 
-    public function test2()
-    {
-        // return Tool::barcodePrint('test1111');
-        var_dump(base64_encode(serialize('你好')));
-    }
+    // public function test2()
+    // {
+    //     // return Tool::barcodePrint('test1111');
+    //     var_dump(base64_encode(serialize('你好')));
+    // }
 
     public function test3()
     {
@@ -97,51 +97,51 @@ class TestController extends Controller
     //     $this->dispatch($job);
     // }
 
-    // public function test2()
-    // {
-    //     $account = AccountModel::find(1);
-    //     $single = new AmazonAdapter($account->api_config);
-    //     // var_dump($single->requestReport());exit;
-    //     var_dump($single->getReportRequestList('53034017045'));exit;
-    //     $buf = $single->getReport('2724553088017044');
-        
-    //     $arr = explode("\n", $buf);
-    //     $keys = explode("\t", $arr[0]);
-    //     $vals = [];
-    //     foreach($arr as $key => $value) {
-    //         if(!$key) {
-    //             continue;
-    //         }
-    //         $buf = explode("\t", $value);
-    //         foreach($buf as $k => $v) {
-    //             $vals[$keys[$k]] = $v;
-    //         }
-    //         var_dump($vals);
-    //         var_dump($vals['afn-inbound-receiving-quantity']);exit;
-    //         // var_dump($vals);exit;
-    //         // $tmp = Tool::filter_sku($vals['sku']);
-    //         // if(count($tmp)) {
-    //         //     $item = ItemModel::where('sku', $tmp['0']['erpSku'])->first()
-    //         //     if($item) {
-    //         //         $vals['item_id'] = $item->id;
-    //         //     }
-    //         // }
-    //         // $vals['title'] = $vals['product-name'];
-    //         // $vals['channel_sku'] = $vals['sku'];
-    //         // $vals['mfn_fulfillable_quantity'] = $vals['mfn-fulfillable-quantity'];
-    //         // $vals['afn_warehouse_quantity'] = $vals['afn-warehouse-quantity'];
-    //         // $vals['afn_fulfillable_quantity'] = $vals['afn-fulfillable-quantity'];
-    //         // $vals['afn_unsellable_quantity'] = $vals['afn-unsellable-quantity'];
-    //         // $vals['afn_reserved_quantity'] = $vals['afn-reserved-quantity'];
-    //         // $vals['afn_total_quantity'] = $vals['afn-total-quantity'];
-    //         // $vals['per_unit_volume'] = $vals['per-unit-volume'];
-    //         // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
-    //         // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
-    //         $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
-    //         // $vals['account_id'] = '1';
-    //         // fbaStock::create($vals);
-    //     }exit;
-    // }
+    public function test2()
+    {
+        $account = AccountModel::find(1);
+        $single = new AmazonAdapter($account->api_config);
+        // var_dump($single->requestReport());exit;
+        // var_dump($single->getReportRequestList('53034017045'));exit;
+        // $buf = $single->getReport('2724553088017044');
+        var_dump(empty($single->listInShipment('FBA3VX2RL1')));
+        // $arr = explode("\n", $buf);
+        // $keys = explode("\t", $arr[0]);
+        // $vals = [];
+        // foreach($arr as $key => $value) {
+        //     if(!$key) {
+        //         continue;
+        //     }
+        //     $buf = explode("\t", $value);
+        //     foreach($buf as $k => $v) {
+        //         $vals[$keys[$k]] = $v;
+        //     }
+        //     var_dump($vals);
+        //     var_dump($vals['afn-inbound-receiving-quantity']);exit;
+            // var_dump($vals);exit;
+            // $tmp = Tool::filter_sku($vals['sku']);
+            // if(count($tmp)) {
+            //     $item = ItemModel::where('sku', $tmp['0']['erpSku'])->first()
+            //     if($item) {
+            //         $vals['item_id'] = $item->id;
+            //     }
+            // }
+            // $vals['title'] = $vals['product-name'];
+            // $vals['channel_sku'] = $vals['sku'];
+            // $vals['mfn_fulfillable_quantity'] = $vals['mfn-fulfillable-quantity'];
+            // $vals['afn_warehouse_quantity'] = $vals['afn-warehouse-quantity'];
+            // $vals['afn_fulfillable_quantity'] = $vals['afn-fulfillable-quantity'];
+            // $vals['afn_unsellable_quantity'] = $vals['afn-unsellable-quantity'];
+            // $vals['afn_reserved_quantity'] = $vals['afn-reserved-quantity'];
+            // $vals['afn_total_quantity'] = $vals['afn-total-quantity'];
+            // $vals['per_unit_volume'] = $vals['per-unit-volume'];
+            // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
+            // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
+            // $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
+            // $vals['account_id'] = '1';
+            // fbaStock::create($vals);
+        // }exit;
+    }
 
     public function test1()
     {

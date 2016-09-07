@@ -67,6 +67,8 @@ class RequireController extends Controller
      */
 	public function addPurchaseOrder()
 	{	
+		ini_set('memory_limit', '2048M');
+		set_time_limit(0);
 		$purchaseIds=explode(',',request()->get('purchase_ids'));
 		if(request()->get('purchase_ids')){
 			$needPurchases=$this->productItem->find($purchaseIds);

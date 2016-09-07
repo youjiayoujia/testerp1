@@ -34,6 +34,9 @@
                 <a href="javascript:" class="btn btn-warning btn-xs print">
                     <span class="glyphicon glyphicon-pencil"></span> 打印拣货单
                 </a>
+                <a href="javascript:" class="btn btn-warning btn-xs code">
+                    <span class="glyphicon glyphicon-pencil"></span> 条码
+                </a>
                 @if($pickList->type == 'MULTI' && $pickList->status == 'PICKING')
                 <a href="{{ route('pickList.inbox', ['id'=>$pickList->id])}}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 分拣
@@ -140,6 +143,16 @@ $(document).ready(function(){
     $(document).on('click', '.print', function () {
         id = $(this).parent().parent().find('td:eq(1)').text();
         src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
+        $('#iframe_print').attr('src', src);
+        $('#iframe_print').load(function () {
+            $('#iframe_print')[0].contentWindow.focus();
+            $('#iframe_print')[0].contentWindow.print();
+        });
+    });
+
+    $(document).on('click', '.code', function () {
+        id = $(this).parent().parent().find('td:eq(1)').text();
+        src = "{{ route('pickList.pickCode', ['id'=>'']) }}/" + id;
         $('#iframe_print').attr('src', src);
         $('#iframe_print').load(function () {
             $('#iframe_print')[0].contentWindow.focus();

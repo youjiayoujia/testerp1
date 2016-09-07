@@ -16,6 +16,7 @@ use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
 use App\Models\WrapLimitsModel;
 use App\Models\CatalogModel;
+use App\Models\UserModel;
 use Excel;
 use App\Models\ChannelModel;
 
@@ -115,6 +116,62 @@ class ItemController extends Controller
             'wrapLimit_arr' => $wrapLimit_arr,
         ];
         return view($this->viewPath . 'show', $response);
+    }
+
+    /**
+     * 获取供应商信息
+     */
+    public function ajaxSupplierUser()
+    {
+        $item_id = request()->input('item_id');
+        $model = $this->model->find($item_id);
+        $user_array = ItemModel::where('supplier_id',$model->supplier_id)->distinct()->get();
+        $in = [];
+        foreach ($user_array as $array) {
+            $in[] = $array->purchase_adminer;
+        }
+
+        if(request()->ajax()) {
+            $user = trim(request()->input('user'));
+            $buf = UserModel::where('name', 'like', '%'.$user.'%')->whereIn('id',$in)->get();
+            $total = $buf->count();
+            $arr = [];
+            foreach($buf as $key => $value) {
+                $arr[$key]['id'] = $value->id;
+                $arr[$key]['text'] = $value->name;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else
+                return json_encode(false);
+        }
+        return json_encode(false);
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function changePurchaseAdmin($item_id)
+    {
+        $user_name = request()->input('manual_name');
+        $user_id = request()->input('purchase_adminer');
+        $model = $this->model->find($item_id);
+        if($user_id){
+            $model->update(['purchase_adminer'=>$user_id]);
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
+        }else{
+            $userModel = UserModel::where('name',$user_name)->first();
+            if($userModel){
+                $model->update(['purchase_adminer'=>$userModel->id]);
+                return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
+            }else{
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
+            }
+        }
+
     }
 
     /**

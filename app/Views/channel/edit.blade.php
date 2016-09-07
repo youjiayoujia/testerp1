@@ -18,30 +18,6 @@
             </select>
         </div>
     </div>
-    <div class='row'>
-        <div class='from-group col-lg-3'>
-            <label for="name" class='control-label'>固定费用类型</label>
-            <select name='flat_rate' class='form-control flat_rate'>
-                <option value="channel" {{ $model->flat_rate == 'channel' ? 'selected' : ''}}>渠道</option>
-                <option value="catalog" {{ $model->flat_rate == 'catalog' ? 'selected' : ''}}>品类</option>
-            </select>
-        </div>
-        <div class='from-group col-lg-3'>
-            <label for="name" class='control-label'>固定费用值</label>
-            <input type='text' class="form-control flat_rate_value" placeholder="固定费用值" name='flat_rate_value' value="{{ old('flat_rate_value') ? old('flat_rate_value') : $model->flat_rate_value }}" {{ $model->flat_rate == 'catalog' ? 'disabled' : ''}}>
-        </div>
-        <div class='from-group col-lg-3'>
-            <label for="name" class='control-label'>费率类型</label>
-            <select name='rate' class='form-control rate'>
-                <option value="channel" {{ $model->rate == 'channel' ? 'selected' : ''}}>渠道</option>
-                <option value="catalog" {{ $model->rate == 'catalog' ? 'selected' : ''}}>品类</option>
-            </select>
-        </div>
-        <div class='from-group col-lg-3'>
-            <label for="name" class='control-label'>费率值</label>
-            <input type='text' class="form-control rate_value" placeholder="费率值 0.XXX" name='rate_value' value="{{ old('rate_value') ? old('rate_value') : $model->rate_value }}" {{ $model->rate == 'catalog' ? 'disabled' : ''}}>
-        </div>
-    </div>
     <div class="row">
         <div class="form-group col-lg-12">
             <label for="brief" class='control-label'>描述</label>

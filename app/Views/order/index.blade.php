@@ -77,12 +77,22 @@
                     <abbr title="Phone">P:</abbr> {{ $order->shipping_phone }}
                 </address>
                 @if($order->customer_remark)
+                    <div class="divider"></div>
                     <div class="text-danger">
                         {{ $order->customer_remark }}
                     </div>
                 @endif
+                @if($order->remarks)
+                    @foreach($order->remarks as $remark)
+                        <div class="divider"></div>
+                        <div class="text-danger">
+                            {{ $remark->remark }}
+                        </div>
+                    @endforeach
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
+                        <div class="divider"></div>
                         <div class="text-danger">
                             <label>退款ID:</label>{{ $refund->id }}
                             <label>退款金额:</label>{{ $refund->refund_amount }}
@@ -96,7 +106,16 @@
                 <div class="col-lg-12 text-center">
                     @foreach($order->items as $orderItem)
                         <div class="row">
-                            <div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>
+                            <div class="col-lg-1">
+                                ID:{{ $orderItem->item ? $orderItem->item->product_id : '' }}
+                                <br>
+                                @if($order->channel)
+                                    @if($order->channel->driver == 'ebay')
+                                        ebay站点: {{ $order->shipping_country }}
+                                    @endif
+                                @endif
+                            </div>
+                            {{--<div class="col-lg-1">{{ $orderItem->id . '@' . $orderItem->sku }}</div>--}}
                             @if($orderItem->item)
                                 <div class="col-lg-2">
                                     <img src="{{ asset($orderItem->item->product->dimage) }}" width="50px">
@@ -202,6 +221,11 @@
                                 title="包裹">
                             <span class="glyphicon glyphicon-link"></span> 包裹
                         </button>
+                    @endif
+                    @if($order->status == 'CANCEL')
+                        <a href="javascript:" class="btn btn-primary btn-xs recover" data-id="{{ $order->id }}">
+                            <span class="glyphicon glyphicon-pencil"></span> 恢复订单
+                        </a>
                     @endif
                     <a href="{{ route('invoice', ['id'=>$order->id]) }}" class="btn btn-primary btn-xs">
                         <span class="glyphicon glyphicon-eye-open"></span> 德国发票
@@ -651,6 +675,22 @@
                     var order_id = $(this).data('id');
                     $.ajax({
                         url: "{{ route('updateNormal') }}",
+                        data: {order_id: order_id},
+                        dataType: 'json',
+                        type: 'get',
+                        success: function (result) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+
+            //恢复订单
+            $('.recover').click(function () {
+                if (confirm("确认恢复订单?")) {
+                    var order_id = $(this).data('id');
+                    $.ajax({
+                        url: "{{ route('updateRecover') }}",
                         data: {order_id: order_id},
                         dataType: 'json',
                         type: 'get',

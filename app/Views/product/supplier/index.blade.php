@@ -16,6 +16,20 @@
         </div>
         @parent
     </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i>
+            审核状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach(config('product.supplier_examine_status') as $key => $item)
+                <li>
+                    <a href="{{ DataList::filtersEncode(['examine_status','=',$key]) }}">{{ $item }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>

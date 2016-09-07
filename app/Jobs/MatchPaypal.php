@@ -114,7 +114,7 @@ class MatchPaypal extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'paypal匹配失败:当前交易凭证在预设的PayPal组中，未查询到交易详情，请通过其它方式查询.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('MatchPaypal',isset($api->httpResponse)?serialize($api->httpResponse):serialize(array('匹配失败')));
+        $this->log('MatchPaypal',isset($api->httpResponse)?base64_encode(serialize($api->httpResponse)):base64_encode(serialize(array('匹配失败'))));
 
     }
 }

@@ -8,6 +8,7 @@
 namespace App\Models\Message\Issues;
 use App\Base\BaseModel;
 use App\Models\OrderModel;
+use App\Models\Order\ItemModel;
 class EbayCasesListsModel extends BaseModel{
     protected $table = 'ebay_cases_lists';
     public $rules = [];
@@ -17,6 +18,9 @@ class EbayCasesListsModel extends BaseModel{
     public function account()
     {
         return $this->hasOne('App\Models\Channel\AccountModel', 'id', 'account_id');
+    }
+    public function orderItem(){
+        return $this->hasOne('App\Models\Order\ItemModel','id','related_order_id');
     }
 
     public function getCaseContentAttribute(){
@@ -82,21 +86,48 @@ class EbayCasesListsModel extends BaseModel{
         return $html;
     }
 
-    public function getOrderIdAttribute(){
-        if(empty($this->related_order_id)){
-            if(!empty($this->transaction_id)){
-                $realted_order = OrderModel::where('transaction_number',$this->transaction_id)->get();
-                if(count($realted_order) > 0){
-                    $this->related_order_id =  $realted_order->first()->id;
-                    $this->save();
-                    return $this->related_order_id;
-                }
+    public function getCaseOrderInfoAttribute()
+    {
+        if (!empty($this->transaction_id)) {
+            $realted_order = ItemModel::where('transaction_id', $this->transaction_id)->first();
+            if (!empty($realted_order)) {
+                return $realted_order;
             }
-        }else{
-            return $this->related_order_id;
         }
         return '';
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

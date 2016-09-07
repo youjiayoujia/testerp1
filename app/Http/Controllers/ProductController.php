@@ -352,60 +352,6 @@ class ProductController extends Controller
         $result['keywords'] = $info[$language."_keywords"];
         return $result;
     }
-    /**
-     * 批量更新
-     *
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function changePurchaseAdmin($product_id)
-    {
-        $user_name = request()->input('manual_name');
-        $user_id = request()->input('purchase_adminer');
-        $model = $this->model->find($product_id);
-        if($user_id){
-            $model->update(['purchase_adminer'=>$user_id]);
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
-        }else{
-            $userModel = UserModel::where('name',$user_name)->first();
-            if($userModel){
-                $model->update(['purchase_adminer'=>$userModel->id]);
-                return redirect($this->mainIndex)->with('alert', $this->alert('success', '采购员变更成功.'));
-            }else{
-                return redirect($this->mainIndex)->with('alert', $this->alert('danger','该用户不存在.'));
-            }
-        }
-
-    }
-    /**
-     * 获取供应商信息
-     */
-    public function ajaxSupplierUser()
-    {
-        $product_id = request()->input('product_id');
-        $model = $this->model->find($product_id);
-        $user_array = ProductModel::where('supplier_id',$model->supplier_id)->distinct()->get();
-        $in = [];
-        foreach ($user_array as $array) {
-            $in[] = $array->purchase_adminer;
-        }
-
-        if(request()->ajax()) {
-            $user = trim(request()->input('user'));
-            $buf = UserModel::where('name', 'like', '%'.$user.'%')->whereIn('id',$in)->get();
-            $total = $buf->count();
-            $arr = [];
-            foreach($buf as $key => $value) {
-                $arr[$key]['id'] = $value->id;
-                $arr[$key]['text'] = $value->name;
-            }
-            if($total)
-                return json_encode(['results' => $arr, 'total' => $total]);
-            else
-                return json_encode(false);
-        }
-        return json_encode(false);
-    }
 
     /**
      * 产品价格计算
@@ -437,7 +383,7 @@ class ProductController extends Controller
                 /**
                  * 亚马逊平台加临界值判断规则
                  * 小于临界值   售价=（采购成本+平台费用+物流成本）（1-利润率）
-                 * 大于临界值   售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
+                 * 大于临界值   售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-PP成交费率）
                  *
                  */
                 $channel_fee = 0; //初始化 平台费
@@ -452,11 +398,10 @@ class ProductController extends Controller
                             }
                             //售价=（采购成本+平台费用+物流成本）（1-利润率）
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_small = 0;
                         }else{
-                            //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_big/100 ) /$USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_small) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100)/$USD_obj->rate ;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_small = 0;
                         }
                         break;
                     case '亚马逊英国':
@@ -472,12 +417,11 @@ class ProductController extends Controller
                             $channel_fee = $channel_fee / $GBP_obj->rate; // 平台费USD
                             //售价=（采购成本+平台费用+物流成本）（1-利润率）
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_small = 0;
 
                         }else{
-                            //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_big/100) /$USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_small) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100)/$USD_obj->rate ;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_small = 0;
 
                         }
 
@@ -495,12 +439,11 @@ class ProductController extends Controller
                             $channel_fee = $channel_fee / $EUR_obj->rate; // 平台费USD
                             //售价=（采购成本+平台费用+物流成本）（1-利润率）
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_small = 0;
 
                         }else{
-                            //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_big/100 ) /$USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_small) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100)/$USD_obj->rate ;
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_small = 0;
                         }
                         break;
                     case '亚马逊日本':
@@ -515,23 +458,31 @@ class ProductController extends Controller
                             }
                             //兑换美元
                             $channel_fee = $channel_fee / $JPY_obj->rate; // 平台费USD
-                            //售价=（采购成本+平台费用+物流成本）（1-利润率）
                             $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $channel_fee)  / (1 - $form_ary['profit_id'] / 100) / $USD_obj->rate;
+                            $sale_price_small = 0;
 
                         }else{
-                            //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
-                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_big/100 ) /$USD_obj->rate;
-                            $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_small) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100)/$USD_obj->rate ;
-
-
+                            $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                            $sale_price_small = 0;
                         }
+                        break;
+                    case 'eBay欧洲':
+                    case 'eBay澳洲':
+                    case 'eBay美国':
+                    case 'eBay英国':
+
+                    /**
+                     * EBAY售价=（采购成本+物流成本+PP固定费用0.3美金）/（1-利润率-分类费率-小PP成交费率3%）
+                     * 如果是大PP计算，则小PP成交费率为0
+                     */
+                        $sale_price_big   = ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) / $USD_obj->rate;
+                        $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100) / $USD_obj->rate;
                         break;
                     default:
                         //其他渠道统一计算
                         //售价=（采购成本+物流成本+PP固定费用）/（1-利润率-分类费率-小PP成交费率）
-                        $sale_price_big =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_big) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_big/100 ) /$USD_obj->rate;
-                        $sale_price_small =  ($product_obj->purchase_price + $shipment_fee + $rates->fixed_fee_small) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 - $rates->transactions_fee_small/100)/$USD_obj->rate;
+                        $sale_price_big =  ($product_obj->purchase_price + $shipment_fee) / (1 - $form_ary['profit_id'] / 100 - $item_channel->pivot->rate /100 ) /$USD_obj->rate;
+                        $sale_price_small = 0;
                         break;
 
                 }

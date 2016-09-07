@@ -1480,5 +1480,18 @@ Class AliexpressAdapter implements AdapterInterface
         }
         return $str;
     }
+    
+    /**
+     * @param $paramAry
+     * compact('orderId','buyId','comments')
+     */
+    public function addMessageNew($paramAry){
+         // $order_detail_ary = json_decode($this->getJsonData('api.findOrderById',"orderId=".$paramAry['orderId']),true);
+        $query =rawurlencode("channelId={$paramAry['orderId']}&buyerId={$paramAry['buyId']}&msgSources=order_msg&content={$paramAry['comments']}");
+        $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
+
+        return $respon_ary['result']['isSuccess'] ? true : false;
+
+    }
 
 }

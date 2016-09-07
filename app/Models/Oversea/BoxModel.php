@@ -25,6 +25,7 @@ class BoxModel extends BaseModel
      */
     protected $fillable = [
         'boxNum',
+        'fee',
         'logistics_id',
         'tracking_no',
         'width',
@@ -49,8 +50,23 @@ class BoxModel extends BaseModel
         ];
     }
 
+    protected $rules = [
+        'create' => [],
+        'update' => []
+    ];
+
     public function forms()
     {
         return $this->hasMany('App\Models\Oversea\BoxFormModel', 'parent_id', 'id');
+    }
+
+    public function logistics()
+    {
+        return $this->belongsTo('App\Models\LogisticsModel', 'logistics_id', 'id');
+    }
+
+    public function report()
+    {
+        return $this->belongsTo('App\Models\Oversea\ReportModel', 'parent_id', 'id');
     }
 }

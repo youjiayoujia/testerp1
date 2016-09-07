@@ -58,7 +58,8 @@ class AmazonModule extends BaseChannelModule
         $this->serviceUrl = "https://mws.amazonservices.com/FulfillmentInboundShipment/2010-10-01?";
         $this->_config['Action'] = 'ListInboundShipments';
         $this->_config['ShipmentStatusList.member.1'] = 'CHECKED_IN';
-        $this->_config['ShipmentIdList.member.1'] = 'FBA44JV8R';
+        $this->_config['ShipmentStatusList.member.2'] = 'WORKING';
+        // $this->_config['ShipmentIdList.member.1'] = 'FBAWWDKDK';
         $this->_config['Version'] = '2010-10-01';
         unset($this->_config['MarketplaceId.Id.1']);
         // var_dump($this->_config);exit;
@@ -73,15 +74,15 @@ class AmazonModule extends BaseChannelModule
         $signature = urlencode(base64_encode($signature));
         $string = $tmp_sigtoString.'&Signature='.$signature;
         $string1 = $this->serviceUrl.$string;
-        // var_dump($string1);exit;
         $ch = curl_init($string1);
         curl_setopt($ch,CURLOPT_HEADER,0);
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
         $res = curl_exec($ch);
+        $result_string = simplexml_load_string($res);
         curl_close($ch);
         echo "<pre>";
-        var_dump($res);
+        print_r($result_string);
         echo "</pre>";
         
         return $res;

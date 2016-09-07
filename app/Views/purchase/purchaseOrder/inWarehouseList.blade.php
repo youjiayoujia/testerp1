@@ -129,6 +129,9 @@ table.gridtable td {
                 data +=":"+$('#badnum_'+id).val()+",";
             }   
 　　　　});
+		if(data==''){
+			alert('该采购单已经全部入库');location.href=history.go(-1);return;
+		}
 		if(flag==1){
 			alert('两次输入数量不一致');return;
 		}

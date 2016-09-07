@@ -41,9 +41,9 @@ class CreatePurchase extends Command
     {
         $begin = microtime(true);
         $itemModel = new ItemModel();
-        //$itemModel->createPurchaseNeedData();
+        $itemModel->createPurchaseNeedData();
         $end = microtime(true);
-        //echo '采购需求数据更新耗时' . round($end - $begin, 3) . '秒,正在自动创建采购单,请稍后......';
+        echo '采购需求数据更新耗时' . round($end - $begin, 3) . '秒,正在自动创建采购单,请稍后......';
         $requireModel = new RequireModel();
         $requireModel->createAllPurchaseOrder();
         $endcreate = microtime(true);

@@ -1466,4 +1466,19 @@ Class AliexpressAdapter implements AdapterInterface
        return $time;
    }
 
+    /**
+     * 过滤速卖通产品信息模块
+     * @param $str 产品详情信息
+     * @return mixed
+     */
+    function filterSmtRelationProduct($str){
+        preg_match_all('/<kse:widget.*><\/kse:widget>/i', $str, $matches);
+        if (!empty($matches[0])){
+            foreach($matches[0] as $widget){
+                $str = str_replace($widget, '', $str);
+            }
+        }
+        return $str;
+    }
+
 }

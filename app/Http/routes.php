@@ -664,6 +664,9 @@ Route::group(['middleware' => 'auth'], function () {
             ['uses' => 'SmtController@ajaxUploadOneCustomPic', 'as' => 'smt.ajaxUploadOneCustomPic']);
         Route::post('getskuinfo',
             ['uses' => 'SmtController@getskuinfo', 'as' => 'smt.getskuinfo']);
+        Route::post('ajaxUploadDirImageByNewSys',
+            ['uses' => 'SmtController@ajaxUploadDirImageByNewSys', 'as' => 'smt.ajaxUploadDirImageByNewSys']);
+       
         Route::get('editOnlineProduct',
             ['uses' => 'SmtController@editOnlineProduct', 'as' => 'smt.editOnlineProduct']);
         Route::get('ajaxOperateOnlineProduct',
@@ -697,8 +700,10 @@ Route::group(['middleware' => 'auth'], function () {
             ['uses' => 'SmtProductController@batchModifyProduct', 'as' => 'smtProduct.batchModifyProduct']);
         Route::post('synchronizationProduct',
             ['uses' => 'SmtProductController@synchronizationProduct', 'as' => 'smtProduct.synchronizationProduct']);
-        
-  
+        Route::get('showAccountToCopyProduct',
+            ['uses' => 'SmtProductController@showAccountToCopyProduct', 'as' => 'smtProduct.showAccountToCopyProduct']);
+        Route::post('copyToDraft',
+            ['uses' => 'SmtProductController@copyToDraft', 'as' => 'smtProduct.copyToDraft']);        
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     

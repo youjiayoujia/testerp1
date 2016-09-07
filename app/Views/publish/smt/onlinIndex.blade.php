@@ -29,11 +29,9 @@
             <td>{{ $smtProductList->productId }}</td>
             <td>
                 <?php 
-                    $skuCodeArr = array();
-                    
+                    $skuCodeArr = array();                    
                     foreach ($smtProductList->productSku as $productSkuItem){
-                        echo $productSkuItem->skuCode.'<br/>';
-                       
+                        echo $productSkuItem->skuCode.'<br/>';                       
                     }                                             
                 ?>            
             </td>
@@ -62,7 +60,16 @@
      @endforeach
 @stop
 @section('tableToolButtons')
-        
+         <div class="btn-group">
+            <a class="btn btn-success export" href="javascript:void(0)" id="batch_copy">
+              另存为草稿
+            </a>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-success export" href="{{ route('smt.index')}}">
+            查看草稿列表
+            </a>
+        </div>
         <div class="btn-group">
             <a class="btn btn-success export" href="{{ route('smt.create') }}">
               批量修改
@@ -186,7 +193,7 @@ function operator(id,type,e){
 
 $(document).on('click','#editOnline',function(){
 	var product_id = $(this).data('id');
-	if(confirm('是否要线同步广告，本次同步不计算利润率')){
+	if(confirm('是否要先同步广告，本次同步不计算利润率')){
 		$.ajax({
 			url: "{{route('smtProduct.synchronizationProduct')}}",
 			data: 'product_id='+product_id,
@@ -211,5 +218,75 @@ $(document).on('click','#editOnline',function(){
 	}	
 	
 })
+
+$(document).on('click', '#batch_copy', function(event) {
+		event.preventDefault();
+		/* Act on the event */
+		var productIds = $('input[name="single[]"]:checked').map(function() {
+			return $(this).val();
+		}).get().join(',');
+		if (productIds == ''){
+			alert('请先选择数据');
+			return false;
+		}
+
+		if (confirm('确定要将选中的广告另存为草稿吗？')) {
+			//弹出层选择账号
+			$.layer({
+				type   : 2,
+				shade  : [0.8 , '' , true],
+				title  : ['选择账号',true],
+				iframe : {src : '{{route('smtProduct.showAccountToCopyProduct')}}'},
+				area   : ['900px' , '550px'],
+				success : function(){
+					layer.shift('top', 400)
+				},
+				btns : 2,
+				btn : ['确定', '取消'],
+				yes : function(index){ //确定按钮的操作
+					var account_list = layer.getChildFrame('.account_list :checked', index).map(function(){
+						return $(this).val();
+					}).get().join(',');
+					console.log(account_list);
+					if (account_list != ''){
+
+						$.ajax({
+							url: '{{route('smtProduct.copyToDraft')}}',
+							data: 'productIds='+productIds+'&tokenIds='+account_list,
+							type: 'POST',
+							dataType: 'json',
+							beforeSend: function(){
+								$('#batch_copy').addClass('disabled');
+							},
+							success: function(data){
+								var str='';
+								if (data.data){
+									$.each(data.data, function(index, el){
+										str += el+';';
+									});
+								}
+								if (data.status) { //成功
+									showxbtips(data.info+str);
+								}else {
+									showxbtips(data.info+str, 'alert-warning');
+								}
+							},
+							complete: function(){
+								$('#batch_copy').removeClass('disabled');
+							}
+						});
+					}else {
+						showtips('请先选择账号', 'alert-warning');
+					}
+					layer.close(index);
+				},
+				no: function(index){
+					layer.close(index);
+				}
+			});
+		}else{
+			return false;
+		}
+	});
 </script>
 @stop

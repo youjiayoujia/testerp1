@@ -42,18 +42,34 @@ $smtApi = $channel->driver($account->channel->driver, $account->api_config);
     padding: 0 10px;
 }
 
-.pic-main {
+.pic-main,.pic-detail,.relate-list{
     padding: 5px;
     border: 1px solid #ccc;
 }
 
-.pic-main li {
+.pic-main li, .pic-detail li,.relate-list li{
     margin: 5px;
     padding: 0px;
     border: 0px;
     width: 102px;
     text-align: right;
 }
+ /***拖拽样式***/
+    .pic-main li div, .pic-detail li div, .relate-list li div{
+        width: 102px;
+        height: 125px;
+        border: 1px solid #fff;
+    }
+
+    .pic-main .placeHolder div, .pic-detail .placeHolder div, .relate-list .placeHolder div{
+        width: 102px;
+        height: 125px;
+        background-color: white !important;
+        border: dashed 1px gray !important;
+    }
+    .my-list-cust li{ padding: 5px; float: left; position: relative;}
+    .my-list-cust li img{ cursor: pointer;}
+    .my-list-cust .my-check-cust{ position: absolute; z-index: 999; left: 5px; top: 1px;}
 
 .form-group{
     margin-top:10px;
@@ -367,11 +383,11 @@ text-align: left;
                             if (array_key_exists('child', $g)) { //有子选项
                                 echo '<optgroup label="'.$g['group_name'].'">';
                                 foreach ($g['child'] as $r):
-                                    echo '<option value="' . $r['group_id'] . '" ' . ($smtApi->filterData('groupId', $draft_info) == $r['group_id'] ? 'selected="selected"' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;--' . $r['group_name'] . '</option>';
+                                    echo '<option value="' . $r['group_id'] . '" ' . ($smtApi->filterData('groupId', $draft_info->toArray()) == $r['group_id'] ? 'selected="selected"' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;--' . $r['group_name'] . '</option>';
                                 endforeach;
                                 echo '</optgroup>';
                             }else {
-                                echo '<option value="' . $g['group_id'] . '" '.($smtApi->filterData('groupId', $draft_info) == $g['group_id'] ? 'selected="selected"' : '').'>' . $g['group_name'] . '</option>';
+                                echo '<option value="' . $g['group_id'] . '" '.($smtApi->filterData('groupId', $draft_info->toArray()) == $g['group_id'] ? 'selected="selected"' : '').'>' . $g['group_name'] . '</option>';
                             }
                         endforeach;
                     ?>
@@ -789,6 +805,8 @@ $template['name'].'</option>';
                                 <a href="javascript:void(0);" class="btn btn-default btn-sm copy_main_pic">复制主图图片</a>
                                 <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImage')}}', '<?php echo $token_id;?>', '');">图片目录上传</a>
                                 <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImage')}}', '<?php echo $token_id;?>', 'SP');">实拍目录上传</a>
+                                <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImageByNewSys',['type'=> 1])}}', '<?php echo $token_id;?>', '');">新图片(实拍)上传</a>
+                                <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImageByNewSys',['type'=> 2])}}', '<?php echo $token_id;?>', '');">新图片(链接)上传</a>
                                 <a class="btn btn-default btn-sm copyToMain" href="javascript: void(0);" onclick="copyPicTo(this, 'pic-main', 6);">复制到主图</a>                                           
                                 <a class="btn btn-danger btn-xs delete_item pic_del_all"><span class="glyphicon glyphicon-trash"></span>全部删除</a>
                                 <b class="ajax-loading hide">图片上传中...</b>
@@ -809,9 +827,8 @@ $template['name'].'</option>';
                                     <?php
                                     endforeach;
                                 endif;
-                            ?>
-       
-                        </ul>
+                            ?>       
+                            </ul>
                              <!-- 
                             <ul class="list-inline pic-detail">
         
@@ -888,13 +905,10 @@ $template['name'].'</option>';
 @show{{-- 表单按钮 --}}
 @section('pageJs')
 
-
-<script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
-{{--<script src="{{ asset('plugins/ueditor/umeditor.js') }}"></script>--}}
-<script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
-<link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
+<link href="{{ asset('plugins/layer/skin/layer.css') }}" rel="stylesheet">
 <script src="{{ asset('plugins/kindeditor/kindeditor.js') }}"></script>
 <script src="{{ asset('plugins/layer/layer.js') }}"></script>
+<script src="{{ asset('plugins/jquery.dragsort-0.5.1.min.js') }}"></script>
 <script type="text/javascript">
     var skuConfig = eval(<?php echo $sku_config;?>); //SKU属性的信息
     var token_id; //账号ID
@@ -1675,7 +1689,11 @@ $template['name'].'</option>';
                     if (data.data){ //说明有成功的，成功的添加到里边去
                         var liStr = '';
                         $.each(data.data, function(index, el){
-                            liStr += '<li><div><img src="' + el + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                        	if(el.resize){
+                            	liStr += '<li><div><img src="' + (el.resize) + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el.remote + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                            }else{
+                            	liStr += '<li><div><img src="' + el + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                            }                    	
                         });
                         $(obj).closest('div.form-group').find('ul').append(liStr);
                         layer.msg('图片上传成功', 2, -1);
@@ -1785,6 +1803,9 @@ $template['name'].'</option>';
                 }
             });
         });
+
+        //图片拖拽排序
+        $(".pic-main, .pic-detail, .relate-list").dragsort({ dragSelector: "div",  placeHolderTemplate: "<li class='placeHolder'><div></div></li>"});
 
         //从别处复制图片到这
         function copyToHere(obj, fromClass){

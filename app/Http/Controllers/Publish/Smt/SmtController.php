@@ -1920,6 +1920,124 @@ html;
        }
    }
    
+   public function ajaxUploadDirImageByNewSys(){
+       $token_id = request()->input('token_id');
+       $dirName  = trim(request()->input('dirName'));
+       $type = $_GET['type']; 
+       if (empty($token_id) || empty($dirName)) {
+           $this->ajax_return('账号或者SKU不能为空', false);
+       }
+   
+       $result =  $this->uploadBankImageNewAll($dirName,$type);
+
+       if(empty($result))
+       {
+           $this->ajax_return('未找到改SKU图片信息', false);
+       }
+       
+       $error   = array();   
+       $account = AccountModel::findOrFail($token_id);
+       $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+       $api = 'api.uploadImage'; 
+       $last_array = array();
+       foreach($result as $re)
+       {
+           $res = $smtApi->uploadBankImage($api,$re['url'],$re['name']);
+           if (array_key_exists('success',$res)&& $res['success']=='true') {
+               $new_pic = $res['photobankUrl'];
+               
+               if(!empty($new_pic))
+               {
+                   $tmpImage = array();
+                   $tmpImage['resize'] = str_replace('getSkuImageInfo-800resize', 'getSkuImageInfo-resize', $re['url']);
+                   $tmpImage['remote'] = $new_pic;               
+                   $last_array[] = $tmpImage;
+               }
+               else
+               {
+                   $this->ajax_return('检查账号图片银行空间是否还有空余', false, $last_array);
+               }
+           } else {
+           }          
+       }
+   
+       $this->ajax_return($error, true, $last_array);
+   }
+   
+   // $type= 1 取实拍图片 $type=2  取链接图
+   public function uploadBankImageNewAll($dirName,$type)
+   {
+       $url='';
+       if($type==1)
+       {
+           //$url ='http://120.24.100.157:3000/api/sku/'.$dirName.'?include-sub=true&distinct=true&tags=photo';
+           $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?tags=photo&distinct=true&include_sub=true&sku='.$dirName;
+       }
+       if($type==2)
+       {
+           //$url ='http://120.24.100.157:3000/api/sku/'.$dirName.'?include-sub=true&distinct=true&tags=link';
+           $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?tags=link&distinct=true&include_sub=true&sku='.$dirName;
+   
+       }   
+         
+       $result =$this->picCurl($url);
+
+        $result = json_decode($result,true);
+
+		$return_pic_array=array();
+		
+        if(!empty($result)){
+        	foreach($result as $ke => $v){
+        		//added by andy.
+	          	$photo_name = $v['filename'];
+	          	//$s_url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImage.php?id='.$photo_name;
+	          	$s_url = 'http://imgurl.moonarstore.com/getSkuImageInfo-800resize/sku/'.$photo_name;
+	            $return_pic_array[$ke]['url'] = $s_url;
+	            $return_pic_array[$ke]['name'] = $s_url;
+        	}
+        }      
+        
+        return $return_pic_array;
+   }
+   
+   public function picCurl($url)
+   {
+       $curl = curl_init();
+   
+       curl_setopt($curl, CURLOPT_URL, $url);
+   
+       curl_setopt($curl, CURLOPT_HEADER, 0);
+   
+       curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+   
+       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+   
+       $result = curl_exec($curl);
+   
+       curl_close($curl);
+       return $result;
+   
+   }
+   
+   /**
+    *  循环上传SKU图片
+    * @param $img
+    * @param $skuCode
+    * @param $id:错误日志时需要用到
+    * @return string
+    */
+   public function uploadBankImageNew($api,$img,$skuCode){
+   
+       $img_return = $this->smt->uploadBankImage($api, $img, $skuCode);
+       $new_pic='';
+       if (isset($img_return['success'])&& $img_return['success']=='true') {
+           $new_pic = $img_return['photobankUrl'];
+       } else { //失败了，写下日志吧
+   
+       }
+       return $new_pic;
+   }
+   
    public function getskuinfo()
    {
        $sku = Input::get('sku');

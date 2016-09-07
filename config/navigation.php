@@ -410,9 +410,9 @@ return [
                 'icon' => '',
             ],
             [
-            'name' => 'smt销售代码设置',
-            'url' => 'smtSellerCode.index',
-            'icon' => '',
+                'name' => 'smt销售代码设置',
+                'url' => 'smtSellerCode.index',
+                'icon' => '',
             ],
             [
                 'name' => 'Ebay站点信息',

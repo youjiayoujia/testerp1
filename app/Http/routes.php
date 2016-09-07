@@ -547,6 +547,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/removePackages/{arr}',
+        ['uses' => 'PackageController@removePackages', 'as' => 'package.removePackages']);
+    Route::get('package/removeLogistics/{arr}',
+        ['uses' => 'PackageController@removeLogistics', 'as' => 'package.removeLogistics']);
+    Route::get('package/changeLogistics/{arr}/{id}',
+        ['uses' => 'PackageController@changeLogistics', 'as' => 'package.changeLogistics']);
     Route::get('package/putNeedQueue',
         ['uses' => 'PackageController@putNeedQueue', 'as' => 'package.putNeedQueue']);
     Route::post('package/processReturnGoods',

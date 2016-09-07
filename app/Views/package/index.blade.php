@@ -112,6 +112,26 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="change_logistics" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="panel panel-default">
+                    <div class="panel-heading">批量修改物流方式</div>
+                    <div class="panel-body">
+                        <div class='col-lg-12'>
+                            <select name='change_logistics' class='form-control change_logistics col-lg-4'>
+                                @foreach($logisticses as $logistics)
+                                    <option value="{{ $logistics->id }}">{{ $logistics->code }}</option>
+                                @endforeach
+                            </select>
+                            <button type='button' class='btn btn-primary submit_logistics'>确认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 @section('tableToolButtons')
     <div class="btn-group">
@@ -139,6 +159,12 @@
             <li><a href="javascript:" class='returnFee' data-type='1'>回传一次运费</a></li>
             <li><a href="javascript:" class='returnFee' data-type='2'>回传二次运费</a></li>
             <li><a href="javascript:" class='multiEditTracking' data-type='3'>批量修改追踪号</a></li>
+            <li><a data-toggle="modal"
+                        data-target="#change_logistics">
+                    批量修改物流方式
+                </a></li>
+            <li><a href="javascript:" class='remove_logistics'>批量清除追踪号</a></li>
+            <li><a href="javascript:" class='remove_packages'>批量取消包裹</a></li>
         </ul>
     </div>
     <div class="btn-group">
@@ -168,7 +194,7 @@
             }
         });
 
-
+        $('.change_logistics').select2();
 
         $(document).on('click', '.sku_search', function(){
             sku = $.trim($(this).text());
@@ -202,6 +228,52 @@
                 type = $(this).data('type');
                 location.href = "{{ route('package.returnFee')}}?type=" + type;
             })
+
+            $(document).on('click', '.submit_logistics', function(){
+                arr = new Array();
+                i = 0;
+                $.each($('.single:checked'), function () {
+                    tmp = $(this).parent().next().text();
+                    arr[i] = tmp;
+                    i++;
+                })
+                logistics_id = $('.change_logistics').val();
+                if(arr.length) {
+                    location.href = "{{ route('package.changeLogistics', ['arr' => '']) }}/" + arr + '/' + logistics_id;
+                } else {
+                    alert('请选择包裹信息');
+                }
+            });
+
+            $(document).on('click', '.remove_packages', function(){
+                arr = new Array();
+                i = 0;
+                $.each($('.single:checked'), function () {
+                    tmp = $(this).parent().next().text();
+                    arr[i] = tmp;
+                    i++;
+                })
+                if(arr.length) {
+                    location.href = "{{ route('package.removePackages', ['arr' => '']) }}/" + arr;
+                } else {
+                    alert('请选择包裹信息');
+                }
+            });
+
+            $(document).on('click', '.remove_logistics', function(){
+                arr = new Array();
+                i = 0;
+                $.each($('.single:checked'), function () {
+                    tmp = $(this).parent().next().text();
+                    arr[i] = tmp;
+                    i++;
+                })
+                if(arr.length) {
+                    location.href = "{{ route('package.removeLogistics', ['arr' => '']) }}/" + arr;
+                } else {
+                    alert('请选择包裹信息');
+                }
+            });
 
             $(document).on('click', '.split_button', function(){
                 if(confirm('确认拆分')) {
@@ -278,8 +350,6 @@
                     alert('未选择包裹信息');
                 }
             });
-
-
 
             $('.select_all').click(function () {
                 if ($(this).prop('checked') == true) {

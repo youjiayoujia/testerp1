@@ -162,8 +162,6 @@ class RequireModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         $needPurchases=PurchasesModel::where('require_create',1)->get();
-        
-        //print_r($needPurchases);exit;
         foreach ($needPurchases as $key => $purchases) {
             $itemModel = $purchases->item;
             $data['type']=0;
@@ -173,7 +171,7 @@ class RequireModel extends BaseModel
             $data['purchase_cost']=$itemModel->purchase_price;
             $data['supplier_id']=$itemModel->supplier_id ? $itemModel->supplier_id : 0;
             $data['purchase_num']=$purchases->need_purchase_num;
-            $data['user_id']=request()->user()?request()->user()->id:'1';
+            $data['user_id']=$itemModel->purchase_adminer;
             $data['lack_num']=$data['purchase_num'];
 
             if($data['purchase_num']>0){

@@ -13,6 +13,7 @@ return [
         'FINANCE'  => '财务退款',
         'COMPLETE' => '已退款',
         'INVALID'  => '已作废',
+        'FAILED'   => '退款失败',
     ],
     'type' => [
         'FULL' => '全部退款',
@@ -24,4 +25,6 @@ return [
         '1' => 'Paypal',
         '2' => '销售平台'
     ],
+    'image_path' => './uploads/refund/',
+
 ];

@@ -832,7 +832,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
     Route::resource('refundCenter','RefundCenterController');
     Route::any('doPaypalRefund',['uses' =>'RefundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
-
+    Route::any('batchProcessStatus',['uses' =>'RefundCenterController@batchProcessStatus' , 'as' => 'refund.batchProcessStatus']);
 });
 
 

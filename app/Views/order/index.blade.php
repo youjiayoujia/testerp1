@@ -284,6 +284,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <form action="{{ route('refundUpdate', ['id' => $order->id])}}" method="POST" enctype="multipart/form-data">
+                       <input  type="hidden" name ="channel_id" value="{{$order->channel_id}}"/>
+                       <input  type="hidden" name ="channel_id" value="{{$order->channel_id}}"/>
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -357,7 +359,7 @@
                                 <div class="form-group col-lg-4">
                                     <label for="refund" class='control-label'>退款方式</label>
                                     <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                    <select class="form-control" name="refund" id="refund">
+                                    <select class="form-control refund-type" name="refund" id="refund" order-id="{{ $order->id }}">
                                         <option value="NULL">==退款方式==</option>
                                         @foreach(config('order.refund') as $refund_key => $refund)
                                             <option value="{{ $refund_key }}" {{ old('refund') }}>
@@ -389,6 +391,17 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                </div>
+                            </div>
+                            <div class="row" id="paypal-input-{{ $order->id }}" style="display: none;">
+                                <div class="col-lg-6 paypal-account" >
+                                    <label for="refund_currency" class='control-label'>客户退款Paypal账号</label>
+                                    <input type="text" class="form-control"   name="user_paypal_account" value="">
+                                </div>
+
+                                <div class="col-lg-6 refund-voucher" >
+                                        <label for="refund_currency" class='control-label'>退款凭证：</label>
+                                        <input type="text" class="form-control"   name="refund_voucher" value="">
                                 </div>
                             </div>
                             @if($order->items->toArray())
@@ -743,6 +756,14 @@
                             window.location.reload();
                         }
                     });
+                }
+            });
+            $(".refund-type").change(function(){
+                console.log($(this).val());
+                if($(this).val() == '1' ){
+                    $('#paypal-input-'+$(this).attr('order-id')).show();
+                }else{
+                    $('#paypal-input-'+$(this).attr('order-id')).hide();
                 }
             });
         });

@@ -16,7 +16,7 @@ class RefundModel extends BaseModel
 {
     protected $table = 'order_refunds';
 
-    public $searchFields = ['order_id', 'refund_amount', 'refund_currency'];
+    public $searchFields = ['order_id' => '订单号'];
 
     protected $fillable = [
         'order_id',
@@ -28,7 +28,18 @@ class RefundModel extends BaseModel
         'type',
         'memo',
         'detail_reason',
-        'image'
+        'image',
+        'refund_voucher',
+        'user_paypal_account',
+        'customer_id',
+        'channel_id',
+    ];
+
+    public $rules = [
+        'create' => [
+        ],
+        'update' => [
+        ]
     ];
 
     public function getReasonNameAttribute()
@@ -54,6 +65,9 @@ class RefundModel extends BaseModel
 
     public function Order(){
         return $this->hasOne('App\Models\OrderModel','id','order_id');
+    }
+    public function User(){
+        return $this->hasOne('App\Models\UserModel','id','customer_id');
     }
     public function getSKUsAttribute(){
         $items = $this->Order->items;
@@ -85,6 +99,27 @@ class RefundModel extends BaseModel
 
         $html .= '</ul>';
         return $html;
+    }
+
+    public function getCustomerNameAttribute(){
+        $name = '无';
+        if(!empty($this->customer_id)){
+            $name = $this->User->name;
+        }
+        return $name;
+    }
+
+    public function batchProcess($paramAry){
+        $ids_ary = explode(',',$paramAry['ids']);
+        $collection = $this->find($ids_ary);
+        if(!$collection->isEmpty()){
+            foreach ($collection as $refund){
+                $refund->process_status = $paramAry['process'];
+                $refund->save();
+            }
+            return true;
+        }
+        return false;
     }
 
 

@@ -4,7 +4,8 @@
     <div class="panel panel-default">
         <div class="panel-heading"> 编辑退款记录 </div>
         <div class="panel-body">
-            <form action="{{route('refundCenter.update',['id' => $refund->id ])}}" method="POST">
+            <form action="{{route('refundCenter.update',['id' => $refund->id ])}}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="_method" value="PUT"/>
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="row">
                     <div class="col-lg-3">
@@ -35,10 +36,8 @@
                     </div>
 
                     <div class="col-lg-3 refund-voucher"  @if($refund->refund == 2) style="display: none;" @endif>
-                        <div class="col-lg-3 paypal-account">
                             <label for="refund_currency" class='control-label'>退款凭证：</label>
                             <input type="text" class="form-control"   name="refund_voucher" value="{{$refund->refund_voucher}}">
-                        </div>
                     </div>
 
                 </div>
@@ -47,7 +46,7 @@
                     <div class="form-group col-lg-3">
                         <label for="group_id" class="control-label">内单号</label>
                         <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                            <input type="text" class="form-control"   name="order_id" value="{{$refund->order_id}}">
+                            <input type="text" class="form-control"   name="order_id" value="{{$refund->order_id}}" disabled>
                     </div>
                     <div class="form-group col-lg-3">
                         <label for="group_id" class="control-label">买家ID</label>
@@ -98,7 +97,7 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label for="group_id" class="control-label">交易号ID</label>
-                            <input type="text" class="form-control" id="group_id"  name="fixed_fee_big" value="{{$refund->refund_amount}}">
+                            <input type="text" class="form-control" id="group_id" value="{{$refund->Order->transaction_number}}">
                     </div>
                     <div class="form-group col-lg-6">
                         <label for="memo" class='control-label'>Memo(只能填写英文)</label>
@@ -111,9 +110,23 @@
                         <textarea class="form-control" rows="3" name="detail_reason" id="detail_reason">{{ $refund->detail_reason }}</textarea>
                     </div>
                     <div class="form-group col-lg-6">
-                    @if($refund->image)
-                        <label>图片链接：</label><a href="../../{{$refund->image}}"><span class="glyphicon glyphicon-paperclip"></span></a>
-                    @endif
+                        @if($refund->image)
+                            <label>图片：</label>
+                            <filearea id="filearea">
+                                <a href="../../{{$refund->image}}" target="_blank"><span class="glyphicon glyphicon-paperclip"></span></a>
+                                &nbsp;&nbsp;<a class="glyphicon glyphicon-remove" href="javascript:void(0)" onclick="deleteFile()" ></a>
+                            </filearea>
+                        @else
+                            <input type='file' class=" file" id="qualifications" placeholder="截图" name='image' value="" />
+                        @endif
+
+
+
+
+
+{{--                    @if($refund->image)
+                        <a href="../../{{$refund->image}}"><span class="glyphicon glyphicon-paperclip"></span></a>
+                    @endif--}}
                     </div>
                 </div>
 
@@ -136,9 +149,16 @@
             });
         });
 
-        function InputHtml($name,label){
+        function InputHtml(name,label){
             return '<label for="memo" class="control-label">'+label+'：</label>' +
-                    '<input type="text" class="form-control" name="'+$name+'" />';
+                    '<input type="text" class="form-control" name="'+name+'" />';
+        }
+
+        function deleteFile(){
+            if(confirm("确定删除原来的文件？")){
+                var fileThml = '<input type="file" class="file white-space:nowrap"  placeholder="截图" name="image" value="" />';
+                $('#filearea').html(fileThml);
+            }
         }
 
 

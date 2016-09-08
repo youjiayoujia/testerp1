@@ -2,17 +2,44 @@
 @section('tableToolButtons')
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询当前状态
+            <i class="glyphicon glyphicon-filter"></i> 渠 道
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
+            @foreach($channels as $channel)
+                <li><a href="{{ DataList::filtersEncode(['channel_id','=',$channel->id]) }}">{{$channel->name}}</a></li>
+            @endforeach
+        </ul>
+    </div>
 
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 客 服
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach($users as $user)
+                <li><a href="{{ DataList::filtersEncode(['customer_id','=',$user->id]) }}">{{$user->name}}</a></li>
+            @endforeach
+        </ul>
+    </div>
+
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i> 状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach(config('refund.process') as $key => $status)
+                <li><a href="{{ DataList::filtersEncode(['process_status','=',$key]) }}">{{$status}}</a></li>
+            @endforeach
         </ul>
     </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
+    <th><input type="checkbox"> 全选</th>
     <th class="sort" data-field="id">ID</th>
+    <th>平台</th>
     <th>内单号</th>
     <th>渠道</th>
     <th>退款方式</th>
@@ -32,7 +59,8 @@
 @section('tableBody')
 @foreach($data as $item)
     <tr>
-        <td><input type="checkbox" isCheck="true"></td>
+        <td><input type="checkbox" value="{{$item->id}}" name="refund_id" class="refund-ids"></td>
+        <td>{{$item->ChannelName}}</td>
         <td>{{$item->id}}</td>
         <td>{{$item->order_id}}</td>
         <td>{{$item->ChannelName}}</td>
@@ -45,7 +73,7 @@
         </td>
         <td>{{$item->PaidTime}}</td>
         <td>{{$item->ReasonName}}</td>
-        <td></td>
+        <td>{{$item->CustomerName}}</td>
         <td>{{$item->ProcessStatusName}}</td>
         <td> {{$item->created_at}}</td>
         <td> {{$item->updated_at}}</td>
@@ -151,24 +179,66 @@
 
             </div>
         </div>
-
-        <!--编辑model-->
-        <!---->
-
     </tr>
 @endforeach
-
-
-        <!-- 模态框（Modal） -->
-
-        <!-- 模态框结束（Modal） -->
-
-
-
 @section('doAction')
+    <div class="btn-group dropup">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            审核
+            <span class="caret"></span>
+        </button>
+
+        <ul class="dropdown-menu">
+            @foreach(config('refund.process') as $key => $name)
+                <li><a href="javascript:void(0);" class="process-status" process-status="{{$key}}" data-name="{{$name}}">{{$name}}</a></li>
+            @endforeach
+        </ul>
+    </div>
 @stop
 <br>
 @stop
 
 @section('childJs')
+    <script>
+        $(document).ready(function(){
+            $('.process-status').click(function () {
+                var process = '';
+                var ids = '';
+                process = $(this).attr('process-status');
+                if(getfilterIds()){
+                    ids = getfilterIds();
+                    $.ajax({
+                        url:"{{route('refund.batchProcessStatus')}}",
+                        type: 'POST',
+                        dataType:'JSON',
+                        data:{process:process,ids:ids},
+                        success:function(data){
+                            if(data == 10){
+                                location.reload();
+                            }else{
+                                alert('批量修改失败');
+
+                            }
+                        },
+                        error:function () {
+                            alert('未知错误');
+                        }
+
+                    });
+                }else{
+                    alert('请先选中需要修改状态的记录');
+                }
+            });
+            
+            
+            
+        });
+        function getfilterIds(){
+            var refund_ids = '';
+            $.each($('.refund-ids:checked'), function(){
+                refund_ids += (refund_ids == '') ? $(this).val() : ',' + $(this).val();
+            });
+            return refund_ids;
+        }
+    </script>
 @stop

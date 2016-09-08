@@ -407,6 +407,7 @@ class OrderModel extends BaseModel
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
+            $data['customer_id'] = request()->user()->id;
             return RefundModel::create($data);
         }
         return 1;

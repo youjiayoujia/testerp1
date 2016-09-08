@@ -230,48 +230,54 @@
             })
 
             $(document).on('click', '.submit_logistics', function(){
-                arr = new Array();
-                i = 0;
-                $.each($('.single:checked'), function () {
-                    tmp = $(this).parent().next().text();
-                    arr[i] = tmp;
-                    i++;
-                })
-                logistics_id = $('.change_logistics').val();
-                if(arr.length) {
-                    location.href = "{{ route('package.changeLogistics', ['arr' => '']) }}/" + arr + '/' + logistics_id;
-                } else {
-                    alert('请选择包裹信息');
+                if(confirm('确认修改物流方式?')) {
+                    arr = new Array();
+                    i = 0;
+                    $.each($('.single:checked'), function () {
+                        tmp = $(this).parent().next().text();
+                        arr[i] = tmp;
+                        i++;
+                    })
+                    logistics_id = $('.change_logistics').val();
+                    if(arr.length) {
+                        location.href = "{{ route('package.changeLogistics', ['arr' => '']) }}/" + arr + '/' + logistics_id;
+                    } else {
+                        alert('请选择包裹信息');
+                    }
                 }
             });
 
             $(document).on('click', '.remove_packages', function(){
-                arr = new Array();
-                i = 0;
-                $.each($('.single:checked'), function () {
-                    tmp = $(this).parent().next().text();
-                    arr[i] = tmp;
-                    i++;
-                })
-                if(arr.length) {
-                    location.href = "{{ route('package.removePackages', ['arr' => '']) }}/" + arr;
-                } else {
-                    alert('请选择包裹信息');
+                if(confirm('确认删除包裹?')) {
+                    arr = new Array();
+                    i = 0;
+                    $.each($('.single:checked'), function () {
+                        tmp = $(this).parent().next().text();
+                        arr[i] = tmp;
+                        i++;
+                    })
+                    if(arr.length) {
+                        location.href = "{{ route('package.removePackages', ['arr' => '']) }}/" + arr;
+                    } else {
+                        alert('请选择包裹信息');
+                    }
                 }
             });
 
             $(document).on('click', '.remove_logistics', function(){
-                arr = new Array();
-                i = 0;
-                $.each($('.single:checked'), function () {
-                    tmp = $(this).parent().next().text();
-                    arr[i] = tmp;
-                    i++;
-                })
-                if(arr.length) {
-                    location.href = "{{ route('package.removeLogistics', ['arr' => '']) }}/" + arr;
-                } else {
-                    alert('请选择包裹信息');
+                if(confirm('确认清空挂号码?')) {
+                    arr = new Array();
+                    i = 0;
+                    $.each($('.single:checked'), function () {
+                        tmp = $(this).parent().next().text();
+                        arr[i] = tmp;
+                        i++;
+                    })
+                    if(arr.length) {
+                        location.href = "{{ route('package.removeLogistics', ['arr' => '']) }}/" + arr;
+                    } else {
+                        alert('请选择包裹信息');
+                    }
                 }
             });
 

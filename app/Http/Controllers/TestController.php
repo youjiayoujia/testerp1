@@ -69,11 +69,14 @@ class TestController extends Controller
 
     public function test3()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
+        var_dump('123');
+        // $response = [
+        //     'metas' => $this->metas(__FUNCTION__),
+        // ];
 
-        return view('test', $response);
+        // return view('test', $response);
+        $model = PackageModel::where('id', '<', 5);
+        return redirect(route('package.index', ['outer_model' => $model]));
     }
 
     // public function test2()

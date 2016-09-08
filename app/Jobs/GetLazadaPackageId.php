@@ -74,7 +74,7 @@ class GetLazadaPackageId extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = '调用API失败';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('GetLazadaPackageId',isset($channel->apiResponse)?serialize($channel->apiResponse):serialize(array('调用API失败')));
+        $this->log('GetLazadaPackageId',isset($channel->apiResponse)?base64_encode(serialize($channel->apiResponse)):base64_encode(serialize(array('调用API失败'))));
 
     }
 }

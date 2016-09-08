@@ -32,6 +32,7 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+        $this->middleware('StockIOStatus');
     }
 
     public function putNeedQueue()
@@ -50,6 +51,80 @@ class PackageController extends Controller
             $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
+    }
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'logisticses' => LogisticsModel::all(),
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    public function changeLogistics($arr, $id) 
+    {
+        $arr = explode(',', $arr);
+        foreach($arr as $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                continue;
+            }
+            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                continue;
+            }
+            $model->update(['logistics_id' => $id]);
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    public function removePackages($arr)
+    {
+        $arr = explode(',', $arr);
+        foreach($arr as $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                continue;
+            }
+            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                continue;
+            }
+            foreach($model->items as $packageItem) {
+                $packageItem->delete();
+            }
+            if($model->order->packages->count() == 1) {
+                $model->order->update(['status' => 'CANCEL']);
+            }
+            $model->delete();
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    public function removeLogistics($arr) 
+    {
+        $arr = explode(',', $arr);
+        foreach($arr as $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                continue;
+            }
+            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                continue;
+            }
+            $model->update(['logistics_id' => '']);
+        }
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -929,8 +1004,10 @@ class PackageController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 'model' => $model,
             ];
+
             return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
         }
+        
         return false;
     }
 

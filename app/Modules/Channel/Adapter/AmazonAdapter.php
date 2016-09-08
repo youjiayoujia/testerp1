@@ -60,6 +60,117 @@ Class AmazonAdapter implements AdapterInterface
         return false;
     }
 
+    /*****************************************************/
+
+    public function requestReport()
+    {
+        $this->_config['Action'] = 'RequestReport';
+        $this->_config['Version'] = '2009-01-01';
+        $this->_config['ReportType'] = '_GET_FBA_MYI_ALL_INVENTORY_DATA_';
+        $this->_config['MarketplaceId.Id.1'] = 'ATVPDKIKX0DER';
+        $this->_config['SellerId'] = $this->config['SellerId'];
+        $this->_config['AWSAccessKeyId'] = $this->config['AWSAccessKeyId'];
+        $this->_config['SignatureVersion'] = '2';
+        $this->_config['SignatureMethod'] = 'HmacSHA256';
+        $this->_config['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+        $sign  = 'GET' . "\n";
+        $sign .= "mws.amazonservices.com" . "\n";
+        $sign .= "/" . "\n";
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, $this->config['AWS_SECRET_ACCESS_KEY'], true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $string1 = $this->serviceUrl."/?".$string;
+
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,0);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
+        $res = curl_exec($ch);
+        curl_close($ch);
+        $result_string = simplexml_load_string($res);
+        echo "<pre>";
+        print_r($result_string);
+        echo "</pre>";
+        $reportRequestId = $result_string->RequestReportResult->ReportRequestInfo->ReportRequestId;
+
+        return (string)$reportRequestId;
+    }
+
+    public function getReportRequestList($id)
+    {
+        $this->_config['Action'] = 'GetReportRequestList';
+        $this->_config['ReportRequestIdList.Id.1'] = $id;
+        $this->_config['Version'] = '2009-01-01';
+        $this->_config['MarketplaceId.Id.1'] = 'ATVPDKIKX0DER';
+        $this->_config['SellerId'] = $this->config['SellerId'];
+        $this->_config['AWSAccessKeyId'] = $this->config['AWSAccessKeyId'];
+        $this->_config['SignatureVersion'] = '2';
+        $this->_config['SignatureMethod'] = 'HmacSHA256';
+        $this->_config['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+        $sign  = 'GET' . "\n";
+        $sign .= "mws.amazonservices.com" . "\n";
+        $sign .= "/" . "\n";
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, $this->config['AWS_SECRET_ACCESS_KEY'], true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $string1 = $this->serviceUrl."/?".$string;
+
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,0);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
+        $res = curl_exec($ch);
+        curl_close($ch);
+
+        $result_string = simplexml_load_string($res);
+        echo "<pre>";
+        print_r($result_string);
+        echo "</pre>";
+        $reportId = (string)$result_string->GetReportRequestListResult->ReportRequestInfo->GeneratedReportId;
+
+        return $reportId;
+    }
+
+    public function getReport($id) 
+    {
+        $this->_config['Action'] = 'GetReport';
+        $this->_config['ReportId'] = $id;
+        $this->_config['Version'] = '2009-01-01';
+        $this->_config['MarketplaceId.Id.1'] = 'ATVPDKIKX0DER';
+        $this->_config['SellerId'] = $this->config['SellerId'];
+        $this->_config['AWSAccessKeyId'] = $this->config['AWSAccessKeyId'];
+        $this->_config['SignatureVersion'] = '2';
+        $this->_config['SignatureMethod'] = 'HmacSHA256';
+        $this->_config['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+        $sign  = 'GET' . "\n";
+        $sign .= "mws.amazonservices.com" . "\n";
+        $sign .= "/" . "\n";
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, $this->config['AWS_SECRET_ACCESS_KEY'], true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $string1 = $this->serviceUrl."/?".$string;
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,0);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+        $res = curl_exec($ch);
+        curl_close($ch);
+        
+        return $res;
+    }
+
+
+
+
+
+    /*******************************************************/
+
 
     /**
      * [['package_id', 'trackingNum']]

@@ -23,7 +23,7 @@
             </div>
             <div class='form-group col-lg-2'>
                 <label>条码打印</label>
-                {!!$barcode!!}
+                <img src="{{ route('barcodeGen', ['content' => $model->id ])}}">
                 <p>{{ $model->id }}</p>
             </div>
         </div>

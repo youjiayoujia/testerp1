@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\ItemModel;
+use App\Models\Purchase\RequireModel;
 
 class CreatePurchase extends Command
 {
@@ -42,6 +43,10 @@ class CreatePurchase extends Command
         $itemModel = new ItemModel();
         $itemModel->createPurchaseNeedData();
         $end = microtime(true);
-        echo '耗时' . round($end - $begin, 3) . '秒';  
+        echo '采购需求数据更新耗时' . round($end - $begin, 3) . '秒,正在自动创建采购单,请稍后......';
+        $requireModel = new RequireModel();
+        $requireModel->createAllPurchaseOrder();
+        $endcreate = microtime(true);
+        echo '采购单创建完成,耗时'.round($endcreate - $end, 3).'秒';
     }
 }

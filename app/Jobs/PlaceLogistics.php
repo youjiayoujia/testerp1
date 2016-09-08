@@ -32,16 +32,23 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        $start = microtime(true);
-        if ($this->package->placeLogistics()) {
-            $this->result['status'] = 'success';
-            $this->result['remark'] = 'Success.';
-        } else {
-            $this->release();
+        if(!Cache::store('file')->get('stockIOStatus')) {
             $this->result['status'] = 'fail';
-            $this->result['remark'] = 'Fail to place logistics order.';
+            $this->result['remark'] = 'stockTaking , stock is locked.';
+            $this->lasting = round(microtime(true) - $start, 3);
+            $this->log('PlaceLogistics');
+        } else {
+            $start = microtime(true);
+            if ($this->package->placeLogistics()) {
+                $this->result['status'] = 'success';
+                $this->result['remark'] = 'Success.';
+            } else {
+                $this->release();
+                $this->result['status'] = 'fail';
+                $this->result['remark'] = 'Fail to place logistics order.';
+            }
+            $this->lasting = round(microtime(true) - $start, 3);
+            $this->log('PlaceLogistics');
         }
-        $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('PlaceLogistics');
     }
 }

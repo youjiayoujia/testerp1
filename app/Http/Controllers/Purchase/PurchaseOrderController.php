@@ -589,11 +589,12 @@ class PurchaseOrderController extends Controller
             $purchaseOrderModel = $this->model->find($p_id);
             foreach($purchaseOrderModel->purchaseItem as $p_item){
                 if($p_item->purchase_num!=$p_item->arrival_num){
+                    $arrival_num = $p_item->lack_num;
                     $p_item->update(['arrival_num'=>$p_item->purchase_num,'lack_num'=>0]);
                     $filed['purchase_item_id'] = $p_item->id;
                     $filed['sku'] = $p_item->sku;
                     $filed['status'] =2;
-                    $filed['arrival_num'] = $p_item->lack_num;
+                    $filed['arrival_num'] = $arrival_num;
                     PurchaseItemArrivalLogModel::create($filed);
                 }
             }
@@ -646,45 +647,45 @@ class PurchaseOrderController extends Controller
         $p_id = request()->input("p_id");
         $data = substr($data, 0,strlen($data)-1);
         $arr = explode(',', $data);
-        
-        foreach ($arr as $value) {
-            $update_data = explode(':', $value);
-            $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
-            $purchase_item = $arrivel_log->purchaseItem;
-            
-            if($purchase_item->item->warehouse_position==''){
-                return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
-            }else{
-                $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
-                $filed['bad_num'] =  $arrivel_log->arrival_num-$update_data[1];
-                $filed['quality_time'] = date('Y-m-d H:i:s',time());
+        if($data){
+            foreach ($arr as $value) {
+                $update_data = explode(':', $value);
+                $arrivel_log = PurchaseItemArrivalLogModel::find($update_data[0]);
+                $purchase_item = $arrivel_log->purchaseItem;
                 
-                $arrivel_log->update($filed);
-                //purchaseitem
-                $datas['status'] = 3;
-                $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
-                $datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
-                if($datas['storage_qty']>=$purchase_item->purchase_num){
-                    $datas['status'] = 4;
-                }
-                
-                $purchase_item->update($datas);
-                $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
-                
-            } 
-            //need包裹分配库存
-            $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
-            if(count($packageItem)>0){
-                foreach($packageItem->package as $package){
-                    if($package->status=='NEED'){
-                        $job = new AssignStocks($this->package);
-                        $job = $job->onQueue('assignStocks');
-                        $this->dispatch($job);
+                if($purchase_item->item->warehouse_position==''){
+                    return redirect(route('recieve'))->with('alert', $this->alert('danger',$purchase_item->sku.'库位不存在，请添加库位后重新入库.'));
+                }else{
+                    $filed['good_num'] = $update_data[1]>$purchase_item->arrival_num?$purchase_item->arrival_num:$update_data[1];
+                    $filed['bad_num'] =  $filed['good_num'];
+                    $filed['quality_time'] = date('Y-m-d H:i:s',time());
+                    
+                    $arrivel_log->update($filed);
+                    //purchaseitem
+                    $datas['status'] = 3;
+                    $datas['storage_qty'] = $purchase_item->storage_qty+$filed['good_num'];
+                    $datas['unqualified_qty'] = $purchase_item->unqualified_qty+$filed['bad_num'];
+                    if($datas['storage_qty']>=$purchase_item->purchase_num){
+                        $datas['status'] = 4;
                     }
-                }
-            }       
-        }
-        
+                    
+                    $purchase_item->update($datas);
+                    $purchase_item->item->in($purchase_item->item->warehouse_position,$filed['good_num'],$filed['good_num']*$purchase_item->purchase_cost,'PURCHASE',$purchase_item->purchaseOrder->id);
+                    
+                } 
+                //need包裹分配库存
+                $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
+                if(count($packageItem)>0){
+                    foreach($packageItem->package as $package){
+                        if($package->status=='NEED'){
+                            $job = new AssignStocks($this->package);
+                            $job = $job->onQueue('assignStocks');
+                            $this->dispatch($job);
+                        }
+                    }
+                }       
+            }
+        } 
         $p_status = 4;
         $purchasrOrder = $this->model->find($p_id);
         foreach($purchasrOrder->purchaseItem as $p_item){
@@ -840,6 +841,25 @@ class PurchaseOrderController extends Controller
         $total_price>2000?$data[0]['total_price'] = '采购单总金额大于2000':$data[0]['total_price'] = '';
        
         return $data;
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function purchaseStaticstics()
+    {
+        
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'staticsticsIndex', $response);
     }
         
 }

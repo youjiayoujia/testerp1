@@ -251,6 +251,16 @@ return [
                     'url' => 'report.shipment',
                     'icon' => '',
                 ],
+                [
+                    'name' => '海外仓箱子',
+                    'url' => 'box.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'fba库存信息',
+                    'url' => 'fbaStock.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],
@@ -410,9 +420,9 @@ return [
                 'icon' => '',
             ],
             [
-            'name' => 'smt销售代码设置',
-            'url' => 'smtSellerCode.index',
-            'icon' => '',
+                'name' => 'smt销售代码设置',
+                'url' => 'smtSellerCode.index',
+                'icon' => '',
             ],
             [
                 'name' => 'Ebay站点信息',
@@ -466,6 +476,36 @@ return [
                 [
                     'name' => 'aliexpress issues',
                     'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+            ],
+            '平台批量操作' => [
+                [
+                    'name' => 'Aliexpress批量订单留言',
+                    'url' => 'aliexpressReturnOrderMessages',
+                    'icon' => '',
+                ],
+            ],
+            '评论列表' =>[
+                [
+                    'name' => 'Ebay feedBack',
+                    'url'  => 'ebayFeedBack.index',
+                    'icon' => '',
+                ]
+            ],
+        ]
+    ],
+    //报表导航
+    [
+        'name' => '报表',
+        'icon' => 'list-alt',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '采购报表' => [
+                [
+                    'name' => '采购数据统计',
+                    'url' => 'message.index',
                     'icon' => '',
                 ],
             ],

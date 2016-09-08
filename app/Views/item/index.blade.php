@@ -79,7 +79,7 @@
                 <div>库存周数：{{$item->getsales('-7 day')==0?0:($item->available_quantity+$item->normal_transit_quantity)/$item->getsales('-7 day')}}</div>
             </td>
             <td>{{ config('item.status')[$item->status]}}</td>
-            <td>{{ $item->product->purchaseAdminer?$item->product->purchaseAdminer->name:''}}</td>
+            <td>{{ $item->purchaseAdminer?$item->purchaseAdminer->name:''}}</td>
             <td>{{ $item->product->spu->Developer?$item->product->spu->Developer->name:''}}</td>
             <td>{{ $item->supplier ? $item->supplier->name :''}}</td>
             <td>{{--<button class ="btn btn-success" >计算</button>--}}
@@ -102,23 +102,34 @@
                                     <div class="form-group form-inline sets" id="setkey_0">
                                         <table class="table table-bordered">
                                             <tr>
-                                                <td>当前分类：</td>
-                                                <td colspan="2">{{ $item->catalog?$item->catalog->all_name:'' }}</td>
+                                                <td colspan="3">当前分类：{{ $item->catalog?$item->catalog->all_name:'' }}</td>
                                             </tr>
                                             <tr>
-                                                <td>产品名称：</td>
-                                                <td colspan="2">{{ $item->c_name }}</td>
+                                                <td colspan="3">产品名称：{{ $item->c_name }}</td>
                                             </tr>
                                             <tr>
                                                 <td>产品重量：
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 60px;" disabled>
+                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 110px;"  disabled>
                                                         <span class="input-group-addon">Kg</span>
                                                     </div>
 
                                                 </td>
-                                                <td>{{--打包：--}}</td>
                                                 <td>
+                                                    渠道名称：
+                                                    <select class="form-control" id="channel-{{$item->id}}">
+                                                        <option value="none">请选择</option>
+                                                        @foreach($Compute_channels as $channel)
+                                                            <option value="{{$channel->name}}">{{$channel->name}}</option>
+                                                        @endforeach
+                                                    </select></td>
+                                                <td>
+
+                                                    利润率：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="20">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
                                                     {{--   <div class="input-group">
                                                            <input type="text" class="form-control" style="width: 60px;">
                                                            <span class="input-group-addon">个</span>
@@ -156,32 +167,16 @@
                                                 </td>
                                                 <td>
                                                     物流分区：
-                                                    <select class="form-control" name="division" id="zones-{{$item->id}}" style="width: 150px;">
+                                                    <select class="form-control" name="division" id="zones-{{$item->id}}">
                                                         <option value="none">请选择</option>
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>
-                                                    渠道名称:
-                                                    <select class="form-control" id="channel-{{$item->id}}">
-                                                        <option value="none">请选择</option>
-                                                        @foreach($Compute_channels as $channel)
-                                                            <option value="{{$channel->name}}">{{$channel->name}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    利润率：
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="">
-                                                        <span class="input-group-addon">%</span>
-                                                    </div>
-                                                </td>
-                                                <td>{{--汇率：XXXX--}}</td>
                                             </tr>
                                         </table>
                                         <div class=" text-right">
+                                            <input type="button" value="取 消" class="form-control btn-default" data-dismiss="modal" aria-label="Close">
                                             <input type="button" name="查询" class="form-control btn-primary" placeholder="属性名" value="查 询" onclick="doComputePrice({{$item->id}})">
                                         </div>
                                         <br/>
@@ -216,7 +211,10 @@
                 </a>
                 <a href="{{ route('item.print', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs" data-id="{{ $item->id }}">
                     <span class="glyphicon glyphicon-pencil"></span> 打印
-                </a> 
+                </a>
+                <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
+                    <span class="glyphicon glyphicon-zoom-in">转移采购员</span>
+                </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"
                    data-url="{{ route('item.destroy', ['id' => $item->id]) }}">
@@ -224,6 +222,41 @@
                 </a>
             </td>
         </tr>
+        <!-- 模态框（Modal）转采购负责人 -->
+        <form action="/item/changePurchaseAdmin/{{$item->id}}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="switch_purchase_{{$item->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           转移采购负责人
+                        </h4>
+                     </div>
+                     
+                     <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div>
+                     <div>转移至：</div>
+                     <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select></div>
+                     或者：
+                     <input type="text" value='' name='manual_name' id='manual_name'>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框结束（Modal） -->
     @endforeach
 
         <!-- 模态框（Modal） -->
@@ -313,6 +346,25 @@
             })
         });
 
+        /*ajax调取采购负责人*/
+        $('.purchase_adminer').select2({
+            //alert(1);return;
+            ajax: {
+                url: "{{ route('item.ajaxSupplierUser') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                  return {
+                    user:params.term,
+                    item_id: $(this).attr('id'),
+                  };
+                },
+                results: function(data, page) {
+                    
+                }
+            },
+        });
+
         function changeSelectVlaue(selected,type,productId){
             var id = selected.val();
             if(id){
@@ -391,6 +443,7 @@
                     }
                 },
                 error:function () {
+                    alert('计算失败，品类渠道的税率是否编辑？');
 
                 }
             });

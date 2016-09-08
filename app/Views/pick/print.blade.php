@@ -7,7 +7,7 @@
             <h3>仓库发货拣货单(面单尺寸:{{$size}})</h3>
         </div>
         <div class='form-group col-lg-offset-8'>
-            {!! $barcode !!}
+            <img src="{{ route('barcodeGen', ['content' => $model->picknum ])}}">
             <p>{{ $model->picknum }}</p>
         </div>
     </div>

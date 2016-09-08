@@ -169,7 +169,7 @@
 
                 <?php } ?>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$product->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
-                    <span class="glyphicon glyphicon-zoom-in"></span>
+                    <span class="glyphicon glyphicon-zoom-in">转移采购员</span>
 
                 <a href="{{ route('createImage', ['model'=>$product->model]) }}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 编辑图片
@@ -262,24 +262,7 @@
             }
         });
         
-        /*ajax调取采购负责人*/
-        $('.purchase_adminer').select2({
-            //alert(1);return;
-            ajax: {
-                url: "{{ route('ajaxSupplierUser') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                  return {
-                    user:params.term,
-                    product_id: $(this).attr('id'),
-                  };
-                },
-                results: function(data, page) {
-                    
-                }
-            },
-        });
+        
 
         $('.batchedit').click(function () {
             var checkbox = document.getElementsByName("tribute_id");

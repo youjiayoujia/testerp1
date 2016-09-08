@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterPackageAddStatus extends Migration
+class AddPackageStatusColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -38,7 +38,7 @@ class AlterPackageAddStatus extends Migration
     public function down()
     {
         Schema::table('packages', function (Blueprint $table) {
-            //
+            $table->dropColumn('status');
         });
     }
 }

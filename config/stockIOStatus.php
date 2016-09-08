@@ -15,4 +15,5 @@
         'pickList.package',
         'pickList.inbox',
         'pickList.createPick',
+        'package.shippingStatistics',
     ];

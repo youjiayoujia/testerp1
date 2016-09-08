@@ -33,7 +33,14 @@ class ReportModel extends BaseModel
         'status',
         'print_status',
         'inStock_status',
-        'from_address',
+        'shipping_firstname',
+        'shipping_lastname',
+        'shipping_address',
+        'shipping_city',
+        'shipping_state',
+        'shipping_country',
+        'shipping_zipcode',
+        'shipping_phone',
         'quantity',
         'created_at'
     ];

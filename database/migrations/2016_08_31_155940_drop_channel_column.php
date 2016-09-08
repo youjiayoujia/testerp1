@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterPackage extends Migration
+class DropChannelColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,11 @@ class AlterPackage extends Migration
      */
     public function up()
     {
-        Schema::table('packages', function (Blueprint $table) {
-            $table->dropColumn('status');
-            
+        Schema::table('channels', function (Blueprint $table) {
+            $table->dropColumn('flat_rate');
+            $table->dropColumn('rate');
+            $table->dropColumn('flat_rate_value');
+            $table->dropColumn('rate_value');
         });
     }
 
@@ -25,7 +27,7 @@ class AlterPackage extends Migration
      */
     public function down()
     {
-        Schema::table('packages', function (Blueprint $table) {
+        Schema::table('channels', function (Blueprint $table) {
             //
         });
     }

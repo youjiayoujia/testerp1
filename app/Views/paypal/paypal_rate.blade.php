@@ -6,29 +6,20 @@
         <div class="panel-body">
               <form action="{{route('paypal.update_rates')}}" method="POST">
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                  <div class="row">
-                        <div class="form-group col-lg-4">
-                            <label for="name" class="control-label">大Paypal成交费</label>
-                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                            <div class="input-group">
-                            <div class="input-group-addon">$</div>
-                            <input type="text" class="form-control" id="name"  name="transactions_fee_big" value="{{$rates->transactions_fee_big}}">
-                            </div>
-                            </div>
-                    </div>
+
                     <div class="row">
                         <div class="form-group col-lg-4">
                             <label for="group_id" class="control-label">小Paypal成交费</label>
                             <small class="text-danger glyphicon glyphicon-asterisk"></small>
                             <div class="input-group">
-                                <div class="input-group-addon">$</div>
                             <input type="text" class="form-control" id="group_id"  name="transactions_fee_small" value="{{$rates->transactions_fee_small}}">
-                        </div>
+                            <div class="input-group-addon">%</div>
+                            </div>
                             </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-4">
-                            <label for="group_id" class="control-label">大Paypal固定费用</label>
+                            <label for="group_id" class="control-label">Paypal固定费用</label>
                             <small class="text-danger glyphicon glyphicon-asterisk"></small>
                             <div class="input-group">
                                 <div class="input-group-addon">$</div>
@@ -36,16 +27,7 @@
                         </div>
                             </div>
                     </div>
-                    <div class="row">
-                        <div class="form-group col-lg-4">
-                            <label for="group_id" class="control-label">小Paypal固定费用</label>
-                            <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                            <div class="input-group">
-                                <div class="input-group-addon">$</div>
-                            <input type="text" class="form-control" id="group_id"  name="fixed_fee_small" value="{{$rates->fixed_fee_small}}">
-                            </div>
-                            </div>
-                    </div>
+
                     <button type="submit" class="btn btn-success">提交</button>
               </form>
         </div>

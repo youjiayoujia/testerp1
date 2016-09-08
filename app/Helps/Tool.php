@@ -1,7 +1,6 @@
 <?php
 namespace App\Helps;
 
-use DNS1D;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class Tool
@@ -15,11 +14,6 @@ class Tool
         } elseif (!is_writable($directory)) {
             throw new FileException(sprintf('Unable to write in the "%s" directory', $directory));
         }
-    }
-
-    public function barcodePrint($content, $type = 'C128', $width = '3', $height='33')
-    {
-        echo DNS1D::getBarcodeSVG($content, $type, $width, $height);
     }
 
     public function getFileExtension($fileName)

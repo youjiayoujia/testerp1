@@ -22,5 +22,19 @@ class PurchaseStaticsticsModel extends BaseModel
 
     public $searchFields = ['id'=>'id'];
     
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'purchase_adminer');
+    }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => [],
+            'filterFields' => [],
+            'filterSelects' => [],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => ['time' => ['get_time']],
+        ];
+    }
 }

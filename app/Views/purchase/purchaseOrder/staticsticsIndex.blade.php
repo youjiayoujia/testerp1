@@ -19,7 +19,7 @@
     </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
+    
     <th class="sort" data-field="id">采购负责人</th>
     <th>管理的SKU数</th>
     <th class="sort" data-field="sku">必须当天内下单SKU数</th>
@@ -38,24 +38,25 @@
 @stop
 
 @section('tableBody')
+    @foreach($data as $staticstics)
         <tr>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
-            <td>1</td>
+            <td>{{$staticstics->user->name}}</td>
+            <td>{{$staticstics->sku_num}}</td>
+            <td>{{$staticstics->need_purchase_num}}</td>
+            <td>{{$staticstics->fifteenday_need_order_num}}</td>
+            <td>{{$staticstics->fifteenday_total_order_num}}</td>
+            <td>{{$staticstics->need_percent}}</td>
+            <td>{{$staticstics->need_total_num}}</td>
+            <td>{{$staticstics->avg_need_day}}</td>
+            <td>{{$staticstics->long_need_day}}</td>
+            <td>{{$staticstics->purchase_order_exceed_time}}</td>
+            <td>{{$staticstics->month_order_num }}</td>
+            <td>{{$staticstics->month_order_money}}</td>
+            <td>{{$staticstics->total_carriage}}</td>
+            <td>{{$staticstics->save_money}}</td>
+            <td>{{$staticstics->get_time}}</td>
         </tr>
+    @endforeach
 @stop
 
 @section('childJs')

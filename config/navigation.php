@@ -226,6 +226,18 @@ return [
                     'icon' => '',
                 ],
             ],
+            '报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //仓储导航

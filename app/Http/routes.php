@@ -63,6 +63,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('fbaStock/updateStock', ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
     Route::resource('fbaStock', 'Oversea\StockController');
 
+    //拣货排行榜
+    Route::get('pickReport/createData', ['uses' => 'PickReportController@createData', 'as' => 'pickReport.createData']);
+    Route::resource('pickReport', 'PickReportController');
     //海外仓箱子
     Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
     Route::resource('box', 'Oversea\BoxController');
@@ -537,6 +540,12 @@ Route::group(['middleware' => 'auth'], function () {
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
 
+    //包裹报表
+    Route::get('allReport/createData',
+        ['uses' => 'AllReportController@createData', 'as' => 'allReport.createData']);
+    Route::get('allReport/report',
+        ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
+    Route::resource('allReport', 'AllReportController');
     //包裹导出
     Route::get('exportPackage/extraField',
         ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
@@ -547,6 +556,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/packageReport',
+        ['uses' => 'PackageController@packageReport', 'as' => 'package.packageReport']);
     Route::get('package/removePackages/{arr}',
         ['uses' => 'PackageController@removePackages', 'as' => 'package.removePackages']);
     Route::get('package/removeLogistics/{arr}',

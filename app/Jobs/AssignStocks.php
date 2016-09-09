@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Cache;
 use App\Jobs\Job;
 use App\Jobs\AssignLogistics;
 use Illuminate\Queue\SerializesModels;

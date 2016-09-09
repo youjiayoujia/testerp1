@@ -90,9 +90,6 @@ Class AmazonAdapter implements AdapterInterface
         $res = curl_exec($ch);
         curl_close($ch);
         $result_string = simplexml_load_string($res);
-        echo "<pre>";
-        print_r($result_string);
-        echo "</pre>";
         $reportRequestId = $result_string->RequestReportResult->ReportRequestInfo->ReportRequestId;
 
         return (string)$reportRequestId;
@@ -125,11 +122,7 @@ Class AmazonAdapter implements AdapterInterface
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
         $res = curl_exec($ch);
         curl_close($ch);
-
         $result_string = simplexml_load_string($res);
-        echo "<pre>";
-        print_r($result_string);
-        echo "</pre>";
         $reportId = (string)$result_string->GetReportRequestListResult->ReportRequestInfo->GeneratedReportId;
 
         return $reportId;
@@ -165,7 +158,38 @@ Class AmazonAdapter implements AdapterInterface
         return $res;
     }
 
+    public function listInShipment($shipmentID)
+    {
+        $this->_config['Action'] = 'ListInboundShipments';
+        $this->_config['AWSAccessKeyId'] = $this->config['AWSAccessKeyId'];
+        $this->_config['SignatureVersion'] = '2';
+        $this->_config['SignatureMethod'] = 'HmacSHA256';
+        $this->_config['SellerId'] = $this->config['SellerId'];
+        $this->_config['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+        $this->_config['ShipmentStatusList.member.1'] = 'CHECK_IN';
+        $this->_config['ShipmentIdList.member.1'] = $shipmentID;
+        $this->_config['Version'] = '2010-10-01';
+        $this->serviceUrl = "https://mws.amazonservices.com/FulfillmentInboundShipment/2010-10-01?";
+        $tmp_arr = parse_url($this->serviceUrl);
+        $sign  = 'GET' . "\n";
+        $sign .= $tmp_arr['host'] . "\n";
+        $sign .= $tmp_arr['path'] . "\n";
+        $tmp_sigtoString = $this->signArrToString();
+        $sign .= $tmp_sigtoString;
+        $signature = hash_hmac("sha256", $sign, $this->config['AWS_SECRET_ACCESS_KEY'], true);
+        $signature = urlencode(base64_encode($signature));
+        $string = $tmp_sigtoString.'&Signature='.$signature;
+        $string1 = $this->serviceUrl.$string;
+        $ch = curl_init($string1);
+        curl_setopt($ch,CURLOPT_HEADER,0);
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);  
+        $res = curl_exec($ch);
+        curl_close($ch);
+        $result_string = simplexml_load_string($res);
 
+        return $result_string->ListInboundShipmentsResult->ShipmentData;
+    }
 
 
 

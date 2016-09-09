@@ -18,6 +18,7 @@ use Translation;
 use Excel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Modules\Channel\Adapter\WishAdapter;
+use App\Modules\Channel\Adapter\EbayAdapter;
 
 
 class MessageController extends Controller
@@ -461,6 +462,10 @@ class MessageController extends Controller
 
 
 
+    }
+    
+    public function SendEbayMessage(){
+        
     }
 
 

@@ -1,5 +1,65 @@
 @extends('common.table')
 @section('tableToolButtons')
+    <div class="btn-group">
+        <form method="POST" action="{{ route('addLotsOfCatalogs') }}" enctype="multipart/form-data" id="add-lots-form">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="file" class="file" id="qualifications" placeholder="上传审核资料" name="excel" value="">
+        </form>
+    </div>
+    <div class="btn-group">
+        <a href="{{route('refund.cvsformat')}}" class="btn btn-warning">Excel格式
+            <i class="glyphicon glyphicon-arrow-down"></i>
+        </a>
+        <a class="btn btn-success add-lots-of-catagory" href="javascript:void(0);">
+            财务导入退款凭证<i class="glyphicon glyphicon-plus"></i>
+        </a>
+        <a class="btn btn-success add-lots-of-catagory" href="javascript:void(0);" data-toggle="modal" data-target="#refund-by-channel">
+            财务导出平台退款记录
+            <i class="glyphicon glyphicon-arrow-down"></i>
+        </a>
+    </div>
+    <div class="modal fade" id="refund-by-channel" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <form id="compute-form" action="{{route('refund.financeExport')}}">
+                {!! csrf_field() !!}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">财务导出需要退款的记录</h4>
+                    </div>
+                    <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label>渠道：</label>
+                                    <select class="form-control" name="channel">
+                                        @foreach($channels as $channel)
+                                            <option value="{{$channel->id}}">{{$channel->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label>记录状态：</label>
+                                    <select class="form-control" name="process">
+                                        @foreach(config('refund.process') as $key => $status)
+                                            <option value="{{$key}}" @if($key == 'FINANCE') selected @endif >{{$status}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary">导出</button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
     <div class="btn-group" role="group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="glyphicon glyphicon-filter"></i> 渠 道
@@ -84,17 +144,10 @@
             <a href="{{ route('refundCenter.edit', ['id'=>$item->id])}}" class="btn btn-warning btn-xs" title="编辑">
                 <span class="glyphicon glyphicon-pencil"></span>
             </a>
-            <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal7" title="API设置">
-                <span class="glyphicon glyphicon-link"></span>
-            </button>
             <a href="javascript:void(0);" class="btn btn-danger btn-xs" data-id="7" data-url="" title="退款" data-toggle="modal" data-target="#myModal_{{$item->id}}">
                 <span class="glyphicon glyphicon-usd"></span>
             </a>
         </td>
-
-
-
-
         <div class="modal fade" id="myModal_{{$item->id}}" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document" style="width:800px;">
                 <form id="compute-form-{{$item->id}}" action="{{route('refund.dopaypalrefund')}}">

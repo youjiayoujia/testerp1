@@ -1,7 +1,7 @@
 <?php
 /**
  * 订单退款模型
- *
+ * modify Norton
  * Created by PhpStorm.
  * User: bianhaiwei
  * Date: 16/5/25
@@ -68,6 +68,9 @@ class RefundModel extends BaseModel
     }
     public function User(){
         return $this->hasOne('App\Models\UserModel','id','customer_id');
+    }
+    public function Account(){
+        return $this->hasOne('App\Models\Channel\AccountModel','id','channel_id');
     }
     public function getSKUsAttribute(){
         $items = $this->Order->items;

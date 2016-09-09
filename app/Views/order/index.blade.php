@@ -563,36 +563,92 @@
             </div>
         </div>
 
-        <div class="modal fade" id="send_ebay_message_{{ $order->id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal fade" id="send_ebay_message_{{ $order->id }}" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form action="{{ route('withdrawUpdate', ['id' => $order->id])}}" method="POST">
+                    <form action="{{ route('message.sendEbayMessage')}}" method="POST">
                         {!! csrf_field() !!}
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <h4 class="modal-title" id="myModalLabel">撤单</h4>
+                            <h4 class="modal-title" id="myModalLabel">Send ebay Message</h4>
                         </div>
                         <div class="modal-body">
-                            <div class="row">
-                                <div class="form-group col-lg-6">
-                                    <label for="withdraw" class='control-label'>撤单原因</label>
-                                    <small class="text-danger glyphicon glyphicon-asterisk"></small>
-                                    <select class="form-control" name="withdraw" id="withdraw">
-                                        <option value="NULL">==选择原因==</option>
-                                        @foreach(config('order.withdraw') as $withdraw_key => $withdraw)
-                                            <option value="{{ $withdraw_key }}" {{ old('withdraw') == $withdraw_key ? 'selected' : '' }}>
-                                                {{ $withdraw }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                           <div class="form-group row">
+                                <label for="example-text-input" class="col-xs-2 col-form-label">买家ID：</label>
+                                <div class="col-xs-10">
+                                    <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
                                 </div>
                             </div>
+
+                            <div class="form-group row">
+                                <div class="col-xs-2">
+                                    <label>物 品:</label>
+                                </div>
+                                <div class="col-xs-10">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>选择</th>
+                                            <th>Item ID</th>
+                                            <th>SKU</th>
+                                            <th>物品名称</th>
+                                            <th>数量</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($order->items as $item)
+                                            <tr>
+                                                <td><input type="checkbox"  name=""/></td>
+                                                <td>{{$item->item_id}}</td>
+                                                <td>{{$item->sku}}</td>
+                                                <td>{{$item->item->c_name}}</td>
+                                                <td>{{$item->quantity}}</td>
+                                            </tr>
+
+                                        @endforeach
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+                            </div>
+
                             <div class="row">
-                                <div class="form-group col-lg-6">
-                                    <label for="withdraw_reason" class='control-label'>原因</label>
-                                    <textarea class="form-control" rows="3" name='withdraw_reason' id="withdraw_reason">{{ old('withdraw_reason') }}</textarea>
+                                <div class="col-lg-12">
+                                    <div class="panel panel-success">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">回信面板</h4>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="form-group row">
+                                                <label for="example-text-input" class="col-xs-2 col-form-label">标题：</label>
+                                                <div class="col-xs-10">
+                                                    <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="example-text-input" class="col-xs-2 col-form-label">内容：</label>
+                                                <div class="col-xs-10">
+                                                    <textarea class="form-control" rows="3"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">历史记录</h4>
+                                        </div>
+                                        <div class="panel-body">
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

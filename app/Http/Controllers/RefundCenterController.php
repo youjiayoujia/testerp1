@@ -13,6 +13,7 @@ use App\Models\CurrencyModel;
 use Illuminate\Support\Facades\Storage;
 use App\Models\UserModel;
 use App\Models\ChannelModel;
+use Excel;
 
 
 class RefundCenterController extends Controller
@@ -187,4 +188,127 @@ class RefundCenterController extends Controller
         }
         return -10;
     }
+
+    public function RefundCsvFormat(){
+        $rows = [
+            [
+                'Refund No.' => '例：450098',
+                '买家ID'      =>  'testuser',
+                '退款金额'     => '3.77',
+                '退款凭证'     => '9VR69784B8555501V',
+            ]
+        ];
+
+        $this->exportExcel($rows, 'refundMoneyTemplate');
+    }
+    public function  exportExcel($rows,$name){
+        Excel::create($name, function($excel) use ($rows){
+                $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
+    //导出财务退
+    public function financeExport() {
+        $form = request()->input();
+        $data = [];
+        if(isset($form['channel']) && isset($form['process'])){
+            $data[] = [
+                'Refund NO.',
+                '内单号',
+                '渠道',
+                '买家ID',
+                'SKU',
+                '退款金额',
+                '交易凭证',
+                '退款原因',
+                '客服',
+                '状态',
+                '录入日期',
+                '客户Paypal帐号'
+            ];
+            $refunds = $this->model->where('channel_id','=',$form['channel'])->where('process_status','=',$form['process'])->get();
+
+            if(!$refunds->isEmpty()){
+                foreach ($refunds as $refund){
+                    $data[] =[
+                        $refund->id,
+                        $refund->order_id,
+                        $refund->ChannelName,
+                        $refund->Order->by_id,
+                        $refund->SKUs,
+                        $refund->refund_amount,
+                        $refund->PaidTime,
+                        $refund->ReasonName,
+                        $refund->CustomerName,
+                        $refund->ProcessStatusName,
+                        $refund->created_at,
+                        $refund->user_paypal_account,
+                    ];
+                }
+            }
+
+            Excel::create('moneyBackManageExport'.date('Y-m-d'), function($excel) use ($data){
+                $excel->sheet('', function($sheet) use ($data){
+                    $sheet->fromArray($data);
+                });
+            })->download('csv');
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
 }

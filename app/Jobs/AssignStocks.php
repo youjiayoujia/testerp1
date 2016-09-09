@@ -37,7 +37,7 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
         if(!Cache::store('file')->get('stockIOStatus')) {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'stockTaking , stock is locked.';
-            $this->lasting = round(microtime(true) - $start, 3);
+            $this->lasting = 0;
             $this->log('AssignStocks');
         } else {
             $start = microtime(true);

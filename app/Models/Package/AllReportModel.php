@@ -37,4 +37,9 @@ class AllReportModel extends BaseModel
     {
         return $this->belongsTo('App\Models\ChannelModel', 'channel_id', 'id');
     }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+    }
 }

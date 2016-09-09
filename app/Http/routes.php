@@ -63,6 +63,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('fbaStock/updateStock', ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
     Route::resource('fbaStock', 'Oversea\StockController');
 
+    //拣货排行榜
+    Route::get('pickReport/createData', ['uses' => 'PickReportController@createData', 'as' => 'pickReport.createData']);
+    Route::resource('pickReport', 'PickReportController');
     //海外仓箱子
     Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
     Route::resource('box', 'Oversea\BoxController');

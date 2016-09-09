@@ -232,6 +232,11 @@ return [
                     'url' => 'allReport.report',
                     'icon' => '',
                 ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

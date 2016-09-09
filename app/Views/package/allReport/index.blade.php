@@ -35,10 +35,25 @@
                     <td>{{ $channel->sum('daily_sales') }}</td>
                     <td>{{ $channel->sum('monty_sales') }}</td>
                     <td>{{ 1111 }}</td>
-                    <td>{{ round((strtotime('now') - strtotime(date('Y-m', strtotime($channel->first()->day_time))))/(strtotime(date('Y-m', date(strtotime('+1 month')))) - strtotime(date('Y-m', strtotime($channel->first()->day_time)))), 2) }}%</td>
+                    <td>{{ round((strtotime('now') - strtotime(date('Y-m', strtotime($channel->first()->day_time))))/(strtotime(date('Y-m', date(strtotime('+1 month')))) - strtotime(date('Y-m', strtotime($channel->first()->day_time))))*100, 2) }}%</td>
                     <td>{{ round($channel->sum('monty_sales')/(strtotime('now') - strtotime(date('Y-m', strtotime($channel->first()->day_time)))/(strtotime('now') - strtotime('-1 day'))), 2) }}</td>
                 </tr>
             @endforeach
+                <tr>
+                    <td>总计</td>
+                    <td>{{ $model->sum('wait_send') }}</td>
+                    <td>{{ $model->sum('sending') }}</td>
+                    <td>{{ $model->sum('sended') }}</td>
+                    <td>{{ $model->sum('more') }}</td>
+                    <td>{{ $model->sum('less') }}</td>
+                    <td>{{ $model->sum('daily_send') }}</td>
+                    <td>{{ $model->sum('need') }}</td>
+                    <td>{{ $model->sum('daily_sales') }}</td>
+                    <td>{{ $model->sum('monty_sales') }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -73,6 +88,16 @@
                         <td>{{ $channel->sum('need') }}</td>
                     </tr>
                 @endforeach
+                    <tr>
+                        <td>总计</td>
+                        <td>{{ $arr[$warehouseId][0] }}</td>
+                        <td>{{ $arr[$warehouseId][1] }}</td>
+                        <td>{{ $arr[$warehouseId][2] }}</td>
+                        <td>{{ $arr[$warehouseId][3] }}</td>
+                        <td>{{ $arr[$warehouseId][4] }}</td>
+                        <td>{{ $arr[$warehouseId][5] }}</td>
+                        <td>{{ $arr[$warehouseId][6] }}</td>
+                    </tr>
                 </tbody>
             </table>
         </div>

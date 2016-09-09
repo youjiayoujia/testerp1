@@ -22,7 +22,7 @@ class CreatePickReports extends Migration
             $table->integer('missing_pick')->comment('漏检数')->default(0);
             $table->integer('today_pick')->comment('今日拣货数')->default(0);
             $table->integer('today_picklist')->comment('今日分配拣货单数')->default(0);
-            $table->timestamp('day_time')->comment('时间')->default(0);
+            $table->timestamp('day_time')->comment('时间')->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });

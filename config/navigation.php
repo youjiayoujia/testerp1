@@ -401,7 +401,17 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => 'Ebay数据监控',
+                'name' => 'Ebay草稿列表',
+                'url' => 'ebayPublish.index',
+                'icon' => '',
+            ],
+           /* [
+                'name' => 'Ebay销售代码设置',
+                'url' => 'ebaySellerCode.index',
+                'icon' => '',
+            ],*/
+            [
+                'name' => 'Ebay在线数据监控',
                 'url' => 'ebayProduct.index',
                 'icon' => '',
             ],

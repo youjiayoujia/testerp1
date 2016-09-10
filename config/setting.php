@@ -119,6 +119,7 @@ return [
         'ebayProduct.account_id'=>'账号',
         'ebayProduct.listing_type'=>'类型',
         'ebayProduct.multi_attribute'=>'多属性',
+        'erpProduct.status' => 'erp状态',
         'price.start_price'=>'价格',
         'time.start_time' => '上架时间',
         'sku'=>'EbaySku',

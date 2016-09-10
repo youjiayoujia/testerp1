@@ -602,7 +602,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
-
+    Route::get('ebayDetail/ajaxUpdate', ['uses' => 'Publish\Ebay\EbayDetailController@ajaxUpdate', 'as' => 'ebayDetail.ajaxUpdate']);
+    Route::get('ebayDetail/ajaxIsUse', ['uses' => 'Publish\Ebay\EbayDetailController@ajaxIsUse', 'as' => 'ebayDetail.ajaxIsUse']);
     Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
     Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
     Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
@@ -611,6 +612,15 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('ebay/productBatchEdit', ['uses' => 'Publish\Ebay\EbayDataMonitorController@productBatchEdit', 'as' => 'ebay.productBatchEdit']);
     Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
+
+//ajaxInitCategory getSiteCategoryCondition
+    Route::get('ebayPublish/ajaxInitErpData', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitErpData', 'as' => 'ebayPublish.ajaxInitErpData']);
+    Route::get('ebayPublish/ajaxInitCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCategory', 'as' => 'ebayPublish.ajaxInitCategory']);
+    Route::get('ebayPublish/ajaxInitSpecifics', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitSpecifics', 'as' => 'ebayPublish.ajaxInitSpecifics']);
+    Route::get('ebayPublish/ajaxInitCondition', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCondition', 'as' => 'ebayPublish.ajaxInitCondition']);
+    Route::get('ebayPublish/ajaxInitSite', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitSite', 'as' => 'ebayPublish.ajaxInitSite']);
+
+    Route::resource('ebayPublish','Publish\Ebay\EbayPublishController');
 
     Route::post('wish/editOnlineProductStore',
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);

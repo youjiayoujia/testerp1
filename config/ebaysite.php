@@ -29,6 +29,30 @@ return [
         'Austria'=>16,
         'Switzerland'=>193,
         'Ireland'=>205,
+    ],
+    'unpaid'=>[
+        2,3,4,5
+    ],
+    'unpaid_day'=>[
+        'Days_30'=>30,
+        'Days_180'=>180,
+        'Days_360'=>360
+    ],
+    'policy' =>[
+        4,5,6,7
+    ],
+    'policy_day'=>[
+        'Days_30'=>30,
+        'Days_180'=>180
+    ],
+    'feedback' =>[
+        -1,-2,-3
+    ],
+    'item_count'=>[
+        1,2,3,4,5,6,7,8,9,10,25,50,75,100
+    ],
+    'item_count_feedback'=>[
+        5,4,3,2,1,0
     ]
 
 ];

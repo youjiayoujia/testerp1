@@ -14,7 +14,6 @@ use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Models\Message\Issues\EbayCasesDetailsModel;
 
 
-
 class EbayAdapter implements AdapterInterface
 {
 
@@ -504,7 +503,7 @@ class EbayAdapter implements AdapterInterface
                 foreach ($v->ValueRecommendation as $i_v) {
                     $specific_values[] = (string)$i_v->Value;
                 }
-                $data['specific_values'] = serialize($specific_values);
+                $data['specific_values'] = json_encode($specific_values);
                 $data['category_id'] = $category_id;
                 $data['site'] = $site;
                 $return[] = $data;
@@ -613,7 +612,7 @@ class EbayAdapter implements AdapterInterface
         $xml .= '</ActiveList>';
         $xml .= '<HideVariations>false</HideVariations>';
         $response = $this->buildEbayBody($xml, 'GetMyeBaySelling', $site);
-        if(isset($response->ActiveList->PaginationResult->TotalNumberOfPages)&&($page>(int)$response->ActiveList->PaginationResult->TotalNumberOfPages)){
+        if (isset($response->ActiveList->PaginationResult->TotalNumberOfPages) && ($page > (int)$response->ActiveList->PaginationResult->TotalNumberOfPages)) {
             return false;
         }
         if (isset($response->ActiveList->ItemArray->Item) && !empty($response->ActiveList->ItemArray->Item)) {
@@ -626,17 +625,18 @@ class EbayAdapter implements AdapterInterface
         }
     }
 
-    public function getSellerEvents($start_time='',$end_time='',$site = 0){
+    public function getSellerEvents($start_time = '', $end_time = '', $site = 0)
+    {
         $return = [];
         $xml = '';
-        $xml .=' <EndTimeFrom>'.$start_time.'T00:00:00.000Z</EndTimeFrom><EndTimeTo>'.$end_time.'T00:00:00.000Z</EndTimeTo>';
+        $xml .= ' <EndTimeFrom>' . $start_time . 'T00:00:00.000Z</EndTimeFrom><EndTimeTo>' . $end_time . 'T00:00:00.000Z</EndTimeTo>';
         $response = $this->buildEbayBody($xml, 'GetSellerEvents', $site);
-        if(isset($response->ItemArray)&&!empty($response->ItemArray)&&$response->Ack == 'Success'){
-            foreach($response->ItemArray->Item as $item){
-                $return[] =$item->ItemID;
+        if (isset($response->ItemArray) && !empty($response->ItemArray) && $response->Ack == 'Success') {
+            foreach ($response->ItemArray->Item as $item) {
+                $return[] = $item->ItemID;
             }
             return $return;
-        }else{
+        } else {
             return false;
         }
     }
@@ -661,7 +661,7 @@ class EbayAdapter implements AdapterInterface
             $list_info['item_id'] = (string)$response->Item->ItemID;
             $list_info['currency'] = (string)$response->Item->Currency;
             $list_info['country'] = (string)$response->Item->Country;
-            $list_info['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+            $list_info['start_time'] = date('Y-m-d H:i:s', strtotime((string)$response->Item->ListingDetails->StartTime));
             $list_info['view_item_url'] = (string)$response->Item->ListingDetails->ViewItemURL;
             $list_info['listing_duration'] = (string)$response->Item->ListingDuration;
             $list_info['listing_type'] = (string)$response->Item->ListingType;
@@ -674,7 +674,7 @@ class EbayAdapter implements AdapterInterface
             $list_info['private_listing'] = (string)$response->Item->PrivateListing;
             $list_info['dispatch_time_max'] = (string)$response->Item->DispatchTimeMax;
             $list_info['start_price'] = (float)$response->Item->StartPrice;
-            $list_info['quantity'] = (int)$response->Item->Quantity-(int)$response->Item->SellingStatus->QuantitySold;
+            $list_info['quantity'] = (int)$response->Item->Quantity - (int)$response->Item->SellingStatus->QuantitySold;
             $list_info['reserve_price'] = (float)$response->Item->ReservePrice;
             $list_info['buy_it_now_price'] = (float)$response->Item->BuyItNowPrice;
             $list_info['title'] = (string)$response->Item->Title;
@@ -711,11 +711,11 @@ class EbayAdapter implements AdapterInterface
                 foreach ($Variations as $variation) {
                     $sku_info[$i]['sku'] = (string)$variation->SKU;
                     $sku_info[$i]['start_price'] = (float)$variation->StartPrice;
-                    $sku_info[$i]['quantity'] = (int)$variation->Quantity-(int)$variation->SellingStatus->QuantitySold;
+                    $sku_info[$i]['quantity'] = (int)$variation->Quantity - (int)$variation->SellingStatus->QuantitySold;
                     $sku_info[$i]['erp_sku'] = (string)$variation->SKU;
                     $sku_info[$i]['quantity_sold'] = isset($variation->SellingStatus->QuantitySold) ? (int)$variation->SellingStatus->QuantitySold : 0;
                     $sku_info[$i]['item_id'] = (string)$response->Item->ItemID;
-                    $sku_info[$i]['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+                    $sku_info[$i]['start_time'] = date('Y-m-d H:i:s', strtotime((string)$response->Item->ListingDetails->StartTime));
                     $variation_specifics = [];
                     if (isset($variation->VariationSpecifics)) {
                         if (isset($variation->VariationSpecifics->NameValueList[0])) {
@@ -738,11 +738,11 @@ class EbayAdapter implements AdapterInterface
             } else {
                 $sku_info[0]['sku'] = (string)$response->Item->SKU;
                 $sku_info[0]['start_price'] = (float)$response->Item->StartPrice;;
-                $sku_info[0]['quantity'] = (int)$response->Item->Quantity-(int)$response->Item->SellingStatus->QuantitySold;
+                $sku_info[0]['quantity'] = (int)$response->Item->Quantity - (int)$response->Item->SellingStatus->QuantitySold;
                 $sku_info[0]['erp_sku'] = (string)$response->Item->SKU;;
                 $sku_info[0]['quantity_sold'] = (int)$response->Item->SellingStatus->QuantitySold;
                 $sku_info[0]['item_id'] = (string)$response->Item->ItemID;
-                $sku_info[0]['start_time'] = date('Y-m-d H:i:s',strtotime((string)$response->Item->ListingDetails->StartTime));
+                $sku_info[0]['start_time'] = date('Y-m-d H:i:s', strtotime((string)$response->Item->ListingDetails->StartTime));
             }
             $VariationPicture = isset($response->Item->Variations->Pictures) ? $response->Item->Variations->Pictures : '';
             $variation_picture = [];
@@ -805,11 +805,11 @@ class EbayAdapter implements AdapterInterface
                     $shipping_details['InternationalShipping'][$key]['ShippingServiceCost'] = (float)$InternationalShippingServiceOption->ShippingServiceCost;
                     $shipping_details['InternationalShipping'][$key]['ShippingServiceAdditionalCost'] = (float)$InternationalShippingServiceOption->ShippingServiceAdditionalCost;
                     $shipToLocation = [];
-                    if(isset($InternationalShippingServiceOption->ShipToLocation[0])){
-                        foreach($InternationalShippingServiceOption->ShipToLocation as $location){
-                            $shipToLocation[]=(string)$location;
+                    if (isset($InternationalShippingServiceOption->ShipToLocation[0])) {
+                        foreach ($InternationalShippingServiceOption->ShipToLocation as $location) {
+                            $shipToLocation[] = (string)$location;
                         }
-                    }else{
+                    } else {
                         $shipToLocation[] = (string)$InternationalShippingServiceOption->ShipToLocation;
                     }
 
@@ -824,16 +824,15 @@ class EbayAdapter implements AdapterInterface
                 $shipping_details['InternationalShipping'][1]['ShipToLocation'] = (string)$InternationalShippingServiceOption->ShipToLocation;
 
 
-
             }
             $shipping_details['ExcludeShipToLocation'] = (array)$response->Item->ShippingDetails->ExcludeShipToLocation;
             $list_info['shipping_details'] = json_encode($shipping_details);
-            if(isset($response->Item->OutOfStockControl)&&((string)$response->Item->OutOfStockControl=='true')){
+            if (isset($response->Item->OutOfStockControl) && ((string)$response->Item->OutOfStockControl == 'true')) {
                 $list_info['is_out_control'] = 1;
             }
             unset($shipping_details);
-            $return['sku_info']=$sku_info;
-            $return['list_info']=$list_info;
+            $return['sku_info'] = $sku_info;
+            $return['list_info'] = $list_info;
             return $return;
         } else {
             return false;
@@ -846,16 +845,17 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return mixed
      */
-    public function changeOutOfStock($itemId,$is_out_stock,$site = 0){
+    public function changeOutOfStock($itemId, $is_out_stock, $site = 0)
+    {
         $xml = '';
-        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><OutOfStockControl>'.$is_out_stock.'</OutOfStockControl></Item>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><OutOfStockControl>' . $is_out_stock . '</OutOfStockControl></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -866,16 +866,17 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return mixed
      */
-    public function changeProcessingDays($itemId,$day,$site = 0){
+    public function changeProcessingDays($itemId, $day, $site = 0)
+    {
         $xml = '';
-        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><DispatchTimeMax>'.$day.'</DispatchTimeMax></Item>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><DispatchTimeMax>' . $day . '</DispatchTimeMax></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -886,16 +887,17 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return mixed
      */
-    public function changePayPal($itemId,$paypal,$site = 0){
+    public function changePayPal($itemId, $paypal, $site = 0)
+    {
         $xml = '';
-        $xml .= '<Item><ItemID>'.$itemId.'</ItemID><PayPalEmailAddress>'.$paypal.'</PayPalEmailAddress></Item>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><PayPalEmailAddress>' . $paypal . '</PayPalEmailAddress></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -907,32 +909,33 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function changePrice($itemId,$sku,$is_mul=0,$site=0){
-        $return =[];
-        $xml='';
-        if($is_mul){
-            foreach($sku as $key=> $v){
+    public function changePrice($itemId, $sku, $is_mul = 0, $site = 0)
+    {
+        $return = [];
+        $xml = '';
+        if ($is_mul) {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
                 $xml .= '<ItemID>' . $itemId . '</ItemID>';
-                $xml .= '<SKU>'.$key.'</SKU>';
-                $xml .= '<StartPrice>'.$v.'</StartPrice>';
+                $xml .= '<SKU>' . $key . '</SKU>';
+                $xml .= '<StartPrice>' . $v . '</StartPrice>';
                 $xml .= '</InventoryStatus>';
             }
-        }else{
-            foreach($sku as $key=> $v){
+        } else {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
                 $xml .= '<ItemID>' . $itemId . '</ItemID>';
-                $xml .= '<StartPrice>'.$v.'</StartPrice>';
+                $xml .= '<StartPrice>' . $v . '</StartPrice>';
                 $xml .= '</InventoryStatus>';
             }
         }
         $response = $this->buildEbayBody($xml, 'ReviseInventoryStatus', $site);
-        if ($response->Ack == 'Success'||$response->Ack=='Warning') {
+        if ($response->Ack == 'Success' || $response->Ack == 'Warning') {
             $return['status'] = true;
-            $return['info'] = isset($response->Errors->LongMessage)?'Success'.(string)$response->Errors->LongMessage:'Success';
-        }else{
+            $return['info'] = isset($response->Errors->LongMessage) ? 'Success' . (string)$response->Errors->LongMessage : 'Success';
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -944,32 +947,33 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function changeQuantity($itemId,$sku,$is_mul=0,$site=0){
-        $return =[];
-        $xml='';
-        if($is_mul){
-            foreach($sku as $key=> $v){
+    public function changeQuantity($itemId, $sku, $is_mul = 0, $site = 0)
+    {
+        $return = [];
+        $xml = '';
+        if ($is_mul) {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
                 $xml .= '<ItemID>' . $itemId . '</ItemID>';
-                $xml .= '<SKU>'.$key.'</SKU>';
-                $xml .= '<Quantity>'.$v.'</Quantity>';
+                $xml .= '<SKU>' . $key . '</SKU>';
+                $xml .= '<Quantity>' . $v . '</Quantity>';
                 $xml .= '</InventoryStatus>';
             }
-        }else{
-            foreach($sku as $key=> $v){
+        } else {
+            foreach ($sku as $key => $v) {
                 $xml .= '<InventoryStatus>';
-                $xml .= '<ItemID>'.$itemId.'</ItemID>';
-                $xml .= '<Quantity>'.$v.'</Quantity>';
+                $xml .= '<ItemID>' . $itemId . '</ItemID>';
+                $xml .= '<Quantity>' . $v . '</Quantity>';
                 $xml .= '</InventoryStatus>';
             }
         }
         $response = $this->buildEbayBody($xml, 'ReviseInventoryStatus', $site);
-        if ($response->Ack == 'Success'||$response->Ack=='Warning') {
+        if ($response->Ack == 'Success' || $response->Ack == 'Warning') {
             $return['status'] = true;
-            $return['info'] = isset($response->Errors->LongMessage)?'Success'.(string)$response->Errors->LongMessage:'Success';
-        }else{
+            $return['info'] = isset($response->Errors->LongMessage) ? 'Success' . (string)$response->Errors->LongMessage : 'Success';
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -980,41 +984,42 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function changeShippingFee($itemId,$ship_info,$site=0){
-        $return =[];
+    public function changeShippingFee($itemId, $ship_info, $site = 0)
+    {
+        $return = [];
         $xml = '';
-        $xml .='<Item><ItemID>'.$itemId.'</ItemID><ShippingDetails>';
-            foreach($ship_info['Shipping'] as $key=>$shipping){
-                $xml .='<ShippingServiceOptions>';
-                $xml .='<ShippingService>'.$shipping['ShippingService'].'</ShippingService>';
-                $xml .='<ShippingServiceAdditionalCost>'.sprintf("%.2f",$shipping['ShippingServiceAdditionalCost']).'</ShippingServiceAdditionalCost>';
-                $xml .='<ShippingServiceCost>'. sprintf("%.2f",$shipping['ShippingServiceCost']).'</ShippingServiceCost>';
-                $xml .='<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
-                $xml .='</ShippingServiceOptions>';
+        $xml .= '<Item><ItemID>' . $itemId . '</ItemID><ShippingDetails>';
+        foreach ($ship_info['Shipping'] as $key => $shipping) {
+            $xml .= '<ShippingServiceOptions>';
+            $xml .= '<ShippingService>' . $shipping['ShippingService'] . '</ShippingService>';
+            $xml .= '<ShippingServiceAdditionalCost>' . sprintf("%.2f", $shipping['ShippingServiceAdditionalCost']) . '</ShippingServiceAdditionalCost>';
+            $xml .= '<ShippingServiceCost>' . sprintf("%.2f", $shipping['ShippingServiceCost']) . '</ShippingServiceCost>';
+            $xml .= '<ShippingServicePriority>' . $key . '</ShippingServicePriority>';
+            $xml .= '</ShippingServiceOptions>';
+        }
+        foreach ($ship_info['InternationalShipping'] as $key => $shipping) {
+            $xml .= '<InternationalShippingServiceOption>';
+            $xml .= '<ShippingService>' . $shipping['ShippingService'] . '</ShippingService>';
+            $xml .= '<ShippingServiceAdditionalCost>' . sprintf("%.2f", $shipping['ShippingServiceAdditionalCost']) . '</ShippingServiceAdditionalCost>';
+            $xml .= '<ShippingServiceCost>' . sprintf("%.2f", $shipping['ShippingServiceCost']) . '</ShippingServiceCost>';
+            $xml .= '<ShippingServicePriority>' . $key . '</ShippingServicePriority>';
+            foreach ($shipping['ShipToLocation'] as $location) {
+                $xml .= '<ShipToLocation>' . $location . '</ShipToLocation>';
             }
-            foreach($ship_info['InternationalShipping'] as $key=>$shipping){
-                $xml .='<InternationalShippingServiceOption>';
-                $xml .='<ShippingService>'.$shipping['ShippingService'].'</ShippingService>';
-                $xml .='<ShippingServiceAdditionalCost>'.sprintf("%.2f",$shipping['ShippingServiceAdditionalCost']).'</ShippingServiceAdditionalCost>';
-                $xml .='<ShippingServiceCost>'.sprintf("%.2f",$shipping['ShippingServiceCost']).'</ShippingServiceCost>';
-                $xml .='<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
-                foreach($shipping['ShipToLocation'] as $location){
-                    $xml .='<ShipToLocation>'.$location.'</ShipToLocation>';
-                }
-                $xml .='</InternationalShippingServiceOption>';
-            }
-            if(!empty($ship_info['ExcludeShipToLocation'])){
-                foreach($ship_info['ExcludeShipToLocation'] as $exclude)
-                $xml .= '<ExcludeShipToLocation>'.$exclude.'</ExcludeShipToLocation>';
-            }
-        $xml .='</ShippingDetails></Item>';
+            $xml .= '</InternationalShippingServiceOption>';
+        }
+        if (!empty($ship_info['ExcludeShipToLocation'])) {
+            foreach ($ship_info['ExcludeShipToLocation'] as $exclude)
+                $xml .= '<ExcludeShipToLocation>' . $exclude . '</ExcludeShipToLocation>';
+        }
+        $xml .= '</ShippingDetails></Item>';
         $response = $this->buildEbayBody($xml, 'ReviseFixedPriceItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
@@ -1025,22 +1030,22 @@ class EbayAdapter implements AdapterInterface
      * @param int $site
      * @return array
      */
-    public function endItems($itemId,$reason='NotAvailable Sorry',$site = 0){
-        $return =[];
+    public function endItems($itemId, $reason = 'NotAvailable Sorry', $site = 0)
+    {
+        $return = [];
         $xml = '';
-        $xml .= '<EndingReason>'.$reason.'</EndingReason>';
-        $xml .= '<ItemID>'.$itemId.'</ItemID>';
+        $xml .= '<EndingReason>' . $reason . '</EndingReason>';
+        $xml .= '<ItemID>' . $itemId . '</ItemID>';
         $response = $this->buildEbayBody($xml, 'EndItem', $site);
         if ($response->Ack == 'Success') {
             $return['status'] = true;
             $return['info'] = 'Success';
-        }else{
+        } else {
             $return['status'] = false;
-            $return['info'] = isset($response->Errors->LongMessage)?(string)$response->Errors->LongMessage:'未知错误';
+            $return['info'] = isset($response->Errors->LongMessage) ? (string)$response->Errors->LongMessage : '未知错误';
         }
         return $return;
     }
-
 
 
     public function  buildEbayBody($xml, $call, $site = 0)
@@ -1059,14 +1064,15 @@ class EbayAdapter implements AdapterInterface
     /**
      * case XML DOM
      */
-    public function buildcaseBody($xml,$call){
+    public function buildcaseBody($xml, $call)
+    {
         $this->serverUrl = 'https://svcs.ebay.com/services/resolution/v1/ResolutionCaseManagementService';  //cases API地址
         $this->verb = $call;
         $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?><' . $call . 'Request xmlns="http://www.ebay.com/marketplace/resolution/v1/services">';
         $requestXmlBody .= $xml;
         $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . $this->requestToken . '</eBayAuthToken></RequesterCredentials></' . $call . 'Request>';
 
-        $result = $this->sendHttpRequest($requestXmlBody,'Resolution');
+        $result = $this->sendHttpRequest($requestXmlBody, 'Resolution');
         $response = simplexml_load_string($result);
 
         return $response;
@@ -1088,63 +1094,64 @@ class EbayAdapter implements AdapterInterface
     }
 
 
-/*    public function sendHttpRequestMessage($requestBody, $mode='Trading') {
-        //build eBay headers using variables passed via constructor
-        if (strcasecmp($mode, 'Trading') === 0) {       //交易API的头信息
-            $headers = $this->buildEbayHeaders();
-        }elseif (strcasecmp($mode, 'Resolution') === 0){//resolution Api头信息
-            $headers = $this->buildEbayResolutionHeaders();
-        }elseif (strcasecmp($mode, 'Return') === 0){ //return case Api头信息
-            $headers = $this->buildEbayReturnHeaders();
-        }else {
-            $headers = $this->buildEbayHeaders();
-        }
-        $connection = curl_init();
-        curl_setopt($connection, CURLOPT_VERBOSE, 1);
-        //set the server we are using (could be Sandbox or Production server)
-        curl_setopt($connection, CURLOPT_URL, $this->serverUrl);
-        //stop CURL from verifying the peer's certificate
-        curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
-        //set the headers using the array of headers
-        curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
-        //set method as POST
-        curl_setopt($connection, CURLOPT_POST, 1);
-        //set the XML body of the request
-        curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
-        //set it to return the transfer as a string from curl_exec
-        curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
+    /*    public function sendHttpRequestMessage($requestBody, $mode='Trading') {
+            //build eBay headers using variables passed via constructor
+            if (strcasecmp($mode, 'Trading') === 0) {       //交易API的头信息
+                $headers = $this->buildEbayHeaders();
+            }elseif (strcasecmp($mode, 'Resolution') === 0){//resolution Api头信息
+                $headers = $this->buildEbayResolutionHeaders();
+            }elseif (strcasecmp($mode, 'Return') === 0){ //return case Api头信息
+                $headers = $this->buildEbayReturnHeaders();
+            }else {
+                $headers = $this->buildEbayHeaders();
+            }
+            $connection = curl_init();
+            curl_setopt($connection, CURLOPT_VERBOSE, 1);
+            //set the server we are using (could be Sandbox or Production server)
+            curl_setopt($connection, CURLOPT_URL, $this->serverUrl);
+            //stop CURL from verifying the peer's certificate
+            curl_setopt($connection, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($connection, CURLOPT_SSL_VERIFYHOST, 0);
+            //set the headers using the array of headers
+            curl_setopt($connection, CURLOPT_HTTPHEADER, $headers);
+            //set method as POST
+            curl_setopt($connection, CURLOPT_POST, 1);
+            //set the XML body of the request
+            curl_setopt($connection, CURLOPT_POSTFIELDS, $requestBody);
+            //set it to return the transfer as a string from curl_exec
+            curl_setopt($connection, CURLOPT_RETURNTRANSFER, 1);
 
-        curl_setopt($connection, CURLOPT_TIMEOUT, 250);
-        //Send the Request
-        $response = curl_exec($connection);
-        //$error = curl_error($connection);
-        //close the connection
-        curl_close($connection);
-        return $response;
-    }*/
+            curl_setopt($connection, CURLOPT_TIMEOUT, 250);
+            //Send the Request
+            $response = curl_exec($connection);
+            //$error = curl_error($connection);
+            //close the connection
+            curl_close($connection);
+            return $response;
+        }*/
 
     /**
      * cases 使用的头部
      * 创建resolution API的头信息
      * @return multitype:
      */
-    private function buildEbayResolutionHeaders(){
+    private function buildEbayResolutionHeaders()
+    {
         $headers = array(
             'X-EBAY-SOA-SERVICE-NAME: ResolutionCaseManagementService',
-            'X-EBAY-SOA-OPERATION-NAME: '.$this->verb,
+            'X-EBAY-SOA-OPERATION-NAME: ' . $this->verb,
             'X-EBAY-SOA-SERVICE-VERSION: 1.1.0',
-            'X-EBAY-SOA-SECURITY-TOKEN: '.$this->requestToken,
+            'X-EBAY-SOA-SECURITY-TOKEN: ' . $this->requestToken,
             'X-EBAY-SOA-REQUEST-DATA-FORMAT: XML'
         );
         return $headers;
     }
 
-    public function sendHttpRequest($requestBody,$type=false)
+    public function sendHttpRequest($requestBody, $type = false)
     {
-        if($type == 'Resolution'){ //case 头部
+        if ($type == 'Resolution') { //case 头部
             $headers = $this->buildEbayResolutionHeaders();
-        }else{
+        } else {
             $headers = $this->buildEbayHeaders();
 
         }
@@ -1185,13 +1192,7 @@ class EbayAdapter implements AdapterInterface
                             <EndTime>' . $time_end . '</EndTime>';
         //2.获取消息
         $call = 'GetMyMessages';
-<<<<<<< HEAD
         $message_ary = $this->buildEbayBody($message_xml_dom, $call);
-=======
-        $message_ary =  $this->buildEbayBody($message_xml_dom,$call);
-
-
->>>>>>> master
         $headers_count = $message_ary->Summary->TotalMessageCount;
         $headers_pages_count = ceil($headers_count / 100); //统计页数
 
@@ -1204,144 +1205,137 @@ class EbayAdapter implements AdapterInterface
                                 </Pagination>        
                                 <StartTime>' . $time_begin . '</StartTime>
                                 <EndTime>' . $time_end . '</EndTime>';
-<<<<<<< HEAD
             $content = $this->buildEbayBody($content_xml_dom, 'GetMyMessages');
             if (isset($content->Messages->Message)) {
                 foreach ($content->Messages->Message as $message) {
-=======
-            $content = $this->buildEbayBody($content_xml_dom,'GetMyMessages');
+
+                    $content = $this->buildEbayBody($content_xml_dom, 'GetMyMessages');
 
 
-            if(isset($content->Messages->Message)) {
-                foreach ($content->Messages->Message as $message){
->>>>>>> master
-                    /*
-                        message 数据格式 样例
-                        SimpleXMLElement Object
-                        (
-                            [Sender] => priya.suryavanshi
-                            [SendingUserID] => 774805616
-                            [RecipientUserID] => wintrade9
-                            [SendToName] => wintrade9
-                            [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                            [MessageID] => 80473418726
-                            [ExternalMessageID] => 1340213839016
-                            [Flagged] => false
-                            [Read] => false
-                            [ReceiveDate] => 2016-08-04T09:16:42.000Z
-                            [ExpirationDate] => 2017-08-04T09:16:42.000Z
-                            [ItemID] => 222123713737
-                            [ResponseDetails] => SimpleXMLElement Object
-                            (
-                                 [ResponseEnabled] => true
-                                 [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
-                            )
+                    if (isset($content->Messages->Message)) {
+                        foreach ($content->Messages->Message as $message) {
 
-                            [Folder] => SimpleXMLElement Object
-                            (
-                                [FolderID] => 0
-                             )
+                            /*
+                                message 数据格式 样例
+                                SimpleXMLElement Object
+                                (
+                                    [Sender] => priya.suryavanshi
+                                    [SendingUserID] => 774805616
+                                    [RecipientUserID] => wintrade9
+                                    [SendToName] => wintrade9
+                                    [Subject] => 關於： priya.suryavanshi 針對物品編號 222123713737 提出問題，結束時間為 2016-08-18 16:16:14–NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                                    [MessageID] => 80473418726
+                                    [ExternalMessageID] => 1340213839016
+                                    [Flagged] => false
+                                    [Read] => false
+                                    [ReceiveDate] => 2016-08-04T09:16:42.000Z
+                                    [ExpirationDate] => 2017-08-04T09:16:42.000Z
+                                    [ItemID] => 222123713737
+                                    [ResponseDetails] => SimpleXMLElement Object
+                                    (
+                                         [ResponseEnabled] => true
+                                         [ResponseURL] => http://contact.ebay.com.hk/ws/eBayISAPI.dll?M2MContact&item=222123713737&requested=priya.suryavanshi&qid=1340213839016&redirect=0&messageid=m80473418726
+                                    )
 
-                            [MessageType] => ResponseToASQQuestion
-                            [Replied] => false
-                            [ItemEndTime] => 2016-08-18T08:16:14.000Z
-                            [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
-                        )*/
+                                    [Folder] => SimpleXMLElement Object
+                                    (
+                                        [FolderID] => 0
+                                     )
+
+                                    [MessageType] => ResponseToASQQuestion
+                                    [Replied] => false
+                                    [ItemEndTime] => 2016-08-18T08:16:14.000Z
+                                    [ItemTitle] => NEW 25M Elastic Cord Rope String Bead Bracelet DIY Stretch Beading Thread Rope
+                                )*/
 
 
+                            /**消息详情
+                             *  call GetMyMessages
+                             * SimpleXMLElement Object
+                             * (
+                             * [Timestamp] => 2016-08-12T03:16:10.880Z
+                             * [Ack] => Success
+                             * [Version] => 963
+                             * [Build] => E963_CORE_APIMSG_17909225_R1
+                             * [Messages] => SimpleXMLElement Object
+                             * (
+                             * [Message] => SimpleXMLElement Object
+                             * (
+                             * [Timestamp] => 2016-08-12T03:16:10.880Z
+                             * [Ack] => Success
+                             * [Version] => 963
+                             * [Build] => E963_CORE_APIMSG_17909225_R1
+                             * [Messages] => SimpleXMLElement Object
+                             * (
+                             * [Message] => SimpleXMLElement Object
+                             * (
+                             * [Sender] => csfeedback@ebay.com
+                             * [RecipientUserID] => wintrade9
+                             * [Subject] => wintrade9锛屾垜浠湪姝ゆ彁閱掓偍鐢?3 鍒嗛挓鏃堕棿鍒嗕韩鎮ㄥ杩戞湡 eBay 鏀寔浣撻獙鐨勫弽棣堟剰瑙
+                             *
+                             * [MessageID] => 80624164816
+                             * [Text] =>          邮件富文本（html）
+                             * [Flagged] => false
+                             * [Read] => false
+                             * [ReceiveDate] => 2016-08-12T01:39:56.000Z
+                             * [ExpirationDate] => 2016-08-13T07:00:00.000Z
+                             * [ResponseDetails] => SimpleXMLElement Object
+                             * (
+                             * [ResponseEnabled] => false
+                             * )
+                             *
+                             * [Folder] => SimpleXMLElement Object
+                             * (
+                             * [FolderID] => 0
+                             * )
+                             *
+                             * [Replied] => false
+                             * )
+                             * )
 
-                    /**消息详情
-                     *  call GetMyMessages
-                     * SimpleXMLElement Object
-                    (
-                    [Timestamp] => 2016-08-12T03:16:10.880Z
-                    [Ack] => Success
-                    [Version] => 963
-                    [Build] => E963_CORE_APIMSG_17909225_R1
-                    [Messages] => SimpleXMLElement Object
-                    (
-                    [Message] => SimpleXMLElement Object
-                    (
-                            [Timestamp] => 2016-08-12T03:16:10.880Z
-                            [Ack] => Success
-                            [Version] => 963
-                            [Build] => E963_CORE_APIMSG_17909225_R1
-                            [Messages] => SimpleXMLElement Object
-                            (
-                            [Message] => SimpleXMLElement Object
-                            (
-                            [Sender] => csfeedback@ebay.com
-                            [RecipientUserID] => wintrade9
-                            [Subject] => wintrade9锛屾垜浠湪姝ゆ彁閱掓偍鐢?3 鍒嗛挓鏃堕棿鍒嗕韩鎮ㄥ杩戞湡 eBay 鏀寔浣撻獙鐨勫弽棣堟剰瑙
+                             */
 
-                            [MessageID] => 80624164816
-                            [Text] =>          邮件富文本（html）
-                            [Flagged] => false
-                            [Read] => false
-                            [ReceiveDate] => 2016-08-12T01:39:56.000Z
-                            [ExpirationDate] => 2016-08-13T07:00:00.000Z
-                            [ResponseDetails] => SimpleXMLElement Object
-                            (
-                            [ResponseEnabled] => false
-                            )
-
-                            [Folder] => SimpleXMLElement Object
-                            (
-                            [FolderID] => 0
-                            )
-
-                            [Replied] => false
-                            )
-                     * )
-
-                     */
-
-                    $member_xlm_dom = '
+                            $member_xlm_dom = '
                                     <WarningLevel>High</WarningLevel>
                                     <DetailLevel>ReturnMessages</DetailLevel>
-                                    <MessageIDs><MessageID>'.$message->MessageID.'</MessageID>
+                                    <MessageIDs><MessageID>' . $message->MessageID . '</MessageID>
                                     </MessageIDs>                    
                                     ';
-                    $content_detail = $this->buildEbayBody($member_xlm_dom,'GetMyMessages');
+                            $content_detail = $this->buildEbayBody($member_xlm_dom, 'GetMyMessages');
 
-                    $message_lists[$order]['message_id'] = $message->MessageID;
-                    $message_lists[$order]['from_name'] = $message->Sender;
-                    $message_lists[$order]['from'] = $message->SendingUserID;
-                    $message_lists[$order]['to'] = $message->SendToName;
-                    $message_lists[$order]['labels'] = '';
-                    $message_lists[$order]['label'] = 'Ebay';
-                    $message_lists[$order]['date'] = $message->ReceiveDate;
-                    $message_lists[$order]['subject'] = $message->Subject;
-                    $message_lists[$order]['attachment'] = ''; //附件
-<<<<<<< HEAD
-                    $message_lists[$order]['content'] = base64_encode(serialize(['ebay' => (string)$message->Subject]));
-                    $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID,
-                        'ExternalMessageID' => (string)$message->ExternalMessageID,
-=======
-                    $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
-                    $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID, //应该是订单号
-                        'ExternalMessageID' => (string)$message->ExternalMessageID,
-                        'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
->>>>>>> master
-                    ];
-                    $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
-                    $order += 1;
+                            $message_lists[$order]['message_id'] = $message->MessageID;
+                            $message_lists[$order]['from_name'] = $message->Sender;
+                            $message_lists[$order]['from'] = $message->SendingUserID;
+                            $message_lists[$order]['to'] = $message->SendToName;
+                            $message_lists[$order]['labels'] = '';
+                            $message_lists[$order]['label'] = 'Ebay';
+                            $message_lists[$order]['date'] = $message->ReceiveDate;
+                            $message_lists[$order]['subject'] = $message->Subject;
+                            $message_lists[$order]['attachment'] = ''; //附件
+                            $message_lists[$order]['content'] = base64_encode(serialize(['ebay' => (string)$message->Subject]));
+                            $message_fields_ary = [
+                                'ItemID' => (string)$message->ItemID,
+                                'ExternalMessageID' => (string)$message->ExternalMessageID,
+                                $message_lists[$order]['content'] = base64_encode(serialize([
+                                    'ebay' => (string)$content_detail->Messages->Message->Text])),
+                            $message_fields_ary = [
+                                'ItemID' => (string)$message->ItemID, //应该是订单号
+                                'ExternalMessageID' => (string)$message->ExternalMessageID,
+                                'ResponseDetails' => (string)$message->ResponseDetails->ResponseURL,
+                            ]];
+                            $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+                            $order += 1;
+                        }
+                    }
                 }
             }
-
         }
-
-<<<<<<< HEAD
-        return (!empty($message_lists)) ? $message_lists : false;
-=======
         return (!empty($message_lists)) ?  array_reverse($message_lists) : false;
-
     }
->>>>>>> master
 
-    public function createMemberMessageXML($page) {
+
+    public function createMemberMessageXML($page)
+    {
         $this->input_str = '
                             <RequesterCredentials>
                             <eBayAuthToken>' . $this->userToken . '</eBayAuthToken>
@@ -1353,8 +1347,7 @@ class EbayAdapter implements AdapterInterface
                             <Pagination>
                                 <EntriesPerPage>100</EntriesPerPage>
                                 <PageNumber>' . $page . '</PageNumber>
-                            </Pagination>
-        ';
+                            </Pagination>';
     }
 
     public function sendMessages($replyMessage)
@@ -1386,7 +1379,8 @@ class EbayAdapter implements AdapterInterface
     /**
      * 获取纠纷
      */
-    public function getCases(){
+    public function getCases()
+    {
 
         /**
          * status   先写死   所有状态都获取
@@ -1398,130 +1392,129 @@ class EbayAdapter implements AdapterInterface
         $time_begin = date('Y-m-d\TH:i:s.000\Z', strtotime('-7 day'));
         $page = 1;
         $cases_xml = '<creationDateRangeFilter>
-                     <fromDate>'.$time_begin.'</fromDate>
-                     <toDate>'.$time_end.'</toDate>
+                     <fromDate>' . $time_begin . '</fromDate>
+                     <toDate>' . $time_end . '</toDate>
                      </creationDateRangeFilter>
                      <paginationInput>
                         <entriesPerPage>100</entriesPerPage>
-                        <pageNumber>'.$page.'</pageNumber>
+                        <pageNumber>' . $page . '</pageNumber>
                      </paginationInput>
                      <sortOrder>CREATION_DATE_DESCENDING</sortOrder>';
 
 
-        $usercases = $this->buildcaseBody($cases_xml,'getUserCases');
+        $usercases = $this->buildcaseBody($cases_xml, 'getUserCases');
 
 
         /**SimpleXMLElement Object
-        (
-        [ack] => Success
-        [version] => 1.3.0
-        [timestamp] => 2016-08-12T07:48:15.322Z
-        [cases] => SimpleXMLElement Object
-                                    (
-                                    [caseSummary] => Array
-                                    (
-                                    [0] => SimpleXMLElement Object
-                                    (
-                                    [caseId] => SimpleXMLElement Object
-                                    (
-                                    [id] => 685784541
-                                    [type] => UPI
-                                    )
-
-                                    [user] => SimpleXMLElement Object
-                                    (
-                                    [userId] => pandaserveyou
-                                    [role] => SELLER
-                                    )
-
-                                    [otherParty] => SimpleXMLElement Object
-                                    (
-                                    [userId] => deis-br
-                                    [role] => BUYER
-                                    )
-
-                                    [status] => SimpleXMLElement Object
-                                    (
-                                    [UPIStatus] => OTHER_PARTY_RESPONSE_DUE
-                                    )
-
-                                    [item] => SimpleXMLElement Object
-                                    (
-                                    [itemId] => 172218797476
-                                    [itemTitle] => Original Andrea Hair Growth Pilatory Essence Oil Baldness Alopecia anti Loss
-                                    [transactionId] => 1578377865007
-                                    )
-
-                                    [caseQuantity] => 2
-                                    [caseAmount] => 1.85
-                                    [respondByDate] => 2016-10-08T16:12:15.000Z
-                                    [creationDate] => 2016-08-11T22:11:10.000Z
-                                    [lastModifiedDate] => 2016-08-11T22:11:10.000Z
-        )
+         * (
+         * [ack] => Success
+         * [version] => 1.3.0
+         * [timestamp] => 2016-08-12T07:48:15.322Z
+         * [cases] => SimpleXMLElement Object
+         * (
+         * [caseSummary] => Array
+         * (
+         * [0] => SimpleXMLElement Object
+         * (
+         * [caseId] => SimpleXMLElement Object
+         * (
+         * [id] => 685784541
+         * [type] => UPI
+         * )
+         *
+         * [user] => SimpleXMLElement Object
+         * (
+         * [userId] => pandaserveyou
+         * [role] => SELLER
+         * )
+         *
+         * [otherParty] => SimpleXMLElement Object
+         * (
+         * [userId] => deis-br
+         * [role] => BUYER
+         * )
+         *
+         * [status] => SimpleXMLElement Object
+         * (
+         * [UPIStatus] => OTHER_PARTY_RESPONSE_DUE
+         * )
+         *
+         * [item] => SimpleXMLElement Object
+         * (
+         * [itemId] => 172218797476
+         * [itemTitle] => Original Andrea Hair Growth Pilatory Essence Oil Baldness Alopecia anti Loss
+         * [transactionId] => 1578377865007
+         * )
+         *
+         * [caseQuantity] => 2
+         * [caseAmount] => 1.85
+         * [respondByDate] => 2016-10-08T16:12:15.000Z
+         * [creationDate] => 2016-08-11T22:11:10.000Z
+         * [lastModifiedDate] => 2016-08-11T22:11:10.000Z
+         * )
          */
-        if($usercases->ack == 'Success'){
+        if ($usercases->ack == 'Success') {
 
 
-            foreach ($usercases->cases->caseSummary as $case){
+            foreach ($usercases->cases->caseSummary as $case) {
 
                 $buyer = '';
                 $seller = '';
-                if((string)$case->user->role == 'BUYER'){
+                if ((string)$case->user->role == 'BUYER') {
                     $buyer = (string)$case->user->userId;
                 }
-                if((string)$case->user->role == 'SELLER'){
+                if ((string)$case->user->role == 'SELLER') {
                     $seller = (string)$case->user->userId;
                 }
 
-                if((string)$case->otherParty->role == 'BUYER'){
+                if ((string)$case->otherParty->role == 'BUYER') {
                     $buyer = (string)$case->user->userId;
                 }
-                if((string)$case->otherParty->role == 'SELLER'){
+                if ((string)$case->otherParty->role == 'SELLER') {
                     $seller = (string)$case->user->userId;
                 }
 
                 $status = array_values((array)$case->status);
-                if($case->lastModifiedDate){
+                if ($case->lastModifiedDate) {
                     $modify_date = (string)$case->lastModifiedDate;
-                }else{
+                } else {
                     $modify_date = '';
                 }
                 $case_new_ary = [
-                    'case_id'        => (string)$case->caseId->id,
-                    'status'         => $status[0],
-                    'type'           => (string)$case->caseId->type,
-                    'seller_id'      => $seller,
-                    'buyer_id'       => $buyer,
-                    'item_id'        => (string)$case->item->itemId,
-                    'item_title'     => (string)$case->item->itemTitle,
+                    'case_id' => (string)$case->caseId->id,
+                    'status' => $status[0],
+                    'type' => (string)$case->caseId->type,
+                    'seller_id' => $seller,
+                    'buyer_id' => $buyer,
+                    'item_id' => (string)$case->item->itemId,
+                    'item_title' => (string)$case->item->itemTitle,
                     'transaction_id' => (string)$case->item->transactionId,
-                    'case_quantity'  => (int)$case->caseQuantity,
-                    'case_amount'    => (float)$case->caseAmount,
-                    'respon_date'    => (string)$case->respondByDate,
-                    'creation_date'  => (string)$case->creationDate,
-                    'creation_date'  => (string)$case->creationDate,
-                    'last_modify_date'=> $modify_date,
+                    'case_quantity' => (int)$case->caseQuantity,
+                    'case_amount' => (float)$case->caseAmount,
+                    'respon_date' => (string)$case->respondByDate,
+                    'creation_date' => (string)$case->creationDate,
+                    'last_modify_date' => $modify_date,
                 ];
 
                 //获取case 详情	 获取EBP_INR，EBP_SNAD， RETURN三类的详情
 
-                $valid_type = ['EBP_INR','EBP_SNAD','RETURN'];
+                $valid_type = ['EBP_INR', 'EBP_SNAD', 'RETURN'];
 
-                if(in_array($case->caseId->type,$valid_type)){
+                if (in_array($case->caseId->type, $valid_type)) {
                     $case_detail_ary = [];
                     $content = '';
-                    $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id,(string)$case->caseId->type),'getEBPCaseDetail');
-                    if($case_detail->ack == 'Success'){
+                    $case_detail = $this->buildcaseBody($this->createCaseDetailXml($case->caseId->id, (string)$case->caseId->type), 'getEBPCaseDetail');
+                    if ($case_detail->ack == 'Success') {
 
-                        if($case_detail->caseDetail->responseHistory){
+                        if ($case_detail->caseDetail->responseHistory) {
                             $detail = (array)$case_detail->caseDetail;
 
-                            if(isset($detail['responseHistory'])){  //若包括消息
-                                foreach ($detail['responseHistory'] as $note){
-                                    $content []= [
-                                        'role' =>(string)$note->author->role,
+                            if (isset($detail['responseHistory'])) {  //若包括消息
+                                foreach ($detail['responseHistory'] as $note) {
+                                    $content [] = [
+                                        'role' => (string)$note->author->role,
                                         'activity' => (string)$note->activity,
-                                        'creationDate'=> (string)$note->creationDate,
+                                        'creationDate' => (string)$note->creationDate,
                                         'note' => (string)$note->note,
                                     ];
                                 }
@@ -1532,31 +1525,31 @@ class EbayAdapter implements AdapterInterface
                         $case_detail_ary = [
                             'tran_price' => $case_detail->item->transactionPrice,
                             'tran_date' => $case_detail->item->transactionDate,
-                            'tran_date' => $case_detail->item->transactionDate,
                             'global_id' => $case_detail->item->globalId,
-                            'open_reason'=> $case_detail->caseDetail->openReason,
-                            'decision'=> $case_detail->caseDetail->decision,
-                            'fvf_credited'=> $case_detail->caseDetail->FVFCredited,
-                            'agreed_renfund_amount'=> $case_detail->caseDetail->agreedRefundAmount,
-                            'buyer_expection'=> $case_detail->caseDetail->initialBuyerExpectation,
+                            'open_reason' => $case_detail->caseDetail->openReason,
+                            'decision' => $case_detail->caseDetail->decision,
+                            'fvf_credited' => $case_detail->caseDetail->FVFCredited,
+                            'agreed_renfund_amount' => $case_detail->caseDetail->agreedRefundAmount,
+                            'buyer_expection' => $case_detail->caseDetail->initialBuyerExpectation,
                             'content' => $content,
                         ];
                     }
                 }
 
-                $list_obj =  EbayCasesListsModel::where('case_id','=',(string)$case->caseId->id)->first();
-                if(empty($list_obj)){
-                    EbayCasesListsModel::create(array_merge($case_new_ary,$case_detail_ary));
+                $list_obj = EbayCasesListsModel::where('case_id', '=', (string)$case->caseId->id)->first();
+                if (empty($list_obj)) {
+                    EbayCasesListsModel::create(array_merge($case_new_ary, $case_detail_ary));
                     echo '导入成功';
                 }
             }
         }
     }
 
-    public function createCaseDetailXml($caseId,$caseType){
+    public function createCaseDetailXml($caseId, $caseType)
+    {
         return '<caseId>
-					<id>'.$caseId.'</id>
-					<type>'.$caseType.'</type>
+					<id>' . $caseId . '</id>
+					<type>' . $caseType . '</type>
 				</caseId>';
     }
 

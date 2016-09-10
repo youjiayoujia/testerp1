@@ -17,14 +17,49 @@ use App\Models\Publish\Ebay\EbayCategoryModel;
 
 class EbayDetailController extends Controller
 {
-    public function __construct(EbaySiteModel $ebaySite,EbayShippingModel $ebayShipping)
+    public function __construct(EbaySiteModel $ebaySite,EbayShippingModel $ebayShipping,EbayCategoryModel $ebayCategory)
     {
         $this->model = $ebaySite;
         $this->mainIndex = route('ebayDetail.index');
         $this->mainTitle = 'ebay站点信息';
         $this->viewPath = 'publish.ebay.site.';
         $this->ebayShipping = $ebayShipping;
+        $this->ebayCategory= $ebayCategory;
     }
+
+
+
+    public function index()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->model->orderBy('id', '')),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    public function edit($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+            'shipping_last_time' =>isset($this->ebayShipping->where('site_id',$model->site_id)->first()->updated_at)?$this->ebayShipping->where('site_id',$model->site_id)->first()->updated_at:'',
+            'category_last_time' =>isset($this->ebayCategory->where('site',$model->site_id)->first()->updated_at)?$this->ebayCategory->where('site',$model->site_id)->first()->updated_at:'',
+
+
+        ];
+        $response['metas']['title']=$model->site.'站点信息更新';
+        return view($this->viewPath . 'edit', $response);
+    }
+
+
+
 
     /*
      * 获取可用站点
@@ -32,7 +67,7 @@ class EbayDetailController extends Controller
     public function getEbaySite(){
 
 
-        $accountID =9;
+        $accountID =378;
         $account = AccountModel::findOrFail($accountID);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbaySite();
@@ -53,10 +88,7 @@ class EbayDetailController extends Controller
     /*
      * 退货政策
      */
-    public function getEbayReturnPolicy(){
-
-        $accountID =9;
-        $site = 77;
+    public function getEbayReturnPolicy($site,$accountID=378){
         $account = AccountModel::findOrFail($accountID);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbayReturnPolicy($site);
@@ -64,21 +96,20 @@ class EbayDetailController extends Controller
             $siteInfo = $this->model->where('site_id',$site)->first();
             if(!empty($siteInfo)){
                 $this->model->where('site_id',$site)->update($result);
+                return true;
 
             }else{
-                echo '未找到该站点信息!';
+                return false;
             }
         }else{
-
+            return false;
         }
     }
 
     /*
      * 获得对应站点的运输方式
      */
-    public function getEbayShipping(){
-        $accountID =9;
-        $site = 3;
+    public function getEbayShipping($site,$accountID=378){
         $account = AccountModel::findOrFail($accountID);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbayShipping($site);
@@ -92,46 +123,73 @@ class EbayDetailController extends Controller
                     $this->ebayShipping->create($ship);
                 }
             }
-
-            echo 'ok';
+            return true;
         }else{
-            echo 'false';
+            return false;
         }
     }
 
     /*
      * 获取对应站点的分类
      */
-    public function getEbayCategory(){
-        $accountId= 378;
-        $site = 0;
+    public function getEbayCategory($site,$accountId=378){
         $account = AccountModel::findOrFail($accountId);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
+        EbayCategoryModel::where('site',$site)->delete(); //全部删除
+        $result = $channel->getEbayCategoryList(1,'',$site);
+        if($result){
+            foreach($result as $re){
+                EbayCategoryModel::create($re);
+            }
+        }else{
+            return false;
+        }
         $category_result = EbayCategoryModel::where(['site'=>$site,'category_level'=>1])->get();
-        if(empty($category_result)){
-            $result = $channel->getEbayCategoryList(1,'',$site);
+        EbayCategoryModel::where('site',$site)->delete(); //再把一级分类删除了
+        foreach($category_result as $category ){
+            $result = $channel->getEbayCategoryList(6,$category->category_id,$site);
             if($result){
                 foreach($result as $re){
                     EbayCategoryModel::create($re);
                 }
             }
-        }else{
-            EbayCategoryModel::where('site',$site)->where('category_level','!=',1)->delete();
-            foreach($category_result as $category ){
-                $result = $channel->getEbayCategoryList(6,$category->category_id,$site);
-                if($result){
-                    foreach($result as $re){
-                        EbayCategoryModel::create($re);
-                    }
-                }
-
-            }
         }
-
+        return true;
     }
 
+    /**
+     * ajax 更新站点信息
+     */
+   public function ajaxUpdate()
+   {
+       $result =false;
+       $site = request()->input('site');
+       $type = request()->input('type');
+       switch ($type) {
+           case 'returns':
+               $result = $this->getEbayReturnPolicy($site);
+               break;
+           case 'shipping':
+               $result = $this->getEbayShipping($site);
+               break;
+           case 'category':
+               $result = $this->getEbayCategory($site);
+               break;
+       }
+       if($result){
+           echo '1';
+       }else{
+           echo '2';
+       }
 
+   }
 
+    public function ajaxIsUse(){
+        $site = request()->input('site');
+        $value = request()->input('value');
+        $this->model->where('site_id',$site)->update(array('is_use'=>$value));
+        echo json_encode('设置完成');
+    }
 
 
 

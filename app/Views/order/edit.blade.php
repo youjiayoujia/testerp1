@@ -136,7 +136,6 @@
             {{--</div>--}}
             {{--<div class="form-group col-lg-2">--}}
                 {{--<label for="rate" class='control-label'>汇率</label>--}}
-                {{--<small class="text-danger glyphicon glyphicon-asterisk"></small>--}}
                 {{--<input class="form-control" id="rate" placeholder="汇率" name='rate' value="{{ old('rate') ? old('rate') : $model->rate }}">--}}
             {{--</div>--}}
             {{--<div class="form-group col-lg-2">--}}

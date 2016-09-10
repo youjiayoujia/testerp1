@@ -85,6 +85,7 @@ return [
         'examine_status'=>'产品审核状态',
         'stock.item.sku' => 'sku',
         'time.created_at'=>'创建时间',
+        'time.get_time'=>'创建时间',
         'order.ordernum' => '订单号',
         'productID'=>'Wish产品ID',
         'details.erp_sku'=>'erpSKU',

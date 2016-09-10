@@ -37,6 +37,11 @@ class PickListModel extends BaseModel
         ]
     ];
 
+    public function getAccountAttribute()
+    {
+        return $this->package->count();
+    }
+
     //查询
     public $searchFields=['picknum' => '拣货单号'];
 

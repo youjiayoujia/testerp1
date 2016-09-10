@@ -13,6 +13,7 @@ namespace App\Http\Controllers\Purchase;
 use App\Http\Controllers\Controller;
 use App\Models\Purchase\PurchaseOrderModel;
 use App\Models\Purchase\PurchaseItemModel;
+use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
@@ -852,11 +853,11 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseStaticstics()
     {
-        
+        $model = new PurchaseStaticsticsModel();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
-            'mixedSearchFields' => $this->model->mixed_search,
+            'data' => $this->autoList($model),
+            'mixedSearchFields' => $model->mixed_search,
         ];
 
         return view($this->viewPath . 'staticsticsIndex', $response);

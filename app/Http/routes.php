@@ -63,6 +63,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('fbaStock/updateStock', ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
     Route::resource('fbaStock', 'Oversea\StockController');
 
+    //拣货排行榜
+    Route::get('pickReport/createData', ['uses' => 'PickReportController@createData', 'as' => 'pickReport.createData']);
+    Route::resource('pickReport', 'PickReportController');
     //海外仓箱子
     Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
     Route::resource('box', 'Oversea\BoxController');
@@ -338,6 +341,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('item/print', ['uses' => 'ItemController@printsku', 'as' => 'item.print']);
     Route::get('itemUser/ajaxSupplierUser', ['uses' => 'ItemController@ajaxSupplierUser', 'as' => 'item.ajaxSupplierUser']);
     Route::any('item/changePurchaseAdmin/{id}', ['uses' => 'ItemController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
+    Route::any('item/question/{id}', ['uses' => 'ItemController@question', 'as' => 'item.question']);
+    Route::any('item/extraQuestion', ['uses' => 'ItemController@extraQuestion', 'as' => 'item.extraQuestion']);
+    Route::any('item/answer', ['uses' => 'ItemController@answer', 'as' => 'item.answer']);
+    Route::any('item/questionIndex', ['uses' => 'ItemController@questionIndex', 'as' => 'item.questionIndex']);
     //Route::any('item/skushowpo', ['uses' => 'Purchase\PurchaseOrderController@showpo', 'as' => 'purchase.skushowpo']);
     Route::get('item.getImage', ['uses' => 'ItemController@getImage', 'as' => 'item.getImage']);
     Route::any('item/uploadSku', ['uses' => 'ItemController@uploadSku', 'as' => 'item.uploadSku']);
@@ -538,6 +545,12 @@ Route::group(['middleware' => 'auth'], function () {
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
 
+    //包裹报表
+    Route::get('allReport/createData',
+        ['uses' => 'AllReportController@createData', 'as' => 'allReport.createData']);
+    Route::get('allReport/report',
+        ['uses' => 'AllReportController@packageReport', 'as' => 'allReport.report']);
+    Route::resource('allReport', 'AllReportController');
     //包裹导出
     Route::get('exportPackage/extraField',
         ['uses' => 'ExportPackageController@extraField', 'as' => 'exportPackage.extraField']);
@@ -548,6 +561,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/packageReport',
+        ['uses' => 'PackageController@packageReport', 'as' => 'package.packageReport']);
     Route::get('package/removePackages/{arr}',
         ['uses' => 'PackageController@removePackages', 'as' => 'package.removePackages']);
     Route::get('package/removeLogistics/{arr}',

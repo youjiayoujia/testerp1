@@ -60,13 +60,37 @@ class PackageController extends Controller
      */
     public function index()
     {
+        $buf = '';
+        if(request()->has('outer')) {
+            $outer = request('outer');
+            $channelId = request('id');
+            if($outer == 'all') {
+                $buf = $this->model->where('status', 'PICKING')
+                                   ->where('channel_id', $channelId)
+                                   ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
+            } else {
+                $flag = request('flag');
+                if($flag == 'less') {
+                    $buf = $this->model->where('status', 'PICKING')
+                                   ->where('channel_id', $channelId)
+                                   ->where('warehouse_id', $outer)
+                                   ->where('created_at', '>', date('Y-m-d H:i:s', strtotime('-3 days')));
+                } else {
+                    $buf = $this->model->where('status', 'PICKING')
+                                   ->where('channel_id', $channelId)
+                                   ->where('warehouse_id', $outer)
+                                   ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
+                }
+            }
+        }
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'logisticses' => LogisticsModel::all(),
         ];
+
         return view($this->viewPath . 'index', $response);
     }
 
@@ -121,7 +145,7 @@ class PackageController extends Controller
             if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
                 continue;
             }
-            $model->update(['logistics_id' => '']);
+            $model->update(['tracking_no' => '']);
         }
 
         return redirect($this->mainIndex);

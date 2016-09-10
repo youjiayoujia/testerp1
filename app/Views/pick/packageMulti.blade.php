@@ -87,9 +87,8 @@
         </div>
     </div>
     <div class='row'>
-        <iframe id='barcode' style='display:none'></iframe>
+        <iframe id='barcode' style='display:none;width:100px;height:100px'></iframe>
     </div>
-
 @stop
 @section('formButton')
     <button type="submit" class="btn btn-success">包装完成</button>
@@ -132,7 +131,10 @@ $(document).on('keydown', function (event) {
         $('.search').click();
     }
 });
+
 $(document).ready(function(){
+    $('.searchsku').focus();
+
     $('.printException').click(function(){
         arr = new Array();
         i=0;
@@ -218,6 +220,7 @@ $(document).ready(function(){
         });
         if(flag == 0) {
             $('.notFindSku').text('根据所有sku匹配不到包裹信息');
+            return false;
         }
     });
 });

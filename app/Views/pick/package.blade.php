@@ -111,7 +111,7 @@
         </div>
     </div>
     <div class='row'>
-        <iframe id='barcode' style='display:none'></iframe>
+        <iframe id='barcode' style='display:none;width:100px;height:100px'></iframe>
     </div>
 @stop
 @section('formButton')
@@ -119,14 +119,16 @@
     <button type="reset" class="btn btn-default">取消</button>
 @stop
 <script type='text/javascript'>
-$(document).on('keypress', function (event) {
-    if(event.keyCode == '13') {
-        $('.search').trigger("click"); 
-        return false;
-    }
-});
-
 $(document).ready(function(){
+    $('.searchsku').focus();
+
+    $(document).on('keypress', function (event) {
+        if(event.keyCode == '13') {
+            $('.search').click(); 
+            return false;
+        }
+    });
+
     $('.printException').click(function(){
         arr = new Array();
         i=0;
@@ -161,8 +163,8 @@ $(document).ready(function(){
         $('.notFindSku').text('');
         extern_flag = 0;
         out_js = 0;
-        $('.searchSku').val('');
-        $('.searchSku').focus();
+        $('.searchsku').val('');
+        $('.searchsku').focus();
         if(val) {
             $.each($('.new tr'), function(){
                 tmp = $(this);
@@ -221,6 +223,23 @@ $(document).ready(function(){
                 if(tmp.find('.sku').text() == val && parseInt(tmp.find('.quantity').text()) >  parseInt(tmp.find('.picked_quantity').text())) {
                     old_flag = 1;
                     tmp.find('.picked_quantity').text(parseInt(tmp.find('.picked_quantity').text()) + 1);
+                    sku = tmp.find('.sku').text();
+                    $.ajax({
+                        url:"{{ route('pickList.packageItemUpdate')}}",
+                        data:{package_id:package_id, sku:sku},
+                        dataType:'json',
+                        type:'get',
+                        success:function(result) {
+                            if(!result) {
+                                return false;
+                            }
+                        }
+                    });
+                    $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
+                    $('#barcode').load(function(){
+                        $('#barcode')[0].contentWindow.focus();
+                        $('#barcode')[0].contentWindow.print();
+                    });
                     if(parseInt(tmp.find('.picked_quantity').text()) == parseInt(tmp.find('.quantity').text())) {
                         needId = tmp.data('id');
                         flag = 1;
@@ -234,24 +253,7 @@ $(document).ready(function(){
                         });
                         if(flag) {
                             out_js = 1;
-                            sku = tmp.find('.sku').text();
-                            $.ajax({
-                                url:"{{ route('pickList.packageItemUpdate')}}",
-                                data:{package_id:package_id, sku:sku},
-                                dataType:'json',
-                                type:'get',
-                                success:function(result) {
-                                    if(!result) {
-                                        return false;
-                                    }
-                                }
-                            });
                             tmp.find('.status').text('已包装');
-                            $('#barcode').attr('src', ("{{ route('templateMsg', ['id'=>''])}}/"+package_id));
-                            $('#barcode').load(function(){
-                                $('#barcode')[0].contentWindow.focus();
-                                $('#barcode')[0].contentWindow.print();
-                            });
                         }
                     }
                     needId = tmp.data('id');
@@ -284,6 +286,9 @@ $(document).ready(function(){
         }
         if(!extern_flag) {
             $('.notFindSku').text('sku不存在或者该对应的拣货单上sku已满');
+            $('.searchsku').val('');
+            $('.searchsku').focus();
+            return false;
         }
     });
 });

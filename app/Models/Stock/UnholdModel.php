@@ -88,6 +88,8 @@ class UnholdModel extends BaseModel
             return '库存导入';
         if($this->type == 'PACKAGE')
             return '包裹ItemId:'.$this->relation_id;
+        if($this->type == 'FBA')
+            return '申请表id:'.$this->relation_id;
     }
 
     /**

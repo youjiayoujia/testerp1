@@ -44,10 +44,10 @@ class ChannelModule
     }
 
     /**
-     * 亚马逊接口驱动
+     * wish接口驱动
      *
      * @param $config
-     * @return AmazonAdapter
+     * @return WishAdapter
      */
     public function createWishDriver($config)
     {

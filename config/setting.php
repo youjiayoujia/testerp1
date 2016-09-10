@@ -30,6 +30,23 @@ return [
         'create' => '新增',
         'edit' => '编辑',
     ],
+
+    'oversea' => [
+        'status' => [
+            'NEW' => '未处理',
+            'FAIL' => '审核未通过',
+            'PASS' => '审核通过',
+            'PICKING' => '分拣中',
+            'PACKING' => '包装中',
+            'PACKED' => '包装完成',
+            'SHIPPED' => '已发货',
+        ],
+        'print_status' => [
+            'UNPRINT' => '未打印',
+            'PRINTED' => '已打印'
+        ]
+    ],
+
     //库位excel地址
     'excelPath' => './uploads/excel/',
     'stockExcelPath' => './uploads/stockExcel/',
@@ -41,7 +58,7 @@ return [
         'logistics.code' => '物流简码',
         'logistics.name' => '物流方式',
         'tracking_no' => '物流追踪号',
-        'status' => '状态',
+        'status' => '订单状态',
         'order.status' => '订单状态',
         'order.active' => '售后状态',
         'active' => '售后状态',
@@ -68,6 +85,7 @@ return [
         'examine_status'=>'产品审核状态',
         'stock.item.sku' => 'sku',
         'time.created_at'=>'创建时间',
+        'time.get_time'=>'创建时间',
         'order.ordernum' => '订单号',
         'productID'=>'Wish产品ID',
         'details.erp_sku'=>'erpSKU',
@@ -78,7 +96,6 @@ return [
         'thrend' => '趋势',
         'user.name' =>'姓名',
         'require_create' => '是否需要采购',
-
         'productSku.skuCode'=>'产品SKU',
         'product.token_id' => '帐号',
         'product.multiattribute' => '=属性=',
@@ -90,16 +107,12 @@ return [
         'is_erp' => 'sku是否匹配',
         'price.skuPrice' => '价格',
         'price.profitRate' => '利润率',
-        
-         'token_id' => '渠道帐号',
-
+        'token_id' => '渠道帐号',
         'hang_num' => '挂号码',
         'hang_number' => '挂号码',
         'package_id' => '包裹id',
-
         'pay_type' =>'付款类型',
         'close_status'=>'付款状态',
-
         'by_id' => '买家ID',
         'profit_rate' => '利润率',
         'items.item.status' => 'SKU状态',
@@ -110,7 +123,6 @@ return [
         'time.printed_at' => '打印时间',
         'time.shipped_at' => '发货时间',
         'warehousePosition.name' => '库位',
-
         'item_id'=>'Ebay ItemID',
         'seller_id' =>'销售人员',
         'ebayProduct.site_name'=>'Ebay站点',
@@ -126,6 +138,8 @@ return [
         'erp_sku' =>'ErpSku',
         'price.quantity_sold'=>'销量',
         'channel_name' => '渠道名称',
+        'account.account' => '渠道帐号',
+        'is_chinese' => '竞拍状态'
     ],
 ];
 

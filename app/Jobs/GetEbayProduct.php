@@ -115,7 +115,7 @@ class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = '获取详情失败.';
         }
         $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('GetEbayProduct',isset($result)?serialize($result):serialize(array('获取失败')));
+        $this->log('GetEbayProduct',isset($result)?base64_encode(serialize($result)):base64_encode(serialize(array('获取失败'))));
 
     }
 }

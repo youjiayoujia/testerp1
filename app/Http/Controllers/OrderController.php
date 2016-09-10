@@ -88,7 +88,8 @@ class OrderController extends Controller
             $arr = [];
             foreach ($buf as $key => $value) {
                 $arr[$key]['id'] = $value->sku;
-                $arr[$key]['text'] = $value->sku;
+                $arr[$key]['text'] = $value->warehouse->name . ' ' . $value->sku . ' ' .
+                    $value->product->c_name . ' ' . $value->getAllQuantityAttribute() . ' ' . $value->status_name;
             }
             if ($total) {
                 return json_encode(['results' => $arr, 'total' => $total]);
@@ -278,7 +279,7 @@ class OrderController extends Controller
     public function update($id)
     {
         request()->flash();
-        $this->validate(request(), $this->model->rule(request()));
+        $this->validate(request(), $this->model->updateRule(request()));
         $data = request()->all();
         $data['status'] = 'REVIEW';
         foreach ($data['arr'] as $key => $item) {
@@ -311,6 +312,11 @@ class OrderController extends Controller
                     $value['item_id'] = productItem::where('sku', $value['sku'])->first()->id;
                     $this->model->find($id)->items()->create($value);
                 }
+            }
+        }
+        if($this->model->find($id)->packages) {
+            foreach($this->model->find($id)->packages as $package) {
+                $package->delete();
             }
         }
 
@@ -442,6 +448,15 @@ class OrderController extends Controller
         return 1;
     }
 
+    //恢复订单
+    public function updateRecover()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['status' => 'REVIEW']);
+
+        return 1;
+    }
+
     /**
      * 批量撤单
      *
@@ -456,6 +471,11 @@ class OrderController extends Controller
             if($this->model->find($id)) {
                 $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
             }
+            if($this->model->find($id)->packages) {
+                foreach($this->model->find($id)->packages as $package) {
+                    $package->delete();
+                }
+            }
         }
         return 1;
     }
@@ -465,6 +485,11 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
+        if($this->model->find($id)->packages) {
+            foreach($this->model->find($id)->packages as $package) {
+                $package->delete();
+            }
+        }
 
         return redirect($this->mainIndex);
     }

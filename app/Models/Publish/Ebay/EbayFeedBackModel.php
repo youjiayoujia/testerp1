@@ -23,7 +23,7 @@ class EbayFeedBackModel extends BaseModel
         'comment_time',
     ];
 
-    protected $searchFields = [];
+    public $searchFields = ['ebay_item_id' => 'ItemId','commenting_user'=>'买家ID'];
 
        protected $rules = [
            'create' => [
@@ -31,5 +31,10 @@ class EbayFeedBackModel extends BaseModel
            'update' => [
            ]
        ];
+
+    public function channelAccount(){
+        return $this->hasOne('App\Models\Channel\AccountModel', 'id', 'channel_account_id');
+
+    }
 
 }

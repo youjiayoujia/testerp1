@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSmtProductUnitTable extends Migration
+class CreateLogisticsTransports extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,13 @@ class AddSmtProductUnitTable extends Migration
      */
     public function up()
     {
-        Schema::table('smt_product_unit', function (Blueprint $table) {
+        Schema::create('logistics_transports', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->comment('名称')->default(NULL);
+            $table->string('code')->comment('简称')->nullable()->default(NULL);
             $table->timestamps();
             $table->softDeletes();
         });
-       
     }
 
     /**
@@ -26,6 +28,6 @@ class AddSmtProductUnitTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('logistics_transports');
     }
 }

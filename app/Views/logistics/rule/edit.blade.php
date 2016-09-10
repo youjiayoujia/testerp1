@@ -51,8 +51,8 @@
                     <div class="panel-body">
                         <div class='form-group row'>
                         @foreach($catalogs_outer as $catalog)
-                            <div class='col-lg-3'>
-                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='3px'>{{ $catalog->name }}</font>
+                            <div class='col-lg-4'>
+                                <input type='checkbox' name='catalogs[]' value="{{ $catalog->id }}" {{ $model->innerType('catalog', $catalog->id) ? 'checked' : ''}}><font size='2px'>{{ $catalog->name }}</font>
                             </div>
                         @endforeach
                         </div>
@@ -171,8 +171,36 @@
                     <div class="panel-body">
                         <div class='form-group row'>
                             @foreach($accounts_outer as $account)
-                                <div class='col-lg-3'>
-                                    <input type='checkbox' name='accounts[]' value="{{ $account->id }}" {{ $model->innerType('account', $account->id) ? 'checked' : '' }}><font size='3px'>{{ $account->account }}</font>
+                                <div class='col-lg-6'>
+                                    <input type='checkbox' name='accounts[]' value="{{ $account->id }}" {{ $model->innerType('account', $account->id) ? 'checked' : '' }}><font size='2px'>{{ $account->account }}</font>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="transports" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        运输方式
+                    </h4>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class='form-group row'>
+                            @foreach($transports_outer as $transport)
+                                <div class='col-lg-6'>
+                                    <input type='checkbox' name='transports[]' value="{{ $transport->id }}" {{ $model->innerType('transport', $transport->id) ? 'checked' : '' }}><font size='2px'>{{ $transport->name }}</font>
                                 </div>
                             @endforeach
                         </div>
@@ -234,6 +262,11 @@
             <label for="accounts" class="control-label">销售账号:</label>
             <input type='checkbox' class='account_section' name='account_section' value='1' {{ $model->account_section ? 'checked' : '' }}>
             <button type="button" class="btn btn-success account_button" data-toggle="modal" data-target="#accounts" {{ !$model->account_section ? 'disabled' : '' }}>销售账号</button>
+        </div>
+        <div class="form-group col-lg-3">
+            <label for="transports" class="control-label">运输方式:</label>
+            <input type='checkbox' class='transport_section' name='transport_section' value='1' {{ $model->transport_section ? 'checked' : '' }}>
+            <button type="button" class="btn btn-success transport_button" data-toggle="modal" data-target="#transports" {{ !$model->transport_section ? 'disabled' : '' }}>运输方式</button>
         </div>
     </div>
 @stop
@@ -306,6 +339,14 @@
                 $('.account_button').prop('disabled', false);
             } else {
                 $('.account_button').prop('disabled', true);
+            }
+        });
+
+        $(document).on('click', '.transport_section', function(){
+            if($(this).prop('checked') == true) {
+                $('.transport_button').prop('disabled', false);
+            } else {
+                $('.transport_button').prop('disabled', true);
             }
         });
     });

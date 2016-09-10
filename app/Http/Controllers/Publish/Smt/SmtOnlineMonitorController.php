@@ -26,6 +26,7 @@ class SmtOnlineMonitorController extends Controller
      */
     public function index()
     {
+        set_time_limit(0);
         $this->mainTitle='速卖通在线数量监控';
         $list = $this->model->whereHas('product',function($query){
             $query = $query->whereIn('productStatusType',['onSelling','offline','auditing','editingRequired']);
@@ -307,35 +308,46 @@ class SmtOnlineMonitorController extends Controller
     public function ajaxOperateProductSkuStockStatus(){
         $product_id_str = Input::get('productIds');
         $type = Input::get('type');
+        if($type == 'set_sku_stock_true'){
+            $isStock = 1;
+        }else if($type == 'set_sku_stock_false'){
+            $isStock = 0;
+        }
         $productArr = explode(' ', $product_id_str);
         foreach($productArr as $product){
-            $tmp = explode(',', $product);
-            $productId = $tmp[0];
-            $smtSkuCode = $tmp[1];
-            
+            list($productId,$smtSkuCode) = explode(',', $product);
             $skuInfo = $this->model->where('smtSkuCode',$smtSkuCode)->first();
             $account_id = $skuInfo->product->token_id;            
             $account = AccountModel::findOrFail($account_id);
             $channel = Channel::driver($account->channel->driver, $account->api_config);
             
+            /* //获取商品最新信息
+            $lastest_product_Info = $channel->findAeProductById($productId);
+            if(array_key_exists('success', $lastest_product_Info) && $lastest_product_Info['success']){
+                // 更新SKU的库存信息
+                $aeopAeProductSKUs = array();
+                $sku = is_array($smtSkuCode) ? $smtSkuCode : array($smtSkuCode); // 把SKU转成数组
+                foreach ($lastest_product_Info['aeopAeProductSKUs'] as $key => $value) {
+                    if (in_array($value['skuCode'], $sku)) {
+                        $lastest_product_Info['aeopAeProductSKUs'][$key]['skuStock'] = $isStock;
+                        $lastest_product_Info['aeopAeProductSKUs'][$key]['ipmSkuStock'] = ($isStock == 'true' ? 999 : 0);
+                    }
+                }
+            } */
             $data['skuId'] = $skuInfo->sku_active_id;
             $data['productId'] = $productId;
-            if($type == 'No'){
-                $data['impSkuStock'] = 0;
-            }else{
-                $data['impSkuStock'] = 999;
-            }
+            $data['impSkuStock'] = $isStock ? 999 : 0;
             $result = $channel->editSingleSkuStock($data);
             if(array_key_exists('success',$result) && $result['success']){
                 $where = ['productId' => $data['productId'], 'sku_active_id' => $data['skuId']];
-                $updateData = ['ipmSkuStock' => $data['ipmSkuStock'],'updated' => date('Y:m:d H:i:s',time())];
+                $updateData = ['ipmSkuStock' => $data['ipmSkuStock'],'updated' => date('Y:m:d H:i:s',time()),'skuStock' => $isStock];
                 $this->model->where($where)->update($updateData);
                 $response[] = array('Status'=> true, 'Msg' => '设置成功');
             }else{
                 $response[] = array('Status' => false, 'Msg' => '产品'.$productId.'操作失败!失败原因：'.$result['error_message']);
             }
         }
-            return $response;
+        return $response;
     }
     
     /**

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSmtProductUnitTable extends Migration
+class AddOrdersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,8 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function up()
     {
-        Schema::create('smt_product_unit', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->comment('单位中文名称');
-            $table->string('name_en')->comment('单位英文名称');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->enum('is_chinese', ['0', '1'])->comment('是否竞拍0否1是')->default('0');
         });
     }
 
@@ -26,6 +24,8 @@ class CreateSmtProductUnitTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('is_chinese');
+        });
     }
 }

@@ -110,6 +110,23 @@ return [
         'url' => '',
         'type' => 'group',
         'subnavigations' => [
+            '收货质检' => [
+               [
+                    'name' => '包裹收货扫描',
+                    'url' => 'purchaseList.create',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包裹收货列表',
+                    'url' => 'purchaseList.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '采购收货和入库',
+                    'url' => 'recieve',
+                    'icon' => '',
+                ],
+            ],
             '发货' => [
                 [
                     'name' => '包裹',
@@ -209,6 +226,18 @@ return [
                     'icon' => '',
                 ],
             ],
+            '报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //仓储导航
@@ -222,6 +251,26 @@ return [
                 [
                     'name' => '海外仓销量',
                     'url' => 'suggestForm.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '申请表',
+                    'url' => 'report.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '发货',
+                    'url' => 'report.shipment',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '海外仓箱子',
+                    'url' => 'box.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'fba库存信息',
+                    'url' => 'fbaStock.index',
                     'icon' => '',
                 ],
             ],
@@ -296,21 +345,6 @@ return [
                     'url' => 'purchaseOrder.index',
                     'icon' => '',
                 ],
-                [
-                    'name' => '包裹收货扫描',
-                    'url' => 'purchaseList.create',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包裹收货列表',
-                    'url' => 'purchaseList.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '采购收货和入库',
-                    'url' => 'recieve',
-                    'icon' => '',
-                ],
                 /*[
                     'name' => '采购入库',
                     'url' => 'inWarehouse',
@@ -344,7 +378,14 @@ return [
                     'url' => 'channelAccount.index',
                     'icon' => '',
                 ],
-            ]
+            ],
+            '其他' =>[
+                [
+                    'name' => '产品分类渠道',
+                    'url'  => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ]
+            ],
         ],
     ],
     [
@@ -391,9 +432,9 @@ return [
                 'icon' => '',
             ],
             [
-            'name' => 'smt销售代码设置',
-            'url' => 'smtSellerCode.index',
-            'icon' => '',
+                'name' => 'smt销售代码设置',
+                'url' => 'smtSellerCode.index',
+                'icon' => '',
             ],
             [
                 'name' => 'Ebay站点信息',
@@ -457,6 +498,36 @@ return [
                 [
                     'name' => 'aliexpress issues',
                     'url' => 'ebayCases.index',
+                    'icon' => '',
+                ],
+            ],
+            '平台批量操作' => [
+                [
+                    'name' => 'Aliexpress批量订单留言',
+                    'url' => 'aliexpressReturnOrderMessages',
+                    'icon' => '',
+                ],
+            ],
+            '评论列表' =>[
+                [
+                    'name' => 'Ebay feedBack',
+                    'url'  => 'ebayFeedBack.index',
+                    'icon' => '',
+                ]
+            ],
+        ]
+    ],
+    //报表导航
+    [
+        'name' => '报表',
+        'icon' => 'list-alt',
+        'url' => '',
+        'type' => 'group',
+        'subnavigations' => [
+            '采购报表' => [
+                [
+                    'name' => '采购数据统计',
+                    'url' => 'message.index',
                     'icon' => '',
                 ],
             ],

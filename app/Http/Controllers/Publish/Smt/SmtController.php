@@ -373,7 +373,6 @@ class SmtController extends Controller{
        $customizedName = array_key_exists('customizedName', $posts) ? $posts['customizedName'] : array();
        //自定义SKU图片信息
        $customizedPic = array_key_exists('customizedPic', $posts) ? $posts['customizedPic'] : array();
-       
        //最小价格
        $productMinPrice = 0;
        //最大价格
@@ -466,7 +465,8 @@ class SmtController extends Controller{
                    $valId                      = $smtApi->checkProductSkuAttrIsOverSea($per_sku['aeopSKUProperty']); //海外仓属性ID
                    $per_sku['aeopSKUProperty'] = $per_sku['aeopSKUProperty'] ? serialize($per_sku['aeopSKUProperty']) : '';
                    $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
-                   $per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : ''). $per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+                   //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : ''). $per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+                   $per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : ''). $per_sku['skuCode'] ;
                    $per_sku['updated']         = 1; //这些都是修改过的
                    $per_sku['isRemove']        = 0; //未被删除的
                    $per_sku['overSeaValId']    = $valId;
@@ -548,8 +548,8 @@ class SmtController extends Controller{
                $per_sku['aeopSKUProperty'] = $per_sku['aeopSKUProperty'] ? serialize($per_sku['aeopSKUProperty']) : '';
                $per_sku['productId']       = $productId;
                $per_sku['skuStock']        = $per_sku['ipmSkuStock'] > 0 ? 1 : 0;
-               $per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
-              
+               //$per_sku['smtSkuCode']      = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] . ($token_info['accountSuffix'] ? '#' . $token_info['accountSuffix'] : '');
+               $per_sku['smtSkuCode'] = ($code ? $code . '*' : '') .(($valId > 0 && $valId != 201336100) ? '{YY}' : '').$per_sku['skuCode'] ;
                $newSkus = $smtApi->buildSysSku($per_sku['skuCode']);
                foreach($newSkus as $sku){
                    $per_sku['skuCode'] = (($valId > 0 && $valId != 201336100) ? '{YY}' : '').$sku;
@@ -1131,7 +1131,11 @@ class SmtController extends Controller{
             }
     
             //查询草稿SKU信息
-            $draft_skus = $this->smtProductSkuModel->where(['productId'=>$id,'isRemove'=>0])->get();
+            $draft_skus = $this->smtProductSkuModel->where('productId',$id)->get();
+            if($draft_skus){
+                $draft_skus = $draft_skus->toArray();
+            }
+           
             //查询草稿详情
             $draft_detail = $draft_info->details;
             //已选择的分类
@@ -1162,6 +1166,7 @@ class SmtController extends Controller{
             }
             //对属性进行排序处理
             $category_attributes = $smtApi->sortAttribute($category_attributes);
+            
             //获取运费模版
             $freight = smtFreightTemplate::where('token_id',$token_id)->get();
            
@@ -1218,6 +1223,9 @@ class SmtController extends Controller{
         
             //查询草稿SKU信息
             $draft_skus = $this->smtProductSkuModel->where(['productId'=>$id,'isRemove'=>0])->get();
+            if($draft_skus){
+                $draft_skus = $draft_skus->toArray();
+            }
             //查询草稿详情
             $draft_detail = $draft_info->details;
             
@@ -1912,6 +1920,124 @@ html;
        }
    }
    
+   public function ajaxUploadDirImageByNewSys(){
+       $token_id = request()->input('token_id');
+       $dirName  = trim(request()->input('dirName'));
+       $type = $_GET['type']; 
+       if (empty($token_id) || empty($dirName)) {
+           $this->ajax_return('账号或者SKU不能为空', false);
+       }
+   
+       $result =  $this->uploadBankImageNewAll($dirName,$type);
+
+       if(empty($result))
+       {
+           $this->ajax_return('未找到改SKU图片信息', false);
+       }
+       
+       $error   = array();   
+       $account = AccountModel::findOrFail($token_id);
+       $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+       $api = 'api.uploadImage'; 
+       $last_array = array();
+       foreach($result as $re)
+       {
+           $res = $smtApi->uploadBankImage($api,$re['url'],$re['name']);
+           if (array_key_exists('success',$res)&& $res['success']=='true') {
+               $new_pic = $res['photobankUrl'];
+               
+               if(!empty($new_pic))
+               {
+                   $tmpImage = array();
+                   $tmpImage['resize'] = str_replace('getSkuImageInfo-800resize', 'getSkuImageInfo-resize', $re['url']);
+                   $tmpImage['remote'] = $new_pic;               
+                   $last_array[] = $tmpImage;
+               }
+               else
+               {
+                   $this->ajax_return('检查账号图片银行空间是否还有空余', false, $last_array);
+               }
+           } else {
+           }          
+       }
+   
+       $this->ajax_return($error, true, $last_array);
+   }
+   
+   // $type= 1 取实拍图片 $type=2  取链接图
+   public function uploadBankImageNewAll($dirName,$type)
+   {
+       $url='';
+       if($type==1)
+       {
+           //$url ='http://120.24.100.157:3000/api/sku/'.$dirName.'?include-sub=true&distinct=true&tags=photo';
+           $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?tags=photo&distinct=true&include_sub=true&sku='.$dirName;
+       }
+       if($type==2)
+       {
+           //$url ='http://120.24.100.157:3000/api/sku/'.$dirName.'?include-sub=true&distinct=true&tags=link';
+           $url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImageInfo.php?tags=link&distinct=true&include_sub=true&sku='.$dirName;
+   
+       }   
+         
+       $result =$this->picCurl($url);
+
+        $result = json_decode($result,true);
+
+		$return_pic_array=array();
+		
+        if(!empty($result)){
+        	foreach($result as $ke => $v){
+        		//added by andy.
+	          	$photo_name = $v['filename'];
+	          	//$s_url = 'http://120.24.100.157:70/getSkuImageInfo/getSkuImage.php?id='.$photo_name;
+	          	$s_url = 'http://imgurl.moonarstore.com/getSkuImageInfo-800resize/sku/'.$photo_name;
+	            $return_pic_array[$ke]['url'] = $s_url;
+	            $return_pic_array[$ke]['name'] = $s_url;
+        	}
+        }      
+        
+        return $return_pic_array;
+   }
+   
+   public function picCurl($url)
+   {
+       $curl = curl_init();
+   
+       curl_setopt($curl, CURLOPT_URL, $url);
+   
+       curl_setopt($curl, CURLOPT_HEADER, 0);
+   
+       curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+   
+       curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+   
+       $result = curl_exec($curl);
+   
+       curl_close($curl);
+       return $result;
+   
+   }
+   
+   /**
+    *  循环上传SKU图片
+    * @param $img
+    * @param $skuCode
+    * @param $id:错误日志时需要用到
+    * @return string
+    */
+   public function uploadBankImageNew($api,$img,$skuCode){
+   
+       $img_return = $this->smt->uploadBankImage($api, $img, $skuCode);
+       $new_pic='';
+       if (isset($img_return['success'])&& $img_return['success']=='true') {
+           $new_pic = $img_return['photobankUrl'];
+       } else { //失败了，写下日志吧
+   
+       }
+       return $new_pic;
+   }
+   
    public function getskuinfo()
    {
        $sku = Input::get('sku');
@@ -1945,6 +2071,40 @@ html;
            $this->model->where('productId',$product_id)->update(['productStatusType' => 'waitPost']);
        }
        return 1;
+   }
+   
+   /**
+    * 批量修改待发布产品
+    */
+   public function batchModify(){
+       $productIds = request()->input('productIds');
+       $productInfo = request()->input('products');
+       $productIdArr = explode(',', $productIds);
+       $string = '';
+       foreach($productIdArr as $productId){
+           if(array_key_exists($productId, $productInfo)){
+               $tmp = array();
+               $tmp = $productInfo[$productId];
+               $product = array();
+               $detail = array();
+               $product['grossWeight']= $tmp['grossWeight'];
+               $product['productPrice'] = $tmp['productPrice'];
+               $product['packageLength'] = $tmp['packageLength'];
+               $product['packageWidth'] = $tmp['packageWidth'];
+               $product['packageHeight'] = $tmp['packageHeight'];
+               $this->model->where('productId',$productId)->update($product);
+
+               $detail['keyword'] = $tmp['keyword'];
+               $detail['productMoreKeywords1'] = $tmp['productMoreKeywords1'];
+               $detail['productMoreKeywords2'] = $tmp['productMoreKeywords2'];
+               $detail['productUnit'] = $tmp['productUnit'];
+               $detail['promiseTemplateId'] = $tmp['promiseTemplateId'];
+               $detail['freightTemplateId'] = $tmp['freightTemplateId'];
+               $this->smtProductDetailModel->where('productId',$productId)->update($detail);
+               $string .= $productId. '更新成功!';
+           }
+       }       
+       return redirect($this->mainIndex)->with('alert', $this->alert('success', $string));
    }
    
 }

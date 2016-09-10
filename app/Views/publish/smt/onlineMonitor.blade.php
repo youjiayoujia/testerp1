@@ -19,7 +19,7 @@
     <th>有货/无货</th> 
     <th>操作</th>
 @stop
-@section('tableBody')
+@section('tableBody')    
       @foreach($data as $item)
       <tr>
         <th><input type='checkbox' name='single[]' class='single' data-productId="{{$item->productId}}"   value="<?php echo $item->productId . ',' .  $item->smtSkuCode;?>"></th>
@@ -31,7 +31,7 @@
         <th><?php if($item->products) echo $item->products->c_name ?></th>
         <th>{{$item->product->quantitySold1}}</th>
         <th>{{$item->product->gmtCreate}}</th>
-        <th>{{$item->product->userInfo->name}}</th>
+        <th><?php if($item->product->userInfo) echo $item->product->userInfo->name ;?></th>
         <th></th>
         <th>{{$item->product->productStatusType}}</th>
         <th>{{$item->skuPrice}}
@@ -147,8 +147,8 @@
         </button>
         <ul class="dropdown-menu">
             <li><a href="javascript:" onclick="setProductSkuPrice()">修改价格</a></li>
-            <li><a href="javascript:" data-type="No" onclick="setProductSkuStockStatus(this)">批量调无货</a></li>
-            <li><a href="javascript:" data-type="Yes" onclick="setProductSkuStockStatus(this)">批量调有货</a></li>
+            <li><a href="javascript:" data-type="set_sku_stock_false" onclick="setProductSkuStockStatus(this)">批量调无货</a></li>
+            <li><a href="javascript:" data-type="set_sku_stock_true" onclick="setProductSkuStockStatus(this)">批量调有货</a></li>
             <li><a href="javascript:" data-type="offline" onclick="changeProductStatus(this)">批量下架</a></li>
             <li><a href="javascript:" data-type="online"  onclick="changeProductStatus(this)">批量上架</a></li>
             <li><a href="javascript:" onclick="setProductSkuStock()">批量调可售库存</a></li>

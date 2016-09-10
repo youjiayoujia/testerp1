@@ -17,7 +17,7 @@ class CreateCurrencys extends Migration
             $table->string('code')->comment('货币简称')->default(NULL);
             $table->string('name')->comment('货币名称')->default(NULL);
             $table->string('identify')->comment('标识')->comment(NULL);
-            $table->decimal('rate',7,4)->comment('汇率')->comment(1.0);
+            $table->decimal('rate',11,9)->comment('汇率')->comment(1.0);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -149,14 +149,59 @@ class OrderController extends Controller
         if ($special == 'yes') {
             $order = $this->model->where('customer_remark', '!=', '');
         }
+        $page = request()->input('page');
+        $pageSize = request()->input('pageSize');
+        $subtotal = '';
+        if(!$page) {
+            if(!$pageSize) {
+                $pageSize = 10;
+            }
+            $orders = $this->model->orderBy('id', 'desc')->take($pageSize)->get();
+            foreach($orders as $order) {
+                $subtotal += $order->amount * $order->rate;
+            }
+        }else {
+            if(!$pageSize) {
+                $pageSize = 10;
+            }
+            $orders = $this->model->orderBy('id', 'desc')->skip(($page - 1) * $pageSize)->take($pageSize)->get();
+            foreach($orders as $order) {
+                $subtotal += $order->amount * $order->rate;
+            }
+        }
+        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
             'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
             'currencys' => CurrencyModel::all(),
+            'subtotal' => $subtotal,
+            'rmbRate' => $rmbRate,
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    //订单统计
+    public function orderStatistics()
+    {
+        $startDate = request()->input('start_date');
+        $endDate = request()->input('end_date');
+        $orders = $this->model->where('create_time', '<=', $endDate)->where('create_time', '>=', $startDate);
+        $data['totalAmount'] = '';
+        $data['averageProfit'] = '';
+        $data['totalPlatform'] = '';
+        $profitAmount = '';
+        if($orders->count()) {
+            foreach($orders->get() as $order) {
+                $data['totalAmount'] += $order->amount * $order->rate;
+                $profitAmount += $order->calculateProfitProcess() * $order->amount * $order->rate;
+                $data['totalPlatform'] += $order->calculateOrderChannelFee();
+            }
+            $data['averageProfit'] = $profitAmount / $data['totalAmount'];
+        }
+
+        return $data;
     }
 
     public function invoice($id)

@@ -530,7 +530,7 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
-        if($this->model->find($id)->packages) {
+        if($this->model->find($id)->packages->count()) {
             foreach($this->model->find($id)->packages as $package) {
                 $package->delete();
             }

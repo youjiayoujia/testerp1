@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRefundOperateLogs extends Migration
+class CreateSendEbayMessageList extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,13 @@ class CreateRefundOperateLogs extends Migration
      */
     public function up()
     {
-        Schema::create('refund_operate_logs', function (Blueprint $table) {
+        Schema::create('send_ebay_message_list', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('operate_id')->comment('操作人');
-/*            $table->('operate_id')->comment('操作人');
-            、、$table->('')->comment('操作人');*/
+            $table->string('title')->comment('标题');
+            $table->string('content')->comment('内容');
+            $table->enum('is_send', ['0', '1'])->comment('是否发送成功，1为成功')->default('0');
+            $table->string('itemis')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +31,6 @@ class CreateRefundOperateLogs extends Migration
      */
     public function down()
     {
-        Schema::drop('refund_operate_logs');
+        Schema::drop('send_ebay_message_list');
     }
 }

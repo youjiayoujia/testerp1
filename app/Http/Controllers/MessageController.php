@@ -454,18 +454,33 @@ class MessageController extends Controller
         }else{
             return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('danger', '文件和评论内容不能为空'));
         }
-
-
         return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('success', '成功发送'.$total.'条数据;失败条目aliexpress订单号:('.$error_order_id.')'));
-
-
-
-
-
     }
     
     public function SendEbayMessage(){
-        
+        $form = request()->input();
+        foreach($form as $key => $input){
+            if(empty($input)){
+                return redirect(route('order.index'))->with('alert',$this->alert('danger','参数不完整'.$key.'不能为空'));
+            }
+        }
+        $order = OrderModel::find($form['message-order-id']);
+        if($order->channel->driver){
+            $ebay = new EbayAdapter($order->channelAccount->apiConfig);
+            foreach ($form['item-ids'] as $item_id){
+                if(!empty($item_id)){
+                }
+            }
+            $buyer_id = $order['by_id'];
+            $itemids  = $form['item-ids'];
+            $title    = $form['message-title'];
+            $content  = $form['message-content'];
+
+           $is_send = $ebay->ebayOrderSendMessage(compact('item_id','buyer_id','itemids','title','content'));
+           if($is_send){
+               
+           }
+        }
     }
 
 

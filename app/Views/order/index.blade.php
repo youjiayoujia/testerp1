@@ -564,10 +564,11 @@
         </div>
 
         <div class="modal fade" id="send_ebay_message_{{ $order->id }}" role="dialog">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog" role="document" style="width:800px;">
                 <div class="modal-content">
-                    <form action="{{ route('message.sendEbayMessage')}}" method="POST">
+                    <form action="{{ route('message.sendEbayMessage')}}" method="POST" id="send-ebay-message-{{ $order->id }}">
                         {!! csrf_field() !!}
+                        <input type="hidden" name="message-order-id" value="{{$order->id}}"/>
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
@@ -578,16 +579,54 @@
                            <div class="form-group row">
                                 <label for="example-text-input" class="col-xs-2 col-form-label">买家ID：</label>
                                 <div class="col-xs-10">
-                                    <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+                                    <input class="form-control" type="text" value="Artisanal kale" id="example-text-input" disabled>
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <div class="row">
                                 <div class="col-xs-2">
                                     <label>物 品:</label>
                                 </div>
                                 <div class="col-xs-10">
-                                    <table class="table table-bordered">
+                                    <div class="row">
+                                        <div class="form-group col-sm-1">
+                                            <label for="id" class="control-label">选择</label>
+
+                                        </div>
+                                        <div class="form-group col-sm-2">
+                                            <label for="id" class="control-label">ItemID</label>
+                                        </div>
+                                        <div class="form-group col-sm-2">
+                                            <label for="sku" class="control-label">sku</label>
+                                        </div>
+                                        <div class="form-group col-sm-4">
+                                            <label for="price" class="control-label">物品名称</label>
+                                        </div>
+                                        <div class="form-group col-sm-1">
+                                            <label for="quantity" class="control-label">数量</label>
+                                        </div>
+                                    </div>
+                                    @foreach($order->items as $item)
+                                        <div class="row">
+                                            <div class="form-group col-sm-1">
+                                                <input type="checkbox" name="item-ids[]" value="{{$item->id}}"/>
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <label for="id" class="control-label">{{$item->item_id}}</label>
+                                            </div>
+                                            <div class="form-group col-sm-2">
+                                                <label for="sku" class="control-label">{{$item->sku}}</label>
+                                            </div>
+                                            <div class="form-group col-sm-4">
+                                                <label for="price" class="control-label">{{$item->item->c_name}}</label>
+                                            </div>
+                                            <div class="form-group col-sm-1">
+                                                <label for="quantity" class="control-label">{{$item->quantity}}</label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    {{--
+                                     <table class="table table-bordered">
                                         <thead>
                                         <tr>
                                             <th>选择</th>
@@ -611,27 +650,28 @@
                                         </tbody>
 
                                     </table>
+                                    --}}
                                 </div>
 
                             </div>
 
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <div class="panel panel-success">
+                                    <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h4 class="panel-title">回信面板</h4>
+                                            <label class="panel-title">回信面板</label>
                                         </div>
                                         <div class="panel-body">
                                             <div class="form-group row">
                                                 <label for="example-text-input" class="col-xs-2 col-form-label">标题：</label>
                                                 <div class="col-xs-10">
-                                                    <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+                                                    <input class="form-control" type="text" value="" id="example-text-input" name="message-title">
                                                 </div>
                                             </div>
                                             <div class="form-group row">
                                                 <label for="example-text-input" class="col-xs-2 col-form-label">内容：</label>
                                                 <div class="col-xs-10">
-                                                    <textarea class="form-control" rows="3"></textarea>
+                                                    <textarea class="form-control" rows="3" name="message-content" ></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -643,7 +683,7 @@
                                 <div class="col-lg-12">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h4 class="panel-title">历史记录</h4>
+                                            <label class="panel-title">历史记录</label>
                                         </div>
                                         <div class="panel-body">
 
@@ -654,7 +694,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                            <button type="submit" class="btn btn-primary">提交</button>
+                            <a type="submit" class="btn btn-primary form-submit" order-id="{{ $order->id }}">提交</a>
                         </div>
                     </form>
                 </div>
@@ -815,12 +855,34 @@
                 }
             });
             $(".refund-type").change(function(){
-                console.log($(this).val());
                 if($(this).val() == '1' ){
                     $('#paypal-input-'+$(this).attr('order-id')).show();
                 }else{
                     $('#paypal-input-'+$(this).attr('order-id')).hide();
                 }
+            });
+
+            $('.form-submit').click(function () {
+                var order_id = $(this).attr('order-id');
+
+                var message_form = $('#send-ebay-message-'+order_id).serializeArray();
+                //console.log($('input[name="item-ids"]:checked').val());
+                if($('input[name="item-ids[]"]:checked').val() == undefined){
+                    alert('请先勾选商品！');
+                    return;
+                }
+                var is_empty =false;
+                $.each(message_form,function(i,field){
+                    if(field.value == '' || field.value== undefined){
+                        alert('请把数据填充完整，'+field.name);
+                        is_empty = true;
+                        return false;
+                    }
+                });
+                if(!is_empty){
+                    $('#send-ebay-message-'+order_id).submit();
+                }
+
             });
         });
 

@@ -329,8 +329,8 @@ class ItemController extends Controller
         $data['question_time'] = date('Y-m-d H:i:s',time());
         $data['question_user'] = request()->user()->id;
         $data['status'] = 'pending';
+        $data['image'] = $this->image->skuMessageImage(request()->file('uploadImage'));
         $messageModel = $this->message->create($data);
-        $this->image->skuMessageImage(['id'=>$messageModel->id],request()->files);
         return redirect($this->mainIndex);
     }
 

@@ -141,17 +141,16 @@ class ImageModel extends BaseModel
      * @param $files
      * @param string $uploadType
      */
-    public function skuMessageImage($data, $files = null)
+    public function skuMessageImage($file = null)
     {
-        $data['path'] = config('product.question.uploadPath') . '/' . $data['id'] . '/';
+        $data = [];
+        $data['path'] = config('product.question.uploadPath') . '/';
         $disk = Storage::disk('product');
-        foreach ($files as $key => $file) {
-            if ($this->valid($file->getClientOriginalName())) {
-                $data['name'] = time() . '.' . $file->getClientOriginalExtension();
-                Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath())); 
-            }
+        if ($this->valid($file->getClientOriginalName())) {
+            $data['name'] = time() . rand(1,100). '.' . $file->getClientOriginalExtension();
+            Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath())); 
         }
-        
+        return $data['path'].$data['name'];      
     }
 
     /**

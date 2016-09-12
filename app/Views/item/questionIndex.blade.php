@@ -20,7 +20,7 @@
     @foreach($data as $question)
         <tr>
             <td>{{config('product.question.types')[$question->question_group]}}</td>
-            <td></td>
+            <td><img src="{{ asset($question->image) }}" width="100px"></td>
             <td>{{$question->question}}</td>
             <td>{{$question->question_time}}</td>
             <td>{{$question->questionUser?$question->questionUser->name:''}}</td>

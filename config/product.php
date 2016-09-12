@@ -4,7 +4,7 @@ return [
     'requireimage' => 'uploads/require',
     //产品图片配置
     'image' => [
-        'extensions' => ['jpg', 'gif', 'bmp'],
+        'extensions' => ['jpg', 'gif', 'bmp','jpeg','png'],
         'types' => ['public', 'original', 'choies', 'aliexpress', 'amazon', 'ebay', 'wish', 'Lazada'],
         'uploadPath' => 'uploads/product'
     ],
@@ -34,6 +34,12 @@ return [
 	'residualReport'=>[ 
 		'status'=>[0=>'正常',1=>'产品残次'],
 	],
+
+    //产品留言板分类
+    'question'=>[
+        'types'=>['WISH业务','仓位管理','速卖通业务','采购','美工','质检售后支持','亚马逊业务','产品编辑','价格问题'],
+        'uploadPath' =>'uploads/sku/message'
+    ],
 	
 	//供应商支付类型
 	'product_supplier'=>[

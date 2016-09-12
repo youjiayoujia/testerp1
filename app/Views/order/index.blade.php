@@ -43,14 +43,14 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                {{--@if($order->status == 'PACKED')--}}
-                    {{--<div>{{ $order->calculateProfitProcess() }}</div>--}}
-                    {{--<div>产品成本: {{ $order->all_item_cost }} RMB</div>--}}
-                    {{--<div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>--}}
-                    {{--<div>平台费: {{ '' }}USD</div>--}}
-                    {{--<div>毛利润: {{ '' }}USD</div>--}}
-                {{--@else--}}
-                {{--@endif--}}
+                @if($order->status == 'PACKED')
+                    <div>{{ $order->calculateProfitProcess() }}</div>
+                    <div>产品成本: {{ $order->all_item_cost }} RMB</div>
+                    <div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>
+                    <div>平台费: {{ $order->calculateOrderChannelFee() }} USD</div>
+                    <div>毛利润: {{ $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee() }} USD</div>
+                @else
+                @endif
             </td>
             <td>{{ $order->status_name }}</td>
             <td>{{ $order->userService ? $order->userService->name : '未分配' }}</td>
@@ -547,6 +547,23 @@
             </div>
         </div>
     @endforeach
+    @section('doAction')
+        <div class="row">
+            <div class="col-lg-2">
+                <strong>当前小计</strong> : {{ '$' . $subtotal }}
+            </div>
+            <div class="col-lg-2">
+                <input class="form-control" id="start_date" placeholder="开始日期" name='start_date'>
+            </div>
+            <div class="col-lg-2">
+                <input class="form-control" id="end_date" placeholder="结束日期" name='end_date'>
+            </div>
+            <div class="col-lg-1">
+                <button class="statistics">统计</button>
+            </div>
+            <div class="col-lg-4" id="statistics"></div>
+        </div>
+    @stop
 @stop
 @section('tableToolButtons')
     <div class="btn-group" role="group">
@@ -617,6 +634,8 @@
 @section('childJs')
     <script type="text/javascript">
         $(document).ready(function () {
+            $('#start_date, #end_date').cxCalendar();
+
             //审核
             $('.review').click(function () {
                 if (confirm("确认审核?")) {
@@ -700,6 +719,26 @@
                     });
                 }
             });
+        });
+
+        $('.statistics').click(function () {
+            var start_date = $('#start_date').val();
+            var end_date = $('#end_date').val();
+            if (start_date && end_date) {
+                $.ajax({
+                    url: "{{ route('orderStatistics') }}",
+                    data: {start_date : start_date, end_date : end_date},
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (result) {
+                        $("#statistics").text(
+                                '总计金额:$' + result['totalAmount'] + ' ' +
+                                '平均利润率:' + result['averageProfit'] + '%' + ' ' +
+                                '总平台费:$' + result['totalPlatform']
+                        );
+                    }
+                });
+            }
         });
 
         //全选订单产品

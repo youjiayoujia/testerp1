@@ -74,7 +74,6 @@ class OrderModel extends BaseModel
             'address_confirm' => 'required',
             'create_time' => 'required',
             'currency' => 'required',
-            'rate' => 'required',
             'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
@@ -241,6 +240,11 @@ class OrderModel extends BaseModel
     public function country()
     {
         return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\CurrencyModel', 'currency', 'code');
     }
 
     public function userAffairer()
@@ -436,6 +440,12 @@ class OrderModel extends BaseModel
     public function createOrder($data)
     {
         $data['ordernum'] = microtime(true);
+        $currency = CurrencyModel::where('code', $data['currency']);
+        if($currency->count() > 0) {
+            foreach($currency->get() as $value) {
+                $data['rate'] = $value['rate'];
+            }
+        }
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {

@@ -30,22 +30,26 @@ class PickReportController extends Controller
     public function index()
     {
         request()->flash();
-        $last_time = $this->model->orderBy('day_time', 'desc')->first()->day_time;
-        $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
-        $monthModel = $this->model->whereBetween('day_time',[date('Y-m', strtotime('now')), date('Y-m', strtotime('+1 month'))])->get();
-        $flag = 0;
-        if(request()->has('date') && !empty(request('date'))) {
-            $flag = 1;
-            $model = $this->model->whereBetween('day_time', [date('Y-m-d', strtotime(request('date'))), date('Y-m-d', strtotime(request('date') + strtotime('+1 day') - strtotime('now')))]);
+        $model = $this->model->orderBy('day_time', 'desc')->first();
+        $monthModel = '';
+        if($model) {
+            $last_time = $this->model->orderBy('day_time', 'desc')->first()->day_time;
+            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            $monthModel = $this->model->whereBetween('day_time',[date('Y-m', strtotime('now')), date('Y-m', strtotime('+1 month'))])->get();
+            $flag = 0;
+            if(request()->has('date') && !empty(request('date'))) {
+                $flag = 1;
+                $model = $this->model->whereBetween('day_time', [date('Y-m-d', strtotime(request('date'))), date('Y-m-d', strtotime(request('date')) + strtotime('+1 day') - strtotime('now'))]);
+            }
+            if(request()->has('warehouseid') && !empty(request('warehouseid'))) {
+                $flag = 1;
+                $model = $model->where('warehouse_id', request('warehouseid'));
+            }
+            if($flag) {
+                $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            }
         }
-        if(request()->has('warehouseid') && !empty(request('warehouseid'))) {
-            $flag = 1;
-            $model = $model->where('warehouse_id', request('warehouseid'));
-        }
-        if($flag) {
-            $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
-        }
-        var_dump($model->toArray());exit;
+        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $model,

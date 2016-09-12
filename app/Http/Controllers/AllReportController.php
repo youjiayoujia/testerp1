@@ -23,7 +23,7 @@ class AllReportController extends Controller
 
     public function createData()
     {
-        $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m', strtotime('-1 month')))->get()
+        $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m-d', strtotime('now')))->get()
                     ->filter(function($single){
                         return !in_array($single->status, ['NEW', 'NEED', 'WAITASSIGN', 'CANCLE']);
                     })
@@ -32,8 +32,8 @@ class AllReportController extends Controller
         foreach($allByWarehouseId as $warehouseId => $row) {
             foreach($row->groupBy('channel_id') as $key => $single) {
                 $date = $single->filter(function($fd){
-                    return strtotime($fd->created_at) > strtotime(date('Y-m', strtotime('-1 day'))) &&
-                        strtotime($fd->created_at) < strtotime(date('Y-m', strtotime('now')));
+                    return strtotime($fd->created_at) > strtotime(date('Y-m-d', strtotime('-1 day'))) &&
+                        strtotime($fd->created_at) < strtotime(date('Y-m-d', strtotime('now')));
                     });
                 $date1 = $single->filter(function($fd){
                     return strtotime($fd->created_at) > strtotime(date('Y-m', strtotime('-30 days'))) &&
@@ -91,7 +91,6 @@ class AllReportController extends Controller
         return redirect($this->mainIndex);
     }
 
-    //时间是过去一个月，不然数据库没有数据，待调时间
     public function packageReport()
     {
         $model = $this->model->orderBy('day_time', 'desc')->first();

@@ -242,6 +242,11 @@ return [
                     'url' => 'pickReport.index',
                     'icon' => '',
                 ],
+                [
+                    'name' => '包装排行榜',
+                    'url' => 'packReport.index',
+                    'icon' => '',
+                ],
             ],
         ],
     ],

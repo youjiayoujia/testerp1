@@ -63,7 +63,7 @@ class PickReportController extends Controller
 
     public function createData()
     {
-        $model = PickListModel::wherebetween('pick_at', [date('Y-m-d', strtotime('-30 day')), date('Y-m-d', strtotime('+1 day'))])->get()->groupBy('pick_by');
+        $model = PickListModel::wherebetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->get()->groupBy('pick_by');
         foreach($model as $userId => $block) {
             $this->model->create([
                     'user_id' => $userId,

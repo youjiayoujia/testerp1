@@ -71,6 +71,27 @@ class PickListController extends Controller
         return view($this->viewPath.'show', $response);
     }
 
+    public function changePickBy()
+    {
+        $picklist = request('picklist');
+        $pickBy = request('pickBy');
+        $id = request('id');
+        $model = $this->model->where('picknum', $picklist)->first();
+        if(!$model) {
+            return json_encode(false);
+        }
+        if($id == 1) {
+            if($model->pick_by == 0 && $model->status == 'NONE') {
+                $model->update(['pick_by' => $pickBy, 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PICKING']);
+            } else {
+                $model->update(['pick_by' => $pickBy, 'pick_at' => date('Y-m-d H:i:s', time())]);
+            }
+        } else {
+            $model->update(['pick_by' => $pickBy]);
+        }
+        return json_encode(true);
+    }
+
     /**
      * 打印拣货单 
      *

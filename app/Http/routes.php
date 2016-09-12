@@ -63,6 +63,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('fbaStock/updateStock', ['uses' => 'Oversea\StockController@updateStock', 'as' => 'fbaStock.updateStock']);
     Route::resource('fbaStock', 'Oversea\StockController');
 
+    //包装排行榜
+    Route::get('packReport/changeData', ['uses' => 'PackReportController@changeData', 'as' => 'packReport.changeData']);
+    Route::get('packReport/createData', ['uses' => 'PackReportController@createData', 'as' => 'packReport.createData']);
+    Route::resource('packReport', 'PackReportController');
+
     //拣货排行榜
     Route::get('pickReport/createData', ['uses' => 'PickReportController@createData', 'as' => 'pickReport.createData']);
     Route::resource('pickReport', 'PickReportController');
@@ -445,6 +450,9 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::get('pickList/changePickBy',
+        ['uses' => 'PickListController@changePickBy', 'as' => 'pickList.changePickBy']);
+
     Route::get('pickList/pickCode/{id}',
         ['uses' => 'PickListController@pickCode', 'as' => 'pickList.pickCode']);
 

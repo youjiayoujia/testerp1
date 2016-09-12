@@ -38,6 +38,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '留言板',
+                    'url' => 'item.questionIndex',
+                    'icon' => '',
+                ],
+                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',
@@ -517,7 +522,7 @@ return [
             '采购报表' => [
                 [
                     'name' => '采购数据统计',
-                    'url' => 'message.index',
+                    'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
             ],

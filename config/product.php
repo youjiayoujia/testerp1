@@ -4,7 +4,7 @@ return [
     'requireimage' => 'uploads/require',
     //产品图片配置
     'image' => [
-        'extensions' => ['jpg', 'gif', 'bmp'],
+        'extensions' => ['jpg', 'gif', 'bmp','jpeg','png'],
         'types' => ['public', 'original', 'choies', 'aliexpress', 'amazon', 'ebay', 'wish', 'Lazada'],
         'uploadPath' => 'uploads/product'
     ],

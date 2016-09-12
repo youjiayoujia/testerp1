@@ -471,7 +471,7 @@ return [
             '采购报表' => [
                 [
                     'name' => '采购数据统计',
-                    'url' => 'message.index',
+                    'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
             ],

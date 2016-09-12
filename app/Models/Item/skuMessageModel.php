@@ -8,9 +8,7 @@ class SkuMessageModel extends BaseModel
 {
     protected $table = 'sku_messages';
 
-	protected $guarded = [
-        
-    ];
+	protected $guarded = [];
 
     //查询
     public $searchFields = ['id'=>'id'];

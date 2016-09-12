@@ -1509,6 +1509,33 @@ class EbayAdapter implements AdapterInterface
         }
     }
 
+    /**
+     * compact('item_id','buyer_id','itemids','title','content')
+     * 订单列表 send ebay message
+     */
+    public function ebayOrderSendMessage($paramAry){
+        $total = count($paramAry['itemids']);
+
+        $ItemIDXML = ($total == 1) ? "<ItemID>$paramAry[itemids][0]</ItemID>" : '' ;
+        $moreItem  = ($total > 1) ?  implode(',',$paramAry['itemids']) : '' ;
+        
+        $xml ='<WarningLevel>High</WarningLevel>
+               ' . $ItemIDXML . '
+		      <MemberMessage>
+                <Subject>' . addslashes($paramAry['title']) . ' ' . addslashes($moreItem) . '</Subject>
+                <Body>' . addslashes($paramAry['content']) . '</Body>
+                <QuestionType>CustomizedSubject</QuestionType>
+                <RecipientID>' . addslashes($paramAry['buyer_id']) . '</RecipientID>
+		      </MemberMessage>';
+        $result = $this->buildcaseBody($xml,'AddMemberMessageAAQToPartner');
+        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+        
+    }
+
 
 
 

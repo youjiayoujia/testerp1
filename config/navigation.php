@@ -568,6 +568,21 @@ return [
             ],
         ]
     ],
+    [
+        'name' => '财务',
+        'icon' => 'glyphicon glyphicon-lock',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '退款中心',
+                'url' => 'refundCenter.index',
+                'icon' => 'glyphicon glyphicon-loc',
+            ],
+        ],
+    ],
+
+
     //系统导航
     [
         'name' => '系统',

@@ -277,6 +277,10 @@ class OrderModel extends BaseModel
         return $this->hasMany('App\Models\RequireModel', 'order_id');
     }
 
+    public function ebayMessageList(){
+        return $this->hasMany('App\Models\Message\SendEbayMessageListModel','order_id','id');
+    }
+
     public function getStatusNameAttribute()
     {
         $config = config('order.status');
@@ -411,6 +415,7 @@ class OrderModel extends BaseModel
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
+            $data['customer_id'] = request()->user()->id;
             return RefundModel::create($data);
         }
         return 1;
@@ -677,6 +682,14 @@ class OrderModel extends BaseModel
     public function getActiveTextAttribute()
     {
         return config('order.active.' . $this->active);
+    }
+
+    public function getSendEbayMessageHistoryAttribute(){
+        if(!$this->ebayMessageList->isEmpty()){
+            return $this->ebayMessageList;
+        }else{
+            return false;
+        }
     }
 
 }

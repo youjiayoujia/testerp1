@@ -94,17 +94,21 @@ class AllReportController extends Controller
     //时间是过去一个月，不然数据库没有数据，待调时间
     public function packageReport()
     {
-        $last_time = $this->model->orderBy('day_time', 'desc')->first()->day_time;
-        $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+        $model = $this->model->orderBy('day_time', 'desc')->first();
+        $last_time = '';
         $arr = [];
-        foreach($model->groupBy('warehouse_id') as $warehouseId => $block) {
-            $arr[$warehouseId][] = $block->sum('wait_send');
-            $arr[$warehouseId][] = $block->sum('sending');
-            $arr[$warehouseId][] = $block->sum('sended');
-            $arr[$warehouseId][] = $block->sum('more');
-            $arr[$warehouseId][] = $block->sum('less');
-            $arr[$warehouseId][] = $block->sum('daily_send');
-            $arr[$warehouseId][] = $block->sum('need');
+        if($model) {
+            $last_time = $model->day_time;
+            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            foreach($model->groupBy('warehouse_id') as $warehouseId => $block) {
+                $arr[$warehouseId][] = $block->sum('wait_send');
+                $arr[$warehouseId][] = $block->sum('sending');
+                $arr[$warehouseId][] = $block->sum('sended');
+                $arr[$warehouseId][] = $block->sum('more');
+                $arr[$warehouseId][] = $block->sum('less');
+                $arr[$warehouseId][] = $block->sum('daily_send');
+                $arr[$warehouseId][] = $block->sum('need');
+            }
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

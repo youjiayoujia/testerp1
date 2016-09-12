@@ -58,7 +58,7 @@ return [
         'logistics.code' => '物流简码',
         'logistics.name' => '物流方式',
         'tracking_no' => '物流追踪号',
-        'status' => '订单状态',
+        'status' => '状态',
         'order.status' => '订单状态',
         'order.active' => '售后状态',
         'active' => '售后状态',

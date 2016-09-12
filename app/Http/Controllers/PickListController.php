@@ -31,6 +31,26 @@ class PickListController extends Controller
     }
 
     /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        $model = '';
+        if(request()->has('checkid')) {
+            $model = $this->model->where('pick_by', request('checkid'))->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
+        }
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList(!empty($model) ? $model : $this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'index', $response);
+    }
+
+    /**
      * 列表显示 
      *
      * @param $id 
@@ -84,7 +104,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['pick_by' => request('pickBy')]);
+        $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time())]);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
     }
@@ -512,42 +532,38 @@ class PickListController extends Controller
         $sum = 0;
         if(!request()->has('mixed') && request()->has('logistics')) {
             foreach(request()->input('logistics') as $logistic_id) {
-                $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1'])->where(function($query){
-                    if(request()->has('package')) {
-                        $query = $query->whereIn('type', request('package'));
+                foreach(request('package') as $key => $type) {
+                    $packages = PackageModel::where(['status'=>'PROCESSING', 'logistics_id'=>$logistic_id, 'is_auto'=>'1', 'type' => $type])->where(function($query){
+                        if(request()->has('channel')) {
+                            $query =$query->whereIn('channel_id', request('channel'));
+                        }
+                    })->get();
+                    $sum += $packages->count();
+                    if($packages->count()) {
+                        $this->model->createPickListItems($packages);
+                        $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
+                                                     (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
+                    }
+                }
+            }
+        } elseif(request()->has('mixed') && request()->has('logistics')) {
+            foreach(request('package') as $key => $type) {
+               $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1', 'type' => $type])->
+                where(function($query){
+                    if(request()->has('logistics')) {
+                        $query = $query->whereIn('logistics_id', request('logistics'));
                     }
                 })->where(function($query){
                     if(request()->has('channel')) {
-                        $query =$query->whereIn('channel_id', request('channel'));
+                        $query = $query->whereIn('channel_id', request('channel'));
                     }
                 })->get();
                 $sum += $packages->count();
                 if($packages->count()) {
                     $this->model->createPickListItems($packages);
-                    $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
-                                                 (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
-                }
-            }
-        } elseif(request()->has('mixed') && request()->has('logistics')) {
-            $packages = PackageModel::where(['status'=>'PROCESSING', 'is_auto'=>'1'])->where(function($query){
-                if(request()->has('package')) {
-                    $query = $query->whereIn('type', request('package'));
-                }
-            })->
-            where(function($query){
-                if(request()->has('logistics')) {
-                    $query = $query->whereIn('logistics_id', request('logistics'));
-                }
-            })->where(function($query){
-                if(request()->has('channel')) {
-                    $query = $query->whereIn('channel_id', request('channel'));
-                }
-            })->get();
-            $sum += $packages->count();
-            if($packages->count()) {
-                $this->model->createPickListItems($packages);
-                $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
-                                             (request()->has('multitext') ? request()->input('multitext') : '20'));
+                    $this->model->createPickListFb((request()->has('singletext') ? request()->input('singletext') : '25'), 
+                                                 (request()->has('multitext') ? request()->input('multitext') : '20'));
+                } 
             }
         }
 

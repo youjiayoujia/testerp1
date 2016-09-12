@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use App\Models\ProductModel;
+use App\Models\Product\ImageModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
@@ -19,16 +20,19 @@ use App\Models\CatalogModel;
 use App\Models\UserModel;
 use Excel;
 use App\Models\ChannelModel;
+use App\Models\Item\SkuMessageModel;
 
 
 class ItemController extends Controller
 {
-    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel)
+    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel, SkuMessageModel $message, ImageModel $imageModel)
     {
         $this->model     = $item;
         $this->supplier  = $supplier;
         $this->product   = $product;
         $this->warehouse = $warehouse;
+        $this->message = $message;
+        $this->image = $imageModel;
         $this->logisticsLimit = $limitsModel;
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('item.index');
@@ -313,5 +317,54 @@ class ItemController extends Controller
 
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    public function question($item_id)
+    {
+        $content = request()->input('question_content');
+        $question_group = request()->input('question_group');
+        $data['sku_id'] = $item_id;
+        $data['question_group'] = $question_group;
+        $data['question'] = $content;
+        $data['question_time'] = date('Y-m-d H:i:s',time());
+        $data['question_user'] = request()->user()->id;
+        $data['status'] = 'pending';
+        $data['image'] = $this->image->skuMessageImage(request()->file('uploadImage'));
+        $messageModel = $this->message->create($data);
+        return redirect($this->mainIndex);
+    }
+
+    public function extraQuestion()
+    {
+        $content = request()->input('extra_content');
+        $data['extra_question'] = $content;
+        $id = request()->input('id');
+        $sku_message = $this->message->find($id);
+        $sku_message->update($data);
+        return redirect(route('item.questionIndex'));
+    }
+
+    public function questionIndex()
+    {
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->message),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+        return view($this->viewPath . 'questionIndex', $response);
+    }
+
+    public function answer()
+    {
+        $content = request()->input('answer_content');
+        $id = request()->input('id');
+        $sku_message = $this->message->find($id);
+        $data['answer'] = $content;
+        $data['answer_date'] = date('Y-m-d H:i:s',time());
+        $data['answer_user'] = request()->user()->id;
+        $data['status'] = 'close';
+        $sku_message->update($data);
+        return redirect(route('item.questionIndex'));
     }
 }

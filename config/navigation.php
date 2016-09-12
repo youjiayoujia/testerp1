@@ -38,6 +38,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '留言板',
+                    'url' => 'item.questionIndex',
+                    'icon' => '',
+                ],
+                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',
@@ -223,6 +228,18 @@ return [
                 [
                     'name' => '库存结转',
                     'url' => 'stockCarryOver.index',
+                    'icon' => '',
+                ],
+            ],
+            '报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
                     'icon' => '',
                 ],
             ],
@@ -420,9 +437,9 @@ return [
                 'icon' => '',
             ],
             [
-            'name' => 'smt销售代码设置',
-            'url' => 'smtSellerCode.index',
-            'icon' => '',
+                'name' => 'smt销售代码设置',
+                'url' => 'smtSellerCode.index',
+                'icon' => '',
             ],
             [
                 'name' => 'Ebay站点信息',
@@ -505,7 +522,7 @@ return [
             '采购报表' => [
                 [
                     'name' => '采购数据统计',
-                    'url' => 'message.index',
+                    'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
             ],

@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterPackage extends Migration
+class AddLogisticsChannelNamesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,8 @@ class AlterPackage extends Migration
      */
     public function up()
     {
-        Schema::table('packages', function (Blueprint $table) {
-            $table->dropColumn('status');
-            
+        Schema::table('logistics_channel_names', function (Blueprint $table) {
+            $table->string('key')->comment('回传key值')->default(NULL);
         });
     }
 
@@ -25,8 +24,8 @@ class AlterPackage extends Migration
      */
     public function down()
     {
-        Schema::table('packages', function (Blueprint $table) {
-            //
+        Schema::table('logistics_channel_names', function (Blueprint $table) {
+            $table->dropColumn('key');
         });
     }
 }

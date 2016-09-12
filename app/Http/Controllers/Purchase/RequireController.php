@@ -89,13 +89,10 @@ class RequireController extends Controller
 			$data['purchase_num']=$sumtrend->need_purchase_num;
 			$data['user_id']=request()->user()->id;
 			$data['lack_num']=$data['purchase_num'];
-			//print_r($data);exit;
 			if($data['purchase_num']>0){
 				$p_item = PurchaseItemModel::create($data);
 				$fillRequireNum = $this->model->where("item_id",$v->id)->where('is_require','1')->get()->sum('quantity');
-				//echo $fillRequireNum;echo $data['purchase_num'];exit;
 				$fillRequireArray =  $this->model->where("item_id",$v->id)->get();
-				//print_r($fillRequireArray);exit;
 				if($fillRequireNum <=$data['purchase_num']){
 					$this->model->where("item_id",$v->id)->update(['is_require'=>'0']);
 				}else{
@@ -218,6 +215,12 @@ class RequireController extends Controller
 		}else{
 			PurchaseRequireModel::where('item_id',$item_id)->update(['quantity'=>$quantity,'status'=>0]);
 		}		
+	}
+
+	//
+	public function createAllPurchaseOrder(){
+		$this->model->createAllPurchaseOrder();
+		return 1;
 	}
 		
 }

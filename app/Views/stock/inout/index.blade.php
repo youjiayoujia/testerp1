@@ -1,5 +1,4 @@
 @extends('common.table')
-@section('tableToolButtons')@stop
 @section('tableHeader')
     <th class='sort' data-field='id'>ID</th>
     <th>sku</th>
@@ -35,4 +34,11 @@
             </td>
         </tr>
     @endforeach
+@stop
+@section('tableToolButtons')
+<div class="btn-group">
+    <a class="btn btn-info" href="{{ route('inOut.export') }}">
+        数据导出
+    </a>
+</div>
 @stop

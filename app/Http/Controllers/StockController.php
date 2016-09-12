@@ -274,12 +274,41 @@ class StockController extends Controller
      * @return obj
      * 
      */
+    public function ajaxAllSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $stocks = $this->model->whereHas('item', function($query) use ($sku){
+                $query = $query->where('sku', 'like', '%'.$sku.'%');
+            })->get();
+            $total = $stocks->count();
+            $arr = [];
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->item_id;
+                $arr[$key]['text'] = $stock->item->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
     public function ajaxSku()
     {
         if(request()->ajax()) {
             $sku = trim(request()->input('sku'));
             $warehouseId = trim(request('warehouse_id'));
-            $stocks = $this->model->whereHas('item', function($query) use ($sku){
+            $stocks = $this->model->where('warehouse_id', $warehouseId)->whereHas('item', function($query) use ($sku){
                 $query = $query->where('sku', 'like', '%'.$sku.'%');
             })->get();
             $total = $stocks->count();

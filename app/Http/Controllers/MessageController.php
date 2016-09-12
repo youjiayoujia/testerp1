@@ -17,6 +17,9 @@ use App\Models\Channel\AccountModel as Channel_account;
 use Translation;
 use Excel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
+use App\Modules\Channel\Adapter\WishAdapter;
+use App\Modules\Channel\Adapter\EbayAdapter;
+use App\Models\Message\SendEbayMessageListModel;
 
 
 class MessageController extends Controller
@@ -79,8 +82,8 @@ class MessageController extends Controller
             }
 
             $emailarr=config('user.email');
-/*           dd($message->MessageFieldsDecodeBase64);
-            dd($message->ChannelParams);*/
+/*           dd($message->MessageFieldsDecodeBase64);*/
+            //dd($message->ChannelParams);
 
             $response = [
                 'metas' => $this->metas(__FUNCTION__),
@@ -234,6 +237,32 @@ class MessageController extends Controller
             }
             return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));
         }
+    }
+
+    public function WishSupportReplay($id){
+        $message = $this->model->find($id);
+        if (!$message) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '信息不存在.'));
+        }
+        $account = Channel_account::find($message->account_id);
+
+        $adapter = new WishAdapter($account->apiConfig);
+
+        if($adapter->ReplayWishSupport($message->message_id)){
+            $message->assign_id=request()->user()->id;
+            $message->required=0;
+            $message->status="COMPLETE";
+            $message->save();
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '处理失败'));
+        }
+        if ($this->workflow == 'keeping') {
+            return redirect(route('message.process'))
+                ->with('alert', $this->alert('success', '上条信息已成功回复.'));
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功'));
+        }
+
     }
 
     /**
@@ -426,18 +455,40 @@ class MessageController extends Controller
         }else{
             return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('danger', '文件和评论内容不能为空'));
         }
-
-
         return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('success', '成功发送'.$total.'条数据;失败条目aliexpress订单号:('.$error_order_id.')'));
-
-
-
-
-
     }
-
-
-
-
-
+    
+    public function SendEbayMessage(SendEbayMessageListModel $list){
+        $form = request()->input();
+        foreach($form as $key => $input){
+            if(empty($input)){
+                return redirect(route('order.index'))->with('alert',$this->alert('danger','参数不完整'.$key.'不能为空'));
+            }
+        }
+        $order = OrderModel::find($form['message-order-id']);
+        if($order->channel->driver){
+            $ebay = new EbayAdapter($order->channelAccount->apiConfig);
+            foreach ($form['item-ids'] as $item_id){
+                if(!empty($item_id)){
+                }
+            }
+            $buyer_id = $order['by_id'];
+            $itemids  = $form['item-ids'];
+            $title    = $form['message-title'];
+            $content  = $form['message-content'];
+           $is_send = $ebay->ebayOrderSendMessage(compact('item_id','buyer_id','itemids','title','content'));
+           if($is_send){
+               $list->operate_id = request()->user()->id;
+               $list->order_id   = $form['message-order-id'];
+               $list->title      = $form['message-title'];
+               $list->content    = $form['message-content'];
+               $list->itemids    = implode(',',$form['item-ids']);
+               $list->save();
+               return redirect(route('order.index'))->with('success',$this->alert('发送成功'));
+           }else{
+               return redirect(route('order.index'))->with('alert',$this->alert('发送失败'));
+           }
+        }
+        return redirect(route('order.index'))->with('alert',$this->alert('发送失败，未知错误'));
+    }
 }

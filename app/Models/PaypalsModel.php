@@ -49,4 +49,12 @@ class PaypalsModel extends BaseModel
        return $retrun;
     }
 
+    public function getApiConfigAttribute(){
+        return (object)[
+            'paypal_account'  => $this->paypal_password,
+            'paypal_password' => $this->paypal_password,
+            'paypal_token'    => $this->paypal_token,
+        ];
+    }
+
 }

@@ -782,6 +782,10 @@ Route::group(['middleware' => 'auth'], function () {
     //稍后处理
     Route::any('message/{id}/dontRequireReply',
         ['as' => 'message.dontRequireReply', 'uses' => 'MessageController@dontRequireReply']);
+    //wish support
+    Route::any('message/{id}/WishSupportReplay',
+        ['as' => 'message.WishSupportReplay', 'uses' => 'MessageController@WishSupportReplay']);
+    
     //无需回复
     Route::any('message/{id}/notRequireReply',
         ['as' => 'message.notRequireReply', 'uses' => 'MessageController@notRequireReply']);
@@ -839,6 +843,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('aliexpressReturnOrderMessages',['as' => 'aliexpressReturnOrderMessages', 'uses' => 'MessageController@aliexpressReturnOrderMessages']);
     Route::any('aliexpressCsvFormat',['as' => 'aliexpressCsvFormat', 'uses' => 'MessageController@aliexpressCsvFormat']);
     Route::any('doSendAliexpressMessages',['as' => 'doSendAliexpressMessages', 'uses' => 'MessageController@doSendAliexpressMessages']);
+    Route::any('SendEbayMessage',['uses' => 'MessageController@SendEbayMessage', 'as' =>'message.sendEbayMessage']);
 
 
     //用户路由
@@ -863,6 +868,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
+    Route::resource('refundCenter','RefundCenterController');
+    Route::any('doPaypalRefund',['uses' =>'RefundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
+    Route::any('batchProcessStatus',['uses' =>'RefundCenterController@batchProcessStatus' , 'as' => 'refund.batchProcessStatus']);
+    Route::any('RefundCsvFormat',['uses' => 'RefundCenterController@RefundCsvFormat', 'as' =>'refund.cvsformat']);
+    Route::any('financeExport',['uses' => 'RefundCenterController@financeExport', 'as' =>'refund.financeExport']);
+    Route::any('changeReundNoteStatus',['uses' => 'RefundCenterController@changeReundNoteStatus','as' =>'refund.changeReundNoteStatus']);
 });
 
 

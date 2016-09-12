@@ -246,7 +246,7 @@ abstract class Controller extends BaseController
         $model->update(request()->all());
         $to = serialize($model);
         $this->eventLog(request()->user()->id, '数据更新', $to, $from);
-        return redirect($this->mainIndex);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '操作成功.'));
     }
 
     /**

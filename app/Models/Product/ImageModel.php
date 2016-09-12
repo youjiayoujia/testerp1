@@ -135,6 +135,26 @@ class ImageModel extends BaseModel
     }
 
     /**
+     * 创建图片
+     *
+     * @param $data ['spu_id','product_id','type']
+     * @param $files
+     * @param string $uploadType
+     */
+    public function skuMessageImage($data, $files = null)
+    {
+        $data['path'] = config('product.question.uploadPath') . '/' . $data['id'] . '/';
+        $disk = Storage::disk('product');
+        foreach ($files as $key => $file) {
+            if ($this->valid($file->getClientOriginalName())) {
+                $data['name'] = time() . '.' . $file->getClientOriginalExtension();
+                Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($file->getRealPath())); 
+            }
+        }
+        
+    }
+
+    /**
      * 更新图片
      *
      * @param $id

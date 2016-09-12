@@ -268,7 +268,7 @@
         <!-- 模态框结束（Modal） -->
 
         <!-- 模态框（Modal）提问 -->
-        <form action="/item/question/{{$item->id}}" method="post">
+        <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <div class="modal fade" id="question_{{$item->id}}"  role="dialog" 
                aria-labelledby="myModalLabel" aria-hidden="true">

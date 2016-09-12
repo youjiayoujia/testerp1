@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use App\Models\ProductModel;
+use App\Models\Product\ImageModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
@@ -24,13 +25,14 @@ use App\Models\Item\SkuMessageModel;
 
 class ItemController extends Controller
 {
-    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel, SkuMessageModel $message)
+    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel, SkuMessageModel $message, ImageModel $imageModel)
     {
         $this->model     = $item;
         $this->supplier  = $supplier;
         $this->product   = $product;
         $this->warehouse = $warehouse;
         $this->message = $message;
+        $this->image = $imageModel;
         $this->logisticsLimit = $limitsModel;
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('item.index');
@@ -321,14 +323,14 @@ class ItemController extends Controller
     {
         $content = request()->input('question_content');
         $question_group = request()->input('question_group');
-        
         $data['sku_id'] = $item_id;
         $data['question_group'] = $question_group;
         $data['question'] = $content;
         $data['question_time'] = date('Y-m-d H:i:s',time());
         $data['question_user'] = request()->user()->id;
         $data['status'] = 'pending';
-        $this->message->create($data);
+        $messageModel = $this->message->create($data);
+        $this->image->skuMessageImage(['id'=>$messageModel->id],request()->files);
         return redirect($this->mainIndex);
     }
 

@@ -40,6 +40,7 @@ class RefundCenterController extends Controller
             'paypals' => PaypalsModel::where('is_enable','=','1')->get(),
             'users'   => UserModel::all(),
             'channels'=> ChannelModel::all(),
+            'types'    => config('refund.type'),
            // 'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index',$response);
@@ -74,7 +75,15 @@ class RefundCenterController extends Controller
      */
     public function show($id)
     {
-        //
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $model,
+        ];
+        return view($this->viewPath . 'show', $response);
     }
 
     /**
@@ -193,9 +202,7 @@ class RefundCenterController extends Controller
         $rows = [
             [
                 'Refund No.' => '例：450098',
-                '买家ID'      =>  'testuser',
-                '退款金额'     => '3.77',
-                '退款凭证'     => '9VR69784B8555501V',
+                '退款凭证(注意：退款成功填凭证，失败不填)'     => '9VR69784B8555501V',
             ]
         ];
 
@@ -255,6 +262,44 @@ class RefundCenterController extends Controller
                 });
             })->download('csv');
         }
+    }
+    public function changeReundNoteStatus(){
+        // $file = request()->file('excel');
+        $result_array   = [];
+
+        if(isset($_FILES['excel']['tmp_name'])){
+            $refund_array = Excel::load($_FILES['excel']['tmp_name'],'gb2312')->noHeading()->toArray();
+            if(is_array($refund_array) && count($refund_array) >= 2){
+                unset($refund_array[0]);
+                if(strpos($refund_array[1][1],':')){
+                    unset($refund_array[1]);
+                }
+                foreach($refund_array as $refund){
+                    $refund_object = RefundModel::find($refund[1]);
+                    if(!empty($refund_object)){
+                        if(!empty($refund[2])){ //退款成功
+                            $refund_object->refund_voucher = $refund[2];
+                            $refund_object->process_status = 'COMPLETE';
+                            $result_array[] = [
+                                'id'     => $refund[1],
+                                'status' => 1
+                            ];
+                        }else{ //失败
+                            $refund_object->process_status = 'FAILED';
+                            $result_array[] = [
+                                'id'     => $refund[1],
+                                'status' => -1,
+                            ];
+                        }
+                        $refund_object->save();
+                    }
+                }
+                return redirect($this->mainIndex)->with('alert', $this->alert('success', '数据导入成功'));
+            }
+
+        }
+        return redirect($this->mainIndex)->with('alert', $this->alert('danger', '数据导入失败'));
+
     }
 
 

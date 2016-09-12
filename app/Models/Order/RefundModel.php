@@ -50,13 +50,13 @@ class RefundModel extends BaseModel
 
     public function getTypeNameAttribute()
     {
-        $arr = config('order.type');
+        $arr = config('refund.type');
         return $arr[$this->type];
     }
 
     public function getRefundNameAttribute()
     {
-        $arr = config('order.refund');
+        $arr = config('refund.refund');
         return $arr[$this->refund];
     }
     public function getProcessStatusNameAttribute(){
@@ -123,6 +123,10 @@ class RefundModel extends BaseModel
             return true;
         }
         return false;
+    }
+
+    public function getChannelAccountNameAttribute(){
+        return $this->Order->channelAccount->account;
     }
 
 

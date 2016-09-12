@@ -19,6 +19,7 @@ use Excel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
+use App\Models\Message\SendEbayMessageListModel;
 
 
 class MessageController extends Controller
@@ -457,7 +458,7 @@ class MessageController extends Controller
         return redirect(route('aliexpressReturnOrderMessages'))->with('alert', $this->alert('success', '成功发送'.$total.'条数据;失败条目aliexpress订单号:('.$error_order_id.')'));
     }
     
-    public function SendEbayMessage(){
+    public function SendEbayMessage(SendEbayMessageListModel $list){
         $form = request()->input();
         foreach($form as $key => $input){
             if(empty($input)){
@@ -475,16 +476,19 @@ class MessageController extends Controller
             $itemids  = $form['item-ids'];
             $title    = $form['message-title'];
             $content  = $form['message-content'];
-
            $is_send = $ebay->ebayOrderSendMessage(compact('item_id','buyer_id','itemids','title','content'));
            if($is_send){
-               
+               $list->operate_id = request()->user()->id;
+               $list->order_id   = $form['message-order-id'];
+               $list->title      = $form['message-title'];
+               $list->content    = $form['message-content'];
+               $list->itemids    = implode(',',$form['item-ids']);
+               $list->save();
+               return redirect(route('order.index'))->with('success',$this->alert('发送成功'));
+           }else{
+               return redirect(route('order.index'))->with('alert',$this->alert('发送失败'));
            }
         }
+        return redirect(route('order.index'))->with('alert',$this->alert('发送失败，未知错误'));
     }
-
-
-
-
-
 }

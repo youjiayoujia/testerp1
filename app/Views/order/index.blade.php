@@ -687,6 +687,21 @@
                                         </div>
                                         <div class="panel-body">
 
+                                            @if($order->SendEbayMessageHistory)
+                                                <div class="list-group">
+                                                    @foreach($order->SendEbayMessageHistory as $item)
+                                                        <a href="#" class="list-group-item">
+                                                            <h4 class="list-group-item-heading ">{{$item->title}}<span class="badge" style="float:right;">{{$item->created_at}}</span></h4>
+                                                            <p class="list-group-item-text">{{$item->content}}</p>
+                                                        </a>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <div class="list-group">
+                                                    <h4 class="list-group-item-heading ">无</h4>
+
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

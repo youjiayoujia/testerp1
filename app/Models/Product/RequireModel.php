@@ -30,7 +30,7 @@ class RequireModel extends BaseModel
     ];
 
     //查询
-    public $searchFields = ['name'];
+    public $searchFields = ['name'=>'名称'];
     
     /**
      *  移动文件 

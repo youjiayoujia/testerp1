@@ -14,6 +14,8 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Modules\Channel\Adapter\EbayAdapter;
+use App\Models\Order\RefundModel;
+
 
 class EbayCasesController extends Controller
 {
@@ -180,7 +182,21 @@ class EbayCasesController extends Controller
     /**
      * case 回复： 退款
      */
-    public function RefundBuyer(){
+    public function RefundBuyer(RefundModel $refund){
+        $case = $this->model->find(request()->input('id'));
+        if(empty($case) || empty($case->related_order_id)){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '无法处理，数据不完整'));
+        }
+        $refund_model = $refund->where('order_id','=',$case->related_order_id)
+               ->where('type','=','FILL')->first();
+        if(empty($refund_model)){ //是否已存在
+            dd($case->orderItem);
+        }
+
+
+
+
+
         echo '退款';
     }
 

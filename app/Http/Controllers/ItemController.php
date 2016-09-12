@@ -321,6 +321,7 @@ class ItemController extends Controller
     {
         $content = request()->input('question_content');
         $question_group = request()->input('question_group');
+        
         $data['sku_id'] = $item_id;
         $data['question_group'] = $question_group;
         $data['question'] = $content;

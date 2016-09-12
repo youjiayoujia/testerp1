@@ -38,6 +38,11 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '留言板',
+                    'url' => 'item.questionIndex',
+                    'icon' => '',
+                ],
+                [
                     'name' => '图片',
                     'url' => 'productImage.index',
                     'icon' => '',

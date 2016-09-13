@@ -32,10 +32,13 @@ class ShipmentCostItemModel extends BaseModel
     	'created_at'
     ];
 
+    public $searchFields = [];
+
     public function getMixedSearchAttribute()
     {
         return [
             'relatedSearchFields' => [
+                'parent' => ['shipmentCostNum']
             ],
             'filterFields' => ['hang_number', 'package_id', 'channel_name'],
             'filterSelects' => [

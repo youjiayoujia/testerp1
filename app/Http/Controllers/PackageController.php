@@ -23,6 +23,7 @@ use App\Models\WarehouseModel;
 use DB;
 use Exception;
 use App\Jobs\AssignStocks;
+use App\Models\NumberModel;
 
 class PackageController extends Controller
 {
@@ -851,6 +852,27 @@ class PackageController extends Controller
         })->download('csv');
     }
 
+    public function bagInfo()
+    {
+        $trackno = request('trackno');
+        $model = $this->model->where('tracking_no', $trackno)->first();
+        if(!$model) {
+            return json_encode(false);
+        }
+        $number = NumberModel::first();
+        if(!count($number)) {
+            $number = NumberModel::create(['number' => 1]);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => $model->logistics ? $model->logistics->code : '',
+            'number' => 'S'.substr($number->number+100000000, 1),
+        ];
+        $number->update(['number' => $number->number + 1]);
+
+        return view($this->viewPath.'bagInfo', $response);
+    }
+
     /**
      * 执行发货
      *
@@ -881,12 +903,20 @@ class PackageController extends Controller
             return json_encode('unhold');
         }
         DB::commit();
-        $package->update([
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => request()->user()->id,
-            'actual_weight' => $weight,
-            'status' => 'SHIPPED',
-        ]);
+        if($weight == '0') {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'status' => 'SHIPPED',
+            ]);
+        } else {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'actual_weight' => $weight,
+                'status' => 'SHIPPED',
+            ]);
+        }
         $order = $package->order;
         $buf = 1;
         foreach($order->packages as $childPackage) {

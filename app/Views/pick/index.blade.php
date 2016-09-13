@@ -47,7 +47,7 @@
                     <span class="glyphicon glyphicon-pencil"></span> 分拣
                 </a>
                 @endif
-                @if($pickList->status == 'PICKING')
+                @if($pickList->status == 'PRINTED')
                 <button class="btn btn-info btn-xs pickBy"
                         data-toggle="modal"
                         data-target="#pickBy">

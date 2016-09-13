@@ -1,6 +1,7 @@
 <?php
     return [
         'NONE' => '未处理',
+        'PRINTED' => '已打印',
         'PICKING' => '拣货中',
         'PICKED' => '拣货完成',
         'INBOXING' => '分拣中',

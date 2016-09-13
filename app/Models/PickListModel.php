@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'print_at', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -44,6 +44,11 @@ class PickListModel extends BaseModel
 
     //查询
     public $searchFields=['picknum' => '拣货单号'];
+
+    public function printRecords()
+    {
+        return $this->hasMany('App\Models\Pick\PrintRecordModel', 'picklist_id', 'id');
+    }
 
     //拣货单item关联关系
     public function pickListItem()

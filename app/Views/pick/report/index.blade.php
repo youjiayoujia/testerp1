@@ -78,6 +78,9 @@
                                 <input class='form-control pick_by' name='pick_by' type="text" placeholder='拣货人员'>
                             </div>
                             <div class='form-group col-lg-3'>
+                                <input class='fix' name='fix' type="radio">固定拣货人员
+                            </div>
+                            <div class='form-group col-lg-3'>
                                 <button type='button' class='btn btn-success confirm'>确认</button>
                             </div>
                             <input type='hidden' class='buf'>
@@ -92,14 +95,18 @@
 <script type='text/javascript'>
 $(document).ready(function(){
     $(document).on('click', '.assign', function(){
+        if($('.fix').prop('checked') == false) {
+            pickBy = $('.pick_by').val('');
+        }
         picklist = $('.picklist_id').val('');
-        pickBy = $('.pick_by').val('');
         $('.buf').val(1);
     });
 
     $(document).on('click', '.change', function(){
+        if($('.fix').prop('checked') == false) {
+            pickBy = $('.pick_by').val('');
+        }
         picklist = $('.picklist_id').val('');
-        pickBy = $('.pick_by').val('');
         $('.buf').val(2);
     });
 
@@ -122,6 +129,23 @@ $(document).ready(function(){
         }
         $('.assign').click();
     });
+
+    $(document).on('keypress', function(event){
+        if(event.keyCode == '13') {
+            if($('.picklist_id').is(':focus')) {
+                if($('.fix').prop('checked') == true) {
+                    $('.confirm').click();
+                }
+                return true;
+            }
+            if($('.pick_by').is(':focus')) {
+                if($('.picklist_id').val()) {
+                    $('.confirm').click();
+                }
+                return true;
+            }
+        }
+    })
 
     $(document).on('click', '.pick', function(){
         id = $(this).data('userid');

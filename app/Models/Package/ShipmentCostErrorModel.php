@@ -27,6 +27,7 @@ class ShipmentCostErrorModel extends BaseModel
     {
         return [
             'relatedSearchFields' => [
+                'parent' => ['shipmentCostNum']
             ],
             'filterFields' => ['hang_num', 'channel_name'],
             'filterSelects' => [
@@ -36,6 +37,8 @@ class ShipmentCostErrorModel extends BaseModel
             'sectionSelect' => [],
         ];
     }
+
+    public $searchFields = ['hang_num' => '挂号码'];
 
     public function getArray($model, $name)
     {

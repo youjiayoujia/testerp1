@@ -1538,10 +1538,34 @@ class EbayAdapter implements AdapterInterface
 
     /**
      * 修改ebay平台 unpaid case
-     * 
+     * compact('order_item_number','transcation_id')
      */
     public function ebayUnpaidCase($paramAry){
+        switch ($paramAry['disputeType']){
+            case 'complaints': //unpaid case
+                $disputeExplanation = 'BuyerNotPaid';
+                $disputeReason      = 'BuyerHasNotPaid';
+                break;
+            case 'cancel': //取消交易
+                $disputeExplanation = 'OtherExplanation';
+                $disputeReason      = 'TransactionMutuallyCanceled';
+                break;
+            default:
+                break;
+        }
 
+        $xml = '
+        	  <DisputeExplanation>' . $disputeExplanation . '</DisputeExplanation>
+			  <DisputeReason>' . $disputeReason . '</DisputeReason>
+			  <ItemID>'.$paramAry['order_item_number'].'</ItemID>
+			  <TransactionID>'.$paramAry['transcation_id'].'</TransactionID>
+        ';
+        $result = $this->buildcaseBody($xml,'AddDispute');
+        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 

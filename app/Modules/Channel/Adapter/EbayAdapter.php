@@ -1536,6 +1536,14 @@ class EbayAdapter implements AdapterInterface
         
     }
 
+    /**
+     * 修改ebay平台 unpaid case
+     * 
+     */
+    public function ebayUnpaidCase($paramAry){
+
+    }
+
 
 
 

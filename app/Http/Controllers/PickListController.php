@@ -41,11 +41,19 @@ class PickListController extends Controller
         if(request()->has('checkid')) {
             $model = $this->model->where('pick_by', request('checkid'))->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
         }
+        $today_print = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
+        $allocate = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])
+                    ->get()
+                    ->filter(function($single){
+                        return $single->pick_by != 0;
+                    })->count();
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList(!empty($model) ? $model : $this->model),
             'mixedSearchFields' => $this->model->mixed_search,
+            'today_print' => $today_print,
+            'allocate' => $allocate
         ];
         return view($this->viewPath . 'index', $response);
     }
@@ -125,7 +133,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time())]);
+        $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PACKAGEING']);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
     }
@@ -303,8 +311,6 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->status = 'PACKAGEING';
-        $model->save();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,

@@ -49,7 +49,6 @@ class PickReportController extends Controller
                 $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
             }
         }
-        
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $model,

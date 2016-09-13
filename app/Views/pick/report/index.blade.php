@@ -1,6 +1,6 @@
 @extends('common.detail')
 @section('detailBody')
-<p><font color='red' size='5px'>今日拣货数:@if(count($data)){{ $data->sum('today_pick')}}@endif个&nbsp;&nbsp;&nbsp;&nbsp;今天拣货漏检总数:@if(count($data)){{ $data->sum('missing_pick')}}@endif个&nbsp;&nbsp;&nbsp;&nbsp;本月拣货完成总数: @if(count($data)){{ $data->sum('single') + $data->sum('singleMulti') + $data->sum('multi') }}@endif个&nbsp;&nbsp;&nbsp;&nbsp;本月拣货漏检总数: @if(count($data)){{ $data->filter(function($query){ return strtotime($query->day_time) > strtotime(date('Y-m', strtotime('now'))) &&  strtotime($query->day_time) < strtotime(date('Y-m', strtotime('+1 month'))); })->sum('missing_pick')}}@endif个</font></p>
+<p><font color='red' size='5px'>今日拣货数:@if(count($data)){{ $data->sum('today_pick')}}@endif个&nbsp;&nbsp;&nbsp;&nbsp;今日拣货漏检总数:@if(count($data)){{ $data->sum('missing_pick')}}@endif个&nbsp;&nbsp;&nbsp;&nbsp;本月拣货完成总数: @if(count($data)){{ $data->sum('single') + $data->sum('singleMulti') + $data->sum('multi') }}@endif个&nbsp;&nbsp;&nbsp;&nbsp;本月拣货漏检总数: @if(count($data)){{ $data->filter(function($query){ return strtotime($query->day_time) > strtotime(date('Y-m', strtotime('now'))) &&  strtotime($query->day_time) < strtotime(date('Y-m', strtotime('+1 month'))); })->sum('missing_pick')}}@endif个</font></p>
 <div class='row'>
     <div class='form-group col-lg-3'>
         <select name='warehouse_id' class='warehouse_id form-control'>

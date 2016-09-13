@@ -521,6 +521,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            '物流报表' => [
+                [
+                    'name' => '物流发货统计',
+                    'url' => 'package.logisticsDelivery',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航

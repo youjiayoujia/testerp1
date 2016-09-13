@@ -870,6 +870,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('RefundBuyer',['as' => 'case.RefundBuyer', 'uses' => 'Message\EbayCasesController@RefundBuyer']);
     
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
+    Route::any('feedBackStatistics',['uses' => 'Message\FeedBack\EbayFeedBackController@feedBackStatistics' , 'as' => 'feeback.feedBackStatistics' ]);
     Route::resource('refundCenter','RefundCenterController');
     Route::any('doPaypalRefund',['uses' =>'RefundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
     Route::any('batchProcessStatus',['uses' =>'RefundCenterController@batchProcessStatus' , 'as' => 'refund.batchProcessStatus']);

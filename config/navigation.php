@@ -526,6 +526,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            'CRM报表' => [
+                [
+                    'name' => '差评统计',
+                    'url'  => 'feeback.feedBackStatistics',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航

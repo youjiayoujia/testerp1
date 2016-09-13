@@ -722,7 +722,15 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('showAccountToCopyProduct',
             ['uses' => 'SmtProductController@showAccountToCopyProduct', 'as' => 'smtProduct.showAccountToCopyProduct']);
         Route::post('copyToDraft',
-            ['uses' => 'SmtProductController@copyToDraft', 'as' => 'smtProduct.copyToDraft']);        
+            ['uses' => 'SmtProductController@copyToDraft', 'as' => 'smtProduct.copyToDraft']);  
+        Route::get('groupManage',
+            ['uses' => 'SmtProductController@groupManage', 'as' => 'smtProduct.groupManage']);
+        Route::get('serviceManage',
+            ['uses' => 'SmtProductController@serviceManage', 'as' => 'smtProduct.serviceManage']);
+        Route::get('freightManage',
+            ['uses' => 'SmtProductController@freightManage', 'as' => 'smtProduct.freightManage']);
+        Route::get('getFreightDetailById',
+            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);           
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     
@@ -744,6 +752,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
     Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');
     
+    Route::post('smtAfterSale/ajaxGetTokenList',
+        ['uses' => 'Publish\Smt\AfterSalesServiceController@ajaxGetTokenList', 'as' => 'smtAfterSale.ajaxGetTokenList']);
+    
+    Route::resource('smtAfterSale', 'Publish\Smt\AfterSalesServiceController');
    
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);

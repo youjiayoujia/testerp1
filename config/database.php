@@ -92,7 +92,7 @@ return [
        // 'sellmore' => [
        //     'driver' => 'mysql',
        //     'host' => '127.0.0.1',
-       //     'database' => 'fangzheng',
+       //     'database' => 'erp',
        //     'username' => 'root',
        //     'password' => '',
        //     'charset' => 'utf8',

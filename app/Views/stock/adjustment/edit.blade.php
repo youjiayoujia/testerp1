@@ -11,10 +11,7 @@
         <div class="form-group col-sm-4">
             <label for="warehouse_id">仓库</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             <select name='warehouse_id' id='warehouse_id' class='form-control warehouse_id'>
-                <option>请选择仓库</option>
-                @foreach($warehouses as $warehouse)
-                    <option value={{ $warehouse->id }} {{ old('warehouse_id') ? old('warehouse_id') == $warehouse->id ? 'selected' : '' : $model->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{ $warehouse->name }}</option>
-                @endforeach
+                <option value="{{ $model->warehouse_id}}">{{ $model->warehouse ? $model->warehouse->name : ''}}</option>
             </select>
         </div>
         <div class="form-group col-sm-4">
@@ -289,12 +286,7 @@
         });
 
         $(document).on('change', '#warehouse_id', function(){
-            $('.warehouse_position_id').val('');
-            $('.type').val('IN');
-            $('.unit_price').attr('readonly', false);
-            $('.quantity').val('');
-            $('.unit_price').val('');
-            $('.sku').val('');
+            location.reload();
         });
         
         $('#check_time').cxCalendar();

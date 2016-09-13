@@ -132,6 +132,11 @@
                         </div>
                     @endif
                 @show{{-- 列表工具栏 --}}
+                <div class='row'>
+                <div class='col-lg-12'>
+                @section('beforeTable')@show
+                </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-12">
                         <table class="table table-bordered table-striped table-hover sortable">

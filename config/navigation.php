@@ -442,7 +442,33 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => 'smt销售代码设置',
+                'name' => 'SMT售后模版管理',
+                'url' => 'smtAfterSale.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT框架模版管理',
+                'url' => 'smtTemplate.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT产品分组',
+                'url' => 'smtProduct.groupManage',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT服务模版',
+                'url' => 'smtProduct.serviceManage',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT运费模版',
+                'url' => 'smtProduct.freightManage',
+                'icon' => '',
+            ],
+            
+            [
+                'name' => 'SMT销售代码设置',
                 'url' => 'smtSellerCode.index',
                 'icon' => '',
             ],
@@ -528,6 +554,20 @@ return [
                 [
                     'name' => '采购数据统计',
                     'url' => 'purchaseStaticstics',
+                    'icon' => '',
+                ],
+            ],
+            'CRM报表' => [
+                [
+                    'name' => '差评统计',
+                    'url'  => 'feeback.feedBackStatistics',
+                    'icon' => '',
+                ],
+            ],
+            '物流报表' => [
+                [
+                    'name' => '物流发货统计',
+                    'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
             ],

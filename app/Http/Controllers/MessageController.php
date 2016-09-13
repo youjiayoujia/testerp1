@@ -491,4 +491,42 @@ class MessageController extends Controller
         }
         return redirect(route('order.index'))->with('alert',$this->alert('发送失败，未知错误'));
     }
+
+    public function ebayUnpaidCase(){
+        $form = request()->input();
+        if(empty($form['disputeType']) || empty($form['order-id'])){
+            return 'asdasdasd';
+        }
+        $apiconfig = OrderModel::find($form['order-id'])->channelAccount->apiConfig;
+        $ebay = new EbayAdapter($apiconfig);
+        
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -60,4 +60,12 @@ class ItemModel extends BaseModel
         return config('order.item_status.' . $this->status);
     }
 
+    public function getItemChineseNameAttribute(){
+        if(!empty($this->item)){
+            return $this->item->c_name;
+        }else{
+            return '';
+        }
+    }
+
 }

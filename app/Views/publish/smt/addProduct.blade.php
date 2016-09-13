@@ -344,9 +344,9 @@ text-align: left;
                                nullmsg="包装重量在0.001-70.000之间" min="0.001" max="70" errormsg="包装重量要在0.001-70.000之间" value="<?php echo $draft_info ? $draft_info['grossWeight'] : '';?>">                      	    
 			</div>KG	                                    
         </div>
-        <div class="row">
-            <div class="form-group col-sm-1">
-                <input type="checkbox" name="isPackSell" id="isPackSell" value="1" <?php echo $draft_detail ? ($draft_detail['grossWeight'] ? 'checked' : '') : ''; ?> >自定义重量
+        <div class="row form-group">
+            <div class="col-sm-1 col-sm-offset-1">
+                <input type="checkbox" name="isPackSell" id="isPackSell" value="1" <?php echo $draft_detail ? ($draft_detail['grossWeight'] ? 'checked' : '') : ''; ?> ><span>自定义重量</span>
             </div>                         
         </div>
         
@@ -383,11 +383,11 @@ text-align: left;
                             if (array_key_exists('child', $g)) { //有子选项
                                 echo '<optgroup label="'.$g['group_name'].'">';
                                 foreach ($g['child'] as $r):
-                                    echo '<option value="' . $r['group_id'] . '" ' . ($smtApi->filterData('groupId', $draft_info) == $r['group_id'] ? 'selected="selected"' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;--' . $r['group_name'] . '</option>';
+                                    echo '<option value="' . $r['group_id'] . '" ' . ($smtApi->filterData('groupId', ($draft_info ? $draft_info->toArray() : '')) == $r['group_id'] ? 'selected="selected"' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;--' . $r['group_name'] . '</option>';
                                 endforeach;
                                 echo '</optgroup>';
                             }else {
-                                echo '<option value="' . $g['group_id'] . '" '.($smtApi->filterData('groupId', $draft_info) == $g['group_id'] ? 'selected="selected"' : '').'>' . $g['group_name'] . '</option>';
+                                echo '<option value="' . $g['group_id'] . '" '.($smtApi->filterData('groupId', ($draft_info ? $draft_info->toArray() : '')) == $g['group_id'] ? 'selected="selected"' : '').'>' . $g['group_name'] . '</option>';
                             }
                         endforeach;
                     ?>
@@ -1023,6 +1023,7 @@ $template['name'].'</option>';
         });
     });
 
+    //属性自定义图片上传
     K('.add-custom-image').click(function () {
         var lang = K(this).attr('lang');
         var input_next = K('.customizedPic-'+lang);
@@ -1043,6 +1044,32 @@ $template['name'].'</option>';
             });
         });
     });
+
+    $("#getskuinfo").click(function(){
+        var sku = $("#skuinfo").val();
+        if(sku=='')
+        {
+            alert('请输入SKU');
+            return false;
+        }
+
+        $.ajax({
+            url:'{{route('smt.getskuinfo')}}',
+            data:'sku='+sku,
+            type:'POST',
+            dataType: 'JSON',
+            success: function(data){
+                $("#grossWeight").val(data.data['weight']);
+                $("#packageLength").val(data.data['length']);
+                $("#packageWidth").val(data.data['width']);
+                $("#packageHeight").val(data.data['height']);
+                editor.html('');
+                //editor.appendHtml(data.data['products_html_mod']);
+                $("#templateId ").get(0).selectedIndex=1;
+                $("#promiseTemplateId ").get(0).selectedIndex=1;
+            }
+        })
+    })
  });
 
     //属性自定义图片上传
@@ -1054,38 +1081,7 @@ $template['name'].'</option>';
             now_length = $(this).val();
             $(this).closest('div').find('.help-block').html('还能够输入<i class="red">' + (num - now_length.length) + '</i>个字符');
     });
-
-    $("#getskuinfo").click(function(){
-        var sku = $("#skuinfo").val();
-        if(sku=='')
-        {
-            return false;
-        }
-
-        $.ajax({
-            url:'{{route('smt.getskuinfo')}}',
-            data:'sku='+sku,
-            type:'POST',
-            dataType: 'JSON',
-            success: function(data){
-
-                $("#grossWeight").val(data.data['weight']);
-                $("#packageLength").val(data.data['length']);
-                $("#packageWidth").val(data.data['width']);
-                $("#packageHeight").val(data.data['height']);
-                editor.html('');
-                editor.appendHtml(data.data['products_html_mod']);
-                $("#templateId ").get(0).selectedIndex=1;
-                $("#promiseTemplateId ").get(0).selectedIndex=1;
-
-               // $(".templateId").find("option[text='one']").attr("selected",true);
-               // $(".promiseTemplateId").find("option[text='Service Template for New Sellers']").attr("selected",true);
-                //  $("#detail").append(data.data['products_html_mod'])
-                /// alert(data.data['weight'])
-            }
-        })
-        //  alert(sku);
-    })
+   
    
     //删除主图片
     $(document).on('click', '.pic-del', function () {
@@ -1695,7 +1691,11 @@ $template['name'].'</option>';
                     if (data.data){ //说明有成功的，成功的添加到里边去
                         var liStr = '';
                         $.each(data.data, function(index, el){
-                            liStr += '<li><div><img src="' + el + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                       	 if(el.resize){
+                          	liStr += '<li><div><img src="' + (el.resize) + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el.remote + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                          }else{
+                          	liStr += '<li><div><img src="' + el + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                          }
                         });
                         $(obj).closest('div.form-group').find('ul').append(liStr);
                         layer.msg('图片上传成功', 2, -1);

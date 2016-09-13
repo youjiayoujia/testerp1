@@ -102,22 +102,24 @@
 
                             <div role="tabpanel" class="tab-pane panel-default" id="refund">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Refund the buyer:</h3>
+                                    <h3 class="panel-title">给买家退款:</h3>
                                 </div>
                                 <div class="panel-body">
-                                    <form class="form-horizontal">
+                                    <form class="form-horizontal" action="{{route('case.RefundBuyer')}}" METHOD="POST" id="refund-form">
+                                        <input type="hidden" name="id" value="{{$case->id}}">
+                                        {!! csrf_field() !!}
                                         <label>退款原因: </label>
                                         <select class="form-control">
                                             @foreach(config('order.reason') as $key => $reason)
                                                 <option value="">{{$reason}}</option>
                                             @endforeach
                                         </select>
-                                        <label>comments: </label>
-                                        <textarea class="form-control" rows="3"></textarea>
+                                        <label>备注: </label>
+                                        <textarea class="form-control" rows="3" name="reason"></textarea>
                                         <div class="row">
                                             <div class="col-lg-12">
 
-                                                <button type="button" class="btn btn-success" style="float: right">提交</button>
+                                                <button type="button" class="btn btn-success submit-refund" style="float: right">提交</button>
                                             </div>
                                         </div>
                                     </form>
@@ -221,6 +223,12 @@
                 }
 
                 $('.track-form').submit();
+            });
+
+            $('.submit-refund').click(function(){
+                if(confirm('确定退款？')){
+                    $('#refund-form').submit();
+                }
             });
 
 

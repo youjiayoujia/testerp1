@@ -49,6 +49,7 @@ use App\Models\Message\ReplyModel;
 use App\Jobs\Inorders;
 use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Models\Oversea\StockModel as fbaStock;
+use App\Models\Order\ItemModel as orderItemss;
 
 use BarcodeGen;
 
@@ -683,6 +684,28 @@ class TestController extends Controller
                 }
             }
 
+        }
+    }
+
+    public function getSmtIssue(){
+
+        $item = orderItemss::find(20);
+        dd($item->ItemChineseName);
+
+
+
+        foreach (AccountModel::all() as $account) {
+            if($account->account == 'darli04@126.com'){ //测试diver
+
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                
+                $messageList = $channel->getIssues();
+                
+                
+                
+                print_r($messageList);exit;
+
+            }
         }
     }
 }

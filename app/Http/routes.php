@@ -554,6 +554,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
+    //物流报表
+    Route::get('package/logisticsDelivery', ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
 
     //包裹报表
     Route::get('allReport/createData',
@@ -758,7 +760,15 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('showAccountToCopyProduct',
             ['uses' => 'SmtProductController@showAccountToCopyProduct', 'as' => 'smtProduct.showAccountToCopyProduct']);
         Route::post('copyToDraft',
-            ['uses' => 'SmtProductController@copyToDraft', 'as' => 'smtProduct.copyToDraft']);        
+            ['uses' => 'SmtProductController@copyToDraft', 'as' => 'smtProduct.copyToDraft']);  
+        Route::get('groupManage',
+            ['uses' => 'SmtProductController@groupManage', 'as' => 'smtProduct.groupManage']);
+        Route::get('serviceManage',
+            ['uses' => 'SmtProductController@serviceManage', 'as' => 'smtProduct.serviceManage']);
+        Route::get('freightManage',
+            ['uses' => 'SmtProductController@freightManage', 'as' => 'smtProduct.freightManage']);
+        Route::get('getFreightDetailById',
+            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);           
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     
@@ -780,10 +790,19 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('smtMonitor', 'Publish\Smt\SmtOnlineMonitorController');
     Route::resource('smtSellerCode','Publish\Smt\SmtSellerCodeController');
     
+    Route::post('smtAfterSale/ajaxGetTokenList',
+        ['uses' => 'Publish\Smt\AfterSalesServiceController@ajaxGetTokenList', 'as' => 'smtAfterSale.ajaxGetTokenList']);
+    
+    Route::resource('smtAfterSale', 'Publish\Smt\AfterSalesServiceController');
+    Route::post('smtTemplate/copyTemplate',
+        ['uses' => 'Publish\Smt\SmtTemplateController@copyTemplate', 'as' => 'smtTemplate.copyTemplate']);
+    
+    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');
    
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
- 
+    Route::any('uploadToProject',
+        ['uses' => 'KindeditorController@uploadToProject', 'as' => 'uploadToProject']);
 
     //开启工作流
     Route::any('message/startWorkflow',
@@ -856,7 +875,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('aliexpressCsvFormat',['as' => 'aliexpressCsvFormat', 'uses' => 'MessageController@aliexpressCsvFormat']);
     Route::any('doSendAliexpressMessages',['as' => 'doSendAliexpressMessages', 'uses' => 'MessageController@doSendAliexpressMessages']);
     Route::any('SendEbayMessage',['uses' => 'MessageController@SendEbayMessage', 'as' =>'message.sendEbayMessage']);
-
+    Route::any('ebayUnpaidCase',['uses' => 'MessageController@ebayUnpaidCase', 'as' =>'message.ebayUnpaidCase']);
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);
@@ -879,7 +898,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('ebayCases','Message\EbayCasesController');
     Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
+    Route::any('RefundBuyer',['as' => 'case.RefundBuyer', 'uses' => 'Message\EbayCasesController@RefundBuyer']);
+    
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
+    Route::any('feedBackStatistics',['uses' => 'Message\FeedBack\EbayFeedBackController@feedBackStatistics' , 'as' => 'feeback.feedBackStatistics' ]);
     Route::resource('refundCenter','RefundCenterController');
     Route::any('doPaypalRefund',['uses' =>'RefundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
     Route::any('batchProcessStatus',['uses' =>'RefundCenterController@batchProcessStatus' , 'as' => 'refund.batchProcessStatus']);
@@ -904,6 +926,7 @@ Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
 Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
+Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
 
 //spu
 Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);

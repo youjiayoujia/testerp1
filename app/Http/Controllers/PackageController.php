@@ -95,6 +95,47 @@ class PackageController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    public function logisticsDelivery()
+    {
+        $date = request()->input('date');
+        if(!$date) {
+            $date = date('Y-m-d');
+        }
+        $data = [];
+        $count = 0;
+        $totalWeight = 0;
+        $logisticses = LogisticsModel::where('is_enable', 1)->get();
+        foreach($logisticses as $key => $logistics) {
+            $data[$key]['logisticsName'] = $logistics->name;
+            $data[$key]['logisticsId'] = $logistics->id;
+            $data[$key]['logisticsPriority'] = $logistics->priority;
+            $data[$key]['weight'] = 0;
+            $data[$key]['percent'] = 0 . '%';
+            $packages = $this->model
+                ->where('logistics_id', $logistics->id)
+                ->where('shipped_at', '>=', $date . ' 00:00:00')
+                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00');
+            foreach($packages->get() as $package) {
+                $data[$key]['weight'] += $package->weight;
+            }
+            $data[$key]['quantity'] = $packages->count();
+            $count += $data[$key]['quantity'];
+            $totalWeight += $data[$key]['weight'];
+            if($count) {
+                $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
+            }
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+            'count' => $count,
+            'date' => $date,
+            'totalWeight' => $totalWeight,
+        ];
+
+        return view($this->viewPath . 'logisticsDelivery', $response);
+    }
+
     public function changeLogistics($arr, $id) 
     {
         $arr = explode(',', $arr);

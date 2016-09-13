@@ -178,7 +178,7 @@ class KindeditorController extends Controller
     
     public function uploadToProject(){
         //上传到的目录名称
-        $dir = trim($this->input->get_post('dir'));
+        $dir = trim(request()->input('dir'));
         $dir_name = empty($dir) ? 'image' : $dir; //目录名称
     
         $this->setControlParams('');
@@ -236,7 +236,8 @@ class KindeditorController extends Controller
             //获得文件扩展名
             $temp_arr = explode(".", $file_name);
             $file_ext = array_pop($temp_arr);
-            $filename = array_pop(explode('/', $temp_arr[0]));
+            $tmp = explode('/', $temp_arr[0]);
+            $filename = array_pop($tmp);
             $file_ext = trim($file_ext);
             $file_ext = strtolower($file_ext);
             //检查扩展名
@@ -244,9 +245,9 @@ class KindeditorController extends Controller
                 $this->alertMsg("上传文件扩展名是不允许的扩展名。\n只允许" . implode(",", $this->ext_arr['image']) . "格式。");
             }
     
-            $save_path = dirname(dirname(dirname(__DIR__))).'/attachments/upload/'; //保存路径
-            $save_url = '/';
-    
+            //$save_path = dirname(dirname(dirname(__DIR__))).'/attachments/upload/'; //保存路径
+            $save_path = public_path().'/plugins/kindeditor/attached/'; //保存路径
+            $save_url = $save_path;
             //创建文件夹
             if ($dir_name !== '') {
                 $save_path .= $dir_name . "/";

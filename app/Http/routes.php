@@ -756,10 +756,15 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Publish\Smt\AfterSalesServiceController@ajaxGetTokenList', 'as' => 'smtAfterSale.ajaxGetTokenList']);
     
     Route::resource('smtAfterSale', 'Publish\Smt\AfterSalesServiceController');
+    Route::post('smtTemplate/copyTemplate',
+        ['uses' => 'Publish\Smt\SmtTemplateController@copyTemplate', 'as' => 'smtTemplate.copyTemplate']);
+    
+    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');
    
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
- 
+    Route::any('uploadToProject',
+        ['uses' => 'KindeditorController@uploadToProject', 'as' => 'uploadToProject']);
 
     //开启工作流
     Route::any('message/startWorkflow',

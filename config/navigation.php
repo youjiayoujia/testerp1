@@ -425,6 +425,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => 'SMT框架模版管理',
+                'url' => 'smtTemplate.index',
+                'icon' => '',
+            ],
+            [
                 'name' => 'SMT产品分组',
                 'url' => 'smtProduct.groupManage',
                 'icon' => '',

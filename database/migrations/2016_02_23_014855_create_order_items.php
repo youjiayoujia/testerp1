@@ -29,6 +29,7 @@ class CreateOrderItems extends Migration
             $table->string('transaction_id')->comment('ebay transaction_id')->nullable()->default(null);
             $table->string('channel_order_id')->comment('渠道对应的订单id(wish 存 order_id)')->nullable()->default(null);
             $table->string('orders_item_number')->comment('产品的广告ID')->nullable()->default(null);
+            $table->integer('ebay_unpaid_status')->comment('ebay unpaid 平台取消訂單 ，1 已取消')->nullable()->default(null);
             $table->string('remark')->comment('备注')->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();

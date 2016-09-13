@@ -20,6 +20,7 @@ use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
 use App\Models\Message\SendEbayMessageListModel;
+use App\Models\Order\ItemModel;
 
 
 class MessageController extends Controller
@@ -484,9 +485,9 @@ class MessageController extends Controller
                $list->content    = $form['message-content'];
                $list->itemids    = implode(',',$form['item-ids']);
                $list->save();
-               return redirect(route('order.index'))->with('success',$this->alert('发送成功'));
+               return redirect(route('order.index'))->with('alert', $this->alert('success', '发送成功'));
            }else{
-               return redirect(route('order.index'))->with('alert',$this->alert('发送失败'));
+               return redirect(route('order.index'))->with('alert', $this->alert('danger', '发送失败'));
            }
         }
         return redirect(route('order.index'))->with('alert',$this->alert('发送失败，未知错误'));
@@ -494,13 +495,25 @@ class MessageController extends Controller
 
     public function ebayUnpaidCase(){
         $form = request()->input();
-        if(empty($form['disputeType']) || empty($form['order-id'])){
-            return 'asdasdasd';
-        }
-        $apiconfig = OrderModel::find($form['order-id'])->channelAccount->apiConfig;
-        $ebay = new EbayAdapter($apiconfig);
-        
+        if(empty($form['disputeType']) || empty($form['order_item_id'])){
+            return redirect(route('order.index'))->with('alert', $this->alert('danger', '参数不完整'));
 
+        }
+        $order_item = ItemModel::find($form['order_item_id']);
+        $ebay = new EbayAdapter($order_item->Order->channelAccount->apiConfig);
+
+        $order_item_number = $order_item->orders_item_number;
+        $transcation_id    = $order_item->transaction_id;
+        $disputeType       = $form['disputeType'];
+        if(!empty($order_item_number) || !empty($transcation_id) || !empty($disputeType)){
+            $result = $ebay->ebayUnpaidCase(compact('order_item_number','transcation_id','disputeType'));
+            if($result){
+                $order_item->ebay_unpaid_status = 1;
+                $order_item->save();
+                return redirect(route('order.index'))->with('alert', $this->alert('success', '操作成功'));
+            }
+        }
+        return redirect(route('order.index'))->with('alert', $this->alert('danger', '操作失败'));
 
     }
 

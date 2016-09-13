@@ -20,6 +20,7 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\Stock\TakingFormModel;
+use App\Jobs\StockTaking;
 
 class StockController extends Controller
 {
@@ -197,21 +198,15 @@ class StockController extends Controller
      */
     public function createTaking()
     {
-        Cache::store('file')->forever('stockIOStatus', '0');
-        $first = TakingModel::orderBy('id', 'desc')->first();
-        if($first && $first->check_status == '0') {
-            return redirect(route('stockTaking.index'))->with('alert', $this->alert('danger', '请先完成之前盘点'));
-        }
-        $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
-        $stocks_arr = $this->model->all()->chunk(1000);
-        foreach($stocks_arr as $stocks) {
-            foreach($stocks as $stock) 
-            {
-                $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
-            }
+        if(!Cache::store('file')->get('stockIOStatus')) {
+            return redirect(route('stockTaking.index'))->with('alert', $this->alert('fail', '盘点中...'));
+        } else {
+            $job = new StockTaking();
+            $job = $job->onQueue('stockTaking');
+            $this->dispatch($job);
         }
         
-        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
+        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '已加入队列'));
     }
 
     /**

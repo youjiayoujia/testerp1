@@ -32,7 +32,7 @@ class ShipmentCostModel extends BaseModel
     	'created_at'
     ];
 
-    public $searchFields = ['id' => 'ID', 'shipmentCostNum' => '批次号'];
+    public $searchFields = ['shipmentCostNum' => '批次号'];
 
     public function items()
     {

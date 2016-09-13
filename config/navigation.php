@@ -479,6 +479,11 @@ return [
                     'url' => 'purchaseStaticstics',
                     'icon' => '',
                 ],
+                [
+                    'name' => '缺货报告',
+                    'url' => 'purchase.outOfStock',
+                    'icon' => '',
+                ],
             ],
         ]
     ],

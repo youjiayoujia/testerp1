@@ -685,4 +685,20 @@ class TestController extends Controller
 
         }
     }
+
+    public function getSmtIssue(){
+        foreach (AccountModel::all() as $account) {
+            if($account->account == 'darli04@126.com'){ //测试diver
+
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+                
+                $messageList = $channel->getIssues();
+                
+                
+                
+                print_r($messageList);exit;
+
+            }
+        }
+    }
 }

@@ -20,7 +20,7 @@ class EbayCasesListsModel extends BaseModel{
         return $this->hasOne('App\Models\Channel\AccountModel', 'id', 'account_id');
     }
     public function orderItem(){
-        return $this->hasOne('App\Models\Order\ItemModel','id','related_order_id');
+        return $this->hasOne('App\Models\Order\ItemModel','order_id','related_order_id');
     }
 
     public function getCaseContentAttribute(){

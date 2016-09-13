@@ -875,7 +875,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('ebayCases','Message\EbayCasesController');
     Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
+    Route::any('RefundBuyer',['as' => 'case.RefundBuyer', 'uses' => 'Message\EbayCasesController@RefundBuyer']);
+    
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
+    Route::any('feedBackStatistics',['uses' => 'Message\FeedBack\EbayFeedBackController@feedBackStatistics' , 'as' => 'feeback.feedBackStatistics' ]);
     Route::resource('refundCenter','RefundCenterController');
     Route::any('doPaypalRefund',['uses' =>'RefundCenterController@doPaypalRefund', 'as' => 'refund.dopaypalrefund' ]);
     Route::any('batchProcessStatus',['uses' =>'RefundCenterController@batchProcessStatus' , 'as' => 'refund.batchProcessStatus']);
@@ -900,6 +903,7 @@ Route::any('cdiscountOrdersList', ['uses' => 'TestController@cdiscountOrdersList
 Route::any('getwishproduct', ['uses' => 'TestController@getWishProduct']);
 Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
 Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
+Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
 
 //spu
 Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);

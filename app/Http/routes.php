@@ -854,7 +854,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('aliexpressCsvFormat',['as' => 'aliexpressCsvFormat', 'uses' => 'MessageController@aliexpressCsvFormat']);
     Route::any('doSendAliexpressMessages',['as' => 'doSendAliexpressMessages', 'uses' => 'MessageController@doSendAliexpressMessages']);
     Route::any('SendEbayMessage',['uses' => 'MessageController@SendEbayMessage', 'as' =>'message.sendEbayMessage']);
-
+    Route::any('ebayUnpaidCase',['uses' => 'MessageController@ebayUnpaidCase', 'as' =>'message.ebayUnpaidCase']);
 
     //用户路由
     Route::get('productUser/ajaxUser', ['uses' => 'UserController@ajaxUser', 'as' => 'ajaxUser']);

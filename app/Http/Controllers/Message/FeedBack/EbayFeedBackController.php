@@ -131,27 +131,4 @@ class EbayFeedBackController extends Controller
         return view($this->viewPath . 'statistics',$response);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

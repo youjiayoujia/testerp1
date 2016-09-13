@@ -552,6 +552,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Order\BlacklistController@downloadUpdateBlacklist', 'as' => 'downloadUpdateBlacklist']);
     //订单投诉
     Route::resource('orderComplaint', 'Order\OrderComplaintController');
+    //物流报表
+    Route::get('package/logisticsDelivery', ['uses' => 'PackageController@logisticsDelivery', 'as' => 'package.logisticsDelivery']);
 
     //包裹报表
     Route::get('allReport/createData',

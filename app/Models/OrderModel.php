@@ -444,7 +444,7 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-        $data['ordernum'] = microtime(true);
+        $data['ordernum'] = str_replace('.', '', microtime(true));
         $currency = CurrencyModel::where('code', $data['currency']);
         if($currency->count() > 0) {
             foreach($currency->get() as $value) {

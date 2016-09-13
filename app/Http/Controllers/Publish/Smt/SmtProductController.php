@@ -14,7 +14,6 @@ use App\Models\Publish\Smt\smtTemplates;
 use App\Models\Publish\Smt\smtProductModule;
 use Illuminate\Support\Facades\Input;
 use App\Models\Channel\AccountModel;
-use App\Modules\Channel\ChannelModule;
 use App\Models\ChannelModel;
 use App\Modules\Channel\Adapter\AliexpressAdapter;
 use App\Models\Publish\Smt\smtProductUnit;
@@ -73,43 +72,42 @@ class SmtProductController extends Controller
         
         }          
         $flag = false; //是否同步成功
-        $ChannelModule = new ChannelModule();
         
         foreach ($token_array as $account) {   
-            $smtApi = $ChannelModule->driver($account->channel->driver, $account->api_config);
-         
+            $smtApi = Channel::driver($account->channel->driver, $account->api_config);
+            $account_id = $account->id;
             $data = $this->getProductGroupList($smtApi);
             if ($data) {                
                 //先变更成过期的再说
                 $oneData['last_update_time'] = date('Y-m-d H:i:s', strtotime('-2 day'));
-                //$this->Smt_product_group_model->where('token_id',$token_id)->update($oneData);
+                $this->Smt_product_group_model->where('token_id',$account_id)->update($oneData);
                 foreach ($data as $row) {  
-                    $options['token_id']         = $token_id;
+                    $options['token_id']         = $account_id;
                     $options['group_id']         = $row['groupId'];
                     $options['group_name']       = trim($row['groupName']);
                     $options['last_update_time'] = date('Y-m-d H:i:s');
                     //判断产品分组是否存在
-                    $id = $this->Smt_product_group_model->where(['token_id'=>$token_id,'group_id'=>$row['groupId']])->first();
-                    if (!$id) { //不存在插入
+                    $group_info = $this->Smt_product_group_model->where(['token_id'=>$account_id,'group_id'=>$row['groupId']])->first();
+                    if (!$group_info) { //不存在插入
                         $this->Smt_product_group_model->create($options);
                     } else { //存在就变更
-                        $options['id'] = $id;
-                        $this->Smt_product_group_model->update($options);
+                        $id = $group_info->id;
+                        $this->Smt_product_group_model->where('id',$id)->update($options);
                     }
                     if (array_key_exists('childGroup', $row)) { //含有子分组
                         foreach ($row['childGroup'] as $child) {
-                            $rs['token_id']         = $token_id;
+                            $rs['token_id']         = $account_id;
                             $rs['group_id']         = $child['groupId'];
                             $rs['group_name']       = trim($child['groupName']);
                             $rs['parent_id']        = $row['groupId'];
                             $rs['last_update_time'] = date('Y-m-d H:i:s');
 
-                            $cid = $this->Smt_product_group_model->where(['token_id'=>$token_id,'group_id'=>$child['groupId']])->first();
-                            if (!$cid) {
+                            $child_group = $this->Smt_product_group_model->where(['token_id'=>$account_id,'group_id'=>$child['groupId']])->first();
+                            if (!$child_group) {
                                 $this->Smt_product_group_model->create($rs);
                             } else {
-                                $rs['id'] = $cid;
-                                $this->Smt_product_group_model->update($rs);
+                                $cid = $child_group->id;
+                                $this->Smt_product_group_model->where('id',$cid)->update($rs);
                             }
                             unset($rs);
                             unset($cid);
@@ -117,16 +115,16 @@ class SmtProductController extends Controller
                     }
                     unset($options);
                     unset($id);
-                }
-                //删除过期的模板
-                $this->Smt_product_group_model->where('token_id',$token_id)->where('last_update_time','<',time())->delete();
-                $flag = true;//同步成功
+                    //删除过期的模板
+                    $this->Smt_product_group_model->where('token_id',$account_id)->where('last_update_time','<',time())->delete();
+                    $flag = true;//同步成功
+                }              
             }
             unset($data);
         }
         unset($token_array);
         if ($token_id && $flag && $return == 'data'){
-            $group_list = $this->getLocalProductGroupList($token_id);         
+            $group_list = $this->getLocalProductGroupList($account_id);         
             $options = '';
             if ($group_list){
                 foreach ($group_list as $group){                      
@@ -163,10 +161,9 @@ class SmtProductController extends Controller
         
         }          
         $flag = false; //是否同步成功
-
-        $ChannelModule = new ChannelModule();    
+    
         foreach ($token_array as $t) {
-            $smtApi = $ChannelModule->driver($t->channel->driver, $t->api_config);    
+            $smtApi = Channel::driver($t->channel->driver, $t->api_config);    
             $freight_list = $this->getOnlineFreightTemplateList($smtApi);
             if ($freight_list) { //模板信息
                 foreach ($freight_list as $row) {
@@ -183,15 +180,14 @@ class SmtProductController extends Controller
                     if (!$Info) {
                         $this->Smt_freight_template_model->create($options);
                     } else {//更新下数据
-                        $options['id'] = $Info['id'];
-                        $this->Smt_freight_template_model->update($options);
+                        $this->Smt_freight_template_model->where('id',$Info['id'])->update($options);
                     }    
                     unset($freight_info);
                     unset($id);
                     unset($options);
                 }
                 //删除本地过期的运费模板
-                $this->Smt_freight_template_model->where('token_id',$token_id)->where('last_update_time','<',time())->delete();
+                $this->Smt_freight_template_model->where('token_id',$t['id'])->where('last_update_time','<',time())->delete();
                 $flag = true;
             }
             unset($freight_list);
@@ -228,10 +224,9 @@ class SmtProductController extends Controller
             $token_array      = AccountModel::where('channel_id',$this->channel_id)->get();
         
         }          
-        $flag = false; //是否同步成功
-        $ChannelModule = new ChannelModule();   
+        $flag = false; //是否同步成功   
         foreach ($token_array as $t) {
-            $smtApi = $ChannelModule->driver($t->channel->driver, $t->api_config);
+            $smtApi = Channel::driver($t->channel->driver, $t->api_config);
             $data = $this->queryPromiseTemplateById($smtApi);
             if ($data) {
                 //先把数据变更成过期的
@@ -244,17 +239,16 @@ class SmtProductController extends Controller
                     $options['last_update_time'] = date('Y-m-d H:i:s');
     
                     $Info = $this->Smt_service_template_model->where(['token_id'=>$t['id'],'serviceID'=>$row['id']])->first();
-                    if (!$Info) { //不存在就插入
+                    if (!$Info) {
                         $this->Smt_service_template_model->create($options);
-                    } else { //存在就UPDATE
-                        $options['id'] = $Info['id'];
-                        $this->Smt_service_template_model->update($options);
+                    } else {                       
+                        $this->Smt_service_template_model->where('id',$Info['id'])->update($options);
                     }
                     unset($options);
                     unset($id);
                 }
                 //删除过期未同步的模板
-                $this->Smt_service_template_model->where('token_id',$token_id)->where('last_update_time','<',time())->delete();
+                $this->Smt_service_template_model->where('token_id',$t['id'])->where('last_update_time','<',time())->delete();
                 $flag = true;
             }
             unset($data);
@@ -313,7 +307,7 @@ class SmtProductController extends Controller
         $api    = 'api.getProductGroupList';
         $result = $smtApi->getJsonData($api, '', true);
         $data   = json_decode($result, true);
-        return $data['success'] ? $data['target'] : false;
+        return isset($data['success']) ? $data['target'] : false;
     }
     
     /**
@@ -326,7 +320,7 @@ class SmtProductController extends Controller
         $api    = 'api.listFreightTemplate';
         $result = $smtApi->getJsonData($api, '', true); //现在需要签名了
         $data   = json_decode($result, true);    
-        return $data['success'] ? $data['aeopFreightTemplateDTOList'] : false;
+        return isset($data['success']) ? $data['aeopFreightTemplateDTOList'] : false;
     }
     
    /**
@@ -339,7 +333,7 @@ class SmtProductController extends Controller
         $api    = 'api.getFreightSettingByTemplateQuery';
         $result = $smtApi->getJsonData($api, 'templateId=' . $templateId);
         $data   = json_decode($result, true);
-        return $data['success'] ? $data : false;
+        return isset($data['success']) ? $data : false;
     }
     
     /**
@@ -354,7 +348,7 @@ class SmtProductController extends Controller
         $result = $smtApi->getJsonData($api, 'templateId=' . $templateId, true);
         $data   = json_decode($result, true);
     
-        return $data['templateList'] ? $data['templateList'] : false;
+        return isset($data['templateList']) ? $data['templateList'] : false;
     }
     
     /**
@@ -924,7 +918,106 @@ class SmtProductController extends Controller
             unset($list_info);
         }
         
-            $this->ajax_return('另存为草稿' . ($flag ? '成功' : '失败'), $flag, $error);
+        $this->ajax_return('另存为草稿' . ($flag ? '成功' : '失败'), $flag, $error);
+    }
+    
+    /**
+     * 产品分组管理
+     * @return [type] [description]
+     */
+    public function groupManage()
+    {   
+        $this->mainTitle = "产品分组";
+        $this->mainIndex = route('smtProduct.groupManage');
+        $token_id = request()->input('token_id');  
+        $group = $this->Smt_product_group_model->getProductGroupList($token_id);
+    
+        //速卖通账号列表查询条件   
+        $channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
+        $account_list = AccountModel::where(['channel_id'=>$channel_id,'is_available' => 1])->get();
+        foreach($account_list as $account){
+            $token_array[$account['id']] = $account->toArray();
+        }
+        
+        
+        if($token_id){
+            $list =  $this->Smt_product_group_model->where('token_id',$token_id)->groupBy('token_id');
+        }else{
+            $list = $this->Smt_product_group_model->groupBy('token_id');
+        }
+        $response = array(
+            'metas'    => $this->metas(__FUNCTION__),
+            'data'     => $this->autoList($this->Smt_product_group_model,$list),
+            'group'    => $group,
+            'token'    => $token_array,
+            'token_id' => $token_id
+        );
+        
+        return view($this->viewPath.'group_list',$response);
+    }
+    
+    /**
+     * 服务模板列表管理
+     */
+    public function serviceManage(){
+        $this->mainTitle = "SMT服务模版";
+        $this->mainIndex = route('smtProduct.serviceManage');
+        $token_id = request()->input('token_id');
+
+        //速卖通账号列表查询条件
+        $channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
+        $account_list = AccountModel::where(['channel_id'=>$channel_id,'is_available' => 1])->get();
+        foreach($account_list as $account){
+            $token_array[$account['id']] = $account->toArray();
+        }
+        $list = '';
+        if($token_id){
+            $list =  $this->Smt_service_template_model->where('token_id',$token_id);
+        }
+        $response = array(
+            'metas'    => $this->metas(__FUNCTION__),
+            'data'     => $this->autoList($this->Smt_service_template_model,$list),
+            'token'    => $token_array,
+            'token_id' => $token_id
+        );
+        return view($this->viewPath.'service_list',$response);
+    }
+    
+    /**
+     * 运费模版列表管理
+     */
+    public function freightManage(){
+        $this->mainTitle = "SMT运费模版";
+        $this->mainIndex = route('smtProduct.freightManage');        
+        $token_id = request()->input('token_id');
+        
+        //速卖通账号列表查询条件
+        $channel_id = ChannelModel::where('driver','aliexpress')->first()->id;
+        $account_list = AccountModel::where(['channel_id'=>$channel_id,'is_available' => 1])->get();
+        foreach($account_list as $account){
+            $token_array[$account['id']] = $account->toArray();
+        }
+        $list = '';
+        if($token_id){
+            $list =  $this->Smt_freight_template_model->where('token_id',$token_id);
+        }
+        $response = array(
+            'metas'    => $this->metas(__FUNCTION__),
+            'data'     => $this->autoList($this->Smt_freight_template_model,$list),  
+            'token'    => $token_array,
+            'token_id' => $token_id
+        );
+        return view($this->viewPath.'freight_list',$response);
+    }
+    
+    public function getFreightDetailById(){
+        $this->mainTitle = "运费模版详情";
+        $id = request()->input('id');
+        $response = array(
+            'metas'    => $this->metas(__FUNCTION__),
+            'data'     => $this->autoList($this->Smt_freight_template_model->where('id',$id)),  
+        );
+        return view($this->viewPath.'show_freight_detail',$response);
     }
     
     

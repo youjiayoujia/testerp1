@@ -154,8 +154,8 @@
                 <input type="text" class="form-control" id="category_keyword" placeholder="关键词" name="category_keyword" />	                 
             </div>
             <div class="col-sm-4">
-				<a class="btn btn-default btn-sm" id="command_btn">推荐类目</a>
-				<a class="btn btn-default btn-sm" id="choose_btn">本地选择</a>
+				<a class="btn btn-default btn-sm form-group" id="command_btn">推荐类目</a>
+				<a class="btn btn-default btn-sm form-group" id="choose_btn">本地选择</a>
 			</div>
         </div>
         <div class="row">
@@ -169,8 +169,7 @@
 						</select>
 					</div>
 				</div>
-				<div class="hide" id="category_ajax_select">
-				    
+				<div class="hide" id="category_ajax_select">				    
 				</div>
 			</div>
         </div>
@@ -178,7 +177,7 @@
             <div class="form-group col-sm-2">
                 <label for="subject" class="right">已选择分类：</label>
             </div>
-            <div class="col-sm-10">
+            <div class="form-group col-sm-10">
     	        <input type="text" class="form-control" readonly="readonly" id="category_name"/>
     	        <input type="hidden" id="category_id" name="category_id" datatype="*" nullmsg="必须选择分类" />
 				    

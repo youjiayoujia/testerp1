@@ -452,6 +452,8 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Picklist\ErrorListController@ajaxProcess', 'as' => 'errorList.ajaxProcess']);
     Route::resource('errorList', 'Picklist\ErrorListController');
     //拣货路由
+    Route::get('pickList/printInfo',
+        ['uses' => 'PickListController@printInfo', 'as' => 'pickList.printInfo']);
     Route::get('pickList/changePickBy',
         ['uses' => 'PickListController@changePickBy', 'as' => 'pickList.changePickBy']);
 
@@ -573,6 +575,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('exportPackage', 'ExportPackageController');
 
     //包裹管理路由
+    Route::get('package/bagInfo',
+        ['uses' => 'PackageController@bagInfo', 'as' => 'package.bagInfo']);
     Route::get('package/packageReport',
         ['uses' => 'PackageController@packageReport', 'as' => 'package.packageReport']);
     Route::get('package/removePackages/{arr}',

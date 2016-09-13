@@ -52,9 +52,21 @@ class StockModel extends BaseModel
             ],
             'filterFields' => [],
             'filterSelects' => [],
-            'selectRelatedSearchs' => [],
+            'selectRelatedSearchs' => [
+                'account' => ['account' => $this->getArray('App\Models\Channel\AccountModel', 'account')]
+            ],
             'sectionSelect' => [],
         ];
+    }
+
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->$name] = $single->$name;
+        }
+        return $arr;
     }
 
     public function account()

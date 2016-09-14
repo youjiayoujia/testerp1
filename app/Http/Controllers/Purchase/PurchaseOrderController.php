@@ -23,6 +23,7 @@ use App\Models\Purchase\PurchasePostageModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\PackageModel;
+use Excel;
 use Tool;
 use App\Jobs\Job;
 
@@ -874,7 +875,6 @@ class PurchaseOrderController extends Controller
      */
     public function outOfStock()
     {
-        //echo '<pre>';
         $item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
             ->where('packages.status','NEED')
             ->distinct()
@@ -890,6 +890,48 @@ class PurchaseOrderController extends Controller
 
         return view($this->viewPath . 'outOfStockIndex', $response);
         
+    }
+
+    /**
+     * 导出缺货报表
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function exportOutOfStockCsv()
+    {   //echo '<pre>';
+        $item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->where('packages.status','NEED')
+            ->distinct()
+            ->get(['package_items.item_id'])
+            ->toArray();
+
+        $rows = [];
+        $warehouses = WarehouseModel::all();
+        //print_r($item_id_arr);exit;
+        foreach($item_id_arr as $item_id) {
+            $model = $this->item->find($item_id['item_id']);
+            foreach($warehouses as $warehouse){
+               $rows[] = [
+                    'sku号' => $model->sku,
+                    '所属仓库' => $warehouse->name,
+                    '物品名称' => $model->c_name,
+                    '在途' => $model->transit_quantity[$warehouse->id]['normal'],
+                    '特采在途' => $model->transit_quantity[$warehouse->id]['special'],
+                    '欠货数量' => $model->out_of_stock,
+                    '虚库存' => $model->warehouse_quantity[$warehouse->id]['available_quantity'],
+                    '实库存' => $model->warehouse_quantity[$warehouse->id]['all_quantity'],
+                    '最近采购' => $model->recently_purchase_time,
+                ]; 
+            }       
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');        
     }
         
 }

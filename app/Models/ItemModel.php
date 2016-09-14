@@ -245,6 +245,12 @@ class ItemModel extends BaseModel
         return $this->purchase->min('created_at');
     }
 
+    //最近缺货时间
+    public function getOutOfStockTimeAttribute()
+    {
+        return $this->purchase->min('created_at');
+    }
+
     public function getStatusNameAttribute()
     {
         $config = config('item.status');

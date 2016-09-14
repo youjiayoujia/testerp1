@@ -204,6 +204,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('/addPurchaseOrder', 'Purchase\RequireController@addPurchaseOrder');
     Route::resource('require', 'Purchase\RequireController');
     Route::any('purchase/require/createAllPurchaseOrder', ['uses' => 'Purchase\RequireController@createAllPurchaseOrder', 'as' => 'purchaseRequire.createAllPurchaseOrder']);
+    Route::any('purchaseOrder/exportOutOfStockCsv', ['uses' => 'Purchase\PurchaseOrderController@exportOutOfStockCsv', 'as' => 'purchase.exportOutOfStockCsv']);
     //未结算订单
     Route::resource('closePurchaseOrder', 'Purchase\ClosePurchaseOrderController');
     //采购单

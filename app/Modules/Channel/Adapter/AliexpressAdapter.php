@@ -1423,14 +1423,15 @@ Class AliexpressAdapter implements AdapterInterface
      * 纠纷
      */
     public function getIssues(){
-
+        $count = 1;
+        $issueAry = [];
         $issue_ary = array(
             'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
-            'SELLER_REFUSE_REFUND', //卖家拒绝纠
+           // 'SELLER_REFUSE_REFUND', //卖家拒绝纠
+           // 'ARBITRATING', // 仲裁中
             // 'ACCEPTISSUE', //卖家接受纠纷     相当于完成了的纠纷
             // 'WAIT_BUYER_SEND_GOODS', //等待买家发货
             //  'WAIT_SELLER_RECEIVE_GOODS', // 买家发货，等待卖家收货
-            'ARBITRATING', // 仲裁中
             //   'SELLER_RESPONSE_ISSUE_TIMEOUT' // 卖家响应纠纷超时  对应相关超时的不需要获取
         );
         $page = 1;
@@ -1443,25 +1444,44 @@ Class AliexpressAdapter implements AdapterInterface
                 $method = 'api.queryIssueList';
                 $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
                 $issue_list = json_decode($this->getJsonData($method, $para));
-                dd($issue_list);
                 if(isset($issue_list->success)) {
-                    foreach ($issue_list->dataList as $item) {
-
+                    foreach ($issue_list->dataList as $key => $item) {
                         $detail_param = "issueId=".$item->id;
-                        $issue_detail = json_decode($this->getJsonData('api.queryIssueDetail',$detail_param));
-                        dd($issue_detail);exit;
-/*                        DB::beginTransaction();
+                        $return_detail = json_decode($this->getJsonData('alibaba.ae.issue.findIssueDetailByIssueId',$detail_param));
 
-                        DB::commit();*/
+                        if(isset($return_detail->success)){
+                            $issue_detail = $return_detail;
+                        }else{
+                            $issue_detail = '';
+                        }
+
+                        $issueAry[] = [
+                            'issue_id'      => $item->id,
+                            'gmtModified'   => $item->gmtModified,
+                            'issueStatus'   => $item->issueStatus,
+                            'gmtCreate'     => $item->gmtCreate,
+                            'reasonChinese' => $item->reasonChinese,
+                            'orderId'       => $item->orderId,
+                            'reasonEnglish' => $item->reasonEnglish,
+                            'issue_detail'  => $issue_detail,
+                            'issueType'     => $issue,
+                        ];
+
+                        $count +=1 ;
+                        if($count == 100)
+                        return $issueAry;
+                        //测试断点  ！！！！！！！！！！！！
 
                     }
                 }else{
                     break;
                 }
-
             }
 
+
         }
+
+        return $issueAry;
 
     }
    public function changetime($time){

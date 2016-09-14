@@ -904,6 +904,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('RefundCsvFormat',['uses' => 'RefundCenterController@RefundCsvFormat', 'as' =>'refund.cvsformat']);
     Route::any('financeExport',['uses' => 'RefundCenterController@financeExport', 'as' =>'refund.financeExport']);
     Route::any('changeReundNoteStatus',['uses' => 'RefundCenterController@changeReundNoteStatus','as' =>'refund.changeReundNoteStatus']);
+    Route::resource('AliexpressIssue','Message\Dispute\AliexpressIssueController');
 });
 
 

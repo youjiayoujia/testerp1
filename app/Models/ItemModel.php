@@ -248,7 +248,20 @@ class ItemModel extends BaseModel
     //最近缺货时间
     public function getOutOfStockTimeAttribute()
     {
-        return $this->purchase->min('created_at');
+        $id = $this->id;
+        $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+                ->whereIn('packages.status', ['NEED'])
+                ->where('package_items.item_id', $id)
+                ->first(['packages.created_at']);
+
+        if($firstNeedItem){
+            $firstNeedItem = $firstNeedItem->toArray();
+            $time = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+        }else{
+            $time = 0;
+        } 
+        
+        return $time;
     }
 
     public function getStatusNameAttribute()

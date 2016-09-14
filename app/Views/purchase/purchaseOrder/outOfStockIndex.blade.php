@@ -1,11 +1,34 @@
 @extends('common.table')
-@section('tableToolButtons')
-    <div class="btn-group">
-        <a href="javascript:" class="btn btn-warning download">CSV导出
-            <i class="glyphicon glyphicon-arrow-down"></i>
-        </a>
-    </div>
-@stop{{-- 工具按钮 --}}
+@section('tableToolbar')
+
+    <form action="{{ route('purchase.outOfStock') }}" method="get">
+        <div class="form-group col-lg-12">
+            SKU：<input type="text" id="sku" name='sku' value='{{$sku}}'>
+            采购人：
+            <select id="user_id" name='user_id'>
+                <option value="0">全部</option>
+                @foreach($users as $user)
+                    <option value="{{$user->id}}" {{ $user_name==$user->name?'selected':'' }} >{{$user->name}}</option>
+                @endforeach
+            </select>
+            产品状态：
+            <select id="status" name='status'>
+                <option value="0">全部</option>
+                @foreach(config('item.status') as $key=>$value)
+                    <option value='{{$key}}'  {{ $status==$key?'selected':'' }} >{{$value}}</option>
+                @endforeach
+            </select>
+            时间<input type="text" name='date_from' id='date_from' class='datetimepicker_dark' value='{{$date_from}}'>--<input type="text" name='date_to' id='date_to' class='datetimepicker_dark' value='{{$date_to}}'>
+            <button class="search">查询</button>
+            <a href="javascript:" class="btn btn-warning download">CSV导出
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </a>
+        </div>
+    </form>
+    
+
+   
+@stop
 @section('tableHeader')
     <th>SKU号</th>
     <th>所属仓库</th>
@@ -32,17 +55,24 @@
 	            <td>{{$item->warehouse_quantity[$warehouse->id]['available_quantity']}}</td>
 	            <td>{{$item->warehouse_quantity[$warehouse->id]['all_quantity']}}</td>
 	            <td>{{$item->recently_purchase_time}}</td>
-	            <td></td>
+	            <td>{{$item->out_of_stock_time}}</td>
 	        </tr>
         @endforeach
     @endforeach
 @stop
 
 @section("childJs")
+<script src="{{ asset('js/jquery.datetimepicker.full.js') }}"></script>
 <script type='text/javascript'>
+$('.datetimepicker_dark').datetimepicker({theme:'dark'})
     $(document).ready(function(){
         $(document).on('click', '.download', function(){
-            location.href="{{ route('purchase.exportOutOfStockCsv')}}";
+            var user_id = $("#user_id").val();
+            var status = $("#status").val();
+            var sku = $("#sku").val();
+            var date_from = $("#date_from").val();
+            var date_to = $("#date_to").val();
+            location.href="{{ route('purchase.exportOutOfStockCsv')}}?user_id="+user_id+"&status="+status+"&sku="+sku+"&date_from="+date_from+"&date_to="+date_to;
         })
     })
 </script>

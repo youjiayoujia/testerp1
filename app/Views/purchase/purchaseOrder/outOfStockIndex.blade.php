@@ -1,6 +1,10 @@
 @extends('common.table')
 @section('tableToolButtons')
-    
+    <div class="btn-group">
+        <a href="javascript:" class="btn btn-warning download">CSV导出
+            <i class="glyphicon glyphicon-arrow-down"></i>
+        </a>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th>SKU号</th>
@@ -34,6 +38,12 @@
     @endforeach
 @stop
 
-@section('childJs')
-    
+@section("childJs")
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $(document).on('click', '.download', function(){
+            location.href="{{ route('purchase.exportOutOfStockCsv')}}";
+        })
+    })
+</script>
 @stop

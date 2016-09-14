@@ -10,6 +10,7 @@ use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\ZoneModel;
+use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
 
 class PackageModel extends BaseModel
@@ -67,10 +68,18 @@ class PackageModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        $arr = [];
+        $arr1 = [];
+        $channels = ChannelModel::all();
+        foreach($channels as $single) {
+            $arr[$single->name] = $single->name;
+        }
+        $accounts = AccountModel::all();
+        foreach($accounts as $account) {
+            $arr1[$account->account] = $account->account;
+        }
         return [
             'relatedSearchFields' => [
-                'channel' => ['name'],
-                'channelAccount' => ['account'],
                 'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
@@ -81,6 +90,8 @@ class PackageModel extends BaseModel
             ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
+                'channel' => ['name' => $arr],
+                'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
         ];

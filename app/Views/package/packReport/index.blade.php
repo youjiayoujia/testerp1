@@ -95,8 +95,6 @@ $(document).ready(function(){
         quantity = $('.quantity').val();
         date = $('.date').val();
         userid = $('.userid').val();
-        alert(userid);
-        alert(date);
         if(time && quantity) {
             $.get(
                 "{{ route('packReport.changeData')}}",

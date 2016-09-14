@@ -31,8 +31,7 @@ class PackReportController extends Controller
         request()->flash();
         $model = $this->model->orderBy('day_time', 'desc')->first();
         $last_time = '';
-        $buf = $this->model->where('day_time', '>', date('Y-m', strtotime('+1 month')))->get();
-        $monthModel = $this->model->whereBetween('day_time', [date('Y-m', strtotime('now')), date('Y-m', strtotime('+1 month'))])->get();
+        $monthModel = $this->model->whereBetween('day_time', [date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
         if($model) {
             $last_time = $model->day_time;
             $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);

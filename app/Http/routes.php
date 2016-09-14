@@ -695,7 +695,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('changeStatusToWait',
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
         Route::post('batchModify',
-            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);        
+            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);                       
     });
    
     Route::resource('smt', 'Publish\Smt\SmtController');
@@ -759,8 +759,19 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('smtTemplate/copyTemplate',
         ['uses' => 'Publish\Smt\SmtTemplateController@copyTemplate', 'as' => 'smtTemplate.copyTemplate']);
     
-    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');
-   
+    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');   
+    
+    Route::post('smtAccountManage/doAction',
+        ['uses' => 'Publish\Smt\smtAccountManageController@doAction', 'as' => 'smtAccountManage.doAction']);
+    Route::post('smtAccountManage/resetAuthorization',
+        ['uses' => 'Publish\Smt\smtAccountManageController@resetAuthorization', 'as' => 'smtAccountManage.resetAuthorization']);
+    
+    Route::resource('smtAccountManage', 'Publish\Smt\smtAccountManageController');
+    
+    Route::post('smtPriceTask/batchDelete',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@batchDelete', 'as' => 'smtPriceTask.batchDelete']);    
+    Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
+    
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
     Route::any('uploadToProject',

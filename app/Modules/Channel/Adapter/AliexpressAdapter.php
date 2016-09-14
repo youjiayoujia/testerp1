@@ -460,6 +460,17 @@ Class AliexpressAdapter implements AdapterInterface
         $postdata = "grant_type=refresh_token&client_id=" . $this->_appkey . "&client_secret=" . $this->_appsecret . "&refresh_token=" . $refresh_token . "";
         return $this->postCurlHttpsData($serverurl, $postdata);
     }
+    
+    /**
+     *
+     * 使用code获取令牌
+     * 返回令牌   refresh_token 用于刷新令牌  access_token 用于获取数据  memderID 用户ID
+     */
+    public function getAppCode($code) {
+        $getAppCodeUrl = "https://" . self::GWURL . "/openapi/http/".$this->_version."/system.oauth2/getToken/" . $this->_appkey . "";
+        $postdata = "grant_type=authorization_code&need_refresh_token=true&client_id=" . $this->_appkey . "&client_secret=" . $this->_appsecret . "&redirect_uri=" . $this->_returnurl . "&code=" . $code . "";
+        return $this->postCurlHttpsData ( $getAppCodeUrl, $postdata );
+    }
 
     /**
      * Curl https Post 数据

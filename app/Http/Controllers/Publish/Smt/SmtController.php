@@ -1735,7 +1735,8 @@ html;
         $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
         }
         $data = json_decode($result, true);
-        if ($data['success'] && $data['total'] > 0) {
+        dd($data);
+        if (isset($data['success']) && $data['total'] > 0) {
            $rs = $data['cateogryIds'];
         }
         

@@ -22,15 +22,18 @@ use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
+use App\Models\PackageModel;
+use Excel;
 use Tool;
 use App\Jobs\Job;
 
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem)
+    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem,ItemModel $item)
     {
         $this->model = $purchaseOrder;
+        $this->item = $item;
         $this->purchaseItem = $purchaseItem;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
@@ -845,7 +848,7 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * ajax请求  sku
+     * 采购统计数据
      *
      * @param none
      * @return obj
@@ -861,6 +864,74 @@ class PurchaseOrderController extends Controller
         ];
 
         return view($this->viewPath . 'staticsticsIndex', $response);
+    }
+
+    /**
+     * 缺货报表
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function outOfStock()
+    {
+        $item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->where('packages.status','NEED')
+            ->distinct()
+            ->get(['package_items.item_id'])
+            ->toArray();
+
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->item,$this->item->whereIn('id',$item_id_arr)),
+            'warehouses' => WarehouseModel::all(),
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'outOfStockIndex', $response);
+        
+    }
+
+    /**
+     * 导出缺货报表
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function exportOutOfStockCsv()
+    {   //echo '<pre>';
+        $item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->where('packages.status','NEED')
+            ->distinct()
+            ->get(['package_items.item_id'])
+            ->toArray();
+
+        $rows = [];
+        $warehouses = WarehouseModel::all();
+        //print_r($item_id_arr);exit;
+        foreach($item_id_arr as $item_id) {
+            $model = $this->item->find($item_id['item_id']);
+            foreach($warehouses as $warehouse){
+               $rows[] = [
+                    'sku号' => $model->sku,
+                    '所属仓库' => $warehouse->name,
+                    '物品名称' => $model->c_name,
+                    '在途' => $model->transit_quantity[$warehouse->id]['normal'],
+                    '特采在途' => $model->transit_quantity[$warehouse->id]['special'],
+                    '欠货数量' => $model->out_of_stock,
+                    '虚库存' => $model->warehouse_quantity[$warehouse->id]['available_quantity'],
+                    '实库存' => $model->warehouse_quantity[$warehouse->id]['all_quantity'],
+                    '最近采购' => $model->recently_purchase_time,
+                ]; 
+            }       
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');        
     }
         
 }

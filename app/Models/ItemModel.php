@@ -4,6 +4,7 @@ namespace App\Models;
 use Tool;
 use DB;
 use App\Base\BaseModel;
+use App\Models\WarehouseModel;
 use App\Models\Warehouse\PositionModel;
 use App\Models\Purchase\RequireModel;
 use App\Models\Purchase\PurchasesModel;
@@ -154,7 +155,7 @@ class ItemModel extends BaseModel
     {
         $zaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
+            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==0) {
                     $zaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                 }
@@ -169,7 +170,7 @@ class ItemModel extends BaseModel
     {
         $szaitu_num = 0;
         foreach ($this->purchase as $purchaseItem) {
-            if ($purchaseItem->status > 0 || $purchaseItem->status < 4) {
+            if ($purchaseItem->status > 0 && $purchaseItem->status < 4) {
                 if (!$purchaseItem->purchaseOrder->write_off&&$purchaseItem->purchaseOrder->type==1) {
                     $szaitu_num += $purchaseItem->purchase_num - $purchaseItem->storage_qty - $purchaseItem->unqualified_qty;
                 }
@@ -177,6 +178,77 @@ class ItemModel extends BaseModel
         }
 
         return $szaitu_num;
+    }
+
+    //分仓实库存和虚库存
+    public function getWarehouseQuantityAttribute()
+    {
+        $data = [];
+        $stockCollection = $this->stocks->groupBy('warehouse_id');
+        foreach($stockCollection as $colleciton){
+            $data[$colleciton[0]->warehouse_id]['all_quantity'] = $colleciton->sum('all_quantity');
+            $data[$colleciton[0]->warehouse_id]['available_quantity'] = $colleciton->sum('available_quantity');    
+        }
+        $warehouses = WarehouseModel::all();
+        foreach($warehouses as $warehouse){
+            if(!array_key_exists($warehouse->id,$data)){
+                $data[$warehouse->id]['all_quantity'] = 0;
+                $data[$warehouse->id]['available_quantity'] = 0;
+            }
+        }
+
+        return $data;
+    }
+
+    //分仓特采和普采在途库存
+    public function getTransitQuantityAttribute()
+    {
+        $data = [];
+        foreach ($this->purchase->groupBy('warehouse_id') as $purchaseItemCollection) {
+            $warehouse_id = $purchaseItemCollection[0]->warehouse_id;
+            $data[$warehouse_id]['normal'] = 0;
+            $data[$warehouse_id]['special'] = 0;
+            foreach ($purchaseItemCollection as $purchaseItem) {          
+                if($purchaseItem->purchaseOrder->status>0&&$purchaseItem->purchaseOrder->status<4){
+                    if($purchaseItem->purchaseOrder->type==0){
+                        $data[$warehouse_id]['normal'] += $purchaseItem->purchase_num;
+                    }else{
+                        $data[$warehouse_id]['special'] += $purchaseItem->purchase_num;
+                    }  
+                }
+            }
+        }
+        $warehouses = WarehouseModel::all();
+        foreach($warehouses as $warehouse){
+            if(!array_key_exists($warehouse->id,$data)){
+                $data[$warehouse->id]['normal'] = 0;
+                $data[$warehouse->id]['special'] = 0;
+            }
+        }
+        
+        return $data;
+    }
+
+    //欠货数量
+    public function getOutOfStockAttribute()
+    {
+        $item_id = $this->id;
+        $num = DB::select('select sum(package_items.quantity) as num from packages,package_items where packages.status= "NEED" and package_items.item_id = "'.$item_id.'" and 
+                packages.id = package_items.package_id')[0]->num;
+
+        return $num;
+    }
+
+    //最近一次采购时间
+    public function getRecentlyPurchaseTimeAttribute()
+    {
+        return $this->purchase->min('created_at');
+    }
+
+    //最近缺货时间
+    public function getOutOfStockTimeAttribute()
+    {
+        return $this->purchase->min('created_at');
     }
 
     public function getStatusNameAttribute()

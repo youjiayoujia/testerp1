@@ -570,6 +570,11 @@ return [
                     'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
+                [
+                    'name' => '缺货报告',
+                    'url' => 'purchase.outOfStock',
+                    'icon' => '',
+                ],
             ],
         ]
     ],

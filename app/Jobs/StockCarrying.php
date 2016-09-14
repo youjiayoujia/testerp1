@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Models\StockModel;
-use App\Models\InOutModel;
+use App\Models\Stock\InOutModel;
 use App\Models\Stock\CarryOverModel;
 use DB;
 
@@ -46,7 +46,7 @@ class StockCarrying extends Job implements SelfHandling, ShouldQueue
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = 'date error, maybe is already carryOvered';
                 $this->log('StockCarrying');
-                exit;
+                return;
             }
             $below40Days = (strtotime('now') - strtotime('-40 day'));
             if(($this->time - $below40Days) > $latest) {
@@ -54,87 +54,66 @@ class StockCarrying extends Job implements SelfHandling, ShouldQueue
                 $this->result['status'] = 'fail';
                 $this->result['remark'] = 'date error, maybe the before month carryOver not done';
                 $this->log('StockCarrying');
-                exit;
+                return;
             }
             $carryOverNewObj = CarryOverModel::create([
                     'date' => date('Y-m', $this->time),
                 ]);
-            DB::beginTransaction();
-            try {
-                $carryOverForms = $carryOver->forms;
+            $len = 1000;
+            $start = 0;
+            $carryOverForms = $carryOver->forms()->skip($start)->take($len)->get();
+            while($carryOverForms->count()) {
                 foreach($carryOverForms as $carryOverForm) {
-                    $carryOverNewObj->forms()->create(['stock_id'=>$carryOverForm->stock_id, 
-                                                    'begin_quantity' => $carryOverForm->over_quantity,
-                                                    'begin_amount' => $carryOverForm->over_amount]);
-                }
-                $stockIns = InOutModel::where('outer_type', 'IN')->whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $this->time)])->get();
-                $stockOuts = InOutModel::where('outer_type', 'OUT')->whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $this->time)])->get();
-                if(count($stockIns)) 
-                {
+                    $buf = $carryOverForm->over_quantity;
+                    $buf1 = $carryOverForm->over_amount;
+                    $stockIns = InOutModel::where('stock_id', $carryOverForm->stock_id)->where('outer_type', 'IN')->whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $this->time)])->get();
                     foreach($stockIns as $stockIn)
                     {
-                        foreach($carryOverForms as $carryOverForm)
-                        {
-                            if($carryOverForm->stock_id == $stockIn->stock_id) {
-                                $carryOverForm->over_quantity += $stockIn->quantity;
-                                $carryOverForm->over_amount += $stockIn->amount;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(count($stockOuts)) 
-                {
+                        $buf += $stockIn->quantity;
+                        $buf1 += $stockIn->amount;
+                    }    
+                    $stockOuts = InOutModel::where('stock_id', $carryOverForm->stock_id)->where('outer_type', 'OUT')->whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $this->time)])->get();
                     foreach($stockOuts as $stockOut)
                     {
-                        foreach($carryOverForms as $carryOverForm)
-                        {
-                            if($carryOverForm->stock_id == $stockOut->stock_id) {
-                                $carryOverForm->over_quantity -= $stockOut->quantity;
-                                $carryOverForm->over_amount -= $stockOut->amount;
-                                break;
-                            }
-                        }
-                    }
+                        $buf -= $stockOut->quantity;
+                        $buf1 -= $stockOut->amount;
+                    }  
+                    $carryOverNewObj->forms()->create(['stock_id'=>$carryOverForm->stock_id, 
+                                                    'purchase_price' => $carryOverForm->stock ? ($carryOverForm->stock->item ? $carryOverForm->stock->item->purchase_price : 0) : 0,
+                                                    'begin_quantity' => $carryOverForm->over_quantity,
+                                                    'begin_amount' => $carryOverForm->over_amount,
+                                                    'over_quantity' => $buf,
+                                                    'over_amount' => $buf1
+                                                    ]);
                 }
-                foreach($carryOverForms as $carryOverForm) {
-                    $carryOverNewObj->forms->where('stock_id', $carryOverForm->stock_id)->first()->update([
-                                                                        'over_quantity' => $carryOverForm->over_quantity,
-                                                                        'over_amount' => $carryOverForm->over_amount]);
-                }
-            } catch (Exception $e) {
-                DB::rollback();
+                $start += $len;
+                $carryOverForms = $carryOver->forms()->skip($start)->take($len)->get();
             }
-            DB::commit();
             $this->result['status'] = 'success';
             $this->result['remark'] = 'success.  Stock CarryOver';
             $this->log('StockCarrying');
         } else {
             var_dump('new');
-            DB::beginTransaction();
-            try {
-                $carryOverNewObj = CarryOverModel::create([
-                        'date' => date('Y-m', $this->time),
-                    ]);
-                $len = 1000;
-                $start = 0;
-                $stocks = StockModel::skip($start)->take($len)->get();
-                while($stocks->count()) {
-                    foreach($stocks as $stock)
-                    {
-                        $carryOverNewObj->forms()->create([
-                                'stock_id' => $stock->id,
-                                'over_quantity' => $stock->all_quantity,
-                                'over_amount' => $stock->all_quantity * $stock->unit_cost,
-                            ]);
-                    }
-                    $start += $len;
-                    $stocks = StockModel::skip($start)->take($len)->get();
+            $carryOverNewObj = CarryOverModel::create([
+                    'date' => date('Y-m', $this->time),
+                ]);
+            $len = 1000;
+            $start = 0;
+            $stocks = StockModel::skip($start)->take($len)->get();
+            while($stocks->count()) {
+                foreach($stocks as $stock)
+                {
+                    $carryOverNewObj->forms()->create([
+                            'stock_id' => $stock->id,
+                            'purchase_price' =>$stock->item ? $stock->item->purchase_price : 0,
+                            'over_quantity' => $stock->all_quantity,
+                            'over_amount' => $stock->all_quantity * $stock->unit_cost,
+                        ]);
                 }
-            } catch (Exception $e) {
-                DB::rollback();
+                $start += $len;
+                $stocks = StockModel::skip($start)->take($len)->get();
             }
-            DB::commit();
+        
             $this->result['status'] = 'success';
             $this->result['remark'] = 'success.  Stock CarryOver';
             $this->log('StockCarrying');

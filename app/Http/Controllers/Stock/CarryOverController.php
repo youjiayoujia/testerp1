@@ -116,20 +116,6 @@ class CarryOverController extends Controller
                 }
             }
         }
-        $arr = [];
-        foreach($carryOverForms as $single) {
-            $arr[] = [
-                '结束重量' => $single->over_quantity,
-            ];
-        }
-
-        $name = 'CatalogRates';
-        Excel::create($name, function ($excel) use ($arr) {
-            $nameSheet = 'daochu';
-            $excel->sheet($nameSheet, function ($sheet) use ($arr) {
-                $sheet->fromArray($arr);
-            });
-        })->download('csv');
 
         $response = [
             'metas' => $this->metas(__FUNCTION__),

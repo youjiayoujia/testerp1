@@ -24,7 +24,7 @@ class ExportPackageController extends Controller
     {
         $this->model = $export;
         $this->mainIndex = route('exportPackage.index');
-        $this->mainTitle = '创建模板';
+        $this->mainTitle = '模版';
         $this->viewPath = 'package.export.';
     }
 

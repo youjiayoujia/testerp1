@@ -18,6 +18,7 @@ class CreatePicklists extends Migration
             $table->enum('type', ['SINGLE', 'SINGLEMULTI', 'MULTI'])->comment('拣货单类型')->default('SINGLE');
             $table->enum('status', ['NONE', 'PRINTED', 'PICKING', 'PICKED', 'INBOXING', 'INBOXED', 'PACKAGEING', 'PACKAGED'])->comment('拣货单状态')->default('NONE');
             $table->integer('logistic_id')->comment('物流号')->default(0);
+            $table->integer('quantity')->comment('漏检sku数')->default(0);
             $table->integer('pick_by')->comment('拣货人')->default(0);
             $table->timestamp('print_at')->comment('打印时间');
             $table->timestamp('pick_at')->comment('拣货时间');

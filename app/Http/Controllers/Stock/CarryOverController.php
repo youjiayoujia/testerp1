@@ -18,6 +18,7 @@ use App\Models\Stock\CarryOverModel;
 use App\Models\StockModel;
 use App\Models\Stock\InModel;
 use App\Models\Stock\OutModel;
+use App\Jobs\StockCarrying;
 
 class CarryOverController extends Controller
 {
@@ -44,7 +45,7 @@ class CarryOverController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
-            'forms' => $model->forms,
+            'forms' => $model->forms()->paginate('1000'),
         ];
         return view($this->viewPath . 'show', $response);
     }
@@ -60,89 +61,10 @@ class CarryOverController extends Controller
     public function CreateCarryOverResult()
     {
         $tmp_timestamp = strtotime(request('stockTime'));
-        $carryOver = $this->model->orderBy('date', 'desc')->first();
-        if($carryOver) {
-            $latest = strtotime($carryOver->date);
-            if($latest >= $tmp_timestamp) {
-                throw new Exception('日期有误，该日期可能已经月结过');
-            }
-            $below40Days = (strtotime('now') - strtotime('-40 day'));
-            if(($tmp_timestamp - $below40Days) > $latest) {
-                throw new Exception('日期有误，可能上个月月结没做');
-            }
-            $carryOverNewObj = $this->model->create([
-                    'date' => date('Y-m', $tmp_timestamp),
-                ]);
-            DB::beginTransaction();
-            try {
-                $carryOverForms = $carryOver->forms;
-                foreach($carryOverForms as $carryOverForm) {
-                    $carryOverNewObj->forms()->create(['stock_id'=>$carryOverForm->stock_id, 
-                                                    'begin_quantity' => $carryOverForm->over_quantity,
-                                                    'begin_amount' => $carryOverForm->over_amount]);
-                }
-                $stockIns = InModel::whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $tmp_timestamp)])->get();
-                $stockOuts = OutModel::whereBetween('created_at', [date('Y-m-d G:i:s', strtotime($carryOver->date)), date('Y-m-d G:i:s', $tmp_timestamp)])->get();
-                if(count($stockIns)) 
-                {
-                    foreach($stockIns as $stockIn)
-                    {
-                        foreach($carryOverForms as $carryOverForm)
-                        {
-                            if($carryOverForm->stock_id == $stockIn->stock_id) {
-                                $carryOverForm->over_quantity += $stockIn->quantity;
-                                $carryOverForm->over_amount += $stockIn->amount;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(count($stockOuts)) 
-                {
-                    foreach($stockOuts as $stockOut)
-                    {
-                        foreach($carryOverForms as $carryOverForm)
-                        {
-                            if($carryOverForm->stock_id == $stockOut->stock_id) {
-                                $carryOverForm->over_quantity -= $stockOut->quantity;
-                                $carryOverForm->over_amount -= $stockOut->amount;
-                                break;
-                            }
-                        }
-                    }
-                }
-                foreach($carryOverForms as $carryOverForm) {
-                    $carryOverNewObj->forms->where('stock_id', $carryOverForm->stock_id)->first()->update([
-                                                                        'over_quantity' => $carryOverForm->over_quantity,
-                                                                        'over_amount' => $carryOverForm->over_amount]);
-                }
-            } catch (Exception $e) {
-                DB::rollback();
-            }
-            DB::commit();
-
-        } else {
-            DB::beginTransaction();
-            try {
-                $carryOverNewObj = $this->model->create([
-                        'date' => date('Y-m', $tmp_timestamp),
-                    ]);
-                $stocks = StockModel::all();
-                foreach($stocks as $stock)
-                {
-                    $carryOverNewObj->forms()->create([
-                            'stock_id' => $stock->id,
-                            'over_quantity' => $stock->all_quantity,
-                            'over_amount' => $stock->all_quantity * $stock->unit_cost,
-                        ]);
-                }
-            } catch (Exception $e) {
-                DB::rollback();
-            }
-            DB::commit();
-        }
-
-        return redirect($this->mainIndex);
+        $jobs = new StockCarrying($tmp_timestamp);
+        $jobs->onQueue('stockCarrying');
+        $this->dispatch($jobs);
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '库存结转成功加入队列'));
     }
 
     public function showStock()
@@ -164,8 +86,8 @@ class CarryOverController extends Controller
         }
         $carryOverTime = date('Y-m-d G:i:s', (strtotime($objCarryOver->date)+(strtotime('+1 month')-strtotime('now'))));
         $carryOverForms = $objCarryOver->forms;
-        $stockIns = InModel::whereBetween('created_at', [$carryOverTime, $stockTime])->get();
-        $stockOuts = OutModel::whereBetween('created_at', [$carryOverTime, $stockTime])->get();
+        $stockIns = InOutModel::where('outer_type', 'IN')->whereBetween('created_at', [$carryOverTime, $stockTime])->get();
+        $stockOuts = InOutModel::where('outer_type', 'OUT')->whereBetween('created_at', [$carryOverTime, $stockTime])->get();
         if(count($stockIns)) 
         {
             foreach($stockIns as $stockIn)
@@ -194,9 +116,24 @@ class CarryOverController extends Controller
                 }
             }
         }
+        $arr = [];
+        foreach($carryOverForms as $single) {
+            $arr[] = [
+                '结束重量' => $single->over_quantity,
+            ];
+        }
+
+        $name = 'CatalogRates';
+        Excel::create($name, function ($excel) use ($arr) {
+            $nameSheet = 'daochu';
+            $excel->sheet($nameSheet, function ($sheet) use ($arr) {
+                $sheet->fromArray($arr);
+            });
+        })->download('csv');
+
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'carryOvers' => $carryOverForms,
+            'carryOvers' => $carryOverForms()->paginate('1000'),
             'stockTime' => $stockTime,
         ];
 

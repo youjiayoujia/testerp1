@@ -27,7 +27,7 @@ class PickListModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'print_at', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'created_at'];
+    protected $fillable = ['picknum', 'type', 'status', 'logistic_id', 'pick_by', 'print_at', 'pick_at', 'inbox_by', 'inbox_at', 'pack_at', 'pack_by', 'quantity', 'created_at'];
 
     // 规则验证
     public $rules = [
@@ -39,7 +39,13 @@ class PickListModel extends BaseModel
 
     public function getAccountAttribute()
     {
-        return $this->package->count();
+        $sum = 0;
+        foreach($this->package as $package) {
+            foreach($package->items as $packageItem) {
+                $sum += $packageItem->quantity;
+            }
+        }
+        return $sum;
     }
 
     //查询

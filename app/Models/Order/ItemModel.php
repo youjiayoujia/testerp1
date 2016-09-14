@@ -16,7 +16,7 @@ class ItemModel extends BaseModel
 {
     protected $table = 'order_items';
 
-    protected $guarded = [];
+    protected $guarded = ['orderItemId'];
 
     public $searchFields = [
         'order_id',

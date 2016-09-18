@@ -6,7 +6,7 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class="batchedit" data-name="weight">重量</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="weight">批量修改质检</a></li>
             <li><a href="javascript:" class="batchedit" data-name="purchase_price">参考成本</a></li>
             <li><a href="javascript:" class="batchedit" data-name="status">SKU状态</a></li>
             <li><a href="javascript:" class="batchedit" data-name="package_size">体积</a></li>

@@ -260,7 +260,9 @@
 @section('doAction')
     <div class="row">
         <div class="col-lg-12">
-            <button class="examine" value="edit">批量审核</button>
+            <button class="examine" value="examineStatus">批量审核</button>
+            <button class="examine" value="close_status">批量付款</button>
+            <button class="examine" value="write_off">批量核销</button>
         </div>
     </div>
 @stop
@@ -348,7 +350,7 @@
         $('.examine').click(function () {
             
             var url = "{{route('purchaseExmaine')}}";
-
+            var type = $(this).val();
             var checkbox = document.getElementsByName("tribute_id");
             var purchase_ids = "";
             for (var i = 0; i < checkbox.length; i++) {
@@ -359,7 +361,7 @@
 
             $.ajax({
                 url: url,
-                data: {purchase_ids:purchase_ids},
+                data: {purchase_ids:purchase_ids,type:type},
                 dataType: 'json',
                 type: 'get',
                 success: function (result) {

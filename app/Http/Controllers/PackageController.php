@@ -220,6 +220,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),

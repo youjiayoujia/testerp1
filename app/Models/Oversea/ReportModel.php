@@ -45,7 +45,7 @@ class ReportModel extends BaseModel
         'created_at'
     ];
 
-    public $searchFields = ['plan_id' => 'plan Id', 'shipment_id' => 'shipment Id', 'reference_id' => 'reference Id'];
+    public $searchFields = ['shipment_id' => 'shipment Id'];
 
     public function getMixedSearchAttribute()
     {

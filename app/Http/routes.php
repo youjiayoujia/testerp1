@@ -75,6 +75,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('box/boxSub', ['uses' => 'Oversea\BoxController@boxSub', 'as' => 'box.boxSub']);
     Route::resource('box', 'Oversea\BoxController');
     //申请表
+    Route::post('report/packageStore/{id}', ['uses' => 'Oversea\ReportController@packageStore', 'as' => 'report.packageStore']);
     Route::get('report/sendExec', ['uses' => 'Oversea\ReportController@sendExec', 'as' => 'report.sendExec']);
     Route::get('report/shipment', ['uses' => 'Oversea\ReportController@shipment', 'as' => 'report.shipment']);
     Route::get('report/check/{id}', ['uses' => 'Oversea\ReportController@check', 'as' => 'report.check']);
@@ -526,6 +527,7 @@ Route::group(['middleware' => 'auth'], function () {
             'as' => 'cancelExamineAmazonProduct'
         ]);
     //订单管理路由
+    Route::get('order/createVirtualPackage', ['uses' => 'OrderController@createVirtualPackage', 'as' => 'order.createVirtualPackage']);
     Route::get('refund/{id}', ['uses' => 'OrderController@refund', 'as' => 'refund']);
     Route::any('batchEdit', ['uses' => 'ItemController@batchEdit', 'as' => 'batchEdit']);
     Route::any('batchUpdate', ['uses' => 'ItemController@batchUpdate', 'as' => 'batchUpdate']);

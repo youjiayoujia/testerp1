@@ -174,14 +174,14 @@ class PositionController extends Controller
     {
         $rows = [
                     [ 
-                     'name'=>'',
-                     'warehouse'=>'',
-                     'remark'=>'',
-                     'size'=>'',
-                     'length'=>'',
-                     'width'=>'',
-                     'height'=>'',
-                     'is_available'=>'',
+                     'name'=>'DZA123',
+                     'warehouse'=>'金华仓',
+                     'remark'=>'备注',
+                     'size'=>'big/middle/small',
+                     'length'=>'10',
+                     'width'=>'10',
+                     'height'=>'10',
+                     'is_available'=>'0/1',
                      '备注'=>'warehouse正常的仓库名,size:big/middle/small 对应大中小,is_available:0/1 是否启用 0=否'
                     ]
             ];

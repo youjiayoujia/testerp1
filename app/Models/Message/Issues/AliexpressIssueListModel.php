@@ -15,5 +15,23 @@ class AliexpressIssueListModel extends BaseModel
     public $searchFields =[];
     protected $guarded = [];
 
+    public function account(){
+        return $this->hasOne('App\Models\Channel\AccountModel','id','account_id');
+
+    }
+    public function getIssueTypeNameAttribute(){
+        if($this->issueType){
+            return config('message.aliexpress.issueType')[$this->issueType];
+        }else{
+            return '';
+        }
+    }
+    public function getaccountNameAttribute(){
+        if($account = $this->account){
+            return  $account->account ? $account->account : '';
+        }else{
+            return '';
+        }
+    }
 
 }

@@ -1423,7 +1423,6 @@ Class AliexpressAdapter implements AdapterInterface
      * 纠纷
      */
     public function getIssues(){
-        $count = 1;
         $issueAry = [];
         $issue_ary = array(
             'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
@@ -1466,12 +1465,6 @@ Class AliexpressAdapter implements AdapterInterface
                             'issue_detail'  => $issue_detail,
                             'issueType'     => $issue,
                         ];
-
-                        $count +=1 ;
-                        if($count == 100)
-                        return $issueAry;
-                        //测试断点  ！！！！！！！！！！！！
-
                     }
                 }else{
                     break;
@@ -1514,6 +1507,12 @@ Class AliexpressAdapter implements AdapterInterface
         $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
 
         return $respon_ary['result']['isSuccess'] ? true : false;
+
+    }
+
+    public function issuesRedfuse(){
+
+       // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
 
     }
 

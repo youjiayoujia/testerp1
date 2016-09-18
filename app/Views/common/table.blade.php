@@ -61,7 +61,7 @@
                                                     @foreach($value as $relation_ship => $name_arr)
                                                         @foreach($name_arr as $name)
                                                             <div class="col-lg-2">
-                                                                <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
+                                                                <input type="text" value="{{request()->input()?request()->input()['mixedSearchFields'][$type][$relation_ship][$name]:''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
                                                     @endforeach
@@ -70,7 +70,7 @@
                                             @if($type == 'filterFields')
                                                 @foreach($value as $name)
                                                     <div class="col-lg-2">
-                                                        <input type="text" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
+                                                        <input type="text" value='{{request()->input()?request()->input()['mixedSearchFields'][$type][$name]:''}}' class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
                                                     </div>
                                                 @endforeach
                                             @endif
@@ -80,7 +80,7 @@
                                                         <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
-                                                                <option value="{{ $k }}">{{$v}}</option>
+                                                                <option value="{{ $k }}" {{$k==(request()->input()?request()->input()['mixedSearchFields'][$type][$name]:'')?'selected':''}} >{{$v}}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -93,7 +93,7 @@
                                                             <select name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                                 <option value=''>{{config('setting.transfer_search')[$relation_ship.'.'.$name]}}</option>
                                                                 @foreach($single as $key => $value1)
-                                                                    <option value="{{ $key }}">{{$value1}}</option>
+                                                                    <option value="{{ $key }}" {{$key==(request()->input()?request()->input()['mixedSearchFields'][$type][$relation_ship][$name]:'')?'selected':'' }} >{{$value1}}</option>
                                                                 @endforeach
                                                             </select>
                                                         </div>
@@ -105,18 +105,18 @@
                                                     @foreach($contents as $content)
                                                         @if($kind == 'time')
                                                             <div class='col-lg-2 form-group'>
-                                                                <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' value='{{request()->input()?request()->input()['mixedSearchFields'][$type][$content]['begin']:''}}' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                             <div class='col-lg-2 form-group'>
-                                                                <input type='text' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' value='{{request()->input()?request()->input()['mixedSearchFields'][$type][$content]['end']:''}}' class='form-control datetime_select' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
                                                         @if($kind == 'price')
                                                             <div class='col-lg-2 form-group'>
-                                                                <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' value='{{request()->input()?request()->input()['mixedSearchFields'][$type][$content]['begin']:''}}' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][begin]" placeholder="起始{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                             <div class='col-lg-2 form-group'>
-                                                                <input type='text' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
+                                                                <input type='text' value='{{request()->input()?request()->input()['mixedSearchFields'][$type][$content]['end']:''}}' class='form-control' name="mixedSearchFields[{{$type}}][{{$content}}][end]" placeholder="结束{{config('setting.transfer_search')[$kind.'.'.$content]}}">
                                                             </div>
                                                         @endif
                                                     @endforeach

@@ -129,15 +129,14 @@ class PositionModel extends BaseModel
             }
             $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available'=>'1'])->first();
             $position['name']=iconv('gb2312','utf-8',$position['name']);
+            $position['warehouse_id'] = $tmp_warehouse->id;
             if(PositionModel::where(['name' => trim($position['name'])])->count()) {
                 $tmp_position = PositionModel::where(['name' => trim($position['name'])])->first();
                 $tmp_position->update($position);
-                $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
                 continue;
             }
 
             $tmp_position = $this->create($position);
-            $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
         }
 
         return $error;

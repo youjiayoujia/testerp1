@@ -748,11 +748,28 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseExmaine()
     {
+        $type = request()->input('type');
         $purchase_ids = request()->input("purchase_ids");
         $arr = explode(',', $purchase_ids);
-        foreach($arr as $id){
-            $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+        switch ($type) {
+            case 'examineStatus':
+                foreach($arr as $id){
+                    $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+                }
+                break;
+            
+            case 'write_off':
+                foreach($arr as $id){
+                    $this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                }
+                break;
+            case 'close_status':
+                foreach($arr as $id){
+                    $this->model->find($id)->update(['close_status'=>1]);
+                }
+                break;
         }
+        
         return 1;
     }
 

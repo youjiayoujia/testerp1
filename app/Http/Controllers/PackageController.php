@@ -102,7 +102,10 @@ class PackageController extends Controller
             $date = date('Y-m-d');
         }
         $data = [];
-        $count = 0;
+        $count = $this->model->where('logistics_id', '!=', 0)
+            ->where('shipped_at', '>=', $date . ' 00:00:00')
+            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00')
+            ->count();
         $totalWeight = 0;
         $logisticses = LogisticsModel::where('is_enable', 1)->get();
         foreach($logisticses as $key => $logistics) {
@@ -119,7 +122,6 @@ class PackageController extends Controller
                 $data[$key]['weight'] += $package->weight;
             }
             $data[$key]['quantity'] = $packages->count();
-            $count += $data[$key]['quantity'];
             $totalWeight += $data[$key]['weight'];
             if($count) {
                 $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';

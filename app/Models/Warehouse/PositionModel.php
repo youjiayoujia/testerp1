@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models\Warehouse;
 
 use Excel;
@@ -29,17 +28,11 @@ class PositionModel extends BaseModel
             'name' => 'required|max:128|unique:warehouse_positions,name',
             'warehouse_id' => 'required',
             'size' => 'required',
-            'length' => 'numeric',
-            'width' => 'numeric', 
-            'height' => 'numeric'
             ],
         'update' => [
             'name' => 'required|max:128|unique:warehouse_positions,name,{id}',
             'warehouse_id' => 'required',
             'size' => 'required',
-            'length' => 'numeric',
-            'width' => 'numeric', 
-            'height' => 'numeric'
             ]
     ];
 
@@ -72,32 +65,6 @@ class PositionModel extends BaseModel
         return $this->excelDataProcess($path.'excelProcess.xls');
     }
 
-    /**
-     * 处理excel数据
-     *
-     * @param $path excel文件路径
-     *
-     */
-    // public function excelDataProcess($path)
-    // {
-    //     Excel::load($path, function($reader) {
-    //         $data = $reader->toArray();
-    //         foreach($data as $position)
-    //         {
-    //             if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->count()) {
-    //                 continue;
-    //             }
-    //             if(PositionModel::where(['name' => trim($position['name'])])->count()) {
-    //                 continue;
-    //             }
-    //             $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->first();
-    //             $tmp = $this->create($position);
-    //             $tmp->update(['warehouse_id' => $tmp_warehouse->id]);
-    //         }
-    //     });
-
-    //     return;
-    // }
     /**
      * 处理excel数据
      *

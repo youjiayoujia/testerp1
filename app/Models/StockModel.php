@@ -21,7 +21,7 @@ class StockModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stocks';
+    public $table = 'stocks';
 
     /**
      * The attributes that are mass assignable.

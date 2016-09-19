@@ -61,16 +61,16 @@
                                                     @foreach($value as $relation_ship => $name_arr)
                                                         @foreach($name_arr as $name)
                                                             <div class="col-lg-2">
-                                                                <input type="text" value="{{request()->input()?request()->input()['mixedSearchFields'][$type][$relation_ship][$name]:''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
+                                                                <input type="text" value="{{request()->has('mixedSearchFields'.$type.$relation_ship.$name)?request('mixedSearchFields'.$type.$relation_ship.$name) : ''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $relation_ship }}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$relation_ship.'.'.$name] }}"/>
                                                             </div>
                                                         @endforeach
                                                     @endforeach
                                                 @endif
                                             @endif
                                             @if($type == 'filterFields')
-                                                @foreach($value as $name)
+                                                @foreach($value as $name1)
                                                     <div class="col-lg-2">
-                                                        <input type="text" value='{{request()->input()?request()->input()['mixedSearchFields'][$type][$name]:''}}' class="form-control" name="mixedSearchFields[{{$type}}][{{ $name }}]" placeholder="{{ config('setting.transfer_search')[$name] }}"/>
+                                                        <input type="text" value="{{request()->has('mixedSearchFields'.$type.$name1)?request('mixedSearchFields'.$type.$name1):''}}" class="form-control" name="mixedSearchFields[{{$type}}][{{ $name1 }}]" placeholder="{{ config('setting.transfer_search')[$name1] }}"/>
                                                     </div>
                                                 @endforeach
                                             @endif
@@ -80,7 +80,7 @@
                                                         <select name="mixedSearchFields[{{$type}}][{{ $name }}]" class='form-control select_select0 col-lg-2'>
                                                             <option value=''>{{config('setting.transfer_search')[$name]}}</option>
                                                             @foreach($content as $k => $v)
-                                                                <option value="{{ $k }}" {{$k==(request()->input()?request()->input()['mixedSearchFields'][$type][$name]:'')?'selected':''}} >{{$v}}</option>
+                                                                <option value="{{ $k }}" {{$k==(request()->has('mixedSearchFields'.$type.$name)?request('mixedSearchFields'.$type.$name):'')?'selected':''}} >{{$v}}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>

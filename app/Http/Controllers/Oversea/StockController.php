@@ -145,10 +145,6 @@ class StockController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        foreach($model->forms as $form) {
-            $form->delete();
-        }
-        
         $model->destroy($id);
         return redirect($this->mainIndex);
     }

@@ -39,9 +39,9 @@
             <tr>
                 <th>拣货人员</th>
                 <th>拣货组</th>
-                <th>本月总拣货完成数(各类型商品数)</th>
-                <th>漏检数</th>
-                <th>今日拣货数</th>
+                <th>本月总拣货完成数(各类型sku数)</th>
+                <th>漏检sku数</th>
+                <th>今日sku拣货数</th>
                 <th>今日分配拣货单</th>
             </tr>
             </thead>
@@ -51,9 +51,18 @@
                 <tr>
                     <td>{{$block->first()->user ? $block->first()->user->name : ''}}</td>
                     <td>{{$block->first()->warehouse ? $block->first()->warehouse->name : ''}}</td>
-                    <td>{{$block->sum('single') + $block->sum('singleMulti') + $block->sum('multi')}}(单单:{{ $block->sum('single')}},
-                            单多:{{ $block->sum('singleMulti')}},多多:{{$block->sum('multi')}})</td>
-                    <td>{{$block->sum('missing_pick')}}</td>
+                    <td>{{count($monthModel) ? ($monthModel->get($userId)->sum('single') + $monthModel->get($userId)->sum('singleMulti') + $monthModel->get($userId)->sum('multi')) : ''}}
+                    (单单:{{ count($monthModel) ? $monthModel->get($userId)->sum('single') : ''}},
+                     单多:{{ count($monthModel) ? $monthModel->get($userId)->sum('singleMulti') : ''}},
+                     多多:{{ count($monthModel) ? $monthModel->get($userId)->sum('multi') : ''}})
+                    </td>
+                    <td>{{count($monthModel) ? $monthModel->get($userId)->sum('missing_pick') : ''}}
+                    ({{count($monthModel) ? 
+                        ((($monthModel->get($userId)->sum('single') + $monthModel->get($userId)->sum('singleMulti') + $monthModel->get($userId)->sum('multi')) ? 
+                                                round($monthModel->get($userId)->sum('missing_pick')/($monthModel->get($userId)->sum('single') + $monthModel->get($userId)->sum('singleMulti') + $monthModel->get($userId)->sum('multi'))*100,2) : 0))
+                        : ''}}%)
+                    </td>
+
                     <td>{{$block->sum('today_pick')}}</td>
                     <td><a href="javascript:" data-userid="{{$userId}}" class='pick'>{{$block->sum('today_picklist')}}</a></td>
                 </tr>
@@ -78,6 +87,9 @@
                                 <input class='form-control pick_by' name='pick_by' type="text" placeholder='拣货人员'>
                             </div>
                             <div class='form-group col-lg-3'>
+                                <input class='fix' name='fix' type="radio">固定拣货人员
+                            </div>
+                            <div class='form-group col-lg-3'>
                                 <button type='button' class='btn btn-success confirm'>确认</button>
                             </div>
                             <input type='hidden' class='buf'>
@@ -92,14 +104,18 @@
 <script type='text/javascript'>
 $(document).ready(function(){
     $(document).on('click', '.assign', function(){
+        if($('.fix').prop('checked') == false) {
+            pickBy = $('.pick_by').val('');
+        }
         picklist = $('.picklist_id').val('');
-        pickBy = $('.pick_by').val('');
         $('.buf').val(1);
     });
 
     $(document).on('click', '.change', function(){
+        if($('.fix').prop('checked') == false) {
+            pickBy = $('.pick_by').val('');
+        }
         picklist = $('.picklist_id').val('');
-        pickBy = $('.pick_by').val('');
         $('.buf').val(2);
     });
 
@@ -122,6 +138,23 @@ $(document).ready(function(){
         }
         $('.assign').click();
     });
+
+    $(document).on('keypress', function(event){
+        if(event.keyCode == '13') {
+            if($('.picklist_id').is(':focus')) {
+                if($('.fix').prop('checked') == true) {
+                    $('.confirm').click();
+                }
+                return true;
+            }
+            if($('.pick_by').is(':focus')) {
+                if($('.picklist_id').val()) {
+                    $('.confirm').click();
+                }
+                return true;
+            }
+        }
+    })
 
     $(document).on('click', '.pick', function(){
         id = $(this).data('userid');

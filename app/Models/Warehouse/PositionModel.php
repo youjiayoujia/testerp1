@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models\Warehouse;
 
 use Excel;
@@ -29,17 +28,11 @@ class PositionModel extends BaseModel
             'name' => 'required|max:128|unique:warehouse_positions,name',
             'warehouse_id' => 'required',
             'size' => 'required',
-            'length' => 'numeric',
-            'width' => 'numeric', 
-            'height' => 'numeric'
             ],
         'update' => [
             'name' => 'required|max:128|unique:warehouse_positions,name,{id}',
             'warehouse_id' => 'required',
             'size' => 'required',
-            'length' => 'numeric',
-            'width' => 'numeric', 
-            'height' => 'numeric'
             ]
     ];
 
@@ -78,32 +71,6 @@ class PositionModel extends BaseModel
      * @param $path excel文件路径
      *
      */
-    // public function excelDataProcess($path)
-    // {
-    //     Excel::load($path, function($reader) {
-    //         $data = $reader->toArray();
-    //         foreach($data as $position)
-    //         {
-    //             if(!WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->count()) {
-    //                 continue;
-    //             }
-    //             if(PositionModel::where(['name' => trim($position['name'])])->count()) {
-    //                 continue;
-    //             }
-    //             $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available' => '1'])->first();
-    //             $tmp = $this->create($position);
-    //             $tmp->update(['warehouse_id' => $tmp_warehouse->id]);
-    //         }
-    //     });
-
-    //     return;
-    // }
-    /**
-     * 处理excel数据
-     *
-     * @param $path excel文件路径
-     *
-     */
     public function excelDataProcess($path)
     {
         $fd = fopen($path, 'r');
@@ -129,15 +96,14 @@ class PositionModel extends BaseModel
             }
             $tmp_warehouse = WarehouseModel::where(['name' => trim($position['warehouse']), 'is_available'=>'1'])->first();
             $position['name']=iconv('gb2312','utf-8',$position['name']);
+            $position['warehouse_id'] = $tmp_warehouse->id;
             if(PositionModel::where(['name' => trim($position['name'])])->count()) {
                 $tmp_position = PositionModel::where(['name' => trim($position['name'])])->first();
                 $tmp_position->update($position);
-                $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
                 continue;
             }
 
             $tmp_position = $this->create($position);
-            $tmp_position->update(['warehouse_id'=>$tmp_warehouse->id]);
         }
 
         return $error;

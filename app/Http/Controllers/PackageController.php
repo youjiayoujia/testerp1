@@ -23,6 +23,7 @@ use App\Models\WarehouseModel;
 use DB;
 use Exception;
 use App\Jobs\AssignStocks;
+use App\Models\NumberModel;
 
 class PackageController extends Controller
 {
@@ -101,7 +102,10 @@ class PackageController extends Controller
             $date = date('Y-m-d');
         }
         $data = [];
-        $count = 0;
+        $count = $this->model->where('logistics_id', '!=', 0)
+            ->where('shipped_at', '>=', $date . ' 00:00:00')
+            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00')
+            ->count();
         $totalWeight = 0;
         $logisticses = LogisticsModel::where('is_enable', 1)->get();
         foreach($logisticses as $key => $logistics) {
@@ -118,7 +122,6 @@ class PackageController extends Controller
                 $data[$key]['weight'] += $package->weight;
             }
             $data[$key]['quantity'] = $packages->count();
-            $count += $data[$key]['quantity'];
             $totalWeight += $data[$key]['weight'];
             if($count) {
                 $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
@@ -219,6 +222,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
@@ -892,6 +896,27 @@ class PackageController extends Controller
         })->download('csv');
     }
 
+    public function bagInfo()
+    {
+        $trackno = request('trackno');
+        $model = $this->model->where('tracking_no', $trackno)->first();
+        if(!$model) {
+            return json_encode(false);
+        }
+        $number = NumberModel::first();
+        if(!count($number)) {
+            $number = NumberModel::create(['number' => 1]);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => $model->logistics ? $model->logistics->code : '',
+            'number' => 'S'.substr($number->number+100000000, 1),
+        ];
+        $number->update(['number' => $number->number + 1]);
+
+        return view($this->viewPath.'bagInfo', $response);
+    }
+
     /**
      * 执行发货
      *
@@ -922,12 +947,20 @@ class PackageController extends Controller
             return json_encode('unhold');
         }
         DB::commit();
-        $package->update([
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => request()->user()->id,
-            'actual_weight' => $weight,
-            'status' => 'SHIPPED',
-        ]);
+        if($weight == '0') {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'status' => 'SHIPPED',
+            ]);
+        } else {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'actual_weight' => $weight,
+                'status' => 'SHIPPED',
+            ]);
+        }
         $order = $package->order;
         $buf = 1;
         foreach($order->packages as $childPackage) {

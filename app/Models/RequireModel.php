@@ -25,7 +25,7 @@ class RequireModel extends BaseModel
      */
     protected $guarded = [];
 
-    protected $searchFields = ['sku'];
+    public $searchFields = ['sku'];
 
     protected $rules = [];
 

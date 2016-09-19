@@ -11,6 +11,7 @@
 namespace App\Http\Controllers\Stock;
 
 use Cache;
+use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Stock\TakingModel;
@@ -149,11 +150,7 @@ class TakingController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $takingForms = $model->stockTakingForms;
-        foreach($takingForms as $takingForm)
-        {
-            $takingForm->delete();
-        }
+        DB::table('stock_taking_forms')->where('stock_taking_id', $model->id)->delete();
         $model->delete();
         Cache::store('file')->forever('stockIOStatus', 1);
 

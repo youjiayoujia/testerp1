@@ -8,11 +8,11 @@ return [
     /**
      * 默认分页条数
      */
-    'pageSize' => 10,
+    'pageSize' => 50,
     /**
      * 可选分页条数
      */
-    'pageSizes' => [10, 25, 50, 100, 300],
+    'pageSizes' => [10, 25, 50],
     /**
      * 默认排序字段
      */
@@ -138,7 +138,7 @@ return [
         'price.quantity_sold'=>'销量',
         'channel_name' => '渠道名称',
         'account.account' => '渠道帐号',
-        'is_chinese' => '竞拍状态'
+        'is_chinese' => '竞拍状态',
+        'parent.shipmentCostNum' => '批次号',
     ],
 ];
-

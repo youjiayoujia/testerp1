@@ -15,7 +15,6 @@ class CreateReports extends Migration
         Schema::create('oversea_reports', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('account_id')->comment('帐号')->default(0);
-            $table->string('fba_address')->comment('fba地址')->default(NULL);
             $table->string('plan_id')->comment('plan  ID')->default(0);
             $table->string('shipment_id')->comment('shipment id')->default(0);
             $table->string('reference_id')->comment('reference_id')->default(0);

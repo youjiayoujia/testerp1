@@ -41,7 +41,7 @@ class PickListController extends Controller
         if(request()->has('checkid')) {
             $model = $this->model->where('pick_by', request('checkid'))->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))]);
         }
-        $today_print = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
+        $today_print = $this->model->whereBetween('print_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])->count();
         $allocate = $this->model->whereBetween('pick_at', [date('Y-m-d', strtotime('now')), date('Y-m-d', strtotime('+1 day'))])
                     ->get()
                     ->filter(function($single){
@@ -58,6 +58,18 @@ class PickListController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    public function printInfo()
+    {
+        $user = request('user');
+        $id = request('id');
+        $model = $this->model->find($id);
+        if (!$model) {
+            return json_encode(false);
+        }
+        $model->printRecords()->create(['user_id' => $user]);
+        return json_encode(true);
+    }
+
     /**
      * 列表显示 
      *
@@ -71,9 +83,12 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $five = $model->printRecords()->orderBy('created_at', 'desc')->take('5')->get();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model, 
+            'user' => request()->user()->id,
+            'five' => $five
         ];
 
         return view($this->viewPath.'show', $response);
@@ -113,9 +128,9 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $model->printRecords()->create(['user_id' => request()->user()->id]);
         if($model->status == 'NONE') {
-            $model->status = 'PICKING';
-            $model->save();
+            $model->update(['status' => 'PRINTED', 'print_at' => date('Y-m-d H:i:s', time())]);
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -133,8 +148,15 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PACKAGEING']);
-
+        $pickBy = request('pickBy');
+        $single = $this->model->where('pick_by', $pickBy)->orderBy('created_at')->first();
+        if($single) {
+            if($single->status == 'PICKING') {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '上次拣货未完成,不可分配新的'));
+            }
+        }
+        $model->update(['pick_by' => request('pickBy'), 'pick_at' => date('Y-m-d H:i:s', time()), 'status' => 'PICKING']);
+        
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '拣货人员修改成功'));
     }
 
@@ -227,14 +249,14 @@ class PickListController extends Controller
                 return $this->printPickList($model->id);
                 break;
             case 'single':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PICKING', 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLE'])->whereIn('status', ['PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
                 return $this->pickListPackage($model->id);
                 break;
             case 'singleMulti':
-                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PICKING', 'PACKAGEING'])->first();
+                $model = $this->model->where(['picknum' => $picknum, 'type' => 'SINGLEMULTI'])->whereIn('status', ['PACKAGEING'])->first();
                 if(!$model) {
                     return $this->indexPrintPickList($flag);
                 }
@@ -310,6 +332,9 @@ class PickListController extends Controller
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        if($model->status == 'PICKING') {
+            $model->update(['status' => 'PACKAGEING']);
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -407,17 +432,18 @@ class PickListController extends Controller
      */
     public function packageStore($id)
     {
-        $model = $this->model->find($id);
-        if (!$model) {
+        $picklist = $this->model->find($id);
+        if (!$picklist) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
-        foreach($model->package as $package)
+        $sum = 0;
+        foreach($picklist->package as $package)
         {
             if($package->status != 'PACKED') {
                 $package->status = 'ERROR';
                 $package->save();
                 foreach($package->items as $packageItem) {
+                    $sum += $packageItem->quantity - $packageItem->picked_quantity;
                     $errorLists = ErrorListModel::where('item_id', $packageItem->item_id)->get();
                     if($errorLists->count()) {
                         foreach($errorLists as $errorList) {
@@ -441,7 +467,9 @@ class PickListController extends Controller
                         }
                     }
                 }
-            }    
+            } 
+        $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time()),
+                            'quantity' => $sum]);
         }
 
         return redirect($this->mainIndex);
@@ -570,6 +598,7 @@ class PickListController extends Controller
                         $this->model->createPickListItems($packages);
                         $this->model->createPickList((request()->has('singletext') ? request()->input('singletext') : '25'), 
                                                      (request()->has('multitext') ? request()->input('multitext') : '20'), $logistic_id);
+
                     }
                 }
             }

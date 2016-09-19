@@ -3,7 +3,7 @@
  * 库位控制器
  * 处理库位相关的Request与Response
  *
- * @author: MC
+ * @author: MC<178069409>
  * Date: 15/12/18
  * Time: 16:15pm
  */
@@ -104,12 +104,6 @@ class PositionController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        if($model->stocks) {
-            $stocks = $model->stocks;
-            foreach($stocks as $stock) {
-                $stock->delete();
-            }
-        }
         $model->destroy($id);
         
         return redirect($this->mainIndex);
@@ -174,14 +168,14 @@ class PositionController extends Controller
     {
         $rows = [
                     [ 
-                     'name'=>'',
-                     'warehouse'=>'',
-                     'remark'=>'',
-                     'size'=>'',
-                     'length'=>'',
-                     'width'=>'',
-                     'height'=>'',
-                     'is_available'=>'',
+                     'name'=>'DZA123',
+                     'warehouse'=>'金华仓',
+                     'remark'=>'备注',
+                     'size'=>'big/middle/small',
+                     'length'=>'10',
+                     'width'=>'10',
+                     'height'=>'10',
+                     'is_available'=>'0/1',
                      '备注'=>'warehouse正常的仓库名,size:big/middle/small 对应大中小,is_available:0/1 是否启用 0=否'
                     ]
             ];

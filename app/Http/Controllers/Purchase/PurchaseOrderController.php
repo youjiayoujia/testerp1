@@ -17,20 +17,24 @@ use App\Models\Purchase\PurchaseStaticsticsModel;
 use App\Models\Purchase\PurchaseItemArrivalLogModel;
 use App\Models\WarehouseModel;
 use App\Models\ItemModel;
+use App\Models\UserModel;
 use App\Models\Stock\InModel;
 use App\Models\Product\SupplierModel;
 use App\Models\Purchase\PurchasePostageModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
+use App\Models\PackageModel;
+use Excel;
 use Tool;
 use App\Jobs\Job;
 
 class PurchaseOrderController extends Controller
 {
 
-    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem)
+    public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem,ItemModel $item)
     {
         $this->model = $purchaseOrder;
+        $this->item = $item;
         $this->purchaseItem = $purchaseItem;
         $this->mainIndex = route('purchaseOrder.index');
         $this->mainTitle = '采购单';
@@ -744,11 +748,28 @@ class PurchaseOrderController extends Controller
      */
     public function purchaseExmaine()
     {
+        $type = request()->input('type');
         $purchase_ids = request()->input("purchase_ids");
         $arr = explode(',', $purchase_ids);
-        foreach($arr as $id){
-            $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+        switch ($type) {
+            case 'examineStatus':
+                foreach($arr as $id){
+                    $this->model->find($id)->update(['examineStatus'=>1,'status'=>1]);
+                }
+                break;
+            
+            case 'write_off':
+                foreach($arr as $id){
+                    $this->model->find($id)->update(['write_off'=>1,'status'=>4]);
+                }
+                break;
+            case 'close_status':
+                foreach($arr as $id){
+                    $this->model->find($id)->update(['close_status'=>1]);
+                }
+                break;
         }
+        
         return 1;
     }
 
@@ -845,7 +866,7 @@ class PurchaseOrderController extends Controller
     }
 
     /**
-     * ajax请求  sku
+     * 采购统计数据
      *
      * @param none
      * @return obj
@@ -861,6 +882,134 @@ class PurchaseOrderController extends Controller
         ];
 
         return view($this->viewPath . 'staticsticsIndex', $response);
+    }
+
+    /**
+     * 缺货报表
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function outOfStock()
+    {
+
+        $user_id = request()->input('user_id');
+        $sku = request()->input('sku');
+        $status = request()->input('status');
+        $date_from = request()->input('date_from');
+        $date_to = request()->input('date_to');
+
+        $item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->leftjoin('items','items.id','=','package_items.item_id')
+            ->where('packages.status','NEED');
+
+        if($user_id){
+            $item_id_arr = $item_id_arr->where('items.purchase_adminer',$user_id);
+        }
+        if($status){
+            $item_id_arr = $item_id_arr->where('items.status',$status);
+        }
+        if($date_from){
+            $item_id_arr = $item_id_arr->where('items.created_at','>',$date_from);
+        }
+        if($date_to){
+            $item_id_arr = $item_id_arr->where('items.created_at','<',$date_to);
+        }
+        if($sku){
+            $sku_arr = explode(',', $sku);
+            $item_id_arr = $item_id_arr->whereIn('items.sku',$sku_arr);
+        }
+
+        $this->mainIndex = route('purchase.outOfStock');
+        $this->mainTitle = '缺货报告';
+
+        $item_id_arr = $item_id_arr->distinct()->get(['package_items.item_id'])->toArray();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->item,$this->item->whereIn('id',$item_id_arr)),
+            'warehouses' => WarehouseModel::all(),
+            'users' => UserModel::all(),
+            'sku' =>$sku,
+            'status' =>$status,
+            'user_name' =>UserModel::find($user_id)?UserModel::find($user_id)->name:'',
+            'date_from' =>$date_from,
+            'date_to' =>$date_to,
+            'mixedSearchFields' => $this->model->mixed_search,
+        ];
+
+        return view($this->viewPath . 'outOfStockIndex', $response);
+        
+    }
+
+    /**
+     * 导出缺货报表
+     *
+     * @param none
+     * @return obj
+     * 
+     */
+    public function exportOutOfStockCsv()
+    {   
+        $sku = request()->input('sku');
+        $status = request()->input('status');
+        $date_from = request()->input('date_from');
+        $date_to = request()->input('date_to');
+        $user_id = request()->input('user_id');
+        /*$item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->where('packages.status','NEED')
+            ->distinct()
+            ->get(['package_items.item_id'])
+            ->toArray();*/
+        $item_id_arr = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+            ->leftjoin('items','items.id','=','package_items.item_id')
+            ->where('packages.status','NEED');
+
+        if($user_id){
+            $item_id_arr = $item_id_arr->where('items.purchase_adminer',$user_id);
+        }
+        if($status){
+            $item_id_arr = $item_id_arr->where('items.status',$status);
+        }
+        if($date_from){
+            $item_id_arr = $item_id_arr->where('items.created_at','>',$date_from);
+        }
+        if($date_to){
+            $item_id_arr = $item_id_arr->where('items.created_at','<',$date_to);
+        }
+        if($sku){
+            $sku_arr = explode(',', $sku);
+            $item_id_arr = $item_id_arr->whereIn('items.sku',$sku_arr);
+        }
+        
+        $item_id_arr = $item_id_arr->distinct()->get(['package_items.item_id'])->toArray();
+
+        $rows = [];
+        $warehouses = WarehouseModel::all();
+        //print_r($item_id_arr);exit;
+        foreach($item_id_arr as $item_id) {
+            $model = $this->item->find($item_id['item_id']);
+            foreach($warehouses as $warehouse){
+               $rows[] = [
+                    'sku号' => $model->sku,
+                    '所属仓库' => $warehouse->name,
+                    '物品名称' => $model->c_name,
+                    '在途' => $model->transit_quantity[$warehouse->id]['normal'],
+                    '特采在途' => $model->transit_quantity[$warehouse->id]['special'],
+                    '欠货数量' => $model->out_of_stock,
+                    '虚库存' => $model->warehouse_quantity[$warehouse->id]['available_quantity'],
+                    '实库存' => $model->warehouse_quantity[$warehouse->id]['all_quantity'],
+                    '最近采购时间' => $model->recently_purchase_time,
+                    '缺货时间' => $model->out_of_stock_time,
+                ]; 
+            }       
+        }
+        $name = 'export_exception';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');        
     }
         
 }

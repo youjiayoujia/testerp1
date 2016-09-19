@@ -75,6 +75,7 @@ class GetMessages extends Command
                         $messageNew = MessageModel::firstOrNew(['message_id' => $message['message_id']]);
                         if($messageNew->id == null){
                             $messageNew->account_id = $account->id;
+                            $messageNew->channel_id = $account->channel_id;
                             $messageNew->message_id = $message['message_id'];
                             $messageNew->from_name = $message['from_name'];
                             $messageNew->labels = $message['labels'];

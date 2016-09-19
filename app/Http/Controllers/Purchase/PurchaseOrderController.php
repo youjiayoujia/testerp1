@@ -681,11 +681,13 @@ class PurchaseOrderController extends Controller
                 //need包裹分配库存
                 $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
                 if(count($packageItem)>0){
-                    foreach($packageItem->package as $package){
-                        if($package->status=='NEED'){
-                            $job = new AssignStocks($this->package);
-                            $job = $job->onQueue('assignStocks');
-                            $this->dispatch($job);
+                    foreach ($packageItem as $_packageItem) {
+                        foreach($_packageItem->package as $package){
+                            if($package->status=='NEED'){
+                                $job = new AssignStocks($this->package);
+                                $job = $job->onQueue('assignStocks');
+                                $this->dispatch($job);
+                            }
                         }
                     }
                 }       

@@ -128,7 +128,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->printRecords()->create(['user_id' => $user]);
+        $model->printRecords()->create(['user_id' => request()->user()->id]);
         if($model->status == 'NONE') {
             $model->update(['status' => 'PRINTED', 'print_at' => date('Y-m-d H:i:s', time())]);
         }

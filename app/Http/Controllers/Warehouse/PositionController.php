@@ -3,7 +3,7 @@
  * 库位控制器
  * 处理库位相关的Request与Response
  *
- * @author: MC
+ * @author: MC<178069409>
  * Date: 15/12/18
  * Time: 16:15pm
  */
@@ -103,12 +103,6 @@ class PositionController extends Controller
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        if($model->stocks) {
-            $stocks = $model->stocks;
-            foreach($stocks as $stock) {
-                $stock->delete();
-            }
         }
         $model->destroy($id);
         

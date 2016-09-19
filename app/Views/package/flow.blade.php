@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col-lg-4">
                 <a type="button" class="btn btn-info" href="{{ route('package.putNeedQueue') }}">
-                    Assign Stock <span class="badge">{{ $packageNum }}</span>
+                    匹配库存 <span class="badge">{{ $packageNum }}</span>
                 </a>
             </div>
         </div>

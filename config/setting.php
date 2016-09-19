@@ -126,6 +126,8 @@ return [
         'erp_sku' =>'ErpSku',
         'price.quantity_sold'=>'销量',
         'channel_name' => '渠道名称',
+        'questionUser.name' => '提问人',
+        'answerUser.name' => '解答人',
     ],
 ];
 

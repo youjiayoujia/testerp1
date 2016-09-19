@@ -895,6 +895,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('MessageToBuyer',['as' => 'MessageToBuyer', 'uses' => 'Message\EbayCasesController@MessageToBuyer']);
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
     Route::any('RefundBuyer',['as' => 'case.RefundBuyer', 'uses' => 'Message\EbayCasesController@RefundBuyer']);
+    Route::any('PartRefundBuyer',['as' => 'case.PartRefundBuyer', 'uses' => 'Message\EbayCasesController@PartRefundBuyer']);
     
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
     Route::any('feedBackStatistics',['uses' => 'Message\FeedBack\EbayFeedBackController@feedBackStatistics' , 'as' => 'feeback.feedBackStatistics' ]);
@@ -906,6 +907,16 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('changeReundNoteStatus',['uses' => 'RefundCenterController@changeReundNoteStatus','as' =>'refund.changeReundNoteStatus']);
     Route::resource('AliexpressIssue','Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',['uses' =>'Message\Dispute\AliexpressIssueController@doRefuseIssues' , 'as' =>'aliexpress.doRefuseIssues']);
+    //spu
+    Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
+    Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
+    Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
+    Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+    Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
+    Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
+    Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
+    Route::any('spu/insertLan', ['uses' => 'SpuController@insertLan', 'as' => 'spu.insertLan']);
+    Route::resource('spu', 'SpuController');
 });
 
 
@@ -926,14 +937,5 @@ Route::any('jdtestcrm',['uses'=> 'TestController@jdtestCrm']);
 Route::any('testEbayCases',['uses'=> 'TestController@testEbayCases']);
 Route::any('getSmtIssue',['uses'=> 'TestController@getSmtIssue']);
 
-//spu
-Route::get('spu/dispatchUser', ['uses' => 'SpuController@dispatchUser', 'as' => 'dispatchUser']);
-Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
-Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
-Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
-Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
-Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
-Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
-Route::any('spu/insertLan', ['uses' => 'SpuController@insertLan', 'as' => 'spu.insertLan']);
-Route::resource('spu', 'SpuController');
+
 

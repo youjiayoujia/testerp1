@@ -651,7 +651,7 @@ class TestController extends Controller
 
     public function testEbayCases(){
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'pandaserveyou'){ //测试diver
+            if($account->account == 'ebay@licn2011'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();

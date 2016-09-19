@@ -8,6 +8,7 @@
 namespace App\Models\Oversea;
 
 use App\Base\BaseModel;
+use App\Models\Channel\AccountModel;
 
 class SuggestFormModel extends BaseModel
 {
@@ -41,15 +42,32 @@ class SuggestFormModel extends BaseModel
 
     public function getMixedSearchAttribute()
     {
+        $accounts = AccountModel::all();
+        $arr = [];
+        foreach($accounts as $account) {
+            $arr[$account->id] = $account->account;
+        }
         return [
             'relatedSearchFields' => [
-                'item' => ['sku'],
+                'item' => ['sku']
             ],
             'filterFields' => [],
-            'filterSelects' => [],
+            'filterSelects' => [
+                'account_id' => $this->getArray('App\Models\Channel\AccountModel', 'account')
+            ],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];
+    }
+
+    public function getArray($model, $name)
+    {
+        $arr = [];
+        $inner_models = $model::all();
+        foreach ($inner_models as $key => $single) {
+            $arr[$single->id] = $single->$name;
+        }
+        return $arr;
     }
 
     protected $rules = [

@@ -74,7 +74,6 @@ class OrderModel extends BaseModel
             'address_confirm' => 'required',
             'create_time' => 'required',
             'currency' => 'required',
-            'rate' => 'required',
             'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
@@ -90,6 +89,58 @@ class OrderModel extends BaseModel
             'shipping_phone' => 'required',
             'payment' => 'required',
             'payment_date' => 'required',
+        ];
+
+        $buf = $request->all();
+        $buf = $buf['arr'];
+        foreach ($buf as $key => $val) {
+            if ($key == 'sku') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.sku.' . $k] = 'required';
+                }
+            }
+            if ($key == 'quantity') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.quantity.' . $k] = 'required';
+                }
+            }
+            if ($key == 'price') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.price.' . $k] = 'required';
+                }
+            }
+            if ($key == 'status') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.status.' . $k] = 'required';
+                }
+            }
+            if ($key == 'ship_status') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.ship_status.' . $k] = 'required';
+                }
+            }
+            if ($key == 'is_gift') {
+                foreach ($val as $k => $v) {
+                    $arr['arr.is_gift.' . $k] = 'required';
+                }
+            }
+        }
+
+        return $arr;
+    }
+
+    public function updateRule($request)
+    {
+        $arr = [
+            'amount_shipping' => 'required',
+            'shipping_firstname' => 'required',
+            'shipping_lastname' => 'required',
+            'shipping_address' => 'required',
+            'shipping_city' => 'required',
+            'shipping_state' => 'required',
+            'shipping_country' => 'required',
+            'shipping_zipcode' => 'required',
+            'shipping_phone' => 'required',
         ];
 
         $buf = $request->all();
@@ -146,7 +197,8 @@ class OrderModel extends BaseModel
             ],
             'filterSelects' => [
                 'status' => config('order.status'),
-                'active' => config('order.active')
+                'active' => config('order.active'),
+                'is_chinese' => config('order.is_chinese')
             ],
             'sectionSelect' => [
                 'price' => ['amount'],
@@ -190,6 +242,11 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
     }
 
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\CurrencyModel', 'currency', 'code');
+    }
+
     public function userAffairer()
     {
         return $this->belongsTo('App\Models\UserModel', 'affairer', 'id');
@@ -218,6 +275,10 @@ class OrderModel extends BaseModel
     public function requires()
     {
         return $this->hasMany('App\Models\RequireModel', 'order_id');
+    }
+
+    public function ebayMessageList(){
+        return $this->hasMany('App\Models\Message\SendEbayMessageListModel','order_id','id');
     }
 
     public function getStatusNameAttribute()
@@ -354,6 +415,7 @@ class OrderModel extends BaseModel
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
+            $data['customer_id'] = request()->user()->id;
             return RefundModel::create($data);
         }
         return 1;
@@ -382,7 +444,13 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-        $data['ordernum'] = microtime(true);
+        $data['ordernum'] = str_replace('.', '', microtime(true));
+        $currency = CurrencyModel::where('code', $data['currency']);
+        if($currency->count() > 0) {
+            foreach($currency->get() as $value) {
+                $data['rate'] = $value['rate'];
+            }
+        }
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
@@ -614,6 +682,14 @@ class OrderModel extends BaseModel
     public function getActiveTextAttribute()
     {
         return config('order.active.' . $this->active);
+    }
+
+    public function getSendEbayMessageHistoryAttribute(){
+        if(!$this->ebayMessageList->isEmpty()){
+            return $this->ebayMessageList;
+        }else{
+            return false;
+        }
     }
 
 }

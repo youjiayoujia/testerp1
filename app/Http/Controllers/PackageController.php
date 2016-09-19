@@ -23,6 +23,7 @@ use App\Models\WarehouseModel;
 use DB;
 use Exception;
 use App\Jobs\AssignStocks;
+use App\Models\NumberModel;
 
 class PackageController extends Controller
 {
@@ -32,6 +33,7 @@ class PackageController extends Controller
         $this->mainIndex = route('package.index');
         $this->mainTitle = '包裹';
         $this->viewPath = 'package.';
+        $this->middleware('StockIOStatus');
     }
 
     public function putNeedQueue()
@@ -50,6 +52,145 @@ class PackageController extends Controller
             $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
         }
         return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
+    }
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        $buf = '';
+        if(request()->has('outer')) {
+            $outer = request('outer');
+            $channelId = request('id');
+            if($outer == 'all') {
+                $buf = $this->model->where('status', 'PICKING')
+                                   ->where('channel_id', $channelId)
+                                   ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
+            } else {
+                $flag = request('flag');
+                if($flag == 'less') {
+                    $buf = $this->model->where('status', 'PICKING')
+                                   ->where('channel_id', $channelId)
+                                   ->where('warehouse_id', $outer)
+                                   ->where('created_at', '>', date('Y-m-d H:i:s', strtotime('-3 days')));
+                } else {
+                    $buf = $this->model->where('status', 'PICKING')
+                                   ->where('channel_id', $channelId)
+                                   ->where('warehouse_id', $outer)
+                                   ->where('created_at', '<', date('Y-m-d H:i:s', strtotime('-3 days')));
+                }
+            }
+        }
+        request()->flash();
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList(!empty($buf) ? $buf : $this->model),
+            'mixedSearchFields' => $this->model->mixed_search,
+            'logisticses' => LogisticsModel::all(),
+        ];
+
+        return view($this->viewPath . 'index', $response);
+    }
+
+    public function logisticsDelivery()
+    {
+        $date = request()->input('date');
+        if(!$date) {
+            $date = date('Y-m-d');
+        }
+        $data = [];
+        $count = 0;
+        $totalWeight = 0;
+        $logisticses = LogisticsModel::where('is_enable', 1)->get();
+        foreach($logisticses as $key => $logistics) {
+            $data[$key]['logisticsName'] = $logistics->name;
+            $data[$key]['logisticsId'] = $logistics->id;
+            $data[$key]['logisticsPriority'] = $logistics->priority;
+            $data[$key]['weight'] = 0;
+            $data[$key]['percent'] = 0 . '%';
+            $packages = $this->model
+                ->where('logistics_id', $logistics->id)
+                ->where('shipped_at', '>=', $date . ' 00:00:00')
+                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00');
+            foreach($packages->get() as $package) {
+                $data[$key]['weight'] += $package->weight;
+            }
+            $data[$key]['quantity'] = $packages->count();
+            $count += $data[$key]['quantity'];
+            $totalWeight += $data[$key]['weight'];
+            if($count) {
+                $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
+            }
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+            'count' => $count,
+            'date' => $date,
+            'totalWeight' => $totalWeight,
+        ];
+
+        return view($this->viewPath . 'logisticsDelivery', $response);
+    }
+
+    public function changeLogistics($arr, $id) 
+    {
+        $arr = explode(',', $arr);
+        foreach($arr as $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                continue;
+            }
+            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                continue;
+            }
+            $model->update(['logistics_id' => $id]);
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    public function removePackages($arr)
+    {
+        $arr = explode(',', $arr);
+        foreach($arr as $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                continue;
+            }
+            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                continue;
+            }
+            foreach($model->items as $packageItem) {
+                $packageItem->delete();
+            }
+            if($model->order->packages->count() == 1) {
+                $model->order->update(['status' => 'CANCEL']);
+            }
+            $model->delete();
+        }
+
+        return redirect($this->mainIndex);
+    }
+
+    public function removeLogistics($arr) 
+    {
+        $arr = explode(',', $arr);
+        foreach($arr as $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                continue;
+            }
+            if(in_array($model->status, ['PICKING', 'PACKED', 'SHIPPED'])) {
+                continue;
+            }
+            $model->update(['tracking_no' => '']);
+        }
+
+        return redirect($this->mainIndex);
     }
 
     /**
@@ -79,6 +220,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'ordernum' => OrderModel::where('status', 'PREPARED')->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
@@ -752,6 +894,27 @@ class PackageController extends Controller
         })->download('csv');
     }
 
+    public function bagInfo()
+    {
+        $trackno = request('trackno');
+        $model = $this->model->where('tracking_no', $trackno)->first();
+        if(!$model) {
+            return json_encode(false);
+        }
+        $number = NumberModel::first();
+        if(!count($number)) {
+            $number = NumberModel::create(['number' => 1]);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => $model->logistics ? $model->logistics->code : '',
+            'number' => 'S'.substr($number->number+100000000, 1),
+        ];
+        $number->update(['number' => $number->number + 1]);
+
+        return view($this->viewPath.'bagInfo', $response);
+    }
+
     /**
      * 执行发货
      *
@@ -782,12 +945,20 @@ class PackageController extends Controller
             return json_encode('unhold');
         }
         DB::commit();
-        $package->update([
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => request()->user()->id,
-            'actual_weight' => $weight,
-            'status' => 'SHIPPED',
-        ]);
+        if($weight == '0') {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'status' => 'SHIPPED',
+            ]);
+        } else {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'actual_weight' => $weight,
+                'status' => 'SHIPPED',
+            ]);
+        }
         $order = $package->order;
         $buf = 1;
         foreach($order->packages as $childPackage) {
@@ -929,8 +1100,10 @@ class PackageController extends Controller
                 'metas' => $this->metas(__FUNCTION__),
                 'model' => $model,
             ];
+
             return view('logistics.template.tpl.' . explode('.', $view->view)[0], $response);
         }
+        
         return false;
     }
 

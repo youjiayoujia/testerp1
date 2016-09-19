@@ -526,13 +526,12 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
                         // 或者  跳过
                         /**
-                         * 去除三种状态的消息
+                         * 去除种状态的消息
                          * 1.最后一条消息是商家发送的
                          * 2.卖家账号为空
                          *
@@ -546,6 +545,9 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+
+                        dd(json_decode($detailArrJson));
+
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
@@ -920,7 +922,7 @@ Class AliexpressAdapter implements AdapterInterface
         $newTrSortArr = $this->combineDika($sKarr); //行显示的排序数组
   
         foreach ($newTrSortArr as $ns){
-            if (array_key_exists($ns, $skus->toArray())){                
+            if (array_key_exists($ns, $skus)){                
                 $newSkus[] = $skus[$ns];
             }
         }
@@ -1441,6 +1443,7 @@ Class AliexpressAdapter implements AdapterInterface
                 $method = 'api.queryIssueList';
                 $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
                 $issue_list = json_decode($this->getJsonData($method, $para));
+                dd($issue_list);
                 if(isset($issue_list->success)) {
                     foreach ($issue_list->dataList as $item) {
 
@@ -1465,5 +1468,33 @@ Class AliexpressAdapter implements AdapterInterface
        $time = date('Y-m-d H:i:s', substr($time, 0, 10));
        return $time;
    }
+
+    /**
+     * 过滤速卖通产品信息模块
+     * @param $str 产品详情信息
+     * @return mixed
+     */
+    function filterSmtRelationProduct($str){
+        preg_match_all('/<kse:widget.*><\/kse:widget>/i', $str, $matches);
+        if (!empty($matches[0])){
+            foreach($matches[0] as $widget){
+                $str = str_replace($widget, '', $str);
+            }
+        }
+        return $str;
+    }
+    
+    /**
+     * @param $paramAry
+     * compact('orderId','buyId','comments')
+     */
+    public function addMessageNew($paramAry){
+         // $order_detail_ary = json_decode($this->getJsonData('api.findOrderById',"orderId=".$paramAry['orderId']),true);
+        $query =rawurlencode("channelId={$paramAry['orderId']}&buyerId={$paramAry['buyId']}&msgSources=order_msg&content={$paramAry['comments']}");
+        $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
+
+        return $respon_ary['result']['isSuccess'] ? true : false;
+
+    }
 
 }

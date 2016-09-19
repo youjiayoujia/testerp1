@@ -1,4 +1,7 @@
 @extends('common.table')
+@section('beforeTable')
+<font size='15px' color='green'>拣货单列表&nbsp;&nbsp;&nbsp;&nbsp;今日打印拣货单:{{$today_print}}张&nbsp;&nbsp;&nbsp;&nbsp;已分配:{{$allocate}}张</font>
+@stop
 @section('tableHeader')
     <th><input type='checkbox' name='select_all' class='select_all'></th>
     <th class='sort' data-field='id'>ID</th>
@@ -31,15 +34,20 @@
                 <a href="{{ route('pickList.show', ['id'=>$pickList->id]) }}" class="btn btn-info btn-xs">
                     <span class="glyphicon glyphicon-eye-open"></span> 查看
                 </a>
+                @if($pickList->status == 'NONE')
                 <a href="javascript:" class="btn btn-warning btn-xs print">
                     <span class="glyphicon glyphicon-pencil"></span> 打印拣货单
+                </a>
+                @endif
+                <a href="javascript:" class="btn btn-warning btn-xs code">
+                    <span class="glyphicon glyphicon-pencil"></span> 条码
                 </a>
                 @if($pickList->type == 'MULTI' && $pickList->status == 'PICKING')
                 <a href="{{ route('pickList.inbox', ['id'=>$pickList->id])}}" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span> 分拣
                 </a>
                 @endif
-                @if($pickList->status == 'PACKAGEING' || $pickList->status == 'PICKING')
+                @if($pickList->status == 'PRINTED')
                 <button class="btn btn-info btn-xs pickBy"
                         data-toggle="modal"
                         data-target="#pickBy">
@@ -140,6 +148,16 @@ $(document).ready(function(){
     $(document).on('click', '.print', function () {
         id = $(this).parent().parent().find('td:eq(1)').text();
         src = "{{ route('pickList.print', ['id'=>'']) }}/" + id;
+        $('#iframe_print').attr('src', src);
+        $('#iframe_print').load(function () {
+            $('#iframe_print')[0].contentWindow.focus();
+            $('#iframe_print')[0].contentWindow.print();
+        });
+    });
+
+    $(document).on('click', '.code', function () {
+        id = $(this).parent().parent().find('td:eq(1)').text();
+        src = "{{ route('pickList.pickCode', ['id'=>'']) }}/" + id;
         $('#iframe_print').attr('src', src);
         $('#iframe_print').load(function () {
             $('#iframe_print')[0].contentWindow.focus();

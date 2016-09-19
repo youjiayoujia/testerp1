@@ -231,6 +231,23 @@ return [
                     'icon' => '',
                 ],
             ],
+            '报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包装排行榜',
+                    'url' => 'packReport.index',
+                    'icon' => '',
+                ],
+            ],
         ],
     ],
     //仓储导航
@@ -244,6 +261,26 @@ return [
                 [
                     'name' => '海外仓销量',
                     'url' => 'suggestForm.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '申请表',
+                    'url' => 'report.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '发货',
+                    'url' => 'report.shipment',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '海外仓箱子',
+                    'url' => 'box.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'fba库存信息',
+                    'url' => 'fbaStock.index',
                     'icon' => '',
                 ],
             ],
@@ -405,9 +442,35 @@ return [
                 'icon' => '',
             ],
             [
-            'name' => 'smt销售代码设置',
-            'url' => 'smtSellerCode.index',
-            'icon' => '',
+                'name' => 'SMT售后模版管理',
+                'url' => 'smtAfterSale.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT框架模版管理',
+                'url' => 'smtTemplate.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT产品分组',
+                'url' => 'smtProduct.groupManage',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT服务模版',
+                'url' => 'smtProduct.serviceManage',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT运费模版',
+                'url' => 'smtProduct.freightManage',
+                'icon' => '',
+            ],
+            
+            [
+                'name' => 'SMT销售代码设置',
+                'url' => 'smtSellerCode.index',
+                'icon' => '',
             ],
             [
                 'name' => 'Ebay站点信息',
@@ -464,6 +527,20 @@ return [
                     'icon' => '',
                 ],
             ],
+            '平台批量操作' => [
+                [
+                    'name' => 'Aliexpress批量订单留言',
+                    'url' => 'aliexpressReturnOrderMessages',
+                    'icon' => '',
+                ],
+            ],
+            '评论列表' =>[
+                [
+                    'name' => 'Ebay feedBack',
+                    'url'  => 'ebayFeedBack.index',
+                    'icon' => '',
+                ]
+            ],
         ]
     ],
     //报表导航
@@ -477,6 +554,20 @@ return [
                 [
                     'name' => '采购数据统计',
                     'url' => 'purchaseStaticstics',
+                    'icon' => '',
+                ],
+            ],
+            'CRM报表' => [
+                [
+                    'name' => '差评统计',
+                    'url'  => 'feeback.feedBackStatistics',
+                    'icon' => '',
+                ],
+            ],
+            '物流报表' => [
+                [
+                    'name' => '物流发货统计',
+                    'url' => 'package.logisticsDelivery',
                     'icon' => '',
                 ],
                 [
@@ -522,6 +613,21 @@ return [
             ],
         ]
     ],
+    [
+        'name' => '财务',
+        'icon' => 'glyphicon glyphicon-lock',
+        'url' => '',
+        'type' => '',
+        'subnavigations' => [
+            [
+                'name' => '退款中心',
+                'url' => 'refundCenter.index',
+                'icon' => 'glyphicon glyphicon-loc',
+            ],
+        ],
+    ],
+
+
     //系统导航
     [
         'name' => '系统',

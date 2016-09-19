@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Cache;
 use App\Jobs\Job;
 use App\Jobs\AssignStocks;
 use App\Models\OrderModel;
@@ -33,36 +34,43 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-        $start = microtime(true);
-        if ($this->order) {
-            if ($this->order->status == 'PREPARED') {
-                $oldPackages = $this->order->packages;
-                foreach($oldPackages as $oldPackage) {
-                    foreach($oldPackage->items as $packageItem) {
-                        $packageItem->delete();
+        if(!Cache::store('file')->get('stockIOStatus')) {
+            $this->result['status'] = 'fail';
+            $this->result['remark'] = 'stockTaking , stock is locked.';
+            $this->lasting = 0;
+            $this->log('DoPackages');
+        } else {
+            $start = microtime(true);
+            if ($this->order) {
+                if ($this->order->status == 'PREPARED') {
+                    $oldPackages = $this->order->packages;
+                    foreach($oldPackages as $oldPackage) {
+                        foreach($oldPackage->items as $packageItem) {
+                            $packageItem->delete();
+                        }
+                        $oldPackage->delete();
                     }
-                    $oldPackage->delete();
-                }
-                $package = $this->order->createPackage();
-                if ($package) {
-                    $job = new AssignStocks($package);
-                    $job->onQueue('assignStocks');
-                    $this->dispatch($job);
-                    $this->relation_id = $this->order->id;
-                    $this->result['status'] = 'success';
-                    $this->result['remark'] = 'Success.';
+                    $package = $this->order->createPackage();
+                    if ($package) {
+                        $job = new AssignStocks($package);
+                        $job->onQueue('assignStocks');
+                        $this->dispatch($job);
+                        $this->relation_id = $this->order->id;
+                        $this->result['status'] = 'success';
+                        $this->result['remark'] = 'Success.';
+                    } else {
+                        $this->relation_id = 0;
+                        $this->result['status'] = 'fail';
+                        $this->result['remark'] = 'Fail to create virtual package.';
+                    }
                 } else {
                     $this->relation_id = 0;
-                    $this->result['status'] = 'fail';
-                    $this->result['remark'] = 'Fail to create virtual package.';
+                    $this->result['status'] = 'success';
+                    $this->result['remark'] = 'Package status is not PREPARED. Can not create package';
                 }
-            } else {
-                $this->relation_id = 0;
-                $this->result['status'] = 'success';
-                $this->result['remark'] = 'Package status is not PREPARED. Can not create package';
             }
-        } 
-        $this->lasting = round(microtime(true) - $start, 3);
-        $this->log('DoPackages', serialize($this->order));
+            $this->lasting = round(microtime(true) - $start, 3);
+            $this->log('DoPackages', base64_encode(serialize($this->order)));
+        }
     }
 }

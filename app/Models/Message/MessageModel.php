@@ -468,7 +468,7 @@ class MessageModel extends BaseModel{
                 $files = $this->MessageFieldsDecodeBase64;
                 if(!empty($files)){
                     $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
-                    $html .= '<p><strong>Ebay链接</strong>:<a herf="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
+                    $html .= '<p><strong>Ebay链接</strong>:<a href="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
 
                 }
 

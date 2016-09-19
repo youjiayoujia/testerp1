@@ -42,18 +42,34 @@ $smtApi = $channel->driver($account->channel->driver, $account->api_config);
     padding: 0 10px;
 }
 
-.pic-main {
+.pic-main,.pic-detail,.relate-list{
     padding: 5px;
     border: 1px solid #ccc;
 }
 
-.pic-main li {
+.pic-main li, .pic-detail li,.relate-list li{
     margin: 5px;
     padding: 0px;
     border: 0px;
     width: 102px;
     text-align: right;
 }
+ /***拖拽样式***/
+.pic-main li div, .pic-detail li div, .relate-list li div{
+    width: 102px;
+    height: 125px;
+    border: 1px solid #fff;
+}
+
+.pic-main .placeHolder div, .pic-detail .placeHolder div, .relate-list .placeHolder div{
+    width: 102px;
+    height: 125px;
+    background-color: white !important;
+    border: dashed 1px gray !important;
+}
+.my-list-cust li{ padding: 5px; float: left; position: relative;}
+.my-list-cust li img{ cursor: pointer;}
+.my-list-cust .my-check-cust{ position: absolute; z-index: 999; left: 5px; top: 1px;}
 
 .form-group{
     margin-top:10px;
@@ -280,8 +296,8 @@ text-align: left;
                 <select name="productUnit" id="productUnit" class="form-control" datatype="n" nullmsg="单位不能为空" errormsg="单位的值类型错误">
                     <?php
                         
-                            if ($draft_info){ //产品ID
-                                $unitId = $draft_detail['productUnit'];
+                            if ($smtApi->filterData('productId',$draft_info)){ //产品ID
+                                $unitId = $smtApi->filterData('productUnit',$draft_detail);
                             }else {
                                 $unitId = '100000015';
                             }
@@ -328,9 +344,9 @@ text-align: left;
                                nullmsg="包装重量在0.001-70.000之间" min="0.001" max="70" errormsg="包装重量要在0.001-70.000之间" value="<?php echo $draft_info ? $draft_info['grossWeight'] : '';?>">                      	    
 			</div>KG	                                    
         </div>
-        <div class="row">
-            <div class="form-group col-sm-1">
-                <input type="checkbox" name="isPackSell" id="isPackSell" value="1" <?php echo $draft_detail ? ($draft_detail['grossWeight'] ? 'checked' : '') : ''; ?> >自定义重量
+        <div class="row form-group">
+            <div class="col-sm-1 col-sm-offset-1">
+                <input type="checkbox" name="isPackSell" id="isPackSell" value="1" <?php echo $draft_detail ? ($draft_detail['grossWeight'] ? 'checked' : '') : ''; ?> ><span>自定义重量</span>
             </div>                         
         </div>
         
@@ -367,11 +383,11 @@ text-align: left;
                             if (array_key_exists('child', $g)) { //有子选项
                                 echo '<optgroup label="'.$g['group_name'].'">';
                                 foreach ($g['child'] as $r):
-                                    echo '<option value="' . $r['group_id'] . '" ' . ($smtApi->filterData('groupId', $draft_info) == $r['group_id'] ? 'selected="selected"' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;--' . $r['group_name'] . '</option>';
+                                    echo '<option value="' . $r['group_id'] . '" ' . ($smtApi->filterData('groupId', ($draft_info ? $draft_info->toArray() : '')) == $r['group_id'] ? 'selected="selected"' : '') . '>&nbsp;&nbsp;&nbsp;&nbsp;--' . $r['group_name'] . '</option>';
                                 endforeach;
                                 echo '</optgroup>';
                             }else {
-                                echo '<option value="' . $g['group_id'] . '" '.($smtApi->filterData('groupId', $draft_info) == $g['group_id'] ? 'selected="selected"' : '').'>' . $g['group_name'] . '</option>';
+                                echo '<option value="' . $g['group_id'] . '" '.($smtApi->filterData('groupId', ($draft_info ? $draft_info->toArray() : '')) == $g['group_id'] ? 'selected="selected"' : '').'>' . $g['group_name'] . '</option>';
                             }
                         endforeach;
                     ?>
@@ -430,6 +446,7 @@ text-align: left;
                 
                 //产品属性
                 $aeopAeProductPropertys = $draft_detail ? ( $draft_detail['aeopAeProductPropertys'] ? unserialize($draft_detail['aeopAeProductPropertys']) : array() ): array();
+                //$aeopAeProductPropertys = $smtApi->filterData('aeopAeProductPropertys', $draft_detail) ? unserialize($draft_detail['aeopAeProductPropertys']) : array();
                 //这个产品属性组装下
                 $propertyArray  = array();
                 $propertyArray2 = array();
@@ -700,7 +717,7 @@ text-align: left;
                     <div class="col-sm-3">
                         <input type="text" class="form-control" id="productStock" name="productStock"
                                datatype="numrange" min="1" max="999999" nullmsg="库存值为1-999999之间" errormsg="库存错误"
-                               value="<?php echo $draft_skus && $smtApi->filterData('ipmSkuStock', $draft_skus[0]) ? $draft_skus[0]['ipmSkuStock'] : 0; ?>"/>
+                               value="<?php $first_sku = array_shift($draft_skus); echo $draft_skus && $smtApi->filterData('ipmSkuStock', $first_sku) ? $first_sku['ipmSkuStock'] : 0; ?>"/>
                     </div>
                     </div>
                 </div>
@@ -710,9 +727,9 @@ text-align: left;
                    
                     <div class="col-sm-3">	
                         <?php
-                        $skuCode = ''; //SKU代码信息
-                        if (!empty($draft_skus) && !empty($draft_skus[0]['smtSkuCode'])){
-                            $skuCode = $smtApi->rebuildSmtSku($draft_skus[0]['smtSkuCode']);
+                        $skuCode = ''; //SKU代码信息              
+                        if (!empty($draft_skus) && !empty($first_sku['smtSkuCode'])){
+                            $skuCode = $smtApi->rebuildSmtSku($first_sku['smtSkuCode']);
                         }
                         ?>	
                          <input type="text" class="form-control" id="productCode" name="productCode" placeholder="商品编码" value="<?php echo $skuCode;?>">    
@@ -788,6 +805,8 @@ $template['name'].'</option>';
                                 <a href="javascript:void(0);" class="btn btn-default btn-sm copy_main_pic">复制主图图片</a>
                                 <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImage')}}', '<?php echo $token_id;?>', '');">图片目录上传</a>
                                 <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImage')}}', '<?php echo $token_id;?>', 'SP');">实拍目录上传</a>
+                                <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImageByNewSys',['type'=> 1])}}', '<?php echo $token_id;?>', '');">新图片(实拍)上传</a>
+                                <a class="btn btn-default btn-sm dir_add" href="javascript: void(0);" onclick="addDir(this, '{{route('smt.ajaxUploadDirImageByNewSys',['type'=> 2])}}', '<?php echo $token_id;?>', '');">新图片(链接)上传</a>
                                 <a class="btn btn-default btn-sm copyToMain" href="javascript: void(0);" onclick="copyPicTo(this, 'pic-main', 6);">复制到主图</a>                                           
                                 <a class="btn btn-danger btn-xs delete_item pic_del_all"><span class="glyphicon glyphicon-trash"></span>全部删除</a>
                                 <b class="ajax-loading hide">图片上传中...</b>
@@ -892,14 +911,10 @@ $template['name'].'</option>';
 
 @show{{-- 表单按钮 --}}
 @section('pageJs')
-
-
-<script src="{{ asset('plugins/UEditor/umeditor.config.js') }}"></script>
-{{--<script src="{{ asset('plugins/ueditor/umeditor.js') }}"></script>--}}
-<script src="{{ asset('plugins/UEditor/umeditor.min.js') }}"></script>
-<link href="{{ asset('plugins/UEditor/themes/default/css/umeditor.css')}}" type="text/css" rel="stylesheet">
+<link href="{{ asset('plugins/layer/skin/layer.css') }}" rel="stylesheet">
 <script src="{{ asset('plugins/kindeditor/kindeditor.js') }}"></script>
 <script src="{{ asset('plugins/layer/layer.js') }}"></script>
+<script src="{{ asset('plugins/jquery.dragsort-0.5.1.min.js') }}"></script>
 <script type="text/javascript">
     var skuConfig = eval(<?php echo $sku_config;?>); //SKU属性的信息
     var token_id; //账号ID
@@ -1008,6 +1023,7 @@ $template['name'].'</option>';
         });
     });
 
+    //属性自定义图片上传
     K('.add-custom-image').click(function () {
         var lang = K(this).attr('lang');
         var input_next = K('.customizedPic-'+lang);
@@ -1028,6 +1044,32 @@ $template['name'].'</option>';
             });
         });
     });
+
+    $("#getskuinfo").click(function(){
+        var sku = $("#skuinfo").val();
+        if(sku=='')
+        {
+            alert('请输入SKU');
+            return false;
+        }
+
+        $.ajax({
+            url:'{{route('smt.getskuinfo')}}',
+            data:'sku='+sku,
+            type:'POST',
+            dataType: 'JSON',
+            success: function(data){
+                $("#grossWeight").val(data.data['weight']);
+                $("#packageLength").val(data.data['length']);
+                $("#packageWidth").val(data.data['width']);
+                $("#packageHeight").val(data.data['height']);
+                editor.html('');
+                //editor.appendHtml(data.data['products_html_mod']);
+                $("#templateId ").get(0).selectedIndex=1;
+                $("#promiseTemplateId ").get(0).selectedIndex=1;
+            }
+        })
+    })
  });
 
     //属性自定义图片上传
@@ -1039,38 +1081,7 @@ $template['name'].'</option>';
             now_length = $(this).val();
             $(this).closest('div').find('.help-block').html('还能够输入<i class="red">' + (num - now_length.length) + '</i>个字符');
     });
-
-    $("#getskuinfo").click(function(){
-        var sku = $("#skuinfo").val();
-        if(sku=='')
-        {
-            return false;
-        }
-
-        $.ajax({
-            url:'{{route('smt.getskuinfo')}}',
-            data:'sku='+sku,
-            type:'POST',
-            dataType: 'JSON',
-            success: function(data){
-
-                $("#grossWeight").val(data.data['weight']);
-                $("#packageLength").val(data.data['length']);
-                $("#packageWidth").val(data.data['width']);
-                $("#packageHeight").val(data.data['height']);
-                editor.html('');
-                editor.appendHtml(data.data['products_html_mod']);
-                $("#templateId ").get(0).selectedIndex=1;
-                $("#promiseTemplateId ").get(0).selectedIndex=1;
-
-               // $(".templateId").find("option[text='one']").attr("selected",true);
-               // $(".promiseTemplateId").find("option[text='Service Template for New Sellers']").attr("selected",true);
-                //  $("#detail").append(data.data['products_html_mod'])
-                /// alert(data.data['weight'])
-            }
-        })
-        //  alert(sku);
-    })
+   
    
     //删除主图片
     $(document).on('click', '.pic-del', function () {
@@ -1680,7 +1691,11 @@ $template['name'].'</option>';
                     if (data.data){ //说明有成功的，成功的添加到里边去
                         var liStr = '';
                         $.each(data.data, function(index, el){
-                            liStr += '<li><div><img src="' + el + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                       	 if(el.resize){
+                          	liStr += '<li><div><img src="' + (el.resize) + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el.remote + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                          }else{
+                          	liStr += '<li><div><img src="' + el + '" width="100" height="100" style="border: 0px;"><input type="hidden" name="detailPicList[]" value="' + el + '" /><a href="javascript: void(0);" class="pic-del">删除</a></div></li>';
+                          }
                         });
                         $(obj).closest('div.form-group').find('ul').append(liStr);
                         layer.msg('图片上传成功', 2, -1);
@@ -1791,6 +1806,8 @@ $template['name'].'</option>';
             });
         });
 
+        $(".pic-main, .pic-detail, .relate-list").dragsort({ dragSelector: "div",  placeHolderTemplate: "<li class='placeHolder'><div></div></li>"});
+
         //从别处复制图片到这
         function copyToHere(obj, fromClass){
             
@@ -1881,10 +1898,10 @@ $template['name'].'</option>';
                     	   $('#id').val(productId);
                        }
                    }
-                   
+                   showxbtips(data.info);
                    location.href = "{{route('smt.index')}}";
                } else {
-                   layer.alert(data.info, 'alert-warning');
+            	   showxbtips(data.info, 'alert-warning');
                }
             }
         });

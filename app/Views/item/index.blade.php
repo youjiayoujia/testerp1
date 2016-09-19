@@ -102,23 +102,34 @@
                                     <div class="form-group form-inline sets" id="setkey_0">
                                         <table class="table table-bordered">
                                             <tr>
-                                                <td>当前分类：</td>
-                                                <td colspan="2">{{ $item->catalog?$item->catalog->all_name:'' }}</td>
+                                                <td colspan="3">当前分类：{{ $item->catalog?$item->catalog->all_name:'' }}</td>
                                             </tr>
                                             <tr>
-                                                <td>产品名称：</td>
-                                                <td colspan="2">{{ $item->c_name }}</td>
+                                                <td colspan="3">产品名称：{{ $item->c_name }}</td>
                                             </tr>
                                             <tr>
                                                 <td>产品重量：
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 60px;" disabled>
+                                                        <input type="text" class="form-control" id="weight-{{$item->id}}" value="{{$item->weight}}" style="width: 110px;"  disabled>
                                                         <span class="input-group-addon">Kg</span>
                                                     </div>
 
                                                 </td>
-                                                <td>{{--打包：--}}</td>
                                                 <td>
+                                                    渠道名称：
+                                                    <select class="form-control" id="channel-{{$item->id}}">
+                                                        <option value="none">请选择</option>
+                                                        @foreach($Compute_channels as $channel)
+                                                            <option value="{{$channel->name}}">{{$channel->name}}</option>
+                                                        @endforeach
+                                                    </select></td>
+                                                <td>
+
+                                                    利润率：
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="20">
+                                                        <span class="input-group-addon">%</span>
+                                                    </div>
                                                     {{--   <div class="input-group">
                                                            <input type="text" class="form-control" style="width: 60px;">
                                                            <span class="input-group-addon">个</span>
@@ -156,32 +167,16 @@
                                                 </td>
                                                 <td>
                                                     物流分区：
-                                                    <select class="form-control" name="division" id="zones-{{$item->id}}" style="width: 150px;">
+                                                    <select class="form-control" name="division" id="zones-{{$item->id}}">
                                                         <option value="none">请选择</option>
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>
-                                                    渠道名称:
-                                                    <select class="form-control" id="channel-{{$item->id}}">
-                                                        <option value="none">请选择</option>
-                                                        @foreach($Compute_channels as $channel)
-                                                            <option value="{{$channel->name}}">{{$channel->name}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    利润率：
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control " style="width:50px" id="profit-{{$item->id}}" value="">
-                                                        <span class="input-group-addon">%</span>
-                                                    </div>
-                                                </td>
-                                                <td>{{--汇率：XXXX--}}</td>
                                             </tr>
                                         </table>
                                         <div class=" text-right">
+                                            <input type="button" value="取 消" class="form-control btn-default" data-dismiss="modal" aria-label="Close">
                                             <input type="button" name="查询" class="form-control btn-primary" placeholder="属性名" value="查 询" onclick="doComputePrice({{$item->id}})">
                                         </div>
                                         <br/>
@@ -499,6 +494,7 @@
                     }
                 },
                 error:function () {
+                    alert('计算失败，品类渠道的税率是否编辑？');
 
                 }
             });

@@ -48,6 +48,9 @@
                 <label>
                     <input type='radio' name='type' value='third' {{ old('type') ? (old('type') == 'third' ? 'checked' : '') : '' }}>第三方仓库
                 </label>
+                <label>
+                    <input type='radio' name='type' value='fbaLocal' {{ old('type') ? (old('type') == 'fbaLocal' ? 'checked' : '') : '' }}>fba本地仓
+                </label>
             </div>
         </div>
     </div>

@@ -52,7 +52,7 @@ class CreateOrders extends Migration
             $table->string('operator')->comment('运营人员')->nullable()->default(NULL);
             $table->string('payment')->comment('支付方式')->default(NULL);
             $table->string('currency')->comment('币种');
-            $table->double('rate', 15, 4)->comment('汇率');
+            $table->decimal('rate',11,9)->comment('汇率')->comment(1.0);
             $table->enum('address_confirm', [0, 1])->comment('地址验证')->default(1);
             $table->string('shipping')->comment('物流方式')->nullable()->default(NULL);
             $table->string('shipping_firstname')->comment('发货名字');

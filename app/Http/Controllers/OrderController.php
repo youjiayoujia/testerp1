@@ -11,7 +11,8 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\Job;
-use App\Jobs\DoPackage;
+use App\Jobs\DoPackages;
+use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
@@ -88,7 +89,8 @@ class OrderController extends Controller
             $arr = [];
             foreach ($buf as $key => $value) {
                 $arr[$key]['id'] = $value->sku;
-                $arr[$key]['text'] = $value->sku;
+                $arr[$key]['text'] = $value->warehouse->name . ' ' . $value->sku . ' ' .
+                    $value->product->c_name . ' ' . $value->getAllQuantityAttribute() . ' ' . $value->status_name;
             }
             if ($total) {
                 return json_encode(['results' => $arr, 'total' => $total]);
@@ -100,7 +102,17 @@ class OrderController extends Controller
         return json_encode(false);
     }
 
-    
+    public function createVirtualPackage()
+    {
+        $model = $this->model->where('status', 'PREPARED')->get();
+        foreach($model as $key => $single) {
+            $job = new DoPackages($single);
+            $job = $job->onQueue('doPackages');
+            $this->dispatch($job);
+        }
+
+        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackage队列'));
+    }
 
     /**
      * 保存数据
@@ -148,14 +160,59 @@ class OrderController extends Controller
         if ($special == 'yes') {
             $order = $this->model->where('customer_remark', '!=', '');
         }
+        $page = request()->input('page');
+        $pageSize = request()->input('pageSize');
+        $subtotal = '';
+        if(!$page) {
+            if(!$pageSize) {
+                $pageSize = 10;
+            }
+            $orders = $this->model->orderBy('id', 'desc')->take($pageSize)->get();
+            foreach($orders as $order) {
+                $subtotal += $order->amount * $order->rate;
+            }
+        }else {
+            if(!$pageSize) {
+                $pageSize = 10;
+            }
+            $orders = $this->model->orderBy('id', 'desc')->skip(($page - 1) * $pageSize)->take($pageSize)->get();
+            foreach($orders as $order) {
+                $subtotal += $order->amount * $order->rate;
+            }
+        }
+        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
             'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
             'currencys' => CurrencyModel::all(),
+            'subtotal' => $subtotal,
+            'rmbRate' => $rmbRate,
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    //订单统计
+    public function orderStatistics()
+    {
+        $startDate = request()->input('start_date');
+        $endDate = request()->input('end_date');
+        $orders = $this->model->where('create_time', '<=', $endDate)->where('create_time', '>=', $startDate);
+        $data['totalAmount'] = '';
+        $data['averageProfit'] = '';
+        $data['totalPlatform'] = '';
+        $profitAmount = '';
+        if($orders->count()) {
+            foreach($orders->get() as $order) {
+                $data['totalAmount'] += $order->amount * $order->rate;
+                $profitAmount += $order->calculateProfitProcess() * $order->amount * $order->rate;
+                $data['totalPlatform'] += $order->calculateOrderChannelFee();
+            }
+            $data['averageProfit'] = $profitAmount / $data['totalAmount'];
+        }
+
+        return $data;
     }
 
     public function invoice($id)
@@ -278,7 +335,7 @@ class OrderController extends Controller
     public function update($id)
     {
         request()->flash();
-        $this->validate(request(), $this->model->rule(request()));
+        $this->validate(request(), $this->model->updateRule(request()));
         $data = request()->all();
         $data['status'] = 'REVIEW';
         foreach ($data['arr'] as $key => $item) {
@@ -447,6 +504,15 @@ class OrderController extends Controller
         return 1;
     }
 
+    //恢复订单
+    public function updateRecover()
+    {
+        $order_id = request()->input('order_id');
+        $this->model->find($order_id)->update(['status' => 'REVIEW']);
+
+        return 1;
+    }
+
     /**
      * 批量撤单
      *
@@ -475,7 +541,7 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
-        if($this->model->find($id)->packages) {
+        if($this->model->find($id)->packages->count()) {
             foreach($this->model->find($id)->packages as $package) {
                 $package->delete();
             }

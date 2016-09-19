@@ -24,7 +24,7 @@ class ExportPackageController extends Controller
     {
         $this->model = $export;
         $this->mainIndex = route('exportPackage.index');
-        $this->mainTitle = '导出模板';
+        $this->mainTitle = '模版';
         $this->viewPath = 'package.export.';
     }
 
@@ -200,25 +200,42 @@ class ExportPackageController extends Controller
                 $arr[$fieldItem->level] = $fieldItem->name;
             }
             ksort($arr);
-            $packages = PackageModel::where('channel_id', request('channel_id'))
-                        ->where('warehouse_id', request('warehouse_id'))
-                        ->where('logistics_id', request('logistics_id'))
-                        ->where('status', request('status'))
-                        ->whereRaw('shipped_at >=  ? and shipped_at <= ?', [request('begin_shipped_at'), request('over_shipped_at')])->get($arr);
-            $buf = config('exportPackage');
-            $extras = [];
-            foreach($field->extra as $extra) {
-                $extras[$extra->fieldLevel]['name'] = $extra->fieldName;
-                $extras[$extra->fieldLevel]['value'] = $extra->fieldValue;
+            $packages = '';
+            if(request()->has('channel_id')) {
+                $packages = PackageModel::where('channel_id', request('channel_id'));
             }
-            ksort($extras);
-            $rows = $this->model->calArray($packages, $buf, $arr, $extras);
-            $name = 'export_packages';
-            Excel::create($name, function($excel) use ($rows){
-                $excel->sheet('', function($sheet) use ($rows){
-                    $sheet->fromArray($rows);
-                });
-            })->download('csv');
+            if(request()->has('warehouse_id')) {
+                $packages = $packages->where('warehouse_id', request('warehouse_id'));
+            }
+            if(request()->has('logistics_id')) {
+                $packages = $packages->where('logistics_id', request('logistics_id'));
+            }
+            if(request()->has('status')) {
+                $packages = $packages->where('status', request('status'));
+            }
+            if(request()->has('begin_shipped_at') && request()->has('over_shipped_at')) {
+                $packages = $packages->whereRaw('shipped_at >=  ? and shipped_at <= ?', [request('begin_shipped_at'), request('over_shipped_at')]);
+            }
+            $packages = $packages->get($arr);
+            if(!empty($packages)) {
+                $buf = config('exportPackage');
+                $extras = [];
+                foreach($field->extra as $extra) {
+                    $extras[$extra->fieldLevel]['name'] = $extra->fieldName;
+                    $extras[$extra->fieldLevel]['value'] = $extra->fieldValue;
+                }
+                ksort($extras);
+                $rows = $this->model->calArray($packages, $buf, $arr, $extras);
+                $name = 'export_packages';
+                Excel::create($name, function($excel) use ($rows){
+                    $excel->sheet('', function($sheet) use ($rows){
+                        $sheet->fromArray($rows);
+                    });
+                })->download('csv');
+            } else {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '条件给的有问题信息有误'));
+            }
+            
         } else {
             $file = request()->file('accordingTracking');
             $arr = $this->model->processGoods($file);

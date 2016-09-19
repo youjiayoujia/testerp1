@@ -73,7 +73,7 @@
                 <option value="0">==选择回邮模版==</option>
                 @foreach($emailTemplates as $emailTemplate)
                     <option value="{{$emailTemplate->id}}" {{ $emailTemplate->id == $model->logistics_email_template_id ? 'selected' : '' }}>
-                        {{$emailTemplate->customer}}
+                        {{$emailTemplate->name}}
                     </option>
                 @endforeach
             </select>

@@ -22,9 +22,10 @@
                         $imagesUrlArr = explode(';', $smtProductList->details->imageURLs);
                         $firstImageURL = array_shift($imagesUrlArr);
                     }
-
                 ?>
+                 @if(!empty($firstImageURL))
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
+                 @endif
             </td>
             <td>{{ $smtProductList->accounts ? $smtProductList->accounts->account : ''}}</td>
             <td>
@@ -62,10 +63,12 @@
             </td>
         </tr>
      @endforeach
-     <form name="batchModify" action="{{route('smtProduct.batchModifyProducts',['_token'=>csrf_token()])}}" method="post" target="newWindow" onsubmit="openNewSpecifiedWindow('newWindow2')">
+     <!-- 
+     <form name="batchModify" action="{{route('smtProduct.batchModifyProduct',['_token'=>csrf_token()])}}" method="post" target="_blank" onsubmit="openNewSpecifiedWindow('newWindow2')">
 		<input type="hidden" name="operateProductIds" value="" id="operateProductIds"/>
 		<input type="hidden" name="from" value="draft"/>
 	</form>
+	-->
 @stop
 @section('tableToolButtons')
     @if($type == 'waitPost')
@@ -177,19 +180,16 @@ $(document).on('click', '#batch_post', function(){
 			type: 'post',
 			dataType: 'json',
 			async: true,
-			success:function(data){				
-				/*if(typeof(data) == "object"){
-					data = JSON.stringify(data);					
-				}*/
-				
+			success:function(data){			
+				var str = '';
 				$.each(data,function(name, value){
 					if(value.status){
-						alert(value.info);
+						str = str + value.info + " ";
 					}else{
-						alert(value.info);
+						str =str + value.info + "  ";
 					}
 				});
-				
+				layer.alert(str);
 			}
 		});	 
 
@@ -263,10 +263,10 @@ $('#batch_modify').on('click', function(e){
 		return false;
 	}
 
+	var url = "{{route('smtProduct.batchModifyProduct')}}";
+    window.location.href = url + '?ids=' + productIds + '&type=' + "{{$type}}";
 	//赋值下 --选择的产品就是需要批量修改的
-	$('#operateProductIds').val(productIds);
-
-	document.forms.batchModify.submit();
+	
 });
 
 function openNewSpecifiedWindow( windowName )

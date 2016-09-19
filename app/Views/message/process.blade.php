@@ -9,6 +9,11 @@
     <div class="row">
         <div class="col-lg-8">
             @include('message.process.content')
+
+            @if($driver == 'wish')
+                @include('message.process.wish_order_detail')
+            @endif
+
             @include('message.process.reply')
         </div>
         <div class="col-lg-4">

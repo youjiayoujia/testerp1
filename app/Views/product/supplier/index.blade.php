@@ -16,6 +16,20 @@
         </div>
         @parent
     </div>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="glyphicon glyphicon-filter"></i>
+            审核状态
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            @foreach(config('product.supplier_examine_status') as $key => $item)
+                <li>
+                    <a href="{{ DataList::filtersEncode(['examine_status','=',$key]) }}">{{ $item }}</a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
@@ -76,11 +90,13 @@
                 <a href="{{ route('productSupplier.edit', ['id'=>$supplier->id]) }}" title="编辑" class="btn btn-warning btn-xs">
                     <span class="glyphicon glyphicon-pencil"></span>
                 </a>
-{{--                <a href="javascript:" class="btn btn-danger btn-xs delete_item" title="删除"
-                   data-id="{{ $supplier->id }}"
-                   data-url="{{ route('productSupplier.destroy', ['id' => $supplier->id]) }}">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </a>--}}
+                @if($supplier->examine_status == 0)
+                    <a href="javascript:" class="btn btn-danger btn-xs delete_item" title="删除"
+                       data-id="{{ $supplier->id }}"
+                       data-url="{{ route('productSupplier.destroy', ['id' => $supplier->id]) }}">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+                 @endif
             </td>
         </tr>
     @endforeach

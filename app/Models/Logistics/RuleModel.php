@@ -42,6 +42,7 @@ class RuleModel extends BaseModel
         'country_section', 
         'limit_section',
         'account_section',
+        'transport_section',
     ];
 
     public $rules = [
@@ -101,6 +102,16 @@ class RuleModel extends BaseModel
     public function rule_accounts_through()
     {
         return $this->belongsToMany('App\Models\Channel\AccountModel', 'logistics_rule_accounts', 'logistics_rule_id', 'account_id');
+    }
+
+    public function rule_transports()
+    {
+        return $this->hasMany('App\Models\Logistics\Rule\TransportModel', 'logistics_rule_id', 'id');
+    }
+
+    public function rule_transports_through()
+    {
+        return $this->belongsToMany('App\Models\Logistics\TransportModel', 'logistics_rule_transports', 'logistics_rule_id', 'transport_id');
     }
 
     public function rule_countries()
@@ -174,6 +185,23 @@ class RuleModel extends BaseModel
         return $str;
     }
 
+    public function getTransportsNameAttribute()
+    {
+        $transports = $this->transports;
+        $arr = explode(',', $transports);
+        $str = '';
+        foreach($arr as $key => $value) {
+            $transport = TransportModel::find($value);
+            if($key == 0) {
+                $str = $transport->name;
+                continue;
+            }
+            $str .=','.$transport->name;
+        }
+
+        return $str;
+    }
+
     public function getCatalogsNameAttribute()
     {
         $catalogs = $this->catalogs;
@@ -209,6 +237,9 @@ class RuleModel extends BaseModel
         }
         if(array_key_exists('account_section', $arr) && array_key_exists('accounts', $arr)) {
             $this->rule_accounts_through()->attach($arr['accounts']);
+        }
+        if(array_key_exists('transport_section', $arr) && array_key_exists('transports', $arr)) {
+            $this->rule_transports_through()->attach($arr['transports']);
         }
     }
 
@@ -264,6 +295,16 @@ class RuleModel extends BaseModel
                 }
                 return false;
                 break;
+
+            case 'transport':
+                $transports = $this->rule_transports_through;
+                foreach($transports as $transport) {
+                    if($transport->pivot->transport_id == $id) {
+                        return true;
+                    }
+                }
+                return false;
+                break;
         }
     }
 
@@ -293,6 +334,12 @@ class RuleModel extends BaseModel
         } else {
             $this->update(['account_section' => '0']);
             $this->rule_accounts_through()->sync([]);
+        }
+        if(array_key_exists('transport_section', $arr) && array_key_exists('transports', $arr)) {
+            $this->rule_transports_through()->sync($arr['transports']);
+        } else {
+            $this->update(['transport_section' => '0']);
+            $this->rule_transports_through()->sync([]);
         }
         if(array_key_exists('country_section', $arr) && array_key_exists('countrys', $arr)) {
             $this->rule_countries_through()->sync($arr['countrys']);

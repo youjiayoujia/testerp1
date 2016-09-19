@@ -20,6 +20,7 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\Stock\TakingFormModel;
+use App\Jobs\StockTaking;
 
 class StockController extends Controller
 {
@@ -87,6 +88,45 @@ class StockController extends Controller
         ];
 
         return view($this->viewPath.'showStockInfo', $response);
+    }
+
+    public function overseaSku()
+    {
+        $sku = request('sku');
+        $stocks = $this->model->whereHas('warehouse', function($query){
+            $query = $query->where('type', 'fbaLocal');
+        })->whereHas('item', function($query) use ($sku){
+            $query = $query->where('sku', 'like', '%'.$sku.'%');
+        })->distinct()->with('item')->get(['item_id']);
+        $total = $stocks->count();
+        $arr = [];
+        foreach($stocks as $key => $stock) {
+            $arr[$key]['id'] = $stock->item_id;
+            $arr[$key]['text'] = $stock->item->sku;
+        }
+        if($total)
+            return json_encode(['results' => $arr, 'total' => $total]);
+        else 
+            return json_encode('false');
+    }
+
+    public function overseaPosition()
+    {
+        if(request()->ajax()) {
+            $item_id = trim(request()->input('item_id'));
+            $obj = StockModel::where(['item_id'=>$item_id])->whereHas('warehouse', function($query){
+                $query = $query->where('type', 'fbaLocal');
+            })->with('position')->get();
+            if(!count($obj)) {
+                return json_encode('none');
+            }
+            $arr[] = $obj;
+            $arr[] = $obj->first()->available_quantity;
+            
+            return json_encode($arr);
+        }
+
+        return json_encode('false');
     }
 
     public function changePosition()
@@ -158,21 +198,15 @@ class StockController extends Controller
      */
     public function createTaking()
     {
-        Cache::store('file')->forever('stockIOStatus', '0');
-        $first = TakingModel::orderBy('id', 'desc')->first();
-        if($first && $first->check_status == '0') {
-            return redirect(route('stockTaking.index'))->with('alert', $this->alert('danger', '请先完成之前盘点'));
-        }
-        $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
-        $stocks_arr = $this->model->all()->chunk(1000);
-        foreach($stocks_arr as $stocks) {
-            foreach($stocks as $stock) 
-            {
-                $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
-            }
+        if(!Cache::store('file')->get('stockIOStatus')) {
+            return redirect(route('stockTaking.index'))->with('alert', $this->alert('fail', '盘点中...'));
+        } else {
+            $job = new StockTaking();
+            $job = $job->onQueue('stockTaking');
+            $this->dispatch($job);
         }
         
-        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
+        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '已加入队列'));
     }
 
     /**
@@ -235,12 +269,41 @@ class StockController extends Controller
      * @return obj
      * 
      */
+    public function ajaxAllSku()
+    {
+        if(request()->ajax()) {
+            $sku = trim(request()->input('sku'));
+            $stocks = $this->model->whereHas('item', function($query) use ($sku){
+                $query = $query->where('sku', 'like', '%'.$sku.'%');
+            })->get();
+            $total = $stocks->count();
+            $arr = [];
+            foreach($stocks as $key => $stock) {
+                $arr[$key]['id'] = $stock->item_id;
+                $arr[$key]['text'] = $stock->item->sku;
+            }
+            if($total)
+                return json_encode(['results' => $arr, 'total' => $total]);
+            else 
+                return json_encode('false');
+        }
+
+        return json_encode('false');
+    }
+
+    /**
+     * ajax请求  sku
+     *
+     * @param none
+     * @return obj
+     * 
+     */
     public function ajaxSku()
     {
         if(request()->ajax()) {
             $sku = trim(request()->input('sku'));
             $warehouseId = trim(request('warehouse_id'));
-            $stocks = $this->model->whereHas('item', function($query) use ($sku){
+            $stocks = $this->model->where('warehouse_id', $warehouseId)->whereHas('item', function($query) use ($sku){
                 $query = $query->where('sku', 'like', '%'.$sku.'%');
             })->get();
             $total = $stocks->count();

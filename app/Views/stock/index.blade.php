@@ -58,10 +58,3 @@
     </a>
 </div>
 @stop
-@section('childJs')
-<script type="text/javascript">
-    $(document).ready(function(){
-        
-    }); 
-</script>
-@stop

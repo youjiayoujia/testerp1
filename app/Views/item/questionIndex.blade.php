@@ -3,6 +3,8 @@
     
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
+    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
+    <th>ID</th>
     <th>提问对象</th>
     <th>图片</th>
     <th>提问</th>
@@ -19,6 +21,8 @@
 @section('tableBody')
     @foreach($data as $question)
         <tr>
+            <td><input type="checkbox" name="tribute_id" value="{{$question->id}}"></td>
+            <td>{{$question->id}}</td>
             <td>{{config('product.question.types')[$question->question_group]}}</td>
             <td><img src="{{ asset($question->image) }}" width="100px"></td>
             <td>{{$question->question}}</td>
@@ -137,8 +141,59 @@
         <!-- 模态框结束（Modal） -->
 
     @endforeach
+
+     @section('doAction')
+        <div class="row">
+            <div class="col-lg-12">
+                <button class="doAction" value="edit">批量</button>
+                <select>
+                    <option>==操作==</option>
+                    <option value='open'>open</option>
+                    <option value='pending'>pending</option>    
+                    <option value='closed'>closed</option>
+                </select>
+
+            </div>
+        </div>
+    @stop
 @stop
 
 @section('childJs')
-    
+    <script type="text/javascript">
+        //全选
+        function quanxuan() {
+            var collid = document.getElementById("checkall");
+            var coll = document.getElementsByName("tribute_id");
+            if (collid.checked) {
+                for (var i = 0; i < coll.length; i++)
+                    coll[i].checked = true;
+            } else {
+                for (var i = 0; i < coll.length; i++)
+                    coll[i].checked = false;
+            }
+        }
+
+        $('.doAction').click(function () {
+            var status = $(this).next().find("option:selected").val();
+            var url = "{{route('item.questionStatus')}}";
+            var checkbox = document.getElementsByName("tribute_id");
+            var question_ids = "";
+            for (var i = 0; i < checkbox.length; i++) {
+                if (!checkbox[i].checked)continue;
+                question_ids += checkbox[i].value + ",";
+            }
+            question_ids = question_ids.substr(0, (question_ids.length) - 1);
+            $.ajax({
+                url: url,
+                data: {status: status,question_ids:question_ids},
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    window.location.reload();
+                }
+            })
+        });
+
+
+    </script>
 @stop

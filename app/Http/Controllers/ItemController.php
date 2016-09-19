@@ -368,9 +368,23 @@ class ItemController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->message),
-            'mixedSearchFields' => $this->model->mixed_search,
+            'mixedSearchFields' => $this->message->mixed_search,
         ];
         return view($this->viewPath . 'questionIndex', $response);
+    }
+
+    public function questionStatus()
+    {
+        $question_ids = request()->input('question_ids');
+        $status = request()->input('status');
+        $arr = explode(',', $question_ids); 
+        
+        foreach ($arr as $id) {
+            $sku_message = $this->message->find($id);
+            $sku_message->update(['status'=>$status]);
+        }
+        
+        return 1;
     }
 
     public function answer()

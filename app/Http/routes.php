@@ -351,6 +351,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('itemUser/ajaxSupplierUser', ['uses' => 'ItemController@ajaxSupplierUser', 'as' => 'item.ajaxSupplierUser']);
     Route::any('item/changePurchaseAdmin/{id}', ['uses' => 'ItemController@changePurchaseAdmin', 'as' => 'changePurchaseAdmin']);
     Route::any('item/question/{id}', ['uses' => 'ItemController@question', 'as' => 'item.question']);
+    Route::any('item/questionStatus', ['uses' => 'ItemController@questionStatus', 'as' => 'item.questionStatus']);
     Route::any('item/extraQuestion', ['uses' => 'ItemController@extraQuestion', 'as' => 'item.extraQuestion']);
     Route::any('item/answer', ['uses' => 'ItemController@answer', 'as' => 'item.answer']);
     Route::any('item/questionIndex', ['uses' => 'ItemController@questionIndex', 'as' => 'item.questionIndex']);

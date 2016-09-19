@@ -142,4 +142,3 @@ return [
         'parent.shipmentCostNum' => '批次号',
     ],
 ];
-

@@ -692,7 +692,7 @@ class ItemModel extends BaseModel
             $data['status'] = $item->status?$item->status:'saleOutStopping';
             $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
-            $data['user_id'] = $item->purchase_adminer;
+            $data['user_id'] = $item->purchase_adminer?$item->purchase_adminer:0;
 
             $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
                 ->whereIn('packages.status', ['NEED'])

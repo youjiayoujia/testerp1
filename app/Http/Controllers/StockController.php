@@ -3,7 +3,7 @@
  * 库存控制器
  * 处理库存相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/12/30
  * Time: 14:19pm
  */

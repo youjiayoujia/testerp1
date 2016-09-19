@@ -23,4 +23,15 @@ class SkuMessageModel extends BaseModel
         return $this->belongsTo('App\Models\UserModel', 'answer_user');
     }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['questionUser' => ['name'], 'answerUser' => ['name']],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('product.question.types'),],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => ['time' => ['created_at']],
+        ];
+    }
+
 }

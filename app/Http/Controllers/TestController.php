@@ -50,6 +50,8 @@ use App\Jobs\Inorders;
 use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Models\Oversea\StockModel as fbaStock;
 use App\Models\Order\ItemModel as orderItemss;
+use App\Models\Message\Issues\AliexpressIssueListModel;
+use App\Models\Message\Issues\AliexpressIssuesDetailModel;
 
 use BarcodeGen;
 
@@ -230,7 +232,7 @@ class TestController extends Controller
             ->createWarehouseOrder($package);
         exit;
     }
-    
+
     public function testYw(){
         $package = PackageModel::findOrFail(3);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
@@ -649,7 +651,7 @@ class TestController extends Controller
 
     public function testEbayCases(){
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'pandaserveyou'){ //测试diver
+            if($account->account == 'ebay@licn2011'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();
@@ -658,7 +660,7 @@ class TestController extends Controller
             }
         }
     }
-    
+
     /*
      * 同步ebay信息
      */
@@ -689,22 +691,57 @@ class TestController extends Controller
 
     public function getSmtIssue(){
 
-        $item = orderItemss::find(20);
-        dd($item->ItemChineseName);
-
-
-
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'darli04@126.com'){ //测试diver
+            if($account->account == 'smtjiahongming@126.com'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-                
-                $messageList = $channel->getIssues();
-                
-                
-                
-                print_r($messageList);exit;
 
+                $getIssueLists = $channel->getIssues();
+                if(!empty($getIssueLists)){
+                    foreach($getIssueLists as $issue){
+                        $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
+                        if(empty($issue_list->id)){
+                            $issue_list->issue_id      = $issue['issue_id'];
+                            $issue_list->gmtModified   = $issue['gmtModified'];
+                            $issue_list->issueStatus   = $issue['issueStatus'];
+                            $issue_list->gmtCreate     = $issue['gmtCreate'];
+                            $issue_list->reasonChinese = $issue['reasonChinese'];
+                            $issue_list->orderId       = $issue['orderId'];
+                            $issue_list->reasonEnglish = $issue['reasonEnglish'];
+                            $issue_list->issueType     = $issue['issueType'];
+                            $issue_list->save();
+
+                            if(!empty($issue['issue_detail'])){
+                                $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
+                                if(empty($issue_detail->id)){
+                                    $issue_detail->issue_list_id = $issue_list->id;
+                                    $issue_detail->resultMemo = $issue['issue_detail']->resultMemo;
+                                    $issue_detail->orderId = $issue['issue_detail']->resultObject->orderId;
+                                    $issue_detail->gmtCreate = $issue['issue_detail']->resultObject->gmtCreate;
+                                    $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
+                                    $issue_detail->buyerAliid = $issue['issue_detail']->resultObject->buyerAliid;
+                                    $issue_detail->issueStatus = $issue['issue_detail']->resultObject->issueStatus;
+                                    $issue_detail->issueReason = $issue['issue_detail']->resultObject->issueReason;
+                                    $issue_detail->productName = $issue['issue_detail']->resultObject->productName;
+
+                                    //序列化对象
+                                    $issue_detail->productPrice = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
+                                    $issue_detail->buyerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
+                                    $issue_detail->sellerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
+                                    $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
+                                    $issue_detail->refundMoneyMax = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
+                                    $issue_detail->refundMoneyMaxLocal = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
+
+                                    $issue_detail->save();
+
+                                }
+
+                                
+
+                            }
+                        }
+                    }
+                }
             }
         }
     }

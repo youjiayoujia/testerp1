@@ -17,7 +17,7 @@ class PackageModel extends BaseModel
 {
     protected $table = 'packages';
 
-    public $searchFields = ['id' => 'ID', 'tracking_no' => '追踪号'];
+    public $searchFields = ['id' => 'ID'];
 
     public $rules = [
         'create' => ['ordernum' => 'required'],

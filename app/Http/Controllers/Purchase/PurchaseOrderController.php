@@ -684,9 +684,9 @@ class PurchaseOrderController extends Controller
                     foreach ($packageItem as $_packageItem) {
                         foreach($_packageItem->package as $package){
                             if($package->status=='NEED'){
-                                $job = new AssignStocks($this->package);
+                                $job = new AssignStocks($package);
                                 $job = $job->onQueue('assignStocks');
-                                $this->dispatch($job);
+                                $package->dispatch($job);
                             }
                         }
                     }

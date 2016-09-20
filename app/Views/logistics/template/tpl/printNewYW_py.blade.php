@@ -48,7 +48,7 @@
     <div class="main1">
         <div class="header1">
             <p style="width:105px;float:left;font-size:22px;font-weight:bold;margin-left:7px;margin-top:20px;">PRIORITY</p>
-            <p style="width:160px;float:right;font-size:22px;font-weight:bold;margin-left:7px;"><img src="'.site_url('attachments').'/images/yw_py.jpg" style="width:160px; "></p>
+            <p style="width:160px;float:right;font-size:22px;font-weight:bold;margin-left:7px;"><img src="{{ asset('picture/yw_py.jpg') }}" style="width:160px; "></p>
             <p style="clear:both;padding-top:5px;font-size:9px;text-align:center;">Return if undeliverable:H-10905,Postbus 7040,3109 AA Schiedam The Netherlands</p>
         </div>
         <div style="width:95mm;word-break:break-all;word-wrap:break-word;margin-top:2px;">

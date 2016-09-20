@@ -72,7 +72,6 @@
             </div>
             <?php echo $stockTakingForms->render(); ?>
         @endforeach
-        
     </div>
 </div>
 @stop

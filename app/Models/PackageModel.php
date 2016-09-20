@@ -66,6 +66,32 @@ class PackageModel extends BaseModel
         'lazada_package_id'
     ];
 
+    public function getPackageInfoAttribute()
+    {
+        $count = 0;
+        $skuString = '';
+        foreach($this->items as $packageItem){
+            if($count>5){
+              $skuString.=',***';
+            }else{
+              $skuString.=','.($packageItem->item ? $packageItem->item->sku : '').'*'.($packageItem->item ? $packageItem->item->cost : '').''.($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '');
+            }
+            $count++;
+        }
+        $skuString=substr($skuString,1);
+        return $skuString;
+    }
+
+    public function getDeclareNameAttribute()
+    {
+        $skuString = '';
+        foreach($this->items as $packageItem){
+           $skuString.=($packageItem->item ? $packageItem->item->name : '').'*'.;
+        }
+        $skuString=substr($skuString,1);
+        return $skuString;
+    }
+
     public function getMixedSearchAttribute()
     {
         $arr = [];
@@ -100,6 +126,16 @@ class PackageModel extends BaseModel
     public function shipperName()
     {
         return $this->belongsTo('App\Models\UserModel', 'shipper_id', 'id');
+    }
+
+    public function getSelfValueAttribute()
+    {
+        $value = 0;
+        foreach($this->items as $packageItem) {
+            $value += $packageItem->quantity * ($packageItem->item ? $packageItem->item->cost : 0);
+        }
+
+        return $value;
     }
 
     public function getStatusColorAttribute()

@@ -3,7 +3,7 @@
  * 盘点控制器
  * 处理盘点相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 16/3/3
  * Time: 10:04am
  */

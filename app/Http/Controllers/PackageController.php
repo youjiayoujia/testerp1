@@ -356,8 +356,6 @@ class PackageController extends Controller
         
     }
 
-   
-
     public function returnSplitPackage()
     {
         $quantity = request('quantity');
@@ -931,20 +929,6 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode('error');
         }
-        DB::beginTransaction();
-        try {
-            foreach($package->items as $packageItem) {
-                $packageItem->item->holdOut($packageItem->warehouse_position_id,
-                                            $packageItem->quantity,
-                                            'PACKAGE',
-                                            $packageItem->id);
-                $packageItem->orderItem->update(['status' => 'SHIPPED']);
-            }
-        } catch (Exception $e) {
-            DB::rollback();
-            return json_encode('unhold');
-        }
-        DB::commit();
         if($weight == '0') {
             $package->update([
                 'shipped_at' => date('Y-m-d h:i:s', time()),

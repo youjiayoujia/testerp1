@@ -12,7 +12,7 @@ class TakingFormModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_taking_forms';
+    public $table = 'stock_taking_forms';
 
     /**
      * The attributes that are mass assignable.

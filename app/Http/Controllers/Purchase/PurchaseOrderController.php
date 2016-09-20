@@ -24,6 +24,7 @@ use App\Models\Purchase\PurchasePostageModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\PackageModel;
+use App\Jobs\AssignStocks;
 use Excel;
 use Tool;
 use App\Jobs\Job;
@@ -682,13 +683,11 @@ class PurchaseOrderController extends Controller
                 $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
                 if(count($packageItem)>0){
                     foreach ($packageItem as $_packageItem) {
-                        foreach($_packageItem->package as $package){
-                            if($package->status=='NEED'){
-                                $job = new AssignStocks($package);
+                            if($_packageItem->package->status=='NEED'){
+                                $job = new AssignStocks($_packageItem->package);
                                 $job = $job->onQueue('assignStocks');
-                                $package->dispatch($job);
-                            }
-                        }
+                                $this->dispatch($job);
+                            }  
                     }
                 }       
             }

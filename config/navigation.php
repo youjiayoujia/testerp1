@@ -523,7 +523,7 @@ return [
                 ],
                 [
                     'name' => 'aliexpress issues',
-                    'url' => 'ebayCases.index',
+                    'url' => 'AliexpressIssue.index',
                     'icon' => '',
                 ],
             ],

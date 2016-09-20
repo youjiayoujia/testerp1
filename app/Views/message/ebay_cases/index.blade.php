@@ -73,7 +73,7 @@
                 @endif
                 @if($case->process_status == 'COMPLETE')
                     <a href="" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 查看
+                        <span class="glyphicon glyphicon-eye-open"></span> 已处理
                     </a>
                 @endif
             </td>

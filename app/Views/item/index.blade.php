@@ -34,6 +34,8 @@
     <th>开发负责人</th>
     <th>供应商</th>
     <th>售价</th>
+    <th>体积系数</th>
+    <th>税率</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>更新时间</th>
     <th>操作</th>
@@ -200,6 +202,8 @@
                     </div>
                 </div>
             </td>
+            <td>1</td>
+            <td>1</td>
             <td>{{ $item->updated_at }}</td>
             <td>{{ $item->created_at }}</td>
             <td>

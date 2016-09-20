@@ -24,6 +24,7 @@ use App\Models\Purchase\PurchasePostageModel;
 use App\Models\Order\ItemModel as OrderItemModel;
 use App\Models\Package\ItemModel as PackageItemModel;
 use App\Models\PackageModel;
+use App\Jobs\AssignStocks;
 use Excel;
 use Tool;
 use App\Jobs\Job;
@@ -681,12 +682,12 @@ class PurchaseOrderController extends Controller
                 //need包裹分配库存
                 $packageItem = PackageItemModel::where('item_id',$purchase_item->item_id)->get();
                 if(count($packageItem)>0){
-                    foreach($packageItem->package as $package){
-                        if($package->status=='NEED'){
-                            $job = new AssignStocks($this->package);
-                            $job = $job->onQueue('assignStocks');
-                            $this->dispatch($job);
-                        }
+                    foreach ($packageItem as $_packageItem) {
+                            if($_packageItem->package->status=='NEED'){
+                                $job = new AssignStocks($_packageItem->package);
+                                $job = $job->onQueue('assignStocks');
+                                $this->dispatch($job);
+                            }  
                     }
                 }       
             }

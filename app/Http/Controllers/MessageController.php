@@ -1,6 +1,6 @@
 <?php
 /**
- * @modify jiangdi
+ * @modify Norton
  * @data 2016-6-20
  * @time 16:13:48
  */
@@ -21,6 +21,7 @@ use App\Modules\Channel\Adapter\WishAdapter;
 use App\Modules\Channel\Adapter\EbayAdapter;
 use App\Models\Message\SendEbayMessageListModel;
 use App\Models\Order\ItemModel;
+use App\Models\ChannelModel;
 
 
 class MessageController extends Controller
@@ -46,11 +47,12 @@ class MessageController extends Controller
         //$userarr=config('user.staff');
         $users=UserModel::all();
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model,$this->model),
+            'metas'             => $this->metas(__FUNCTION__),
+            'data'              => $this->autoList($this->model,$this->model),
             'mixedSearchFields' => $this->model->mixed_search,
-            'channel_accounts' => Channel_account::all(),
-            'users' => $users,
+            'channel_accounts'  => Channel_account::all(),
+            'users'             => $users,
+            'channels'          => ChannelModel::All(),
         ];
         return view($this->viewPath . 'index', $response);
     }

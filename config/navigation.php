@@ -576,6 +576,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            '订单报表' => [
+                [
+                    'name' => '退款统计',
+                    'url' => 'refund.refundStatistics',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航

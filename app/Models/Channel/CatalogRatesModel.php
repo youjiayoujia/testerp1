@@ -2,7 +2,7 @@
 /**
  * 分类渠道税率
  * Created by PhpStorm.
- * User: jiangdi
+ * User: Norton
  * Date: 2016/8/29
  * Time: 18:02
  */

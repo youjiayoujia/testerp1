@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\UserModel;
 use App\Models\ChannelModel;
 use Excel;
+use App\Models\Channel\AccountModel;
 
 
 class RefundCenterController extends Controller
@@ -302,6 +303,33 @@ class RefundCenterController extends Controller
 
     }
 
+    /**
+     * 退款统计报表
+     */
+    public function refundStatistics(){
+
+        $metas = [
+            'mainIndex' => route('feeback.feedBackStatistics'),
+            'mainTitle' => '报表',
+            'title'     => '退款统计',
+        ];
+
+
+
+        $response = [
+            'metas' => $metas,
+            'channels' => ChannelModel::all(),
+            //'data'  => $total,
+        ];
+
+        return view($this->viewPath . 'statistics',$response);
+    }
+
+    public function getChannelAccount(){
+        $channel_id = request()->input('channel_id');
+        $accounts   = AccountModel::where('channel_id',$channel_id)->get(['account','id'])->toJson();
+        echo $accounts;
+    }
 
 
 
@@ -311,49 +339,5 @@ class RefundCenterController extends Controller
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
     
 }

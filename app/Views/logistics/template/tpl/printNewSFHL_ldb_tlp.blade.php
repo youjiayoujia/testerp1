@@ -43,7 +43,7 @@
                         {{ $model->shipping_city }}<br/>
                         {{ $model->shipping_state }}<br/>
                         {{ $model->shipping_zipcode }}<br/>
-                        {{ $model->shipping_country }}
+                        {{ $model->country ? $model->country->name : $model->shipping_country }}
                     </p>
                 </td>
             </tr>
@@ -57,7 +57,7 @@
                         <p>{{ $model->package_info }}</p>
                     </div>
                     <div style="width:22mm;float:right;font-size:18px;font-weight:bold;line-height:30px;text-align:center;">
-                        <p>{{ $model->shipping_country }}</p>
+                        <p>{{ $model->shipping_country ? $model->shipping_country : ($model->country ? $model->country->name : '') }}</p>
                         <p>gjfjm</p>
                     </div>
                 </td>
@@ -99,7 +99,7 @@
                 <td style="border-right:1px solid black;border-bottom:1px solid black;">Totals of contents</td>
                 <td style="border-right:1px solid black;border-bottom:1px solid black;">Pcs</td>
                 <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->weight }}Kg</td>
-                <td style="border-bottom:1px solid black;">${{ $model->self_value }}</td>
+                <td style="border-bottom:1px solid black;">${{ $model->self_value < 20 ? $model->selft_value : 20 }}</td>
             </tr>
             <tr>
                 <td colspan="4" style="height:7mm;line-height:17px;">

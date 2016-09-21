@@ -18,6 +18,7 @@ use App\Models\Stock\CarryOverModel;
 use App\Models\StockModel;
 use App\Models\Stock\InOutModel;
 use App\Jobs\StockCarrying;
+use Excel;
 
 class CarryOverController extends Controller
 {
@@ -77,18 +78,21 @@ class CarryOverController extends Controller
 
     public function showStockView()
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '1G');
         $stockTime = request('stockTime');
         $tmp = date('Y-m', strtotime($stockTime));
         $objCarryOver = $this->model->where('date', '<=', $tmp)->orderBy('date', 'desc')->first();
         if(!$objCarryOver) {
-            throw new Exception('该时间段没有库存');
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '该时间段没有库存'));
         }
         $carryOverTime = date('Y-m-d G:i:s', (strtotime($objCarryOver->date)+(strtotime('+1 month')-strtotime('now'))));
-        $len = 1000;
+        $len = 10000;
         $start = 0;
         $carryOverForms = $objCarryOver->forms()->skip($start)->take($len)->get();
+        $rows = [];
         while($carryOverForms->count()) {
-            foreach($carryOverForms as $carryOverForm) {
+            foreach($carryOverForms as $key => $carryOverForm) {
                 $stockIns = InOutModel::where('stock_id', $carryOverForm->stock_id)->where('outer_type', 'IN')->whereBetween('created_at', [$carryOverTime, $stockTime])->get();
                 foreach($stockIns as $stockIn)
                 {
@@ -101,16 +105,22 @@ class CarryOverController extends Controller
                     $carryOverForm->over_quantity -= $stockOut->quantity;
                     $carryOverForm->over_amount -= $stockOut->amount;
                 }  
+                $rows[] = [
+                    'sku' => $carryOverForm->stock->item->sku,
+                    'position' => $carryOverForm->stock->position->name,
+                    'quantity' => $carryOverForm->over_quantity,
+                    'amount' => $carryOverForm->over_amount,
+                ];
             }
             $start += $len;
+            unset($carryOverForms);
             $carryOverForms = $objCarryOver->forms()->skip($start)->take($len)->get();
         }
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-            'carryOvers' => $carryOverForms()->paginate('1000'),
-            'stockTime' => $stockTime,
-        ];
-
-        return view($this->viewPath.'showStockView', $response);
+        $name = 'showStockView';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 }

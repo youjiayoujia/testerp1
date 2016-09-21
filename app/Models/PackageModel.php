@@ -86,7 +86,7 @@ class PackageModel extends BaseModel
     {
         $skuString = '';
         foreach($this->items as $packageItem){
-           $skuString.=($packageItem->item ? $packageItem->item->name : '').'*'.;
+           $skuString.=($packageItem->item ? $packageItem->item->name : '').'*';
         }
         $skuString=substr($skuString,1);
         return $skuString;

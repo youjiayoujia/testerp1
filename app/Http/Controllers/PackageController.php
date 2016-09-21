@@ -837,6 +837,8 @@ class PackageController extends Controller
         foreach ($items as $item) {
             $item->picked_quantity = 0;
             $item->save();
+            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost, 'CANCLE', $item->id);
+            $item->item->hold($item->warehouse_position_id, $item->quantity);
         }
         return json_encode(true);
     }

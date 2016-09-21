@@ -203,6 +203,7 @@ Route::group(['middleware' => 'auth'], function () {
         ['uses' => 'Warehouse\PositionController@ajaxGetPosition', 'as' => 'position.getPosition']);
     Route::resource('warehousePosition', 'Warehouse\PositionController');
     //库存
+    Route::get('stock/getTakingExcel', ['uses' => 'StockController@getTakingExcel', 'as' => 'stock.getTakingExcel']);
     Route::get('stock/ajaxAllSku', ['uses' => 'StockController@ajaxAllSku', 'as' => 'stock.ajaxAllSku']);
     Route::get('stock/overseaPosition', ['uses' => 'StockController@overseaPosition', 'as' => 'stock.overseaPosition']);
     Route::get('stock/overseaSku', ['uses' => 'StockController@overseaSku', 'as' => 'stock.overseaSku']);

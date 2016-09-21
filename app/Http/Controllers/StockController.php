@@ -90,6 +90,35 @@ class StockController extends Controller
         return view($this->viewPath.'showStockInfo', $response);
     }
 
+    public function getTakingExcel()
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '1G');
+        $start = 0;
+        $len = 10000;
+        $rows = [];
+        $stocks = $this->model->skip($start)->take($len)->get();
+        while($stocks->count()) {
+            foreach($stocks as $stock) {
+                $rows[] = [
+                    'sku' => $stock->item ? $stock->item->sku : '',
+                    'position' => $stock->position ? $stock->position->name : '',
+                    'all_quantity' => $stock->all_quantity,
+                    'quantity' => '',
+                ];
+            }
+            $start += $len;
+            unset($stocks);
+            $stocks = $this->model->skip($start)->take($len)->get();
+        }
+        $name = 'getTakingExcel';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
+    }
+
     public function overseaSku()
     {
         $sku = request('sku');

@@ -37,7 +37,13 @@
                    Tel:{{ $model->shipping_phone }}<br/>{{ $model->shipping_country }}<br/>{{ $model->country ? $model->country->cn_name : ''}}
                 </p>
                 <p style="text-align:right;font-weight:bold;font-size:25px;margin-right:10px;margin-bottom:10px;">{{ $model->shipping_country }}</p>
-                <p style="float:left;width:100px;text-align:center;font-weight:bold;font-size:25px;">eu &nbsp;&nbsp;D</p>
+                <p style="float:left;width:100px;text-align:center;font-weight:bold;font-size:25px;">
+                @foreach(['Austria','Belgium','Bulgaria','Cyprus','Croatia','CzechRepublic','Denmark','Estonia','Finland','France','Germany','Greece','Hungary','Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta','Poland','Portugal','Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom','Netherlands'] as $key => $country)
+                    @if(strtolower($country) == strtolower($model->country->name))
+                        <font>EU</font>
+                    @endif
+                @enforeach
+                &nbsp;&nbsp;D</p>
                 <p style="text-align:left;font-size:15px;">OrderNo:{{ $model->order ? $model->order->ordernum : '' }}</p>
             </div>
         </div>
@@ -69,13 +75,13 @@
                 <td style="text-align:left"> {{ $model->items()->first()->item->name }}</td>
                 <td>1</td>
                 <td>{{ $model->items()->first()->item->weight }}</td>
-                <td>{{ $model->items()->first()->item->cost }}</td>
+                <td>{{ $model->items()->first()->item->cost > 20 ? 20 : $model->items()->first()->item->cost }}</td>
             </tr>
             <tr style="height:50px;">
                 <td style="text-align:left">Totals of contents</td>
                 <td>{{ $model->items()->sum('quantity') }} Pcs</td>
                 <td>{{ $model->weight }} Kg</td>
-                <td>{{ $model->self_value }} $</td>
+                <td>{{ $model->self_value > 22 ? 22 : $model->self_value }} $</td>
             </tr>
             <tr style="height:30px;text-align:left;">
                 <td colspan="4" style="text-align:left;">Country of origin of goods</td>

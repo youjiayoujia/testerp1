@@ -33,6 +33,7 @@ class RefundModel extends BaseModel
         'user_paypal_account',
         'customer_id',
         'channel_id',
+        'account_id'
     ];
 
     public $rules = [

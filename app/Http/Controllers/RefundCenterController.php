@@ -15,6 +15,8 @@ use App\Models\UserModel;
 use App\Models\ChannelModel;
 use Excel;
 use App\Models\Channel\AccountModel;
+use App\Models\Order\ItemModel;
+use DB;
 
 
 class RefundCenterController extends Controller
@@ -326,10 +328,78 @@ class RefundCenterController extends Controller
     }
 
     public function getChannelAccount(){
+
         $channel_id = request()->input('channel_id');
-        $accounts   = AccountModel::where('channel_id',$channel_id)->get(['account','id'])->toJson();
+        $channel_ids   = explode(',',$channel_id);
+        $accounts   = AccountModel::whereIn('channel_id',$channel_ids)->get(['account','id'])->toJson();
         echo $accounts;
     }
+
+    public function exportRefundDetail(){
+        $form = request()->input();
+        $items = new ItemModel;
+        if(!empty($form['skus']))
+            $items = $items->whereIn('sku',explode(',',$form['skus']));
+        $items = $items->where('refund_id','<>','');
+
+        if($form['time-type'] == 'order'){
+            $items = $items->where('created_at','<=',$form['end']);
+            $items = $items->where('created_at','>=',$form['start']);
+        }
+        $items = $items->distinct();
+        $items = $items->get(['refund_id']);
+
+
+        $refunds =  new RefundModel;
+        if(!$items->isEmpty()){
+            $refund_ids = array_column($items->toArray(),'refund_id');
+            $refunds = $refunds->whereIn('id',$refund_ids);
+        }
+        if(!empty($form['refund-statistics-channel-ids']))
+            $refunds = $refunds->whereIn('channel_id',explode(',',$form['refund-statistics-channel-ids']));
+
+        if(!empty($form['refund-statistics-account-ids']))
+            $refunds = $refunds->whereIn('account_id',explode(',',$form['refund-statistics-account-ids']));
+
+        if(!empty($form['refund-statistics-reason']))
+            $refunds = $refunds->whereIn('reason',explode(',',$form['refund-statistics-reason']));
+        if($form['time-type'] == 'refund'){
+            $refunds = $refunds->where('created_at','<=',$form['end']);
+            $refunds = $refunds->where('created_at','>=',$form['start']);
+        }
+
+        $result = $refunds->get();
+        if(!$result->isEmpty()){
+            $data[] = [
+                'Refund NO.',
+                '订单号',
+                '退款金额',
+                '币种',
+            ];
+            foreach ($result as $refund){
+                $data[] =[
+                    $refund->id,
+                    $refund->refund_amount,
+                    $refund->refund_currency,
+                ];
+            }
+            Excel::create('refund'.date('Y-m-d'), function($excel) use ($data){
+                $excel->sheet('', function($sheet) use ($data){
+                    $sheet->fromArray($data);
+                });
+            })->download('csv');
+        }else{
+            return redirect(route('refund.exportRefundDetail'))->with('alert', $this->alert('danger', '没有找到数据。'));
+
+        }
+
+
+        
+        
+        
+    }
+
+
 
 
 

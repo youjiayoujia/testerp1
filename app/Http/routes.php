@@ -917,6 +917,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('changeReundNoteStatus',['uses' => 'RefundCenterController@changeReundNoteStatus','as' =>'refund.changeReundNoteStatus']);
     Route::any('refundStatistics',['as' => 'refund.refundStatistics', 'uses' => 'RefundCenterController@refundStatistics']);
     Route::any('getChannelAccount',['as' => 'refund.getChannelAccount', 'uses' => 'RefundCenterController@getChannelAccount']);
+    Route::any('exportRefundDetail',['as' => 'refund.exportRefundDetail','uses' =>'RefundCenterController@exportRefundDetail']);
 
     Route::resource('AliexpressIssue','Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',['uses' =>'Message\Dispute\AliexpressIssueController@doRefuseIssues' , 'as' =>'aliexpress.doRefuseIssues']);

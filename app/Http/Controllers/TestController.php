@@ -52,6 +52,8 @@ use App\Models\Oversea\StockModel as fbaStock;
 use App\Models\Order\ItemModel as orderItemss;
 use App\Models\Message\Issues\AliexpressIssueListModel;
 use App\Models\Message\Issues\AliexpressIssuesDetailModel;
+use App\Models\Order\RefundModel;
+
 
 use BarcodeGen;
 
@@ -690,6 +692,9 @@ class TestController extends Controller
     }
 
     public function getSmtIssue(){
+        $refund = new RefundModel;
+        dd($refund->create([]));
+
 
         foreach (AccountModel::all() as $account) {
             if($account->account == 'smtjiahongming@126.com'){ //测试diver

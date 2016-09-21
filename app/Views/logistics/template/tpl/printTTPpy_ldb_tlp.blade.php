@@ -98,17 +98,17 @@
                     </td>
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
-                    @if($model->items)
-                        @foreach($model->items as $key => $item)
+                    @if($model->order)
+                        @foreach($model->order->items as $key => $orderItem)
                             @if($key == 0)
                                 <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                                    {{ $item->item ? ($item->item->product ? $item->item->product->name : '' ) : '' }}&nbsp;&nbsp;&nbsp;&nbsp;{{ 'x1' }}
+                                    {{ $orderItem->item ? $orderItem->item->name : '' }}&nbsp;&nbsp;&nbsp;&nbsp;{{ 'x1' }}
                                 </td>
                                 <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                                    {{ $item->quantity * $item->item ? $item->item->weight : '' }}
+                                    {{ $orderItem->quantity * $orderItem->item ? $orderItem->item->weight : '' }}
                                 </td>
                                 <td style="border-bottom:1px solid black;">
-                                    {{ $item->quantity * $item->item ? $item->item->purchase_price : '' }}
+                                    {{ $orderItem->quantity * $orderItem->price / $model->order->rate > 20 ? 20 : $orderItem->quantity * $orderItem->price / $model->order->rate }}
                                 </td>
                             @endif
                         @endforeach

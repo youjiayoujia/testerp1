@@ -213,10 +213,26 @@ class ItemController extends Controller
         $arr = explode(',', $item_ids);
         $skus = $this->model->whereIn("id",$arr)->get();
         $data = request()->all();
-        foreach($skus as $itemModel){
-            $itemModel->update($data);
-        }       
-        return redirect($this->mainIndex);
+        if(!array_key_exists('productsVolume',$data)){
+            foreach($skus as $itemModel){
+                $itemModel->update($data);
+            }       
+            return redirect($this->mainIndex);
+        }else{
+            $data['length'] = $data['productsVolume']['bp']['length'];
+            $data['width'] = $data['productsVolume']['bp']['width'];
+            $data['height'] = $data['productsVolume']['bp']['height'];
+            $data['package_length'] = $data['productsVolume']['ap']['length'];
+            $data['package_width'] = $data['productsVolume']['ap']['width'];
+            $data['package_height'] = $data['productsVolume']['ap']['height'];
+            $data['weight'] = $data['products_weight2'];
+            //echo '<pre>';
+            //print_r($data);exit;
+            foreach($skus as $itemModel){
+                $itemModel->update($data);
+            }       
+            return redirect($this->mainIndex);
+        }    
     }
 
 
@@ -347,12 +363,28 @@ class ItemController extends Controller
     public function questionIndex()
     {
         request()->flash();
+        $this->mainIndex = route('item.questionIndex');
+        $this->mainTitle = '产品留言板';
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($this->message),
-            'mixedSearchFields' => $this->model->mixed_search,
+            'mixedSearchFields' => $this->message->mixed_search,
         ];
         return view($this->viewPath . 'questionIndex', $response);
+    }
+
+    public function questionStatus()
+    {
+        $question_ids = request()->input('question_ids');
+        $status = request()->input('status');
+        $arr = explode(',', $question_ids); 
+        
+        foreach ($arr as $id) {
+            $sku_message = $this->message->find($id);
+            $sku_message->update(['status'=>$status]);
+        }
+        
+        return 1;
     }
 
     public function answer()

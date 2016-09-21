@@ -13,6 +13,7 @@ namespace App\Http\Controllers;
 use App\Jobs\Job;
 use App\Jobs\DoPackages;
 use App\Jobs\DoPackage;
+use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
@@ -102,7 +103,17 @@ class OrderController extends Controller
         return json_encode(false);
     }
 
-    
+    public function createVirtualPackage()
+    {
+        $model = $this->model->where('status', 'PREPARED')->get();
+        foreach($model as $key => $single) {
+            $job = new DoPackages($single);
+            $job = $job->onQueue('doPackages');
+            $this->dispatch($job);
+        }
+
+        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackage队列'));
+    }
 
     /**
      * 保存数据

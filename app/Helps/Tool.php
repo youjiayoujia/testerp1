@@ -306,4 +306,11 @@ class Tool
 
 
     }
+
+    //先base64解码，再反序列化
+    public function unserializeBase64Decode($data){
+        $array = unserialize(base64_decode($data));//先base64解码，再反序列化
+        return $array;
+
+    }
 }

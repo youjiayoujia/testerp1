@@ -248,7 +248,20 @@ class ItemModel extends BaseModel
     //最近缺货时间
     public function getOutOfStockTimeAttribute()
     {
-        return $this->purchase->min('created_at');
+        $id = $this->id;
+        $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
+                ->whereIn('packages.status', ['NEED'])
+                ->where('package_items.item_id', $id)
+                ->first(['packages.created_at']);
+
+        if($firstNeedItem){
+            $firstNeedItem = $firstNeedItem->toArray();
+            $time = ceil((time()-strtotime($firstNeedItem['created_at']))/(3600*24));
+        }else{
+            $time = 0;
+        } 
+        
+        return $time;
     }
 
     public function getStatusNameAttribute()
@@ -679,7 +692,7 @@ class ItemModel extends BaseModel
             $data['status'] = $item->status?$item->status:'saleOutStopping';
             $data['require_create'] = $needPurchaseNum>0?1:0;
             $thisModel = PurchasesModel::where("item_id", $data['item_id'])->get()->first();
-            $data['user_id'] = $item->purchase_adminer;
+            $data['user_id'] = $item->purchase_adminer?$item->purchase_adminer:0;
 
             $firstNeedItem = PackageItemModel::leftjoin('packages', 'packages.id', '=', 'package_items.package_id')
                 ->whereIn('packages.status', ['NEED'])
@@ -703,7 +716,7 @@ class ItemModel extends BaseModel
 
     public function createPurchaseStaticstics()
     {
-        $users = UserRoleModel::all()->where('role_id',2);
+        $users = UserRoleModel::all()->where('role_id','2');
         foreach ($users as $user) {
             $data = [];
             //采购负责人

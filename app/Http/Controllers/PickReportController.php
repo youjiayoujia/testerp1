@@ -31,23 +31,28 @@ class PickReportController extends Controller
     {
         request()->flash();
         $model = $this->model->orderBy('day_time', 'desc')->first();
-        $monthModel = '';
+        $last_time = '';
+        $monthModel = $this->model->whereBetween('day_time',[date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
         if($model) {
-            $last_time = $this->model->orderBy('day_time', 'desc')->first()->day_time;
+            $last_time = $model->day_time;
             $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
-            $monthModel = $this->model->whereBetween('day_time',[date('Y-m', strtotime('now')), date('Y-m', strtotime('+1 month'))])->get();
-            $flag = 0;
-            if(request()->has('date') && !empty(request('date'))) {
-                $flag = 1;
-                $model = $this->model->whereBetween('day_time', [date('Y-m-d', strtotime(request('date'))), date('Y-m-d', strtotime(request('date')) + strtotime('+1 day') - strtotime('now'))]);
-            }
+        }
+        if(request()->has('date') && !empty(request('date'))) {
+            $last_time = '';
+            $model = $this->model;
             if(request()->has('warehouseid') && !empty(request('warehouseid'))) {
-                $flag = 1;
                 $model = $model->where('warehouse_id', request('warehouseid'));
             }
-            if($flag) {
-                $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time');
+            foreach($model as $time => $single) {
+                if(date('Y-m-d', strtotime($time)) == date('Y-m-d', strtotime(request('date')))) {
+                    $last_time = $time;
+                }
             }
+            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            $monthModel = $this->model->whereBetween('day_time', [
+                date('Y-m-d', strtotime(date('Y-m', strtotime($last_time)))),
+                date('Y-m-d', strtotime(date('Y-m', strtotime($last_time) + strtotime('now') - strtotime('-1 month'))))])->get()->groupBy('user_id');
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
@@ -75,10 +80,14 @@ class PickReportController extends Controller
                     'multi' => $block->filter(function($single){
                         return $single->type == 'MULTI';
                     })->sum('account'),
+                    'missing_pick' => $block->filter(function($single){
+                        return strtotime($single->pick_at) > strtotime(date('Y-m-d', strtotime('now'))) &&
+                               strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));
+                    })->sum('quantity'),
                     'today_pick' => $block->filter(function($single){
                         return strtotime($single->pick_at) > strtotime(date('Y-m-d', strtotime('now'))) &&
                                strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));
-                    })->sum('accouont'),
+                    })->sum('account'),
                     'today_picklist' => $block->filter(function($single){
                         return strtotime($single->pick_at) > strtotime(date('Y-m-d', strtotime('now'))) &&
                                strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));

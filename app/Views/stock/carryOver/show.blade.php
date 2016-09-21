@@ -34,4 +34,5 @@
             @endforeach
         </tbody>
     </table>
+    <?php echo $forms->render(); ?>
 @stop

@@ -33,8 +33,9 @@ class ShipmentCostErrorController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->where('parent_id', $id)),
+            'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
+            'id' => $id,
         ];
 
         return view($this->viewPath . 'showErrors', $response);

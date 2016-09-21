@@ -140,6 +140,10 @@ return [
         'account.account' => '渠道帐号',
         'is_chinese' => '竞拍状态',
         'parent.shipmentCostNum' => '批次号',
+        'questionUser.name' => '提问人',
+        'answerUser.name' => '解答人',
+        'question_group' => '指定分组',
+        'skuName.c_name' => '产品名',
+        'messageSku.sku' => 'sku',
     ],
 ];
-

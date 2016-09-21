@@ -128,6 +128,7 @@ class PickListController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $model->printRecords()->create(['user_id' => request()->user()->id]);
         if($model->status == 'NONE') {
             $model->update(['status' => 'PRINTED', 'print_at' => date('Y-m-d H:i:s', time())]);
         }
@@ -431,17 +432,18 @@ class PickListController extends Controller
      */
     public function packageStore($id)
     {
-        $model = $this->model->find($id);
-        if (!$model) {
+        $picklist = $this->model->find($id);
+        if (!$picklist) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        $model->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time())]);
-        foreach($model->package as $package)
+        $sum = 0;
+        foreach($picklist->package as $package)
         {
             if($package->status != 'PACKED') {
                 $package->status = 'ERROR';
                 $package->save();
                 foreach($package->items as $packageItem) {
+                    $sum += $packageItem->quantity - $packageItem->picked_quantity;
                     $errorLists = ErrorListModel::where('item_id', $packageItem->item_id)->get();
                     if($errorLists->count()) {
                         foreach($errorLists as $errorList) {
@@ -465,7 +467,9 @@ class PickListController extends Controller
                         }
                     }
                 }
-            }    
+            } 
+        $picklist->update(['status' => 'PACKAGED', 'pack_by' => request()->user()->id, 'pack_at' => date('Y-m-d H:i:s', time()),
+                            'quantity' => $sum]);
         }
 
         return redirect($this->mainIndex);

@@ -119,7 +119,7 @@ class EbayFeedBackController extends Controller
         ];
 
         $metas = [
-            'mainIndex' => '报表',
+            'mainIndex' => route('feeback.feedBackStatistics'),
             'mainTitle' => '报表',
             'title'     => '差评统计',
         ];

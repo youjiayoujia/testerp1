@@ -38,7 +38,7 @@ class SuggestFormModel extends BaseModel
         'created_at',
     ];
 
-    public $searchFields = ['id' => 'ID', 'channel_sku' => '渠道sku'];
+    public $searchFields = ['channel_sku' => '渠道sku'];
 
     public function getMixedSearchAttribute()
     {

@@ -111,7 +111,7 @@ class ProductModel extends BaseModel
         return [
             'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['examine_status' => config('product.examineStatus')],
+            'filterSelects' => [],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];

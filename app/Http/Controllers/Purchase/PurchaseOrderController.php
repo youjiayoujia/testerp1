@@ -34,6 +34,7 @@ class PurchaseOrderController extends Controller
 
     public function __construct(PurchaseOrderModel $purchaseOrder,PurchaseItemModel $purchaseItem,ItemModel $item)
     {
+        //$this->middleware('roleCheck');
         $this->model = $purchaseOrder;
         $this->item = $item;
         $this->purchaseItem = $purchaseItem;
@@ -876,6 +877,8 @@ class PurchaseOrderController extends Controller
     public function purchaseStaticstics()
     {
         $model = new PurchaseStaticsticsModel();
+        $this->mainIndex = route('purchaseStaticstics');
+        $this->mainTitle = '采购数据统计';
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($model),

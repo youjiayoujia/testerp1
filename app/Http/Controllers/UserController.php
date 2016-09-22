@@ -23,16 +23,10 @@ class UserController extends Controller
         $this->mainIndex = route('user.index');
         $this->mainTitle = '用户';
         $this->viewPath = 'user.';
-        if (Gate::denies('check','user_admin,user_staff|show')) {
-            echo "没有权限";exit;
-        }
     }
 
     public function create()
     {
-        if (Gate::denies('check','user_admin|create')) {
-            echo "没有权限";exit;
-        }
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'roles' => RoleModel::all(),
@@ -48,9 +42,6 @@ class UserController extends Controller
      */
     public function store()
     {
-        if (Gate::denies('check','user_admin|create')) {
-            echo "没有权限";exit;
-        }
         request()->flash();
         $this->validate(request(), $this->model->rules('create'));
         $data = request()->all();
@@ -72,9 +63,6 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        if (Gate::denies('check','user_admin|edit')) {
-            echo "没有权限";exit;
-        }
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -101,9 +89,6 @@ class UserController extends Controller
      */
     public function update($id)
     {
-        if (Gate::denies('check','user_admin|create')) {
-            echo "没有权限";exit;
-        }
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
@@ -147,7 +132,7 @@ class UserController extends Controller
         return json_encode(false);
     }
 
-    public function per()
+/*    public function per()
     {
         $role = $this->role->find(1);
         $permission = $this->permission->find(1);
@@ -158,7 +143,7 @@ class UserController extends Controller
 
         print_r($role->permission->toArray());exit;
         
-    }
+    }*/
 
     
 

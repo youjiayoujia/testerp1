@@ -1,22 +1,6 @@
 @extends('common.table')
 @section('tableToolButtons')
-    <div class="btn-group btn-info" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 批量修改属性
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a href="javascript:" class="batchedit" data-name="weight">重量</a></li>
-            <li><a href="javascript:" class="batchedit" data-name="purchase_price">参考成本</a></li>
-            <li><a href="javascript:" class="batchedit" data-name="status">SKU状态</a></li>
-            <li><a href="javascript:" class="batchedit" data-name="package_size">体积</a></li>
-            <li><a href="javascript:" class="batchedit" data-name="name">中英文资料</a></li>
-            <li><a href="javascript:" class="batchedit" data-name="wrap_limit">包装方式</a></li>
-            <li><a href="javascript:" class="batchedit" data-name="catalog">分类</a></li>
-            <li><a href="javascript:" class="batchdelete" data-name="catalog">批量删除</a></li>
-            <li><a href="javascript:" class="" data-toggle="modal" data-target="#myModal">上传表格修改状态</a></li>
-        </ul>
-    </div>
+    
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
     

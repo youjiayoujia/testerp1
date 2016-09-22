@@ -25,7 +25,7 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 // Registration routes...
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
-Route::group(['middleware' => 'auth'], function () {
+Route::group(['middleware' => 'roleCheck'], function () {
     //Home
     Route::any('/', ['as' => 'dashboard.index', 'uses' => 'PackageController@flow']);
     //国家
@@ -229,6 +229,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('stock/ajaxGetOnlyPosition',
         ['uses' => 'StockController@ajaxGetOnlyPosition', 'as' => 'stock.ajaxGetOnlyPosition']);
     Route::resource('stock', 'StockController');
+
+    /*Route::group(['prefix' => 'admin', 'middleware' => 'roleCheck'], function() {
+        Route::get('purchaseOrder/purchaseStaticstics', ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    });*/
     //采购条目
     Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
     Route::any('purchaseItem/deletePurchaseItem', ['uses' => 'Purchase\PurchaseItemController@deletePurchaseItem', 'as' => 'deletePurchaseItem']);

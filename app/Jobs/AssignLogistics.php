@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use Cache;
+use Exception;
 use App\Jobs\Job;
 use App\Jobs\PlaceLogistics;
 use Illuminate\Queue\SerializesModels;
@@ -39,6 +40,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'stockTaking , stock is locked.';
             $this->lasting = 0;
             $this->log('AssignLogistics');
+            throw new Exception();
         } else {
             $start = microtime(true);
             $this->package->assignLogistics();

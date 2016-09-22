@@ -36,7 +36,6 @@ class SendMessages extends Job implements SelfHandling, ShouldQueue
      */
     public function handle()
     {
-
         if($this->reply){
             $account = $this->reply->message->account;
 

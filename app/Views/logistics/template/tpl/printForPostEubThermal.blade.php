@@ -76,7 +76,7 @@
           <div style="font-family:Arial, Helvetica, sans-serif; font-size:11px; line-height:12px">
               &nbsp;{{ $model->shipping_firstname . ' ' . $model->shipping_lastname}}<br />
               &nbsp;{{ $model->shipping_city }}<br />
-              &nbsp;{{ $model->shipping_state}}<br />
+              &nbsp;{{ $model->shipping_address. ' ' . $model->shipping_state}}<br />
               &nbsp;{{ $model->shipping_country . ' ' . $model->shipping_zipcode }}<br/>
           </div>
           <div style="font-family:Arial, Helvetica, sans-serif; height:13px;" align="center">
@@ -143,8 +143,6 @@
     </tr>
           </table>
           </div>
-          ';
-          $reStr .='
           <div class="float_box2">
            <table border="0" cellpadding="0" cellspacing="0" style="border:#000000 1px solid; width:368px; height:364px;font-size: 9px; font-family: Arial, Helvetica, sans-serif;">
            <tr>
@@ -194,11 +192,13 @@
           <td width="58%" rowspan="2" valign="top" style="border-top:#000 solid 1px">
                   <div style=" font-size:11px">
           SHIP TO:  {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>{{ $model->shipping_address . ' ' . $model->shipping_address1 }}
-                      <br/>{{ $model->shipping_city . ' ' $model->shipping_state . ' ' . $model->zipcode }}<br/>{{ $model->shipping_country }}
+                      <br/>{{ $model->shipping_city . ' ' . $model->shipping_state . ' ' . $model->shipping_zipcode }}<br/>{{ $model->shipping_country }}
                   </div>
           </td>
         </tr>
+
         <tr >
+
           <td style="border-bottom: 1px solid #000; border-right:#000 solid 1px"><div style=" font-size:10px; padding-left:5px;">Fees(US $):</div></td>
         </tr>
         <tr >
@@ -217,21 +217,29 @@
             </tr>
            <tr style="height:15mm;">
               <td align="center" valign="top" style="border-right:#000 1px solid; border-bottom:#000 1px solid; font-size:10px;">
-               {{ $model->items()->first()->id }}
+               {{ $model->items()->count() }}
               </td>
               <td align="center" valign="top" style="border-right:#000 1px solid; border-bottom:#000 1px solid;font-size:10px; ">
                {{ $model->items()->first()->quantity }}
               </td>
+
               <td height="" align="left" valign="top" style="border-bottom:#000 1px solid; ">
                   <div style=" font-size:10px;color#000;">
                       <strong>
-                      {{ $model->package_info }}
+                      {{ $model->items()->first()->item->name }}' '{{ $model->items()->first()->item->c_name }} ' '
+
+                      @foreach($model->items as $packageItem)
+                        {{ $packageItem->item->sku }}'_'{{ $packageItem->quantity }}<br/>
+                      @endforeach
+                      {{ date('Y-m-d H:i:s', strtotime($model->printed_at)) }}
                       </strong>
                   </div>
               </td>
+
               <td align="center" valign="top" style=" border-right:#000 1px solid;border-bottom:#000 1px solid;border-left:#000 1px solid; font-size:10px; ">
               {{ $model->items()->first()->item->weight }}
               </td>
+
               <td align="center" valign="top" style= "border-right:#000 1px solid; border-bottom:#000 1px solid; font-size:10px;">
                {{ $model->items()->first()->item->cost }}
               </td>

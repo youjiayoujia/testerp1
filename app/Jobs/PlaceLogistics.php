@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Cache;
 use App\Jobs\Job;
+use Exception;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
@@ -38,6 +39,7 @@ class PlaceLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'stockTaking , stock is locked.';
             $this->lasting = 0;
             $this->log('PlaceLogistics');
+            throw new Exception();
         } else {
             $start = microtime(true);
             if ($this->package->placeLogistics()) {

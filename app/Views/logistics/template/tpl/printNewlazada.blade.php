@@ -53,7 +53,7 @@
                         
                     </div>
                     <div style="width:82mm;height:20mm;float:right;text-align:center;margin-top: 10px;">
-                        <p>'.$allParamArr['ordersInfo']['orders_shipping_code'].'</p>
+                        <p>{{$model->tracking_no}}</p>
                         <p><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code39&o=2&t=40&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3=" /></p>
                         <p>{{ $model->tracking_no }}</p>
                     </div>

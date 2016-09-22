@@ -692,8 +692,11 @@ class TestController extends Controller
     }
 
     public function getSmtIssue(){
-        $refund = new RefundModel;
-        dd($refund->create([]));
+        $refund = RefundModel::find(2);
+        dd($refund->RefundOrderLogistics);
+        
+        dd($refund);
+
 
 
         foreach (AccountModel::all() as $account) {

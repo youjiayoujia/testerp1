@@ -371,18 +371,77 @@ class RefundCenterController extends Controller
         $result = $refunds->get();
         if(!$result->isEmpty()){
             $data[] = [
-                'Refund NO.',
+                '退款ID号',
+                '买家ID',
+                '买家Eamil',
+                '收货人',
+                '退款类型',
+                '退款原因',
                 '订单号',
                 '退款金额',
                 '币种',
+                '汇率比',
+                '国家代码',
+
+
+                '订单总金额',
+                '运费',
+                '订单状态',
+                '追踪号',
+                '渠道',
+                '销售账号',
+                '退款状态',
+                '录入人员',
+                '退款备注',
+                'SKU*数量',
+                '下单时间',
+                '支付时间',
+                '退款创建时间',
+                '订单备注',
+                '运费成本',
+                '平台成本',
+                '利润率',
+                '物流名称',
             ];
+
+
+
             foreach ($result as $refund){
                 $data[] =[
                     $refund->id,
+                    $refund->Order->by_id,
+                    $refund->Order->email,
+                    $refund->Order->shipping_firstname . ' '.$refund->Order->shipping_lastname,
+                    $refund->RefundName,
+                    $refund->ReasonName,
+                    $refund->order_id,
                     $refund->refund_amount,
                     $refund->refund_currency,
+                    $refund->Currency->rate,
+
+                    $refund->Order->shipping_country,
+                    $refund->Order->amount,
+                    $refund->Order->amount_shipping,
+                    $refund->Order->StatusText,
+                    $refund->Order->transaction_number,
+                    $refund->ChannelName,
+                    $refund->Account->account,
+                    $refund->ProcessStatusName,
+                    $refund->CustomerName,
+                    $refund->detail_reason,
+                    $refund->RefundProducts,
+                    $refund->Order->create_time,
+                    $refund->Order->payment_date,
+                    $refund->created_at,
+                    $refund->Order->OrderReamrks,
+                    $refund->Order->packages->sum('cost'),
+                    '平台成本',//$refund->Order->calculateOrderChannelFee,   //平台成本
+                    $refund->Order->profit_rate,
+                    $refund->RefundOrderLogistics
+
                 ];
             }
+            dd($data);
             Excel::create('refund'.date('Y-m-d'), function($excel) use ($data){
                 $excel->sheet('', function($sheet) use ($data){
                     $sheet->fromArray($data);
@@ -390,24 +449,6 @@ class RefundCenterController extends Controller
             })->download('csv');
         }else{
             return redirect(route('refund.exportRefundDetail'))->with('alert', $this->alert('danger', '没有找到数据。'));
-
         }
-
-
-        
-        
-        
     }
-
-
-
-
-
-
-
-
-
-
-
-    
 }

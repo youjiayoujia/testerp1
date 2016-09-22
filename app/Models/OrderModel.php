@@ -705,4 +705,15 @@ class OrderModel extends BaseModel
         }
     }
 
+    public function getOrderReamrksAttribute(){
+        $remarks = '';
+        if(!$this->remarks->isEmpty()){
+            foreach ($this->remarks as $remark){
+                $remarks .= empty($remarks) ? $remark->remark : $remark->remark.';';
+
+            }
+        }
+        return $remarks;
+    }
+
 }

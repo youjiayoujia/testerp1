@@ -194,7 +194,7 @@
           <td width="58%" rowspan="2" valign="top" style="border-top:#000 solid 1px">
                   <div style=" font-size:11px">
           SHIP TO:  {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>{{ $model->shipping_address . ' ' . $model->shipping_address1 }}
-                      <br/>{{ $model->shipping_city . ' ' $model->shipping_state . ' ' . $model->zipcode }}<br/>{{ $model->shipping_country }}
+                      <br/>{{ $model->shipping_city . ' ' . $model->shipping_state . ' ' . $model->zipcode }}<br/>{{ $model->shipping_country }}
                   </div>
           </td>
         </tr>

@@ -382,8 +382,6 @@ class RefundCenterController extends Controller
                 '币种',
                 '汇率比',
                 '国家代码',
-
-
                 '订单总金额',
                 '运费',
                 '订单状态',
@@ -403,9 +401,6 @@ class RefundCenterController extends Controller
                 '利润率',
                 '物流名称',
             ];
-
-
-
             foreach ($result as $refund){
                 $data[] =[
                     $refund->id,
@@ -418,7 +413,6 @@ class RefundCenterController extends Controller
                     $refund->refund_amount,
                     $refund->refund_currency,
                     $refund->Currency->rate,
-
                     $refund->Order->shipping_country,
                     $refund->Order->amount,
                     $refund->Order->amount_shipping,
@@ -435,13 +429,12 @@ class RefundCenterController extends Controller
                     $refund->created_at,
                     $refund->Order->OrderReamrks,
                     $refund->Order->packages->sum('cost'),
-                    '平台成本',//$refund->Order->calculateOrderChannelFee,   //平台成本
+                    $refund->Order->calculateOrderChannelFee(),   //平台成本
                     $refund->Order->profit_rate,
                     $refund->RefundOrderLogistics
 
                 ];
             }
-            dd($data);
             Excel::create('refund'.date('Y-m-d'), function($excel) use ($data){
                 $excel->sheet('', function($sheet) use ($data){
                     $sheet->fromArray($data);

@@ -55,4 +55,14 @@ return [
 		'2' => '审核通过',
 		'3' => '审核不通过',
 	],
+
+	'supplier' =>[
+		'examine_status' =>[
+			'newData'       => '待审核',
+			'confirmModify' => '待复审',
+			'currentData'   => '已通过',
+			'unPassed'      => '不通过',
+
+		]
+	],
 ];

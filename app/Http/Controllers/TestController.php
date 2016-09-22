@@ -53,6 +53,7 @@ use App\Models\Order\ItemModel as orderItemss;
 use App\Models\Message\Issues\AliexpressIssueListModel;
 use App\Models\Message\Issues\AliexpressIssuesDetailModel;
 use App\Models\Order\RefundModel;
+use App\Models\Product\SupplierModel;
 
 
 use BarcodeGen;
@@ -690,8 +691,40 @@ class TestController extends Controller
 
         }
     }
-
+    public function getCurlData($remote_server)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $remote_server);
+        //curl_setopt ( $ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=utf-8'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true); // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $output = curl_exec($ch);
+        if (curl_errno($ch)) {
+            // $this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error($ch)); //异常错误
+        }
+        curl_close($ch);
+        return $output;
+    }
     public function getSmtIssue(){
+
+
+        for($i = 1; $i>0; $i++){
+            $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page='.$i;
+            $data = json_decode($this->getCurlData($url));
+            if(empty($data)){
+                break;
+            }else{
+                foreach ($data as $value){
+                    
+                    dd($value);
+                }
+            }
+
+
+        }
+
         $refund = RefundModel::find(2);
         dd($refund->RefundOrderLogistics);
         

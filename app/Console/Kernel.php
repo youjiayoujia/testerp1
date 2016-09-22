@@ -30,7 +30,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetWishProduct::class,
         \App\Console\Commands\GetEbayProduct::class,
         \App\Console\Commands\GetAliexpressProduct::class,
-        //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
         \App\Console\Commands\SetMessageRead::class,
@@ -42,6 +41,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\SentFeedBack::class,
         \App\Console\Commands\GetEbayCases::class,
         \App\Console\Commands\GetAliexpressIssues::class,
+        \App\Console\Commands\getSellmoreSuppliers::class,
     ];
 
     /**

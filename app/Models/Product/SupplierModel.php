@@ -83,6 +83,14 @@ class SupplierModel extends BaseModel
         return $this->province . $this->city . $this->address;
     }
 
+    public function getExamineStatusNameAttribute(){
+        if(isset(config('product.supplier.examine_status')[$this->examine_status])){
+            return config('product.supplier.examine_status')[$this->examine_status];
+        }else{
+            return '无审核状态';
+        }
+    }
+
     /**
      * return the relation between the two module
      *

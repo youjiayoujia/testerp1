@@ -76,7 +76,7 @@
           <div style="font-family:Arial, Helvetica, sans-serif; font-size:11px; line-height:12px">
               &nbsp;{{ $model->shipping_firstname . ' ' . $model->shipping_lastname}}<br />
               &nbsp;{{ $model->shipping_city }}<br />
-              &nbsp;{{ $model->shipping_state}}<br />
+              &nbsp;{{ $model->shipping_address. ' ' . shipping_state}}<br />
               &nbsp;{{ $model->shipping_country . ' ' . $model->shipping_zipcode }}<br/>
           </div>
           <div style="font-family:Arial, Helvetica, sans-serif; height:13px;" align="center">
@@ -217,7 +217,7 @@
             </tr>
            <tr style="height:15mm;">
               <td align="center" valign="top" style="border-right:#000 1px solid; border-bottom:#000 1px solid; font-size:10px;">
-               {{ $model->items()->first()->id }}
+               {{ $model->items()->count() }}
               </td>
               <td align="center" valign="top" style="border-right:#000 1px solid; border-bottom:#000 1px solid;font-size:10px; ">
                {{ $model->items()->first()->quantity }}
@@ -225,7 +225,11 @@
               <td height="" align="left" valign="top" style="border-bottom:#000 1px solid; ">
                   <div style=" font-size:10px;color#000;">
                       <strong>
-                      {{ $model->package_info }}
+                      {{ $model->items()->first()->item->name }}' '{{ $model->items()->first()->item->c_name }} ' '
+                      @foreach($model->items as $packageItem)
+                        {{ $packageItem->item->sku }}'_'{{ $packageItem->quantity }}<br/>
+                      @endforeach
+                      {{ date('Y-m-d H:i:s', strtotime($package->printed_at)) }}
                       </strong>
                   </div>
               </td>

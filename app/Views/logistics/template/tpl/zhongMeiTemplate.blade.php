@@ -66,7 +66,13 @@
            </tr>
            <tr height="50">
             <td colspan="2" style="font-weight:bold;">
-              {{ $model->package_info }}
+              @foreach($model->items as $key => $packageItem)
+                @if($key != 0)
+                ,{{$packageItem->item->sku}}*{{$packageItem->quantity}}【{{$packageItem->warehousePosition->name}}】
+                @else
+                {{$packageItem->item->sku}}*{{$packageItem->quantity}}【{{$packageItem->warehousePosition->name}}】
+                @endif
+              @endforeach
             </td>
            </tr>
         </table>

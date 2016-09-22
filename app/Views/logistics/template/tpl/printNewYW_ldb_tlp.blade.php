@@ -94,7 +94,7 @@
             </tr>
             <tr style="font-size:12px;height:30px;">
                 <td colspan="4" style="border-bottom:none;">
-                    <p>Date and sender\'s signature:SLME &nbsp;&nbsp;302035 &nbsp;&nbsp;{{date('d-m-Y')}}&nbsp;{{ $model->country ? $model->country->number : '' }</p>
+                    <p>Date and sender\'s signature:SLME &nbsp;&nbsp;302035 &nbsp;&nbsp;{{date('d-m-Y')}}&nbsp;{{ $model->country ? $model->country->number : '' }}</p>
                 </td>
 
             </tr>

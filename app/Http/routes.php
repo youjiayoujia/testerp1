@@ -769,7 +769,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('smtAccountManage', 'Publish\Smt\smtAccountManageController');
     
     Route::post('smtPriceTask/batchDelete',
-        ['uses' => 'Publish\Smt\SmtPriceTaskController@batchDelete', 'as' => 'smtPriceTask.batchDelete']);    
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@batchDelete', 'as' => 'smtPriceTask.batchDelete']); 
+    Route::post('smtPriceTask/createPriceTask',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@createPriceTask', 'as' => 'smtPriceTask.createPriceTask']);
+    Route::post('smtPriceTask/getSmtPriceTask',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@getSmtPriceTask', 'as' => 'smtPriceTask.getSmtPriceTask']);  
     Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
     
     Route::any('upload',
@@ -777,6 +781,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::any('uploadToProject',
         ['uses' => 'KindeditorController@uploadToProject', 'as' => 'uploadToProject']);
 
+    Route::post('lazada/setQuantity',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setQuantity', 'as' => 'lazada.setQuantity']);
+    Route::post('lazada/setPrice',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setPrice', 'as' => 'lazada.setPrice']);
+    Route::post('lazada/setSellerSkuStatus',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSellerSkuStatus', 'as' => 'lazada.setSellerSkuStatus']);
+    Route::get('lazada/productBatchEdit',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@productBatchEdit', 'as' => 'lazada.productBatchEdit']);
+    Route::any('lazada/batchUpdate',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@batchUpdate', 'as' => 'lazada.batchUpdate']);
+    
+    Route::resource('lazada', 'Publish\Lazada\LazadaOnlineMonitorController');
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);

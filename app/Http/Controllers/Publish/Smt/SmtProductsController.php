@@ -369,7 +369,7 @@ class SmtProductsController
     }
     
     public function getExchangeRateByType($type = "RMB"){
-        return CurrencyModel::where('code','RMB')->first()->rate;
+        return CurrencyModel::where('code',$type)->first()->rate;
     }
     
     /**

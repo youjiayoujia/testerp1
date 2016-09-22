@@ -137,7 +137,9 @@ return [
         'price.quantity_sold'=>'销量',
         'channel_name' => '渠道名称',
         'account.account' => '渠道帐号',
-        'is_chinese' => '竞拍状态'
+        'is_chinese' => '竞拍状态',
+        'product.status' => '==ERP状态==',
+        'account' => '=帐号=',
     ],
 ];
 

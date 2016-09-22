@@ -470,6 +470,11 @@ return [
                 'url' => 'ebayProduct.index',
                 'icon' => '',
             ],
+            [
+                'name' => 'Lazada数据监控',
+                'url' => 'lazada.index',
+                'icon' => '',
+            ],
         ],
     ],
     //CRM导航

@@ -20,7 +20,7 @@ class PurchaseStaticsticsModel extends BaseModel
      */
     protected $guarded  = [];
 
-    public $searchFields = ['id'=>'id'];
+    public $searchFields = ['id'=>''];
     
     public function user()
     {

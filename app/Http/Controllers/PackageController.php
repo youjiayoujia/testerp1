@@ -358,8 +358,6 @@ class PackageController extends Controller
         
     }
 
-   
-
     public function returnSplitPackage()
     {
         $quantity = request('quantity');
@@ -839,6 +837,8 @@ class PackageController extends Controller
         foreach ($items as $item) {
             $item->picked_quantity = 0;
             $item->save();
+            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost, 'CANCLE', $item->id);
+            $item->item->hold($item->warehouse_position_id, $item->quantity);
         }
         return json_encode(true);
     }
@@ -933,20 +933,6 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode('error');
         }
-        DB::beginTransaction();
-        try {
-            foreach($package->items as $packageItem) {
-                $packageItem->item->holdOut($packageItem->warehouse_position_id,
-                                            $packageItem->quantity,
-                                            'PACKAGE',
-                                            $packageItem->id);
-                $packageItem->orderItem->update(['status' => 'SHIPPED']);
-            }
-        } catch (Exception $e) {
-            DB::rollback();
-            return json_encode('unhold');
-        }
-        DB::commit();
         if($weight == '0') {
             $package->update([
                 'shipped_at' => date('Y-m-d h:i:s', time()),

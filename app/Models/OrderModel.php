@@ -637,7 +637,7 @@ class OrderModel extends BaseModel
             $sum += $channel->flat_rate_value;
             foreach ($orderItems as $orderItem) {
                 $rate = $orderItem->item->catalog->channels->first()->pivot->rate;
-                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $this->logistics_fee) * $rate;
+                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate;
                 $sum += $tmp;
             }
             return $sum;
@@ -655,7 +655,7 @@ class OrderModel extends BaseModel
                 $buf = $orderItem->item->catalog->channels->first()->pivot;
                 $flat_rate_value = $buf->flat_rate_value;
                 $rate_value = $buf->rate_value;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
             }
             return $sum;
         }

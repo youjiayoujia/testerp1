@@ -49,15 +49,15 @@
 @stop
 @section('tableToolButtons')
 <div class="btn-group" role="group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="glyphicon glyphicon-filter"></i> 查询状态
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a href="{{ DataList::filtersEncode(['status','=','0']) }}">未审核</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status','=','1']) }}">未通过</a></li>
-            <li><a href="{{ DataList::filtersEncode(['status','=','2']) }}">已通过</a></li>
-        </ul>
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="glyphicon glyphicon-filter"></i> 查询状态
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+        <li><a href="{{ DataList::filtersEncode(['status','=','0']) }}">未审核</a></li>
+        <li><a href="{{ DataList::filtersEncode(['status','=','1']) }}">未通过</a></li>
+        <li><a href="{{ DataList::filtersEncode(['status','=','2']) }}">已通过</a></li>
+    </ul>
 </div>
 @parent
 @stop

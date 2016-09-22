@@ -301,7 +301,7 @@ class AllotmentController extends Controller
     {
         $this->model->find($id)->update(['allotment_status'=>'over']);
 
-        return redirect($this->mainIndex)->with('alert', $this->alert('success', '强制结束调拨单 成功'));
+        return redirect($this->mainIndex)->with('alert', $this->alert('success', '强制结束调拨单成功'));
     }
 
     /**

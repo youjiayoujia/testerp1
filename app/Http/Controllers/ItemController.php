@@ -153,7 +153,7 @@ class ItemController extends Controller
     }
 
     /**
-     * 批量更新
+     * 更新采购员
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -307,7 +307,7 @@ class ItemController extends Controller
         }
         
     }
-
+    //批量删除sku
     public function batchDelete()
     {
         $item_ids = request()->input('item_ids');

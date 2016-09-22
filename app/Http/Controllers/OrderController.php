@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\Job;
 use App\Jobs\DoPackages;
+use App\Jobs\DoPackage;
 use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
@@ -377,6 +378,9 @@ class OrderController extends Controller
                 $package->delete();
             }
         }
+        $job = new DoPackages($this->model->find($id));
+        $job->onQueue('doPackages');
+        $this->dispatch($job);
 
         return redirect($this->mainIndex);
     }

@@ -18,6 +18,7 @@ use App\Models\Pick\PackageScoreModel;
 use Tool;
 use App\Models\Pick\ErrorListModel;
 use App\Models\ItemModel;
+use DB;
 
 class PickListController extends Controller
 {
@@ -525,6 +526,21 @@ class PickListController extends Controller
                     }
                     $order->update(['status' => 'PACKED']);
                 }
+                DB::beginTransaction();
+                try {
+                    foreach($package->items as $packageItem) {
+                        $packageItem->item->holdOut($packageItem->warehouse_position_id,
+                                                    $packageItem->quantity,
+                                                    'PACKAGE',
+                                                    $packageItem->id);
+                        $packageItem->orderItem->update(['status' => 'SHIPPED']);
+                    }
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return json_encode('unhold');
+                }
+                DB::commit();
+
             }
 
             return json_encode('1');

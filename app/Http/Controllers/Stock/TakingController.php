@@ -3,7 +3,7 @@
  * 盘点控制器
  * 处理盘点相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 16/3/3
  * Time: 10:04am
  */
@@ -19,6 +19,8 @@ use App\Models\Stock\TakingFormModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\ItemModel;
 use App\Models\Stock\InOutModel;
+use App\Models\Warehouse\PositionModel;
+use App\Models\StockModel;
 
 class TakingController extends Controller
 {
@@ -100,41 +102,57 @@ class TakingController extends Controller
      */
     public function update($id)
     {
-        request()->flash();
-        $takings = request()->all();
-        $arr = $takings['arr'];
-        $len = count($arr['id']);
+        set_time_limit(0);
+        ini_set('memory_limit', '1G');
+        if(!request()->hasFile('actual_stock')) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '没传文件'));
+        }
         $this->model->find($id)->update(['stock_taking_by'=>request()->user()->id, 'stock_taking_time'=>date('Y-m-d h:m:s',time())]);
+        $file = request()->file('actual_stock');
+        $arr = $this->model->excelProcess($file);
         $flag = 1;
-        for($i=0;$i<$len;$i++)
-        {
-            $buf = [];
-            foreach($arr as $key => $val)
-            {
-                $buf[$key] = $val[$i];
-            }
-            if($buf['quantity'] == '') {
+        foreach($arr as $key => $block) {
+            if($block['quantity'] == '0') {
                 $flag = 0;
                 continue;
             }
-            $taking = TakingFormModel::find($buf['id']);
-            if($taking->stock) {
-                if($taking->stock->all_quantity == $buf['quantity']) {
-                    $taking->update(['quantity'=>$buf['quantity'], 'stock_taking_status'=>'equal', 'stock_taking_yn'=>'0']);
+            $item = ItemModel::where('sku', $block['sku'])->first();
+            if(!$item) {
+                $flag = 0;
+                continue;
+            }
+            $item_id = $item->id;
+            $position = PositionModel::where('name', $block['position'])->first();
+            if(!$position) {
+                $flag = 0;
+                continue;
+            }
+            $position_id = $position->id;
+            $stock = StockModel::where(['item_id' => $item_id, 'warehouse_position_id' => $position_id])->first();
+            if(!$stock) {
+                $flag = 0;
+                continue;
+            }
+            $stock_id = $stock->id;
+            $taking = TakingFormModel::where('stock_id', $stock_id)->first();
+            if($taking && $taking->stock) {
+                if($taking->stock->all_quantity == $block['quantity']) {
+                    $taking->update(['quantity'=>$block['quantity'], 'stock_taking_status'=>'equal', 'stock_taking_yn'=>'0']);
                 }
-                if($taking->stock->all_quantity < $buf['quantity']) {
-                    $taking->update(['quantity'=>$buf['quantity'], 'stock_taking_status'=>'more', 'stock_taking_yn'=>'1']);
+                if($taking->stock->all_quantity < $block['quantity']) {
+                    $taking->update(['quantity'=>$block['quantity'], 'stock_taking_status'=>'more', 'stock_taking_yn'=>'1']);
                 }
-                if($buf['quantity'] < $taking->stock->all_quantity && $taking->stock->all_quantity - $buf['quantity'] <= $taking->stock->available_quantity) {
-                    $taking->update(['quantity'=>$buf['quantity'], 'stock_taking_status'=>'less', 'stock_taking_yn'=>'1']);
+                if($block['quantity'] < $taking->stock->all_quantity && $taking->stock->all_quantity - $block['quantity'] <= $taking->stock->available_quantity) {
+                    $taking->update(['quantity'=>$block['quantity'], 'stock_taking_status'=>'less', 'stock_taking_yn'=>'1']);
                 }
-                if($buf['quantity'] < $taking->stock->all_quantity && $taking->stock->all_quantity - $buf['quantity'] > $taking->stock->available_quantity) {
-                    $taking->update(['quantity'=>$buf['quantity'], 'stock_taking_status'=>'less', 'stock_taking_yn'=>'0']);
+                if($block['quantity'] < $taking->stock->all_quantity && $taking->stock->all_quantity - $block['quantity'] > $taking->stock->available_quantity) {
+                    $taking->update(['quantity'=>$block['quantity'], 'stock_taking_status'=>'less', 'stock_taking_yn'=>'0']);
                     $flag = 0;
                 }
-            }
+            }    
         }
         $flag ? $this->model->find($id)->update(['create_taking_adjustment' => '1']) : $this->model->find($id)->update(['create_taking_adjustment' => '0']);
+        
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 

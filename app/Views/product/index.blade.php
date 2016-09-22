@@ -80,13 +80,7 @@
     <th class="sort" data-field="model">MODEL</th>
     <th>图片</th>
     <th>产品名称</th>
-    <th>分类</th>
-    <th>状态</th>
-    {{-- <th>选中shop</th>
-    <th>编辑状态</th>
-    <th>审核状态</th>--}}
-    <th class="sort" data-field="name">名称</th>
-    <th class="sort" data-field="c_name">中文名称</th>
+    <th>英文名</th>
     <th>供应商</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>操作</th>
@@ -104,50 +98,9 @@
             <td>{{ $product->id }}</td>
             <td>{{ $product->model }}</td>
             <td><img src="{{ asset($product->dimage) }}" width="100px"></td>
-            <td>{{ $product->c_name }}<br>分类：{{ $product->catalog?$product->catalog->all_name:'' }}<br>开发时间：{{ $product->created_at }}<br></td>
-            <td>{{ $product->catalog?$product->catalog->all_name:'' }}</td>
-            <!-- <td><?php if ($product->edit_status == "") echo "新品上传";if ($product->edit_status == "picked") echo "被选中";if ($product->edit_status == "canceled") echo "取消"; ?></td>
-            <td><?php if ($product->amazonProduct) echo "amazon,";if ($product->ebayProduct) echo "ebay,";if ($product->aliexpressProduct) echo "aliexpress,";if ($product->b2cProduct) echo "B2C,"; ?></td>
-            <?php switch ($product->edit_status) {
-            case '':
-            ?>
-            <td>新品上传</td>
-            <?php
-            break;
-
-            case 'canceled':
-            ?>
-            <td>取消</td>
-            <?php
-            break;
-
-            case 'picked':
-            ?>
-            <td>选中</td>
-            <?php
-            break;
-
-            case 'data_edited':
-            ?>
-            <td>资料已编辑</td>
-            <?php
-            break;
-
-            case 'image_edited':
-            ?>
-            <td>图片已编辑</td>
-            <?php
-            break;
-
-            case 'image_unedited':
-            ?>
-            <td>图片不编辑</td>
-            <?php
-            break;
-            } ?> -->
-            <td>{{config('product.examineStatus')[$product->examine_status?$product->examine_status:'pending']}}</td>
+            <td>{{ $product->c_name }}<br>分类：{{ $product->catalog?$product->catalog->all_name:'' }}<br>开发时间：{{ $product->created_at }}<br></td>    
             <td>{{ $product->name }}</td>
-            <td>{{ $product->c_name }}</td>
+            
             <td>{{ $product->supplier?$product->supplier->name:'无' }}</td>
             <td>{{ $product->created_at }}</td>
             <td>

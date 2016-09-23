@@ -15,44 +15,44 @@
         </style>
 
         <div style="width:100mm;height:100mm;margin:auto;">
-        <div class="main1">
-            <div class="header1">
-                <p style="width:105px;float:left;font-size:22px;font-weight:bold;margin-left:7px;margin-top:20px;">PRIORITY</p>
-                <p style="width:50px;float:right;font-size:22px;font-weight:bold;margin-left:7px;"><img src="'.site_url('attachments').'/images/hl-logo.jpg" style="width:50px; "></p>
-                <p style="clear:both;padding-top:5px;font-size:9px;text-align:center;">Return if undeliverable:H-10905,Postbus 7040,3109 AA Schiedam The Netherlands</p>
-            </div>
-            <div style="height:80px;">
-                <div style="width:22px;height:80px;float:left;font-size:25px;font-weight:bold;line-height:70px;margin-left:7px;">R</div>
-                <div style="height:80px;width:335px;float:right;text-align:center;">
-                    <p style="margin-top:3px;"><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=30&r=1&text='{{$model->tracking_no}}'&f1=-1&f2=8&a1=&a2=B&a3="/></p>
-                    <p style="font-size:18px;margin-top:5px;">{{ $model->tracking_no }}</p>
-                    
+            <div class="main1">
+                <div class="header1">
+                    <p style="width:105px;float:left;font-size:22px;font-weight:bold;margin-left:7px;margin-top:20px;">PRIORITY</p>
+                    <p style="width:50px;float:right;font-size:22px;font-weight:bold;margin-left:7px;"><img src="'.site_url('attachments').'/images/hl-logo.jpg" style="width:50px; "></p>
+                    <p style="clear:both;padding-top:5px;font-size:9px;text-align:center;">Return if undeliverable:H-10905,Postbus 7040,3109 AA Schiedam The Netherlands</p>
+                </div>
+                <div style="height:80px;">
+                    <div style="width:22px;height:80px;float:left;font-size:25px;font-weight:bold;line-height:70px;margin-left:7px;">R</div>
+                    <div style="height:80px;width:335px;float:right;text-align:center;">
+                        <p style="margin-top:3px;"><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=30&r=1&text='{{$model->tracking_no}}'&f1=-1&f2=8&a1=&a2=B&a3="/></p>
+                        <p style="font-size:18px;margin-top:5px;">{{ $model->tracking_no }}</p>
+                        
+                    </div>
+                </div>
+                <div style="width:95mm;word-break:break-all;word-wrap:break-word;margin-top:2px;">
+                <p style="font-size:16px;">{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<p>
+                    <p style="font-size:16px;line-height:17px;">
+                        {{ $model->shipping_address}} <br/>{{ $model->shipping_address1 }}<br/>
+                       {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>{{ $model->shipping_zipcode }}<br/>
+                       Tel:{{ $model->shipping_phone }}<br/>{{ $model->shipping_country }}<br/>{{ $model->country ? $model->country->cn_name : ''}}
+                    </p>
+                    <p style="text-align:right;font-weight:bold;font-size:25px;margin-right:10px;margin-bottom:10px;">{{ $model->shipping_country }}</p>
+                    <p style="float:left;width:100px;text-align:center;font-weight:bold;font-size:25px;">
+                    @foreach(['Austria','Belgium','Bulgaria','Cyprus','Croatia','CzechRepublic','Denmark','Estonia','Finland','France','Germany','Greece','Hungary','Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta','Poland','Portugal','Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom','Netherlands'] as $key => $country)
+                        @if(strtolower($country) == strtolower($model->country->name))
+                            <font>EU</font>
+                        @endif
+                    @endforeach
+                    &nbsp;&nbsp;D</p>
+                    <p style="text-align:left;font-size:15px;">OrderNo:{{ $model->order ? $model->order->ordernum : '' }}</p>
                 </div>
             </div>
-            <div style="width:95mm;word-break:break-all;word-wrap:break-word;margin-top:2px;">
-            <p style="font-size:16px;">{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<p>
-                <p style="font-size:16px;line-height:17px;">
-                    {{ $model->shipping_address}} <br/>{{ $model->shipping_address1 }}<br/>
-                   {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>{{ $model->shipping_zipcode }}<br/>
-                   Tel:{{ $model->shipping_phone }}<br/>{{ $model->shipping_country }}<br/>{{ $model->country ? $model->country->cn_name : ''}}
-                </p>
-                <p style="text-align:right;font-weight:bold;font-size:25px;margin-right:10px;margin-bottom:10px;">{{ $model->shipping_country }}</p>
-                <p style="float:left;width:100px;text-align:center;font-weight:bold;font-size:25px;">
-                @foreach(['Austria','Belgium','Bulgaria','Cyprus','Croatia','CzechRepublic','Denmark','Estonia','Finland','France','Germany','Greece','Hungary','Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta','Poland','Portugal','Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom','Netherlands'] as $key => $country)
-                    @if(strtolower($country) == strtolower($model->country->name))
-                        <font>EU</font>
-                    @endif
-                @enforeach
-                &nbsp;&nbsp;D</p>
-                <p style="text-align:left;font-size:15px;">OrderNo:{{ $model->order ? $model->order->ordernum : '' }}</p>
-            </div>
         </div>
-    </div>
 
         <table cellspacing="0" cellpadding="0" style="border:1px solid black;border-right:none;width:97mm;margin-top: 15px;font-size:14px;">
             <tr>
                 <td colspan="4" style="font-size:13px;border-bottom:1px solid black;">
-                <p style="width:50mm;text-align:center;float:left;border-right:1px solid black;">CUSTOMS DECLARATION</p>
+                <p style="width:5s0mm;text-align:center;float:left;border-right:1px solid black;">CUSTOMS DECLARATION</p>
                 <p style="width:45mm;text-align:center;float:right;">May be opened officially</p>
                 </td>
             </tr>
@@ -90,13 +90,11 @@
                 <td colspan="4" style="line-height:15px;text-align:left;">
                     I,the undersigned whose name and address are given on the item,certify that the data given in this declaration are correct and that this item does not contain any dangerous goods or articles prohibited by transport or export / import regultions.
                 </td>
-
             </tr>
             <tr style="font-size:12px;height:30px;">
                 <td colspan="4" style="border-bottom:none;">
                     <p>Date and sender\'s signature:SLME &nbsp;&nbsp;302035 &nbsp;&nbsp;{{date('d-m-Y')}}&nbsp;{{ $model->country ? $model->country->number : '' }}</p>
                 </td>
-
             </tr>
         </table>
     </body>

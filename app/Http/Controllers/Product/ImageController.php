@@ -152,8 +152,6 @@ class ImageController extends Controller
         $spu_id = request()->input('spu_id');
         
         $productModel = ProductModel::where("spu_id",$spu_id)->get();
-        //echo '<pre>';
-        //print_r($productModel);exit;
         if (!count($productModel)) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger',  'SPU不存在.'));
         }

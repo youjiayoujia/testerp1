@@ -937,6 +937,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
 
 //getEbayInfo
 Route::any('getEbayProduct', ['uses' => 'TestController@getEbayProduct']);
+Route::any('testOnesku', ['uses' => 'TestController@oneSku']);
 Route::any('testPaypal', ['uses' => 'TestController@testPaypal']);
 Route::any('testLazada', ['uses' => 'TestController@testLazada']);
 Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);

@@ -50,9 +50,10 @@ use App\Jobs\Inorders;
 use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Models\Oversea\StockModel as fbaStock;
 use App\Models\Order\ItemModel as orderItemss;
-use App\Models\ProductModel;
+use App\Models\Message\Issues\AliexpressIssueListModel;
+use App\Models\Message\Issues\AliexpressIssuesDetailModel;
+
 use BarcodeGen;
-use Storage;
 
 class TestController extends Controller
 {
@@ -63,11 +64,16 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
     }
 
-    // public function test2()
-    // {
-    //     // return Tool::barcodePrint('test1111');
-    //     var_dump(base64_encode(serialize('你好')));
-    // }
+    public function test2()
+    {
+        $package = PackageModel::find(127);
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+
+        return view('logistics.template.tpl.zhongMeiTemplate', $response);
+    }
 
     public function test3()
     {
@@ -102,57 +108,55 @@ class TestController extends Controller
     //     $this->dispatch($job);
     // }
 
-    public function test2()
-    {
-        $account = AccountModel::find(1);
-        $single = new AmazonAdapter($account->api_config);
-        // var_dump($single->requestReport());exit;
-        // var_dump($single->getReportRequestList('53034017045'));exit;
-        // $buf = $single->getReport('2724553088017044');
-        var_dump(empty($single->listInShipment('FBA3VX2RL1')));
-        // $arr = explode("\n", $buf);
-        // $keys = explode("\t", $arr[0]);
-        // $vals = [];
-        // foreach($arr as $key => $value) {
-        //     if(!$key) {
-        //         continue;
-        //     }
-        //     $buf = explode("\t", $value);
-        //     foreach($buf as $k => $v) {
-        //         $vals[$keys[$k]] = $v;
-        //     }
-        //     var_dump($vals);
-        //     var_dump($vals['afn-inbound-receiving-quantity']);exit;
-            // var_dump($vals);exit;
-            // $tmp = Tool::filter_sku($vals['sku']);
-            // if(count($tmp)) {
-            //     $item = ItemModel::where('sku', $tmp['0']['erpSku'])->first()
-            //     if($item) {
-            //         $vals['item_id'] = $item->id;
-            //     }
-            // }
-            // $vals['title'] = $vals['product-name'];
-            // $vals['channel_sku'] = $vals['sku'];
-            // $vals['mfn_fulfillable_quantity'] = $vals['mfn-fulfillable-quantity'];
-            // $vals['afn_warehouse_quantity'] = $vals['afn-warehouse-quantity'];
-            // $vals['afn_fulfillable_quantity'] = $vals['afn-fulfillable-quantity'];
-            // $vals['afn_unsellable_quantity'] = $vals['afn-unsellable-quantity'];
-            // $vals['afn_reserved_quantity'] = $vals['afn-reserved-quantity'];
-            // $vals['afn_total_quantity'] = $vals['afn-total-quantity'];
-            // $vals['per_unit_volume'] = $vals['per-unit-volume'];
-            // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
-            // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
-            // $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
-            // $vals['account_id'] = '1';
-            // fbaStock::create($vals);
-        // }exit;
-    }
+    // public function test2()
+    // {
+    //     $account = AccountModel::find(1);
+    //     $single = new AmazonAdapter($account->api_config);
+    //     // var_dump($single->requestReport());exit;
+    //     // var_dump($single->getReportRequestList('53034017045'));exit;
+    //     // $buf = $single->getReport('2724553088017044');
+    //     var_dump(empty($single->listInShipment('FBA3VX2RL1')));
+    //     // $arr = explode("\n", $buf);
+    //     // $keys = explode("\t", $arr[0]);
+    //     // $vals = [];
+    //     // foreach($arr as $key => $value) {
+    //     //     if(!$key) {
+    //     //         continue;
+    //     //     }
+    //     //     $buf = explode("\t", $value);
+    //     //     foreach($buf as $k => $v) {
+    //     //         $vals[$keys[$k]] = $v;
+    //     //     }
+    //     //     var_dump($vals);
+    //     //     var_dump($vals['afn-inbound-receiving-quantity']);exit;
+    //         // var_dump($vals);exit;
+    //         // $tmp = Tool::filter_sku($vals['sku']);
+    //         // if(count($tmp)) {
+    //         //     $item = ItemModel::where('sku', $tmp['0']['erpSku'])->first()
+    //         //     if($item) {
+    //         //         $vals['item_id'] = $item->id;
+    //         //     }
+    //         // }
+    //         // $vals['title'] = $vals['product-name'];
+    //         // $vals['channel_sku'] = $vals['sku'];
+    //         // $vals['mfn_fulfillable_quantity'] = $vals['mfn-fulfillable-quantity'];
+    //         // $vals['afn_warehouse_quantity'] = $vals['afn-warehouse-quantity'];
+    //         // $vals['afn_fulfillable_quantity'] = $vals['afn-fulfillable-quantity'];
+    //         // $vals['afn_unsellable_quantity'] = $vals['afn-unsellable-quantity'];
+    //         // $vals['afn_reserved_quantity'] = $vals['afn-reserved-quantity'];
+    //         // $vals['afn_total_quantity'] = $vals['afn-total-quantity'];
+    //         // $vals['per_unit_volume'] = $vals['per-unit-volume'];
+    //         // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
+    //         // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
+    //         // $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
+    //         // $vals['account_id'] = '1';
+    //         // fbaStock::create($vals);
+    //     // }exit;
+    // }
 
     public function test1()
     {
-        $shipment = ShipmentModel::where('shipmentID', '2')->first();
-        var_dump($shipment->shipmentCarrierInfo);
-        var_dump(unserialize($shipment->shipmentCarrierInfo));
+        var_dump('123');exit;
     }
 
     public function index()
@@ -231,7 +235,7 @@ class TestController extends Controller
             ->createWarehouseOrder($package);
         exit;
     }
-    
+
     public function testYw(){
         $package = PackageModel::findOrFail(3);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
@@ -650,7 +654,7 @@ class TestController extends Controller
 
     public function testEbayCases(){
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'pandaserveyou'){ //测试diver
+            if($account->account == 'ebay@licn2011'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();
@@ -659,7 +663,7 @@ class TestController extends Controller
             }
         }
     }
-    
+
     /*
      * 同步ebay信息
      */
@@ -690,46 +694,59 @@ class TestController extends Controller
 
     public function getSmtIssue(){
 
-        $item = orderItemss::find(20);
-        dd($item->ItemChineseName);
-
-
-
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'darli04@126.com'){ //测试diver
+            if($account->account == 'smtjiahongming@126.com'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
-                
-                $messageList = $channel->getIssues();
-                
-                
-                
-                print_r($messageList);exit;
 
-            }
-        }
-    }
+                $getIssueLists = $channel->getIssues();
+                if(!empty($getIssueLists)){
+                    foreach($getIssueLists as $issue){
+                        $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
+                        if(empty($issue_list->id)){
+                            $issue_list->issue_id      = $issue['issue_id'];
+                            $issue_list->gmtModified   = $issue['gmtModified'];
+                            $issue_list->issueStatus   = $issue['issueStatus'];
+                            $issue_list->gmtCreate     = $issue['gmtCreate'];
+                            $issue_list->reasonChinese = $issue['reasonChinese'];
+                            $issue_list->orderId       = $issue['orderId'];
+                            $issue_list->reasonEnglish = $issue['reasonEnglish'];
+                            $issue_list->issueType     = $issue['issueType'];
+                            $issue_list->save();
 
-    public function get_remote_file($url,$folder,$pic_name){  
-        set_time_limit(0); //限制最大的执行时间
-        $destination_folder=$folder?$folder.'/':''; //文件下载保存目录
-        $newfname=$destination_folder.$pic_name;//文件PATH
-        $file=fopen($url,'rb');
-         
-        if($file){          
-            $newf=fopen($newfname,'wb');
-            if($newf){              
-                while(!feof($file)){                    
-                    fwrite($newf,fread($file,1024*8),1024*8);
+                            if(!empty($issue['issue_detail'])){
+                                $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
+                                if(empty($issue_detail->id)){
+                                    $issue_detail->issue_list_id = $issue_list->id;
+                                    $issue_detail->resultMemo = $issue['issue_detail']->resultMemo;
+                                    $issue_detail->orderId = $issue['issue_detail']->resultObject->orderId;
+                                    $issue_detail->gmtCreate = $issue['issue_detail']->resultObject->gmtCreate;
+                                    $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
+                                    $issue_detail->buyerAliid = $issue['issue_detail']->resultObject->buyerAliid;
+                                    $issue_detail->issueStatus = $issue['issue_detail']->resultObject->issueStatus;
+                                    $issue_detail->issueReason = $issue['issue_detail']->resultObject->issueReason;
+                                    $issue_detail->productName = $issue['issue_detail']->resultObject->productName;
+
+                                    //序列化对象
+                                    $issue_detail->productPrice = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
+                                    $issue_detail->buyerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
+                                    $issue_detail->sellerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
+                                    $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
+                                    $issue_detail->refundMoneyMax = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
+                                    $issue_detail->refundMoneyMaxLocal = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
+
+                                    $issue_detail->save();
+
+                                }
+
+                                
+
+                            }
+                        }
+                    }
                 }
             }
-            if($file){              
-                fclose($file);
-            }
-            if($newf){              
-                fclose($newf);
-            }
-        }       
+        }
     }
 
     public function oneSku(){

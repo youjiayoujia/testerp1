@@ -147,6 +147,16 @@ $(document).ready(function(){
         $(this).parent().remove();
     });
 
+    $(document).on('blur', '.report_quantity', function(){
+        available = parseInt($(this).parent().parent().find('.access_quantity').val());
+        val = $(this).val();
+        if(val > available) {
+            alert('数量超出可用数量');
+            $(this).val('');
+            return false;
+        }
+    });
+
     $('.sku1').select2({
         ajax: {
             url: "{{ route('stock.overseaSku') }}",

@@ -33,6 +33,9 @@
                                 <li role="presentation" class="active"><a href="#tracking" aria-controls="tracking" role="tab" data-toggle="tab">Add tracking details</a></li>
                                 <li role="presentation"><a  href="#refund" aria-controls="refund" role="tab" data-toggle="tab" >Refund the buyer</a></li>
                                 <li role="presentation"><a  href="#message" aria-controls="message" role="tab" data-toggle="tab">Send a message to the buyer</a></li>
+                                @if($case->type == 'EBP_SNAD') <!--return case 可以部分退款-->
+                                <li role="presentation"><a  href="#part-refund" aria-controls="message" role="tab" data-toggle="tab">Part refund the buyer</a></li>
+                                @endif
                             </ul>
                         </div>
                     </div>
@@ -44,7 +47,6 @@
                             <div tabindex="1" id="tracking" role="tabpanel" class="tab-pane active">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">Add tracking details</h3>
                                     </div>
                                     <div class="panel-body">
                                         <form class="form-horizontal track-form" action="{{route('AddTrackingDetails')}}">
@@ -102,20 +104,19 @@
 
                             <div role="tabpanel" class="tab-pane panel-default" id="refund">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">给买家退款:</h3>
                                 </div>
                                 <div class="panel-body">
                                     <form class="form-horizontal" action="{{route('case.RefundBuyer')}}" METHOD="POST" id="refund-form">
                                         <input type="hidden" name="id" value="{{$case->id}}">
                                         {!! csrf_field() !!}
                                         <label>退款原因: </label>
-                                        <select class="form-control">
+                                        <select class="form-control" name="refund-reason">
                                             @foreach(config('order.reason') as $key => $reason)
-                                                <option value="">{{$reason}}</option>
+                                                <option value="{{$key}}">{{$reason}}</option>
                                             @endforeach
                                         </select>
                                         <label>备注: </label>
-                                        <textarea class="form-control" rows="3" name="reason"></textarea>
+                                        <textarea class="form-control" rows="3" name="comment"></textarea>
                                         <div class="row">
                                             <div class="col-lg-12">
 
@@ -128,7 +129,6 @@
 
                             <div role="tabpanel" class="tab-pane panel-default" id="message">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Send a message to the buyer:</h3>
                                 </div>
                                 <div class="panel-body">
                                     <form class="form-horizontal" action="{{route('MessageToBuyer')}}">
@@ -145,6 +145,37 @@
                                     </form>
                                 </div>
                             </div>
+
+
+                            <div role="tabpanel" class="tab-pane panel-default" id="part-refund">
+                                <div class="panel-heading">
+                                </div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal" action="{{route('case.PartRefundBuyer')}}" METHOD="POST" id="refund-form">
+                                        <input type="hidden" name="id" value="{{$case->id}}">
+                                        {!! csrf_field() !!}
+                                        <small class="text-danger glyphicon glyphicon-asterisk"></small><label>退款金额: </label>
+                                        <input type="text" name="amount" class="form-control" />
+                                        <label>退款原因: </label>
+                                        <select class="form-control" name="refund-reason">
+                                            @foreach(config('order.reason') as $key => $reason)
+                                                <option value="{{$key}}">{{$reason}}</option>
+                                            @endforeach
+                                        </select>
+                                        <label>备注: </label>
+                                        <textarea class="form-control" rows="3" name="comment"></textarea>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+
+                                                <button type="button" class="btn btn-success submit-refund" style="float: right">提交</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+
+
                         </div>
                     </div>
                     <!--case 操作表单  end-->
@@ -209,16 +240,20 @@
                 if($("input[name='is_tracked']").val() == 10){
                     if($("input[name='trackingNumber']").val() == ''){
                         alert('trackingNumber 不能为空');
+                        return;
                     }
                     if($("input[name='carrier']").val() == ''){
                         alert('carrier 不能为空');
+                        return;
                     }
                 }else if($("input[name='is_tracked']").val() == -10){
                     if($("input[name='carrierUsed']").val() == ''){
                         alert('carrierUsed 不能为空');
+                        return;
                     }
                     if($("input[name='shippedDate']").val() == ''){
                         alert('shippedDate 不能为空');
+                        return;
                     }
                 }
 

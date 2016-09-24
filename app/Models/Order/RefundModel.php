@@ -166,41 +166,23 @@ class RefundModel extends BaseModel
         }
     }
 
+    public function getRefundOrderShipTimeAttribute(){
+        if(!$this->Order->packages->isEmpty()){
+            return $this->Order->packages->first()->shipped_at;
+        }else{
+            return '';
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public function getPakcageWeightAttribute(){
+        $weight = 0;
+        if(!$this->Order->items->isEmpty()){
+            foreach($this->Order->items as $order_item){
+                $weight += $order_item->item->weight;
+            }
+        }
+        return $weight;
+    }
 
 
 }

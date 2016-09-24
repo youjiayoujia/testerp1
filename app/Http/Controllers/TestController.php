@@ -709,6 +709,11 @@ class TestController extends Controller
     }
     public function getSmtIssue(){
 
+        $refund = RefundModel::find(2);
+
+/*        dd($refund->PakcageWeight);
+
+        dd($refund);*/
 
         for($i = 1; $i>0; $i++){
             $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page='.$i;
@@ -717,18 +722,40 @@ class TestController extends Controller
                 break;
             }else{
                 foreach ($data as $value){
-                    
-                    dd($value);
+                     $img_src = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
+                     $img     =  file_get_contents($img_src);
+                     echo $img;
+
+
+
+
+                    $pay_type = $value->pay_method;
+
+                    $insert = [
+                        'company'         => $value->suppliers_company,
+                        'address'         => $value->suppliers_address,
+                        'contact_name'    => $value->suppliers_name,
+                        //'contact_name' => $value->suppliers_phone,
+                        'telephone'       => $value->suppliers_mobile,
+                        'official_url'    => $value->suppliers_website,
+                        'qq'              => $value->suppliers_qq,
+                        'wangwang'        => $value->suppliers_wangwang,
+                        'bank_account'    => $value->suppliers_bank,
+                        'bank_code'       => $value->suppliers_card_number,
+                        'examine_status'  => $value->suppliers_status,
+                        'purchase_time'   => $value->supplierArrivalMinDays,
+                        'created_by'      => $value->user_id,
+                        'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                    ];
+
+                    if(!empty($insert)){
+                        SupplierModel::create($insert);
+                    }
                 }
             }
-
-
         }
 
-        $refund = RefundModel::find(2);
-        dd($refund->RefundOrderLogistics);
-        
-        dd($refund);
+
 
 
 

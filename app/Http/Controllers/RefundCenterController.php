@@ -400,6 +400,8 @@ class RefundCenterController extends Controller
                 '平台成本',
                 '利润率',
                 '物流名称',
+                '发货时间',
+                '包裹重量',
             ];
             foreach ($result as $refund){
                 $data[] =[
@@ -431,10 +433,12 @@ class RefundCenterController extends Controller
                     $refund->Order->packages->sum('cost'),
                     $refund->Order->calculateOrderChannelFee(),   //平台成本
                     $refund->Order->profit_rate,
-                    $refund->RefundOrderLogistics
-
+                    $refund->RefundOrderLogistics,
+                    $refund->RefundOrderShipTime,
+                    $refund->PakcageWeight,
                 ];
             }
+            dd($data);
             Excel::create('refund'.date('Y-m-d'), function($excel) use ($data){
                 $excel->sheet('', function($sheet) use ($data){
                     $sheet->fromArray($data);

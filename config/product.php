@@ -43,7 +43,12 @@ return [
 	
 	//供应商支付类型
 	'product_supplier'=>[
-		'pay_type'=>['ONLINE'=>'网上付款','BANK_PAY'=>'银行付款','CASH_PAY'=>'现金付款','OTHER_PAY'=>'其他方式'],
+		'pay_type'=>[
+			            'ONLINE'   =>'网上付款',
+						'BANK_PAY' =>'银行付款',
+						'CASH_PAY' =>'现金付款',
+						'OTHER_PAY'=>'其他方式'
+		            ],
 		'examine_status'=>['待审核','待复审','审核通过','审核不通过'],
         'type'=>['线下','线上','做货'],
 		'file_path' => 'uploads/product/supplier/', //审核文件路径
@@ -65,4 +70,17 @@ return [
 
 		]
 	],
+
+	'sellmore' => [
+		'pay_type' => [
+			1 => 'ONLINE',
+			2 => 'BANK_PAY',
+			3 => 'CASH_PAY',
+			4 => 'OTHER_PAY',
+		]
+	],
+
+
+
+
 ];

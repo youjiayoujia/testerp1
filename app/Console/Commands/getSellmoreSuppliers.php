@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Product\SupplierModel;
+
 
 class getSellmoreSuppliers extends Command
 {
@@ -37,30 +39,47 @@ class getSellmoreSuppliers extends Command
      */
     public function handle()
     {
-        $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page=1';
-
-        $data = json_decode($this->getCurlData($url));
+        $count = 0;
         for($i = 1; $i>0; $i++){
+
+            $this->comment('start page #'.$i);
+
             $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page='.$i;
             $data = json_decode($this->getCurlData($url));
-            if(empty($data)){
+            if(empty($data) || count($data) == 0){
                 break;
             }else{
                 foreach ($data as $value){
-                    
+                    $pay_type = $value->pay_method;
+                    $insert = [
+                        'company'         => $value->suppliers_company,
+                        'address'         => $value->suppliers_address,
+                        'contact_name'    => $value->suppliers_name,
+                        //'contact_name' => $value->suppliers_phone,
+                        'telephone'       => $value->suppliers_mobile,
+                        'official_url'    => $value->suppliers_website,
+                        'qq'              => $value->suppliers_qq,
+                        'wangwang'        => $value->suppliers_wangwang,
+                        'bank_account'    => $value->suppliers_bank,
+                        'bank_code'       => $value->suppliers_card_number,
+                        'examine_status'  => $value->suppliers_status,
+                        'purchase_time'   => $value->supplierArrivalMinDays,
+                        'created_by'      => $value->user_id,
+                        'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                    ];
+
+                    if(!empty($insert)){
+                        if(!empty(SupplierModel::find(10001))){
+                            $this->comment('data already inserted');
+                        }
+                        SupplierModel::create($insert);
+                        $this->info($value->suppliers_id.' insert success');
+                        $count += 1;
+                    }
                 }
             }
-
-
         }
-
-/*        for($i = 1){
-
-        }*/
-
-
-
-
+        $this->comment('the end, total #'.$count);
 
     }
 

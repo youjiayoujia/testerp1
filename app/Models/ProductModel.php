@@ -681,8 +681,8 @@ class ProductModel extends BaseModel
         $model = $this->all();
         foreach($model as $_item){
             $sku = $_item->item[0]->sku;
-            //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
-            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
             $contents = json_decode(file_get_contents($url));
             if(count($contents)){
                 foreach ($contents as $image) {
@@ -700,7 +700,6 @@ class ProductModel extends BaseModel
                     $imageModel->labels()->attach($tags);
                 }
             }
-            exit;
         }
     }
 }

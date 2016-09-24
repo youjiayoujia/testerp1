@@ -35,12 +35,12 @@
             <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
-                {{ $model->country ? $model->country->cn_name : '' }}{{ '根据国家简码获取分拣编码' }}
+                {{ $model->country ? $model->country->cn_name : '' }}{{ '编码' }}
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">
             <span style="display:inline-block;margin-top:12px;margin-left:40px;">
-                <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3="/>
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 {{ $model->tracking_no }}
             </span>
             <span style="font-weight:bold;font-size:11px;display:inline-block;">Untracked 平小包</span>

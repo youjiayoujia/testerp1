@@ -139,7 +139,7 @@
                         {{ '209052' }}
                     @endif
                 @endif
-                &nbsp;&nbsp;{{ date('d-m-Y') }}&nbsp;{{ '根据国家简码获取分拣编码' }}
+                &nbsp;&nbsp;{{ date('d-m-Y') }}&nbsp;{{ '编码' }}
             </p>
         </td>
     </tr>

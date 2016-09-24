@@ -33,7 +33,7 @@
     <div style="width:379px;height:130px;border:1px solid #000;border-bottom:none;">
         发货标签<br><br>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=25&r=2&text=0B04379950000000&f1=-1&f2=8&a1=&a2=B&a3="/>
+        <img src="{{ route('barcodeGen', ['content' => '0B04379950000000']) }}">
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lntl Tracking No：{{ $model->tracking_no }}
     </div>
     <table border="0" style="width:382px;height:155px;" cellspacing="0" cellpadding="0">
@@ -52,16 +52,14 @@
         <tr height="62">
             <td colspan="3" style="font-size:10px;font-weight:bold;">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=25&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3="/>
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tracking No:None
             </td>
         </tr>
         <tr height="90">
             <td colspan="3" style="border-bottom:1px solid #000;font-size:11px;">
                 是否带电池：
-                @if($model->items)
-
-                @endif
+                {{ $model->is_battery ? '是' : '否' }}
                 <br>
                 仓库：
                 @if($model->warehouse)

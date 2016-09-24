@@ -157,6 +157,11 @@ class ProductModel extends BaseModel
         return $this->hasMany('App\Models\ItemModel', 'product_id');
     }
 
+    public function limits()
+    {
+        return $this->hasMany('App\Models\Product\ProductLogisticsLimitModel', 'product_id', 'id');
+    }
+
     public function logisticsLimit()
     {
         return $this->belongsToMany('App\Models\Logistics\LimitsModel','product_logistics_limits','product_id','logistics_limits_id')->withTimestamps();

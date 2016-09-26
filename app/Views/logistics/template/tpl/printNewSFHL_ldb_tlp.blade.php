@@ -90,10 +90,12 @@
                 <td style="border-bottom:1px solid black;">Value</td>
             </tr>
             <tr style="text-align:center;height:5mm;">
-                <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->item->name }}</td>
-                <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->quantity }}</td>
-                <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->item->weight }}</td>
-                <td style="border-bottom:1px solid black;">{{ $model->items->first()->item->cost }}</td>
+                @if($model->items)
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->item->name }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->quantity }}</td>
+                    <td style="border-right:1px solid black;border-bottom:1px solid black;">{{ $model->items->first()->item->weight }}</td>
+                    <td style="border-bottom:1px solid black;">{{ $model->items->first()->item->cost }}</td>
+                @endif
             </tr>
             <tr style="text-align:center;height:5mm;">
                 <td style="border-right:1px solid black;border-bottom:1px solid black;">Totals of contents</td>

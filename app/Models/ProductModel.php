@@ -8,6 +8,8 @@ use App\Models\Product\RequireModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\ChannelModel;
+use App\Models\LabelModel;
+use Storage;
 
 use Illuminate\Support\Facades\DB;
 use Tool;
@@ -111,7 +113,7 @@ class ProductModel extends BaseModel
         return [
             'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['examine_status' => config('product.examineStatus')],
+            'filterSelects' => [],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];
@@ -155,6 +157,11 @@ class ProductModel extends BaseModel
     public function item()
     {
         return $this->hasMany('App\Models\ItemModel', 'product_id');
+    }
+
+    public function limits()
+    {
+        return $this->hasMany('App\Models\Product\ProductLogisticsLimitModel', 'product_id', 'id');
     }
 
     public function logisticsLimit()
@@ -226,7 +233,8 @@ class ProductModel extends BaseModel
 
     public function getDimageAttribute()
     {
-        $arr = array('1'=>'8','2'=>'9');
+        $arr = LabelModel::whereIn('name',['正面图','外观图'])->get(['id'])->toArray();
+        $arr = array_column($arr, 'id'); 
         if (count($this->imageAll)) {
             foreach ($this->imageAll as $key => $image) {
                 $temp = [];
@@ -236,7 +244,7 @@ class ProductModel extends BaseModel
                 if(count(array_intersect($arr,$temp))==2){
                     return $image->path . $image->name;
                 }
-            }    
+            }   
         }
         return '/default.jpg';
     }
@@ -632,5 +640,74 @@ class ProductModel extends BaseModel
            
         }
         //
+    }
+
+    public function tagRevert($data){
+        foreach($data as $key=>$_data){
+            switch ($_data) {
+                case 'photo':
+                    $data[$key] = 1;
+                    break;
+                
+                case 'link':
+                    $data[$key] = 2;
+                    break;
+
+                case 'logo':
+                    $data[$key] = 6;
+                    break;
+
+                case 'size':
+                    $data[$key] = 8;
+                    break;
+
+                case 'color':
+                    $data[$key] = 7;
+                    break;
+
+                case 'shape':
+                    $data[$key] = 4;
+                    break;
+
+                case 'front':
+                    $data[$key] = 5;
+                    break;
+
+                case 'normal':
+                    $data[$key] = 6;
+                    break;
+            }
+        }
+        return $data;
+    }  
+
+    public function oneSku(){
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        //$imageModel = new ImageModel();
+        //$model = $this->all();
+        $model = $this->where('id','>','78700')->get();
+        foreach($model as $_item){
+            $sku = $_item->item[0]->sku;
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
+            $contents = json_decode(file_get_contents($url));
+            if(count($contents)){
+                foreach ($contents as $image) {
+                    $data['spu_id'] = $_item->item[0]->product->spu_id;
+                    $data['product_id'] = $_item->item[0]->product_id;
+                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
+                    $data['name'] = $image->filename;
+                    $arr = (array)$image->fileId;
+                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
+                    $disk = Storage::disk('product');
+                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
+                    $imageModel = ImageModel::create($data);
+                    $tags = $image->tags;
+                    $tags = $this->tagRevert($tags);
+                    $imageModel->labels()->attach($tags);
+                }
+            }
+        }
     }
 }

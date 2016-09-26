@@ -749,4 +749,26 @@ class TestController extends Controller
             }
         }
     }
+
+    public function oneSku(){
+        ini_set('memory_limit', '2048M');
+        $model = ProductModel::all();
+        foreach($model as $_item){
+            $sku = $_item->item[0]->sku;
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            $contents = json_decode(file_get_contents($url));
+            if(count($contents)){
+                foreach ($contents as $image) {
+                    $data['spu_id'] = $_item->item[0]->product->spu_id;
+                    $data['product_id'] = $_item->item[0]->product_id;
+                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
+                    $data['name'] = $image->filename;
+                    $arr = (array)$image->fileId;
+                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
+                    $disk = Storage::disk('product');
+                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
+                }
+            }
+        }
+    }
 }

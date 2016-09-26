@@ -32,7 +32,7 @@
 <div id="main_frame_box">
     <div style="width:379px;height:150px;border:1px solid #000;border-bottom:none;">
         <p style="float:left;width:140px;height:30px;">
-            <img src="'.site_url('attachments').'/images/EUB01.jpg"/>
+            <img src="{{ asset('picture/EUB01.jpg') }}"/>
         </p>
         <p style="float:left;width:120px;height:30px;text-align:center;font-size:12px;font-weight:bold;line-height:30px;border-right:1px solid #000;">
             Small Packet By Air
@@ -173,13 +173,39 @@
                 Val(US $)
             </td>
         </tr>
-        '.$allParamArr['trInfo'].'
+        <tr style="font-size:12px;">
+            @if($model->items)
+                    @foreach($model->items as $key => $item)
+                        @if($key == 0)
+                            <td width="70%" style="border-right:none;">
+                                {{ $item->item ? ($item->item->product ? $item->item->product->name : '' ) : '' }}
+                            </td>
+                            <td width="15%" style="border-right:none;">
+                                {{ $item->quantity * $item->item ? $item->item->weight : '' }}
+                            </td>
+                            <td width="15%">
+                                {{ $item->quantity * $item->item ? $item->item->purchase_price : '' }}
+                            </td>
+                        @endif
+                    @endforeach
+            @endif
+        </tr>
         <tr height="15" style="font-size:12px;">
             <td width="70%" style="border-right:none;font-size:12px;">
                 Totalg Gross Weight(kg)
             </td>
-            <td width="15%" style="border-right:none;">'.$allParamArr['productsInfo']['total_weight'].'</td>
-            <td width="15%">'.$allParamArr['productsInfo']['total_value'].'</td>
+            @if($model->items)
+                @foreach($model->items as $key => $item)
+                    @if($key == 0)
+                        <td width="15%" style="border-right:none;">
+                            {{ $item->quantity * $item->item ? $item->item->weight : '' }}
+                        </td>
+                        <td width="15%">
+                            {{ $item->quantity * $item->item ? $item->item->purchase_price : '' }}
+                        </td>
+                    @endif
+                @endforeach
+            @endif
         </tr>
         <tr height="55">
             <td colspan="3" style="border-bottom:1px solid #000;font-size:9px;">
@@ -195,7 +221,14 @@
         </tr>
     </table>
     <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
-        '.$allParamArr['skuInfo'].'<b style="float:right;font-size:11px;">【{{ $model->logistics_id }}】</b>
+        @if($model->order)
+            @foreach($model->order->items as $item)
+                {{ $item->sku }} * {{ $item->quantity }} 【{{ $item->item ? ($item->item->warehousePosition ? $item->item->warehousePosition->name : '') : '' }}】
+            @endforeach
+        @endif
+        <b style="float:right;font-size:11px;">
+            【{{ $model->logistics_id }}】
+        </b>
     </div>
 </div>
 </body>

@@ -48,7 +48,9 @@
     <div class="main1">
         <div class="header1">
             <p style="width:105px;float:left;font-size:22px;font-weight:bold;margin-left:7px;margin-top:20px;">PRIORITY</p>
-            <p style="width:160px;float:right;font-size:22px;font-weight:bold;margin-left:7px;"><img src="'.site_url('attachments').'/images/yw_py.jpg" style="width:160px; "></p>
+            <p style="width:160px;float:right;font-size:22px;font-weight:bold;margin-left:7px;">
+                <img src="{{ asset('picture/yw_py.jpg') }}" style="width:160px; ">
+            </p>
             <p style="clear:both;padding-top:5px;font-size:9px;text-align:center;">Return if undeliverable:H-10905,Postbus 7040,3109 AA Schiedam The Netherlands</p>
         </div>
         <div style="width:95mm;word-break:break-all;word-wrap:break-word;margin-top:2px;">
@@ -59,24 +61,21 @@
                 {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>
                 {{ $model->shipping_zipcode }}<br/>
                 Tel:{{ $model->shipping_phone }}<br/>
-                {{ $model->shipping_country }}<br/>
+                {{ $model->country ? $model->country->name : '' }}<br/>
                 {{ $model->country ? $model->country->cn_name : '' }}
             </p>
             <p style="text-align:right;font-weight:bold;font-size:25px;margin-right:10px;margin-bottom:10px;">
                 {{ $model->country ? $model->country->code : '' }}
             </p>
             <p align="center" style="margin-top:3px;">
-                <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=30&r=2&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3="/>
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             </p>
             <p align="center" style="font-size:18px;margin-top:5px;">{{ $model->tracking_no }}</p><br>
             <p style="float:left;width:100px;text-align:center;font-weight:bold;font-size:25px;">
                 @if($model->country)
-                    <?php $country = array(
-                            'Austria','Belgium','Bulgaria','Cyprus','Croatia','CzechRepublic','Denmark','Estonia','Finland','France',
+                    @foreach(['Austria','Belgium','Bulgaria','Cyprus','Croatia','CzechRepublic','Denmark','Estonia','Finland','France',
                             'Germany','Greece','Hungary','Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta','Poland','Portugal',
-                            'Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom','Netherlands');
-                    ?>
-                    @foreach($country as $value )
+                            'Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom','Netherlands'] as $value )
                         @if(strtolower($model->country->name) == strtolower($value))
                             {{ 'EU' }}
                         @endif
@@ -111,26 +110,16 @@
         <td>Value</td>
     </tr>
     <tr style="height:50px;">
-        @if($model->items)
-            @foreach($model->items as $key => $item)
-                @if($key == 0)
-                    <td style="text-align:left">{{ $item->item ? ($item->item->product ? $item->item->product->name : '' ) : '' }}</td>
-                    <td>1</td>
-                    <td>{{ $item->quantity * $item->item ? $item->item->weight : '' }}</td>
-                    <td>{{ $item->quantity * $item->item ? $item->item->purchase_price : '' }}</td>
-                @endif
-            @endforeach
-        @endif
+        <td style="text-align:left">{{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}
+        <td>1</td>
+        <td>{{ $model->signal_weight }}</td>
+        <td>{{ $model->signal_price > 20 ? 20 : $model->signal_price }}</td>
     </tr>
     <tr style="height:50px;">
-        @if($model->items)
-            <td style="text-align:left">Totals of contents</td>
-            <td>{{ $model->items->sum('quantity') }}Pcs</td>
-            @foreach($model->items as $item)
-                <td>{{ $item->quantity }}Kg</td>
-                <td>{{ $item->quantity }}$</td>
-            @endforeach
-        @endif
+        <td style="text-align:left">Totals of contents</td>
+        <td>{{ $model->items ? $model->items->sum('quantity') : 0 }}Pcs</td>
+        <td>{{ $model->total_weight }}Kg</td>
+        <td>{{ $model->total_price > 22 ? 22 : $model->total_price }}$</td>
     </tr>
     <tr style="height:30px;text-align:left;">
         <td colspan="4" style="text-align:left;">Country of origin of goods</td>

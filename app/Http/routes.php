@@ -25,7 +25,7 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 // Registration routes...
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
-Route::group(['middleware' => 'auth'], function () {
+Route::group(['middleware' => 'roleCheck'], function () {
     //Home
     Route::any('/', ['as' => 'dashboard.index', 'uses' => 'PackageController@flow']);
     //国家
@@ -229,6 +229,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('stock/ajaxGetOnlyPosition',
         ['uses' => 'StockController@ajaxGetOnlyPosition', 'as' => 'stock.ajaxGetOnlyPosition']);
     Route::resource('stock', 'StockController');
+
+    /*Route::group(['prefix' => 'admin', 'middleware' => 'roleCheck'], function() {
+        Route::get('purchaseOrder/purchaseStaticstics', ['uses' => 'Purchase\PurchaseOrderController@purchaseStaticstics', 'as' => 'purchaseStaticstics']);
+    });*/
     //采购条目
     Route::any('purchaseItem/cancelThisItem/{id}', 'Purchase\PurchaseItemController@cancelThisItem');
     Route::any('purchaseItem/deletePurchaseItem', ['uses' => 'Purchase\PurchaseItemController@deletePurchaseItem', 'as' => 'deletePurchaseItem']);
@@ -923,6 +927,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('spu/doAction', ['uses' => 'SpuController@doAction', 'as' => 'doAction']);
     Route::get('spu/actionBack', ['uses' => 'SpuController@actionBack', 'as' => 'actionBack']);
     Route::get('spu/saveRemark', ['uses' => 'SpuController@saveRemark', 'as' => 'saveRemark']);
+    //上传产品信息表格
+    Route::get('spu/insertData', ['uses' => 'SpuController@insertData', 'as' => 'insertData']);
+    Route::any('spu/uploadSku', ['uses' => 'SpuController@uploadSku', 'as' => 'spu.uploadSku']);
+
     Route::get('spu/spuMultiEdit', ['uses' => 'SpuController@spuMultiEdit', 'as' => 'spu.MultiEdit']);
     Route::any('spuMultiUpdate', ['uses' => 'SpuController@spuMultiUpdate', 'as' => 'spu.MultiUpdate']);
     Route::any('spuInfo', ['uses' => 'SpuController@spuInfo', 'as' => 'spu.Info']);
@@ -933,6 +941,7 @@ Route::group(['middleware' => 'auth'], function () {
 
 //getEbayInfo
 Route::any('getEbayProduct', ['uses' => 'TestController@getEbayProduct']);
+Route::any('testOnesku', ['uses' => 'TestController@oneSku']);
 Route::any('testPaypal', ['uses' => 'TestController@testPaypal']);
 Route::any('testLazada', ['uses' => 'TestController@testLazada']);
 Route::any('testReturnTrack', ['uses' => 'TestController@testReturnTrack']);

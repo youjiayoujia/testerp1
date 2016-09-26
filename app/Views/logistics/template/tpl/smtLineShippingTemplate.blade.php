@@ -32,7 +32,7 @@
 <div id="main_frame_box">
     <div style="width:380px;border:1px solid #000;border-bottom:none;">
         <p style="float:left;width:140px;height:90px;border-left:1px solid #000;">
-            <img src="'.site_url('attachments').'/images/post_logo.jpg" style="width:140px;height:50px;"/>
+            <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
                 {{ $model->country ? $model->country->cn_name : '' }}{{ '根据国家简码获取分拣编码' }}

@@ -139,6 +139,18 @@ class PackageModel extends BaseModel
         return $value;
     }
 
+    //包裹sku信息
+    public function getSkuInfoAttribute()
+    {
+        $skuString = '';
+        foreach($this->items as $packageItem){
+            $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . $packageItem->quantity . '【' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '') . '】';
+        }
+        $skuString = substr($skuString, 1);
+
+        return $skuString;
+    }
+
     //包裹总重量
     public function getTotalWeightAttribute()
     {

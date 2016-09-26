@@ -40,6 +40,11 @@
                 <button class="btn btn-primary btn-xs" type="button" data-toggle="collapse" data-target=".packageDetails{{$package->id}}" aria-expanded="false" aria-controls="collapseExample">
                   <span class="glyphicon glyphicon-eye-open"></span>
                 </button>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $package->table }}" data-id="{{$package->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
         @foreach($package->items as $key => $packageItem)

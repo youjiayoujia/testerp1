@@ -12,14 +12,14 @@ class AdjustmentModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_adjustments';
+    public $table = 'stock_adjustments';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['adjust_form_id', 'warehouse_id', 'adjust_by', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
+    public $fillable = ['adjust_form_id', 'warehouse_id', 'adjust_by', 'remark', 'status', 'check_by', 'check_time', 'created_at'];
 
     // 用于查询
     public $searchFields = ['adjust_form_id' => '调整单号'];

@@ -22,7 +22,7 @@
     </div>
     <div class="panel-body">
         <p>ERP系统中没找到此消息关联的订单 /(ㄒoㄒ)/~~</p>
-{{--        <form action="{{ route('message.setRelatedOrders', ['id'=>$message->id]) }}" method="POST">
+        <form action="{{ route('message.setRelatedOrders', ['id'=>$message->id]) }}" method="POST">
             {!! csrf_field() !!}
             <div class="row form-group">
                 <div class="col-lg-12">
@@ -41,6 +41,6 @@
                     </button>
                 </div>
             </div>
-        </form>--}}
+        </form>
     </div>
 </div>

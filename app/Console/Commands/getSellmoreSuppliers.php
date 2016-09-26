@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Product\SupplierModel;
+use Illuminate\Support\Facades\Storage;
+use Tool;
 
 
 class getSellmoreSuppliers extends Command
@@ -51,6 +53,17 @@ class getSellmoreSuppliers extends Command
             }else{
                 foreach ($data as $value){
                     $pay_type = $value->pay_method;
+                    if(!empty($value->attachment_url)){
+                        $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
+                        $content      = file_get_contents($img_src);
+                        $suffix       = strstr(substr($value->attachment_url,1),'.');
+                        $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
+
+                        Storage::put($uploads_file,$content);
+                        $qualifications = Tool::randString(16,false).$suffix;
+                    }else{
+                        $qualifications = '';
+                    }
                     $insert = [
                         'company'         => $value->suppliers_company,
                         'address'         => $value->suppliers_address,
@@ -66,12 +79,15 @@ class getSellmoreSuppliers extends Command
                         'purchase_time'   => $value->supplierArrivalMinDays,
                         'created_by'      => $value->user_id,
                         'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                        'qualifications'  => $qualifications
                     ];
 
                     if(!empty($insert)){
-                        if(!empty(SupplierModel::find(10001))){
+
+/*                        if(!empty(SupplierModel::find(10001))){
                             $this->comment('data already inserted');
-                        }
+                        }*/
+                        
                         SupplierModel::create($insert);
                         $this->info($value->suppliers_id.' insert success');
                         $count += 1;

@@ -55,6 +55,7 @@ use App\Models\Message\Issues\AliexpressIssuesDetailModel;
 use App\Models\Order\RefundModel;
 use App\Models\Product\SupplierModel;
 
+use Illuminate\Support\Facades\Storage;
 
 use BarcodeGen;
 
@@ -709,7 +710,7 @@ class TestController extends Controller
     }
     public function getSmtIssue(){
 
-        $refund = RefundModel::find(2);
+      //  $refund = RefundModel::find(2);
 
 /*        dd($refund->PakcageWeight);
 
@@ -721,14 +722,18 @@ class TestController extends Controller
             if(empty($data)){
                 break;
             }else{
-                foreach ($data as $value){
-                     $img_src = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
-                     $img     =  file_get_contents($img_src);
-                     echo $img;
+                foreach ($data as $key => $value){
+if($key == 1)
+                    dd($value);
 
+                    $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
+                    $content          = file_get_contents($img_src);
+                    $suffix       = strstr(substr($value->attachment_url,1),'.');
+                    $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
 
-
-
+                //dd($uploads_file);
+                    $bytes = Storage::put($uploads_file,$content);
+                    
                     $pay_type = $value->pay_method;
 
                     $insert = [
@@ -746,6 +751,8 @@ class TestController extends Controller
                         'purchase_time'   => $value->supplierArrivalMinDays,
                         'created_by'      => $value->user_id,
                         'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                        'qualifications'  => Tool::randString(16,false).$suffix,
+
                     ];
 
                     if(!empty($insert)){

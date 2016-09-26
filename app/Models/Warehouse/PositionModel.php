@@ -20,7 +20,7 @@ class PositionModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['name', 'warehouse_id', 'remark', 'size', 'length', 'width', 'height', 'is_available'];
+    public $fillable = ['name', 'warehouse_id', 'remark', 'size', 'length', 'width', 'height', 'is_available'];
 
     // 用于规则验证
     public $rules = [

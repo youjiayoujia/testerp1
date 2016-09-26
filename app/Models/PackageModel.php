@@ -16,7 +16,7 @@ use App\Models\LogisticsModel;
 
 class PackageModel extends BaseModel
 {
-    protected $table = 'packages';
+    public $table = 'packages';
 
     public $searchFields = ['id' => 'ID'];
 
@@ -25,7 +25,7 @@ class PackageModel extends BaseModel
         'update' => [],
     ];
 
-    protected $fillable = [
+    public $fillable = [
         'channel_id',
         'channel_account_id',
         'order_id',

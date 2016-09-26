@@ -81,6 +81,11 @@
                         <span class="glyphicon glyphicon-trash"></span> 删除
                     </a>
                 @endif
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $allotment->table }}" data-id="{{$allotment->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

@@ -93,7 +93,7 @@ return [
 
     'queues' => [
         'InOrders' => '存储订单',
-        'DoPackage' => '打包',
+        'DoPackages' => '打包',
         'AssignLogistics' => '分配物流',
         'PlaceLogistics' => '物流下单',
         'SendMessages' => '发送邮件',

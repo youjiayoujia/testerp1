@@ -34,7 +34,7 @@ Route::group(['middleware' => 'auth'], function () {
     //国家分类
     Route::resource('countriesSort', 'CountriesSortController');
 
-
+    Route::get('eventChild/getInfo', ['uses' => 'EventChildController@getInfo', 'as' => 'eventChild.getInfo']);
     Route::resource('eventChild', 'EventChildController');
     //3宝package
     Route::resource('bao3Package', 'Bao3PackageController');

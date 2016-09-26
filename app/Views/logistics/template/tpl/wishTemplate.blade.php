@@ -190,11 +190,7 @@
         </tr>
     </table>
     <div style="width:382px;height:40px;margin:0 auto;font-size:10px;white-space:normal;overflow:hidden;">
-        @if($model->order)
-            @foreach($model->order->items as $item)
-                {{ $item->sku }} * {{ $item->quantity }} 【{{ $item->item ? ($item->item->warehousePosition ? $item->item->warehousePosition->name : '') : '' }}】
-            @endforeach
-        @endif
+        {{ $model->sku_info }}
         <b style="float:right;font-size:11px;">
             【{{ $model->logistics_id }}】
         </b>

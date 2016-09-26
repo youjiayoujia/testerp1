@@ -121,7 +121,7 @@
         <span style="font-size:12px;font-weight:bold;">
             【{{ $model->logistics_id }}】
         </span>
-        $allParamArr['skuInfo']
+        {{ $model->sku_info }}
     </div>
 </div>
 </body>

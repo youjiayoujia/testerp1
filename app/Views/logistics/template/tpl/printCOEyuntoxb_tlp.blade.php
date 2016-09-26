@@ -96,9 +96,7 @@
                     </tr>
                     <tr>
                         <td style="border-right: 1px solid black;">
-                            @foreach($model->order->items as $item)
-                                {{ $item->sku }} * {{ $item->quantity }} 【{{ $item->item ? ($item->item->warehousePosition ? $item->item->warehousePosition->name : '') : '' }}】
-                            @endforeach
+                            {{ $model->sku_info }}
                         </td>
                         <td style="border-right: 1px solid black;">
                             {{ $model->signal_weight }}

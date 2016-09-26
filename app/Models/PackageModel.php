@@ -165,10 +165,7 @@ class PackageModel extends BaseModel
     //包裹单个sku重量
     public function getSignalWeightAttribute()
     {
-        $weight = 0;
-        foreach($this->items->first() as $packageItem) {
-            $weight += $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
-        }
+        $weight = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->item ? $this->items->first()->item->weight : 0) : 0);
 
         return $weight;
     }
@@ -176,10 +173,7 @@ class PackageModel extends BaseModel
     //包裹单个sku价格
     public function getSignalPriceAttribute()
     {
-        $price = 0;
-        foreach($this->items->first() as $packageItem) {
-            $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
-        }
+        $price = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->orderItem ? $this->items->first()->orderItem->price : 0) : 0);
         if($this->order) {
             $price = $price / $this->order->rate;
         }

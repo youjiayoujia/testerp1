@@ -683,7 +683,8 @@ class ProductModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         //$imageModel = new ImageModel();
-        $model = $this->all();
+        //$model = $this->all();
+        $model = $this->where('id','>','78700')->get();
         foreach($model as $_item){
             $sku = $_item->item[0]->sku;
             $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;

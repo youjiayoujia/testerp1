@@ -8,6 +8,7 @@ use App\Models\Product\RequireModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\ChannelModel;
+use App\Models\LabelModel;
 use Storage;
 
 use Illuminate\Support\Facades\DB;
@@ -227,7 +228,8 @@ class ProductModel extends BaseModel
 
     public function getDimageAttribute()
     {
-        $arr = array('1'=>'8','2'=>'9');
+        $arr = LabelModel::whereIn('name',['正面图','外观图'])->get(['id'])->toArray();
+        $arr = array_column($arr, 'id'); 
         if (count($this->imageAll)) {
             foreach ($this->imageAll as $key => $image) {
                 $temp = [];
@@ -237,7 +239,7 @@ class ProductModel extends BaseModel
                 if(count(array_intersect($arr,$temp))==2){
                     return $image->path . $image->name;
                 }
-            }    
+            }   
         }
         return '/default.jpg';
     }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 导航配置文件
  *
@@ -116,7 +115,7 @@ return [
         'type' => 'group',
         'subnavigations' => [
             '收货质检' => [
-               [
+                [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
                     'icon' => '',
@@ -231,61 +230,44 @@ return [
                     'icon' => '',
                 ],
             ],
-            '报表' => [
-                [
-                    'name' => '包裹信息',
-                    'url' => 'allReport.report',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '拣货排行榜',
-                    'url' => 'pickReport.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包装排行榜',
-                    'url' => 'packReport.index',
-                    'icon' => '',
-                ],
-            ],
         ],
     ],
     //仓储导航
-    [
-        'name' => '海外仓',
-        'icon' => 'home',
-        'url' => '',
-        'type' => 'group',
-        'subnavigations' => [
-            '海外仓模块' => [
-                [
-                    'name' => '海外仓销量',
-                    'url' => 'suggestForm.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '申请表',
-                    'url' => 'report.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '发货',
-                    'url' => 'report.shipment',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '海外仓箱子',
-                    'url' => 'box.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => 'fba库存信息',
-                    'url' => 'fbaStock.index',
-                    'icon' => '',
-                ],
-            ],
-        ],
-    ],
+    // [
+    //     'name' => '海外仓',
+    //     'icon' => 'home',
+    //     'url' => '',
+    //     'type' => 'group',
+    //     'subnavigations' => [
+    //         '海外仓模块' => [
+    //             [
+    //                 'name' => '海外仓销量',
+    //                 'url' => 'suggestForm.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '申请表',
+    //                 'url' => 'report.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '发货',
+    //                 'url' => 'report.shipment',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '海外仓箱子',
+    //                 'url' => 'box.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => 'fba库存信息',
+    //                 'url' => 'fbaStock.index',
+    //                 'icon' => '',
+    //             ],
+    //         ],
+    //     ],
+    // ],
     //物流导航
     [
         'name' => '物流',
@@ -420,7 +402,6 @@ return [
                 'icon' => '',
             ],
             [
-
                 'name' => 'SMT待发布产品列表',
                 'url' => 'smt.waitPost',
                 'icon' => '',
@@ -431,7 +412,7 @@ return [
                 'icon' => '',
             ],
             [
-            
+
                 'name' => 'SMT在线产品列表',
                 'url' => 'smt.onlineProductIndex',
                 'icon' => '',
@@ -466,7 +447,7 @@ return [
                 'url' => 'smtProduct.freightManage',
                 'icon' => '',
             ],
-            
+
             [
                 'name' => 'SMT销售代码设置',
                 'url' => 'smtSellerCode.index',
@@ -576,6 +557,30 @@ return [
                     'icon' => '',
                 ],
             ],
+            '包裹报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包装排行榜',
+                    'url' => 'packReport.index',
+                    'icon' => '',
+                ],
+            ],
+            '订单报表' => [
+                [
+                    'name' => '退款统计',
+                    'url' => 'refund.refundStatistics',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航
@@ -626,8 +631,6 @@ return [
             ],
         ],
     ],
-
-
     //系统导航
     [
         'name' => '系统',
@@ -702,6 +705,4 @@ return [
             ],
         ],
     ],
-
 ];
-

@@ -310,7 +310,9 @@ class OrderController extends Controller
         }
         request()->flash();
         $data = request()->all();
-        $data['order_id'] = $id;
+        $data['order_id']   = $id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
         $model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
     }

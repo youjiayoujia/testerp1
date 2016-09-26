@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event\ChildModel;
+use App\Models\Event\CategoryModel;
 
 class EventChildController extends Controller
 {
@@ -21,5 +22,49 @@ class EventChildController extends Controller
         $this->mainIndex = route('eventChild.index');
         $this->mainTitle = '事件记录';
         $this->viewPath = 'event.child.';
+    }
+
+    public function getInfo()
+    {
+        $table = request('table');
+        $id = request('id');
+        $category = CategoryModel::where('model_name', $table)->first();
+        if(!$category) {
+            return 'false';
+        }
+        $models = $category->child()->where('type_id', $id)->get()->sortByDesc('when');
+        $html = '';
+        foreach($models as $model) {
+            $to = unserialize(base64_decode($model->to_arr));
+            $from = unserialize(base64_decode($model->from_arr));
+            $toFillable = $to->fillable;
+            if(!$from) {
+                $html .= "<div class='panel panel-default'>
+                        <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
+                        <div class='panel-body'>";
+                foreach($toFillable as $key => $value) {
+                    $html .= "<div class='row'>";
+                    $html .= $value . "&nbsp;&nbsp;:&nbsp;&nbsp;" . $to->$value;
+                    $html .= "</div>";
+                }               
+                $html .= "</div></div>";   
+                continue;     
+            }
+            $fromFillable = $from->fillable;
+            $html .= "<div class='panel panel-default'>
+                        <div class='panel-heading'>备注:".$model->what. '&nbsp;&nbsp;&nbsp;&nbsp;操作时间:' . $model->when . "&nbsp;&nbsp;&nbsp;&nbsp;操作人:". $model->who . "</div>
+                        <div class='panel-body'>";
+            foreach($toFillable as $key => $value) {
+                if($to->$value == $from->$value) {
+                    continue;
+                }
+                $html .= "<div class='row'>";
+                $html .= $value . "&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;" . $from->$value . "&nbsp;&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-arrow-right'></span>&nbsp;&nbsp;&nbsp;&nbsp;" . $to->$value;
+                $html .= "</div>";
+            }               
+            $html .= "</div></div>";
+        }
+
+        return $html;
     }
 }

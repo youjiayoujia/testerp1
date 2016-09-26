@@ -52,6 +52,10 @@ use App\Models\Oversea\StockModel as fbaStock;
 use App\Models\Order\ItemModel as orderItemss;
 use App\Models\Message\Issues\AliexpressIssueListModel;
 use App\Models\Message\Issues\AliexpressIssuesDetailModel;
+use App\Models\Order\RefundModel;
+use App\Models\Product\SupplierModel;
+
+use Illuminate\Support\Facades\Storage;
 
 use BarcodeGen;
 
@@ -67,6 +71,7 @@ class TestController extends Controller
     public function test2()
     {
         $package = PackageModel::find(127);
+        var_dump($package);exit;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $package,
@@ -691,8 +696,81 @@ class TestController extends Controller
 
         }
     }
-
+    public function getCurlData($remote_server)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $remote_server);
+        //curl_setopt ( $ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=utf-8'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true); // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $output = curl_exec($ch);
+        if (curl_errno($ch)) {
+            // $this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error($ch)); //异常错误
+        }
+        curl_close($ch);
+        return $output;
+    }
     public function getSmtIssue(){
+
+        dd(request()->user());
+
+      //  $refund = RefundModel::find(2);
+
+/*        dd($refund->PakcageWeight);
+
+        dd($refund);*/
+
+        for($i = 1; $i>0; $i++){
+            $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page='.$i;
+            $data = json_decode($this->getCurlData($url));
+            if(empty($data)){
+                break;
+            }else{
+                foreach ($data as $key => $value){
+if($key == 1)
+                    dd($value);
+
+                    $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
+                    $content          = file_get_contents($img_src);
+                    $suffix       = strstr(substr($value->attachment_url,1),'.');
+                    $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
+
+                //dd($uploads_file);
+                    $bytes = Storage::put($uploads_file,$content);
+                    
+                    $pay_type = $value->pay_method;
+
+                    $insert = [
+                        'company'         => $value->suppliers_company,
+                        'address'         => $value->suppliers_address,
+                        'contact_name'    => $value->suppliers_name,
+                        //'contact_name' => $value->suppliers_phone,
+                        'telephone'       => $value->suppliers_mobile,
+                        'official_url'    => $value->suppliers_website,
+                        'qq'              => $value->suppliers_qq,
+                        'wangwang'        => $value->suppliers_wangwang,
+                        'bank_account'    => $value->suppliers_bank,
+                        'bank_code'       => $value->suppliers_card_number,
+                        'examine_status'  => $value->suppliers_status,
+                        'purchase_time'   => $value->supplierArrivalMinDays,
+                        'created_by'      => $value->user_id,
+                        'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                        'qualifications'  => Tool::randString(16,false).$suffix,
+
+                    ];
+
+                    if(!empty($insert)){
+                        SupplierModel::create($insert);
+                    }
+                }
+            }
+        }
+
+
+
+
 
         foreach (AccountModel::all() as $account) {
             if($account->account == 'smtjiahongming@126.com'){ //测试diver

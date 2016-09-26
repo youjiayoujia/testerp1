@@ -39,6 +39,11 @@
                    data-url="{{ route('warehouse.destroy', ['id' => $warehouse->id]) }}">
                     <span class="glyphicon glyphicon-trash"></span> 删除
                 </a>
+                <button class="btn btn-primary btn-xs dialog"
+                        data-toggle="modal"
+                        data-target="#dialog" data-table="{{ $warehouse->table }}" data-id="{{$warehouse->id}}">
+                    <span class="glyphicon glyphicon-road"></span>
+                </button>
             </td>
         </tr>
     @endforeach

@@ -61,6 +61,18 @@ class MessageModel extends BaseModel{
         return $this->hasMany('App\Models\Message\OrderModel', 'message_id');
     }
 
+    public function channel(){
+        return $this->hasOne('App\Models\ChannelModel','id','channel_id');
+    }
+
+    public function getChannelNameAttribute(){
+        if(!empty($this->channel_id)){
+            return $this->channel->name;
+        }else{
+            return '无';
+        }
+    }
+
     /**
      * 分配
      * @param $userId

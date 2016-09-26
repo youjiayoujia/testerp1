@@ -153,7 +153,7 @@ class SupplierController extends Controller
         $product_id_arr = explode(',',$product_id_str);
 		$suppliers=$this->model->find($product_id_arr);
 		foreach($suppliers as $key=>$vo){
-			if($vo->examine_status !=2){
+			if($vo->examine_status != 'currentData'){ //审核通过
 				$vo->update(['examine_status'=>$channel_id]);
 			}
 			}

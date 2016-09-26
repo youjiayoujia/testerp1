@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\UserModel;
 use App\Models\ChannelModel;
 use Excel;
+use App\Models\Channel\AccountModel;
+use App\Models\Order\ItemModel;
+use DB;
 
 
 class RefundCenterController extends Controller
@@ -302,58 +305,147 @@ class RefundCenterController extends Controller
 
     }
 
+    /**
+     * 退款统计报表
+     */
+    public function refundStatistics(){
+
+        $metas = [
+            'mainIndex' => route('feeback.feedBackStatistics'),
+            'mainTitle' => '报表',
+            'title'     => '退款统计',
+        ];
 
 
 
+        $response = [
+            'metas' => $metas,
+            'channels' => ChannelModel::all(),
+            //'data'  => $total,
+        ];
+
+        return view($this->viewPath . 'statistics',$response);
+    }
+
+    public function getChannelAccount(){
+
+        $channel_id = request()->input('channel_id');
+        $channel_ids   = explode(',',$channel_id);
+        $accounts   = AccountModel::whereIn('channel_id',$channel_ids)->get(['account','id'])->toJson();
+        echo $accounts;
+    }
+
+    public function exportRefundDetail(){
+        $form = request()->input();
+        $items = new ItemModel;
+        if(!empty($form['skus']))
+            $items = $items->whereIn('sku',explode(',',$form['skus']));
+        $items = $items->where('refund_id','<>','');
+
+        if($form['time-type'] == 'order'){
+            $items = $items->where('created_at','<=',$form['end']);
+            $items = $items->where('created_at','>=',$form['start']);
+        }
+        $items = $items->distinct();
+        $items = $items->get(['refund_id']);
 
 
+        $refunds =  new RefundModel;
+        if(!$items->isEmpty()){
+            $refund_ids = array_column($items->toArray(),'refund_id');
+            $refunds = $refunds->whereIn('id',$refund_ids);
+        }
+        if(!empty($form['refund-statistics-channel-ids']))
+            $refunds = $refunds->whereIn('channel_id',explode(',',$form['refund-statistics-channel-ids']));
 
+        if(!empty($form['refund-statistics-account-ids']))
+            $refunds = $refunds->whereIn('account_id',explode(',',$form['refund-statistics-account-ids']));
 
+        if(!empty($form['refund-statistics-reason']))
+            $refunds = $refunds->whereIn('reason',explode(',',$form['refund-statistics-reason']));
+        if($form['time-type'] == 'refund'){
+            $refunds = $refunds->where('created_at','<=',$form['end']);
+            $refunds = $refunds->where('created_at','>=',$form['start']);
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
+        $result = $refunds->get();
+        if(!$result->isEmpty()){
+            $data[] = [
+                '退款ID号',
+                '买家ID',
+                '买家Eamil',
+                '收货人',
+                '退款类型',
+                '退款原因',
+                '订单号',
+                '退款金额',
+                '币种',
+                '汇率比',
+                '国家代码',
+                '订单总金额',
+                '运费',
+                '订单状态',
+                '追踪号',
+                '渠道',
+                '销售账号',
+                '退款状态',
+                '录入人员',
+                '退款备注',
+                'SKU*数量',
+                '下单时间',
+                '支付时间',
+                '退款创建时间',
+                '订单备注',
+                '运费成本',
+                '平台成本',
+                '利润率',
+                '物流名称',
+                '发货时间',
+                '包裹重量',
+            ];
+            foreach ($result as $refund){
+                $data[] =[
+                    $refund->id,
+                    $refund->Order->by_id,
+                    $refund->Order->email,
+                    $refund->Order->shipping_firstname . ' '.$refund->Order->shipping_lastname,
+                    $refund->RefundName,
+                    $refund->ReasonName,
+                    $refund->order_id,
+                    $refund->refund_amount,
+                    $refund->refund_currency,
+                    $refund->Currency->rate,
+                    $refund->Order->shipping_country,
+                    $refund->Order->amount,
+                    $refund->Order->amount_shipping,
+                    $refund->Order->StatusText,
+                    $refund->Order->transaction_number,
+                    $refund->ChannelName,
+                    $refund->Account->account,
+                    $refund->ProcessStatusName,
+                    $refund->CustomerName,
+                    $refund->detail_reason,
+                    $refund->RefundProducts,
+                    $refund->Order->create_time,
+                    $refund->Order->payment_date,
+                    $refund->created_at,
+                    $refund->Order->OrderReamrks,
+                    $refund->Order->packages->sum('cost'),
+                    $refund->Order->calculateOrderChannelFee(),   //平台成本
+                    $refund->Order->profit_rate,
+                    $refund->RefundOrderLogistics,
+                    $refund->RefundOrderShipTime,
+                    $refund->PakcageWeight,
+                ];
+            }
+            dd($data);
+            Excel::create('refund'.date('Y-m-d'), function($excel) use ($data){
+                $excel->sheet('', function($sheet) use ($data){
+                    $sheet->fromArray($data);
+                });
+            })->download('csv');
+        }else{
+            return redirect(route('refund.exportRefundDetail'))->with('alert', $this->alert('danger', '没有找到数据。'));
+        }
+    }
 }

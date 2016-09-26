@@ -4,6 +4,19 @@
         <div class="panel-heading">
             <strong>@section('tableTitle') {{ $metas['title'] }} @show{{-- 列表标题 --}}</strong>
         </div>
+
+        <div class="modal fade" id="dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>日志记录</div>
+                        <div class='panel-body info_buf'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="panel-body">
             <div class="table-responsive">
                 @section('tableToolbar')
@@ -203,6 +216,20 @@
             var size = $(this).val();
             location.href = new URI().setQuery('pageSize', size);
         });
+
+        $(document).on('click', '.dialog', function(){
+            table = $(this).data('table');
+            id = $(this).data('id');
+            $.get(
+                "{{ route('eventChild.getInfo')}}",
+                {table:table, id:id},
+                function(result) {
+                   $('.info_buf').html('');
+                   $('.info_buf').html(result);
+                },'html'
+                );
+        });
+
         {{-- 排序 --}}
         $('.sort').click(function () {
             var field = $(this).data('field');

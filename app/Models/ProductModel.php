@@ -8,6 +8,7 @@ use App\Models\Product\RequireModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\ChannelModel;
+use App\Models\LabelModel;
 use Storage;
 
 use Illuminate\Support\Facades\DB;
@@ -232,7 +233,8 @@ class ProductModel extends BaseModel
 
     public function getDimageAttribute()
     {
-        $arr = array('1'=>'8','2'=>'9');
+        $arr = LabelModel::whereIn('name',['正面图','外观图'])->get(['id'])->toArray();
+        $arr = array_column($arr, 'id'); 
         if (count($this->imageAll)) {
             foreach ($this->imageAll as $key => $image) {
                 $temp = [];
@@ -242,7 +244,7 @@ class ProductModel extends BaseModel
                 if(count(array_intersect($arr,$temp))==2){
                     return $image->path . $image->name;
                 }
-            }    
+            }   
         }
         return '/default.jpg';
     }
@@ -683,7 +685,8 @@ class ProductModel extends BaseModel
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
         //$imageModel = new ImageModel();
-        $model = $this->all();
+        //$model = $this->all();
+        $model = $this->where('id','>','78700')->get();
         foreach($model as $_item){
             $sku = $_item->item[0]->sku;
             $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;

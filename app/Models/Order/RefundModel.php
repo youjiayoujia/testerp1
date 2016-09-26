@@ -33,6 +33,7 @@ class RefundModel extends BaseModel
         'user_paypal_account',
         'customer_id',
         'channel_id',
+        'account_id'
     ];
 
     public $rules = [
@@ -57,7 +58,10 @@ class RefundModel extends BaseModel
     public function getRefundNameAttribute()
     {
         $arr = config('refund.refund');
-        return $arr[$this->refund];
+        if(isset($arr[$this->refund])){
+            return $arr[$this->refund];
+        }
+        return '';
     }
     public function getProcessStatusNameAttribute(){
         return config('refund.process')[$this->process_status];
@@ -70,8 +74,17 @@ class RefundModel extends BaseModel
         return $this->hasOne('App\Models\UserModel','id','customer_id');
     }
     public function Account(){
-        return $this->hasOne('App\Models\Channel\AccountModel','id','channel_id');
+        return $this->hasOne('App\Models\Channel\AccountModel','id','account_id');
     }
+
+    public function Currency(){
+        return $this->hasOne('App\Models\CurrencyModel','code','refund_currency');
+    }
+
+    public function OrderItems(){
+        return $this->hasMany('App\Models\Order\ItemModel','refund_id','id');
+    }
+
     public function getSKUsAttribute(){
         $items = $this->Order->items;
         $sku ='';
@@ -129,41 +142,47 @@ class RefundModel extends BaseModel
         return $this->Order->channelAccount->account;
     }
 
+    public function getRefundProductsAttribute(){
+        $skus = '';
+        if(!$this->OrderItems->isEmpty()){
+            foreach ($this->OrderItems as $item){
+                $skus .= $item->sku.'*'.$item->quantity.';';
+            }
+        }
+        return $skus;
+    }
 
+    public function getRefundOrderLogisticsAttribute(){
+        //$this->Order->packages;
+        if($this->Order->packages->first()->logistics_id != 0){
+            if(!empty($this->Order->packages->logistics)){
+                return  $this->Order->packages->logistics->name;
+            }else{
+                return '无';
+            }
 
+        }else{
+            return '无';
+        }
+    }
 
+    public function getRefundOrderShipTimeAttribute(){
+        if(!$this->Order->packages->isEmpty()){
+            return $this->Order->packages->first()->shipped_at;
+        }else{
+            return '';
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public function getPakcageWeightAttribute(){
+        $weight = 0;
+        if(!$this->Order->items->isEmpty()){
+            foreach($this->Order->items as $order_item){
+                $weight += $order_item->item->weight;
+            }
+        }
+        return $weight;
+    }
 
 
 }

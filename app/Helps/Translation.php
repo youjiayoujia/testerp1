@@ -2,7 +2,7 @@
 /**
  * 百度API翻译
  * Created by PhpStorm.
- * User: jiangdi
+ * User: Norton
  * Date: 2016/8/10
  * Time: 17:30
  */

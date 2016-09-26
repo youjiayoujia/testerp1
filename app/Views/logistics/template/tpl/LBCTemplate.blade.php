@@ -45,7 +45,7 @@
             <td colspan="2" style="border-top:none;">
                 <p style="float:left;width:265px;margin-left:10px;height:100%;text-align:left;overflow:hidden;word-wrap:break-word;font-size:13px;">
                     {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
-                    {{ $model->shipping_address }}
+                    {{ $model->shipping_address . ' ' }}
                     {{ $model->shipping_address1 }}<br/>
                     {{ $model->shipping_city }}<br/>
                     {{ $model->shipping_state }}<br/>

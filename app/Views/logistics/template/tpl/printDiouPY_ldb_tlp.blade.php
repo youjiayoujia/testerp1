@@ -45,13 +45,7 @@
                 Zip Code:{{ $model->shipping_zipcode }}<br/>
                 Country:{{ $model->country ? $model->country->name : '' . '(' }}{{ $model->country ? $model->country->code : '' . ')' }}<br/>
                 Phone:{{ $model->shipping_phone }}<br>
-                Weight:
-                @if($model->items)
-                    @foreach($model->items as $item)
-                        {{ sprintf("%01.2f", $item->quantity * $item->item->weight) }}
-                    @endforeach
-                @endif
-                <br/>
+                Weight:{{ sprintf("%01.2f", $model->total_weight) }}<br/>
                 Ref:{{ $model->order_id }}
             </td>
         </tr>

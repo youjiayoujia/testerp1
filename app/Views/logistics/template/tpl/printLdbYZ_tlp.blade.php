@@ -259,13 +259,11 @@
         <p style="width:50px;padding:0;float:left;font-size:40px;text-align:center;height:50px;font-weight:bold;">
             {{ '格口号' }}
         </p>
-
         <p style="display:inline-block;width:240px;float:left;font-size:12px;height:50px;text-align:center;padding-top:2px;">
-            <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=32&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3="/>
+            <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
             <br/>
             {{ $model->tracking_no }}
         </p>
-
         <p style="display:inline-block;width:55px;float:left;font-size:20px;height:50px;text-align:center;">
             AAAJ
         </p>
@@ -274,11 +272,9 @@
         <p style="display:inline-block;width:110px;float:left;font-size:10px;font-weight:bold;">
             <span style="font-size:8px;">报关签条<br/>CUSTOMS DECLARATION</span>
         </p>
-
         <p style="display:inline-block;width:100px;float:left;font-size:10px;text-align:center;">
             <span style="font-size:8px;">可以进行开拆<br/>May be open officially</span>
         </p>
-
         <p style="display:inline-block;width:120px;float:left;font-size:10px;text-align:center;">
             <span style="font-size:8px;padding-left:5px;">请先阅读背面的注意事项<br/>May be opend officially</span>
         </p>
@@ -290,7 +286,6 @@
                     <td style="width:160px;padding:1px"><p style="width:140px;border-right:1px solid black;">邮件种类
                             Category of item</p></td>
                     <td colspan="2"></td>
-
                 </tr>
                 <tr style="height:30px;">
                     <td>内件详情名称和数量 Quantity and<br/>detailed description of contents</td>
@@ -298,14 +293,18 @@
                     <td style="text-align: center;">价值<br/>Value</td>
                 </tr>
                 <tr style="height:30px;">
-                    <td style="text-align: center;padding-top:2px;">' . $allParamArr['productsInfo'][0]['item_count']. '
-                        * '. $allParamArr['productsInfo'][0]['products_declared_en'].'
+                    <td style="text-align: center;padding-top:2px;">
+                        @if($model->items)
+                            @foreach($model->items->first() as $packageItem)
+                                {{ $packageItem->quantity . '*' . $packageItem->item ? $packageItem->item->name : '' }}
+                            @endforeach
+                        @endif
                     </td>
                     <td style="text-align: center;">
-                        '.$allParamArr['productsInfo'][0]['item_count']*$allParamArr['productsInfo'][0]['products_weight'].'
+                        {{ $model->signal_weight }}
                     </td>
                     <td style="text-align: center;">
-                        USD'.$allParamArr['productsInfo'][0]['products_declared_value']*$allParamArr['productsInfo'][0]['item_count'].'
+                        USD{{ $model->signal_price > 20 ? 20 : $model->signal_price }}
                     </td>
                 </tr>
                 <tr>
@@ -318,13 +317,13 @@
                 <tr style="border-bottom: none;">
                     <td style="border-bottom: none;"></td>
                     <td style="border-bottom: none;width:50px;height:10px;text-align: center;padding-top:2px;">
-                        '.$allParamArr['total_weight'].'
+                        {{ $model->total_weight }}
                     </td>
-                    <td style="border-bottom: none;text-align: center;width:50px">USD'.$allParamArr['total_price'].'
+                    <td style="border-bottom: none;text-align: center;width:50px">
+                        USD{{ $model->total_price > 20 ? 20 : $model->total_price }}
                     </td>
                 </tr>
             </table>
-
         </div>
         <div style="float:right;border-bottom:1px solid black;">
             <table style="font-size:10px;float:right;width:97px;height:50px;text-align:center;" cellspacing="0" cellpadding="0" class="table2">
@@ -353,13 +352,13 @@
         我保证上述申报准确无误,本函件内未装寄法律或邮政和海关规章禁止寄递的任何危险物品<br/>
         I, the undersigned,certify that the particulars given inthis declaration are correct and this item does not
         containany dangerous articles prohibited by legislation or bypostal or customs regulations.<br/>
-        寄件人签字 Sender\'s signature:
+        寄件人签字 Sender's signature:
         <div style="float:right;font-size:12px;font-weight:bold;margin-right:30px;">CN22</div>
         <div style="font-size:12px;padding-top:2px;right:0;bottom:0;width:100px;">
             {{ '(' . $model->order_id . ')' }}
         </div>
         <div style="text-align:right;padding-right:2px;font-size:14px;font-weight:bold;width:100px;position:absolute;right:0;bottom:0">
-            【{{ $model->logistics_id }}】
+            {{ $model->logistics_id }}
         </div>
     </div>
 </div>

@@ -416,7 +416,20 @@ class OrderModel extends BaseModel
                 }
             }
             $data['customer_id'] = request()->user()->id;
-            return RefundModel::create($data);
+            $refund = new RefundModel;
+            $refund_new=$refund->create($data);
+            if ($data['type'] == 'FULL') {
+                foreach ($data['arr']['id'] as $fullid) {
+                    $orderItem = $this->items->find($fullid);
+                    $orderItem->update(['refund_id' => $refund_new->id]);
+                }
+            }else{
+                foreach ($data['tribute_id'] as $partid) {
+                    $orderItem = $this->items->find($partid);
+                    $orderItem->update(['refund_id' => $refund_new->id]);
+                }
+            }
+            return;
         }
         return 1;
     }
@@ -690,6 +703,17 @@ class OrderModel extends BaseModel
         }else{
             return false;
         }
+    }
+
+    public function getOrderReamrksAttribute(){
+        $remarks = '';
+        if(!$this->remarks->isEmpty()){
+            foreach ($this->remarks as $remark){
+                $remarks .= empty($remarks) ? $remark->remark : $remark->remark.';';
+
+            }
+        }
+        return $remarks;
     }
 
 }

@@ -105,7 +105,7 @@
                         {{ $model->signal_weight }}
                     </td>
                     <td style="border-bottom:1px solid black;">
-                        {{ $model->signal_price > 20 ? 20 : $model->signal_price }}
+                        {{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
                     </td>
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
@@ -138,14 +138,15 @@
                         {{ $model->total_weight }}
                     </td>
                     <td style="border-bottom:1px solid black;text-align:center;">
-                        {{ $model->total_price > 22 ? 22 : $model->total_price }}
+                        {{ sprintf("%.2f", $model->total_price > 22 ? 22 : $model->total_price) }}
                     </td>
                 </tr>
                 <tr style="font-size:10px;line-height: 10px;">
                     <td colspan="3" style="border-bottom:1px solid black;">
-                        The undersigned whose name and address are given on the item certify that the particulars given
-                        in the declartion are correct and taht this item dose not contain any dangerous article or
-                        articles pohibited by legislation or by postal or customs regulaitions
+                        The undersigned whose name and address are given on the item certify that
+                        the particulars given in the declartion are correct and taht this item dose
+                        not contain any dangerous article or articles pohibited by legislation or by
+                        postal or customs regulaitions
                     </td>
                 </tr>
                 <tr style="height:4.5mm;font-size: 11px;">

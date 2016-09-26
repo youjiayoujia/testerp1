@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Models\Logistics\LimitsModel;
 use Excel;
 use DB;
 use App\Base\BaseModel;
@@ -13,6 +12,8 @@ use App\Models\WarehouseModel;
 use App\Models\Logistics\ZoneModel;
 use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
+use App\Models\Logistics\LimitsModel;
+use App\Models\Product\ProductLogisticsLimitModel;
 
 class PackageModel extends BaseModel
 {
@@ -173,8 +174,9 @@ class PackageModel extends BaseModel
     //包裹单个sku价格
     public function getSignalPriceAttribute()
     {
-        $price = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->orderItem ? $this->items->first()->orderItem->price : 0) : 0);
-        if($this->order) {
+        $price = 0;
+        if($this->order->rate) {
+            $price = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->orderItem ? $this->items->first()->orderItem->price : 0) : 0);
             $price = $price / $this->order->rate;
         }
 
@@ -185,10 +187,10 @@ class PackageModel extends BaseModel
     public function getTotalPriceAttribute()
     {
         $price = 0;
-        foreach($this->items as $packageItem) {
-            $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
-        }
-        if($this->order) {
+        if($this->order->rate) {
+            foreach($this->items as $packageItem) {
+                $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+            }
             $price = $price / $this->order->rate;
         }
 
@@ -199,10 +201,15 @@ class PackageModel extends BaseModel
     public function getIsBatteryAttribute()
     {
         $flag = false;
-        foreach($this->items->item->product->limits as $logisticsLimit) {
-            $name = LimitsModel::where('id', $logisticsLimit->logistics_limits_id)->get(['name']);
-            if($name == '含电池') {
-                $flag = true;
+        foreach($this->items as $packageItem) {
+            if($packageItem->item ? ($packageItem->item->product ? $packageItem->item->product : null) : null) {
+                $productLogisticsLimits = ProductLogisticsLimitModel::where('product_id', $packageItem->item->product->id)->get();
+                foreach($productLogisticsLimits as $productLogisticsLimit) {
+                    $name = LimitsModel::where('id', $productLogisticsLimit->logistics_limits_id)->get(['name']);
+                    if($name == '含电池') {
+                        $flag = true;
+                    }
+                }
             }
         }
 

@@ -18,7 +18,7 @@ class CreateEventChilds extends Migration
             $table->integer('type_id')->comment('类型id')->default(0);
             $table->string('what')->comment('什么事情')->default(NULL);
             $table->timestamp('when')->comment('时间')->default(NULL);
-            $table->integer('who')->comment('操作人')->default(0);
+            $table->string('who')->comment('操作人')->default(NULL);
             $table->text('from_arr')->comment('原始数据 serialize')->default(NULL);
             $table->text('to_arr')->comment('修改后数据 serialize')->default(NULL);
             $table->timestamps();

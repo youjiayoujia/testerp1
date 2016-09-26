@@ -67,6 +67,7 @@ class TestController extends Controller
     public function test2()
     {
         $package = PackageModel::find(127);
+        var_dump($package);exit;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $package,

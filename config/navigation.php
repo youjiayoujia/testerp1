@@ -231,61 +231,44 @@ return [
                     'icon' => '',
                 ],
             ],
-            '报表' => [
-                [
-                    'name' => '包裹信息',
-                    'url' => 'allReport.report',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '拣货排行榜',
-                    'url' => 'pickReport.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '包装排行榜',
-                    'url' => 'packReport.index',
-                    'icon' => '',
-                ],
-            ],
         ],
     ],
     //仓储导航
-    [
-        'name' => '海外仓',
-        'icon' => 'home',
-        'url' => '',
-        'type' => 'group',
-        'subnavigations' => [
-            '海外仓模块' => [
-                [
-                    'name' => '海外仓销量',
-                    'url' => 'suggestForm.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '申请表',
-                    'url' => 'report.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '发货',
-                    'url' => 'report.shipment',
-                    'icon' => '',
-                ],
-                [
-                    'name' => '海外仓箱子',
-                    'url' => 'box.index',
-                    'icon' => '',
-                ],
-                [
-                    'name' => 'fba库存信息',
-                    'url' => 'fbaStock.index',
-                    'icon' => '',
-                ],
-            ],
-        ],
-    ],
+    // [
+    //     'name' => '海外仓',
+    //     'icon' => 'home',
+    //     'url' => '',
+    //     'type' => 'group',
+    //     'subnavigations' => [
+    //         '海外仓模块' => [
+    //             [
+    //                 'name' => '海外仓销量',
+    //                 'url' => 'suggestForm.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '申请表',
+    //                 'url' => 'report.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '发货',
+    //                 'url' => 'report.shipment',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => '海外仓箱子',
+    //                 'url' => 'box.index',
+    //                 'icon' => '',
+    //             ],
+    //             [
+    //                 'name' => 'fba库存信息',
+    //                 'url' => 'fbaStock.index',
+    //                 'icon' => '',
+    //             ],
+    //         ],
+    //     ],
+    // ],
     //物流导航
     [
         'name' => '物流',
@@ -573,6 +556,23 @@ return [
                 [
                     'name' => '缺货报告',
                     'url' => 'purchase.outOfStock',
+                    'icon' => '',
+                ],
+            ],
+            '包裹报表' => [
+                [
+                    'name' => '包裹信息',
+                    'url' => 'allReport.report',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '拣货排行榜',
+                    'url' => 'pickReport.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => '包装排行榜',
+                    'url' => 'packReport.index',
                     'icon' => '',
                 ],
             ],

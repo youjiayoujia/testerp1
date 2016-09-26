@@ -911,7 +911,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('AddTrackingDetails',['as' => 'AddTrackingDetails', 'uses' => 'Message\EbayCasesController@AddTrackingDetails']);
     Route::any('RefundBuyer',['as' => 'case.RefundBuyer', 'uses' => 'Message\EbayCasesController@RefundBuyer']);
     Route::any('PartRefundBuyer',['as' => 'case.PartRefundBuyer', 'uses' => 'Message\EbayCasesController@PartRefundBuyer']);
-    
+
     Route::resource('ebayFeedBack','Message\FeedBack\EbayFeedBackController');
     Route::any('feedBackStatistics',['uses' => 'Message\FeedBack\EbayFeedBackController@feedBackStatistics' , 'as' => 'feeback.feedBackStatistics' ]);
     Route::resource('refundCenter','RefundCenterController');
@@ -920,6 +920,10 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('RefundCsvFormat',['uses' => 'RefundCenterController@RefundCsvFormat', 'as' =>'refund.cvsformat']);
     Route::any('financeExport',['uses' => 'RefundCenterController@financeExport', 'as' =>'refund.financeExport']);
     Route::any('changeReundNoteStatus',['uses' => 'RefundCenterController@changeReundNoteStatus','as' =>'refund.changeReundNoteStatus']);
+    Route::any('refundStatistics',['as' => 'refund.refundStatistics', 'uses' => 'RefundCenterController@refundStatistics']);
+    Route::any('getChannelAccount',['as' => 'refund.getChannelAccount', 'uses' => 'RefundCenterController@getChannelAccount']);
+    Route::any('exportRefundDetail',['as' => 'refund.exportRefundDetail','uses' =>'RefundCenterController@exportRefundDetail']);
+
     Route::resource('AliexpressIssue','Message\Dispute\AliexpressIssueController');
     Route::any('doRefuseIssues',['uses' =>'Message\Dispute\AliexpressIssueController@doRefuseIssues' , 'as' =>'aliexpress.doRefuseIssues']);
     //spu

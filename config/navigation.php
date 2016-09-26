@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 导航配置文件
  *
@@ -116,7 +115,7 @@ return [
         'type' => 'group',
         'subnavigations' => [
             '收货质检' => [
-               [
+                [
                     'name' => '包裹收货扫描',
                     'url' => 'purchaseList.create',
                     'icon' => '',
@@ -403,7 +402,6 @@ return [
                 'icon' => '',
             ],
             [
-
                 'name' => 'SMT待发布产品列表',
                 'url' => 'smt.waitPost',
                 'icon' => '',
@@ -414,7 +412,7 @@ return [
                 'icon' => '',
             ],
             [
-            
+
                 'name' => 'SMT在线产品列表',
                 'url' => 'smt.onlineProductIndex',
                 'icon' => '',
@@ -449,7 +447,7 @@ return [
                 'url' => 'smtProduct.freightManage',
                 'icon' => '',
             ],
-            
+
             [
                 'name' => 'SMT销售代码设置',
                 'url' => 'smtSellerCode.index',
@@ -576,6 +574,13 @@ return [
                     'icon' => '',
                 ],
             ],
+            '订单报表' => [
+                [
+                    'name' => '退款统计',
+                    'url' => 'refund.refundStatistics',
+                    'icon' => '',
+                ],
+            ],
         ]
     ],
     //监控导航
@@ -626,8 +631,6 @@ return [
             ],
         ],
     ],
-
-
     //系统导航
     [
         'name' => '系统',
@@ -702,6 +705,4 @@ return [
             ],
         ],
     ],
-
 ];
-

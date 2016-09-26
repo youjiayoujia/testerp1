@@ -268,6 +268,7 @@ class CatalogController extends Controller
             $rows[0][$channel->name] = '20,40';
         }
 
+
         $this->exportExcel($rows, '批量添加产品品类csv格式');
     }
     public function addLotsOfCatalogs(){

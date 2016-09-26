@@ -546,7 +546,7 @@ Class AliexpressAdapter implements AdapterInterface
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
 
-                        dd(json_decode($detailArrJson));
+                        //dd(json_decode($detailArrJson));
 
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);

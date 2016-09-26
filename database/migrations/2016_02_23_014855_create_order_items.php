@@ -31,6 +31,8 @@ class CreateOrderItems extends Migration
             $table->string('orders_item_number')->comment('产品的广告ID')->nullable()->default(null);
             $table->integer('ebay_unpaid_status')->comment('ebay unpaid 平台取消訂單 ，1 已取消')->nullable()->default(null);
             $table->string('remark')->comment('备注')->nullable()->default(null);
+            $table->integer('refund_id')->comment('退款记录表id ,没退款为 null')->nullable()->default(null);
+            $table->integer('account_id')->comment('销售账号')->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -714,6 +714,8 @@ class TestController extends Controller
     }
     public function getSmtIssue(){
 
+        dd(request()->user());
+
       //  $refund = RefundModel::find(2);
 
 /*        dd($refund->PakcageWeight);

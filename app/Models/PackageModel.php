@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Logistics\LimitsModel;
 use Excel;
 use DB;
 use App\Base\BaseModel;
@@ -136,6 +137,70 @@ class PackageModel extends BaseModel
         }
 
         return $value;
+    }
+
+    //包裹总重量
+    public function getTotalWeightAttribute()
+    {
+        $weight = 0;
+        foreach($this->items as $packageItem) {
+            $weight += $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
+        }
+
+        return $weight;
+    }
+
+    //包裹单个sku重量
+    public function getSignalWeightAttribute()
+    {
+        $weight = 0;
+        foreach($this->items->first() as $packageItem) {
+            $weight += $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
+        }
+
+        return $weight;
+    }
+
+    //包裹单个sku价格
+    public function getSignalPriceAttribute()
+    {
+        $price = 0;
+        foreach($this->items->first() as $packageItem) {
+            $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+        }
+        if($this->order) {
+            $price = $price / $this->order->rate;
+        }
+
+        return $price;
+    }
+
+    //包裹总价格
+    public function getTotalPriceAttribute()
+    {
+        $price = 0;
+        foreach($this->items as $packageItem) {
+            $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+        }
+        if($this->order) {
+            $price = $price / $this->order->rate;
+        }
+
+        return $price;
+    }
+
+    //包裹是否含电池
+    public function getIsBatteryAttribute()
+    {
+        $flag = false;
+        foreach($this->items->item->product->limits as $logisticsLimit) {
+            $name = LimitsModel::where('id', $logisticsLimit->logistics_limits_id)->get(['name']);
+            if($name == '含电池') {
+                $flag = true;
+            }
+        }
+
+        return $flag;
     }
 
     public function getStatusColorAttribute()

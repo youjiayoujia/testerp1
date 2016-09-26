@@ -17,7 +17,7 @@ class WarehouseModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = [
+    public $fillable = [
         'name',
         'province',
         'city',

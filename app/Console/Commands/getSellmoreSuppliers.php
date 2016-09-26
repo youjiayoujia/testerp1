@@ -52,6 +52,11 @@ class getSellmoreSuppliers extends Command
                 break;
             }else{
                 foreach ($data as $value){
+                    if(!empty(SupplierModel::find($value->suppliers_id))){
+                        continue;
+                    }
+
+
                     $pay_type = $value->pay_method;
                     if(!empty($value->attachment_url)){
                         $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);

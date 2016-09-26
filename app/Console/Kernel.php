@@ -1,10 +1,8 @@
 <?php
 namespace App\Console;
-
 use App\Models\ChannelModel;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-
 class Kernel extends ConsoleKernel
 {
     /**
@@ -30,6 +28,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetWishProduct::class,
         \App\Console\Commands\GetEbayProduct::class,
         \App\Console\Commands\GetAliexpressProduct::class,
+        \App\Console\Commands\ProductImage::class,
+        //邮件
         \App\Console\Commands\GetMessages::class,
         \App\Console\Commands\SendMessages::class,
         \App\Console\Commands\SetMessageRead::class,
@@ -43,7 +43,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\GetAliexpressIssues::class,
         \App\Console\Commands\getSellmoreSuppliers::class,
     ];
-
     /**
      * Define the application's command schedule.
      *

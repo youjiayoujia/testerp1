@@ -68,11 +68,17 @@ class TestController extends Controller
         $this->itemModel = $itemModel;
     }
 
-    // public function test2()
-    // {
-    //     // return Tool::barcodePrint('test1111');
-    //     var_dump(base64_encode(serialize('你好')));
-    // }
+    public function test2()
+    {
+        $package = PackageModel::find(127);
+        var_dump($package);exit;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+
+        return view('logistics.template.tpl.zhongMeiTemplate', $response);
+    }
 
     public function test3()
     {
@@ -107,57 +113,55 @@ class TestController extends Controller
     //     $this->dispatch($job);
     // }
 
-    public function test2()
-    {
-        $account = AccountModel::find(1);
-        $single = new AmazonAdapter($account->api_config);
-        // var_dump($single->requestReport());exit;
-        // var_dump($single->getReportRequestList('53034017045'));exit;
-        // $buf = $single->getReport('2724553088017044');
-        var_dump(empty($single->listInShipment('FBA3VX2RL1')));
-        // $arr = explode("\n", $buf);
-        // $keys = explode("\t", $arr[0]);
-        // $vals = [];
-        // foreach($arr as $key => $value) {
-        //     if(!$key) {
-        //         continue;
-        //     }
-        //     $buf = explode("\t", $value);
-        //     foreach($buf as $k => $v) {
-        //         $vals[$keys[$k]] = $v;
-        //     }
-        //     var_dump($vals);
-        //     var_dump($vals['afn-inbound-receiving-quantity']);exit;
-            // var_dump($vals);exit;
-            // $tmp = Tool::filter_sku($vals['sku']);
-            // if(count($tmp)) {
-            //     $item = ItemModel::where('sku', $tmp['0']['erpSku'])->first()
-            //     if($item) {
-            //         $vals['item_id'] = $item->id;
-            //     }
-            // }
-            // $vals['title'] = $vals['product-name'];
-            // $vals['channel_sku'] = $vals['sku'];
-            // $vals['mfn_fulfillable_quantity'] = $vals['mfn-fulfillable-quantity'];
-            // $vals['afn_warehouse_quantity'] = $vals['afn-warehouse-quantity'];
-            // $vals['afn_fulfillable_quantity'] = $vals['afn-fulfillable-quantity'];
-            // $vals['afn_unsellable_quantity'] = $vals['afn-unsellable-quantity'];
-            // $vals['afn_reserved_quantity'] = $vals['afn-reserved-quantity'];
-            // $vals['afn_total_quantity'] = $vals['afn-total-quantity'];
-            // $vals['per_unit_volume'] = $vals['per-unit-volume'];
-            // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
-            // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
-            // $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
-            // $vals['account_id'] = '1';
-            // fbaStock::create($vals);
-        // }exit;
-    }
+    // public function test2()
+    // {
+    //     $account = AccountModel::find(1);
+    //     $single = new AmazonAdapter($account->api_config);
+    //     // var_dump($single->requestReport());exit;
+    //     // var_dump($single->getReportRequestList('53034017045'));exit;
+    //     // $buf = $single->getReport('2724553088017044');
+    //     var_dump(empty($single->listInShipment('FBA3VX2RL1')));
+    //     // $arr = explode("\n", $buf);
+    //     // $keys = explode("\t", $arr[0]);
+    //     // $vals = [];
+    //     // foreach($arr as $key => $value) {
+    //     //     if(!$key) {
+    //     //         continue;
+    //     //     }
+    //     //     $buf = explode("\t", $value);
+    //     //     foreach($buf as $k => $v) {
+    //     //         $vals[$keys[$k]] = $v;
+    //     //     }
+    //     //     var_dump($vals);
+    //     //     var_dump($vals['afn-inbound-receiving-quantity']);exit;
+    //         // var_dump($vals);exit;
+    //         // $tmp = Tool::filter_sku($vals['sku']);
+    //         // if(count($tmp)) {
+    //         //     $item = ItemModel::where('sku', $tmp['0']['erpSku'])->first()
+    //         //     if($item) {
+    //         //         $vals['item_id'] = $item->id;
+    //         //     }
+    //         // }
+    //         // $vals['title'] = $vals['product-name'];
+    //         // $vals['channel_sku'] = $vals['sku'];
+    //         // $vals['mfn_fulfillable_quantity'] = $vals['mfn-fulfillable-quantity'];
+    //         // $vals['afn_warehouse_quantity'] = $vals['afn-warehouse-quantity'];
+    //         // $vals['afn_fulfillable_quantity'] = $vals['afn-fulfillable-quantity'];
+    //         // $vals['afn_unsellable_quantity'] = $vals['afn-unsellable-quantity'];
+    //         // $vals['afn_reserved_quantity'] = $vals['afn-reserved-quantity'];
+    //         // $vals['afn_total_quantity'] = $vals['afn-total-quantity'];
+    //         // $vals['per_unit_volume'] = $vals['per-unit-volume'];
+    //         // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
+    //         // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
+    //         // $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
+    //         // $vals['account_id'] = '1';
+    //         // fbaStock::create($vals);
+    //     // }exit;
+    // }
 
     public function test1()
     {
-        $shipment = ShipmentModel::where('shipmentID', '2')->first();
-        var_dump($shipment->shipmentCarrierInfo);
-        var_dump(unserialize($shipment->shipmentCarrierInfo));
+        var_dump('123');exit;
     }
 
     public function index()
@@ -816,6 +820,28 @@ if($key == 1)
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    public function oneSku(){
+        ini_set('memory_limit', '2048M');
+        $model = ProductModel::all();
+        foreach($model as $_item){
+            $sku = $_item->item[0]->sku;
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            $contents = json_decode(file_get_contents($url));
+            if(count($contents)){
+                foreach ($contents as $image) {
+                    $data['spu_id'] = $_item->item[0]->product->spu_id;
+                    $data['product_id'] = $_item->item[0]->product_id;
+                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
+                    $data['name'] = $image->filename;
+                    $arr = (array)$image->fileId;
+                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
+                    $disk = Storage::disk('product');
+                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
                 }
             }
         }

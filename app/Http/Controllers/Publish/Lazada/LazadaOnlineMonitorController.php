@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Publish\Lazada;
-
+ini_set('memory_limit','256M');
 use Channel;
 use App\Http\Controllers\Controller;
 use App\Models\Publish\Lazada\erpLazadaProduct;
 use App\Models\StockModel;
 use App\Models\Channel\AccountModel;
-
 
 class LazadaOnlineMonitorController extends Controller
 {

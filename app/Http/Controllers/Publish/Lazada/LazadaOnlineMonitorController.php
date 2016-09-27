@@ -41,6 +41,7 @@ class LazadaOnlineMonitorController extends Controller
                 @$stockArr[$result->item_id] += $result->all_quantity;  //同一SKU的不同仓位的实库存要累加
             }
         }
+        dd($stockArr);
         return $stockArr;
     }
     

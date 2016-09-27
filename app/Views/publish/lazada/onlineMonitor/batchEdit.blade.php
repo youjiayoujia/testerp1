@@ -86,6 +86,27 @@
         @endforeach
         <?php 
         break;
+        case 'changeSalePrice':        
+        ?>
+         <div class="form-group col-md-12">
+            <label for="model">设置sellerSku销售价格</label>
+            <input type="text" class="hidden" name="operate" value="changeSalePrice" />
+            <a href="javascript:void(0);" class="btn btn-success btn-sm" onclick="batchOperate('price')"
+                    >批量设置
+            </a>
+            <input type="radio"  name="operateType" checked value="add"> 增加
+            <input type="radio"  name="operateType" value="fixed"> 固定值
+        </div>
+        @foreach($products as $key=> $product)           
+            <div class="form-group col-md-12">
+                <label>{{ $product->sellerSku}}</label>
+                <br/>
+                <input class="form-control price" placeholder="普通价格"
+                       name='salePrice[{{$product->id}}]' value="{{$product->salePrice}}">
+            </div>                 
+        @endforeach
+        <?php 
+        break;
         }
         ?>
     </div>

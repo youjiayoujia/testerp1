@@ -25,7 +25,7 @@ class LazadaOnlineMonitorController extends Controller
             'mixedSearchFields' => $this->model->mixed_search,
             'stocks' => $this->getRealQuantity(),
         ];    
-        dd(1);
+
         return view($this->viewPath . 'index', $response);
     }
     
@@ -41,7 +41,7 @@ class LazadaOnlineMonitorController extends Controller
                 @$stockArr[$result->item_id] += $result->all_quantity;  //同一SKU的不同仓位的实库存要累加
             }
         }
-        dd($stockArr);
+
         return $stockArr;
     }
     
@@ -144,6 +144,61 @@ class LazadaOnlineMonitorController extends Controller
         }else{
             return redirect($this->mainIndex)->with('alert', $this->alert('error',$sellerSku[0].'的在线价格更改失败!'));
         }        
+    }
+    
+    /**
+     * 修改单个sellSku的销售价格
+     */
+    public function setSalePrice(){
+        set_time_limit ( 0 );
+        $string = '';
+        $sellerSku[] = request()->input('sellerSku');
+        $account_name = request()->input('account');
+        $count['SalePrice'] = trim(request()->input('salePrice'));
+        $count['Price'] = trim(request()->input('price'));
+        $count['StartDate'] = request()->input('saleStartDate');
+        $count['EndDate'] = request()->input('saleEndDate');
+        if(empty($count['SalePrice'])){
+            return redirect($this->mainIndex)->with('alert', $this->alert('error','Sellersku销售价格不能为空!'));
+        }
+        $account = AccountModel::where('account',$account_name)->first();
+        $channel = Channel::driver($account->channel->driver, $account->api_config);
+        $result = $channel->operateProduct($sellerSku,4,$count);
+        $type = 0;
+        if(isset($result['Head']['RequestId'])){
+            $RequestId = $result['Head']['RequestId'];
+            for($i=1;$i>0;$i++) {
+                $re = $channel->getFeedInfo();
+                $feedinfo = $re['Body']['Feed'];
+                foreach ($feedinfo as $k => $feed) {
+                    if($k >10 ) // 单Feed的时候 一般改Feed处于第一个，没有必要循环全部、
+                        break;
+                    if ($feed['Feed'] == $RequestId) {
+                        if ($feed['Status'] == 'Finished') {
+                            if ($feed['FailedRecords'] == 0) {
+                                $type = 1;
+                                $string .='更新成功';
+                            } else {
+                                $type = 2;
+                                $string .= '更新失败,可能是因为Sale price must be lower than the standard price. 或者 结束时间比开始时间小';
+                            }
+                        }
+                    }
+                }
+                if (($type == 1)||($type == 2))
+                    break;
+            }
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('error','发送请求失败，可能请求太频繁!'));
+        }
+        if($type == 1){
+            $data = array();
+            $data['salePrice'] = trim(request()->input('salePrice'));
+            erpLazadaProduct::where('sellerSku',$sellerSku[0])->update($data);
+            return redirect($this->mainIndex)->with('alert', $this->alert('success',$string));
+        }else{
+            return redirect($this->mainIndex)->with('alert', $this->alert('error',$sellerSku[0].'的销售价格更改失败!'));
+        }
     }
     
     /**
@@ -361,6 +416,57 @@ class LazadaOnlineMonitorController extends Controller
                     }
                 }
             break;
+            case 'changeSalePrice';
+                $statusArr = request()->input('salePrice');
+                foreach($res as $product){
+                    $account = AccountModel::where('account',$product->account)->first();
+                    $channel = Channel::driver($account->channel->driver, $account->api_config);
+                    $sellerSku = $product->sellerSku;
+                    $count['SalePrice'] = $statusArr[$product->id];
+                    $count['Price'] = $product->price;
+                    $count['StartDate'] = $product->saleStartDate;
+                    $count['EndDate'] = $product->saleEndDate;
+                    $type = 0;
+                    $success = 0;
+                    for($i=0;$i<50;$i++){
+                        $result = $channel->operateProduct($sellerSku,4,$count);
+                        if(isset($result['Head']['RequestId'])){
+                            break;
+                        }else{
+                            sleep(10);
+                        }
+                
+                        if($i == 50){
+                            return redirect($this->mainIndex)->with('alert', $this->alert('error','发送请求失败，可能请求太频繁!'));
+                        }
+                    }
+                    $RequestId = $result['Head']['RequestId'];
+                    for($j=1;$j<50;$j++){
+                        $re = $channel->getFeedInfo();
+                        $feedinfo = $re['Body']['Feed'];
+                        foreach ($feedinfo as $k => $feed) {
+                            if($k >10 ) // 单Feed的时候 一般改Feed处于第一个，没有必要循环全部、
+                                break;
+                            if ($feed['Feed'] == $RequestId) {
+                                if ($feed['Status'] == 'Finished') {
+                                    if ($feed['FailedRecords'] == 0) {
+                                        $type = 1;
+                                        $success = 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if ($type == 1)
+                            break;
+                    }
+                    if($success == 1){
+                        $data = array();
+                        $data['salePrice'] = $count['SalePrice'] ;
+                        erpLazadaProduct::where('sellerSku',$sellerSku)->update($data);
+                        $string .= $sellerSku.'的销售价格调整成功!';
+                    }
+                }
         }
         return redirect($this->mainIndex)->with('alert', $this->alert('success',$string));
     }

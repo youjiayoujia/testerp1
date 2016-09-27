@@ -44,7 +44,14 @@
                     <span class="glyphicon glyphicon-link"></span> 
                 </button>
             </td>
-            <td>{{$productInfo->salePrice}}</td>
+            <td>{{$productInfo->salePrice}}
+                <button class="btn btn-primary btn-xs"
+                    data-toggle="modal"
+                    data-target="#setSalePrice{{$productInfo->id}}"
+                    title="设置">
+                    <span class="glyphicon glyphicon-link"></span> 
+                </button>
+            </td>
             <td>
                 @if($productInfo->product)
                     {{$productInfo->product->c_name}}
@@ -164,7 +171,39 @@
                    </form>
                 </div>
             </div>
-        </div>            
+        </div>  
+        <div class="modal fade" id="setSalePrice{{$productInfo->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form action="{{route('lazada.setSalePrice')}}" method="POST">
+                    {!! csrf_field() !!}
+                     <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-left" id="myModalLabel">修改sellerSku的销售价格</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                                <div class="form-group col-lg-12">
+                                    <label for="account" class='control-label'>修改 {{$productInfo->sellerSku}}的销售价格</label>
+                                    <input type='text' class="form-control" placeholder=""  name="salePrice" value="{{$productInfo->salePrice}}">
+                                    <input type="hidden" name="sellerSku" value="{{$productInfo->sellerSku}}">
+                                    <input type="hidden" name="account" value="{{$productInfo->account}}"> 
+                                    <input type="hidden" name="price" value="{{$productInfo->price}}"> 
+                                    <input type="hidden" name="saleStartDate" value="{{$productInfo->saleStartDate}}"> 
+                                    <input type="hidden" name="saleEndDate" value="{{$productInfo->saleEndDate}}">                                  
+                                </div>
+                         </div>
+                    </div>
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-primary" id="setQuantity">提交</button>
+                    </div>
+                   </form>
+                </div>
+            </div>
+        </div>                      
              
     @endforeach
 @stop
@@ -179,7 +218,7 @@
             <li><a href="javascript:" class='batchedit' data-name="changeQuantity">设置sku在线库存</a></li>
             <li><a href="javascript:" class='batchedit' data-name="changeStatus">修改状态</a></li>
             <li><a href="javascript:" class='batchedit' data-name="changePrice">修改普通价格</a></li>             
-            <li><a href="javascript:" data-type="online"  onclick="changeProductStatus(this)">修改销售价格</a></li>
+            <li><a href="javascript:" class='batchedit' data-name="changeSalePrice">修改销售价格</a></li>
         </ul>
     </div>
 @stop
@@ -187,32 +226,6 @@
 <link href="{{ asset('plugins/layer/skin/layer.css')}}" type="text/css" rel="stylesheet">
 <script src="{{ asset('plugins/layer/layer.js') }}"></script>
 <script type='text/javascript'>
-function changeProductStatus(obj){
-	var ids = $('input[name="single[]"]:checked').map(function(){
-		return $(this).attr('data-id');
-	}).get().join(',');
-	if (!ids){
-		alert('请先勾选信息', 'alert-warning');
-		return false;
-	}
-
-	var type = $(obj).data('type');
-	$.ajax({
-		url: "{{ route('smtMonitor.ajaxOperateOnlineProductStatus') }}",
-        data: {ids: ids,type:type},
-        dataType: 'json',
-        type: 'post',
-        beforeSend: function(){
-        	layer.alert("正在批量下架，请稍等......！请不要刷新页面！！！");        	
-        },
-        success: function (result) {  
-            $.each(result,function(index,value){
-            	alert(value.Msg);
-             });         	         
-            window.location.reload();
-        }
-	});
-}
 
 $(".batchedit").click(function(){
 	var ids = $('input[name="single[]"]:checked').map(function(){

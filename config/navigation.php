@@ -478,7 +478,7 @@ return [
                 'url' => 'lazada.index',
                 'icon' => '',
             ],
-        ],
+        ]
     ],
     //CRM导航
     [

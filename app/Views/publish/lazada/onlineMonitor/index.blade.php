@@ -50,7 +50,11 @@
                     {{$productInfo->product->c_name}}
                 @endif
             </td>
-            <td>{{$productInfo->product->status}}</td>
+            <td>
+                @if($productInfo->product)
+                    {{$productInfo->product->status}}
+                @endif
+            </td>
             <td>{{$productInfo->sku}}</td>
             <td>
                 <?php

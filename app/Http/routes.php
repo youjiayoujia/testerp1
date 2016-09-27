@@ -836,6 +836,9 @@ Route::group(['middleware' => 'roleCheck'], function () {
         ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setPrice', 'as' => 'lazada.setPrice']);
     Route::post('lazada/setSellerSkuStatus',
         ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSellerSkuStatus', 'as' => 'lazada.setSellerSkuStatus']);
+    Route::post('lazada/setSalePrice',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSalePrice', 'as' => 'lazada.setSalePrice']);
+    
     Route::get('lazada/productBatchEdit',
         ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@productBatchEdit', 'as' => 'lazada.productBatchEdit']);
     Route::any('lazada/batchUpdate',

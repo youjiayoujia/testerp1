@@ -35,9 +35,12 @@ class LazadaOnlineMonitorController extends Controller
     public function getRealQuantity(){
         $stocks = StockModel::all();
         $stockArr = array();
-        foreach($stocks as $result){            
-            @$stockArr[$result->item_id] += $result->all_quantity;  //同一SKU的不同仓位的实库存要累加
+        if($stocks){
+            foreach($stocks as $result){
+                @$stockArr[$result->item_id] += $result->all_quantity;  //同一SKU的不同仓位的实库存要累加
+            }
         }
+       
         return $stockArr;
     }
     

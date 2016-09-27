@@ -24,7 +24,8 @@ class LazadaOnlineMonitorController extends Controller
             'data' => $this->autoList($this->model),
             'mixedSearchFields' => $this->model->mixed_search,
             'stocks' => $this->getRealQuantity(),
-        ];     
+        ];    
+        dd(1);
         return view($this->viewPath . 'index', $response);
     }
     
@@ -36,11 +37,10 @@ class LazadaOnlineMonitorController extends Controller
         $stocks = StockModel::all();
         $stockArr = array();
         if($stocks){
-            foreach($stocks as $result){
+            foreach($stocks as $result){            
                 @$stockArr[$result->item_id] += $result->all_quantity;  //同一SKU的不同仓位的实库存要累加
             }
         }
-       
         return $stockArr;
     }
     

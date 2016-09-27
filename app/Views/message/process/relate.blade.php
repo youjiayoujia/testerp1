@@ -18,7 +18,7 @@
 </div>--}}
 
 <div class="panel panel-danger">
-    <div class="panel-heading"><p class="glyphicon glyphicon-tag"></p>ERP关联订单信息
+    <div class="panel-heading"><p class="glyphicon glyphicon-tag"></p>手动关联订单
     </div>
     <div class="panel-body">
         <p>ERP系统中没找到此消息关联的订单 /(ㄒoㄒ)/~~</p>

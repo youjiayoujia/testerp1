@@ -55,17 +55,16 @@ class getSellmoreSuppliers extends Command
                     if(!empty(SupplierModel::find($value->suppliers_id))){
                         continue;
                     }
-
-
                     $pay_type = $value->pay_method;
                     if(!empty($value->attachment_url)){
                         $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
                         $content      = file_get_contents($img_src);
                         $suffix       = strstr(substr($value->attachment_url,1),'.');
-                        $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
+                        $filename     = Tool::randString(16,false);
+                        $uploads_file = '/product/supplier/'.$filename.$suffix;
 
                         Storage::put($uploads_file,$content);
-                        $qualifications = Tool::randString(16,false).$suffix;
+                        $qualifications = $filename.$suffix;
                     }else{
                         $qualifications = '';
                     }

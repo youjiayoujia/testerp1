@@ -6,7 +6,7 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <li><a href="javascript:" class="batchedit" data-name="weight">重量</a></li>
+            <li><a href="javascript:" class="batchedit" data-name="weight">批量修改质检</a></li>
             <li><a href="javascript:" class="batchedit" data-name="purchase_price">参考成本</a></li>
             <li><a href="javascript:" class="batchedit" data-name="status">SKU状态</a></li>
             <li><a href="javascript:" class="batchedit" data-name="package_size">体积</a></li>
@@ -34,6 +34,8 @@
     <th>开发负责人</th>
     <th>供应商</th>
     <th>售价</th>
+    <th>体积系数</th>
+    <th>税率</th>
     <th class="sort" data-field="created_at">创建时间</th>
     <th>更新时间</th>
     <th>操作</th>
@@ -200,6 +202,8 @@
                     </div>
                 </div>
             </td>
+            <td>1</td>
+            <td>1</td>
             <td>{{ $item->updated_at }}</td>
             <td>{{ $item->created_at }}</td>
             <td>
@@ -214,6 +218,9 @@
                 </a>
                 <a data-toggle="modal" data-target="#switch_purchase_{{$item->id}}" title="转移采购负责人" class="btn btn-info btn-xs" id="find_shipment">
                     <span class="glyphicon glyphicon-zoom-in">转移采购员</span>
+                </a>
+                <a data-toggle="modal" data-target="#question_{{$item->id}}" title="常见问题" class="btn btn-info btn-xs" id="ques">
+                    <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
                 <a href="javascript:" class="btn btn-danger btn-xs delete_item"
                    data-id="{{ $item->id }}"
@@ -238,12 +245,13 @@
                            转移采购负责人
                         </h4>
                      </div>
-                     
-                     <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div>
-                     <div>转移至：</div>
-                     <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select></div>
-                     或者：
-                     <input type="text" value='' name='manual_name' id='manual_name'>
+                     <div class="modal-body">
+                         <div>当前采购负责人:{{$item->purchaseAdminer?$item->purchaseAdminer->name:'无负责人'}}</div>
+                         <div>转移至：</div>
+                         <div><select class='form-control purchase_adminer' name="purchase_adminer" id="{{$item->id}}"></select></div>
+                         或者：
+                         <input type="text" value='' name='manual_name' id='manual_name'>
+                     </div>
                      <div class="modal-footer">
                         <button type="button" class="btn btn-default" 
                            data-dismiss="modal">关闭
@@ -257,6 +265,53 @@
             </div>
         </form>
         <!-- 模态框结束（Modal） -->
+
+        <!-- 模态框（Modal）提问 -->
+        <form action="/item/question/{{$item->id}}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <div class="modal fade" id="question_{{$item->id}}"  role="dialog" 
+               aria-labelledby="myModalLabel" aria-hidden="true">
+               <div class="modal-dialog">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <button type="button" class="close" 
+                           data-dismiss="modal" aria-hidden="true">
+                              &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                           常见问题提问
+                        </h4>
+                     </div>
+
+                     <div class="modal-body">
+                        
+
+                        <div>向
+                            <select name='question_group'>
+                                @foreach(config('product.question.types') as $key=>$value)
+                                    <option value="{{$key}}">{{$value}}</option>
+                                @endforeach
+                            </select>
+                        分组提问</div>
+                        <br>
+                        <div><textarea rows="3" cols="88" name='question_content'></textarea></div>
+                        <div><input type='file' name='uploadImage'></div>
+                     </div>
+                     
+                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" 
+                           data-dismiss="modal">关闭
+                        </button>
+                        <button type="submit" class="btn btn-primary" name='edit_status' value='image_unedited'>
+                           提交
+                        </button>
+                     </div>
+                  </div>
+            </div>
+            </div>
+        </form>
+        <!-- 模态框结束（Modal） -->
+
     @endforeach
 
         <!-- 模态框（Modal） -->

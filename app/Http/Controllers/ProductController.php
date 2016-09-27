@@ -209,7 +209,7 @@ class ProductController extends Controller
         return 1;
     }
     /**
-     * 产品审核
+     * 选中shop
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response

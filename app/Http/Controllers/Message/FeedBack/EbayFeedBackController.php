@@ -100,4 +100,35 @@ class EbayFeedBackController extends Controller
     {
         //
     }
+
+    /**
+     * 差评统计报表
+     */
+    public function feedBackStatistics(){
+        //当月统计
+        $begin = date('Y-m-01 00:00:00');
+        $end   = date('Y-m-d H:i:s');
+        $this_month = $this->model->getFeedBackStatistics(compact('begin','end'));
+        //当天统计
+        $begin = date('Y-m-d 00:00:00');
+        $end   = date('Y-m-d H:i:s');
+        $this_day = $this->model->getFeedBackStatistics(compact('begin','end'));
+        $total = [
+           '当天'     => $this_day,
+           '当月累计'  => $this_month,
+        ];
+
+        $metas = [
+            'mainIndex' => route('feeback.feedBackStatistics'),
+            'mainTitle' => '报表',
+            'title'     => '差评统计',
+        ];
+        $response = [
+            'metas' => $metas,
+            //'model' => $model,
+            'data'  => $total,
+        ];
+        return view($this->viewPath . 'statistics',$response);
+    }
+
 }

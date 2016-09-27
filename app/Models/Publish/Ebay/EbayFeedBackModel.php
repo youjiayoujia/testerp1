@@ -37,4 +37,42 @@ class EbayFeedBackModel extends BaseModel
 
     }
 
+    /**
+     * 退款统计
+     * compact('begin','end')
+     */
+    public function getFeedBackStatistics($TimeAry){
+
+        $feebdbacks = $this->where('comment_time','>=', $TimeAry['begin'])
+                           ->where('comment_time','<=', $TimeAry['end'])->get();
+        $Positive = 0; //好
+        $Neutral  = 0; //中
+        $Negative = 0; //差
+        $Percentage = 0; //中差评百分比
+        foreach ($feebdbacks as $feedback){
+            switch ($feedback->comment_type){
+                case 'Positive':
+                    $Positive += 1;
+                    break;
+                case 'Neutral':
+                    $Neutral += 1;
+                    break;
+                case 'Negative':
+                    $Negative += 1;
+                    break;
+                default :
+                    break;
+            }
+
+        }
+       $total = $Positive + $Neutral + $Percentage;
+       if($total == 0){
+           $Percentage = 0;
+       }else{
+           $Percentage = round(($Negative + $Neutral) / $total,2)*100; //百分比
+       }
+
+        return compact('Positive','Neutral','Negative','Percentage');
+    }
+
 }

@@ -15,6 +15,7 @@ class CreateMessagesTable extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('account_id')->nullable()->default(NULL);
+            $table->integer('channel_id')->default(NULL)->comment('渠道ID');
             $table->integer('type_id');
             $table->integer('list_id')->nullable()->defalut(NULL);
             $table->string('message_id')->nullable()->defalut(NULL);

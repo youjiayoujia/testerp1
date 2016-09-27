@@ -3,8 +3,20 @@
     <div class="text-center">
         <div class="row">
             <div class="col-lg-4">
+                <a type="button" class="btn btn-info" href="{{ route('order.createVirtualPackage') }}">
+                    Do Package <span class="badge">{{ $ordernum }}</span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <i class="glyphicon glyphicon-arrow-down"></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
                 <a type="button" class="btn btn-info" href="{{ route('package.putNeedQueue') }}">
-                    Do Package <span class="badge">{{ $packageNum }}</span>
+                    匹配库存 <span class="badge">{{ $packageNum }}</span>
                 </a>
             </div>
         </div>

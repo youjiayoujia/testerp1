@@ -29,7 +29,7 @@ class PermissionModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'action_name','action'];
+    protected $fillable = ['id', 'action_name','route'];
 
     public function role()
     {

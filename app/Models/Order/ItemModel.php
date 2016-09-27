@@ -16,7 +16,7 @@ class ItemModel extends BaseModel
 {
     protected $table = 'order_items';
 
-    protected $guarded = [];
+    protected $guarded = ['orderItemId'];
 
     public $searchFields = [
         'order_id',
@@ -58,6 +58,14 @@ class ItemModel extends BaseModel
     public function getStatusTextAttribute()
     {
         return config('order.item_status.' . $this->status);
+    }
+
+    public function getItemChineseNameAttribute(){
+        if(!empty($this->item)){
+            return $this->item->c_name;
+        }else{
+            return '';
+        }
     }
 
 }

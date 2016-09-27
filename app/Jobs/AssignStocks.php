@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use Cache;
 use App\Jobs\Job;
+use Exception;
 use App\Jobs\AssignLogistics;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -36,8 +38,9 @@ class AssignStocks extends Job implements SelfHandling, ShouldQueue
         if(!Cache::store('file')->get('stockIOStatus')) {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'stockTaking , stock is locked.';
-            $this->lasting = round(microtime(true) - $start, 3);
+            $this->lasting = 0;
             $this->log('AssignStocks');
+            throw new Exception('in stock taking');
         } else {
             $start = microtime(true);
             if (($this->package->status == 'NEED' || $this->package->status == 'NEW') && $this->package->createPackageItems()) {

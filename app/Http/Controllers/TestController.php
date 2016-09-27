@@ -49,6 +49,13 @@ use App\Models\Message\ReplyModel;
 use App\Jobs\Inorders;
 use App\Modules\Channel\Adapter\AmazonAdapter;
 use App\Models\Oversea\StockModel as fbaStock;
+use App\Models\Order\ItemModel as orderItemss;
+use App\Models\Message\Issues\AliexpressIssueListModel;
+use App\Models\Message\Issues\AliexpressIssuesDetailModel;
+use App\Models\Order\RefundModel;
+use App\Models\Product\SupplierModel;
+
+use Illuminate\Support\Facades\Storage;
 
 use BarcodeGen;
 
@@ -63,17 +70,26 @@ class TestController extends Controller
 
     public function test2()
     {
-        // return Tool::barcodePrint('test1111');
-        var_dump(base64_encode(serialize('你好')));
+        $package = PackageModel::find(127);
+        var_dump($package);exit;
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'model' => $package,
+        ];
+
+        return view('logistics.template.tpl.zhongMeiTemplate', $response);
     }
 
     public function test3()
     {
-        $response = [
-            'metas' => $this->metas(__FUNCTION__),
-        ];
+        var_dump('123');
+        // $response = [
+        //     'metas' => $this->metas(__FUNCTION__),
+        // ];
 
-        return view('test', $response);
+        // return view('test', $response);
+        $model = PackageModel::where('id', '<', 5);
+        return redirect(route('package.index', ['outer_model' => $model]));
     }
 
     // public function test2()
@@ -102,22 +118,22 @@ class TestController extends Controller
     //     $account = AccountModel::find(1);
     //     $single = new AmazonAdapter($account->api_config);
     //     // var_dump($single->requestReport());exit;
-    //     var_dump($single->getReportRequestList('53034017045'));exit;
-    //     $buf = $single->getReport('2724553088017044');
-        
-    //     $arr = explode("\n", $buf);
-    //     $keys = explode("\t", $arr[0]);
-    //     $vals = [];
-    //     foreach($arr as $key => $value) {
-    //         if(!$key) {
-    //             continue;
-    //         }
-    //         $buf = explode("\t", $value);
-    //         foreach($buf as $k => $v) {
-    //             $vals[$keys[$k]] = $v;
-    //         }
-    //         var_dump($vals);
-    //         var_dump($vals['afn-inbound-receiving-quantity']);exit;
+    //     // var_dump($single->getReportRequestList('53034017045'));exit;
+    //     // $buf = $single->getReport('2724553088017044');
+    //     var_dump(empty($single->listInShipment('FBA3VX2RL1')));
+    //     // $arr = explode("\n", $buf);
+    //     // $keys = explode("\t", $arr[0]);
+    //     // $vals = [];
+    //     // foreach($arr as $key => $value) {
+    //     //     if(!$key) {
+    //     //         continue;
+    //     //     }
+    //     //     $buf = explode("\t", $value);
+    //     //     foreach($buf as $k => $v) {
+    //     //         $vals[$keys[$k]] = $v;
+    //     //     }
+    //     //     var_dump($vals);
+    //     //     var_dump($vals['afn-inbound-receiving-quantity']);exit;
     //         // var_dump($vals);exit;
     //         // $tmp = Tool::filter_sku($vals['sku']);
     //         // if(count($tmp)) {
@@ -137,17 +153,15 @@ class TestController extends Controller
     //         // $vals['per_unit_volume'] = $vals['per-unit-volume'];
     //         // $vals['afn_inbound_working_quantity'] = $vals['afn-inbound-working-quantity'];
     //         // $vals['afn_inbound_shipped_quantity'] = $vals['afn-inbound-shipped-quantity'];
-    //         $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
+    //         // $vals['afn_inbound_receiving_quantity'] = $vals['afn-inbound-shipped-quantity'];
     //         // $vals['account_id'] = '1';
     //         // fbaStock::create($vals);
-    //     }exit;
+    //     // }exit;
     // }
 
     public function test1()
     {
-        $shipment = ShipmentModel::where('shipmentID', '2')->first();
-        var_dump($shipment->shipmentCarrierInfo);
-        var_dump(unserialize($shipment->shipmentCarrierInfo));
+        var_dump('123');exit;
     }
 
     public function index()
@@ -226,7 +240,7 @@ class TestController extends Controller
             ->createWarehouseOrder($package);
         exit;
     }
-    
+
     public function testYw(){
         $package = PackageModel::findOrFail(3);
         Logistics::driver($package->logistics->driver, $package->logistics->api_config)
@@ -645,7 +659,7 @@ class TestController extends Controller
 
     public function testEbayCases(){
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'pandaserveyou'){ //测试diver
+            if($account->account == 'ebay@licn2011'){ //测试diver
 
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
                 $messageList = $channel->getCases();
@@ -654,7 +668,7 @@ class TestController extends Controller
             }
         }
     }
-    
+
     /*
      * 同步ebay信息
      */
@@ -680,6 +694,158 @@ class TestController extends Controller
                 }
             }
 
+        }
+    }
+    public function getCurlData($remote_server)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $remote_server);
+        //curl_setopt ( $ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded; charset=utf-8'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 获取数据返回
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true); // 在启用 CURLOPT_RETURNTRANSFER 时候将获取数据返回
+        curl_setopt($ch, CURLOPT_TIMEOUT, 100);
+        $output = curl_exec($ch);
+        if (curl_errno($ch)) {
+            // $this->setCurlErrorLog(curl_error ( $ch ));
+            die(curl_error($ch)); //异常错误
+        }
+        curl_close($ch);
+        return $output;
+    }
+    public function getSmtIssue(){
+
+        dd(request()->user());
+
+      //  $refund = RefundModel::find(2);
+
+/*        dd($refund->PakcageWeight);
+
+        dd($refund);*/
+
+        for($i = 1; $i>0; $i++){
+            $url = 'http://v2.erp.moonarstore.com/admin/auto/getSuppliers/getSuppliersData?key=SLME5201314&page='.$i;
+            $data = json_decode($this->getCurlData($url));
+            if(empty($data)){
+                break;
+            }else{
+                foreach ($data as $key => $value){
+if($key == 1)
+                    dd($value);
+
+                    $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
+                    $content          = file_get_contents($img_src);
+                    $suffix       = strstr(substr($value->attachment_url,1),'.');
+                    $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
+
+                //dd($uploads_file);
+                    $bytes = Storage::put($uploads_file,$content);
+                    
+                    $pay_type = $value->pay_method;
+
+                    $insert = [
+                        'company'         => $value->suppliers_company,
+                        'address'         => $value->suppliers_address,
+                        'contact_name'    => $value->suppliers_name,
+                        //'contact_name' => $value->suppliers_phone,
+                        'telephone'       => $value->suppliers_mobile,
+                        'official_url'    => $value->suppliers_website,
+                        'qq'              => $value->suppliers_qq,
+                        'wangwang'        => $value->suppliers_wangwang,
+                        'bank_account'    => $value->suppliers_bank,
+                        'bank_code'       => $value->suppliers_card_number,
+                        'examine_status'  => $value->suppliers_status,
+                        'purchase_time'   => $value->supplierArrivalMinDays,
+                        'created_by'      => $value->user_id,
+                        'pay_type'        => isset(config('product.sellmore.pay_type')[$pay_type]) ? config('product.sellmore.pay_type')[$pay_type] : 'OTHER_PAY',
+                        'qualifications'  => Tool::randString(16,false).$suffix,
+
+                    ];
+
+                    if(!empty($insert)){
+                        SupplierModel::create($insert);
+                    }
+                }
+            }
+        }
+
+
+
+
+
+        foreach (AccountModel::all() as $account) {
+            if($account->account == 'smtjiahongming@126.com'){ //测试diver
+
+                $channel = Channel::driver($account->channel->driver, $account->api_config);
+
+                $getIssueLists = $channel->getIssues();
+                if(!empty($getIssueLists)){
+                    foreach($getIssueLists as $issue){
+                        $issue_list = AliexpressIssueListModel::firstOrNew(['issue_id' => $issue['issue_id']]);
+                        if(empty($issue_list->id)){
+                            $issue_list->issue_id      = $issue['issue_id'];
+                            $issue_list->gmtModified   = $issue['gmtModified'];
+                            $issue_list->issueStatus   = $issue['issueStatus'];
+                            $issue_list->gmtCreate     = $issue['gmtCreate'];
+                            $issue_list->reasonChinese = $issue['reasonChinese'];
+                            $issue_list->orderId       = $issue['orderId'];
+                            $issue_list->reasonEnglish = $issue['reasonEnglish'];
+                            $issue_list->issueType     = $issue['issueType'];
+                            $issue_list->save();
+
+                            if(!empty($issue['issue_detail'])){
+                                $issue_detail = AliexpressIssuesDetailModel::firstOrNew(['issue_list_id' => $issue_list->id]);
+                                if(empty($issue_detail->id)){
+                                    $issue_detail->issue_list_id = $issue_list->id;
+                                    $issue_detail->resultMemo = $issue['issue_detail']->resultMemo;
+                                    $issue_detail->orderId = $issue['issue_detail']->resultObject->orderId;
+                                    $issue_detail->gmtCreate = $issue['issue_detail']->resultObject->gmtCreate;
+                                    $issue_detail->issueReasonId = $issue['issue_detail']->resultObject->issueReasonId;
+                                    $issue_detail->buyerAliid = $issue['issue_detail']->resultObject->buyerAliid;
+                                    $issue_detail->issueStatus = $issue['issue_detail']->resultObject->issueStatus;
+                                    $issue_detail->issueReason = $issue['issue_detail']->resultObject->issueReason;
+                                    $issue_detail->productName = $issue['issue_detail']->resultObject->productName;
+
+                                    //序列化对象
+                                    $issue_detail->productPrice = base64_encode(serialize($issue['issue_detail']->resultObject->productPrice));
+                                    $issue_detail->buyerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->buyerSolutionList));
+                                    $issue_detail->sellerSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->sellerSolutionList));
+                                    $issue_detail->platformSolutionList = base64_encode(serialize($issue['issue_detail']->resultObject->platformSolutionList));
+                                    $issue_detail->refundMoneyMax = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMax));
+                                    $issue_detail->refundMoneyMaxLocal = base64_encode(serialize($issue['issue_detail']->resultObject->refundMoneyMaxLocal));
+
+                                    $issue_detail->save();
+
+                                }
+
+                                
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function oneSku(){
+        ini_set('memory_limit', '2048M');
+        $model = ProductModel::all();
+        foreach($model as $_item){
+            $sku = $_item->item[0]->sku;
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            $contents = json_decode(file_get_contents($url));
+            if(count($contents)){
+                foreach ($contents as $image) {
+                    $data['spu_id'] = $_item->item[0]->product->spu_id;
+                    $data['product_id'] = $_item->item[0]->product_id;
+                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
+                    $data['name'] = $image->filename;
+                    $arr = (array)$image->fileId;
+                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
+                    $disk = Storage::disk('product');
+                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
+                }
+            }
         }
     }
 }

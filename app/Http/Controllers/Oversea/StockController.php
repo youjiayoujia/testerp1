@@ -85,24 +85,14 @@ class StockController extends Controller
         return $reportRequestId;
     }   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public function updateFBAStock()
+    {
+        $account = AccountModel::find(1);
+        $single = new AmazonAdapter($account->api_config);
+        if(!empty($single->listInShipment('FBAWWDKDK'))) {
+            $this->updateStock();
+        }
+    }
 
     /**
      * 详情
@@ -155,10 +145,6 @@ class StockController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
-        foreach($model->forms as $form) {
-            $form->delete();
-        }
-        
         $model->destroy($id);
         return redirect($this->mainIndex);
     }

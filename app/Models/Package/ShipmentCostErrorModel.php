@@ -15,6 +15,8 @@ class ShipmentCostErrorModel extends BaseModel
 {
     protected $table = 'shipment_cost_errors';
 
+    public $searchFields = ['hang_num' => '挂号码'];
+    
     protected $fillable = [
     	'parent_id',
     	'hang_num',
@@ -27,6 +29,7 @@ class ShipmentCostErrorModel extends BaseModel
     {
         return [
             'relatedSearchFields' => [
+                'parent' => ['shipmentCostNum']
             ],
             'filterFields' => ['hang_num', 'channel_name'],
             'filterSelects' => [

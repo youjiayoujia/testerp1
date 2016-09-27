@@ -16,6 +16,7 @@ use App\Models\Oversea\BoxModel;
 use App\Models\LogisticsModel;
 use App\Models\ItemModel;
 use App\Models\StockModel;
+use App\Models\Oversea\StockModel as fbaStock;
 use Tool;
 
 class ReportController extends Controller
@@ -73,8 +74,10 @@ class ReportController extends Controller
                 $buf[$key] = $val[$i];      
             }
             $item = ItemModel::find($buf['item_id']);
+            $stock = fbaStock::where(['item_id' => $buf['item_id'], 'account_id' => $obj->account_id])->first();
             $buf['sku'] = $item->sku;
             $buf['parent_id'] = $obj->id;
+            $buf['fnsku'] = $stock ? $stock->fnsku : '';
             ReportFormModel::create($buf);
             $item->hold($buf['warehouse_position_id'], $buf['report_quantity'], 'FBA', $obj->id);
         }
@@ -114,7 +117,7 @@ class ReportController extends Controller
             'forms' => $model->forms,
             'boxes' => $model->boxes,
             'all_weight' => $all_weight,
-            'actual_weight' => $model->forms->sum('weight'),
+            'actual_weight' => $model->boxes->sum('weight'),
             'volumn' => $volumn,
             'fee' => $model->boxes->sum('fee'),
             'arr' => $arr,
@@ -254,6 +257,17 @@ class ReportController extends Controller
         return view($this->viewPath.'package', $response);
     }
 
+    public function packageStore($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $model->update(['status' => 'PACKED']);
+
+        return redirect($this->mainIndex);
+    }
+
     public function reportFormUpdate()
     {
         $id = trim(request('id'));
@@ -272,7 +286,7 @@ class ReportController extends Controller
 
         $single = $box->forms->where('sku', $item->sku)->first();
         if(!$single) {
-            $single = $box->forms()->create(['sku' => $item->sku]);
+            $single = $box->forms()->create(['sku' => $item->sku, 'fnsku' => $model->fnsku]);
         }
         $single->quantity += 1;
         $single->save();
@@ -374,7 +388,7 @@ class ReportController extends Controller
         if(!$box) {
             return json_encode(false);
         }
-        $box->update(['logistics_id' => $logistics, 'status' => '1', 'tracking_no' => $tracking_no]);
+        $box->update(['logistics_id' => $logistics, 'status' => '1', 'tracking_no' => $tracking_no, 'fee' => $fee]);
         $report = $box->report;
         $flag = 1;
         foreach($report->boxes as $singleBox) {

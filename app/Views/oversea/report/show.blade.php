@@ -1,25 +1,19 @@
 @extends('common.detail')
 @section('detailBody')
 <div class='row'>
-    <div class="form-group col-lg-4">
-        <label for="fba_address" class='control-label'>fba地址</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
-        <input type='text' class="form-control" placeholder="fba地址" name='fba_address' value="{{ old('fba_address') ? old('fba_address') : $model->fba_address }}">
-    </div>
-    <div class='form-group col-lg-4'> 
+    <div class='form-group col-lg-2'> 
         <label for='渠道帐号'>shipment名称</label> 
         <input type='text' class="form-control" placeholder="shipment 名称" name='shipment_name' value="{{ old('shipment_name') ? old('shipment_name') : $model->shipment_name }}">
     </div>
-    <div class='form-group col-lg-4'> 
+    <div class='form-group col-lg-2'> 
         <label for='渠道帐号'>渠道帐号</label> 
         <input type='text' class="form-control" value="{{ $model->account ? $model->account->account : '' }}">
     </div>
-</div>
-<div class='row'>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-2">
         <label for="fba_address" class='control-label'>plan Id</label><small class="text-danger glyphicon glyphicon-asterisk"></small>
         <input type='text' class="form-control" placeholder="plan Id" name='plan_id' value="{{ old('plan_id') ? old('plan_id') : $model->plan_id }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-2">
         <label for='from_address'>shipment Id</label>
         <input type='text' class="form-control" placeholder="shipment Id" name='shipment_id' value="{{ old('shipment_id') ? old('shipment_id') : $model->shipment_id }}">
     </div>
@@ -110,29 +104,37 @@
     <div class="panel-body">
     @foreach($boxes as $key => $box)
     <div class='row'>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label>箱号</label>
             <input type='text' class="form-control" value="{{ $box->boxNum }}">
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label>物流方式</label>
             <input type='text' class="form-control" value="{{ $box->logistics ? $box->logistics->code : '' }}">
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label>体积(m3)</label>
             <input type='text' class="form-control" value="{{ $box->length . '*' . $box->width . '*' . $box->height }}">
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label>预估重量(kg)</label>
             <input type='text' class="form-control" value="{{ $arr[$key] }}">
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label>实际重量(kg)</label>
             <input type='text' class="form-control" value="{{ $box->weight }}">
         </div>
-        <div class="form-group col-lg-2">
+        <div class="form-group col-lg-3">
             <label>物流费</label>
             <input type='text' class="form-control" value="{{ $box->fee }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label>体积重</label>
+            <input type='text' class="form-control" value="{{ round($box->length * $box->height * $box->width / 5000, 3) }}">
+        </div>
+        <div class="form-group col-lg-3">
+            <label>体积系数</label>
+            <input type='text' class="form-control" value="{{ round($box->length * $box->height * $box->width / 5000 / $box->weight, 4) }}">
         </div>
     </div>
     <table class="table table-bordered">

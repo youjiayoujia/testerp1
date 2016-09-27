@@ -16,6 +16,7 @@ class CreateCarryOverForms extends Migration
             $table->increments('id');
             $table->integer('parent_id')->comment('月结单id')->default(0);
             $table->integer('stock_id')->comment('stock ID')->default(0);
+            $table->decimal('purchase_price', 8, 2)->comment('期初采购价')->default(0);
             $table->integer('begin_quantity')->comment('期初数量')->default(0);
             $table->decimal('begin_amount', 16, 4)->comment('期初金额')->default(0);
             $table->integer('over_quantity')->comment('期末数量')->default(0);

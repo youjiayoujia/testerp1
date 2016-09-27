@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemModel;
 use App\Models\ProductModel;
+use App\Models\Product\ImageModel;
 use App\Models\Product\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\LimitsModel;
@@ -19,16 +20,19 @@ use App\Models\CatalogModel;
 use App\Models\UserModel;
 use Excel;
 use App\Models\ChannelModel;
+use App\Models\Item\SkuMessageModel;
 
 
 class ItemController extends Controller
 {
-    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel)
+    public function __construct(ItemModel $item,SupplierModel $supplier,ProductModel $product,WarehouseModel $warehouse,LimitsModel $limitsModel,WrapLimitsModel $wrapLimitsModel, SkuMessageModel $message, ImageModel $imageModel)
     {
         $this->model     = $item;
         $this->supplier  = $supplier;
         $this->product   = $product;
         $this->warehouse = $warehouse;
+        $this->message = $message;
+        $this->image = $imageModel;
         $this->logisticsLimit = $limitsModel;
         $this->wrapLimit = $wrapLimitsModel;
         $this->mainIndex = route('item.index');
@@ -149,7 +153,7 @@ class ItemController extends Controller
     }
 
     /**
-     * 批量更新
+     * 更新采购员
      *
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -209,10 +213,26 @@ class ItemController extends Controller
         $arr = explode(',', $item_ids);
         $skus = $this->model->whereIn("id",$arr)->get();
         $data = request()->all();
-        foreach($skus as $itemModel){
-            $itemModel->update($data);
-        }       
-        return redirect($this->mainIndex);
+        if(!array_key_exists('productsVolume',$data)){
+            foreach($skus as $itemModel){
+                $itemModel->update($data);
+            }       
+            return redirect($this->mainIndex);
+        }else{
+            $data['length'] = $data['productsVolume']['bp']['length'];
+            $data['width'] = $data['productsVolume']['bp']['width'];
+            $data['height'] = $data['productsVolume']['bp']['height'];
+            $data['package_length'] = $data['productsVolume']['ap']['length'];
+            $data['package_width'] = $data['productsVolume']['ap']['width'];
+            $data['package_height'] = $data['productsVolume']['ap']['height'];
+            $data['weight'] = $data['products_weight2'];
+            //echo '<pre>';
+            //print_r($data);exit;
+            foreach($skus as $itemModel){
+                $itemModel->update($data);
+            }       
+            return redirect($this->mainIndex);
+        }    
     }
 
 
@@ -287,7 +307,7 @@ class ItemController extends Controller
         }
         
     }
-
+    //批量删除sku
     public function batchDelete()
     {
         $item_ids = request()->input('item_ids');
@@ -313,5 +333,70 @@ class ItemController extends Controller
 
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    public function question($item_id)
+    {
+        $content = request()->input('question_content');
+        $question_group = request()->input('question_group');
+        $data['sku_id'] = $item_id;
+        $data['question_group'] = $question_group;
+        $data['question'] = $content;
+        $data['question_time'] = date('Y-m-d H:i:s',time());
+        $data['question_user'] = request()->user()->id;
+        $data['status'] = 'pending';
+        $data['image'] = $this->image->skuMessageImage(request()->file('uploadImage'));
+        $messageModel = $this->message->create($data);
+        return redirect($this->mainIndex);
+    }
+
+    public function extraQuestion()
+    {
+        $content = request()->input('extra_content');
+        $data['extra_question'] = $content;
+        $id = request()->input('id');
+        $sku_message = $this->message->find($id);
+        $sku_message->update($data);
+        return redirect(route('item.questionIndex'));
+    }
+
+    public function questionIndex()
+    {
+        request()->flash();
+        $this->mainIndex = route('item.questionIndex');
+        $this->mainTitle = '产品留言板';
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $this->autoList($this->message),
+            'mixedSearchFields' => $this->message->mixed_search,
+        ];
+        return view($this->viewPath . 'questionIndex', $response);
+    }
+
+    public function questionStatus()
+    {
+        $question_ids = request()->input('question_ids');
+        $status = request()->input('status');
+        $arr = explode(',', $question_ids); 
+        
+        foreach ($arr as $id) {
+            $sku_message = $this->message->find($id);
+            $sku_message->update(['status'=>$status]);
+        }
+        
+        return 1;
+    }
+
+    public function answer()
+    {
+        $content = request()->input('answer_content');
+        $id = request()->input('id');
+        $sku_message = $this->message->find($id);
+        $data['answer'] = $content;
+        $data['answer_date'] = date('Y-m-d H:i:s',time());
+        $data['answer_user'] = request()->user()->id;
+        $data['status'] = 'close';
+        $sku_message->update($data);
+        return redirect(route('item.questionIndex'));
     }
 }

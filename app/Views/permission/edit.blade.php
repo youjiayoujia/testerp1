@@ -9,9 +9,9 @@
             <input type='text' class="form-control" id="action_name" placeholder="权限" name='action_name' value="{{ $model->action_name }}">
         </div>
         <div class="form-group col-lg-6">
-            <label for="action" class='control-label'>action</label>
+            <label for="route" class='control-label'>route</label>
             <small class="text-danger glyphicon glyphicon-asterisk"></small>
-            <input type='text' class="form-control" id="action" placeholder="action" name='action' value="{{ $model->action }}">
+            <input type='text' class="form-control" id="route" placeholder="route" name='route' value="{{ $model->route }}">
         </div>
     </div>
 @stop

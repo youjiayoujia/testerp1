@@ -1,7 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: di
+ * User: Norton
  * Date: 2016/8/13
  * Time: 15:31
  */
@@ -20,8 +19,11 @@ class EbayCasesListsModel extends BaseModel{
         return $this->hasOne('App\Models\Channel\AccountModel', 'id', 'account_id');
     }
     public function orderItem(){
-        return $this->hasOne('App\Models\Order\ItemModel','id','related_order_id');
+        return $this->hasOne('App\Models\Order\ItemModel','transaction_id','transaction_id');
     }
+/*    public function order(){
+        return $this->belongsTo('App\Models\OrderModel','','');
+    }*/
 
     public function getCaseContentAttribute(){
         $html = '';
@@ -39,10 +41,6 @@ class EbayCasesListsModel extends BaseModel{
                     $html .= '<p>activity:'.$this->seller_id.'</p>';
                     $html .= '<p>Date:'.$note['creationDate'].'</p>';
                     $html .= '<p>Date:'.$note['note'].'</p>';
-                    $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
-                    $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="">
-                                    翻译
-                                </button>';
                     $html .= '</div>';
                 }else{
                     $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right">';
@@ -62,10 +60,6 @@ class EbayCasesListsModel extends BaseModel{
 
                         $html .= '<p>Date:'.$item['creationDate'].'</p>';
                         $html .= '<p>Date:'.$item['note'].'</p>';
-                        $html .= '<div class="" style="display: none;"><strong>翻译结果: </strong><p class="content"></p></div>';
-                        $html .= '<button style="float: right;" type="button" class="btn btn-success btn-translation" need-translation-content="">
-                                    翻译
-                                </button>';
                         $html .= '</div>';
                     }else{
                         $html .= '<div class="alert alert-success col-md-10" role="alert" style="float: right">';

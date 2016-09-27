@@ -7,7 +7,7 @@
     <th>导入时间</th>
 @stop
 @section('tableBody')
-    @foreach($data as $item)
+    @foreach($data->filter(function($single) use ($id){return $single->parent_id == $id;}) as $item)
         <tr>
             <td>{{ $item->parent ? $item->parent->shipmentCostNum : '' }}</td>
             <td>{{ $item->hang_num }}</td>

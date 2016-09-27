@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use App\Base\BaseModel;
@@ -18,7 +17,7 @@ class WarehouseModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = [
+    public $fillable = [
         'name',
         'province',
         'city',
@@ -35,12 +34,10 @@ class WarehouseModel extends BaseModel
         'create' => [
             'name' => 'required|max:128|unique:warehouses,name',
             'type' => 'required',
-            'volumn' => 'required|digits_between:1,10'
         ],
         'update' => [
             'name' => 'required|max:128|unique:warehouses,name,{id}',
             'type' => 'required',
-            'volumn' => 'required|digits_between:1,10'
         ]
     ];
 

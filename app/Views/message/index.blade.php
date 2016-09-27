@@ -43,6 +43,17 @@
         </div>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="glyphicon glyphicon-filter"></i> 渠道
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                @foreach($channels as $channel)
+                    <li><a href="{{ DataList::filtersEncode(['channel_id','=',$channel->id]) }}">{{$channel->name}}</a></li>
+                @endforeach
+            </ul>
+        </div>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="glyphicon glyphicon-filter"></i> 客服
                 <span class="caret"></span>
             </button>
@@ -54,7 +65,7 @@
         </div>
         <div class="btn-group" role="group">
             <select class=" btn btn-default dropdown-toggle" style="width: 120px;" name="select-acount-id" id="select-account-id" onchange="getAccountList($(this))" >
-                <option value="none">请选择渠道名</option>
+                <option value="none">请选择渠道账号</option>
 
                 @foreach($channel_accounts as $account)
                     <option value="{{ DataList::filtersEncode(['account_id','=',$account->id])}}">{{$account->account}}</option>
@@ -65,11 +76,12 @@
 @stop
 @section('tableHeader')
     <th class="sort" data-field="id">ID</th>
+    <th>渠道</th>
     <th>账号</th>
     <th>主题</th>
     <th>状态</th>
-    <th class="sort" data-field="from_name">发信人</th>
-    <th class="sort" data-field="from">发信邮箱</th>
+    <th class="sort" data-field="from_name">用户昵称</th>
+    <th class="sort" data-field="from">用户ID</th>
     <th class="sort" data-field="date">发信日期</th>
     <th class="sort">客服</th>
     <th class="sort" data-field="created_at">创建日期</th>
@@ -82,6 +94,7 @@
     @foreach($data as $message)
         <tr>
             <td>{{ $message->id }}</td>
+            <td>{{ $message->ChannelName}}</td>
             <td>{{ $message->account->account }}</td>
             <td>
                 <span class='label label-success'>{{$message->label}}</span>

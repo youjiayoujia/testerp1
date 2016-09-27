@@ -11,7 +11,9 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\Job;
+use App\Jobs\DoPackages;
 use App\Jobs\DoPackage;
+use App\Jobs\AssignStocks;
 use App\Models\Channel\AccountModel;
 use App\Models\ChannelModel;
 use App\Models\CountriesModel;
@@ -101,7 +103,17 @@ class OrderController extends Controller
         return json_encode(false);
     }
 
-    
+    public function createVirtualPackage()
+    {
+        $model = $this->model->where('status', 'PREPARED')->get();
+        foreach($model as $key => $single) {
+            $job = new DoPackages($single);
+            $job = $job->onQueue('doPackages');
+            $this->dispatch($job);
+        }
+
+        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackage队列'));
+    }
 
     /**
      * 保存数据
@@ -149,14 +161,43 @@ class OrderController extends Controller
         if ($special == 'yes') {
             $order = $this->model->where('customer_remark', '!=', '');
         }
+        $subtotal = 0;
+        foreach($this->autoList($this->model) as $value) {
+            $subtotal += $value->amount * $value->rate;
+        }
+        $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'data' => $this->autoList($order),
             'mixedSearchFields' => $this->model->mixed_search,
             'countries' => CountriesModel::all(),
             'currencys' => CurrencyModel::all(),
+            'subtotal' => $subtotal,
+            'rmbRate' => $rmbRate,
         ];
         return view($this->viewPath . 'index', $response);
+    }
+
+    //订单统计
+    public function orderStatistics()
+    {
+        $startDate = request()->input('start_date');
+        $endDate = request()->input('end_date');
+        $orders = $this->model->where('create_time', '<=', $endDate)->where('create_time', '>=', $startDate);
+        $data['totalAmount'] = '';
+        $data['averageProfit'] = '';
+        $data['totalPlatform'] = '';
+        $profitAmount = '';
+        if($orders->count()) {
+            foreach($orders->get() as $order) {
+                $data['totalAmount'] += $order->amount * $order->rate;
+                $profitAmount += $order->calculateProfitProcess() * $order->amount * $order->rate;
+                $data['totalPlatform'] += $order->calculateOrderChannelFee();
+            }
+            $data['averageProfit'] = $profitAmount / $data['totalAmount'];
+        }
+
+        return $data;
     }
 
     public function invoice($id)
@@ -253,7 +294,9 @@ class OrderController extends Controller
         }
         request()->flash();
         $data = request()->all();
-        $data['order_id'] = $id;
+        $data['order_id']   = $id;
+        $data['channel_id'] = $model->channel_id;
+        $data['account_id'] = $model->channel_account_id;
         $model->refundCreate($data, request()->file('image'));
         return redirect($this->mainIndex);
     }
@@ -319,6 +362,9 @@ class OrderController extends Controller
                 $package->delete();
             }
         }
+        $job = new DoPackages($this->model->find($id));
+        $job->onQueue('doPackages');
+        $this->dispatch($job);
 
         return redirect($this->mainIndex);
     }
@@ -485,7 +531,7 @@ class OrderController extends Controller
         request()->flash();
         $data = request()->all();
         $this->model->find($id)->update(['status' => 'CANCEL', 'withdraw_reason' => $data['withdraw_reason'], 'withdraw' => $data['withdraw']]);
-        if($this->model->find($id)->packages) {
+        if($this->model->find($id)->packages->count()) {
             foreach($this->model->find($id)->packages as $package) {
                 $package->delete();
             }

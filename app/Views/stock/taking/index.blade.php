@@ -70,6 +70,11 @@
         生成盘点表
     </a>
 </div>
+<div class="btn-group">
+    <a class="btn btn-success" href="{{ route('stock.getTakingExcel') }}">
+        导出表格
+    </a>
+</div>
 @stop
 @section('childJs')
 <script src="{{ asset('js/jquery.min.js') }}"></script>{{-- JQuery JS --}}

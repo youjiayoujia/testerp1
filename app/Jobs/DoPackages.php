@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use Cache;
 use App\Jobs\Job;
+use Exception;
 use App\Jobs\AssignStocks;
 use App\Models\OrderModel;
 use Illuminate\Queue\SerializesModels;
@@ -36,8 +38,9 @@ class DoPackages extends Job implements SelfHandling, ShouldQueue
         if(!Cache::store('file')->get('stockIOStatus')) {
             $this->result['status'] = 'fail';
             $this->result['remark'] = 'stockTaking , stock is locked.';
-            $this->lasting = round(microtime(true) - $start, 3);
+            $this->lasting = 0;
             $this->log('DoPackages');
+            throw new Exception('in stock taking');
         } else {
             $start = microtime(true);
             if ($this->order) {

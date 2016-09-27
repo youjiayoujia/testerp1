@@ -1,6 +1,6 @@
 <?php
 /**
- * User: jiangdi
+ * User: Norton
  * Date: 2016/6/20
  * Time: 19:04
  */
@@ -59,6 +59,18 @@ class MessageModel extends BaseModel{
     public function relatedOrders()
     {
         return $this->hasMany('App\Models\Message\OrderModel', 'message_id');
+    }
+
+    public function channel(){
+        return $this->hasOne('App\Models\ChannelModel','id','channel_id');
+    }
+
+    public function getChannelNameAttribute(){
+        if(!empty($this->channel_id)){
+            return $this->channel->name;
+        }else{
+            return '无';
+        }
     }
 
     /**
@@ -468,7 +480,7 @@ class MessageModel extends BaseModel{
                 $files = $this->MessageFieldsDecodeBase64;
                 if(!empty($files)){
                     $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
-                    $html .= '<p><strong>Ebay链接</strong>:<a herf="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
+                    $html .= '<p><strong>Ebay链接</strong>:<a href="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
 
                 }
 

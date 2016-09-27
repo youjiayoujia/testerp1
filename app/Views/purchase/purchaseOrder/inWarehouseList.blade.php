@@ -122,19 +122,23 @@ table.gridtable td {
                 if($("#goodnum_"+id).val()!=$("#badnum_"+id).val()){
 					flag = 1;
 				}
-				if($("#arrival_num_"+id).val()<$("#goodnum_"+id).val()){
+				if(parseInt($("#arrival_num_"+id).val())<parseInt($("#goodnum_"+id).val())){
 					num_contorl = 1;
 				}
                 data += id+":"+$(this).val();
                 data +=":"+$('#badnum_'+id).val()+",";
             }   
 　　　　});
+		if(data==''){
+			alert('该采购单已经全部入库');location.href=history.go(-1);return;
+		}
 		if(flag==1){
 			alert('两次输入数量不一致');return;
 		}
 		if(num_contorl==1){
 			alert('优品数量大于到货数量');return;
 		}
+		
 		window.location.href=url+"?data="+data+"&p_id="+p_id;                    
 	});
 </script>

@@ -3,7 +3,7 @@
  * 库存控制器
  * 处理库存相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/12/30
  * Time: 14:19pm
  */
@@ -20,6 +20,7 @@ use App\Models\Warehouse\PositionModel;
 use App\Models\Stock\TakingModel;
 use App\Models\Stock\TakingAdjustmentModel;
 use App\Models\Stock\TakingFormModel;
+use App\Jobs\StockTaking;
 
 class StockController extends Controller
 {
@@ -87,6 +88,35 @@ class StockController extends Controller
         ];
 
         return view($this->viewPath.'showStockInfo', $response);
+    }
+
+    public function getTakingExcel()
+    {
+        set_time_limit(0);
+        ini_set('memory_limit', '1G');
+        $start = 0;
+        $len = 10000;
+        $rows = [];
+        $stocks = $this->model->skip($start)->take($len)->get();
+        while($stocks->count()) {
+            foreach($stocks as $stock) {
+                $rows[] = [
+                    'sku' => $stock->item ? $stock->item->sku : '',
+                    'position' => $stock->position ? $stock->position->name : '',
+                    'all_quantity' => $stock->all_quantity,
+                    'quantity' => '',
+                ];
+            }
+            $start += $len;
+            unset($stocks);
+            $stocks = $this->model->skip($start)->take($len)->get();
+        }
+        $name = 'getTakingExcel';
+        Excel::create($name, function($excel) use ($rows){
+            $excel->sheet('', function($sheet) use ($rows){
+                $sheet->fromArray($rows);
+            });
+        })->download('csv');
     }
 
     public function overseaSku()
@@ -197,21 +227,15 @@ class StockController extends Controller
      */
     public function createTaking()
     {
-        Cache::store('file')->forever('stockIOStatus', '0');
-        $first = TakingModel::orderBy('id', 'desc')->first();
-        if($first && $first->check_status == '0') {
-            return redirect(route('stockTaking.index'))->with('alert', $this->alert('danger', '请先完成之前盘点'));
-        }
-        $taking = TakingModel::create(['taking_id'=>'PD'.time()]);
-        $stocks_arr = $this->model->all()->chunk(1000);
-        foreach($stocks_arr as $stocks) {
-            foreach($stocks as $stock) 
-            {
-                $stock->stockTakingForm()->create(['stock_taking_id'=>$taking->id]);
-            }
+        if(!Cache::store('file')->get('stockIOStatus')) {
+            return redirect(route('stockTaking.index'))->with('alert', $this->alert('fail', '盘点中...'));
+        } else {
+            $job = new StockTaking();
+            $job = $job->onQueue('stockTaking');
+            $this->dispatch($job);
         }
         
-        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '盘点更新中.....'));
+        return redirect(route('stockTaking.index'))->with('alert', $this->alert('success', '已加入队列'));
     }
 
     /**

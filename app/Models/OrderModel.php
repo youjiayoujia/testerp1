@@ -74,7 +74,6 @@ class OrderModel extends BaseModel
             'address_confirm' => 'required',
             'create_time' => 'required',
             'currency' => 'required',
-            'rate' => 'required',
             'transaction_number' => 'required',
             'amount' => 'required',
             'amount_product' => 'required',
@@ -243,6 +242,11 @@ class OrderModel extends BaseModel
         return $this->belongsTo('App\Models\CountriesModel', 'shipping_country', 'code');
     }
 
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\CurrencyModel', 'currency', 'code');
+    }
+
     public function userAffairer()
     {
         return $this->belongsTo('App\Models\UserModel', 'affairer', 'id');
@@ -271,6 +275,10 @@ class OrderModel extends BaseModel
     public function requires()
     {
         return $this->hasMany('App\Models\RequireModel', 'order_id');
+    }
+
+    public function ebayMessageList(){
+        return $this->hasMany('App\Models\Message\SendEbayMessageListModel','order_id','id');
     }
 
     public function getStatusNameAttribute()
@@ -407,7 +415,21 @@ class OrderModel extends BaseModel
                     $orderItem->update(['is_refund' => 1]);
                 }
             }
-            return RefundModel::create($data);
+            $data['customer_id'] = request()->user()->id;
+            $refund = new RefundModel;
+            $refund_new=$refund->create($data);
+            if ($data['type'] == 'FULL') {
+                foreach ($data['arr']['id'] as $fullid) {
+                    $orderItem = $this->items->find($fullid);
+                    $orderItem->update(['refund_id' => $refund_new->id]);
+                }
+            }else{
+                foreach ($data['tribute_id'] as $partid) {
+                    $orderItem = $this->items->find($partid);
+                    $orderItem->update(['refund_id' => $refund_new->id]);
+                }
+            }
+            return;
         }
         return 1;
     }
@@ -435,7 +457,13 @@ class OrderModel extends BaseModel
 
     public function createOrder($data)
     {
-        $data['ordernum'] = microtime(true);
+        $data['ordernum'] = str_replace('.', '', microtime(true));
+        $currency = CurrencyModel::where('code', $data['currency']);
+        if($currency->count() > 0) {
+            foreach($currency->get() as $value) {
+                $data['rate'] = $value['rate'];
+            }
+        }
         $order = $this->create($data);
         foreach ($data['items'] as $orderItem) {
             if ($orderItem['sku']) {
@@ -609,7 +637,7 @@ class OrderModel extends BaseModel
             $sum += $channel->flat_rate_value;
             foreach ($orderItems as $orderItem) {
                 $rate = $orderItem->item->catalog->channels->first()->pivot->rate;
-                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $this->logistics_fee) * $rate;
+                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate;
                 $sum += $tmp;
             }
             return $sum;
@@ -627,7 +655,7 @@ class OrderModel extends BaseModel
                 $buf = $orderItem->item->catalog->channels->first()->pivot;
                 $flat_rate_value = $buf->flat_rate_value;
                 $rate_value = $buf->rate_value;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $order->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
+                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
             }
             return $sum;
         }
@@ -667,6 +695,25 @@ class OrderModel extends BaseModel
     public function getActiveTextAttribute()
     {
         return config('order.active.' . $this->active);
+    }
+
+    public function getSendEbayMessageHistoryAttribute(){
+        if(!$this->ebayMessageList->isEmpty()){
+            return $this->ebayMessageList;
+        }else{
+            return false;
+        }
+    }
+
+    public function getOrderReamrksAttribute(){
+        $remarks = '';
+        if(!$this->remarks->isEmpty()){
+            foreach ($this->remarks as $remark){
+                $remarks .= empty($remarks) ? $remark->remark : $remark->remark.';';
+
+            }
+        }
+        return $remarks;
     }
 
 }

@@ -537,13 +537,12 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$i&pageSize=$pageSize&msgSources=$Sources&filter=$filter";
                 $returnJson = $this->getJsonData($method,$para);
                 $message_array = json_decode($returnJson, true);
-                //dd($message_array);
                 if(!empty($message_array['result'])){
                     foreach ($message_array['result'] as $item){
 
                         // 或者  跳过
                         /**
-                         * 去除三种状态的消息
+                         * 去除种状态的消息
                          * 1.最后一条消息是商家发送的
                          * 2.卖家账号为空
                          *
@@ -557,6 +556,9 @@ Class AliexpressAdapter implements AdapterInterface
                          * 获取信息详情
                          */
                         $detailArrJson = $this->getJsonData('api.queryMsgDetailList', "currentPage=1&pageSize=100&msgSources=$Sources&channelId=".$item['channelId']);
+
+                        //dd(json_decode($detailArrJson));
+
                         $message_list[$j]['message_id'] = $item['channelId'];
                         $message_list[$j]['from_name'] = addslashes($item['otherName']);
                         $message_list[$j]['from'] = $item['otherLoginId'];
@@ -1432,14 +1434,14 @@ Class AliexpressAdapter implements AdapterInterface
      * 纠纷
      */
     public function getIssues(){
-
+        $issueAry = [];
         $issue_ary = array(
             'WAIT_SELLER_CONFIRM_REFUND',  //买家提起纠纷
-            'SELLER_REFUSE_REFUND', //卖家拒绝纠
+           // 'SELLER_REFUSE_REFUND', //卖家拒绝纠
+           // 'ARBITRATING', // 仲裁中
             // 'ACCEPTISSUE', //卖家接受纠纷     相当于完成了的纠纷
             // 'WAIT_BUYER_SEND_GOODS', //等待买家发货
             //  'WAIT_SELLER_RECEIVE_GOODS', // 买家发货，等待卖家收货
-            'ARBITRATING', // 仲裁中
             //   'SELLER_RESPONSE_ISSUE_TIMEOUT' // 卖家响应纠纷超时  对应相关超时的不需要获取
         );
         $page = 1;
@@ -1453,23 +1455,37 @@ Class AliexpressAdapter implements AdapterInterface
                 $para = "currentPage=$page&pageSize=$page_size&issueStatus=".$issue;
                 $issue_list = json_decode($this->getJsonData($method, $para));
                 if(isset($issue_list->success)) {
-                    foreach ($issue_list->dataList as $item) {
-
+                    foreach ($issue_list->dataList as $key => $item) {
                         $detail_param = "issueId=".$item->id;
-                        $issue_detail = json_decode($this->getJsonData('api.queryIssueDetail',$detail_param));
-                        dd($issue_detail);exit;
-/*                        DB::beginTransaction();
+                        $return_detail = json_decode($this->getJsonData('alibaba.ae.issue.findIssueDetailByIssueId',$detail_param));
 
-                        DB::commit();*/
+                        if(isset($return_detail->success)){
+                            $issue_detail = $return_detail;
+                        }else{
+                            $issue_detail = '';
+                        }
 
+                        $issueAry[] = [
+                            'issue_id'      => $item->id,
+                            'gmtModified'   => $item->gmtModified,
+                            'issueStatus'   => $item->issueStatus,
+                            'gmtCreate'     => $item->gmtCreate,
+                            'reasonChinese' => $item->reasonChinese,
+                            'orderId'       => $item->orderId,
+                            'reasonEnglish' => $item->reasonEnglish,
+                            'issue_detail'  => $issue_detail,
+                            'issueType'     => $issue,
+                        ];
                     }
                 }else{
                     break;
                 }
-
             }
 
+
         }
+
+        return $issueAry;
 
     }
    public function changetime($time){
@@ -1502,6 +1518,12 @@ Class AliexpressAdapter implements AdapterInterface
         $respon_ary = json_decode($this->getJsonData('api.addMsg',$query));
 
         return $respon_ary['result']['isSuccess'] ? true : false;
+
+    }
+
+    public function issuesRedfuse(){
+
+       // $respon_ary = json_decode($this->getJsonData('api.addMsg','api.sellerRefuseIssue'));
 
     }
 

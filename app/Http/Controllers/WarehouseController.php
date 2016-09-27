@@ -3,7 +3,7 @@
  * 仓库控制器
  * 处理仓库相关的Request与Response
  *
- * @author: MC<178069409@qq.com>
+ * @author: MC<178069409>
  * Date: 15/12/18
  * Time: 15:22pm
  */
@@ -67,15 +67,16 @@ class WarehouseController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
-        $from = serialize($model);
+        $userName = UserModel::find(request()->user()->id);
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         request()->flash();
         $this->validate(request(), $this->model->rules('update', $id));
         $model->update(request()->all());
-        $to = serialize($model);
-        $this->eventLog(request()->user()->id, '仓库信息更新,id='.$model->id, $to, $from);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($userName->name, '仓库信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 

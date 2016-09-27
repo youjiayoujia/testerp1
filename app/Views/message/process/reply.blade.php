@@ -137,9 +137,11 @@
                         </span>
                     </div>
                 </form>
-
             </div>
             <div class="col-lg-6 text-right">
+                @if($driver == 'wish')
+                    <a class="btn btn-primary " href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}">Apeal To Wish Support</a>
+                @endif
                 <button class="btn btn-warning" type="button"
                         onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply', ['id'=>$message->id]) }}'}">
                     <span class="glyphicon glyphicon-minus-sign"></span> 无需回复

@@ -152,6 +152,14 @@ class PackageModel extends BaseModel
         return $skuString;
     }
 
+    //sku申报名
+    public function getDeclaredEnAttribute()
+    {
+        $declared_en = $this->items ? ($this->items->first()->item ? ($this->items->first()->item->product ? $this->items->first()->item->product->declared_en : '') : '') : '';
+
+        return $declared_en;
+    }
+
     //包裹总重量
     public function getTotalWeightAttribute()
     {

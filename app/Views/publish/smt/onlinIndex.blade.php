@@ -20,8 +20,9 @@
                     if(!empty($smtProductList->details->imageURLs)){
                         $imagesUrlArr = explode(';', $smtProductList->details->imageURLs);
                         $firstImageURL = array_shift($imagesUrlArr);
+                    }else {
+                         $firstImageURL = '';
                     }
-
                 ?>
                   <a target="_blank" href="{{ $firstImageURL}}"><img style="width:50px;height:50px;" src="{{ $firstImageURL}}"></a>
             </td>

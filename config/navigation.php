@@ -454,8 +454,18 @@ return [
             ],
 
             [
+                'name' => 'SMT调价任务列表',
+                'url' => 'smtPriceTask.index',
+                'icon' => '',
+            ],
+            [
                 'name' => 'SMT销售代码设置',
                 'url' => 'smtSellerCode.index',
+                'icon' => '',
+            ],
+            [
+                'name' => 'SMT帐号管理',
+                'url' => 'smtAccountManage.index',
                 'icon' => '',
             ],
             [
@@ -468,7 +478,12 @@ return [
                 'url' => 'ebayProduct.index',
                 'icon' => '',
             ],
-        ],
+            [
+                'name' => 'Lazada数据监控',
+                'url' => 'lazada.index',
+                'icon' => '',
+            ],
+        ]
     ],
     //CRM导航
     [

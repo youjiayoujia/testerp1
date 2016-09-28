@@ -220,7 +220,6 @@ class SupplierModel extends BaseModel
 
             !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
             $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
-            print_r($result);
         }
         return $res;
     }

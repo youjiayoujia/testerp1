@@ -714,7 +714,6 @@ class TestController extends Controller
     }
     public function getSmtIssue(){
 
-        print_r(request()->input());
 
       //  $refund = RefundModel::find(2);
 
@@ -729,11 +728,9 @@ class TestController extends Controller
                 break;
             }else{
                 foreach ($data as $key => $value){
-if($key == 1)
-                    dd($value);
 
                     $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
-                    $content          = file_get_contents($img_src);
+                    $content      = file_get_contents($img_src);
                     $suffix       = strstr(substr($value->attachment_url,1),'.');
                     $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
 

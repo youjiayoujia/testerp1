@@ -61,8 +61,8 @@ class getSellmoreSuppliers extends Command
                         $content      = file_get_contents($img_src);
                         $suffix       = strstr(substr($value->attachment_url,1),'.');
                         $filename     = Tool::randString(16,false);
-                        $uploads_file = './uploads/product/supplier/'.$filename.$suffix;
-                        Storage::put($uploads_file,$content);
+                        $uploads_file = './public/uploads/product/supplier/'.$filename.$suffix;
+                        file_put_contents($uploads_file,$content);
                         $qualifications = $filename.$suffix;
                     }else{
                         $qualifications = '';

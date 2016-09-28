@@ -316,9 +316,6 @@ class Tool
 
     /**
      * Curl Post JSON 数据
-     * 使用方法：
-     * $post_string = "app=request&version=beta";
-     *
      */
     public function postCurlHttpsData($url, $data)
     { // 模拟提交数据函数

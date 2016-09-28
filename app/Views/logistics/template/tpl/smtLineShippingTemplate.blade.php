@@ -93,7 +93,7 @@
             </td>
         </tr>
         <tr style="font-size:12px;">
-            <td width="70%" style="border-right:none;">{{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}</td>
+            <td width="70%" style="border-right:none;">{{ $model->declared_en }}</td>
             <td width="15%" style="border-right:none;">{{ $model->signal_weight }}</td>
             <td width="15%">{{ $model->signal_price }}</td>
         </tr>

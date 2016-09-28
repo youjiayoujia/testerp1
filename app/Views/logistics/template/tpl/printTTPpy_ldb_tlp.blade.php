@@ -99,7 +99,7 @@
                 </tr>
                 <tr style="height:4mm;font-size: 11px;text-align:center;">
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">
-                        {{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}&nbsp;&nbsp;&nbsp;&nbsp;{{ 'x1' }}
+                        {{ $model->sku_info }}
                     </td>
                     <td style="border-right:1px solid black;border-bottom:1px solid black;">
                         {{ $model->signal_weight }}

@@ -110,7 +110,7 @@
         <td>Value</td>
     </tr>
     <tr style="height:50px;">
-        <td style="text-align:left">{{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}
+        <td style="text-align:left">{{ $model->sku_info }}
         <td>1</td>
         <td>{{ $model->signal_weight }}</td>
         <td>{{ $model->signal_price > 20 ? 20 : $model->signal_price }}</td>

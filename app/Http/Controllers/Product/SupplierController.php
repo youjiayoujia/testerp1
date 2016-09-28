@@ -202,7 +202,7 @@ class SupplierController extends Controller
             $post['key']          = 'slme';
             $post['suppliers_id'] = $model->id;
 
-            //$result = Tool::postCurlHttpsData('http://erp.moonarstore.com/api/api_suppliers.php',json_encode($post));
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
 
         }
 

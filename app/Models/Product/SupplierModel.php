@@ -91,9 +91,9 @@ class SupplierModel extends BaseModel
         }
     }
     
-/*    public function getLevelNameAttribute(){
-        
-    }*/
+    public function getLevelNameAttribute(){
+        return isset(config('product.supplier.level')[$this->level_id]) ? config('product.supplier.level')[$this->level_id] : '无';
+    }
 
     /**
      * return the relation between the two module
@@ -161,7 +161,7 @@ class SupplierModel extends BaseModel
 
             !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
             
-          //  $result = Tool::postCurlHttpsData('http://erp.moonarstore.com/api/api_suppliers.php',json_encode($post));
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
         }
         return $create;
     }
@@ -198,28 +198,29 @@ class SupplierModel extends BaseModel
 
 
         if($res){//api同步sellmore 旧系统
-
+            $suplier = $this->find($id);
             $type_config =  array_flip(config('product.sellmore.pay_type'));
 
             $post['type'] = 'update';
             $post['key']  = 'slme';
 
-            $post['suppliers_id']           = $data->id;
-            $post['suppliers_company']      = $data->company;
-            $post['suppliers_website']      = $data->official_url;
-            $post['suppliers_address']      = $data->address;
-            $post['suppliers_type']         = $data->type;
-            $post['supplierArrivalMinDays'] = $data->purchase_time;
-            $post['suppliers_bank']         = $data->bank_account;
-            $post['suppliers_card_number']  = $data->bank_code;
-            $post['suppliers_type']         = $type_config[$data->pay_type];
-            $post['suppliers_name']         = $data->contact_name;
-            $post['suppliers_mobile']       = $data->telephone;
-            $post['suppliers_wangwang']     = $data->wangwang;
-            $post['suppliers_qq']           = $data->qq;
+            $post['suppliers_id']           = $suplier->id;
+            $post['suppliers_company']      = $suplier->company;
+            $post['suppliers_website']      = $suplier->official_url;
+            $post['suppliers_address']      = $suplier->address;
+            $post['suppliers_type']         = $suplier->type;
+            $post['supplierArrivalMinDays'] = $suplier->purchase_time;
+            $post['suppliers_bank']         = $suplier->bank_account;
+            $post['suppliers_card_number']  = $suplier->bank_code;
+            $post['suppliers_type']         = $type_config[$suplier->pay_type];
+            $post['suppliers_name']         = $suplier->contact_name;
+            $post['suppliers_mobile']       = $suplier->telephone;
+            $post['suppliers_wangwang']     = $suplier->wangwang;
+            $post['suppliers_qq']           = $suplier->qq;
 
             !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
-            //  $result = Tool::postCurlHttpsData('http://erp.moonarstore.com/api/api_suppliers.php',json_encode($post));
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
+            print_r($result);
         }
         return $res;
     }

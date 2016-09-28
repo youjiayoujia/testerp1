@@ -315,7 +315,7 @@ class Tool
     }
 
     /**
-     * Curl https Post 数据
+     * Curl Post JSON 数据
      * 使用方法：
      * $post_string = "app=request&version=beta";
      *
@@ -334,6 +334,10 @@ class Tool
         curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
         curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
+/*        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data))
+        );*/
         $tmpInfo = curl_exec($curl); // 执行操作
         if (curl_errno($curl)) {
             // $this->setCurlErrorLog(curl_error ( $curl ));

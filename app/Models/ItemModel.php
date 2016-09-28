@@ -270,6 +270,17 @@ class ItemModel extends BaseModel
         return $config[$this->status];
     }
 
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'],'warehouse' => ['name'] ],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('item.status'),],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
+    }
+
     //获得sku销量 period参数格式为 -7 day
     public function getsales($period)
     {

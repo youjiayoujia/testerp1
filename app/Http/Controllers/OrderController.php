@@ -112,7 +112,7 @@ class OrderController extends Controller
             $this->dispatch($job);
         }
 
-        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackage队列'));
+        return redirect('/')->with('alert', $this->alert('success', '已成功加入doPackages队列'));
     }
 
     /**

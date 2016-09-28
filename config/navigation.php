@@ -96,6 +96,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '未付款订单',
+                'url' => 'unpaidOrder.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '黑名单',
                 'url' => 'orderBlacklist.index',
                 'icon' => '',

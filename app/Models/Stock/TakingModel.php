@@ -14,14 +14,14 @@ class TakingModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_takings';
+    public $table = 'stock_takings';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['taking_id', 'stock_taking_by', 'create_taking_adjustment', 'stock_taking_time', 'adjustment_by', 'adjustment_time', 'check_by', 'create_status', 'check_status', 'check_time', 'created_at'];
+    public $fillable = ['taking_id', 'stock_taking_by', 'create_taking_adjustment', 'stock_taking_time', 'adjustment_by', 'adjustment_time', 'check_by', 'create_status', 'check_status', 'check_time', 'created_at'];
 
 
     // 用于查询

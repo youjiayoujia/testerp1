@@ -1,7 +1,6 @@
 <?php
 namespace App\Models;
 
-use App\Models\Logistics\LimitsModel;
 use Excel;
 use DB;
 use App\Base\BaseModel;
@@ -13,10 +12,12 @@ use App\Models\WarehouseModel;
 use App\Models\Logistics\ZoneModel;
 use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
+use App\Models\Logistics\LimitsModel;
+use App\Models\Product\ProductLogisticsLimitModel;
 
 class PackageModel extends BaseModel
 {
-    protected $table = 'packages';
+    public $table = 'packages';
 
     public $searchFields = ['id' => 'ID'];
 
@@ -25,7 +26,7 @@ class PackageModel extends BaseModel
         'update' => [],
     ];
 
-    protected $fillable = [
+    public $fillable = [
         'channel_id',
         'channel_account_id',
         'order_id',
@@ -139,6 +140,18 @@ class PackageModel extends BaseModel
         return $value;
     }
 
+    //包裹sku信息
+    public function getSkuInfoAttribute()
+    {
+        $skuString = '';
+        foreach($this->items as $packageItem){
+            $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . $packageItem->quantity . '【' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '') . '】';
+        }
+        $skuString = substr($skuString, 1);
+
+        return $skuString;
+    }
+
     //包裹总重量
     public function getTotalWeightAttribute()
     {
@@ -153,10 +166,7 @@ class PackageModel extends BaseModel
     //包裹单个sku重量
     public function getSignalWeightAttribute()
     {
-        $weight = 0;
-        foreach($this->items->first() as $packageItem) {
-            $weight += $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
-        }
+        $weight = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->item ? $this->items->first()->item->weight : 0) : 0);
 
         return $weight;
     }
@@ -165,10 +175,8 @@ class PackageModel extends BaseModel
     public function getSignalPriceAttribute()
     {
         $price = 0;
-        foreach($this->items->first() as $packageItem) {
-            $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
-        }
-        if($this->order) {
+        if($this->order->rate) {
+            $price = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->orderItem ? $this->items->first()->orderItem->price : 0) : 0);
             $price = $price / $this->order->rate;
         }
 
@@ -179,10 +187,10 @@ class PackageModel extends BaseModel
     public function getTotalPriceAttribute()
     {
         $price = 0;
-        foreach($this->items as $packageItem) {
-            $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
-        }
-        if($this->order) {
+        if($this->order->rate) {
+            foreach($this->items as $packageItem) {
+                $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+            }
             $price = $price / $this->order->rate;
         }
 
@@ -193,10 +201,15 @@ class PackageModel extends BaseModel
     public function getIsBatteryAttribute()
     {
         $flag = false;
-        foreach($this->items->item->product->limits as $logisticsLimit) {
-            $name = LimitsModel::where('id', $logisticsLimit->logistics_limits_id)->get(['name']);
-            if($name == '含电池') {
-                $flag = true;
+        foreach($this->items as $packageItem) {
+            if($packageItem->item ? ($packageItem->item->product ? $packageItem->item->product : null) : null) {
+                $productLogisticsLimits = ProductLogisticsLimitModel::where('product_id', $packageItem->item->product->id)->get();
+                foreach($productLogisticsLimits as $productLogisticsLimit) {
+                    $name = LimitsModel::where('id', $productLogisticsLimit->logistics_limits_id)->get(['name']);
+                    if($name == '含电池') {
+                        $flag = true;
+                    }
+                }
             }
         }
 

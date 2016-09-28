@@ -90,6 +90,12 @@
                         </div>
                     @endforeach
                 @endif
+                @if($order->unpaidOrder)
+                    <div class="divider"></div>
+                    <div class="text-danger">
+                        {{ '未付款: ' . $order->unpaidOrder->note }}
+                    </div>
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div class="divider"></div>
@@ -578,7 +584,7 @@
                                         <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>包裹状态</strong> : {{ $package->status }}
+                                        <strong>包裹状态</strong> : {{ $package->status_name }}
                                     </div>
                                     <div class="col-lg-3">
                                         <strong>打印面单时间</strong> : {{ $package->printed_at }}

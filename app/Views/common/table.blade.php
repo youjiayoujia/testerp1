@@ -224,8 +224,12 @@
                 "{{ route('eventChild.getInfo')}}",
                 {table:table, id:id},
                 function(result) {
-                   $('.info_buf').html('');
-                   $('.info_buf').html(result);
+                    $('.info_buf').html('');
+                    if(result) {
+                        $('.info_buf').html(result);
+                    } else {
+                        $('.info_buf').html('该记录暂无日志');
+                    }
                 },'html'
                 );
         });

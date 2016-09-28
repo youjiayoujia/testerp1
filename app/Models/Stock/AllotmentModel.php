@@ -12,14 +12,14 @@ class AllotmentModel extends BaseModel
      *
      * @var string
      */
-    protected $table = 'stock_allotments';
+    public $table = 'stock_allotments';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['allotment_id', 'out_warehouse_id', 'in_warehouse_id', 'remark', 'allotment_by', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
+    public $fillable = ['allotment_id', 'out_warehouse_id', 'in_warehouse_id', 'remark', 'allotment_by', 'allotment_status', 'check_by', 'check_status', 'check_time', 'checkform_by', 'checkform_time', 'created_at'];
 
     /**
      * search field 

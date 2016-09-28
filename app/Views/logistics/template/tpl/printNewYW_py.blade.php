@@ -131,7 +131,7 @@
     </tr>
     <tr style="font-size:12px;height:30px;">
         <td colspan="4" style="border-bottom:none;">
-            <p>Date and sender\'s signature:SLME &nbsp;&nbsp;
+            <p>Date and sender's signature:SLME &nbsp;&nbsp;
                 @if($model->warehouse)
                     @if($model->warehouse->name == '深圳仓')
                         {{ '302035' }}
@@ -139,7 +139,7 @@
                         {{ '209052' }}
                     @endif
                 @endif
-                &nbsp;&nbsp;{{ date('d-m-Y') }}&nbsp;{{ '根据国家简码获取分拣编码' }}
+                &nbsp;&nbsp;{{ date('d-m-Y') }}&nbsp;{{ '编码' }}
             </p>
         </td>
     </tr>

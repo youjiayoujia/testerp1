@@ -39,11 +39,8 @@
             <div style="height:45mm;width:38mm;float:left">
                 <div style="height:29mm;width:36mm;border:1px solid black;text-align: center;font-size:14px;margin-top:2px;">
                     <p>TAIPEI(TP)TAIWAN</p>
-
                     <p>R.O.C.</p>
-
                     <p>POSTAGE PAID</p>
-
                     <p>LICENCE NO.TP6627</p>
                 </div>
                 <div style="height:12mm;width:36mm;font-size:11px;line-height: 12px;margin-top:1px;padding-left:5px;">
@@ -56,20 +53,18 @@
             <div style="height:46mm;width:58mm;margin-right:1px;float:right;font-size:11px;text-align: center;">
                 <p style="line-height:14px;">CHUNGHWA POST CO., LTD.
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b style="font-size: 14px;">CN22</b></p>
-                <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=50&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3="/>
-
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 <div style="font-size:16px;font-weight:bold;line-height: 14px;margin-top:1px;">
                     {{ $model->tracking_no }}
                 </div>
                 <p style="line-height:13px;width:10mm;font-size:14px;font-weight: bold;text-align: left;float:left;">
                     TO</p>
-
                 <p style="width:45mm;font-size:15px;font-weight: bold;text-align: right;margin-right:10px;float:right;line-height:13px;">
-                    @if(in_array(substr($model->shipping_zipcode, 0, 1), array(0, 1, 2, 3)))
+                    @if(in_array(substr($model->shipping_zipcode, 0, 1), [0, 1, 2, 3]))
                         {{ 'JFK' }}
-                    @elseif(in_array(substr($model->shipping_zipcode, 0, 1), array(4, 5, 6)))
+                    @elseif(in_array(substr($model->shipping_zipcode, 0, 1), [4, 5, 6]))
                         {{ 'ORD' }}
-                    @elseif(in_array(substr($model->shipping_zipcode, 0, 1), array(7, 8, 9)))
+                    @elseif(in_array(substr($model->shipping_zipcode, 0, 1), [7, 8, 9]))
                         {{ 'LAX' }}
                     @endif
                 </p>
@@ -99,35 +94,23 @@
                         <td style="border-bottom: 1px solid black;border-right: 1px solid black;">Weight(KG)</td>
                         <td style="border-bottom: 1px solid black;">Value(USD)</td>
                     </tr>
-                    @if($model->order)
-                        <tr>
-                            <td style="border-right: 1px solid black;">
-                                @foreach($model->order->items as $item)
-                                    {{ $item->sku }} * {{ $item->quantity }} 【{{ $item->item ? ($item->item->warehousePosition ? $item->item->warehousePosition->name : '') : '' }}】
-                                @endforeach
-                            </td>
-                            @foreach($model->order->items as $key => $orderItem)
-                                @if($key == 0)
-                                    <td style="border-right: 1px solid black;">
-                                        {{ $orderItem->quantity * $orderItem->item ? $orderItem->item->weight : '' }}
-                                    </td>
-                                    <td>
-                                        {{ $orderItem->quantity * $orderItem->price / $model->order->rate > 20 ? 20 : $orderItem->quantity * $orderItem->price / $model->order->rate }}
-                                    </td>
-                                @endif
-                            @endforeach
-                        </tr>
-                    @endif
+                    <tr>
+                        <td style="border-right: 1px solid black;">
+                            {{ $model->sku_info }}
+                        </td>
+                        <td style="border-right: 1px solid black;">
+                            {{ $model->signal_weight }}
+                        </td>
+                        <td>
+                            {{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div style="margin-top:1px;border:1px solid black;width:48mm;height:24mm;float:right;margin-right:2px;font-size:11px;line-height: 10px;padding:1px;">
                 <p style="line-height: 9px;border-bottom: 1px solid black;padding-bottom: 1px;">
                     <b>
-                        @if($model->order)
-                            @foreach($model->order->items as $item)
-                                {{ $item->sku }} * {{ $item->quantity }} 【{{ $item->item ? ($item->item->warehousePosition ? $item->item->warehousePosition->name : '') : '' }}】
-                            @endforeach
-                        @endif
+                        {{ $model->logistics_id }}
                     </b>
                 </p>
                 <p>I,the undersigned,whose name and address are given on the item certify that the particulars given in
@@ -147,23 +130,17 @@
                     <td valign="top" style="border-bottom: 1px solid black;border-right: 1px solid black;">Total<br/>Value
                     </td>
                     <td valign="top" style="width:45mm;border-bottom: 1px solid black;line-height:18px;">Date and
-                        sender\'s signature :
+                        sender's signature :
                     </td>
                 </tr>
                 <tr>
-                    @if($model->order)
-                        <td valign="top" style="width:11mm;border-right: 1px solid black;line-height:15px;">
-                            @foreach($model->order->items as $key => $orderItem)
-                                {{ $orderItem->quantity * $orderItem->item ? $orderItem->item->weight : '' }}
-                            @endforeach
-                        </td>
-                        <td valign="top" style="width:10mm;border-right: 1px solid black;line-height:15px;">
-                            @foreach($model->order->items as $key => $orderItem)
-                                {{ $orderItem->quantity * $orderItem->price / $model->order->rate > 20 ? 20 : $orderItem->quantity * $orderItem->price / $model->order->rate }}
-                            @endforeach
-                        </td>
-                        <td valign="top" style="line-height:15px;">TSAI TSUNG LIANG &nbsp;{{ date('Y-m-d') }}</td>
-                    @endif
+                    <td valign="top" style="width:11mm;border-right: 1px solid black;line-height:15px;">
+                        {{ $model->total_weight }}
+                    </td>
+                    <td valign="top" style="width:10mm;border-right: 1px solid black;line-height:15px;">
+                        {{ sprintf("%.2f", $model->total_price > 20 ? 20 : $model->total_price) }}
+                    </td>
+                    <td valign="top" style="line-height:15px;">TSAI TSUNG LIANG &nbsp;{{ date('Y-m-d') }}</td>
                 </tr>
             </table>
         </div>

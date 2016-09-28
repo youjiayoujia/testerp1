@@ -18,6 +18,7 @@
 Route::get('test1', 'TestController@testYw');
 Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
+Route::post('api/curlApiChangeWarehousePositon', ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
@@ -542,6 +543,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::get('orderStatistics', ['uses' => 'OrderController@orderStatistics', 'as' => 'orderStatistics']);
     Route::resource('order', 'OrderController');
     Route::resource('orderItem', 'Order\ItemController');
+    Route::resource('unpaidOrder', 'Order\UnpaidOrderController');
     Route::get('orderAdd', ['uses' => 'OrderController@ajaxOrderAdd', 'as' => 'orderAdd']);
     Route::resource('orderBlacklist', 'Order\BlacklistController');
     Route::any('withdrawAll', ['uses' => 'OrderController@withdrawAll', 'as' => 'withdrawAll']);
@@ -744,7 +746,7 @@ Route::group(['middleware' => 'roleCheck'], function () {
         Route::get('changeStatusToWait',
             ['uses' => 'SmtController@changeStatusToWait', 'as' => 'smt.changeStatusToWait']);
         Route::post('batchModify',
-            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);        
+            ['uses' => 'SmtController@batchModify', 'as' => 'smt.batchModify']);                       
     });
    
     Route::resource('smt', 'Publish\Smt\SmtController');
@@ -808,13 +810,43 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::post('smtTemplate/copyTemplate',
         ['uses' => 'Publish\Smt\SmtTemplateController@copyTemplate', 'as' => 'smtTemplate.copyTemplate']);
     
-    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');
-   
+    Route::resource('smtTemplate', 'Publish\Smt\SmtTemplateController');   
+    
+    Route::post('smtAccountManage/doAction',
+        ['uses' => 'Publish\Smt\SmtAccountManageController@doAction', 'as' => 'smtAccountManage.doAction']);
+    Route::post('smtAccountManage/resetAuthorization',
+        ['uses' => 'Publish\Smt\SmtAccountManageController@resetAuthorization', 'as' => 'smtAccountManage.resetAuthorization']);
+    
+    Route::resource('smtAccountManage', 'Publish\Smt\SmtAccountManageController');
+    
+    Route::post('smtPriceTask/batchDelete',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@batchDelete', 'as' => 'smtPriceTask.batchDelete']); 
+    Route::post('smtPriceTask/createPriceTask',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@createPriceTask', 'as' => 'smtPriceTask.createPriceTask']);
+    Route::post('smtPriceTask/getSmtPriceTask',
+        ['uses' => 'Publish\Smt\SmtPriceTaskController@getSmtPriceTask', 'as' => 'smtPriceTask.getSmtPriceTask']);  
+    Route::resource('smtPriceTask', 'Publish\Smt\SmtPriceTaskController');
+    
     Route::any('upload',
          ['uses' => 'KindeditorController@upload', 'as' => 'upload']);
     Route::any('uploadToProject',
         ['uses' => 'KindeditorController@uploadToProject', 'as' => 'uploadToProject']);
 
+    Route::post('lazada/setQuantity',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setQuantity', 'as' => 'lazada.setQuantity']);
+    Route::post('lazada/setPrice',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setPrice', 'as' => 'lazada.setPrice']);
+    Route::post('lazada/setSellerSkuStatus',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSellerSkuStatus', 'as' => 'lazada.setSellerSkuStatus']);
+    Route::post('lazada/setSalePrice',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@setSalePrice', 'as' => 'lazada.setSalePrice']);
+    
+    Route::get('lazada/productBatchEdit',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@productBatchEdit', 'as' => 'lazada.productBatchEdit']);
+    Route::any('lazada/batchUpdate',
+        ['uses' => 'Publish\Lazada\LazadaOnlineMonitorController@batchUpdate', 'as' => 'lazada.batchUpdate']);
+    
+    Route::resource('lazada', 'Publish\Lazada\LazadaOnlineMonitorController');
     //开启工作流
     Route::any('message/startWorkflow',
         ['as' => 'message.startWorkflow', 'uses' => 'MessageController@startWorkflow']);

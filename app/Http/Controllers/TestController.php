@@ -632,7 +632,7 @@ class TestController extends Controller
          *
          */
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'darli04@126.com'){ //测试diver
+            if($account->account == 'hkdajin@126.com'){ //测试diver
 
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -714,7 +714,7 @@ class TestController extends Controller
     }
     public function getSmtIssue(){
 
-        dd(request()->user());
+        print_r(request()->input());
 
       //  $refund = RefundModel::find(2);
 

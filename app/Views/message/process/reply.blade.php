@@ -45,7 +45,7 @@
                         <img src="{{ asset('loading.gif') }}" width="30" />
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="display: none;">
                     <div class="col-lg-6">
                         <div class="form-group">
                             <input type="text" class="form-control" name="to" value="{{ $message->from_name }}"/>
@@ -58,7 +58,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="display: none;">
                     <div class="col-lg-12">
                         <div class="form-group">
                             <input type="text" class="form-control" name="title" value="Re: {{ $message->subject }}"/>

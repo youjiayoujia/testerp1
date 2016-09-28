@@ -37,6 +37,7 @@ class CreateMessagesTable extends Migration
             $table->integer('dont_reply')->nullable()->default(0);
             $table->mediumText('content')->nullable()->default(NULL);
             $table->text('channel_message_fields')->nullable()->comment('渠道信息数据数组')->default(NULL);
+            $table->string('channel_order_number')->nullable()->comment('平台订单号');
             $table->timestamps();
             $table->softDeletes();
         });

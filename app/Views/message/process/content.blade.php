@@ -1,7 +1,6 @@
-<div class="panel panel-primary">
+<div class="panel panel-info">
     <div class="panel-heading">
-        {!! $message->label_text !!}
-        <strong>{{ $message->subject }}</strong><br/>
+        <strong>描述：{{ str_limit($message->subject,150) }}</strong><br/>
         <small>
             {{ $message->date }} by <i>{{ $message->from_name }}</i> from {{ '<'.$message->from.'>' }}
         </small>
@@ -15,9 +14,7 @@
         <a href="javascript:" class="close" data-toggle="modal" data-target="#myModal">
             <small class="glyphicon glyphicon-list"></small>
         </a>
-        &nbsp;&nbsp;
 
-        &nbsp;&nbsp;
 
     </div>
 	

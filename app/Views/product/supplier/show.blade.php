@@ -40,7 +40,7 @@
                 <strong>采购员</strong>: {{ $model->purchaseName ? $model->purchaseName->name : '' }}
             </div>
             <div class="col-lg-2">
-                <strong>供货商等级</strong>: {{ $model->levelByName ? $model->levelByName->name : '' }}
+                <strong>供货商等级</strong>: {{ $model->LevelName }}
             </div>
             <div class="col-lg-4">
                 <strong>评级描述</strong>: {{ $model->levelByName ? $model->levelByName->description : '' }}

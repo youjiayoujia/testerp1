@@ -217,6 +217,11 @@ class OrderModel extends BaseModel
         ];
     }
 
+    public function unpaidOrder()
+    {
+        return $this->belongsTo('App\Models\Order\UnpaidOrderModel', 'by_id', 'ordernum');
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');

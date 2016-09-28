@@ -90,6 +90,12 @@
                         </div>
                     @endforeach
                 @endif
+                @if($order->unpaidOrder)
+                    <div class="divider"></div>
+                    <div class="text-danger">
+                        {{ '未付款: ' . $order->unpaidOrder->note }}
+                    </div>
+                @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
                         <div class="divider"></div>

@@ -371,24 +371,20 @@ class MessageController extends Controller
      * ajax获取百度翻译
      */
     public function ajaxGetTranInfo(){
-        if(request()->ajax()){
+
             $content = request()->input('content');
             if(!empty($content)){
                 $result = Translation::translate($content);
             }else{
                 $result = false;
             }
-            if(isset($result['trans_result'][0]['dst'])){
-                echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
-            }else{
+        echo json_encode(['content'=>'翻译结果','status'=>config('status.ajax.success')]);exit;
+        if(isset($result['error_code'])){
                 echo json_encode(['status'=>config('status.ajax.fail')]);
+            }else{
+                echo json_encode(['content'=>$result['trans_result'][0]['dst'],'status'=>config('status.ajax.success')]);
             }
-
-        }
     }
-
-
-
 
 /*    public function testbaidu(){
         $text =$_POST['info'];

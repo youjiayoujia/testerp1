@@ -359,7 +359,7 @@ class OrderModel extends BaseModel
     {
         $total = 0;
         foreach ($this->items as $item) {
-            $total += $item->item->cost * $item->item->quantity;
+            $total += $item->item->cost * $item->quantity;
         }
         return $total;
     }
@@ -442,7 +442,6 @@ class OrderModel extends BaseModel
             $blacklist = BlacklistModel::where('zipcode', $this['shipping_zipcode'])->where('name', $name);
         } else {
             $blacklist = BlacklistModel::where('email', $this['email']);
-
         }
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
@@ -605,11 +604,11 @@ class OrderModel extends BaseModel
      */
     public function calculateProfitProcess()
     {
-        $orderItems = $this->items;
         $orderAmount = $this->amount;
         $orderCosting = $this->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee();
-        $orderRate = ($this->amount - ($orderCosting + $this->calculateOrderChannelFee() + $this->logistics_fee)) / $this->amount;
+        var_dump($orderAmount);var_dump($orderCosting);var_dump($orderChannelFee);exit;
+        $orderRate = ($this->amount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $this->amount;
         if ($this->status != 'CANCLE' && $orderRate <= 0) {
             //利润率为负撤销0
             $this->OrderCancle();

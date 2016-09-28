@@ -632,7 +632,7 @@ class TestController extends Controller
          *
          */
         foreach (AccountModel::all() as $account) {
-            if($account->account == 'darli04@126.com'){ //测试diver
+            if($account->account == 'hkdajin@126.com'){ //测试diver
 
                 //dd($account);
                 $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -714,7 +714,6 @@ class TestController extends Controller
     }
     public function getSmtIssue(){
 
-        dd(request()->user());
 
       //  $refund = RefundModel::find(2);
 
@@ -729,11 +728,9 @@ class TestController extends Controller
                 break;
             }else{
                 foreach ($data as $key => $value){
-if($key == 1)
-                    dd($value);
 
                     $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
-                    $content          = file_get_contents($img_src);
+                    $content      = file_get_contents($img_src);
                     $suffix       = strstr(substr($value->attachment_url,1),'.');
                     $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
 

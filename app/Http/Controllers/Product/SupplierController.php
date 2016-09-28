@@ -182,5 +182,32 @@ class SupplierController extends Controller
 
         return json_encode(false);
     }
+
+    /**
+     * 删除
+     *
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        $model = $this->model->find($id);
+        if (!$model) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+        }
+        $res = $model->destroy($id);
+
+        if($res){
+            $post['type']         = 'delete';
+            $post['key']          = 'slme';
+            $post['suppliers_id'] = $model->id;
+
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
+
+        }
+
+
+        return redirect($this->mainIndex);
+    }
 	
 }

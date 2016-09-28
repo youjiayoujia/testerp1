@@ -83,7 +83,7 @@
     <th class="sort" data-field="from_name">用户昵称</th>
     <th class="sort" data-field="from">用户ID</th>
     <th class="sort" data-field="date">发信日期</th>
-    <th class="sort">客服</th>
+    <th class="sort">消息处理客服</th>
     <th class="sort" data-field="created_at">创建日期</th>
     <th class="sort" data-field="updated_at">更新日期</th>
     <th>延时</th>
@@ -97,12 +97,11 @@
             <td>{{ $message->ChannelName}}</td>
             <td>{{ $message->account->account }}</td>
             <td>
-                <span class='label label-success'>{{$message->label}}</span>
                {{ str_limit($message->subject,30) }}
             </td>
             <td>{{ $message->status_text }}</td>
             <td>{{ $message->from_name }}</td>
-            <td>{{ $message->from }}</td>
+            <td>{{ str_limit($message->from,15)}}</td>
             <td>{{ date('Y-m-d H:i:s',strtotime($message->date)) }}</td>
             <td>{{ $message->assign_id ? $message->assigner->name : '未分配' }}</td>
             <td>{{ $message->created_at }}</td>

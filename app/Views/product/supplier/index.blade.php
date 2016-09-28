@@ -44,6 +44,7 @@
     <th class='sort' data-field='telephone'>电话</th>
     <th>旺旺</th>
     <th>QQ</th>
+    <th>供货商等级</th>
 {{--    <th>采购员</th>--}}
     <th>创建人</th>
     <th class='sort' data-field='created_at'>创建时间</th>
@@ -73,6 +74,7 @@
             <td>{{ $supplier->telephone }}</td>
             <td>{{ $supplier->wangwang }}</td>
             <td>{{ $supplier->qq }}</td>
+            <td>{{ $supplier->LevelName }}</td>
 {{--            <td>{{ $supplier->purchaseName ? $supplier->purchaseName->name : '' }}</td>--}}
             <td>{{ $supplier->createdByName ? $supplier->createdByName->name : '' }}</td>
             <td>{{ $supplier->created_at }}</td>

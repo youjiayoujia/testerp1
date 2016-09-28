@@ -102,7 +102,7 @@
                             {{ $model->signal_weight }}
                         </td>
                         <td>
-                            {{ $model->signal_price > 20 ? 20 : $model->signal_price }}
+                            {{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
                         </td>
                     </tr>
                 </table>
@@ -138,7 +138,7 @@
                         {{ $model->total_weight }}
                     </td>
                     <td valign="top" style="width:10mm;border-right: 1px solid black;line-height:15px;">
-                        {{ $model->total_price > 20 ? 20 : $model->total_price }}
+                        {{ sprintf("%.2f", $model->total_price > 20 ? 20 : $model->total_price) }}
                     </td>
                     <td valign="top" style="line-height:15px;">TSAI TSUNG LIANG &nbsp;{{ date('Y-m-d') }}</td>
                 </tr>

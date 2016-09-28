@@ -294,17 +294,13 @@
                 </tr>
                 <tr style="height:30px;">
                     <td style="text-align: center;padding-top:2px;">
-                        @if($model->items)
-                            @foreach($model->items->first() as $packageItem)
-                                {{ $packageItem->quantity . '*' . $packageItem->item ? $packageItem->item->name : '' }}
-                            @endforeach
-                        @endif
+                        {{ $model->items ? $model->items->first()->quantity : '' . '*' . $model->declared_en }}
                     </td>
                     <td style="text-align: center;">
                         {{ $model->signal_weight }}
                     </td>
                     <td style="text-align: center;">
-                        USD{{ $model->signal_price > 20 ? 20 : $model->signal_price }}
+                        USD{{ sprintf("%.2f", $model->signal_price > 20 ? 20 : $model->signal_price) }}
                     </td>
                 </tr>
                 <tr>
@@ -320,7 +316,7 @@
                         {{ $model->total_weight }}
                     </td>
                     <td style="border-bottom: none;text-align: center;width:50px">
-                        USD{{ $model->total_price > 20 ? 20 : $model->total_price }}
+                        USD{{ sprintf("%.2f", $model->total_price > 20 ? 20 : $model->total_price) }}
                     </td>
                 </tr>
             </table>

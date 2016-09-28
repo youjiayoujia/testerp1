@@ -90,6 +90,10 @@ class SupplierModel extends BaseModel
             return '无审核状态';
         }
     }
+    
+    public function getLevelNameAttribute(){
+        return isset(config('product.supplier.level')[$this->level_id]) ? config('product.supplier.level')[$this->level_id] : '无';
+    }
 
     /**
      * return the relation between the two module
@@ -131,7 +135,35 @@ class SupplierModel extends BaseModel
                 }
             }
         }
-        return $this->create($data);
+        $create = $this->create($data);
+
+        $post = [];
+        //api同步sellmore 旧系统
+        if(!empty($create->id)){
+            $type_config =  array_flip(config('product.sellmore.pay_type'));
+
+            $post['type'] = 'add';
+            $post['key']  = 'slme';
+
+            $post['suppliers_id']           = $create->id;
+            $post['suppliers_company']      = $create->company;
+            $post['suppliers_website']      = $create->official_url;
+            $post['suppliers_address']      = $create->address;
+            $post['suppliers_type']         = $create->type;
+            $post['supplierArrivalMinDays'] = $create->purchase_time;
+            $post['suppliers_bank']         = $create->bank_account;
+            $post['suppliers_card_number']  = $create->bank_code;
+            $post['suppliers_type']         = $type_config[$create->pay_type];
+            $post['suppliers_name']         = $create->contact_name;
+            $post['suppliers_mobile']       = $create->telephone;
+            $post['suppliers_wangwang']     = $create->wangwang;
+            $post['suppliers_qq']           = $create->qq;
+
+            !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
+            
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
+        }
+        return $create;
     }
 
     /**
@@ -161,6 +193,34 @@ class SupplierModel extends BaseModel
         }else{
             $data['qualifications'] = '';
         }
-        return $this->find($id)->update($data);
+
+        $res = $this->find($id)->update($data);
+
+
+        if($res){//api同步sellmore 旧系统
+            $suplier = $this->find($id);
+            $type_config =  array_flip(config('product.sellmore.pay_type'));
+
+            $post['type'] = 'update';
+            $post['key']  = 'slme';
+
+            $post['suppliers_id']           = $suplier->id;
+            $post['suppliers_company']      = $suplier->company;
+            $post['suppliers_website']      = $suplier->official_url;
+            $post['suppliers_address']      = $suplier->address;
+            $post['suppliers_type']         = $suplier->type;
+            $post['supplierArrivalMinDays'] = $suplier->purchase_time;
+            $post['suppliers_bank']         = $suplier->bank_account;
+            $post['suppliers_card_number']  = $suplier->bank_code;
+            $post['suppliers_type']         = $type_config[$suplier->pay_type];
+            $post['suppliers_name']         = $suplier->contact_name;
+            $post['suppliers_mobile']       = $suplier->telephone;
+            $post['suppliers_wangwang']     = $suplier->wangwang;
+            $post['suppliers_qq']           = $suplier->qq;
+
+            !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
+        }
+        return $res;
     }
 }

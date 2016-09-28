@@ -217,6 +217,11 @@ class OrderModel extends BaseModel
         ];
     }
 
+    public function unpaidOrder()
+    {
+        return $this->belongsTo('App\Models\Order\UnpaidOrderModel', 'by_id', 'ordernum');
+    }
+
     public function items()
     {
         return $this->hasMany('App\Models\Order\ItemModel', 'order_id', 'id');
@@ -446,7 +451,7 @@ class OrderModel extends BaseModel
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
             foreach ($blacklist->get() as $value) {
-                if ($value['type'] == 'CONFIRMED') {
+                if ($value->type == 'CONFIRMED') {
                     return true;
                 }
             }
@@ -471,11 +476,11 @@ class OrderModel extends BaseModel
                     $orderItem['item_id'] = $item->id;
                 }
             }
-            // if (!isset($orderItem['item_id'])) {
-            //     $orderItem['item_id'] = 0;
-            //     $order->update(['status' => 'REVIEW']);
-            //     $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
-            // }
+            if (!isset($orderItem['item_id'])) {
+                $orderItem['item_id'] = 0;
+                $order->update(['status' => 'REVIEW']);
+                $order->remark($orderItem['channel_sku'] . '找不到对应产品.');
+            }
             $order->items()->create($orderItem);
         }
         if($order->status == 'COMPLETE' && $order->fulfill_by == 'AFN') {

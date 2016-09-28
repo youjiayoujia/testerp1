@@ -35,7 +35,7 @@
             <img src="{{ asset('picture/post_logo.jpg') }}" style="width:140px;height:50px;"/>
             <span style="font-size:10px;">Small Packet By Air</span><br/>
             <span style="display:inline-block;width:55px;height:22px;border:2px solid #000;margin-left:40px;text-align:center;font-size:18px;font-weight:bold;">
-                {{ $model->country ? $model->country->cn_name : '' }}{{ '编码' }}
+                {{ $model->country ? $model->country->code : '' }}{{ '编码' }}
             </span>
         </p>
         <p style="float:left;width:238px;height:90px;text-align:center;border-right:1px solid #000;">
@@ -93,7 +93,7 @@
             </td>
         </tr>
         <tr style="font-size:12px;">
-            <td width="70%" style="border-right:none;">{{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}</td>
+            <td width="70%" style="border-right:none;">{{ $model->declared_en }}</td>
             <td width="15%" style="border-right:none;">{{ $model->signal_weight }}</td>
             <td width="15%">{{ $model->signal_price }}</td>
         </tr>

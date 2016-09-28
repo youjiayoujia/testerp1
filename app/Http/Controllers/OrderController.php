@@ -161,25 +161,9 @@ class OrderController extends Controller
         if ($special == 'yes') {
             $order = $this->model->where('customer_remark', '!=', '');
         }
-        $page = request()->input('page');
-        $pageSize = request()->input('pageSize');
-        $subtotal = '';
-        if(!$page) {
-            if(!$pageSize) {
-                $pageSize = 10;
-            }
-            $orders = $this->model->orderBy('id', 'desc')->take($pageSize)->get();
-            foreach($orders as $order) {
-                $subtotal += $order->amount * $order->rate;
-            }
-        }else {
-            if(!$pageSize) {
-                $pageSize = 10;
-            }
-            $orders = $this->model->orderBy('id', 'desc')->skip(($page - 1) * $pageSize)->take($pageSize)->get();
-            foreach($orders as $order) {
-                $subtotal += $order->amount * $order->rate;
-            }
+        $subtotal = 0;
+        foreach($this->autoList($this->model) as $value) {
+            $subtotal += $value->amount * $value->rate;
         }
         $rmbRate = CurrencyModel::where('code', 'RMB')->first()->rate;
         $response = [

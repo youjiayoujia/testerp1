@@ -29,6 +29,8 @@ use App\Models\SkuPublishRecords;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ItemModel;
+use App\Models\LogisticsModel;
+use App\Models\Publish\Smt\smtPriceTaskMain;
 
 
 
@@ -1730,12 +1732,11 @@ html;
         $api    = 'api.recommendCategoryByKeyword';
         
         if ($token_id && $keyword) {
-        $account = AccountModel::findOrFail($token_id);
-        $smtApi = Channel::driver($account->channel->driver, $account->api_config);   
-        $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
+            $account = AccountModel::findOrFail($token_id);
+            $smtApi = Channel::driver($account->channel->driver, $account->api_config);   
+            $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
         }
         $data = json_decode($result, true);
-        dd($data);
         if (isset($data['success']) && $data['total'] > 0) {
            $rs = $data['cateogryIds'];
         }

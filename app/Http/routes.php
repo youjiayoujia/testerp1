@@ -18,6 +18,7 @@
 Route::get('test1', 'TestController@testYw');
 Route::get('test2', ['uses' => 'TestController@test2', 'as' => 'test2']);
 Route::get('test3', 'TestController@test3');
+Route::post('api/curlApiChangeWarehousePositon', ['uses' => 'ItemController@curlApiChangeWarehousePositon', 'as' => 'item.curlApiChangeWarehousePositon']);
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');

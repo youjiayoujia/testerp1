@@ -61,7 +61,7 @@ class getSellmoreSuppliers extends Command
                         $content      = file_get_contents($img_src);
                         $suffix       = strstr(substr($value->attachment_url,1),'.');
                         $filename     = Tool::randString(16,false);
-                        $uploads_file = '/product/supplier/'.$filename.$suffix;
+                        $uploads_file = '/supplier/'.$filename.$suffix;
 
                         Storage::put($uploads_file,$content);
                         $qualifications = $filename.$suffix;
@@ -69,10 +69,10 @@ class getSellmoreSuppliers extends Command
                         $qualifications = '';
                     }
                     $insert = [
+                        'id'              => $value->suppliers_id,
                         'company'         => $value->suppliers_company,
                         'address'         => $value->suppliers_address,
                         'contact_name'    => $value->suppliers_name,
-                        //'contact_name' => $value->suppliers_phone,
                         'telephone'       => $value->suppliers_mobile,
                         'official_url'    => $value->suppliers_website,
                         'qq'              => $value->suppliers_qq,
@@ -88,10 +88,6 @@ class getSellmoreSuppliers extends Command
 
                     if(!empty($insert)){
 
-/*                        if(!empty(SupplierModel::find(10001))){
-                            $this->comment('data already inserted');
-                        }*/
-                        
                         SupplierModel::create($insert);
                         $this->info($value->suppliers_id.' insert success');
                         $count += 1;

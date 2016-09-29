@@ -57,9 +57,9 @@
                     success: function (data) {
 
                         if(data.content){
-                            $(this).prev().show().addClass('alert-success');
-                            $(this).prev().children('.content').text(data.content);
-                            $(this).hide();
+                            $('.btn-translation').prev().show().addClass('alert-success');
+                            $('.btn-translation').prev().children('.content').text(data.content);
+                            $('.btn-translation').hide();
                         }else{
                             console.log(data.content);
 

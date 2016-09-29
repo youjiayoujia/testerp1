@@ -289,7 +289,7 @@ class OrderModel extends BaseModel
     public function getStatusNameAttribute()
     {
         $config = config('order.status');
-        return $config[$this->status];
+        return isset($config[$this->status]) ? $config[$this->status] : '';
     }
 
     public function getStatusColorAttribute()

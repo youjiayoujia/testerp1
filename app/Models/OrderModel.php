@@ -289,7 +289,7 @@ class OrderModel extends BaseModel
     public function getStatusNameAttribute()
     {
         $config = config('order.status');
-        return $config[$this->status];
+        return isset($config[$this->status]) ? $config[$this->status] : '';
     }
 
     public function getStatusColorAttribute()
@@ -364,7 +364,7 @@ class OrderModel extends BaseModel
     {
         $total = 0;
         foreach ($this->items as $item) {
-            $total += $item->item->cost * $item->quantity;
+            $total += $item->item->purchase_price * $item->quantity;
         }
         return $total;
     }

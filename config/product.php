@@ -51,7 +51,7 @@ return [
 		            ],
 		'examine_status'=>['待审核','待复审','审核通过','审核不通过'],
         'type'=>['线下','线上','做货'],
-		'file_path' => 'uploads/product/supplier/', //审核文件路径
+		'file_path' => 'uploads/supplier/', //审核文件路径
 	],
 
 	'supplier_examine_status' =>[

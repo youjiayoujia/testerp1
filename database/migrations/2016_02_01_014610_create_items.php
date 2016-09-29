@@ -19,7 +19,9 @@ class CreateItems extends Migration
             $table->string('sku')->comment('sku')->nullable()->default(0);
             $table->string('name')->nullable();
             $table->string('c_name')->nullable();
-            $table->decimal('weight', 7, 4)->comment('重量')->nullable()->default(0);
+            $table->string('competition_url')->nullable()->default(null);;
+            $table->decimal('weight', 5, 2)->comment('重量')->nullable()->default(0);
+            $table->decimal('package_weight', 5, 2)->comment('重量')->nullable()->default(0);
             $table->string('inventory')->comment('库存')->nullable()->default(null);
             $table->integer('warehouse_id')->comment('仓库')->default(0);
             $table->string('warehouse_position')->comment('库位')->default(null);

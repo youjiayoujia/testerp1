@@ -65,6 +65,8 @@ class ItemModel extends BaseModel
         'purchase_adminer',
         'remark',
         'cost',
+        'package_weight',
+        'competition_url',
     ];
 
     public function product()

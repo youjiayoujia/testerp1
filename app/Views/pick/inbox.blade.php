@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class='row'>
-        <div class='col-lg-7 inboxNum text-center'>
+        <div class='col-lg-9 inboxNum text-center'>
             <div class='form-group'>
                 <font class='result'></font>
             </div>
@@ -38,7 +38,7 @@
                 <font class='result_sku'></font>
             </div>
         </div>
-        <div class='col-lg-5 inboxImage image'>
+        <div class='col-lg-3 inboxImage image'>
             
         </div>
     </div>
@@ -60,7 +60,7 @@
                     <td rowspan="{{$package->items()->count()}}" class='package_id col-lg-1' name="{{ $k+1 }}" data-cname="{{ $packageitem->item->c_name}}">{{ $package->id }}</td>
                     <td rowspan="{{$package->items()->count()}}" class='col-lg-2'>{{ $package->order ? $package->order->ordernum : '订单号有误' }}</td>
                     @endif
-                    <td class='sku col-lg-6'>{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
+                    <td class='sku col-lg-6' name="{{ $k+1 }}">{{ $packageitem->item ? $packageitem->item->sku : '' }}</td>
                     <td class='quantity col-lg-1'>{{ $packageitem->quantity}}</td>
                     <td class='picked_quantity col-lg-1'>{{ $packageitem->picked_quantity }}</td>
                     @if($key == '0')
@@ -74,7 +74,7 @@
     </table>
 @stop
 @section('formButton')
-    <button type="submit" class="btn btn-success">拣货完成</button>
+    <button type="submit" class="btn btn-success">分拣完成</button>
 @stop
 <script type='text/javascript'>
 $(document).on('keypress', function (event) {
@@ -112,36 +112,28 @@ $(document).ready(function(){
             $.each($('.sku'), function(){
                 if($(this).text() == val) {
                     row = $(this).parent();
-                    block = row.parent();
                     if(parseInt(row.find('.quantity').text()) > parseInt(row.find('.picked_quantity').text())) {
                         outflag = 1;
                         row.find('.picked_quantity').text(parseInt(row.find('.picked_quantity').text())+1);
-                        img = 0;
                         $.get("{{route('item.getImage')}}",
-                              {sku:block.find('.sku').text()},
+                              {sku:row.find('.sku').text()},
                               function(result){
                                 if(result) {
-                                    $('.result').text(block.find('.package_id').attr('name')+'号');
-                                    $('.result_cname').text(block.find('.package_id').data('cname'));
-                                    $('.result_sku').text(block.find('.sku').text());
                                     $('.image').html("<img class='inboxImage' src="+result+">");
-                                    img = 1;
                                 }
                             });
-                        if(img == 0) {
-                            $('.result').text(block.find('.package_id').attr('name')+'号');
-                            $('.result_cname').text('中文名:' + block.find('.package_id').data('cname'));
-                            $('.result_sku').text('sku:' + block.find('.sku').text());
-                        }
+                        $('.result').text(row.find('.sku').attr('name')+'号');
+                        $('.result_cname').text('中文名:' + row.find('.package_id').data('cname'));
+                        $('.result_sku').html("<div class='row'>"+row.find('.sku').text()+"</div>");
                         if(parseInt(row.find('.quantity').text()) == parseInt(row.find('.picked_quantity').text())) {
                             flag = '1';
-                            $.each(block.find('.picked_quantity'), function(){
+                            $.each(row.find('.picked_quantity'), function(){
                                 if(parseInt($(this).text()) != parseInt($(this).parent().find('.quantity').text())) {
                                     flag = '0';
                                 }
                             });
                             if(flag == '1') {
-                                block.find('.status').text('待包装');
+                                row.find('.status').text('待包装');
                             }
                         }
                     return 2;

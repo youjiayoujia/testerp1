@@ -141,7 +141,6 @@ class SupplierModel extends BaseModel
         //api同步sellmore 旧系统
         if(!empty($create->id)){
             $type_config =  array_flip(config('product.sellmore.pay_type'));
-
             $post['type'] = 'add';
             $post['key']  = 'slme';
 
@@ -153,15 +152,14 @@ class SupplierModel extends BaseModel
             $post['supplierArrivalMinDays'] = $create->purchase_time;
             $post['suppliers_bank']         = $create->bank_account;
             $post['suppliers_card_number']  = $create->bank_code;
-            $post['suppliers_type']         = $type_config[$create->pay_type];
+            $post['pay_method']             = $type_config[$create->pay_type];  //付款方式
             $post['suppliers_name']         = $create->contact_name;
             $post['suppliers_mobile']       = $create->telephone;
             $post['suppliers_wangwang']     = $create->wangwang;
             $post['suppliers_qq']           = $create->qq;
 
-            !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
-            
-            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
+            !empty($data['qualifications']) ? $post['attachment_url'] = request()->server()['HTTP_HOST'].'/'.$path . $data['qualifications'] : '';
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
         }
         return $create;
     }
@@ -173,8 +171,8 @@ class SupplierModel extends BaseModel
      */
     public function updateSupplier($id, $data, $file = null)
     {
+        $path = config('product.product_supplier.file_path');
         if ($data['type'] == 0 && $file != null) { //线下类型
-            $path = config('product.product_supplier.file_path');
                 if ($file->getClientOriginalName()) {
                     $itemInfo = $this->where('id',$id)->first();
                     $originPath = $itemInfo['qualifications']; //原来文件路径
@@ -196,30 +194,28 @@ class SupplierModel extends BaseModel
 
         $res = $this->find($id)->update($data);
 
-
         if($res){//api同步sellmore 旧系统
             $suplier = $this->find($id);
             $type_config =  array_flip(config('product.sellmore.pay_type'));
 
             $post['type'] = 'update';
             $post['key']  = 'slme';
-
             $post['suppliers_id']           = $suplier->id;
             $post['suppliers_company']      = $suplier->company;
             $post['suppliers_website']      = $suplier->official_url;
             $post['suppliers_address']      = $suplier->address;
-            $post['suppliers_type']         = $suplier->type;
             $post['supplierArrivalMinDays'] = $suplier->purchase_time;
             $post['suppliers_bank']         = $suplier->bank_account;
             $post['suppliers_card_number']  = $suplier->bank_code;
-            $post['suppliers_type']         = $type_config[$suplier->pay_type];
+            $post['pay_method']             = $type_config[$suplier->pay_type];
+            $post['suppliers_type']         = $suplier->type;
             $post['suppliers_name']         = $suplier->contact_name;
             $post['suppliers_mobile']       = $suplier->telephone;
             $post['suppliers_wangwang']     = $suplier->wangwang;
             $post['suppliers_qq']           = $suplier->qq;
 
-            !empty($data['qualifications']) ? $post['attachment_url'] = $path . $data['qualifications'] : '';
-            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),json_encode($post));
+            !empty($suplier->qualifications) ? $post['attachment_url'] = request()->server()['HTTP_HOST'].'/'.$path . $suplier->qualifications : '';
+            $result = Tool::postCurlHttpsData(config('product.sellmore.api_url'),$post);
         }
         return $res;
     }

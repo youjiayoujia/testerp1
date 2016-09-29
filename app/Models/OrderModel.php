@@ -613,7 +613,7 @@ class OrderModel extends BaseModel
         $orderCosting = $this->all_item_cost;
         $orderChannelFee = $this->calculateOrderChannelFee();
         $orderRate = ($this->amount - ($orderCosting + $orderChannelFee + $this->logistics_fee)) / $this->amount;
-        if ($this->status != 'CANCLE' && $orderRate <= 0) {
+        if ($this->status != 'CANCEL' && $orderRate <= 0) {
             //利润率为负撤销0
             $this->OrderCancle();
         }
@@ -633,35 +633,13 @@ class OrderModel extends BaseModel
         $sum = 0;
         $orderItems = $this->items;
         $channel = $this->channel;
-        if ($channel->flat_rate == 'channel' && $channel->rate == 'channel') {
-            return ($this->amount + $this->logistics_fee) * $channel->rate_value + $channel->flat_rate_value;
+        foreach ($orderItems as $orderItem) {
+            $buf = $orderItem->item->catalog->channelRates->where('id', $this->channel_id)->first()->pivot;
+            $flat_rate_value = $buf->flat_rate;
+            $rate_value = $buf->rate;
+            $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
         }
-        if ($channel->flat_rate == 'channel' && $channel->rate == 'catalog') {
-            $sum += $channel->flat_rate_value;
-            foreach ($orderItems as $orderItem) {
-                $rate = $orderItem->item->catalog->channelRates->where('id', $this->channel_id)->first()->pivot->rate;
-                $tmp = ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate;
-                $sum += $tmp;
-            }
-            return $sum;
-        }
-        if ($channel->flat_rate == 'catalog' && $channel->rate == 'channel') {
-            $sum = ($this->amount + $this->logistics_fee) * $channel->rate_value;
-            foreach ($orderItems as $orderItem) {
-                $flat_rate_value = $orderItem->item->catalog->channelRates->where('id', $this->channel_id)->first()->pivot->flat_rate;
-                $sum += $flat_rate_value;
-            }
-            return $sum;
-        }
-        if ($channel->flat_rate == 'catalog' && $channel->rate == 'catalog') {
-            foreach ($orderItems as $orderItem) {
-                $buf = $orderItem->item->catalog->channelRates->where('id', $this->channel_id)->first()->pivot;
-                $flat_rate_value = $buf->flat_rate;
-                $rate_value = $buf->rate;
-                $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;
-            }
-            return $sum;
-        }
+        return $sum;
     }
 
     /**
@@ -674,7 +652,7 @@ class OrderModel extends BaseModel
     public function OrderCancle()
     {
         $orderItems = $this->items;
-        $this->update(['status' => 'CANCLE']);
+        $this->update(['status' => 'CANCEL']);
         foreach ($orderItems as $orderItem) {
             $orderItem->update(['is_active' => '0']);
         }
@@ -684,7 +662,7 @@ class OrderModel extends BaseModel
                 $item = $packageItem->item;
                 if(!in_array($package->status, ['NEW', 'WAITASSIGN', 'NEED', 'SHIPPED', 'PACKED'])) {
                     $item->unhold($packageItem->warehouse_position_id, $packageItem->quantity,
-                         'CANCLE');
+                         'CANCEL');
                 }
                 $packageItem->delete();
             }

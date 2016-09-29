@@ -248,9 +248,6 @@ class PackageModel extends BaseModel
             case 'PACKED':
                 $color = 'info';
                 break;
-            case 'CANCLE':
-                $color = 'warning';
-                break;
             case 'SHIPPED':
                 $color = 'success';
                 break;
@@ -776,12 +773,70 @@ class PackageModel extends BaseModel
         })->where(['is_clearance' => $isClearance])
             ->get();
         foreach ($rules as $rule) {
+            if ($rule->catalog_section) {
+                $catalogs = $rule->rule_catalogs_through;
+                foreach($this->items as $item) {
+                    $flag = 0;
+                    foreach ($catalogs as $catalog) {
+                        if ($catalog->id == $item->catalog_id) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue 2;
+                    }
+                } 
+            }
+
+            if ($rule->channel_section) {
+                $channels = $rule->rule_channels_through;
+                $flag = 0;
+                foreach ($channels as $channel) {
+                    if ($channel->id == $this->channel_id) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+
             //是否在物流方式国家中
             if ($rule->country_section) {
                 $countries = $rule->rule_countries_through;
                 $flag = 0;
                 foreach ($countries as $country) {
                     if ($country->code == $this->shipping_country) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+            //是否在物流方式账号中
+            if ($rule->account_section) {
+                $accounts = $rule->rule_accounts_through;
+                $flag = 0;
+                foreach ($accounts as $account) {
+                    if ($account->id == $this->channel_account_id) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+            //是否在物流方式运输方式中
+            if ($rule->transport_section) {
+                $transports = $rule->rule_transports_through;
+                $flag = 0;
+                foreach ($transports as $transport) {
+                    if (!$this->order->shipping || $transport->name == $this->order->shipping) {
                         $flag = 1;
                         break;
                     }
@@ -813,7 +868,7 @@ class PackageModel extends BaseModel
             
             return $rule->logistics->code;
         }
-        return false;
+        return '&nbsp;&nbsp;&nbsp;&nbsp;虚拟匹配未匹配到';
     }
 
     public function assignLogistics()
@@ -843,16 +898,19 @@ class PackageModel extends BaseModel
                 //是否在物流方式产品分类中
                 if ($rule->catalog_section) {
                     $catalogs = $rule->rule_catalogs_through;
-                    $flag = 0;
-                    foreach ($catalogs as $catalog) {
-                        if ($catalog->id == $this->items->item->catalog_id) {
-                            $flag = 1;
-                            break;
+                    foreach($this->items as $item) {
+                        $flag = 0;
+                        foreach ($catalogs as $catalog) {
+                            if ($catalog->id == $item->catalog_id) {
+                                $flag = 1;
+                                break;
+                            }
+                        }
+                        if ($flag == 0) {
+                            continue 2;
                         }
                     }
-                    if ($flag == 0) {
-                        continue;
-                    }
+                    
                 }
                 //是否在物流方式渠道中
                 if ($rule->channel_section) {

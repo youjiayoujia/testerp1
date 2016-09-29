@@ -438,7 +438,6 @@ class RefundCenterController extends Controller
                     $refund->PakcageWeight,
                 ];
             }
-            dd($data);
             Excel::create('refund'.date('Y-m-d'), function($excel) use ($data){
                 $excel->sheet('', function($sheet) use ($data){
                     $sheet->fromArray($data);

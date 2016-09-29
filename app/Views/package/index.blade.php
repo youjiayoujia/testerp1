@@ -20,7 +20,7 @@
         <tr class="dark-{{ $package->status_color }}">
             <td>
                 <input type='checkbox' name='single[]' class='single'>
-                @if($package->order->packages->count() > 1)
+                @if(($package->order ? $package->order->packages->count() : 0) > 1)
                     <span class='glyphicon glyphicon-adjust'></span>
                 @endif
             </td>

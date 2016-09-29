@@ -15,6 +15,7 @@ use App\Models\WarehouseModel;
 use App\Models\CountriesModel;
 use App\Models\UserModel;
 use App\Models\PaypalsModel;
+use App\Models\Channel\CatalogRatesModel;
 
 class AccountController extends Controller
 {
@@ -45,7 +46,8 @@ class AccountController extends Controller
             'channels' => ChannelModel::all(),
             'warehouses' => WarehouseModel::all(),
             'users' => UserModel::orderBy('name', 'asc')->get(['id', 'name']),
-            'countries' => CountriesModel::orderBy('code', 'asc')->get(['id', 'name'])
+            'countries' => CountriesModel::orderBy('code', 'asc')->get(['id', 'name']),
+            'catalog_rates_channels' =>CatalogRatesModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -62,7 +64,9 @@ class AccountController extends Controller
             'channels' => ChannelModel::all(),
             'warehouses' => WarehouseModel::all(),
             'users' => UserModel::orderBy('name', 'asc')->get(['id', 'name']),
-            'countries' => CountriesModel::orderBy('code', 'asc')->get(['id', 'name'])
+            'countries' => CountriesModel::orderBy('code', 'asc')->get(['id', 'name']),
+            'catalog_rates_channels' =>CatalogRatesModel::all(),
+
         ];
         return view($this->viewPath . 'edit', $response);
     }

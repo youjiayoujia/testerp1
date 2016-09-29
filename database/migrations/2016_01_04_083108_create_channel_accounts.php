@@ -75,6 +75,8 @@ class CreateChannelAccounts extends Migration
             $table->string('cd_pw')->nullable();
             $table->string('cd_sales_account')->nullable();
             $table->integer('cd_expires_in')->nullable();
+            //渠道地域id 例如：亚马逊美国
+            $table->integer('catalog_rates_channel_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

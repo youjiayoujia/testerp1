@@ -46,9 +46,9 @@
                 @if($order->status == 'PACKED')
                     <div>{{ $order->calculateProfitProcess() }}</div>
                     <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                    <div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>
-                    <div>平台费: {{ $order->calculateOrderChannelFee() }} USD</div>
-                    <div>毛利润: {{ $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee() }} USD</div>
+                    <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
+                    <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                    <div>毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }} USD</div>
                 @else
                 @endif
             </td>

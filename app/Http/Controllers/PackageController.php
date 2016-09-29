@@ -312,9 +312,9 @@ class PackageController extends Controller
                             $errors[$key]['remark'] = '仓库对应库位有问题';
                             continue;
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
                     }
-                    $model->update(['status' => 'CANCLE']);
+                    $model->delete();
                 }
                 if(count($errors)) {
                     throw new Exception('导入数据有问题');
@@ -340,7 +340,7 @@ class PackageController extends Controller
                             $errors[$key]['remark'] = '仓库对应库位有问题'; 
                             continue;
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
                     }
                     if(request('trackingNo') == 'on') {
                         $model->update(['tracking_no' => '']);
@@ -756,7 +756,7 @@ class PackageController extends Controller
         foreach ($model->items as $packageItem) {
             $stockout = $packageItem->stockout;
             $stock = StockModel::find($stockout->stock_id);
-            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
+            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCEL');
             $packageItem->delete();
             $stockout->delete();
         }
@@ -881,7 +881,7 @@ class PackageController extends Controller
         foreach ($items as $item) {
             $item->picked_quantity = 0;
             $item->save();
-            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost, 'CANCLE', $item->id);
+            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost, 'CANCEL', $item->id);
             $item->item->hold($item->warehouse_position_id, $item->quantity);
         }
         return json_encode(true);

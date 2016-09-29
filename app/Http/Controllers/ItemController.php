@@ -406,16 +406,16 @@ class ItemController extends Controller
         $data = request()->all();
         $positionModel = PositionModel::where('name',$data['products_location'])->get()->first();
         if(!$positionModel){
-            echo json_encode('库位不存在');exit;
+            echo json_encode(['msg'=>'库位不存在']);exit;
         }
         $itemModel = $this->model->where('sku',$data['products_sku'])->get()->first();
         if(!$itemModel){
-            echo json_encode('sku不存在');exit;
+            echo json_encode(['msg'=>'sku不存在']);exit;
         }
         $warehouse_position_id = $positionModel->id;
         $warehouse_id = $data['product_warehouse_id']==1000?1:2;
         $result = $itemModel->update(['warehouse_id'=>$warehouse_id,'warehouse_position'=>$warehouse_position_id]);
-        echo json_encode('修改库位成功');exit;
+        echo json_encode(['msg'=>'修改库位成功']);exit;
     }
 
 }

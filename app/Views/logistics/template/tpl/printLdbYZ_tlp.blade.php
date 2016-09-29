@@ -294,7 +294,7 @@
                 </tr>
                 <tr style="height:30px;">
                     <td style="text-align: center;padding-top:2px;">
-                        {{ $model->items ? $model->items->first()->quantity : '' . '*' . $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}
+                        {{ $model->items ? $model->items->first()->quantity : '' . '*' . $model->declared_en }}
                     </td>
                     <td style="text-align: center;">
                         {{ $model->signal_weight }}

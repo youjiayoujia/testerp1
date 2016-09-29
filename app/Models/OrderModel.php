@@ -452,7 +452,7 @@ class OrderModel extends BaseModel
         if ($blacklist->count() > 0) {
             $this->update(['blacklist' => '0']);
             foreach ($blacklist->get() as $value) {
-                if ($value['type'] == 'CONFIRMED') {
+                if ($value->type == 'CONFIRMED') {
                     return true;
                 }
             }

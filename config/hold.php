@@ -4,5 +4,5 @@
         'ADJUSTMENT' => '调整hold',
         'PACKAGE' => '包裹hold',
         'FBA' => 'FBA调拨',
-        'CANCLE' => '包裹取消unhold'
+        'CANCEL' => '包裹取消unhold'
     ];

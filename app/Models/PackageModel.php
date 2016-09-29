@@ -340,7 +340,7 @@ class PackageModel extends BaseModel
     public function getStatusNameAttribute()
     {
         $arr = config('package');
-        return !empty($arr[$this->status]) ? $arr[$this->status] : '';
+        return isset($arr[$this->status]) ? $arr[$this->status] : '';
     }
 
     public function processGoods($file)

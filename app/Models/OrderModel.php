@@ -674,7 +674,7 @@ class OrderModel extends BaseModel
     public function OrderCancle()
     {
         $orderItems = $this->items;
-        $this->update(['status' => 'CANCLE']);
+        $this->update(['status' => 'CANCEL']);
         foreach ($orderItems as $orderItem) {
             $orderItem->update(['is_active' => '0']);
         }
@@ -684,7 +684,7 @@ class OrderModel extends BaseModel
                 $item = $packageItem->item;
                 if(!in_array($package->status, ['NEW', 'WAITASSIGN', 'NEED', 'SHIPPED', 'PACKED'])) {
                     $item->unhold($packageItem->warehouse_position_id, $packageItem->quantity,
-                         'CANCLE');
+                         'CANCEL');
                 }
                 $packageItem->delete();
             }

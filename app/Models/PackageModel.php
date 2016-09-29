@@ -248,9 +248,6 @@ class PackageModel extends BaseModel
             case 'PACKED':
                 $color = 'info';
                 break;
-            case 'CANCLE':
-                $color = 'warning';
-                break;
             case 'SHIPPED':
                 $color = 'success';
                 break;

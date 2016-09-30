@@ -52,7 +52,7 @@
                 PRIORITY</p>
 
             <p style="width:50px;float:right;font-size:22px;font-weight:bold;margin-left:7px;">
-                <img src="'.site_url('attachments').'/images/hl-logo.jpg" style="width:50px; "></p>
+                <img src="{{ asset('picture/hl-logo.jpg') }}" style="width:50px; "></p>
 
             <p style="clear:both;padding-top:5px;font-size:9px;text-align:center;">Return if
                 undeliverable:H-10905,Postbus 7040,3109 AA Schiedam The Netherlands</p>
@@ -63,25 +63,21 @@
             </div>
             <div style="height:80px;width:335px;float:right;text-align:center;">
                 <p style="margin-top:3px;">
-                    <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=30&r=1&text='{{$model->tracking_no}}'&f1=-1&f2=8&a1=&a2=B&a3="/>
+                    <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                 </p>
-
                 <p style="font-size:18px;margin-top:5px;">{{ $model->tracking_no }}</p>
-
             </div>
         </div>
         <div style="width:95mm;word-break:break-all;word-wrap:break-word;margin-top:2px;">
             <p style="font-size:16px;">{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<p>
-
             <p style="font-size:16px;line-height:17px;">
-                {{ $model->shipping_address}} <br/>{{ $model->shipping_address1 }}<br/>
-                {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>{{ $model->shipping_zipcode }}<br/>
+                {{ $model->shipping_address}}<br/>{{ $model->shipping_address1 }}<br/>
+                {{ $model->shipping_city . ' ' . $model->shipping_state }}<br/>
+                {{ $model->shipping_zipcode }}<br/>
                 Tel:{{ $model->shipping_phone }}<br/>{{ $model->shipping_country }}
                 <br/>{{ $model->country ? $model->country->cn_name : ''}}
             </p>
-
             <p style="text-align:right;font-weight:bold;font-size:25px;margin-right:10px;margin-bottom:10px;">{{ $model->shipping_country }}</p>
-
             <p style="float:left;width:100px;text-align:center;font-weight:bold;font-size:25px;">
                 @foreach(['Austria','Belgium','Bulgaria','Cyprus','Croatia','CzechRepublic','Denmark','Estonia','Finland','France','Germany','Greece','Hungary','Ireland','Italy','Latvia','Lithuania','Luxembourg','Malta','Poland','Portugal','Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom','Netherlands'] as $key => $country)
                     @if(strtolower($country) == strtolower($model->country->name))
@@ -89,7 +85,6 @@
                     @endif
                 @endforeach
                 &nbsp;&nbsp;D</p>
-
             <p style="text-align:left;font-size:15px;">OrderNo:{{ $model->order ? $model->order->ordernum : '' }}</p>
         </div>
     </div>

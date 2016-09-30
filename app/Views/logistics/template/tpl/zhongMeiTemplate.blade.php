@@ -24,7 +24,8 @@
            </tr>
            <tr height="60">
             <td colspan="2" style="font-weight:bold;text-align:center;">
-             <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3=" /><br/>
+                <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
+                <br/>
               <span style="font-weight:bold;font-size:12px;">{{$model->tracking_no}}</span>
             </td>
            </tr>
@@ -55,8 +56,9 @@
            </tr>
            <tr height="60">
             <td colspan="2" style="font-weight:bold;text-align:center;">
-              <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text=SLM{{ $model->tracking_no}}&f1=-1&f2=8&a1=&a2=B&a3=" /><br/>
-              <span style="font-weight:bold;font-size:12px;">SLM{{ $model->order ? $model->order->ordernum : ''}}</span>
+                <img src="{{ route('barcodeGen', ['content' => $model->order_id]) }}">
+                <br/>
+              <span style="font-weight:bold;font-size:12px;">SLM{{ $model->order_id }}</span>
             </td>
            </tr>
            <tr height="10">
@@ -68,7 +70,7 @@
             <td colspan="2" style="font-weight:bold;">
               @foreach($model->items as $key => $packageItem)
                 @if($key != 0)
-                ,{{$packageItem->item->sku}}*{{$packageItem->quantity}}【{{$packageItem->warehousePosition->name}}】
+                {{$packageItem->item->sku}}*{{$packageItem->quantity}}【{{$packageItem->warehousePosition->name}}】
                 @else
                 {{$packageItem->item->sku}}*{{$packageItem->quantity}}【{{$packageItem->warehousePosition->name}}】
                 @endif
@@ -77,6 +79,5 @@
            </tr>
         </table>
        </div>
-    ';
     </body>
 </html>

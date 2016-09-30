@@ -32,13 +32,13 @@
                             <td width="40%" align="center">
                                 <table width="92%" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
-                                        <td align="center" ><img src="'.site_url('attachments').'/images/EUB01.jpg" width="110" height="20" style="margin-top:5px;"/></td>
+                                        <td align="center" ><img src="{{ asset('picture/EUB01.jpg') }}" width="110" height="20" style="margin-top:5px;"/></td>
                                     </tr>
                                     <tr>
                                         <td align="center"></td>
                                     </tr>
                                     <tr>
-                                        <td align="center" ><img src="'.site_url('attachments').'/images/EUB02.jpg" width="160" height="45" /></td>
+                                        <td align="center" ><img src="{{ asset('picture/EUB02.jpg') }}" width="160" height="45" /></td>
                                     </tr>
                                 </table>
                             </td>
@@ -87,7 +87,11 @@
             <tr>
               <td align="left"><table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td align="left"><div style="margin-top:3px; margin-right:5px; "> <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text=420{{ explode('-', $model->shipping_zipcode)[0] }}&f1=-1&f2=8&a1=&a2=B&a3='.'" /> </div></td>
+                  <td align="left">
+                      <div style="margin-top:3px; margin-right:5px; ">
+                          <img src="{{ route('barcodeGen', ['content' => explode('-', $model->shipping_zipcode)[0]]) }}">
+                      </div>
+                  </td>
                 </tr>
                 <tr>
                   <td align="center" valign="bottom"><div style="font-size:14px; margin-top:0px;"><strong>ZIP {{ explode('-', $model->shipping_zipcode)[0] }}</strong></div></td>
@@ -127,7 +131,7 @@
             <tr>
               <td align="center">
                   <div >
-                      <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=20&r=2&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3=" />
+                      <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}">
                       <span style="font-size:12px;margin-top:5px;">
                           <br>
                           <strong>
@@ -151,7 +155,7 @@
           <tr>
             <td width="35%" valign="top"><table width="100%" height="75" border="0" cellpadding="0" cellspacing="0" style="">
               <tr>
-                <td colspan="2" valign="top"><img src="'.site_url('attachments').'/images/EUB01.jpg" alt="" width="110" height="20" /></td>
+                <td colspan="2" valign="top"><img src="{{ asset('picture/EUB01.jpg') }}" alt="" width="110" height="20" /></td>
               </tr>
               <tr>
                 <td width="51%" height="40" valign="bottom"><div style="font-family:Arial; font-size:8px; line-height:11px;">IMPORTANT:<br/>
@@ -168,7 +172,7 @@
             </table></td>
             <td width="65%"><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
-                <td align="left" valign="top"><div style=" margin-top:5px;text-align:center;"><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=40&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3=" alt="" /></div></td>
+                <td align="left" valign="top"><div style=" margin-top:5px;text-align:center;"><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}"></div></td>
               </tr>
               <tr>
                 <td align="center" valign="top"><div style="font-size:12px"><strong>{{ $model->tracking_no }}</strong></div></td>
@@ -261,7 +265,7 @@
                     legislation or by postal or customs regulations. I have met all applicable export filing requirements under the Foreign Trade Regulations. </div>
                     <div style="font-family:Arial; font-size:8px;">
                      <strong>Sender\'s Signature &amp; Date Signed:</strong>
-                     <strong style="font-family:Arial; font-size:12px; text-align:right; margin-left:70px;">【{{ $model->logistics ? $model->logistics->code : ''}}】</strong>
+                     <strong style="font-family:Arial; font-size:12px; text-align:right; margin-left:70px;">【{{ $model->logistics_id }}】</strong>
                      <strong style="font-family:Arial; font-size:12px; text-align:right; margin-left:90px;">CN22</strong>
                      </div>
                     </td>

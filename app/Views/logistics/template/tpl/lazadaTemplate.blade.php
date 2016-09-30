@@ -80,7 +80,7 @@
                     <span style="width:100px;display:inline-block;font-weight:bold;">Seller Sku</span>
                     <span style="width:90px;display:inline-block;font-weight:bold;">Shop Sku</span>
                     <span style="width:15px;display:inline-block;font-weight:bold;">1</span>
-                    <span style="width:140px;display:inline-block;font-weight:bold;">{{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->name : '') : '' }}</span>
+                    <span style="width:140px;display:inline-block;font-weight:bold;">{{ $model->declared_en }}</span>
                     <span style="width:100px;display:inline-block;font-weight:bold;">{{ $model->items ? ($model->items->first()->item ? $model->items->first()->item->sku : '') : '' }}</span>
                     <span style="width:90px;display:inline-block;font-weight:bold;"></span>
                 </div>

@@ -263,7 +263,7 @@ class CatalogController extends Controller
             ]
         ];
 
-        $channels = ChannelModel::all();
+        $channels = CatalogRatesModel::all();
         foreach ($channels as $channel){
             $rows[0][$channel->name] = '20,40';
         }

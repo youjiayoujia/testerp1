@@ -55,25 +55,24 @@ class getSellmoreSuppliers extends Command
                     if(!empty(SupplierModel::find($value->suppliers_id))){
                         continue;
                     }
-
-
                     $pay_type = $value->pay_method;
                     if(!empty($value->attachment_url)){
                         $img_src      = 'http://erp.moonarstore.com'.substr($value->attachment_url,1);
                         $content      = file_get_contents($img_src);
                         $suffix       = strstr(substr($value->attachment_url,1),'.');
-                        $uploads_file = '/product/supplier/'.Tool::randString(16,false).$suffix;
+                        $filename     = Tool::randString(16,false);
+                        $uploads_file = '/supplier/'.$filename.$suffix;
 
                         Storage::put($uploads_file,$content);
-                        $qualifications = Tool::randString(16,false).$suffix;
+                        $qualifications = $filename.$suffix;
                     }else{
                         $qualifications = '';
                     }
                     $insert = [
+                        'id'              => $value->suppliers_id,
                         'company'         => $value->suppliers_company,
                         'address'         => $value->suppliers_address,
                         'contact_name'    => $value->suppliers_name,
-                        //'contact_name' => $value->suppliers_phone,
                         'telephone'       => $value->suppliers_mobile,
                         'official_url'    => $value->suppliers_website,
                         'qq'              => $value->suppliers_qq,
@@ -89,10 +88,6 @@ class getSellmoreSuppliers extends Command
 
                     if(!empty($insert)){
 
-/*                        if(!empty(SupplierModel::find(10001))){
-                            $this->comment('data already inserted');
-                        }*/
-                        
                         SupplierModel::create($insert);
                         $this->info($value->suppliers_id.' insert success');
                         $count += 1;

@@ -27,17 +27,18 @@
                     <p style="margin-top:15px;">Deliver To:</p>
                     <p>
                         {{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}<br/>
-                        {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>{{ $model->shipping_city }}<br/>
-                        {{ $model->shipping_state . ' ' . $model->shipping_zipcode . ' ' . $model->shipping_country }}<br/>
+                        {{ $model->shipping_address . ' ' . $model->shipping_address1 }}<br/>
+                        {{ $model->shipping_city }}<br/>
+                        {{ $model->shipping_state . ' ' . $model->shipping_zipcode . ',' }}{{ $model->country ? $model->country->name : '' }}<br/>
                         {{ $model->shipping_phone }}
                     </p>
                     <p style="margin-top:5px;">
-                        pagenumber
+                        {{ $model->lazada_package_id }}
                     </p>
                 </td>
                 <td valign="top" >
                     <p style="text-align:right;width:47mm;">
-                        <img src="'.site_url('attachments').'/images/lazada.png" style="width:180px;"/>
+                        <img src="{{ asset('picture/lazada.png') }}" style="width:180px;"/>
                     </p>
                     <p style="text-align:center;width:143px;border:3px solid black;margin-top:10px;margin-left:22px;font-weight: bold;padding:2px;font-size: 16px;">
                         Registered Mail
@@ -49,15 +50,15 @@
             </tr>
             <tr>
                 <td colspan="2" style="height:25mm;">
-                    <div style="width:14mm;height:20mm;font-size: 20px;font-weight: bold;float:left;line-height: 90px;margin-top: 10px;" >RX
-                        
+                    <div style="width:14mm;height:20mm;font-size: 20px;font-weight: bold;float:left;line-height: 90px;margin-top: 10px;" >
+                        RX
                     </div>
                     <div style="width:82mm;height:20mm;float:right;text-align:center;margin-top: 10px;">
                         <p>{{$model->tracking_no}}</p>
-                        <p><img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code39&o=2&t=40&r=1&text={{ $model->tracking_no }}&f1=-1&f2=8&a1=&a2=B&a3=" /></p>
+                        <p><img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}"></p>
                         <p>{{ $model->tracking_no }}</p>
                     </div>
-                    <div>{{ $model->order ? $model->order->ordernum : '' }}</div>
+                    <div>{{ $model->order_id }}</div>
                 </td>
             </tr>
         </table>

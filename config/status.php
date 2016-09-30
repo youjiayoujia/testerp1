@@ -7,7 +7,7 @@
  */
 return [
     'ajax'=>[
-        'fail'=> -1,
+        'fail'    => -1,
         'success' => 1,
     ],
     

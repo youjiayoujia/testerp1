@@ -96,6 +96,11 @@ return [
                 'icon' => '',
             ],
             [
+                'name' => '未付款订单',
+                'url' => 'unpaidOrder.index',
+                'icon' => '',
+            ],
+            [
                 'name' => '黑名单',
                 'url' => 'orderBlacklist.index',
                 'icon' => '',
@@ -366,17 +371,15 @@ return [
                     'icon' => '',
                 ],
                 [
+                    'name' => '地域渠道名',
+                    'url'  => 'CatalogRatesChannel.index',
+                    'icon' => ''
+                ],
+                [
                     'name' => '账号',
                     'url' => 'channelAccount.index',
                     'icon' => '',
                 ],
-            ],
-            '其他' =>[
-                [
-                    'name' => '产品分类渠道',
-                    'url'  => 'CatalogRatesChannel.index',
-                    'icon' => ''
-                ]
             ],
         ],
     ],

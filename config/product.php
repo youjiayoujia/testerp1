@@ -51,7 +51,7 @@ return [
 		            ],
 		'examine_status'=>['待审核','待复审','审核通过','审核不通过'],
         'type'=>['线下','线上','做货'],
-		'file_path' => 'uploads/product/supplier/', //审核文件路径
+		'file_path' => 'uploads/supplier/', //审核文件路径
 	],
 
 	'supplier_examine_status' =>[
@@ -68,7 +68,12 @@ return [
 			'currentData'   => '已通过',
 			'unPassed'      => '不通过',
 
-		]
+		],
+		'level' => [
+			1 => '普通',
+			2 => '优良',
+			3 => '黑名单',
+		],
 	],
 
 	'sellmore' => [
@@ -77,7 +82,8 @@ return [
 			2 => 'BANK_PAY',
 			3 => 'CASH_PAY',
 			4 => 'OTHER_PAY',
-		]
+		],
+		'api_url' => 'http://120.24.100.157:60/api/api_suppliers.php',
 	],
 
 

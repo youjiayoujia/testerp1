@@ -91,6 +91,8 @@ class GetMessages extends Command
                             $messageNew->required  = 1;
                             $messageNew->read  = 0;
 
+                            !empty($message['channel_order_number']) ? $messageNew->channel_order_number=$message['channel_order_number'] : '';
+
                             $messageNew->save();
                             $this->info('Message #' . $messageNew->message_id . ' Received.');
 

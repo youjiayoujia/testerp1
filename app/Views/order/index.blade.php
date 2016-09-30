@@ -43,12 +43,12 @@
             <td>{{ $order->currency . ' ' . $order->amount }}</td>
             <td><strong class="text-danger">{{ $order->currency . ' ' . $order->amount_shipping }}</strong></td>
             <td>
-                @if($order->status == 'PACKED')
+                @if($order->status == 'PACKED' || $order->status == 'SHIPPED' || $order->status == 'COMPLETE')
                     <div>{{ $order->calculateProfitProcess() }}</div>
                     <div>产品成本: {{ $order->all_item_cost }} RMB</div>
-                    <div>运费成本: {{ $order->packages->sum('cost') }} RMB</div>
-                    <div>平台费: {{ $order->calculateOrderChannelFee() }} USD</div>
-                    <div>毛利润: {{ $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee() }} USD</div>
+                    <div>运费成本: {{ sprintf("%.3f", $order->packages->sum('cost')) }} RMB</div>
+                    <div>平台费: {{ sprintf("%.2f", $order->calculateOrderChannelFee()) }} USD</div>
+                    <div>毛利润: {{ sprintf("%.2f", $order->amount * $order->rate - ($order->all_item_cost + $order->packages->sum('cost')) * $rmbRate - $order->calculateOrderChannelFee()) }} USD</div>
                 @else
                 @endif
             </td>
@@ -89,6 +89,12 @@
                             {{ $remark->remark }}
                         </div>
                     @endforeach
+                @endif
+                @if($order->unpaidOrder)
+                    <div class="divider"></div>
+                    <div class="text-danger">
+                        {{ '未付款: ' . $order->unpaidOrder->note }}
+                    </div>
                 @endif
                 @if(count($order->refunds) > 0)
                     @foreach($order->refunds as $refund)
@@ -578,7 +584,7 @@
                                         <strong>追踪号</strong> : <a href="http://{{ $package->tracking_link }}">{{ $package->tracking_no }}</a>
                                     </div>
                                     <div class="col-lg-3">
-                                        <strong>包裹状态</strong> : {{ $package->status }}
+                                        <strong>包裹状态</strong> : {{ $package->status_name }}
                                     </div>
                                     <div class="col-lg-3">
                                         <strong>打印面单时间</strong> : {{ $package->printed_at }}

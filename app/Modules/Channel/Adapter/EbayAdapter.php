@@ -1226,11 +1226,12 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['attachment'] = ''; //附件
                     $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID, //应该是订单号
+                        'ItemID'            => (string)$message->ItemID, //应该是订单号
                         'ExternalMessageID' => (string)$message->ExternalMessageID,
                         'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+                    $message_lists[$order]['channel_order_number'] = (string)$message->ItemID;
                     $order += 1;
                 }
             }

@@ -41,7 +41,8 @@
     <th>客服人员</th>
     <th>客服邮箱地址</th>
     <th>状态</th>
-    <th class="sort" data-field="created_at">创建时间</th>
+    <th>状态</th>
+    <th>地域渠道名</th>
     <th class="sort" data-field="updated_at">更新时间</th>
     <th>操作</th>
 @stop
@@ -61,6 +62,7 @@
             <td>{{ $account->customer_service ? $account->customer_service->name : '无' }}</td>
             <td>{{ $account->service_email }}</td>
             <td>{{ $account->is_available?'启用':'停用' }}</td>
+            <td>{{ $account->catalogChannelName }}</td>
             <td>{{ $account->created_at }}</td>
             <td>{{ $account->updated_at }}</td>
             <td>

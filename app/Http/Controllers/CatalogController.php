@@ -13,6 +13,7 @@ use App\Models\ChannelModel;
 use App\Models\Catalog\CatalogChannelsModel;
 use App\Models\Channel\CatalogRatesModel;
 use App\Models\Catalog\RatesChannelsModel;
+use App\Models\Product\CatalogCategoryModel;
 use Excel;
 
 class CatalogController extends Controller
@@ -34,8 +35,9 @@ class CatalogController extends Controller
     {
         $CatalogRatesModel = CatalogRatesModel::all();
         $response = [
-            'metas' => $this->metas(__FUNCTION__),
+            'metas'             => $this->metas(__FUNCTION__),
             'CatalogRatesModel' => $CatalogRatesModel,
+            'catalogCategory'   => CatalogCategoryModel::all(),
         ];
         return view($this->viewPath . 'create', $response);
     }
@@ -240,6 +242,7 @@ class CatalogController extends Controller
             'metas' => $this->metas(__FUNCTION__),
             'model' => $model,
             'channels_all' => $channels_all,
+            'catalogCategory'   => CatalogCategoryModel::all(),
         ];
         return view($this->viewPath . 'edit', $response);
     }

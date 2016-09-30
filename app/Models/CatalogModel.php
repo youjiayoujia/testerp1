@@ -15,7 +15,7 @@ class CatalogModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['id', 'name','c_name','code'];
+    protected $fillable = ['id', 'name','c_name','code','catalog_category_id'];
 
     public $searchFields = ['id'=>'ID','c_name'=>'名称'];
 
@@ -60,6 +60,14 @@ class CatalogModel extends BaseModel
     public function channels()
     {
         return $this->belongsToMany('App\Models\Channel\CatalogRatesModel','catalog_rates_channels_catalogs','catalog_id','channel_id')->withPivot('rate', 'flat_rate')->withTimestamps();
+    }
+
+    public function catalogCategory(){
+        return $this->belongsTo('App\Models\product\CatalogCategoryModel','catalog_category_id','id');
+    }
+
+    public function getCatalogCategoryNameAttribute(){
+        return !empty($this->catalogCategory) ? $this->catalogCategory->cn_name : '';
     }
 
     public function createCatalog($data,$extra=[])

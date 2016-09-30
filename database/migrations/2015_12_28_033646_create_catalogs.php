@@ -17,6 +17,7 @@ class CreateCatalogs extends Migration
             $table->string('name')->comment('分类名中文')->nullable()->default(NULL);
             $table->string('c_name')->comment('分类名英文')->nullable()->default(NULL);
             $table->string('code')->comment('前缀')->nullable()->default(NULL);
+            $table->integer('catalog_category_id')->comment('一级分类ID')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

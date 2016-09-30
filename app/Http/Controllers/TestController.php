@@ -70,14 +70,13 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = PackageModel::find(127);
-        var_dump($package);exit;
+        $package = PackageModel::find(1);
         $response = [
             'metas' => $this->metas(__FUNCTION__),
             'model' => $package,
         ];
 
-        return view('logistics.template.tpl.zhongMeiTemplate', $response);
+        return view('logistics.template.tpl.printJHPingYouTemplate', $response);
     }
 
     public function test3()

@@ -254,8 +254,10 @@ class CatalogController extends Controller
     public function catalogCsvFormat(){
         $rows = [
             [
-                '中文分类名称'=>'鞋子',
-                '分类英文名称' => 'shoes',
+                '一级分类中文名'=>'玩具及爱好(实例：不用删除)',
+                '一级分类英文'=>'toy and hobby',
+                '二级中文分类名称'=>'鞋子',
+                '二级分类英文名称' => 'shoes',
                 '前缀'=>'XL',
                 'Set属性'=>'name1:value1,value2;name2:value1,value2',
                 'variation属性'=>'name1:value1,value2;name2:value1,value2',

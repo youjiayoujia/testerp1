@@ -634,7 +634,7 @@ class OrderModel extends BaseModel
         $orderItems = $this->items;
         $channel = $this->channel;
         foreach ($orderItems as $orderItem) {
-            $buf = $orderItem->item->catalog->channels->where('id', $this->channel_id)->first()->pivot;
+            $buf = $orderItem->item->catalog->channels->where('id', $this->channelAccount->catalog_rates_channel_id)->first()->pivot;
             $flat_rate_value = $buf->flat_rate;
             $rate_value = $buf->rate;
             $sum += ($orderItem->price * $orderItem->quantity + ($orderItem->quantity / $this->order_quantity) * $this->logistics_fee) * $rate_value + $flat_rate_value;

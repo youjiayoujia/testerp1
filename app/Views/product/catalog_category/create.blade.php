@@ -1,5 +1,5 @@
 @extends('common.form')
-@section('formAction') {{ route('CatalogCategory.store') }} @stop
+@section('formAction') {{ route(request()->segment(1).'.store') }} @stop
 @section('formAttributes') enctype="multipart/form-data" @stop
 @section('formBody')
     <div class='row'>
@@ -14,8 +14,6 @@
             <input class="form-control" placeholder="品类分类英文名" name='en_name' value="{{ old('purchase_day') }}">
         </div>
     </div>
-
-
 @stop
 
 @section('pageJs')

@@ -9,17 +9,34 @@
 
 @stop{{-- 工具按钮 --}}
 @section('tableHeader')
-    <th><input type="checkbox" isCheck="true" id="checkall" onclick="quanxuan()"> 全选</th>
-    <th>ID</th>
-    <th class="sort" data-field="model">MODEL</th>
-    <th>图片</th>
-    <th>产品名称</th>
-    <th>英文名</th>
-    <th>供应商</th>
-    <th class="sort" data-field="created_at">创建时间</th>
+    <th class="sort">ID</th>
+    <th>中文名称</th>
+    <th>英文名称</th>
+    <th>创建时间</th>
     <th>操作</th>
 @stop
 @section('tableBody')
+    @foreach($data as $item)
+        <tr>
+            <td>{{$item->id}}</td>
+            <td>{{$item->cn_name}}</td>
+            <td>{{$item->en_name}}</td>
+            <td>{{$item->created_at}}</td>
+            <td>
+                <a href="{{ route(request()->segment(1).'.show', ['id'=>$item->id]) }}" class="btn btn-info btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 查看
+                </a>
+                <a href="{{ route(request()->segment(1).'.edit', ['id'=>$item->id]) }}" class="btn btn-warning btn-xs">
+                    <span class="glyphicon glyphicon-pencil"></span> 编辑
+                </a>
+                <a href="javascript:" class="btn btn-danger btn-xs delete_item"
+                   data-id="{{ $item->id }}"
+                   data-url="{{ route(request()->segment(1).'.destroy', ['id' => $item->id]) }}">
+                    <span class="glyphicon glyphicon-trash"></span> 删除
+                </a>
+            </td>
+        </tr>
+    @endforeach
 
 @stop
 @section('childJs')

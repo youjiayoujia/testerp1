@@ -14,7 +14,7 @@ class CatalogCategoryController extends Controller
     public function __construct(CatalogCategoryModel $model)
     {
         $this->model = $model;
-        $this->mainIndex = route('paypal.index');
+        $this->mainIndex = route('CatalogCategory.index');
         $this->mainTitle = '品类分类';
         $this->viewPath = 'product.catalog_category.';
     }
@@ -40,10 +40,10 @@ class CatalogCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+/*    public function show($id)
     {
         //
-    }
+    }*/
 
     /**
      * Show the form for editing the specified resource.
@@ -51,10 +51,10 @@ class CatalogCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+/*    public function edit($id)
     {
         //
-    }
+    }*/
 
     /**
      * Update the specified resource in storage.
@@ -63,19 +63,9 @@ class CatalogCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update($id)
+/*    public function update($id)
     {
         //
-    }
+    }*/
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

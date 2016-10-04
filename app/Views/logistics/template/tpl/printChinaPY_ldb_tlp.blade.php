@@ -101,12 +101,12 @@
 			<tr style="height:5mm;line-height:11px;font-size:12px;">
 				<td colspan="2">{{ $model->decleared_ename }}({{ $model->decleared_cname  }})</td>
 				<td>{{ $model->signal_weight }}</td>
-				<td>{{ $model->signal_price }}</td>
+				<td>{{ sprintf("%.2f",$model->signal_price) }}</td>
 			</tr>
 			<tr style="height:5mm;line-height:11px;font-size:12px;">
 				<td colspan="2">Total Gross Weight(KG)</td>
 				<td>{{ $model->total_weight }}</td>
-				<td>{{ $model->total_price }}</td>
+				<td>{{ sprintf("%.2f",$model->total_price) }}</td>
 			</tr>
 			<tr style="height:10mm;line-height:11px;font-size:12px;">
 				<td colspan="4" style="text-align:left;">

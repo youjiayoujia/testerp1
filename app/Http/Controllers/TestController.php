@@ -76,7 +76,7 @@ class TestController extends Controller
             'model' => $package,
         ];
 
-        return view('logistics.template.tpl.printJHPingYouTemplate', $response);
+        return view('logistics.template.tpl.printChinaPY_ldb_tlp', $response);
     }
 
     public function test3()

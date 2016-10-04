@@ -40,4 +40,8 @@ class CountriesModel extends BaseModel
     public function shsHkZone(){
         return $this->belongsTo('App\Models\Logistics\Zone\SHSHKZoneModel', 'cn_name', 'country_cn');
     }
+    
+    public function geKou(){
+        return $this->belongsTo('App\Models\Logistics\Zone\GeKouModel', 'cn_name', 'country');
+    }
 }

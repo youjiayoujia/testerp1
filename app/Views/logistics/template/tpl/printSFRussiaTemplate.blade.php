@@ -195,7 +195,7 @@
                 			{{ $model->total_weight }}
                 			</td>
                 			<td class="border_r_b" valign="top">
-                			{{ $model->total_price }}
+                			{{ sprintf("%.2f",$model->total_price) }}
                 			</td>
                 		</tr>
                 		<tr style="line-height: 12px;">
@@ -215,7 +215,7 @@
                 			{{ $model->total_weight }}
                 			</td>
                 			<td class="border_r_b">
-                			{{ $model->total_price }}
+                			{{ sprintf("%.2f",$model->total_price) }}
                 			</td>
                 		</tr>
                 		<tr style="line-height: 12px;height:60px;">
@@ -234,7 +234,7 @@
     <div style="width:100%;height:55px;">
       <p style="width:190px;height:55px;float:left;text-align:center;font-weight:bold;">
         
-        <img src="'.site_url('default/third_party').'/chanage_code/barcode/html/image.php?code=code128&o=2&t=30&r=1&text='.$allParamArr['ordersInfo']['orders_shipping_code'].'&f1=-1&f2=8&a1=&a2=B&a3=" style="padding-top:5px;"/>
+        <img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}"/>
         <br/>{{ $model->tracking_no }}
       </p>
       <p style="width:40px;height:55px;float:left;font-weight:bold;line-height:60px;font-size:20px;text-align:center;">

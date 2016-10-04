@@ -50,67 +50,70 @@
 <body>
     <div id="main_frame_box">
         <div class="float_box">
-			<div align="center" style="width:100%;height:82px;">	
-				<div style="padding:7px 5px 0 5px;">		
-					<div style="float:left; width: 180px; text-align:left;">
-						<div><b>FROM:</b></div>
-						<div style="font-size: 10px;">Rm A1，10/F, Shun Luen Factory Building, 86 Tokwawan Road, Hong Kong，</div>
-					</div>			
-					<div style="float: right;">
-						<table cellspacing="0" border="1" height="62">
-							<tr>
-								<td>
-									<p style="font-size:24px;">1</p>
-								</td>
-								<td align="center">
-									<div style="font-size: 10px; padding:0 2px; font-weight:bold;">
-										POSTAGE<br/>
-										PAID<br/>
-										HONG KONG
-									</div>
-								</td>
-								
-								<td align="center">
-									<div style="font-size: 10px; padding:0 5px; font-weight:bold;">
-										PERMIT<br/>
-										NO.<br/><br/>										 
-										5743
-									</div>
-								</td>
-							</tr>
-						</table>
-					</div>
-					<div style="clear:both;"></div>
-				</div>
-			</div>	
-			<div style="width:100%;height:95px;">
-				<table style="width:368px;">
-					<tr>
-						<td align="left">
-							<strong style="font-size:15px;text-decoration:underline;margin-left:0px;">TO:</strong>
-							<strong style="font-size:15px;margin-left:5px;">{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}</strong><br/>	
-							<span style="font-size:13px;margin-left:5px;">
-    							{{ $model->shipping_address}}<br/>
+    		<div align="center" style="width:100%;height:82px;">	
+    			<div style="padding:7px 5px 0 5px;">
+    	
+    				<div style="float:left; width: 200px; text-align:left;">
+    					<div><b>FROM:</b></div>
+    					<div style="font-size: 10px;">Rm A1，10/F, Shun Luen Factory Building, 86 Tokwawan Road, Hong Kong，</div>
+    				</div>
+    		
+    				<div style="float: right;">
+    					<table cellspacing="0" border="1" height="62">
+    						<tr>
+    							<td>
+    								<p style="font-size:24px;">1</p>
+    							</td>
+    							<td align="center">
+    								<div style="font-size: 10px; padding:0 2px; font-weight:bold;">
+    									POSTAGE<br/>
+    									PAID<br/>
+    									HONG KONG
+    								</div>
+    							</td>
+    							
+    							<td align="center">
+    								<div style="font-size: 10px; padding:0 5px; font-weight:bold;">
+    									PERMIT<br/>
+    									NO.<br/>
+    									<br/>
+    									5743
+    								</div>
+    							</td>
+    						</tr>
+    					</table>
+    				</div>
+    				<div style="clear:both;"></div>
+    			</div>
+    		</div>	
+    		<div style="width:100%;height:95px;">
+    			<table style="width:368px;">
+    				<tr>
+    					<td align="left">
+    						<strong style="font-size:15px;text-decoration:underline;margin-left:0px;">TO:</strong>
+    						<strong style="font-size:15px;margin-left:5px;">{{ $model->shipping_firstname . ' ' . $model->shipping_lastname }}</strong>	
+    						<span style="font-size:13px;margin-left:5px;">
+    						    {{ $model->shipping_address}}<br/>
     							@if($model->shipping_address1)
     							{{$model->shipping_address1 }} <br/>
     							@endif 							
     						    {{ $model->shipping_city }}&nbsp;&nbsp;{{ $model->shipping_state }}<br/>				 
     							Zip:{{ $model->shipping_zipcode }}<br/>
     							Tel:{{  $model->shipping_phone }} 
-							</span>									
-						</td>
-						<td align="right">
-							<div style="width:80px;height:90px;border:2px solid #000;font-weight:bold;">
-		     					<table>
-									<tr>
-										<td>
-											<img width="80px;" height="70px;" style="margin-top:-3px;margin-left:-3px;" src="{{ asset('picture/mddHkPost2.jpg') }}"/>
-										</td>
-									</tr>
-									<tr>
-										<td align="center">
-											<span style="font-size:16px;">											
-											 <?php 											 
+    						</span>									
+    					</td>
+    					<td align="right">
+    						<div style="width:80px;height:90px;border:2px solid #000;font-weight:bold;">
+    	     					<table>
+    								<tr>
+    									<td>
+    										<img width="80px;" height="70px;" style="margin-top:-3px;margin-left:-3px;" src="{{ asset('picture/mddHkPost2.jpg') }}"/>
+    									</td>
+    								</tr>
+    								<tr>
+    									<td align="center">
+    										<span style="font-size:16px;">
+    											 <?php 											 
 											 $zip_arr = str_split($model->shipping_zipcode);	//分割邮编
 											 $zip_first = strtoupper($zip_arr[0]);										 	
 
@@ -166,58 +169,58 @@
 											     {{ $partition_arr[$model->country->cn_name][$zip_first] }}
 											 @else
 											    {{ $model->country ? ($model->country->shsHkZone ? $model->country->shsHkZone->partition : 50) : '' }}
-											 @endif								 																
-											</span>
-										</td>
-									</tr>
-								</table>
-		  					</div>
-						</td>
-					</tr>
-				</table>
-			</div>	
-			<div style="width:50px;height:28px;border:1px solid #000;margin-left:5px;margin-top:5px;">
-		     	<strong style="font-size:28px;" >{{ $model->logistics_id }}</strong>				
-		  	</div>	
-			<div style="width:100%;height:20px;margin-left:5px;margin-top:10px;">
-				<span>{{ $model->shipping_country }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $model->country ? $model->country->name : '' }}</span>
-			</div>	
-			<div>
-				<table style="width:370px; border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;">
-					<tr>
-						<td align="center" colspan="2">
-							<strong>S{{ $model->order ? $model->order->ordernum : '' }}</strong>
-						</td>
-					</tr>							
-				</table>
-				<table style="width:370px; border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;">
-					<tr>
-						<td align="center" colspan="2">
-							<img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" />
-						</td>
-					</tr>
-				</table>
-				<table height="52px;" style="border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;border-collapse:collapse;BORDER-right: rgb(0,0,0) 1px;">
-						<tr>				
-							<td align="left">
-								<span>BAM</span>
-							</td>											
-						
-							<td rowspan="2" align="left" style="border: solid thin #000;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;">
-								<textarea readonly="readonly" style=" font-size:13px; height: 45px; width: 232px; margin-top:-1px;margin-left:-1px;resize:none;border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;overflow-y:hidden" rows="3">							
-								{{ $model->sku_info }}
-								</textarea>
-							</td>
-						</tr>
-						<tr>
-							<td align="left" style="border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;">
-								<span>Ref NO:S'{{ $model->order ? $model->order->ordernum : '' }}</span>
-							</td>																										
-						</tr>
-				</table>						
-			</div>										
-	     </div>	
-	    </div>
+											 @endif							
+    										</span>
+    									</td>
+    								</tr>
+    							</table>
+    	  					</div>
+    					</td>
+    				</tr>
+    			</table>
+	    </div>	
+    	<div style="width:50px;height:28px;border:1px solid #000;margin-left:5px;margin-top:5px;">
+         	<strong style="font-size:28px;" >{{ $model->logistics_id }}</strong>				
+      	</div>	
+    	<div style="width:100%;height:20px;margin-left:5px;margin-top:10px;">
+    		<span>{{ $model->shipping_country }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $model->country ? $model->country->name : '' }}</span>
+    	</div>	
+    	<div>
+    		<table style="width:370px; border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;">
+    			<tr>
+    				<td align="center" colspan="2">
+    					<strong>{{ $model->order_id }}</strong>
+    				</td>
+    			</tr>							
+    		</table>
+    		<table style="width:370px; border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;">
+    			<tr>
+    				<td align="center" colspan="2">
+    					<img src="{{ route('barcodeGen', ['content' => $model->tracking_no]) }}" />
+    				</td>
+    			</tr>
+    		</table>
+    		<table height="52px;" style="border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;border-collapse:collapse;BORDER-right: rgb(0,0,0) 1px;">
+				<tr>				
+					<td align="left">
+						<span>BAM</span>
+					</td>											
+				
+					<td rowspan="2" align="left" style="border: solid thin #000;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;">
+						<textarea readonly="readonly" style=" font-size:13px; height: 45px; width: 232px; margin-top:-1px;margin-left:-1px;resize:none;border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-top: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;overflow-y:hidden" rows="3">
+						{{ $model->sku_info }}
+					</textarea>
+					</td>
+				</tr>
+				<tr>
+					<td align="left" style="border: solid thin #000;BORDER-left: rgb(0,0,0) 1px;BORDER-bottom: rgb(0,0,0) 1px;BORDER-right: rgb(0,0,0) 1px;">
+						<span>Ref NO:S{{ $model->order ? $model->order->ordernum : '' }}</span>
+					</td>																										
+				</tr>
+    		</table>						
+    	</div>										
+     </div>
+       
 		<div class="tongyong" style="width:375px;height:360px;margin:0 auto;margin-top:8px;">
 		  <table border="1" style="width:375px;height:360px;margin:0;padding:0;">
 		    <tr height="35">
@@ -329,7 +332,7 @@
 		      </td>
 		      <td width="70">
 		        <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-		        	{{ $model->total_price > 20 ? 20 : $model->total_price }}USD 
+		        	{{ sprintf("%.2f",$model->total_price > 20 ? 20 : $model->total_price) }}USD 
 		        </p>
 		      </td>
 		    </tr>
@@ -361,7 +364,7 @@
 		      </td>
 		      <td>
 		       <p style="height:25px;font-size:11px;text-align:center;line-height:25px;">
-		        	{{ $model->total_price > 20 ? 20 : $model->total_price }}USD 
+		        	{{ sprintf("%.2f",$model->total_price > 20 ? 20 : $model->total_price) }}USD 
 		        </p>
 		      </td>
 		    </tr>

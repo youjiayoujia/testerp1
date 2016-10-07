@@ -124,10 +124,21 @@ class SmtOnlineMonitorController extends Controller
      * @return unknown
      */
     public function manualUpdateProductInfo(){
-        $productIdStr = Input::get('productIds');
+        $product_info_str = Input::get('productIds');        
+        $productInfo = explode(' ', $product_info_str);
         
-        $productIds = explode(',', $productIdStr);
-        $productIds = array_unique($productIds);
+        foreach($productInfo as $val){
+            list($productId,$smtSkuCode) = explode(',',$val); 
+            $sku_info = smtProductSku::where(['productId'=>$productId,'smtSkuCode'=>$smtSkuCode,'isRemove'=>0])->first();
+            foreach($sku_info as $sku_item){
+                if(strstr($sku_item->skuCode,"{YY}")){
+                    $sku_item->skuCode = substr($sku_item->skuCode,4);
+                }
+                
+                $virtualStock = '';
+            }
+        }
+        /*$productIds = array_unique($productIds);
         foreach($productIds as $productId){                          
             $account_id = smtProductList::where('productId',$productId)->first()->token_id;
             
@@ -161,7 +172,7 @@ class SmtOnlineMonitorController extends Controller
             }
  
         }
-        return $result;
+        return $result;*/
        // return array('statue'=>true,'Msg'=>'更新成功!');
     }
     
@@ -363,5 +374,15 @@ class SmtOnlineMonitorController extends Controller
         
         return $product_ids;
     }
+    
+    /**
+     * 计算sku的虚拟库存
+     * @param string $skuCode
+     */
+    public function calculateVirtualStock($skuCode){
+       //虚库存 = 实际库存-已打印-已通过-新录入的sku的数量
+       
+    }
+    
    
 }

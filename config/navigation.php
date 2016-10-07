@@ -421,11 +421,6 @@ return [
                 'icon' => '',
             ],
             [
-                'name' => 'SMT在线数据监控',
-                'url' => 'smtMonitor.index',
-                'icon' => '',
-            ],
-            [
                 'name' => 'SMT售后模版管理',
                 'url' => 'smtAfterSale.index',
                 'icon' => '',
@@ -475,6 +470,11 @@ return [
                 'name' => 'Ebay数据监控',
                 'url' => 'ebayProduct.index',
                 'icon' => '',
+            ],
+            [
+            'name' => 'SMT在线数据监控',
+            'url' => 'smtMonitor.index',
+            'icon' => '',
             ],
             [
                 'name' => 'Lazada数据监控',

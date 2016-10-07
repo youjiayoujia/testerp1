@@ -781,7 +781,16 @@ Route::group(['middleware' => 'roleCheck'], function () {
         Route::get('freightManage',
             ['uses' => 'SmtProductController@freightManage', 'as' => 'smtProduct.freightManage']);
         Route::get('getFreightDetailById',
-            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);           
+            ['uses' => 'SmtProductController@getFreightDetailById', 'as' => 'smtProduct.getFreightDetailById']);  
+        Route::post('showAccountProductGroup',
+            ['uses' => 'SmtProductController@showAccountProductGroup', 'as' => 'smtProduct.showAccountProductGroup']);
+        Route::post('SynchronousDataByAccount',
+            ['uses' => 'SmtProductController@SynchronousDataByAccount', 'as' => 'smtProduct.SynchronousDataByAccount']);
+        Route::post('copyAllAccountNew',
+            ['uses' => 'SmtProductController@copyAllAccountNew', 'as' => 'smtProduct.copyAllAccountNew']); 
+        Route::post('getCategoryInfo',
+            ['uses' => 'SmtProductController@getCategoryInfo', 'as' => 'smtProduct.getCategoryInfo']);       
+        
     });
     Route::resource('smtProduct', 'Publish\Smt\SmtProductController');
     

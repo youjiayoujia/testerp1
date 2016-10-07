@@ -3,15 +3,11 @@
 @section('formBody')
     <input type="hidden" name="_method" value="PUT"/>
     <div class='row'>
-    <div class="form-group col-lg-4">
-        <label>fba地址</label>
-        <input type='text' class="form-control" placeholder="fba地址" name='fba_address' value="{{ old('fba_address') ? old('fba_address') : $model->fba_address }}">
-    </div>
-    <div class='form-group col-lg-4'> 
+    <div class='form-group col-lg-2'> 
         <label>shipment名称</label> 
         <input type='text' class="form-control" placeholder="shipment 名称" name='shipment_name' value="{{ old('shipment_name') ? old('shipment_name') : $model->shipment_name }}">
     </div>
-    <div class='form-group col-lg-4'> 
+    <div class='form-group col-lg-2'> 
         <label for='渠道帐号'>渠道帐号</label> 
         <select name='account_id' class='form-control account_id'>
             @foreach($accounts as $account)
@@ -19,13 +15,11 @@
             @endforeach
         </select>
     </div>
-</div>
-<div class='row'>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-2">
         <label for="fba_address" class='control-label'>plan Id</label>
         <input type='text' class="form-control" placeholder="plan Id" name='plan_id' value="{{ old('plan_id') ? old('plan_id') : $model->plan_id }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-2">
         <label for='from_address'>shipment Id</label>
         <input type='text' class="form-control" placeholder="shipment Id" name='shipment_id' value="{{ old('shipment_id') ? old('shipment_id') : $model->shipment_id }}">
     </div>
@@ -88,8 +82,8 @@
                 <label for="quantity" class='control-label'>数量</label> <small class="text-danger glyphicon glyphicon-asterisk"></small>
             </div>
         </div>
-        <div class='row'>
         @foreach($forms as $key => $form)
+        <div class='row'>
             <div class="form-group col-sm-2">
                 <select class='form-control sku sku1' name="arr[item_id][{{ $key }}}]">
                     <option value="{{ $form->item_id }}">{{ $form->item ? $form->item->sku : ''}}</option>
@@ -109,8 +103,8 @@
                 <input type='text' class="form-control report_quantity" placeholder="数量" name='arr[report_quantity][{{$key}}]' value="{{ old('arr[report_quantity][$key]') ? old('arr[report_quantity][$key]') : $form->report_quantity }}">
             </div>
             <button type='button' class='btn btn-danger bt_right'><i class='glyphicon glyphicon-trash'></i></button>
-        @endforeach
         </div>
+        @endforeach
     </div>
 </div> 
 @stop
@@ -119,7 +113,6 @@
 <script type='text/javascript'>
 $(document).ready(function(){
     $('.account_id').select2();
-
     current = 1;
     $(document).on('click', '.create_form', function(){
         warehouse = $('#out_warehouse_id').val();

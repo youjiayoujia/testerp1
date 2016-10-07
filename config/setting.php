@@ -8,11 +8,11 @@ return [
     /**
      * 默认分页条数
      */
-    'pageSize' => 10,
+    'pageSize' => 50,
     /**
      * 可选分页条数
      */
-    'pageSizes' => [10, 25, 50, 100, 300],
+    'pageSizes' => [50, 25, 10],
     /**
      * 默认排序字段
      */
@@ -58,7 +58,7 @@ return [
         'logistics.code' => '物流简码',
         'logistics.name' => '物流方式',
         'tracking_no' => '物流追踪号',
-        'status' => '订单状态',
+        'status' => '状态',
         'order.status' => '订单状态',
         'order.active' => '售后状态',
         'active' => '售后状态',
@@ -147,7 +147,17 @@ return [
         'details.seller_id'=>'销售人员',
         'channel_name' => '渠道名称',
         'account.account' => '渠道帐号',
-        'is_chinese' => '竞拍状态'
+        'is_chinese' => '竞拍状态',
+
+        'product.status' => '==ERP状态==',
+        'account' => '=帐号=',
+
+        'parent.shipmentCostNum' => '批次号',
+        'questionUser.name' => '提问人',
+        'answerUser.name' => '解答人',
+        'question_group' => '指定分组',
+        'skuName.c_name' => '产品名',
+        'messageSku.sku' => 'sku',
+
     ],
 ];
-

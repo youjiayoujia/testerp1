@@ -23,17 +23,17 @@ class AllReportController extends Controller
 
     public function createData()
     {
-        $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m', strtotime('-1 month')))->get()
+        $allByWarehouseId = PackageModel::where('created_at', '>', date('Y-m-d', strtotime('now')))->get()
                     ->filter(function($single){
-                        return !in_array($single->status, ['NEW', 'NEED', 'WAITASSIGN', 'CANCLE']);
+                        return !in_array($single->status, ['NEW', 'NEED', 'WAITASSIGN', 'CANCEL']);
                     })
                     ->groupBy('warehouse_id');
         $arr = [];
         foreach($allByWarehouseId as $warehouseId => $row) {
             foreach($row->groupBy('channel_id') as $key => $single) {
                 $date = $single->filter(function($fd){
-                    return strtotime($fd->created_at) > strtotime(date('Y-m', strtotime('-1 day'))) &&
-                        strtotime($fd->created_at) < strtotime(date('Y-m', strtotime('now')));
+                    return strtotime($fd->created_at) > strtotime(date('Y-m-d', strtotime('-1 day'))) &&
+                        strtotime($fd->created_at) < strtotime(date('Y-m-d', strtotime('now')));
                     });
                 $date1 = $single->filter(function($fd){
                     return strtotime($fd->created_at) > strtotime(date('Y-m', strtotime('-30 days'))) &&
@@ -91,20 +91,23 @@ class AllReportController extends Controller
         return redirect($this->mainIndex);
     }
 
-    //时间是过去一个月，不然数据库没有数据，待调时间
     public function packageReport()
     {
-        $last_time = $this->model->orderBy('day_time', 'desc')->first()->day_time;
-        $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+        $model = $this->model->orderBy('day_time', 'desc')->first();
+        $last_time = '';
         $arr = [];
-        foreach($model->groupBy('warehouse_id') as $warehouseId => $block) {
-            $arr[$warehouseId][] = $block->sum('wait_send');
-            $arr[$warehouseId][] = $block->sum('sending');
-            $arr[$warehouseId][] = $block->sum('sended');
-            $arr[$warehouseId][] = $block->sum('more');
-            $arr[$warehouseId][] = $block->sum('less');
-            $arr[$warehouseId][] = $block->sum('daily_send');
-            $arr[$warehouseId][] = $block->sum('need');
+        if($model) {
+            $last_time = $model->day_time;
+            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            foreach($model->groupBy('warehouse_id') as $warehouseId => $block) {
+                $arr[$warehouseId][] = $block->sum('wait_send');
+                $arr[$warehouseId][] = $block->sum('sending');
+                $arr[$warehouseId][] = $block->sum('sended');
+                $arr[$warehouseId][] = $block->sum('more');
+                $arr[$warehouseId][] = $block->sum('less');
+                $arr[$warehouseId][] = $block->sum('daily_send');
+                $arr[$warehouseId][] = $block->sum('need');
+            }
         }
         $response = [
             'metas' => $this->metas(__FUNCTION__),

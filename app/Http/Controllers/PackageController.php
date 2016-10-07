@@ -23,6 +23,8 @@ use App\Models\WarehouseModel;
 use DB;
 use Exception;
 use App\Jobs\AssignStocks;
+use App\Models\NumberModel;
+use App\Models\UserModel;
 
 class PackageController extends Controller
 {
@@ -40,17 +42,20 @@ class PackageController extends Controller
         $len = 1000;
         $start = 0;
         $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
+        $name = UserModel::find(request()->user()->id)->name;
         while ($packages->count()) {
             foreach ($packages as $package) {
                 $job = new AssignStocks($package);
                 $job->onQueue('assignStocks');
                 $this->dispatch($job);
+                $to = base64_encode(serialize($package));
+                $this->eventLog($name, '包裹放匹配库存队列', $to, $to);
             }
             $start += $len;
             unset($packages);
             $packages = $this->model->where('status', 'NEED')->skip($start)->take($len)->get();
         }
-        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至 [DO PACKAGE] 队列成功'));
+        return redirect(route('dashboard.index'))->with('alert', $this->alert('success', '添加至assignStocks队列成功'));
     }
 
     /**
@@ -94,11 +99,56 @@ class PackageController extends Controller
         return view($this->viewPath . 'index', $response);
     }
 
+    public function logisticsDelivery()
+    {
+        $date = request()->input('date');
+        if(!$date) {
+            $date = date('Y-m-d');
+        }
+        $data = [];
+        $count = $this->model->where('logistics_id', '!=', 0)
+            ->where('shipped_at', '>=', $date . ' 00:00:00')
+            ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00')
+            ->count();
+        $totalWeight = 0;
+        $logisticses = LogisticsModel::where('is_enable', 1)->get();
+        foreach($logisticses as $key => $logistics) {
+            $data[$key]['logisticsName'] = $logistics->name;
+            $data[$key]['logisticsId'] = $logistics->id;
+            $data[$key]['logisticsPriority'] = $logistics->priority;
+            $data[$key]['weight'] = 0;
+            $data[$key]['percent'] = 0 . '%';
+            $packages = $this->model
+                ->where('logistics_id', $logistics->id)
+                ->where('shipped_at', '>=', $date . ' 00:00:00')
+                ->where('shipped_at', '<', date('Y-m-d', strtotime('+1 day', strtotime($date))) . ' 00:00:00');
+            foreach($packages->get() as $package) {
+                $data[$key]['weight'] += $package->weight;
+            }
+            $data[$key]['quantity'] = $packages->count();
+            $totalWeight += $data[$key]['weight'];
+            if($count) {
+                $data[$key]['percent'] = round($data[$key]['quantity'] / $count * 100, 2) . '%';
+            }
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'datas' => $data,
+            'count' => $count,
+            'date' => $date,
+            'totalWeight' => $totalWeight,
+        ];
+
+        return view($this->viewPath . 'logisticsDelivery', $response);
+    }
+
     public function changeLogistics($arr, $id) 
     {
         $arr = explode(',', $arr);
+        $name = UserModel::find(request()->user()->id)->name;
         foreach($arr as $packageId) {
             $model = $this->model->find($packageId);
+            $from = base64_ecode(serialize($model));
             if (!$model) {
                 continue;
             }
@@ -106,6 +156,8 @@ class PackageController extends Controller
                 continue;
             }
             $model->update(['logistics_id' => $id]);
+            $to = base64_decode(serialize($model));
+            $this->eventLog($name, '改变物流方式', $to, $from);
         }
 
         return redirect($this->mainIndex);
@@ -137,8 +189,10 @@ class PackageController extends Controller
     public function removeLogistics($arr) 
     {
         $arr = explode(',', $arr);
+        $name = UserModel::find(request()->user()->id)->name;
         foreach($arr as $packageId) {
             $model = $this->model->find($packageId);
+            $from = base64_encode(serialize($model));
             if (!$model) {
                 continue;
             }
@@ -146,6 +200,8 @@ class PackageController extends Controller
                 continue;
             }
             $model->update(['tracking_no' => '']);
+            $to = base64_encode(serialize($model));
+            $this->eventLog($name, '清空物流方式', $to, $from);
         }
 
         return redirect($this->mainIndex);
@@ -178,6 +234,7 @@ class PackageController extends Controller
         $response = [
             'metas' => $this->metas(__FUNCTION__, 'Flow'),
             'packageNum' => $this->model->where('status', 'NEED')->count(),
+            'ordernum' => OrderModel::where('status', 'PREPARED')->get()->filter(function($single){return $single->packages()->count() == 0;})->count(),
             'assignNum' => $this->model->where(['status' => 'WAITASSIGN'])->count(),
             'placeNum' => $this->model->whereIn('status', ['ASSIGNED', 'TRACKINGFAIL'])->where('is_auto', '1')->count(),
             'manualShip' => $this->model->where(['is_auto' => '0', 'status' => 'ASSIGNED'])->count(),
@@ -255,9 +312,9 @@ class PackageController extends Controller
                             $errors[$key]['remark'] = '仓库对应库位有问题';
                             continue;
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
                     }
-                    $model->update(['status' => 'CANCLE']);
+                    $model->delete();
                 }
                 if(count($errors)) {
                     throw new Exception('导入数据有问题');
@@ -283,7 +340,7 @@ class PackageController extends Controller
                             $errors[$key]['remark'] = '仓库对应库位有问题'; 
                             continue;
                         }
-                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCLE', $model->id);
+                        $packageItem->item->in($stock->warehouse_position_id, $packageItem->quantity, $packageItem->quantity * $packageItem->item->cost, 'CANCEL', $model->id);
                     }
                     if(request('trackingNo') == 'on') {
                         $model->update(['tracking_no' => '']);
@@ -312,8 +369,6 @@ class PackageController extends Controller
         return view($this->viewPath.'returnErrors', $response);
         
     }
-
-   
 
     public function returnSplitPackage()
     {
@@ -350,6 +405,18 @@ class PackageController extends Controller
     {
         $arr = [];
         $buf = explode(',', $tmp);
+        $name = UserModel::find(request()->user()->id)->name;
+        $orderId = $this->model->find($buf[0])->order->id;
+        foreach($buf as $key => $packageId) {
+            $model = $this->model->find($packageId);
+            if (!$model) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
+            }
+            if($model->order->id != $orderId) {
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '要合并的包裹不是来自于一个订单'));
+            }
+        }
+
         foreach($buf as $key => $packageId) {
             $model = $this->model->find($packageId);
             if (!$model) {
@@ -373,6 +440,7 @@ class PackageController extends Controller
             }
         }
         $model = $this->model->find($buf[0]);
+        $from = base64_encode(serialize($model));
         $model->update(['status' => 'NEW']);
         $model->order->update(['status' => 'REVIEW']);
         if($model) {
@@ -381,6 +449,8 @@ class PackageController extends Controller
                 $model->items()->create($info);
             }
         }
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '合并包裹', $to, $from);
 
         return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '合并成功.'));
     }
@@ -388,11 +458,14 @@ class PackageController extends Controller
     public function editTrackStore($id)
     {
         $model = $this->model->find($id);
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
         $model->update(['tracking_no' => request('tracking_no')]);
-
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '修改追踪号', $to, $from);
         return redirect($this->mainIndex);
     }
 
@@ -402,6 +475,7 @@ class PackageController extends Controller
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
+        $name = UserModel::find(request()->user()->id)->name;
         $tmp = $this->processArr($arr, $model);
         sort($tmp);
         if(count($tmp) == 1) {
@@ -412,19 +486,24 @@ class PackageController extends Controller
             }
             foreach($tmp as $packageId => $info) {
                 if(!$packageId) {
+                    $from = base64_encode(serialize($model));
                     foreach($info as $itemId => $packageItem) {
                         $packageItem['item_id'] = $itemId;
                         $model->items()->create($packageItem);
                     }
                     $model->update(['status' => 'NEW']);
+                    $to = base64_encode(serialize($model));
+                    $this->eventLog($name, '拆分包裹', $to, $from);
                     $model->order->update(['status' => 'REVIEW']);
                 } else {
                     $newPackage = $this->model->create($model->toArray());
+                    $to = base64_encode(serialize($newPackage));
                     foreach($info as $itemId => $packageItem) {
                         $packageItem['item_id'] = $itemId;
                         $newPackage->items()->create($packageItem);
                     }
                     $newPackage->update(['status' => 'NEW']);
+                    $this->eventLog($name, '拆分包裹', $to);
                     $newPackage->order->update(['status' => 'REVIEW']);
                 } 
             }
@@ -491,7 +570,9 @@ class PackageController extends Controller
     public function forceOutPackage()
     {
         $package_id = trim(request('package_id'));
+        $name = UserModel::find(request()->user()->id)->name;
         $package = $this->model->find($package_id);
+        $from = base64_decode(serialize($package));
         if (!$package) {
             return json_encode(false);
         }
@@ -501,6 +582,8 @@ class PackageController extends Controller
             $item->item->out($item->warehouse_position_id, $item->quantity, 'PACKAGE', $package->id);
         }
         $package->update(['status' => 'PACKED']);
+        $to = base64_decode(serialize($package));
+        $this->eventLog($name, '强制出库', $to, $from);
 
         return json_encode(true);
     }
@@ -529,6 +612,8 @@ class PackageController extends Controller
     public function storeAllocateLogistics($id)
     {
         $model = $this->model->find($id);
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_decode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -537,6 +622,8 @@ class PackageController extends Controller
             $model->update(['is_auto' => '0']);
         }
         $model->update(['logistics_id' => request('logistics_id'), 'status' => 'ASSIGNED']);
+        $to = base64_decode(serialize($model));
+        $this->eventLog($name, '拆分包裹', $to, $from);
 
         return redirect($this->mainIndex);
     }
@@ -669,7 +756,7 @@ class PackageController extends Controller
         foreach ($model->items as $packageItem) {
             $stockout = $packageItem->stockout;
             $stock = StockModel::find($stockout->stock_id);
-            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCLE');
+            $stock->in($stockout->quantity, $stockout->amount, 'PACKAGE_CANCEL');
             $packageItem->delete();
             $stockout->delete();
         }
@@ -794,6 +881,8 @@ class PackageController extends Controller
         foreach ($items as $item) {
             $item->picked_quantity = 0;
             $item->save();
+            $item->item->in($item->warehouse_position_id, $item->quantity, $item->quantity * $item->item->cost, 'CANCEL', $item->id);
+            $item->item->hold($item->warehouse_position_id, $item->quantity);
         }
         return json_encode(true);
     }
@@ -851,6 +940,27 @@ class PackageController extends Controller
         })->download('csv');
     }
 
+    public function bagInfo()
+    {
+        $trackno = request('trackno');
+        $model = $this->model->where('tracking_no', $trackno)->first();
+        if(!$model) {
+            return json_encode(false);
+        }
+        $number = NumberModel::first();
+        if(!count($number)) {
+            $number = NumberModel::create(['number' => 1]);
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'logistics' => $model->logistics ? $model->logistics->code : '',
+            'number' => 'S'.substr($number->number+100000000, 1),
+        ];
+        $number->update(['number' => $number->number + 1]);
+
+        return view($this->viewPath.'bagInfo', $response);
+    }
+
     /**
      * 执行发货
      *
@@ -867,26 +977,22 @@ class PackageController extends Controller
         if (!$package) {
             return json_encode('error');
         }
-        DB::beginTransaction();
-        try {
-            foreach($package->items as $packageItem) {
-                $packageItem->item->holdOut($packageItem->warehouse_position_id,
-                                            $packageItem->quantity,
-                                            'PACKAGE',
-                                            $packageItem->id);
-                $packageItem->orderItem->update(['status' => 'SHIPPED']);
-            }
-        } catch (Exception $e) {
-            DB::rollback();
-            return json_encode('unhold');
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_decode(serialize($package));
+        if($weight == '0') {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'status' => 'SHIPPED',
+            ]);
+        } else {
+            $package->update([
+                'shipped_at' => date('Y-m-d h:i:s', time()),
+                'shipper_id' => request()->user()->id,
+                'actual_weight' => $weight,
+                'status' => 'SHIPPED',
+            ]);
         }
-        DB::commit();
-        $package->update([
-            'shipped_at' => date('Y-m-d h:i:s', time()),
-            'shipper_id' => request()->user()->id,
-            'actual_weight' => $weight,
-            'status' => 'SHIPPED',
-        ]);
         $order = $package->order;
         $buf = 1;
         foreach($order->packages as $childPackage) {
@@ -902,6 +1008,8 @@ class PackageController extends Controller
         } else {
             $order->update(['status' => 'PARTIAL']);
         }
+        $to = base64_decode(serialize($package));
+        $this->eventLog($name, '发货', $to, $from);
         if (!in_array($package->logistics_id, $logistic_id)) {
             return json_encode('logistic_error');
         }

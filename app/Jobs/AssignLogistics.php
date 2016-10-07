@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use Cache;
+use Exception;
 use App\Jobs\Job;
 use App\Jobs\PlaceLogistics;
 use Illuminate\Queue\SerializesModels;
@@ -39,6 +40,7 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
             $this->result['remark'] = 'stockTaking , stock is locked.';
             $this->lasting = 0;
             $this->log('AssignLogistics');
+            throw new Exception('in stock taking');
         } else {
             $start = microtime(true);
             $this->package->assignLogistics();
@@ -52,8 +54,10 @@ class AssignLogistics extends Job implements SelfHandling, ShouldQueue
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'Success.';
                 } else {
+                    $order = $this->package->order;
+                    $order->OrderCancle();
                     $this->result['status'] = 'fail';
-                    $this->result['remark'] = "Order rate isn't more than 0.";
+                    $this->result['remark'] = "Order's profit isn't more than 0.";
                 }
             } else {
                 $this->result['status'] = 'fail';

@@ -1,6 +1,6 @@
 <?php
 /**
- * User: jiangdi
+ * User: Norton
  * Date: 2016/6/20
  * Time: 19:04
  */
@@ -61,6 +61,18 @@ class MessageModel extends BaseModel{
         return $this->hasMany('App\Models\Message\OrderModel', 'message_id');
     }
 
+    public function channel(){
+        return $this->hasOne('App\Models\ChannelModel','id','channel_id');
+    }
+
+    public function getChannelNameAttribute(){
+        if(!empty($this->channel_id)){
+            return $this->channel->name;
+        }else{
+            return '无';
+        }
+    }
+
     /**
      * 分配
      * @param $userId
@@ -82,6 +94,7 @@ class MessageModel extends BaseModel{
 
     /**
      * 工作流获取下一个message
+     * 说明：只获取会话客服被分配的账号下的的信息
      * @param $userId
      * @return mixed
      */
@@ -153,7 +166,10 @@ class MessageModel extends BaseModel{
     {
         return $this->hasMany('App\Models\Message\PartModel', 'message_id');
     }
-
+    public function getAttachment()
+    {
+        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
+    }
     public function getMessageContentAttribute()
     {
         $plainBody = '';
@@ -253,10 +269,7 @@ class MessageModel extends BaseModel{
         }
         return false;
     }
-    public function getAttachment()
-    {
-        return $this->hasMany('App\Models\Message\MessageAttachment', 'message_id');
-    }
+
     public function getMessageAttanchmentsAttribute()
     {
         $attanchments = [];
@@ -354,7 +367,7 @@ class MessageModel extends BaseModel{
                         $html = $content;
                         break;
                     default :
-                        $html = 'crm was make a big mistake';
+                        $html = 'invaild channel message';
                 }
             }
 
@@ -453,7 +466,7 @@ class MessageModel extends BaseModel{
                 $html .= '<p>Message type:'.$this->label.'</p>';
                 $html .= '<p>Detail type:'.$type.'</p>';
                 $html .= '<p>Order id:'.$files['order_id'].'</p>';
-                $html .= '<p>Order url:<a href="'.$files['order_url'].'">'.$files['order_url'].'</a></p>';
+                $html .= '<p>Order url:<a href="'.$files['order_url'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
                 break;
             case 'wish':
                 $files = $this->MessageFieldsDecodeBase64;
@@ -468,7 +481,7 @@ class MessageModel extends BaseModel{
                 $files = $this->MessageFieldsDecodeBase64;
                 if(!empty($files)){
                     $html .= '<p><strong>ItemID</strong>:'.$files['ItemID'].'</p>';
-                    $html .= '<p><strong>Ebay链接</strong>:<a herf="'.$files['ResponseDetails'].'">'.$files['ResponseDetails'].'</a></p>';
+                    $html .= '<p><strong>Ebay链接</strong>:<a target="_blank" href="'.$files['ResponseDetails'].'"><span class="glyphicon glyphicon-link"></span></a></p>';
 
                 }
 

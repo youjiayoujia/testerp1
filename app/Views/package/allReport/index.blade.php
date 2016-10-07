@@ -22,6 +22,7 @@
             </tr>
             </thead>
             <tbody>
+            @if(count($model))
             @foreach($model->groupBy('channel_id') as $key => $channel)
                 <tr>
                     <td>{{ $channel->first()->channel ? $channel->first()->channel->name : '' }}平台</td>
@@ -54,10 +55,12 @@
                     <td></td>
                     <td></td>
                 </tr>
+                @endif
             </tbody>
         </table>
     </div>
 </div>
+@if(count($model))
 @foreach($model->groupBy('warehouse_id') as $warehouseId => $body)
     <div class="panel panel-default">
         <div class="panel-heading">{{ $body->first()->warehouse ? $body->first()->warehouse->name : '仓库未对应' }}中心</div>
@@ -103,6 +106,7 @@
         </div>
     </div>
 @endforeach
+@endif
 @stop
 <script src="{{ asset('js/jquery.min.js') }}"></script>
 <script type='text/javascript'>

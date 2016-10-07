@@ -19,7 +19,7 @@
     @foreach($data as $report)
         <tr>
             <td>{{ $report->id }}</td>
-            <td>{{ $report->fba_address }}</td>
+            <td>{{ $report->shipping_address }}</td>
             <td>{{ $report->plan_id }}</td>
             <td>{{ $report->shipment_id }}</td>
             <td>{{ $report->reference_id }}</td>

@@ -27,7 +27,7 @@
         <ul class="dropdown-menu">
             @foreach($types as $item)
                 <li>
-                    <a href="{{ DataList::filtersEncode(['status','=',$item->type]) }}">{{ $item->type }}</a>
+                    <a href="{{ DataList::filtersEncode(['type','=',$item->type]) }}">{{ $item->type }}</a>
                 </li>
             @endforeach
         </ul>
@@ -73,7 +73,7 @@
                 @endif
                 @if($case->process_status == 'COMPLETE')
                     <a href="" class="btn btn-info btn-xs">
-                        <span class="glyphicon glyphicon-eye-open"></span> 查看
+                        <span class="glyphicon glyphicon-eye-open"></span> 已处理
                     </a>
                 @endif
             </td>

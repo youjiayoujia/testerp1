@@ -27,6 +27,10 @@ use App\Models\ProductModel;
 use App\Modules\Common\common_helper;
 use App\Models\SkuPublishRecords;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\ItemModel;
+use App\Models\LogisticsModel;
+use App\Models\Publish\Smt\smtPriceTaskMain;
 
 
 
@@ -131,8 +135,10 @@ class SmtController extends Controller{
                     $category_attributes = $return;
             }                                
         }
+    
         //对属性进行排序处理
         $category_attributes = $smtApi->sortAttribute($category_attributes);
+        
         //获取运费模版
         $freight = smtFreightTemplate::where('token_id',$token_id)->get();
        
@@ -1702,8 +1708,8 @@ html;
        $keyword  = trim(Input::get('keyword'));
        $token_id = trim(Input::get('token_id'));
        $category_list = $this->getOnlineCategoryId($token_id, $keyword);
-       //$category_list = array('200000174', '200000236', '3010');
-       $rs            = array();
+       $this->smt_category = new smtCategoryModel();
+       $rs = array();
        if ($category_list) {
            foreach ($category_list as $category_id) {
                //显示推荐的类目信息
@@ -1726,12 +1732,12 @@ html;
         $api    = 'api.recommendCategoryByKeyword';
         
         if ($token_id && $keyword) {
-        $account = AccountModel::findOrFail($token_id);
-        $smtApi = Channel::driver($account->channel->driver, $account->api_config);   
-        $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
+            $account = AccountModel::findOrFail($token_id);
+            $smtApi = Channel::driver($account->channel->driver, $account->api_config);   
+            $result = $smtApi->getJsonData($api, 'keyword=' . rawurlencode($keyword));
         }
         $data = json_decode($result, true);
-        if ($data['success'] && $data['total'] > 0) {
+        if (isset($data['success']) && $data['total'] > 0) {
            $rs = $data['cateogryIds'];
         }
         
@@ -1958,9 +1964,11 @@ html;
                    $this->ajax_return('检查账号图片银行空间是否还有空余', false, $last_array);
                }
            } else {
+               $error = array('图片上传是失败'.$res['error_message']);
+               $this->ajax_return($error, false, '');
+              
            }          
        }
-   
        $this->ajax_return($error, true, $last_array);
    }
    
@@ -2040,24 +2048,21 @@ html;
    
    public function getskuinfo()
    {
-       $sku = Input::get('sku');
-       $resukt = $this->Products_data_model->where('productsIsActive',1)->where('products_sku','like',$sku);
+       $sku = trim(Input::get('sku'));
+       $suk_info = ItemModel::where('is_available',1)->where('sku','like','%'.$sku.'%')->first();
        $returnarr = array();
-       $returnarr['weight'] = $resukt[0]['products_weight'];
+       $returnarr['weight'] = 0;
        $returnarr['length'] = 0;
        $returnarr['width'] = 0;
        $returnarr['height'] = 0;
-       if(!empty($resukt[0]['products_volume']))
-       {
-           $volume = unserialize($resukt[0]['products_volume']);
-           $returnarr['length'] = $volume['ap']['length'];
-           $returnarr['width'] = $volume['ap']['width'];
-           $returnarr['height'] = $volume['ap']['height'];
-       }
-       $returnarr['products_html_mod'] = htmlspecialchars_decode($resukt[0]['products_html_mod']);
-   
-       $this->ajax_return('',1,$returnarr);
-   
+       if($suk_info){
+           $returnarr['weight'] = $suk_info->weight;
+           $returnarr['length'] = $suk_info->length;
+           $returnarr['width'] = $suk_info->width;
+           $returnarr['height'] = $suk_info->height;
+       }       
+      
+       $this->ajax_return('',1,$returnarr);   
    }
    
    /**

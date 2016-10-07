@@ -17,8 +17,7 @@ class smtCategoryModel extends Model{
         $this->name = array();
         $this->getCategoryPid($category_id);   
         $category = $this->name;
-        $rs = array_reverse($category);  
-        unset($this->name);
+        $rs = array_reverse($category); 
         return implode('>>', $rs);
     }
     
@@ -28,7 +27,7 @@ class smtCategoryModel extends Model{
      * @param  [type] $category_id [description]
      * @return [type]              [description]
      */
-    public function getCategoryPid($category_id){      
+    public function getCategoryPid($category_id){
         $tmp = $this->where('category_id','=',$category_id)->get(); 
         foreach ($tmp as $item){           
             array_push($this->name, $item['category_name']);

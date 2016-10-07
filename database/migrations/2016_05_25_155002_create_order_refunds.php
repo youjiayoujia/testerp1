@@ -36,6 +36,18 @@ class CreateOrderRefunds extends Migration
             $table->text('memo')->comment('memo')->nullable()->default(NULL);
             $table->text('detail_reason')->comment('详细原因')->nullable()->default(NULL);
             $table->string('image')->comment('截图')->nullable()->default(NULL);
+            $table->enum('process_status',
+                [
+                    'PENDING',
+                    'REFUSE',
+                    'PAUSE',
+                    'FINANCE',
+                    'COMPLETE',
+                    'INVALID',
+                ])->comment('操作状态')->default('PENDING');
+            $table->string('user_paypal_account')->nullable()->comment('用户paypal账号');
+            $table->integer('customer_id')->nullable()->comment('客服ID');
+            $table->integer('refund_voucher')->nullable()->comment('退款凭证');
             $table->timestamps();
             $table->softDeletes();
         });

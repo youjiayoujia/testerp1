@@ -1837,11 +1837,12 @@ class EbayAdapter implements AdapterInterface
                     $message_lists[$order]['attachment'] = ''; //附件
                     $message_lists[$order]['content'] = base64_encode(serialize([ 'ebay' => (string)$content_detail->Messages->Message->Text]));
                     $message_fields_ary = [
-                        'ItemID' => (string)$message->ItemID, //应该是订单号
+                        'ItemID'            => (string)$message->ItemID, //应该是订单号
                         'ExternalMessageID' => (string)$message->ExternalMessageID,
                         'ResponseDetails'   => (string)$message->ResponseDetails->ResponseURL,
                     ];
                     $message_lists[$order]['channel_message_fields'] = base64_encode(serialize($message_fields_ary));
+                    $message_lists[$order]['channel_order_number'] = (string)$message->ItemID;
                     $order += 1;
                 }
             }
@@ -1912,17 +1913,20 @@ class EbayAdapter implements AdapterInterface
             foreach ($usercases->cases->caseSummary as $case){
                 $buyer = '';
                 $seller = '';
-                if((string)$case->user->role == 'BUYER'){
-                    $buyer = (string)$case->user->userId;
-                }
                 if((string)$case->user->role == 'SELLER'){
                     $seller = (string)$case->user->userId;
                 }
-                if((string)$case->otherParty->role == 'BUYER'){
-                    $buyer = (string)$case->user->userId;
-                }
-                if((string)$case->otherParty->role == 'SELLER'){
-                    $seller = (string)$case->user->userId;
+                switch ((string)$case->user->role){
+                    case 'BUYER':
+                        $seller  = (string)$case->otherParty->userId;
+                        $buyer = (string)$case->user->userId;
+                        break;
+                    case 'SELLER':
+                        $buyer  = (string)$case->otherParty->userId;
+                        $seller = (string)$case->user->userId;
+                        break;
+                    default:
+                        break;
                 }
                 $status = array_values((array)$case->status);
                 if($case->lastModifiedDate){
@@ -2089,12 +2093,93 @@ class EbayAdapter implements AdapterInterface
             $this->input_str .= '<comments>'.htmlspecialchars($array['comments']).'</comments>';
         }
     }
+    /**
+     * compact('item_id','buyer_id','itemids','title','content')
+     * 订单列表 send ebay message
+     */
+    public function ebayOrderSendMessage($paramAry){
+        $total = count($paramAry['itemids']);
+        $ItemIDXML = ($total == 1) ? "<ItemID>$paramAry[itemids][0]</ItemID>" : '' ;
+        $moreItem  = ($total > 1) ?  implode(',',$paramAry['itemids']) : '' ;
 
+        $xml ='<WarningLevel>High</WarningLevel>
+               ' . $ItemIDXML . '
+              <MemberMessage>
+                <Subject>' . addslashes($paramAry['title']) . ' ' . addslashes($moreItem) . '</Subject>
+                <Body>' . addslashes($paramAry['content']) . '</Body>
+                <QuestionType>CustomizedSubject</QuestionType>
+                <RecipientID>' . addslashes($paramAry['buyer_id']) . '</RecipientID>
+              </MemberMessage>';
+        $result = $this->buildcaseBody($xml,'AddMemberMessageAAQToPartner');
+        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
 
-
-
-
-
-
-
+    }
+    /**
+     * 修改ebay平台 unpaid case
+     * compact('order_item_number','transcation_id')
+     */
+    public function ebayUnpaidCase($paramAry){
+        switch ($paramAry['disputeType']){
+            case 'complaints': //unpaid case
+                $disputeExplanation = 'BuyerNotPaid';
+                $disputeReason      = 'BuyerHasNotPaid';
+                break;
+            case 'cancel': //取消交易
+                $disputeExplanation = 'OtherExplanation';
+                $disputeReason      = 'TransactionMutuallyCanceled';
+                break;
+            default:
+                break;
+        }
+        $xml = '
+        	  <DisputeExplanation>' . $disputeExplanation . '</DisputeExplanation>
+              <DisputeReason>' . $disputeReason . '</DisputeReason>
+              <ItemID>'.$paramAry['order_item_number'].'</ItemID>
+              <TransactionID>'.$paramAry['transcation_id'].'</TransactionID>
+        ';
+        $result = $this->buildcaseBody($xml,'AddDispute');
+        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 全额退款操作
+     *
+     */
+    public function caseFullRefund($paramAry){
+        $xml = '<caseId>
+                    <id>'.$paramAry['caseId'].'</id>
+                    <type>'.$paramAry['caseType'].'</type>
+                </caseId>
+                ';
+        $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
+        $result = $this->buildcaseBody($xml,'issueFullRefund');
+        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public function casePartRefund($paramAry){
+        $xml = '
+        	      <amount>'.$paramAry['amount'].'</amount>
+                  <caseId>
+                    <id>'.$paramAry['caseId'].'</id>
+                    <type>EBP_SNAD</type>
+                  </caseId>
+        ';
+        $xml .= empty($paramAry['comment']) ? '' : '<comments>'.htmlspecialchars($paramAry['comment']).'</comments>';
+        $result = $this->buildcaseBody($xml,'issuePartialRefund');
+        if($result->Ack =='Success' || $result->Ack == 'Warning'){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

@@ -76,7 +76,7 @@ class ShipmentCostController extends Controller
                 $item->delete();
             }
             foreach($model->errors as $error) {
-                $item->delete();
+                $error->delete();
             }
             $model->delete();
         }

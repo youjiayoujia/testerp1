@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Bus\SelfHandling;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\ChannelModel;
 
 class InOrders extends Job implements SelfHandling, ShouldQueue
 {
@@ -57,7 +58,8 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
             }
         } else {
             //todo:计算利润率,验证黑名单,生成包裹
-            if ($oldOrder->channel_id == 4 && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
+            $channel = ChannelModel::where('name', 'Ebay')->first();
+            if ($oldOrder->channel_id == $channel->id && $oldOrder->status == 'UNPAID' && $this->order['status'] == 'PAID') {//ebay  以前是UNPAID  现在是PAID 需要更新
                 $this->order['id'] = $oldOrder->id;
                 $order = $orderModel->updateOrder($this->order, $oldOrder);
                 if ($order) {
@@ -68,6 +70,9 @@ class InOrders extends Job implements SelfHandling, ShouldQueue
                     if ($order->status == 'PAID') {
                         $order->update(['status' => 'PREPARED']);
                     }
+                    $job = new DoPackages($order);
+                    $job->onQueue('doPackages');
+                    $this->dispatch($job);
                     $this->relation_id = $oldOrder->id;
                     $this->result['status'] = 'success';
                     $this->result['remark'] = 'UNPAID to PAID. to PREPARED';

@@ -26,4 +26,14 @@ class PickReportModel extends BaseModel
         'today_picklist',
         'day_time'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\UserModel', 'user_id', 'id');
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\WarehouseModel', 'warehouse_id', 'id');
+    }
 }

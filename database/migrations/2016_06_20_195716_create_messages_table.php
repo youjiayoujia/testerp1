@@ -15,6 +15,7 @@ class CreateMessagesTable extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('account_id')->nullable()->default(NULL);
+            $table->integer('channel_id')->default(NULL)->comment('渠道ID');
             $table->integer('type_id');
             $table->integer('list_id')->nullable()->defalut(NULL);
             $table->string('message_id')->nullable()->defalut(NULL);
@@ -36,6 +37,7 @@ class CreateMessagesTable extends Migration
             $table->integer('dont_reply')->nullable()->default(0);
             $table->mediumText('content')->nullable()->default(NULL);
             $table->text('channel_message_fields')->nullable()->comment('渠道信息数据数组')->default(NULL);
+            $table->string('channel_order_number')->nullable()->comment('平台订单号');
             $table->timestamps();
             $table->softDeletes();
         });

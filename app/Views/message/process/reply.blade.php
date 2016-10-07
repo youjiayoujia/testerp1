@@ -45,7 +45,7 @@
                         <img src="{{ asset('loading.gif') }}" width="30" />
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="display: none;">
                     <div class="col-lg-6">
                         <div class="form-group">
                             <input type="text" class="form-control" name="to" value="{{ $message->from_name }}"/>
@@ -58,7 +58,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" style="display: none;">
                     <div class="col-lg-12">
                         <div class="form-group">
                             <input type="text" class="form-control" name="title" value="Re: {{ $message->subject }}"/>
@@ -137,9 +137,11 @@
                         </span>
                     </div>
                 </form>
-
             </div>
             <div class="col-lg-6 text-right">
+                @if($driver == 'wish')
+                    <a class="btn btn-primary " href="{{route('message.WishSupportReplay',['id'=>$message->id]) }}">Apeal To Wish Support</a>
+                @endif
                 <button class="btn btn-warning" type="button"
                         onclick="if(confirm('确认无需回复?')){location.href='{{ route('message.notRequireReply', ['id'=>$message->id]) }}'}">
                     <span class="glyphicon glyphicon-minus-sign"></span> 无需回复

@@ -10,20 +10,23 @@ use App\Models\Logistics\CodeModel;
 use App\Models\Logistics\SupplierModel;
 use App\Models\WarehouseModel;
 use App\Models\Logistics\ZoneModel;
+use App\Models\Channel\AccountModel;
 use App\Models\LogisticsModel;
+use App\Models\Logistics\LimitsModel;
+use App\Models\Product\ProductLogisticsLimitModel;
 
 class PackageModel extends BaseModel
 {
-    protected $table = 'packages';
+    public $table = 'packages';
 
-    public $searchFields = ['id' => 'ID', 'tracking_no' => '追踪号'];
+    public $searchFields = ['id' => 'ID'];
 
     public $rules = [
         'create' => ['ordernum' => 'required'],
         'update' => [],
     ];
 
-    protected $fillable = [
+    public $fillable = [
         'channel_id',
         'channel_account_id',
         'order_id',
@@ -65,12 +68,46 @@ class PackageModel extends BaseModel
         'lazada_package_id'
     ];
 
+    public function getPackageInfoAttribute()
+    {
+        $count = 0;
+        $skuString = '';
+        foreach($this->items as $packageItem){
+            if($count>5){
+              $skuString.=',***';
+            }else{
+              $skuString.=','.($packageItem->item ? $packageItem->item->sku : '').'*'.($packageItem->item ? $packageItem->item->cost : '').''.($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '');
+            }
+            $count++;
+        }
+        $skuString=substr($skuString,1);
+        return $skuString;
+    }
+
+    public function getDeclareNameAttribute()
+    {
+        $skuString = '';
+        foreach($this->items as $packageItem){
+           $skuString.=($packageItem->item ? $packageItem->item->name : '').'*';
+        }
+        $skuString=substr($skuString,1);
+        return $skuString;
+    }
+
     public function getMixedSearchAttribute()
     {
+        $arr = [];
+        $arr1 = [];
+        $channels = ChannelModel::all();
+        foreach($channels as $single) {
+            $arr[$single->name] = $single->name;
+        }
+        $accounts = AccountModel::all();
+        foreach($accounts as $account) {
+            $arr1[$account->account] = $account->account;
+        }
         return [
             'relatedSearchFields' => [
-                'channel' => ['name'],
-                'channelAccount' => ['account'],
                 'order' => ['ordernum'],
             ],
             'filterFields' => ['tracking_no'],
@@ -81,6 +118,8 @@ class PackageModel extends BaseModel
             ],
             'selectRelatedSearchs' => [
                 'order' => ['status' => config('order.status'), 'active' => config('order.active')],
+                'channel' => ['name' => $arr],
+                'channelAccount' => ['account' => $arr1]
             ],
             'sectionSelect' => ['time' => ['created_at', 'printed_at', 'shipped_at']],
         ];
@@ -89,6 +128,100 @@ class PackageModel extends BaseModel
     public function shipperName()
     {
         return $this->belongsTo('App\Models\UserModel', 'shipper_id', 'id');
+    }
+
+    public function getSelfValueAttribute()
+    {
+        $value = 0;
+        foreach($this->items as $packageItem) {
+            $value += $packageItem->quantity * ($packageItem->item ? $packageItem->item->cost : 0);
+        }
+
+        return $value;
+    }
+
+    //包裹sku信息
+    public function getSkuInfoAttribute()
+    {
+        $skuString = '';
+        foreach($this->items as $packageItem){
+            $skuString .= ',' . ($packageItem->item ? $packageItem->item->sku : '') . '*' . $packageItem->quantity . '【' . ($packageItem->warehousePosition ? $packageItem->warehousePosition->name : '') . '】';
+        }
+        $skuString = substr($skuString, 1);
+
+        return $skuString;
+    }
+
+    //sku申报名
+    public function getDeclaredEnAttribute()
+    {
+        $declared_en = $this->items ? ($this->items->first()->item ? ($this->items->first()->item->product ? $this->items->first()->item->product->declared_en : '') : '') : '';
+
+        return $declared_en;
+    }
+
+    //包裹总重量
+    public function getTotalWeightAttribute()
+    {
+        $weight = 0;
+        foreach($this->items as $packageItem) {
+            $weight += $packageItem->quantity * ($packageItem->item ? $packageItem->item->weight : 0);
+        }
+
+        return $weight;
+    }
+
+    //包裹单个sku重量
+    public function getSignalWeightAttribute()
+    {
+        $weight = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->item ? $this->items->first()->item->weight : 0) : 0);
+
+        return $weight;
+    }
+
+    //包裹单个sku价格
+    public function getSignalPriceAttribute()
+    {
+        $price = 0;
+        if($this->order->rate) {
+            $price = ($this->items ? $this->items->first()->quantity : 0) * ($this->items ? ($this->items->first()->orderItem ? $this->items->first()->orderItem->price : 0) : 0);
+            $price = $price / $this->order->rate;
+        }
+
+        return $price;
+    }
+
+    //包裹总价格
+    public function getTotalPriceAttribute()
+    {
+        $price = 0;
+        if($this->order->rate) {
+            foreach($this->items as $packageItem) {
+                $price += $packageItem->quantity * ($packageItem->orderItem ? $packageItem->orderItem->price : 0);
+            }
+            $price = $price / $this->order->rate;
+        }
+
+        return $price;
+    }
+
+    //包裹是否含电池
+    public function getIsBatteryAttribute()
+    {
+        $flag = false;
+        foreach($this->items as $packageItem) {
+            if($packageItem->item ? ($packageItem->item->product ? $packageItem->item->product : null) : null) {
+                $productLogisticsLimits = ProductLogisticsLimitModel::where('product_id', $packageItem->item->product->id)->get();
+                foreach($productLogisticsLimits as $productLogisticsLimit) {
+                    $name = LimitsModel::where('id', $productLogisticsLimit->logistics_limits_id)->get(['name']);
+                    if($name == '含电池') {
+                        $flag = true;
+                    }
+                }
+            }
+        }
+
+        return $flag;
     }
 
     public function getStatusColorAttribute()
@@ -114,9 +247,6 @@ class PackageModel extends BaseModel
                 break;
             case 'PACKED':
                 $color = 'info';
-                break;
-            case 'CANCLE':
-                $color = 'warning';
                 break;
             case 'SHIPPED':
                 $color = 'success';
@@ -207,7 +337,7 @@ class PackageModel extends BaseModel
     public function getStatusNameAttribute()
     {
         $arr = config('package');
-        return $arr[$this->status];
+        return isset($arr[$this->status]) ? $arr[$this->status] : '';
     }
 
     public function processGoods($file)
@@ -643,12 +773,70 @@ class PackageModel extends BaseModel
         })->where(['is_clearance' => $isClearance])
             ->get();
         foreach ($rules as $rule) {
+            if ($rule->catalog_section) {
+                $catalogs = $rule->rule_catalogs_through;
+                foreach($this->items as $item) {
+                    $flag = 0;
+                    foreach ($catalogs as $catalog) {
+                        if ($catalog->id == $item->catalog_id) {
+                            $flag = 1;
+                            break;
+                        }
+                    }
+                    if ($flag == 0) {
+                        continue 2;
+                    }
+                } 
+            }
+
+            if ($rule->channel_section) {
+                $channels = $rule->rule_channels_through;
+                $flag = 0;
+                foreach ($channels as $channel) {
+                    if ($channel->id == $this->channel_id) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+
             //是否在物流方式国家中
             if ($rule->country_section) {
                 $countries = $rule->rule_countries_through;
                 $flag = 0;
                 foreach ($countries as $country) {
                     if ($country->code == $this->shipping_country) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+            //是否在物流方式账号中
+            if ($rule->account_section) {
+                $accounts = $rule->rule_accounts_through;
+                $flag = 0;
+                foreach ($accounts as $account) {
+                    if ($account->id == $this->channel_account_id) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if ($flag == 0) {
+                    continue;
+                }
+            }
+            //是否在物流方式运输方式中
+            if ($rule->transport_section) {
+                $transports = $rule->rule_transports_through;
+                $flag = 0;
+                foreach ($transports as $transport) {
+                    if (!$this->order->shipping || $transport->name == $this->order->shipping) {
                         $flag = 1;
                         break;
                     }
@@ -680,7 +868,7 @@ class PackageModel extends BaseModel
             
             return $rule->logistics->code;
         }
-        return false;
+        return '&nbsp;&nbsp;&nbsp;&nbsp;虚拟匹配未匹配到';
     }
 
     public function assignLogistics()
@@ -710,9 +898,26 @@ class PackageModel extends BaseModel
                 //是否在物流方式产品分类中
                 if ($rule->catalog_section) {
                     $catalogs = $rule->rule_catalogs_through;
+                    foreach($this->items as $item) {
+                        $flag = 0;
+                        foreach ($catalogs as $catalog) {
+                            if ($catalog->id == $item->catalog_id) {
+                                $flag = 1;
+                                break;
+                            }
+                        }
+                        if ($flag == 0) {
+                            continue 2;
+                        }
+                    }
+                    
+                }
+                //是否在物流方式渠道中
+                if ($rule->channel_section) {
+                    $channels = $rule->rule_channels_through;
                     $flag = 0;
-                    foreach ($catalogs as $catalog) {
-                        if ($catalog->id == $this->items->item->catalog_id) {
+                    foreach ($channels as $channel) {
+                        if ($channel->id == $this->channel_id) {
                             $flag = 1;
                             break;
                         }
@@ -754,7 +959,7 @@ class PackageModel extends BaseModel
                     $transports = $rule->rule_transports_through;
                     $flag = 0;
                     foreach ($transports as $transport) {
-                        if ($transport->id == $this->order->shipping) {
+                        if (!$this->order->shipping || $transport->name == $this->order->shipping) {
                             $flag = 1;
                             break;
                         }

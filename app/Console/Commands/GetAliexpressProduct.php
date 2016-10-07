@@ -52,7 +52,6 @@ class GetAliexpressProduct extends Command
         $page_size = 100;
         $_product_statues_type = array("onSelling", "offline", "auditing", "editingRequired");  //商品业务状态
         $channel = Channel::driver($account->channel->driver, $account->api_config);
-
         foreach($_product_statues_type as $type){
             $productList = $channel->getOnlineProduct($type,$currentPage, $page_size);
             $productList['productStatusType'] = $type;
@@ -74,7 +73,7 @@ class GetAliexpressProduct extends Command
         }
       
         $end = microtime(true);
-        echo 'Running time ' . round($end - $start, 3) . ' seconds';
+        echo ' Running time ' . round($end - $start, 3) . ' seconds';
 
     }
 
@@ -133,7 +132,7 @@ class GetAliexpressProduct extends Command
                 }
             
                 $productDetail['productId'] = $productItem['productId'];
-                $productDetail['aeopAeProductPropertys'] = serialize($productInfo['aeopAeProductPropertys']);
+                $productDetail['aeopAeProductPropertys'] = array_key_exists('aeopAeProductPropertys', $productInfo) ? serialize($productInfo['aeopAeProductPropertys']) : '';
                 $productDetail['imageURLs'] = $productInfo['imageURLs'];
                 $productDetail['detail'] = array_key_exists('detail', $productInfo) ? $productInfo['detail'] : '';
                 $productDetail['productUnit'] = $productInfo['productUnit'];

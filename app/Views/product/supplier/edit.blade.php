@@ -107,9 +107,15 @@
         <div class="form-group col-lg-2">
             <label for="level">供货商等级</label>
             <select id='level' name='level_id' class='form-control' >
+
+                @foreach(config('product.supplier.level') as $key=>$pay_type)
+                    <option value="{{$key}}" @if($model->level_id == $key) selected @endif> {{$pay_type}} </option>
+                @endforeach
+
+{{--
                 @foreach($levels as $level)
                     <option value="{{$level->id}}" {{ old('level_id') ? (old('level_id') == $model->level_id ? 'selected' : '') : ($model->level_id == $level->id ? 'selected' : '') }}> {{$level->name}} </option>
-                @endforeach
+                @endforeach--}}
             </select>
         </div>
         <div class='form-group col-lg-2'>

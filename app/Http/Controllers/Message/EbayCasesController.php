@@ -1,7 +1,7 @@
 <?php
 /**
  * Ebay case纠纷
- * @author jiangdi
+ * @author Norton
  *
  */
 
@@ -14,6 +14,8 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Modules\Channel\Adapter\EbayAdapter;
+use App\Models\Order\RefundModel;
+
 
 class EbayCasesController extends Controller
 {
@@ -171,18 +173,106 @@ class EbayCasesController extends Controller
             $case_obj->assign_id = request()->user()->id;
             $case_obj->process_status = 'COMPLETE';
             $case_obj->save();
-            return redirect($this->mainIndex)->with('alert', $this->alert('success', $this->mainTitle . '处理成功.'));
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '处理成功.'));
         }else{
-            return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '处理失败.'));
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger',  '处理失败.'));
         }
     }
 
     /**
      * case 回复： 退款
      */
-    public function RefundBuyer(){
-        echo '退款';
+    public function RefundBuyer(RefundModel $refund){
+        
+        $reason  = request()->input('refund-reason');
+        $comment = request()->input('comment');
+        $case    = $this->model->find(request()->input('id'));
+
+        if(empty($case) || empty($case->transaction_id)){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '无法处理，数据不完整'));
+        }
+        $ebay     = new EbayAdapter($case->account->ApiConfig);
+        $caseId   = $case->id;
+        $caseType = $case->type;
+
+        $relation_order = $case->orderItem->order;
+
+        if($ebay->caseFullRefund(compact('caseId','caseType','comment'))){
+            $case->process_status = 'COMPLETE';
+            $case->save();
+
+            $refund->type            = 'FULL';
+            $refund->refund          = 2;
+            $refund->refund_currency = $relation_order->currency;
+            $refund->price           = $relation_order->amount;
+            $refund->refund_amount   = $relation_order->amount;
+            $refund->reason          = $reason;
+            $refund->order_id        = $relation_order->id;
+            $refund->process_status  = 'COMPLETE';
+            $refund->customer_id     = request()->user()->id;
+            $refund->channel_id      = $relation_order->channel_id;
+            $refund->save();
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '退款成功！'));
+        }else{
+            $refund->type            = 'PARTIAL';
+            $refund->refund          = 2;
+            $refund->refund_currency = $relation_order->currency;
+            $refund->price           = $relation_order->amount;
+            $refund->refund_amount   = $relation_order->amount;
+            $refund->reason          = $reason;
+            $refund->order_id        = $relation_order->id;
+            $refund->process_status  = 'FAILED';
+            $refund->customer_id     = request()->user()->id;
+            $refund->channel_id      = $relation_order->channel_id;
+            $refund->save();
+
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败！'));
+        }
     }
 
+    public function PartRefundBuyer(RefundModel $refund){
+        $form = request()->input();
+        $case = $this->model->find(request()->input('id'));
 
+        if(empty($form['amount']) || empty($case)){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '退款失败，参数不完整'));
+        }
+        $ebay = new EbayAdapter($case->account->ApiConfig);
+        $caseId   = $case->id;
+        $caseType = $case->type;
+        $comment  = $form['comment'];
+        $amount   = $form['amount'];
+        $relation_order = $case->orderItem->order;
+
+        if($ebay->casePartRefund(compact('caseId','caseType','comment','amount'))){
+            $case->process_status = 'COMPLETE';
+            $case->save();
+            
+            $refund->type            = 'PARTIAL';
+            $refund->refund          = 2;
+            $refund->refund_currency = $relation_order->currency;
+            $refund->price           = $relation_order->amount;
+            $refund->refund_amount   = $relation_order->amount;
+            $refund->reason          = $form['reason'];
+            $refund->order_id        = $relation_order->id;
+            $refund->process_status  = 'COMPLETE';
+            $refund->customer_id     = request()->user()->id;
+            $refund->channel_id      = $relation_order->channel_id;
+            $refund->save();
+            return redirect($this->mainIndex)->with('alert', $this->alert('success', '部分退款成功！'));
+        }else{
+            $refund->type            = 'PARTIAL';
+            $refund->refund          = 2;
+            $refund->refund_currency = $relation_order->currency;
+            $refund->price           = $relation_order->amount;
+            $refund->refund_amount   = $relation_order->amount;
+            $refund->reason          = $form['reason'];
+            $refund->order_id        = $relation_order->id;
+            $refund->process_status  = 'FAILED';
+            $refund->customer_id     = request()->user()->id;
+            $refund->channel_id      = $relation_order->channel_id;
+            $refund->save();
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '部分退款失败'));
+        }
+    }
 }

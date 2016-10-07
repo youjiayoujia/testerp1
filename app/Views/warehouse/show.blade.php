@@ -25,11 +25,12 @@
                 <strong>联系电话</strong>: {{ $model->telephone }}
             </div>
             <div class="col-lg-2">
-                <strong>类型</strong>: {{ $warehouse->type == 'local' ? '本地仓库' : ($warehouse->type == 'oversea' ? '海外仓库' : ($warehouse->type == 'third' ? '第三方仓库' : 'fba本地仓') }}
+                <strong>类型</strong>: {{ $model->type == 'local' ? '本地仓库' : ($model->type == 'oversea' ? '海外仓库' : ($model->type == 'third' ? '第三方仓库' : 'fba本地仓')) }}
             </div>
             <div class="col-lg-2">
                 <strong>容积(m3)</strong>: {{ $model->volumn }}
             </div>
+
             <div class="col-lg-2">
                 <strong>是否启用</strong>: {{ $model->is_available == '1' ? '是' : '否' }}
             </div>

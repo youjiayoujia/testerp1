@@ -863,4 +863,58 @@ Class WishAdapter implements AdapterInterface
     public function changeMessageState(){
 
     }
+    
+    /**
+     * 请求wish support的邮件
+     * @param $mailID
+     * @return bool
+     */
+    public function ReplayWishSupport($mailID){
+        $data['id']           =  $mailID;
+        $data['access_token'] = $this->access_token;
+        $result = json_decode($this->postCurlHttpsData('https://merchant.wish.com/api/v2/ticket/appeal-to-wish-support',$data),true);
+        if(!empty($re['data']) && $re['data']['success']==1){
+            return true;
+        }else{
+            return false;
+        }
+        
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

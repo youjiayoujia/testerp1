@@ -9,6 +9,11 @@
     <div class="row">
         <div class="col-lg-8">
             @include('message.process.content')
+
+            @if($driver == 'wish')
+                @include('message.process.wish_order_detail')
+            @endif
+
             @include('message.process.reply')
         </div>
         <div class="col-lg-4">
@@ -43,16 +48,28 @@
         $(document).ready(function () {
             $('.btn-translation').click(function(){
                 text =changeSome($(this).attr('need-translation-content'),1);
-                if(tran_content = getTransInfo(text)){
-                    $(this).prev().show().addClass('alert-success');
-                    $(this).prev().children('.content').text(tran_content);
-                    $(this).hide();
-                }else{
-                    $(this).prev().show().addClass('alert-danger');
-                    $(this).prev().children('.content').text('翻译失败');
-                    $(this).hide();
 
-                }
+                $.ajax({
+                    url: "{{route('ajaxGetTranInfo')}}",
+                    data: 'content=' + text,
+                    type: 'POST',
+                    dataType: 'JSON',
+                    success: function (data) {
+
+                        if(data.content){
+                            $('.btn-translation').prev().show().addClass('alert-success');
+                            $('.btn-translation').prev().children('.content').text(data.content);
+                            $('.btn-translation').hide();
+                        }else{
+                            console.log(data.content);
+
+                            $(this).prev().show().addClass('alert-danger');
+                            $(this).prev().children('.content').text('翻译失败');
+                            $(this).hide();
+
+                        }
+                    }
+                });
             });
         });
 
@@ -67,23 +84,18 @@
 
             return text;
         }
+        var tran_info = false;
 
         function getTransInfo(content) {
-            var tran_info = false;
             $.ajax({
                 url: "{{route('ajaxGetTranInfo')}}",
                 data: 'content=' + content,
                 type: 'POST',
                 dataType: 'JSON',
                 success: function (data) {
-                    if(data.status == {{config('status.ajax.success')}}){
-                        tran_info = changeSome( data.info,2);
-                    }else{
-                        tran_info = false;
-                    }
+                    return data.content ? data.content : false;
                 }
             });
-            return tran_info;
         }
 
         function changeChildren(parent) {

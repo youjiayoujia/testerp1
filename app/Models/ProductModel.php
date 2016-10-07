@@ -8,6 +8,9 @@ use App\Models\Product\RequireModel;
 use App\Models\Product\ProductVariationValueModel;
 use App\Models\Product\ProductFeatureValueModel;
 use App\Models\ChannelModel;
+use App\Models\LabelModel;
+use App\Models\CatalogModel;
+use Storage;
 
 use Illuminate\Support\Facades\DB;
 use Tool;
@@ -111,7 +114,7 @@ class ProductModel extends BaseModel
         return [
             'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name']],
             'filterFields' => [],
-            'filterSelects' => ['examine_status' => config('product.examineStatus')],
+            'filterSelects' => [],
             'selectRelatedSearchs' => [],
             'sectionSelect' => [],
         ];
@@ -155,6 +158,11 @@ class ProductModel extends BaseModel
     public function item()
     {
         return $this->hasMany('App\Models\ItemModel', 'product_id');
+    }
+
+    public function limits()
+    {
+        return $this->hasMany('App\Models\Product\ProductLogisticsLimitModel', 'product_id', 'id');
     }
 
     public function logisticsLimit()
@@ -226,7 +234,8 @@ class ProductModel extends BaseModel
 
     public function getDimageAttribute()
     {
-        $arr = array('1'=>'8','2'=>'9');
+        $arr = LabelModel::whereIn('name',['正面图','外观图'])->get(['id'])->toArray();
+        $arr = array_column($arr, 'id'); 
         if (count($this->imageAll)) {
             foreach ($this->imageAll as $key => $image) {
                 $temp = [];
@@ -236,7 +245,7 @@ class ProductModel extends BaseModel
                 if(count(array_intersect($arr,$temp))==2){
                     return $image->path . $image->name;
                 }
-            }    
+            }   
         }
         return '/default.jpg';
     }
@@ -295,11 +304,21 @@ class ProductModel extends BaseModel
                 $data['model'] = $spuobj->spu . $az[$aznum];
                 $data['examine_status'] = 'pending';
                 $product = $this->create($data);
+                
                 if(array_key_exists('carriage_limit_arr', $data)){
                     foreach($data['carriage_limit_arr'] as $logistics_limit_id){
                         $arr['logistics_limits_id'] = $logistics_limit_id;
                         $product->logisticsLimit()->attach($arr);
                     }
+                    //回传旧系统
+                    $data['products_with_battery'] = 0;
+                    $data['products_with_adapter'] = 0;
+                    $data['products_with_fluid'] = 0;
+                    $data['products_with_powder'] = 0;
+                    if(in_array('1', $data['carriage_limit_arr']))$data['products_with_battery'] = 1;
+                    if(in_array('4', $data['carriage_limit_arr']))$data['products_with_adapter'] = 1;
+                    if(in_array('5', $data['carriage_limit_arr']))$data['products_with_fluid'] = 1;
+                    if(in_array('2', $data['carriage_limit_arr']))$data['products_with_powder'] = 1;
                 }
 
                 if(array_key_exists('package_limit_arr', $data)){
@@ -372,12 +391,14 @@ class ProductModel extends BaseModel
                         }
                     }
                 }
-                $product->createItem();
+
+                //$product->createItem();
+                //回传旧系统用，上线后用上一句
+                $product->createItem($data);
                 $aznum++;
             }
             $require_status['status']=3;
             RequireModel::find($data['require_id'])->update($require_status);
-            
         } catch (Exception $e) {
             DB::rollBack();
         }
@@ -510,10 +531,10 @@ class ProductModel extends BaseModel
     /**
      * 创建item
      * 2016-1-13 17:48:26 YJ
-     * @param array product_id_array 产品id字符串
+     * @param array product_id_array 产品id字符串 $temp为回传旧系统数据时方便的参数，上线后删掉
      * @return array
      */
-    public function createItem()
+    public function createItem($temp)
     {
         //获得variation属性集合
         $variations = $this->variationValues->toArray();
@@ -527,8 +548,43 @@ class ProductModel extends BaseModel
             $product_data['product_id'] = $this->id;
             $product_data['status'] = 'sellWaiting';
             unset($product_data['id']);
-            //echo '<pre>';print_r($product_data);exit;
-            $this->item()->create($product_data);
+            $itemModel = $this->item()->create($product_data);
+            //初始化
+            $old_data = [];
+            $old_data['products_name_en'] = $itemModel->name;
+            $old_data['products_name_cn'] = $itemModel->c_name;
+            $old_data['products_sku'] = $itemModel->sku;
+            $old_data['products_sort'] = CatalogModel::find($itemModel->catalog_id)?CatalogModel::find($itemModel->catalog_id)->name:'异常';
+            $old_data['products_declared_en'] = $itemModel->product->declared_en;
+            $old_data['products_declared_cn'] = $itemModel->product->declared_cn;
+            $old_data['products_value'] = $itemModel->purchase_price;
+            $old_data['products_weight'] = $itemModel->weight;
+            //包装后重量暂时为0
+            $old_data['weightWithPacket'] = 0;
+            $old_data['products_with_battery'] = $temp['products_with_battery'];
+            $old_data['products_with_adapter'] = $temp['products_with_adapter'];
+            $old_data['products_with_fluid'] = $temp['products_with_fluid'];
+            $old_data['products_with_powder'] = $temp['products_with_powder'];
+            $old_data['products_suppliers_id'] = $itemModel->supplier_id;
+            $old_data['products_check_standard'] = $itemModel->quality_standard;
+            $old_data['product_warehouse_id'] = $itemModel->warehouse_id;
+            $old_data['products_more_img'] = $itemModel->purchase_url;
+            $old_data['productsPhotoStandard'] = $itemModel->name;
+            $old_data['products_remark_2'] = $itemModel->product->notify;
+            $old_data['products_create_time'] = $itemModel->created_at->format('Y-m-d H:i:s');
+            $old_data['user_id'] = $itemModel->product->spu->product_require_id;
+            //回传老系统
+            $url="http://120.24.100.157:60/api/products.php";
+            $c = curl_init(); 
+            curl_setopt($c, CURLOPT_URL, $url); 
+            curl_setopt($c, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($c, CURLOPT_POSTFIELDS, $old_data);
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, 0);
+            curl_setopt($c, CURLOPT_CONNECTTIMEOUT, 60); 
+            $buf = curl_exec($c);
+            if($buf){
+
+            }
         }
 
         $this->status = "selling";
@@ -632,5 +688,74 @@ class ProductModel extends BaseModel
            
         }
         //
+    }
+
+    public function tagRevert($data){
+        foreach($data as $key=>$_data){
+            switch ($_data) {
+                case 'photo':
+                    $data[$key] = 1;
+                    break;
+                
+                case 'link':
+                    $data[$key] = 2;
+                    break;
+
+                case 'logo':
+                    $data[$key] = 6;
+                    break;
+
+                case 'size':
+                    $data[$key] = 8;
+                    break;
+
+                case 'color':
+                    $data[$key] = 7;
+                    break;
+
+                case 'shape':
+                    $data[$key] = 4;
+                    break;
+
+                case 'front':
+                    $data[$key] = 5;
+                    break;
+
+                case 'normal':
+                    $data[$key] = 6;
+                    break;
+            }
+        }
+        return $data;
+    }  
+
+    public function oneSku(){
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+        //$imageModel = new ImageModel();
+        //$model = $this->all();
+        $model = $this->where('id','>','78700')->get();
+        foreach($model as $_item){
+            $sku = $_item->item[0]->sku;
+            $url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku='.$sku;
+            //$url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImageInfo.php?distinct=true&include_sub=true&sku=HW3184';
+            $contents = json_decode(file_get_contents($url));
+            if(count($contents)){
+                foreach ($contents as $image) {
+                    $data['spu_id'] = $_item->item[0]->product->spu_id;
+                    $data['product_id'] = $_item->item[0]->product_id;
+                    $data['path'] = config('product.image.uploadPath') . '/' . $data['spu_id'] . '/' . $data['product_id'] . '/' ;
+                    $data['name'] = $image->filename;
+                    $arr = (array)$image->fileId;
+                    $image_url = 'http://erp.moonarstore.com/getSkuImageInfo/getSkuImage.php?id='.$arr['$id'];
+                    $disk = Storage::disk('product');
+                    Storage::disk('product')->put($data['path'].$data['name'],file_get_contents($image_url));
+                    $imageModel = ImageModel::create($data);
+                    $tags = $image->tags;
+                    $tags = $this->tagRevert($tags);
+                    $imageModel->labels()->attach($tags);
+                }
+            }
+        }
     }
 }

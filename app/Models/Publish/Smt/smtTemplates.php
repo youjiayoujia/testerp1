@@ -2,9 +2,9 @@
 
 namespace App\Models\Publish\Smt;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Base\BaseModel;
 
-class smtTemplates extends Model
+class smtTemplates extends BaseModel
 {
     protected $table = "smt_template";
     

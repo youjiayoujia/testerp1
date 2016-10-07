@@ -19,7 +19,7 @@ class CarryOverFormsModel extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['parent_id', 'stock_id', 'begin_quantity', 'begin_amount', 'over_quantity', 'over_amount', 'created_at'];
+    protected $fillable = ['parent_id', 'stock_id', 'purchase_price', 'begin_quantity', 'begin_amount', 'over_quantity', 'over_amount', 'created_at'];
 
 
     //查询

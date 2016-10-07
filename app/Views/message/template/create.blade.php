@@ -20,7 +20,7 @@
                     </select>
                 </div>
                 <div class="col-lg-2" id="loadingDiv">
-                    <img src="{{ asset('loading.gif') }}" width="30"/>
+                    <img src="{{ asset('loading.gif') }}" width="30" style="display:none;"/>
                 </div>
             </div>
         </div>

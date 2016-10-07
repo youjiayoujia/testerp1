@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PickReportModel;
 use App\Models\PickListModel;
+use App\Models\WarehouseModel;
 
 class PickReportController extends Controller
 {
@@ -19,6 +20,49 @@ class PickReportController extends Controller
         $this->mainIndex = route('pickReport.index');
         $this->mainTitle = '拣货排行榜';
         $this->viewPath = 'pick.report.';
+    }
+
+    /**
+     * 列表
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function index()
+    {
+        request()->flash();
+        $model = $this->model->orderBy('day_time', 'desc')->first();
+        $last_time = '';
+        $monthModel = $this->model->whereBetween('day_time',[date('Y-m-d', strtotime(date('Y-m', strtotime('now')))), date('Y-m-d', strtotime(date('Y-m', strtotime('+1 month'))))])->get()->groupBy('user_id');
+        if($model) {
+            $last_time = $model->day_time;
+            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+        }
+        if(request()->has('date') && !empty(request('date'))) {
+            $last_time = '';
+            $model = $this->model;
+            if(request()->has('warehouseid') && !empty(request('warehouseid'))) {
+                $model = $model->where('warehouse_id', request('warehouseid'));
+            }
+            $model = $model->orderBy('day_time', 'desc')->get()->groupBy('day_time');
+            foreach($model as $time => $single) {
+                if(date('Y-m-d', strtotime($time)) == date('Y-m-d', strtotime(request('date')))) {
+                    $last_time = $time;
+                }
+            }
+            $model = $this->model->orderBy('day_time', 'desc')->get()->groupBy('day_time')->get($last_time);
+            $monthModel = $this->model->whereBetween('day_time', [
+                date('Y-m-d', strtotime(date('Y-m', strtotime($last_time)))),
+                date('Y-m-d', strtotime(date('Y-m', strtotime($last_time) + strtotime('now') - strtotime('-1 month'))))])->get()->groupBy('user_id');
+        }
+        $response = [
+            'metas' => $this->metas(__FUNCTION__),
+            'data' => $model,
+            'mixedSearchFields' => $this->model->mixed_search,
+            'monthModel' => $monthModel,
+            'warehouses' => WarehouseModel::all(),
+        ];
+
+        return view($this->viewPath . 'index', $response);
     }
 
     public function createData()
@@ -36,17 +80,22 @@ class PickReportController extends Controller
                     'multi' => $block->filter(function($single){
                         return $single->type == 'MULTI';
                     })->sum('account'),
+                    'missing_pick' => $block->filter(function($single){
+                        return strtotime($single->pick_at) > strtotime(date('Y-m-d', strtotime('now'))) &&
+                               strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));
+                    })->sum('quantity'),
                     'today_pick' => $block->filter(function($single){
                         return strtotime($single->pick_at) > strtotime(date('Y-m-d', strtotime('now'))) &&
-                               strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')))
-                    })->sum('accouont'),
+                               strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));
+                    })->sum('account'),
                     'today_picklist' => $block->filter(function($single){
                         return strtotime($single->pick_at) > strtotime(date('Y-m-d', strtotime('now'))) &&
-                               strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')))
+                               strtotime($single->pick_at) < strtotime(date('Y-m-d', strtotime('+1 day')));
                     })->count(),
                     'day_time' => date('Y-m-d H:i:s', time()),
-                ])
+                ]);
         }
-        var_dump($model->toArray());exit;
+        
+        return redirect($this->mainIndex);
     }
 }

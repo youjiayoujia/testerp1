@@ -2,15 +2,11 @@
 @section('formAction') {{ route('report.store') }} @stop
 @section('formBody')
 <div class='row'>
-    <div class="form-group col-lg-4">
-        <label for="fba_address" class='control-label'>fba地址</label>
-        <input type='text' class="form-control" placeholder="fba地址" name='fba_address' value="{{ old('fba_address') }}">
-    </div>
-    <div class='form-group col-lg-4'> 
+    <div class='form-group col-lg-2'> 
         <label for='渠道帐号'>shipment名称</label> 
         <input type='text' class="form-control" placeholder="shipment 名称" name='shipment_name' value="{{ old('shipment_name') }}">
     </div>
-    <div class='form-group col-lg-4'> 
+    <div class='form-group col-lg-2'> 
         <label for='渠道帐号'>渠道帐号</label> 
         <select name='account_id' class='form-control account_id'>
             @foreach($accounts as $account)
@@ -18,13 +14,11 @@
             @endforeach
         </select>
     </div>
-</div>
-<div class='row'>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-2">
         <label for="fba_address" class='control-label'>plan Id</label>
         <input type='text' class="form-control" placeholder="plan Id" name='plan_id' value="{{ old('plan_id') }}">
     </div>
-    <div class="form-group col-lg-4">
+    <div class="form-group col-lg-2">
         <label for='from_address'>shipment Id</label>
         <input type='text' class="form-control" placeholder="shipment Id" name='shipment_id' value="{{ old('shipment_id') }}">
     </div>
@@ -124,7 +118,7 @@ $(document).ready(function(){
                 $('.add_row').children('div:last').after(result);
                 $('.sku1').select2({
                     ajax: {
-                        url: "{{ route('stock.ajaxSku') }}",
+                        url: "{{ route('stock.overseaSku') }}",
                         dataType: 'json',
                         delay: 250,
                         data: function (params) {
@@ -151,6 +145,16 @@ $(document).ready(function(){
 
     $(document).on('click', '.bt_right', function(){
         $(this).parent().remove();
+    });
+
+    $(document).on('blur', '.report_quantity', function(){
+        available = parseInt($(this).parent().parent().find('.access_quantity').val());
+        val = $(this).val();
+        if(val > available) {
+            alert('数量超出可用数量');
+            $(this).val('');
+            return false;
+        }
     });
 
     $('.sku1').select2({

@@ -3,7 +3,7 @@
  * 库位控制器
  * 处理库位相关的Request与Response
  *
- * @author: MC
+ * @author: MC<178069409>
  * Date: 15/12/18
  * Time: 16:15pm
  */
@@ -14,6 +14,7 @@ use Excel;
 use App\Http\Controllers\Controller;
 use App\Models\Warehouse\PositionModel;
 use App\Models\WarehouseModel;
+use App\Models\UserModel;
 
 class PositionController extends Controller
 {
@@ -71,7 +72,8 @@ class PositionController extends Controller
     public function update($id)
     {
         $model = $this->model->find($id);
-        $from = serialize($model);
+        $name = UserModel::find(request()->user()->id)->name;
+        $from = base64_encode(serialize($model));
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
         }
@@ -87,8 +89,8 @@ class PositionController extends Controller
                 }
             }
         }
-        $to = serialize($model);
-        $this->eventLog(request()->user()->id, '库位信息更新,id='.$model->id, $to, $from);
+        $to = base64_encode(serialize($model));
+        $this->eventLog($name, '库位信息更新,id='.$model->id, $to, $from);
         return redirect($this->mainIndex)->with('alert', $this->alert('success', '修改成功'));
     }
 
@@ -103,12 +105,6 @@ class PositionController extends Controller
         $model = $this->model->find($id);
         if (!$model) {
             return redirect($this->mainIndex)->with('alert', $this->alert('danger', $this->mainTitle . '不存在.'));
-        }
-        if($model->stocks) {
-            $stocks = $model->stocks;
-            foreach($stocks as $stock) {
-                $stock->delete();
-            }
         }
         $model->destroy($id);
         
@@ -174,14 +170,14 @@ class PositionController extends Controller
     {
         $rows = [
                     [ 
-                     'name'=>'',
-                     'warehouse'=>'',
-                     'remark'=>'',
-                     'size'=>'',
-                     'length'=>'',
-                     'width'=>'',
-                     'height'=>'',
-                     'is_available'=>'',
+                     'name'=>'DZA123',
+                     'warehouse'=>'金华仓',
+                     'remark'=>'备注',
+                     'size'=>'big/middle/small',
+                     'length'=>'10',
+                     'width'=>'10',
+                     'height'=>'10',
+                     'is_available'=>'0/1',
                      '备注'=>'warehouse正常的仓库名,size:big/middle/small 对应大中小,is_available:0/1 是否启用 0=否'
                     ]
             ];

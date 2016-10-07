@@ -34,7 +34,7 @@ class EbayDetailController extends Controller
         request()->flash();
         $response = [
             'metas' => $this->metas(__FUNCTION__),
-            'data' => $this->autoList($this->model->orderBy('id', '')),
+            'data' => $this->autoList($this->model,$this->model->orderBy('id', 'asc')),
             'mixedSearchFields' => $this->model->mixed_search,
         ];
         return view($this->viewPath . 'index', $response);
@@ -65,10 +65,7 @@ class EbayDetailController extends Controller
      * 获取可用站点
      */
     public function getEbaySite(){
-
-
-        $accountID =378;
-        $account = AccountModel::findOrFail($accountID);
+        $account = AccountModel::where('account',config('ebaysite.default_account'))->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbaySite();
         if($result){
@@ -80,16 +77,20 @@ class EbayDetailController extends Controller
                    $this->model->where('id',$siteInfo->id)->update($re);
                }
             }
+
+            $currency = config('ebaysite.init_currency');
+            foreach($currency as $key=>$value){
+                $this->model->where('site_id',$key)->update(['currency'=>$value]);
+            }
         }else{
-
+            echo '同步失败';
         }
-
     }
     /*
      * 退货政策
      */
-    public function getEbayReturnPolicy($site,$accountID=378){
-        $account = AccountModel::findOrFail($accountID);
+    public function getEbayReturnPolicy($site){
+        $account = AccountModel::where('account',config('ebaysite.default_account'))->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbayReturnPolicy($site);
         if($result){
@@ -109,8 +110,8 @@ class EbayDetailController extends Controller
     /*
      * 获得对应站点的运输方式
      */
-    public function getEbayShipping($site,$accountID=378){
-        $account = AccountModel::findOrFail($accountID);
+    public function getEbayShipping($site){
+        $account = AccountModel::where('account',config('ebaysite.default_account'))->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getEbayShipping($site);
         if($result){
@@ -132,8 +133,8 @@ class EbayDetailController extends Controller
     /*
      * 获取对应站点的分类
      */
-    public function getEbayCategory($site,$accountId=378){
-        $account = AccountModel::findOrFail($accountId);
+    public function getEbayCategory($site){
+        $account = AccountModel::where('account',config('ebaysite.default_account'))->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         EbayCategoryModel::where('site',$site)->delete(); //全部删除
         $result = $channel->getEbayCategoryList(1,'',$site);

@@ -392,70 +392,108 @@ return [
         'name' => ' 刊登',
         'icon' => 'glyphicon glyphicon-send',
         'url' => '',
-        'type' => '',
+        'type' => 'group',
         'subnavigations' => [
-            [
-                'name' => 'Wish草稿列表',
-                'url' => 'wish.index',
-                'icon' => '',
+            'Wish刊登' => [
+                [
+                    'name' => 'Wish草稿列表',
+                    'url' => 'wish.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Wish在线数据列表',
+                    'url' => 'wish.indexOnlineProduct',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Wish销售代码设置',
+                    'url' => 'wishSellerCode.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => 'Wish在线数据列表',
-                'url' => 'wish.indexOnlineProduct',
-                'icon' => '',
-            ],
-            [
-                'name' => 'Wish销售代码设置',
-                'url' => 'wishSellerCode.index',
-                'icon' => '',
-            ],
-            [
+            'Aliexpress刊登'=>[
+                [
+                    'name' => 'SMT待发布产品列表',
+                    'url' => 'smt.waitPost',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT产品草稿列表',
+                    'url' => 'smt.index',
+                    'icon' => '',
+                ],
+                [
 
-                'name' => 'SMT待发布产品列表',
-                'url' => 'smt.waitPost',
-                'icon' => '',
+                    'name' => 'SMT在线产品列表',
+                    'url' => 'smt.onlineProductIndex',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'SMT在线数据监控',
+                    'url' => 'smtMonitor.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'smt销售代码设置',
+                    'url' => 'smtSellerCode.index',
+                    'icon' => '',
+                ],
             ],
-            [
-                'name' => 'SMT产品草稿列表',
-                'url' => 'smt.index',
-                'icon' => '',
+
+            'Ebay刊登' => [
+                [
+                    'name' => 'Ebay站点信息',
+                    'url' => 'ebayDetail.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay草稿列表',
+                    'url' => 'ebayPublish.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay在线列表',
+                    'url' => 'ebayOnline.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay销售代码设置',
+                    'url' => 'ebaySellerCode.index',
+                    'icon' => '',
+                ],
+
+                [
+                    'name' => 'Ebay账号设置',
+                    'url' => 'ebayAccountSet.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay描述模板设置',
+                    'url' => 'ebayDescription.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay数据模板设置',
+                    'url' => 'ebayDataTemplate.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay店铺分类设置',
+                    'url' => 'ebayStoreCategory.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay曝光规则设置',
+                    'url' => 'ebayTiming.index',
+                    'icon' => '',
+                ],
+                [
+                    'name' => 'Ebay在线数据监控',
+                    'url' => 'ebayProduct.index',
+                    'icon' => '',
+                ],
             ],
-            [
-            
-                'name' => 'SMT在线产品列表',
-                'url' => 'smt.onlineProductIndex',
-                'icon' => '',
-            ],
-            [
-                'name' => 'SMT在线数据监控',
-                'url' => 'smtMonitor.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'smt销售代码设置',
-                'url' => 'smtSellerCode.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'Ebay站点信息',
-                'url' => 'ebayDetail.index',
-                'icon' => '',
-            ],
-            [
-                'name' => 'Ebay草稿列表',
-                'url' => 'ebayPublish.index',
-                'icon' => '',
-            ],
-           /* [
-                'name' => 'Ebay销售代码设置',
-                'url' => 'ebaySellerCode.index',
-                'icon' => '',
-            ],*/
-            [
-                'name' => 'Ebay在线数据监控',
-                'url' => 'ebayProduct.index',
-                'icon' => '',
-            ],
+
         ],
     ],
     //CRM导航

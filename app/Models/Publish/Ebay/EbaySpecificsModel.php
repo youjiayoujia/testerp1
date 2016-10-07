@@ -42,7 +42,7 @@ class EbaySpecificsModel extends BaseModel
               return $result;
           }
         }
-        $account = AccountModel::find(378);
+        $account = AccountModel::where('account',config('ebaysite.default_account'))->first();
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $specifics = $channel->getEbayCategorySpecifics($category_id,$site);
         if($specifics){

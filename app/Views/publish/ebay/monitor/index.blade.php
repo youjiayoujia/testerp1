@@ -154,6 +154,10 @@
                 ids += checkbox[i].value + ",";
             }
             ids = ids.substr(0, (ids.length) - 1);
+            if(ids==''){
+                alert("请先勾选");
+                return false;
+            }
             var url = "{{ route('ebay.productBatchEdit') }}";
             window.location.href = url + "?ids=" + ids + "&param=" + param;
         });

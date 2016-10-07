@@ -12,6 +12,7 @@ use Tool;
 use App\Models\OrderModel;
 use App\Models\Message\Issues\EbayCasesListsModel;
 use App\Models\Message\Issues\EbayCasesDetailsModel;
+use App\Models\Publish\Ebay\EbayPublishProductModel;
 
 
 class EbayAdapter implements AdapterInterface
@@ -253,6 +254,10 @@ class EbayAdapter implements AdapterInterface
                 foreach ($items as $item) {
                     $item['currency'] = $reurnOrder['currency'];
                     $item['channel_order_id'] = $reurnOrder['channel_ordernum'];
+                    $is_chinese = EbayPublishProductModel::where(['item_id'=>$item['orders_item_number'],'listing_type'=>'Chinese'])->first();
+                    if(isset($is_chinese->id)){
+                        $reurnOrder['is_chinese'] = 1;
+                    }
                     $reurnOrder['items'][] = $item;
                 }
 
@@ -263,6 +268,10 @@ class EbayAdapter implements AdapterInterface
             foreach ($items as $item) {
                 $item['currency'] = $reurnOrder['currency'];
                 $item['channel_order_id'] = $reurnOrder['channel_ordernum'];
+                $is_chinese = EbayPublishProductModel::where(['item_id'=>$item['orders_item_number'],'listing_type'=>'Chinese'])->first();
+                if(isset($is_chinese->id)){
+                    $reurnOrder['is_chinese'] = 1;
+                }
                 $reurnOrder['items'][] = $item;
             }
 
@@ -448,6 +457,69 @@ class EbayAdapter implements AdapterInterface
 
     }
 
+    public function getStoreCategory($site=0){
+        $return = [];
+        $xml ='<LevelLimit>3</LevelLimit>';
+        $response = $this->buildEbayBody($xml, 'GetStore', $site);
+        if ($response->Ack == 'Success') {
+            $category = $response->Store->CustomCategories->CustomCategory;
+           // var_dump($response);exit;
+            //先删除以前的
+            foreach ($category as $v1) {
+
+                $add_data=array();
+                $add_data['store_category'] = (string)$v1->CategoryID;
+                $add_data['store_category_name'] = (string)$v1->Name;
+                $add_data['level'] = 1;
+                $add_data['category_parent'] = '';
+                $return[] = $add_data;
+                if(isset($v1->ChildCategory)){
+                    foreach($v1->ChildCategory as $v2){
+                        $add_data=array();
+                        $add_data['store_category'] = (string)$v2->CategoryID;
+                        $add_data['store_category_name'] = (string)$v2->Name;
+                        $add_data['level'] = 2;
+                        $add_data['category_parent'] = (string)$v1->CategoryID;
+                        $return[] = $add_data;
+                        if(isset($v2->ChildCategory)){
+                            foreach($v2->ChildCategory as $v3){
+                                $add_data=array();
+                                $add_data['store_category'] = (string)$v3->CategoryID;
+                                $add_data['store_category_name'] = (string)$v3->Name;
+                                $add_data['level'] = 3;
+                                $add_data['category_parent'] = (string)$v2->CategoryID;
+                                $return[] = $add_data;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }else{
+            return false;
+        }
+        return $return;
+    }
+    public function getSuggestedCategories($query,$site)
+    {
+        $return = [];
+        $xml = '<Query>' . $query . '</Query>';
+        $response = $this->buildEbayBody($xml, 'GetSuggestedCategories', $site);
+        if ($response->Ack == 'Success') {
+            $suggestedCategory = $response->SuggestedCategoryArray->SuggestedCategory;
+            $i = 0;
+            foreach($suggestedCategory as $key=> $suggest){
+                $return[$i]['CategoryID']= (string)$suggest->Category->CategoryID;
+                $return[$i]['Percent']= (string)$suggest->PercentItemFound;
+                $i++;
+            }
+
+        }else{
+            return false;
+        }
+        return $return;
+    }
+
     public function getEbayCondition($category_id, $site)
     {
         $return = [];
@@ -515,6 +587,537 @@ class EbayAdapter implements AdapterInterface
         }
         return $return;
     }
+
+    /**验证和上架
+     * @param $api
+     * @param $data
+     * @param $site
+     */
+    public function publish($api,$data,$site){
+        $return = [];
+        $xml = '<Item>';
+        $xml .= '<Title>' . htmlspecialchars($data['title']) . '</Title>';
+        if(!empty($data['sub_title'])){
+            $xml .= '<SubTitle>'.htmlspecialchars($data['sub_title']) .'</SubTitle>';
+        }
+        $xml .= '<Site>'.$data['site_name'].'</Site>';
+        $xml .= '<Currency>'.$data['currency'].'</Currency>';
+        $xml .= '<SKU>'.$data['sku'].'</SKU>';
+        $xml .= '<ListingDuration>'.$data['listing_duration'].'</ListingDuration>';
+        $xml .= '<CategoryMappingAllowed>true</CategoryMappingAllowed>'; //是否允许多分类
+        $xml .='<PrimaryCategory><CategoryID>'.$data['primary_category'].'</CategoryID></PrimaryCategory>';
+        if(!empty( $data['secondary_category'])){
+            $xml .= '<SecondaryCategory><CategoryID>' . $data['secondary_category'] . '</CategoryID></SecondaryCategory>';
+        }
+        $xml .= '<ConditionID>'.$data['condition_id'].'</ConditionID>';
+        if(!empty($data['condition_description'])){
+            $xml .= '<ConditionDescription>'.trim($data['condition_description']).'</ConditionDescription>';
+        }
+        if($data['private_listing']){
+            $xml .= '<PrivateListing>ture</PrivateListing>';
+        }
+        $xml .= '<PaymentMethods>PayPal</PaymentMethods>';  // 付款方式 - 暂时只支持paypal
+        $xml .= '<PayPalEmailAddress>'.$data['paypal_email_address'] .'</PayPalEmailAddress>';
+        if (!empty($data['picture_details'])) //ebay图片
+        {
+            $xml .= '<PictureDetails>';
+            $picture = json_decode($data['picture_details'], true);
+            $i=0;
+            foreach ($picture as $value) {
+                if($i==12){break;}
+                if($i==1&&($data['site_name']=='Italy'||$data['site_name']=='France')){//意大利和法国只上传一张主图片 09.08
+                    break;
+                }
+                $value =  str_replace(" ", "%20",$value);
+                $xml .= '<PictureURL>'.($value).'</PictureURL>';
+                $i++;
+            }
+            $xml .= '</PictureDetails>';
+        }
+        if (!empty($data['country'])) //产品所在的国家
+        {
+            $xml .= '<Country>'.$data['country'].'</Country>';
+        }
+        if (!empty($data['location']))  //地点
+        {
+            $xml .= '<Location>' . $data['location'] . '</Location>';
+        }
+        if (!empty($data['postal_code']))  //邮编
+        {
+            $xml .= '<PostalCode>' . $data['postal_code'] . '</PostalCode>';
+        }
+        $productListingDetails = '';
+        if(!empty($data['item_specifics'])){
+            $xml .= '<ItemSpecifics>';
+            $item_specifics = json_decode($data['item_specifics'],true);
+            foreach($item_specifics as $key=>$value){
+                if(!empty($value)){
+                    if((strtoupper($key)=='UPC')||(strtoupper($key)=='EAN')||(strtoupper($key)=='ISBN')){
+                        $productListingDetails .= '<'.strtoupper($key).'>'.$value.'</'.strtoupper($key).'>';
+                        continue;
+                    }
+                    $xml .= '<NameValueList><Name>'.htmlspecialchars($key).'</Name><Value>'.htmlspecialchars($value).'</Value></NameValueList>';
+                }
+            }
+            $xml .= '</ItemSpecifics>';
+        }
+        if(!empty($productListingDetails)){ //UPC EAN ISBN
+            $xml .='<ProductListingDetails>'.$productListingDetails.'</ProductListingDetails>';
+        }
+
+        $buyerRequirementDetails = '';
+        $buyer_requirement = json_decode($data['buyer_requirement'], true);
+
+        //买家要求
+        if (($buyer_requirement['LinkedPayPalAccount'])&&isset($buyer_requirement['LinkedPayPalAccount'])) {
+            $buyerRequirementDetails .= '<LinkedPayPalAccount>true</LinkedPayPalAccount>'; //只支持PAYPAL付款
+        }
+        if (($buyer_requirement['ShipToRegistrationCountry'])&&isset($buyer_requirement['ShipToRegistrationCountry'])) {
+            $buyerRequirementDetails .= '<ShipToRegistrationCountry>true</ShipToRegistrationCountry>'; //排除运输范围之外的国家
+        }
+        if (isset($buyer_requirement['unpaid_on'])&&$buyer_requirement['unpaid_on']) {
+            $buyerRequirementDetails .= '<MaximumUnpaidItemStrikesInfo><Count>' . $buyer_requirement['MaximumUnpaidItemStrikesInfo']['Count'] . '</Count><Period>' . $buyer_requirement['MaximumUnpaidItemStrikesInfo']['Period'] . '</Period></MaximumUnpaidItemStrikesInfo>';
+        }
+        if (isset($buyer_requirement['policy_on'])&&$buyer_requirement['policy_on']) {
+            $buyerRequirementDetails .= '<MaximumBuyerPolicyViolations><Count>' . $buyer_requirement['MaximumBuyerPolicyViolations']['Count'] . '</Count><Period>' . $buyer_requirement['MaximumBuyerPolicyViolations']['Period'] . '</Period></MaximumBuyerPolicyViolations>';
+        }
+        if (isset($buyer_requirement['feedback_on'])&&$buyer_requirement['feedback_on']) {
+            $buyerRequirementDetails .= '<MinimumFeedbackScore>' . $buyer_requirement['MinimumFeedbackScore']. '</MinimumFeedbackScore>';  //信用低于
+        }
+        if (isset($buyer_requirement['item_count_on'])&&$buyer_requirement['item_count_on']) {
+            $buyerRequirementDetails .= '<MaximumItemRequirements><MaximumItemCount>' . $buyer_requirement['MaximumItemRequirements']['MaximumItemCount'].'</MaximumItemCount><MinimumFeedbackScore>' . $buyer_requirement['MaximumItemRequirements']['MinimumFeedbackScore'].'</MinimumFeedbackScore></MaximumItemRequirements>';
+        }
+
+        if(!empty($buyerRequirementDetails)){
+            $xml .='<BuyerRequirementDetails>'.$buyerRequirementDetails.'</BuyerRequirementDetails>';
+        }
+
+        $returnPolicy = '';
+        $return_policy = json_decode($data['return_policy'],true);
+        //退货政策
+        if ($return_policy['ReturnsAcceptedOption'] == 'ReturnsAccepted')   //退货政策  接受的情况下，
+        {
+            $returnPolicy .= '<ReturnsAcceptedOption>'.$return_policy['ReturnsAcceptedOption'].'</ReturnsAcceptedOption>';
+            if (!empty($return_policy['ReturnsWithinOption'])) {
+                $returnPolicy .= ' <ReturnsWithinOption>' . $return_policy['ReturnsWithinOption'] . '</ReturnsWithinOption>'; //退货天数
+            }
+            if (!empty($return_policy['RefundOption'])) {
+                $returnPolicy .= '<RefundOption>' . $return_policy['RefundOption'] . '</RefundOption>';  //退货方式  一些站点没有这个标签
+            }
+            if (!empty($return_policy['ShippingCostPaidByOption'])) {
+                $returnPolicy .= '<ShippingCostPaidByOption>'.$return_policy['ShippingCostPaidByOption'] . '</ShippingCostPaidByOption>'; // 退货费用谁承担
+            }
+
+            if ($return_policy['ExtendedHolidayReturns']) {
+                $returnPolicy .= '<ExtendedHolidayReturns>true</ExtendedHolidayReturns>'; //节假日延迟
+            }
+            if (!empty($returnPolicy['Description'])) {
+                $returnPolicy .= '<Description>' . trim($return_policy['Description']) . '</Description>'; // 退货详情
+            }
+        }
+        if(!empty($returnPolicy)){
+            $xml .='<ReturnPolicy>'.$returnPolicy.'</ReturnPolicy>';
+        }
+
+        $xml .= '<DispatchTimeMax>'.$data['dispatch_time_max'].'</DispatchTimeMax>'; //  对应的发货天数
+
+        $xml .= '<ShippingDetails>';
+        $shippingServiceOptions = json_decode($data['shipping_details'],true);
+        foreach($shippingServiceOptions['Shipping'] as $key=>$value){
+            if( empty($value['ShippingService'])){
+                continue;
+            }
+            $xml .= '<ShippingServiceOptions>';
+            $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
+            $xml .= ' <ShippingService>' .$value['ShippingService'] . '</ShippingService>';  //国内运输方式
+            if(empty($value['ShippingServiceCost'])&&(empty($value['ShippingServiceAdditionalCost']))){
+                $xml .= '<FreeShipping>true</FreeShipping>'; //是否免费
+            }else{
+                if (!empty($value['ShippingServiceCost'])) {
+                    $xml .= '<ShippingServiceCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceCost']. '</ShippingServiceCost>';//基本运费
+                }
+                if (!empty($value['ShippingServiceAdditionalCost'])) {
+                    $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceAdditionalCost']. '</ShippingServiceAdditionalCost>'; //额外加收
+                }
+            }
+            $xml .= '</ShippingServiceOptions>';
+        }
+
+        foreach($shippingServiceOptions['InternationalShipping'] as $key=>$value){
+            if( empty($value['ShippingService'])){
+                continue;
+            }
+            $xml .= '<InternationalShippingServiceOption>';
+            $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>'; //国际运输 顺序
+            $xml .= '<ShippingService>'.$value['ShippingService'].'</ShippingService>'; //国际运输方式
+            $xml .= '<ShippingServiceCost crenccuyID="' . $data['currency'] . '" >'.$value['ShippingServiceCost'].'</ShippingServiceCost>'; // 费用
+            $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency']. '" >'.$value['ShippingServiceAdditionalCost'].'</ShippingServiceAdditionalCost>';// 额外加收
+            if(!empty($value['ShipToLocation'])){
+                foreach($value['ShipToLocation'] as $v){
+                    if(!empty($v)){
+                        $xml .= '<ShipToLocation>'.$v.'</ShipToLocation>';
+
+                    }
+                }
+            }
+            $xml .= '</InternationalShippingServiceOption>';
+        }
+        if(!empty($shippingServiceOptions['ExcludeShipToLocation'])){
+            foreach($shippingServiceOptions['ExcludeShipToLocation'] as $v){
+                $xml .= '<ExcludeShipToLocation>' . $v . '</ExcludeShipToLocation>';
+            }
+        }
+        $xml .= '</ShippingDetails>';
+
+        if(!empty($data['store_category_id'])){
+            $xml .='<Storefront>';
+            $xml .='<StoreCategoryID>'.$data['store_category_id'].'</StoreCategoryID>';
+            $xml .='</Storefront>';
+        }
+
+        if ($data['listing_type'] == 'Chinese') {
+            $xml .= '<ListingType>Chinese</ListingType>';
+            $xml .= '<StartPrice currencyID="' . $data['currency'].'">'.$data['start_price'].'</StartPrice>';
+            $xml .= '<ReservePrice  currencyID="' . $data['currency'] . '">0.00</ReservePrice>';
+            $xml .= '<BuyItNowPrice currencyID="' . $data['currency'] . '">0.00</BuyItNowPrice>';
+            $xml .= '<Quantity>'.(int)$data['quantity'].'</Quantity>';
+        }
+        if ($data['listing_type'] == 'FixedPriceItem'&&$data['multi_attribute']==0) {
+            $xml .= '<ListingType>FixedPriceItem</ListingType>';
+            $xml .= '<StartPrice currencyID="' .$data['currency']. '">'.$data['start_price'].'</StartPrice>';
+            $xml .= '<Quantity>' . $data['quantity'] . '</Quantity>';
+        }
+        if ($data['listing_type'] == 'FixedPriceItem'&&$data['multi_attribute']==1) {
+            $xml .= '<ListingType>FixedPriceItem</ListingType>';
+            $variation_specifics = json_decode($data['variation_specifics'],true);
+            if(!empty($variation_specifics)){
+                $xml .= '<Variations>';
+                $variationSpecificsSet = '';
+                foreach($variation_specifics as $key => $value){
+                    if((strtoupper($key)!='UPC')&&(strtoupper($key)!='EAN')&&(strtoupper($key)!='ISBN')) {
+                        $variationSpecificsSet .= '<NameValueList><Name>' . $key . '</Name>';
+                        foreach($value as $v){
+                            $variationSpecificsSet .= '<Value>'.$v .'</Value>';
+                        }
+                        $variationSpecificsSet .= '</NameValueList>';
+                    }
+                }
+                if(!empty($variationSpecificsSet))
+                $xml .= '<VariationSpecificsSet>'.$variationSpecificsSet.'</VariationSpecificsSet>';
+            }
+
+            foreach($data['sku_detail'] as $key => $value){
+                $xml .= '<Variation>';
+                $xml .= '<SKU>' . $value['sku'] . '</SKU>';
+                $xml .= '<StartPrice >' . $value['start_price'] . '</StartPrice>';
+                $xml .= '<Quantity>' . $value['quantity']. '</Quantity>';
+                $variationSpecifics =  '';
+                if(!empty($variation_specifics)) {
+                    foreach($variation_specifics as $k => $v) {
+                        if((strtoupper($k)=='UPC')||(strtoupper($k)=='EAN')||(strtoupper($k)=='ISBN')) {
+                            $xml .= '<VariationProductListingDetails>';
+                            $xml .= '<'.strtoupper($k).'>' . $variation_specifics[strtoupper($k)][$key] . '</'.strtoupper($k).'>';
+                            $xml .= '</VariationProductListingDetails>';
+                        }else{
+                            $variationSpecifics .= '<NameValueList>';
+                            $variationSpecifics .= '<Name>' . $k . '</Name>';
+                            $variationSpecifics .= '<Value>'.$variation_specifics[$k][$key].'</Value>';
+                            $variationSpecifics .= '</NameValueList>';
+                        }
+                    }
+                }
+                if(!empty($variationSpecifics)){
+                    $xml .='<VariationSpecifics>'.$variationSpecifics.'</VariationSpecifics>';
+                }
+                $xml .= '</Variation>';
+            }
+            $variation_picture = json_decode($data['variation_picture'],true);
+            if(!empty($variation_picture)){
+                foreach($variation_picture as $key=>$value){
+                    $xml .= '<Pictures>';
+                    $xml .= '<VariationSpecificName>' .$key . '</VariationSpecificName>';
+                    foreach($value as $k=>$v){
+                        $xml .= '<VariationSpecificPictureSet><VariationSpecificValue>' . $k . '</VariationSpecificValue>';
+                        $v =  str_replace(" ", "%20",$v);
+                        $xml .= ' <PictureURL>' . ($v) . '</PictureURL>';
+                        $xml .= '</VariationSpecificPictureSet>';
+                    }
+                    $xml .= '</Pictures>';
+
+                }
+            }
+            $xml .= '</Variations>';
+        }
+        $xml .= '<Description><![CDATA[' . (trim(($data['description']))) .']]></Description>';  //将描述部分 设置完了再传进来
+        $xml .= '<OutOfStockControl>true</OutOfStockControl>'; //无货在线
+        $xml .= '</Item>';
+        //var_dump($xml);
+        if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
+            $response = $this->buildEbayBody($xml, $api, $site);
+
+        }else{
+            $response =  (object)array();
+          //  $response->ItemID = rand(1000000000, 10000000000);
+        }
+
+        if(isset($response->ItemID)){
+            $return['is_success'] =true;
+            if($api=='VerifyAddItem'||$api=='VerifyAddFixedPriceItem'){
+                $fee = 0;
+                foreach($response->Fees->Fee as $value){
+                    $fee = $fee + (float)$value->Fee;
+                }
+                $return['info'] =$fee;
+            }else{
+                $return['info'] =(string)$response->ItemID;
+            }
+        }else{
+            $return['is_success'] =false;
+            foreach($response->Errors as $error){
+                if((string)$error->SeverityCode =='Error'){
+                    $info_String = (string)$error->LongMessage;
+                    if(isset($error->ErrorParameters->Value)){
+                        $info_String = $info_String.((string)$error->ErrorParameters->Value);
+                    }
+                    $errorInfo[]=$info_String;
+                }
+            }
+            $errorInfo=  array_unique($errorInfo);
+            $errorInfo =implode(',',$errorInfo);
+            $return['info'] =$errorInfo;
+            //$return['info'] ='测试错误情况下';
+
+        }
+        $return['info_all'] =var_export($response,true);
+        return $return;
+    }
+
+
+    public function ReviseItem($api,$param,$data,$site){
+        $return = [];
+        $xml ='<Item>';
+        $xml .= '<ItemID>'.$data['item_id'].'</ItemID>';
+        if($param=='changeSku'){
+            if(isset($data['sku_detail'])){
+                $xml .= '<Variations>';
+                foreach($data['delete'] as $sku){
+                    $xml .='<Variation>';
+                    $xml .='<Delete>true</Delete>';
+                    $xml .='<SKU>'.$sku.'</SKU>';
+                    $xml .='</Variation>';
+                }
+                $variation_specifics = json_decode($data['variation_specifics'],true);
+                /*      if(!empty($variation_specifics)){
+
+                          $variationSpecificsSet = '';
+                          foreach($variation_specifics as $key => $value){
+                              if((strtoupper($key)!='UPC')&&(strtoupper($key)!='EAN')&&(strtoupper($key)!='ISBN')) {
+                                  $variationSpecificsSet .= '<NameValueList><Name>' . $key . '</Name>';
+                                  foreach($value as $v){
+                                      $variationSpecificsSet .= '<Value>'.$v .'</Value>';
+                                  }
+                                  $variationSpecificsSet .= '</NameValueList>';
+                              }
+                          }
+                          if(!empty($variationSpecificsSet))
+                              $xml .= '<VariationSpecificsSet>'.$variationSpecificsSet.'</VariationSpecificsSet>';
+                      }*/
+
+                foreach($data['sku_detail'] as $key => $value){
+                    $xml .= '<Variation>';
+                    $xml .= '<SKU>' . $value['sku'] . '</SKU>';
+                    $xml .= '<StartPrice >' . $value['start_price'] . '</StartPrice>';
+                    $xml .= '<Quantity>' . $value['quantity']. '</Quantity>';
+                    $variationSpecifics =  '';
+                    if(!empty($variation_specifics)) {
+                        foreach($variation_specifics as $k => $v) {
+                            if((strtoupper($k)=='UPC')||(strtoupper($k)=='EAN')||(strtoupper($k)=='ISBN')) {
+                                $xml .= '<VariationProductListingDetails>';
+                                $xml .= '<'.strtoupper($k).'>' . $variation_specifics[strtoupper($k)][$key] . '</'.strtoupper($k).'>';
+                                $xml .= '</VariationProductListingDetails>';
+                            }else{
+                                $variationSpecifics .= '<NameValueList>';
+                                $variationSpecifics .= '<Name>' . $k . '</Name>';
+                                $variationSpecifics .= '<Value>'.$variation_specifics[$k][$key].'</Value>';
+                                $variationSpecifics .= '</NameValueList>';
+                            }
+                        }
+                    }
+                    if(!empty($variationSpecifics)){
+                        $xml .='<VariationSpecifics>'.$variationSpecifics.'</VariationSpecifics>';
+                    }
+                    $xml .= '</Variation>';
+                }
+                $variation_picture = json_decode($data['variation_picture'],true);
+                if(!empty($variation_picture)){
+                    foreach($variation_picture as $key=>$value){
+                        $xml .= '<Pictures>';
+                        $xml .= '<VariationSpecificName>' .$key . '</VariationSpecificName>';
+                        foreach($value as $k=>$v){
+                            $xml .= '<VariationSpecificPictureSet><VariationSpecificValue>' . $k . '</VariationSpecificValue>';
+                            $v =  str_replace(" ", "%20",$v);
+                            $xml .= ' <PictureURL>' . ($v) . '</PictureURL>';
+                            $xml .= '</VariationSpecificPictureSet>';
+                        }
+                        $xml .= '</Pictures>';
+
+                    }
+                }
+                $xml .= '</Variations>';
+            }else{
+                $xml .= '<SKU>'.$data['sku'].'</SKU>';
+                $xml .= '<StartPrice currencyID="' .$data['currency']. '">'.$data['start_price'].'</StartPrice>';
+                $xml .= '<Quantity>' . $data['quantity'] . '</Quantity>';
+            }
+        }
+        if($param=='changeTitle'){
+            $xml .= '<Title>' . htmlspecialchars($data['title']) . '</Title>';
+            if(!empty($data['sub_title'])){
+                $xml .= '<SubTitle>'.htmlspecialchars($data['sub_title']) .'</SubTitle>';
+            }
+        }
+        if($param=='changeDescription'){
+            $xml .= '<Description><![CDATA['.trim($data['description']).']]></Description><DescriptionReviseMode>Replace</DescriptionReviseMode>';
+        }
+        if($param=='changeShipping'){
+            $xml .= '<ShippingDetails>';
+            $shippingServiceOptions = json_decode($data['shipping_details'],true);
+            foreach($shippingServiceOptions['Shipping'] as $key=>$value){
+                if( empty($value['ShippingService'])){
+                    continue;
+                }
+                $xml .= '<ShippingServiceOptions>';
+                $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>';
+                $xml .= ' <ShippingService>' .$value['ShippingService'] . '</ShippingService>';  //国内运输方式
+                if(empty($value['ShippingServiceCost'])&&(empty($value['ShippingServiceAdditionalCost']))){
+                    $xml .= '<FreeShipping>true</FreeShipping>'; //是否免费
+                }else{
+                    if (!empty($value['ShippingServiceCost'])) {
+                        $xml .= '<ShippingServiceCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceCost']. '</ShippingServiceCost>';//基本运费
+                    }
+                    if (!empty($value['ShippingServiceAdditionalCost'])) {
+                        $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency'].'">' .$value['ShippingServiceAdditionalCost']. '</ShippingServiceAdditionalCost>'; //额外加收
+                    }
+                }
+                $xml .= '</ShippingServiceOptions>';
+            }
+
+            foreach($shippingServiceOptions['InternationalShipping'] as $key=>$value){
+                if( empty($value['ShippingService'])){
+                    continue;
+                }
+                $xml .= '<InternationalShippingServiceOption>';
+                $xml .= '<ShippingServicePriority>'.$key.'</ShippingServicePriority>'; //国际运输 顺序
+                $xml .= '<ShippingService>'.$value['ShippingService'].'</ShippingService>'; //国际运输方式
+                $xml .= '<ShippingServiceCost crenccuyID="' . $data['currency'] . '" >'.$value['ShippingServiceCost'].'</ShippingServiceCost>'; // 费用
+                $xml .= '<ShippingServiceAdditionalCost crenccuyID="'.$data['currency']. '" >'.$value['ShippingServiceAdditionalCost'].'</ShippingServiceAdditionalCost>';// 额外加收
+                if(!empty($value['ShipToLocation'])){
+                    foreach($value['ShipToLocation'] as $v){
+                        if(!empty($v)){
+                            $xml .= '<ShipToLocation>'.$v.'</ShipToLocation>';
+
+                        }
+                    }
+                }
+                $xml .= '</InternationalShippingServiceOption>';
+            }
+            if(!empty($shippingServiceOptions['ExcludeShipToLocation'])){
+                foreach($shippingServiceOptions['ExcludeShipToLocation'] as $v){
+                    $xml .= '<ExcludeShipToLocation>' . $v . '</ExcludeShipToLocation>';
+                }
+            }
+            $xml .= '</ShippingDetails>';
+
+        }
+        if($param=='changePicture'){
+            if (!empty($data['picture_details'])) //ebay图片
+            {
+                $xml .= '<PictureDetails>';
+                $picture = json_decode($data['picture_details'], true);
+                $i=0;
+                foreach ($picture as $value) {
+                    if($i==12){break;}
+                    if($i==1&&($data['site_name']=='Italy'||$data['site_name']=='France')){//意大利和法国只上传一张主图片 09.08
+                        break;
+                    }
+                    $value =  str_replace(" ", "%20",$value);
+                    $xml .= '<PictureURL>'.($value).'</PictureURL>';
+                    $i++;
+                }
+                $xml .= '</PictureDetails>';
+            }
+        }
+        if($param=='changeSpecifics'){
+
+
+            $xml .= '<ConditionID>'.$data['condition_id'].'</ConditionID>';
+            if(!empty($data['condition_description'])){
+                $xml .= '<ConditionDescription>'.trim($data['condition_description']).'</ConditionDescription>';
+            }
+
+            $productListingDetails = '';
+            if(!empty($data['item_specifics'])){
+                $xml .= '<ItemSpecifics>';
+                $item_specifics = json_decode($data['item_specifics'],true);
+                foreach($item_specifics as $key=>$value){
+                    if(!empty($value)){
+                        if((strtoupper($key)=='UPC')||(strtoupper($key)=='EAN')||(strtoupper($key)=='ISBN')){
+                            $productListingDetails .= '<'.strtoupper($key).'>'.$value.'</'.strtoupper($key).'>';
+                            continue;
+                        }
+                        $xml .= '<NameValueList><Name>'.htmlspecialchars($key).'</Name><Value>'.htmlspecialchars($value).'</Value></NameValueList>';
+                    }
+                }
+                $xml .= '</ItemSpecifics>';
+            }
+            if(!empty($productListingDetails)){ //UPC EAN ISBN
+                $xml .='<ProductListingDetails>'.$productListingDetails.'</ProductListingDetails>';
+            }
+        }
+
+        $xml .='</Item>';
+        $response = $this->buildEbayBody($xml, $api, $site);
+        if(isset($response->ItemID)){
+            $return['is_success'] =true;
+            $return['info'] ='修改成功';
+        }else{
+            $errorInfo = [];
+            $return['is_success'] =false;
+            if(isset($response->Errors)){
+                foreach($response->Errors as $error){
+                    if((string)$error->SeverityCode =='Error'){
+                        $info_String = (string)$error->LongMessage;
+                        if(isset($error->ErrorParameters->Value)){
+                            $info_String = $info_String.((string)$error->ErrorParameters->Value);
+                        }
+                        $errorInfo[]=$info_String;
+                    }
+                }
+                $errorInfo=  array_unique($errorInfo);
+                $errorInfo =implode(',',$errorInfo);
+            }
+
+            $return['info'] =empty($errorInfo)?'未知错误':$errorInfo;
+        }
+        return $return;
+
+    }
+
+    public function endItem($item_id,$site=0){
+        $return = [];
+        $xml = '<ItemID>'.$item_id.'</ItemID>';
+        $xml .= '<EndingReason>NotAvailable</EndingReason>';
+        $response = $this->buildEbayBody($xml, 'EndItem', $site);
+        if((string)$response->Ack=='Success'){
+            $return['is_success'] = true;
+            $return['info'] = '下架成功';
+        }else{
+            $return['is_success'] = false;
+            $return['info'] = '下架失败';
+        }
+        return $return;
+    }
+
 
 
     /** 获取该账号近一个月的Feedback
@@ -686,6 +1289,14 @@ class EbayAdapter implements AdapterInterface
             $list_info['site'] = config('ebaysite.site_name_id')[$list_info['site_name']];
             $list_info['quantity_sold'] = (int)$response->Item->SellingStatus->QuantitySold;
             $list_info['store_category_id'] = (string)$response->Item->Storefront->StoreCategoryID;
+            $list_info['description_id'] = 1;
+            $list_info['country'] = isset($response->Item->Country) ? (string)$response->Item->Country: '';
+            $list_info['warehouse'] = 1;
+            $list_info['description_picture'] = '';
+            $list_info['note'] = '';
+            $list_info['description'] =isset($response->Item->Description) ? htmlspecialchars($response->Item->Description) :'';
+
+
 
             //ConditionID
             $list_info['condition_id'] = (string)$response->Item->ConditionID;

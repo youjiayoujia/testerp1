@@ -56,6 +56,21 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="form-group col-lg-12">
+            <label for="name" class='control-label'>店铺分类信息</label>
+            <label for="name" class='control-label'>最后更新时间：
+              {{--  @if(isset($category_last_time))
+                    {{$category_last_time}}
+                @endif--}}
+            </label>
+
+            <a class="btn btn-primary" onclick="updateInfo('storeCategory',this)">更新</a>
+
+
+        </div>
+    </div>
+
 
 
     <div class="row">

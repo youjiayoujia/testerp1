@@ -47,7 +47,7 @@ class GetEbayProduct extends Job implements SelfHandling, ShouldQueue
         $account = AccountModel::find($this->account_id);
         $channel = Channel::driver($account->channel->driver, $account->api_config);
         $result = $channel->getProductDetail($this->item_id);
-        echo $this->item_id;
+        //echo $this->item_id;
         $EbaySellerCode = new EbaySellerCodeModel();
         $sellerIdInfo = $EbaySellerCode->getAllEbayCode();
         if($result){

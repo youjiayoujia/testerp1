@@ -57,12 +57,12 @@
     }
 
     #Validform_msg {
-        color: #7d8289;
+        color: #7D8289;
         font: 12px/1.5 tahoma, arial, \5b8b\4f53, sans-serif;
         width: 280px;
         background: #fff;
         position: absolute;
-        top: 0px;
+        top: 100px;
         right: 50px;
         z-index: 99999;
         display: none;
@@ -132,6 +132,25 @@
 @section('formBody')
 
 
+    <div class="modal fade " id="mulAccount" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title text-left" id="myModalLabel">多账号价格设置<span id="mulAccountName"></span></h4>
+                </div>
+                <div class="modal-body" id="mulAccountSet">
+
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-default" data-dismiss="modal">取消</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade " id="withdraw" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -146,22 +165,23 @@
 
                     <div class="row">
                         <div class="form-group col-sm-4">
-                            <input type="text" class="form-control " placeholder="输入关键字搜索">
+                            <input type="text" id="key_word" class="form-control " placeholder="输入关键字搜索">
                         </div>
                         <div class="form-group col-sm-1">
-                            <label> <a class="btn btn-primary">推荐类目</a></label>
+                            <label> <a class="btn btn-primary" onclick="suggestCategory()">推荐类目</a></label>
                         </div>
                         <div class="form-group col-sm-1">
-                            <label> <a class="btn btn-primary">本地选择</a></label>
+                            <label> <a class="btn btn-primary" onclick="initCategory(0, 0)">本地选择</a></label>
                         </div>
                     </div>
                     <div class="row" id="category-set">
+
                     </div>
                     <div class="row">
                         <div class="form-group col-sm-12">
                             <input type="text" class="form-control" readonly="readonly" placeholder="已选分类"
                                    id="hasChoose">
-                            <input type="text" value="" id="category_id" class="hidden">
+                            <input type="text" value=""   id="category_id" class="hidden">
                         </div>
                     </div>
                 </div>
@@ -172,23 +192,8 @@
             </div>
         </div>
     </div>
-    {{--账号--}}
-    <div class="panel panel-default">
-        <div class="panel-heading">账号选择</div>
-        <div class="panel-body">
-            <?php
-            $account = array('A-FM', 'A-AN', 'A-ME', 'A-SM', 'D-SM', 'H-XH', 'H-LE', 'H-RE', 'A-OY', 'H-TE', 'J-RY', 'I-LT', 'J-MT', 'J-M5', 'M-SP', '226win', '62gbs');
-            foreach ($account as $key => $a):?>
-            <div class="col-lg-2">
-                <input type="checkbox" value="<?php echo $key;?>"
-                       name="choose_account[]" <?php  if (isset($account_id) && $key == $account_id) {
-                    echo 'checked="checked"';
-                } ?>
-                       datatype="*" nullmsg="账号不能为空" class="choose_account "/> <?php echo $a;?>
-            </div>
-            <?php endforeach;?>
-        </div>
-    </div>
+
+
     {{--站点 分类 sku--}}
     <div class="panel panel-default">
         <div class="panel-heading">站点与分类、SKU</div>
@@ -212,12 +217,28 @@
 
             <div class="row">
                 <div class="form-group col-sm-1">
+                    <label for="subject" class="right">仓库：</label>
+                </div>
+                <div class="form-group col-sm-6">
+                    <select class="select_select0 col-sm-4" name="warehouse" id="warehouse">
+                        <option value="">==请选择==</option>
+                        @foreach(config('ebaysite.warehouse') as $key=>$name)
+                            <option value="{{$key}}"  >{{$name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="form-group col-sm-1">
                     <label class="right">Ebay_sku：</label>
                 </div>
 
                 <div class="form-group col-sm-2">
                     <input type="text" class="form-control" name="ebay_sku" id="ebay_sku" placeholder="ebay_sku"/>
                 </div>
+
             </div>
 
 
@@ -269,6 +290,25 @@
             </div>
         </div>
     </div>
+
+    {{--账号--}}
+    <div class="panel panel-default">
+        <div class="panel-heading">账号选择</div>
+        <div class="panel-body">
+            <?php
+            //$account = array('A-FM', 'A-AN', 'A-ME', 'A-SM', 'D-SM', 'H-XH', 'H-LE', 'H-RE', 'A-OY', 'H-TE', 'J-RY', 'I-LT', 'J-MT', 'J-M5', 'M-SP', '226win', '62gbs');
+            foreach ($account as $key => $a):?>
+            <div class="col-lg-2">
+                <input type="checkbox" value="<?php echo $key;?>"
+                       name="choose_account[]" <?php  if (isset($account_id) && $key == $account_id) {
+                    echo 'checked="checked"';
+                } ?>
+                       datatype="*" nullmsg="账号不能为空" class="choose_account "/> <?php echo $a;?>
+            </div>
+            <?php endforeach;?>
+        </div>
+    </div>
+
 
     <div class="panel panel-default">
         <div class="panel-heading">标题</div>
@@ -353,7 +393,7 @@
                 </div>
                 <div class=" col-sm-3">
                     <a class="btn btn-primary btn-sm dir_add" href="javascript: void(0);"
-                       onclick="addUserSpecifics()">添加属性</a>
+                       onclick="addUserSpecifics(1,1)">添加属性</a>
                 </div>
             </div>
 
@@ -381,7 +421,7 @@
                         <label for="subject" class="right">私人拍卖：</label>
                     </div>
                     <div class="form-group col-sm-8">
-                        <input type="checkbox">不向公众显示买家的名称
+                        <input type="checkbox" name="private_listing" value="true">不向公众显示买家的名称
                     </div>
                 </div>
 
@@ -390,7 +430,7 @@
                         <label for="subject" class="right">起拍价格:</label>
                     </div>
                     <div class="form-group col-sm-2">
-                        <input class="form-control" type="text" name="start_price">
+                        <input class="form-control" type="text" name="start_price1" id="start_price1" onblur="setData(1)">
                     </div>
                 </div>
 
@@ -399,7 +439,7 @@
                         <label for="subject" class="right">数量:</label>
                     </div>
                     <div class="form-group col-sm-2">
-                        <input class="form-control" type="text" name="quantity">
+                        <input class="form-control" type="text" name="quantity1">
                     </div>
                 </div>
             </div>
@@ -410,7 +450,10 @@
                         <label for="subject" class="right">价格:</label>
                     </div>
                     <div class="form-group col-sm-2">
-                        <input class="form-control" type="text" name="start_price">
+                        <input class="form-control" type="text" name="start_price2"  id="start_price2" onblur="setData(2)">
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <button type="button" class="btn btn-info mul-account" title="设置不用账号价格"><i class="glyphicon glyphicon-cog"></i></button>
                     </div>
                 </div>
 
@@ -419,7 +462,7 @@
                         <label for="subject" class="right">数量:</label>
                     </div>
                     <div class="form-group col-sm-2">
-                        <input class="form-control" type="text" name="quantity">
+                        <input class="form-control" type="text" name="quantity2">
                     </div>
                 </div>
 
@@ -459,7 +502,7 @@
 
                     {{--  <div class="row">
                           <div class="form-group col-sm-1 ">
-                              <input type="text" value=""  name="sku[]"  class="form-control text-center " >
+                              <input type="text" value=""  name="sku[]"  class="form-control text-center  sku-sku" >
                           </div>
                           <div class="form-group col-sm-1 do-change">
                               <input type="text" value="" name="start_price[]" class="form-control text-center sku-price" style="background-color:#fa3658">
@@ -556,6 +599,22 @@
                 </div>
             </div>
             <div class="row">
+                <div class="form-group col-sm-2">
+                    <label for="subject" class="right">描述模板：</label>
+                   {{-- <a href="javascript:void(0);" class="btn btn-success btn-sm"
+                       onclick="previewDescription()">预览</a>--}}
+                </div>
+                <div class="form-group col-sm-1">
+                    <select class="form-control col-sm-1 select_select0" name="description_id" >
+                        <option value="">==请选择==</option>
+                        @foreach($description as $key=>$value)
+                        <option value="{{$key}}">{{$value}}</option>
+                        @endforeach
+
+                    </select>
+                </div>
+            </div>
+            <div class="row">
                 <label class="col-sm-2 control-label">描述详情：</label>
 
                 <div class="col-sm-9">
@@ -577,7 +636,7 @@
                     <label for="subject" class="right">退货政策：</label>
                 </div>
                 <div class="form-group col-sm-1">
-                    <select class="form-control col-sm-1 select_select0">
+                    <select class="form-control col-sm-1 select_select0" name="returns_option">
                         <option value="ReturnsAccepted">ReturnsAccepted</option>
                         <option value="ReturnsNotAccepted">ReturnsNotAccepted</option>
                     </select>
@@ -598,7 +657,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type="checkbox" value="">提供节假日延期退货至12月31日
+                    <input type="checkbox" value="true" name="extended_holiday">提供节假日延期退货至12月31日
                 </div>
             </div>
 
@@ -618,7 +677,8 @@
                     <label for="subject" class="right">退货运费由谁负担：</label>
                 </div>
                 <div class="form-group col-sm-1">
-                    <select class="form-control col-sm-1 select_select0" name="shipping_costpaid_by" id="shipping_costpaid_by" >
+                    <select class="form-control col-sm-1 select_select0" name="shipping_costpaid_by"
+                            id="shipping_costpaid_by">
                     </select>
                 </div>
             </div>
@@ -627,7 +687,7 @@
                     <label for="subject" class="right">退货政策详情：</label>
                 </div>
                 <div class="form-group col-sm-4">
-                    <textarea class="form-control"></textarea>
+                    <textarea class="form-control" name="refund_description"></textarea>
                 </div>
             </div>
         </div>
@@ -640,7 +700,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type="checkbox" name="no_paypal"> 没有PayPal用户
+                    <input type="checkbox" name="no_paypal" value="true"> 没有PayPal用户
                 </div>
             </div>
 
@@ -650,7 +710,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-2">
-                    <input type="checkbox" name="no_ship"> 主要运送地址在我的运送范围之外
+                    <input type="checkbox" name="no_ship" value="true">  主要运送地址在我的运送范围之外
                 </div>
             </div>
 
@@ -659,7 +719,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-4">
-                    <input type="checkbox"> 曾收到
+                    <input type="checkbox" name="unpaid_on" value="true"> 曾收到
                     <select class="select_select0 col-sm-1" name="unpaid">
                         @foreach(config('ebaysite.unpaid')as $key=>$value)
                             <option value="{{$value}}">{{$value}}</option>
@@ -679,7 +739,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-4">
-                    <input type="checkbox"> 曾收到
+                    <input type="checkbox" name="policy_on" value="true"> 曾收到
                     <select class="select_select0 col-sm-1" name="policy">
                         @foreach(config('ebaysite.policy')as $key=>$value)
                             <option value="{{$value}}">{{$value}}</option>
@@ -700,7 +760,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-4">
-                    <input type="checkbox">信用指标等于或低于：
+                    <input type="checkbox" name="feedback_on" value="true">信用指标等于或低于：
                     <select class="select_select0 col-sm-1" name="feedback">
                         @foreach(config('ebaysite.feedback')as $key=>$value)
                             <option value="{{$key}}">{{$value}}</option>
@@ -714,7 +774,7 @@
                     <label for="subject" class="right"></label>
                 </div>
                 <div class="form-group col-sm-6">
-                    <input type="checkbox">在过去10天内曾出价或购买我的物品，已达到我所设定的限制
+                    <input type="checkbox" name="item_count_on" value="true">在过去10天内曾出价或购买我的物品，已达到我所设定的限制
                     <select class="select_select0 col-sm-1" name="item_count">
                         @foreach(config('ebaysite.item_count')as $key=>$value)
                             <option value="{{$key}}">{{$value}}</option>
@@ -749,8 +809,13 @@
                 <div class="form-group col-sm-1">
                     <label for="subject" class="right">国家或地区：</label>
                 </div>
-                <div class="form-group col-sm-2">
-                    <input type="text" class="form-control" name="country">
+                <div class="form-group col-sm-4">
+                    <select class="select_select0 col-sm-4" name="country" id="country">
+                        <option value="">==请选择==</option>
+                        @foreach(config('ebaysite.ebay_country')as $key=>$value)
+                            <option value="{{$key}}">{{$value}}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -771,13 +836,29 @@
     <div class="panel panel-default">
         <div class="panel-heading">国内运输</div>
         <div class="panel-body">
+
+
             <?php
             $ship_name = [
                     1 => '第一运输',
                     2 => '第二运输'
-            ]
+            ];
 
+            $dispatch_time_max =[0,1,2,3,4,5,6,7,8,9];
             ?>
+
+            <div class="row">
+                <div class="form-group col-sm-1">
+                    <label for="subject" class="right">处理天数：</label>
+                </div>
+                <div class="form-group col-sm-1">
+                    <select class="form-control select_select0 col-sm-1" name="dispatch_time_max" id="dispatch_time_max">
+                        @foreach($dispatch_time_max as $v)
+                        <option value="{{$v}}">{{$v}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
             @for($i=1;$i<3;$i++)
                 <div id="{{'shipping'.$i}}">
                     <div class="row">
@@ -793,7 +874,8 @@
                             <label for="subject" class="right">运输方式：</label>
                         </div>
                         <div class="form-group col-sm-3">
-                            <select class="form-control select_select0 col-sm-1 shipping" name="shipping[{{$i}}][ShippingService]">
+                            <select class="form-control select_select0 col-sm-1 shipping"
+                                    name="shipping[{{$i}}][ShippingService]">
 
                             </select>
                         </div>
@@ -804,7 +886,7 @@
                             <label for="subject" class="right">运费：</label>
                         </div>
                         <div class="form-group col-sm-2">
-                            <input class="form-control" type="text" name="shipping[{{$i}}][ShippingServiceCost]">
+                            <input class="form-control shipping_cost" type="text" name="shipping[{{$i}}][ShippingServiceCost]" id="">
 
                         </div>
                     </div>
@@ -813,7 +895,8 @@
                             <label for="subject" class="right">额外每件加收：</label>
                         </div>
                         <div class="form-group col-sm-2">
-                            <input class="form-control" type="text" name="shipping[{{$i}}][ShippingServiceAdditionalCost]">
+                            <input class="form-control shipping_addcost" type="text"
+                                   name="shipping[{{$i}}][ShippingServiceAdditionalCost]">
                         </div>
                     </div>
 
@@ -840,7 +923,8 @@
                             <label for="subject" class="right">运输方式：</label>
                         </div>
                         <div class="form-group col-sm-3">
-                            <select class="form-control select_select0 col-sm-1 international" name="InternationalShipping[{{$i}}][ShippingService]">
+                            <select class="form-control select_select0 col-sm-1 international"
+                                    name="InternationalShipping[{{$i}}][ShippingService]">
 
                             </select>
                         </div>
@@ -851,7 +935,8 @@
                             <label for="subject" class="right">运费：</label>
                         </div>
                         <div class="form-group col-sm-2">
-                            <input class="form-control" type="text" name="InternationalShipping[{{$i}}][ShippingServiceCost]">
+                            <input class="form-control international_cost" type="text"
+                                   name="InternationalShipping[{{$i}}][ShippingServiceCost]" id="">
 
                         </div>
                     </div>
@@ -860,7 +945,8 @@
                             <label for="subject" class="right">额外每件加收：</label>
                         </div>
                         <div class="form-group col-sm-2">
-                            <input class="form-control" type="text" name="InternationalShipping[{{$i}}][ShippingServiceAdditionalCost]">
+                            <input class="form-control international_addcost" type="text"
+                                   name="InternationalShipping[{{$i}}][ShippingServiceAdditionalCost]">
                         </div>
                     </div>
 
@@ -869,7 +955,12 @@
                             <label for="subject" class="right">运输国家：</label>
                         </div>
                         <div class="form-group col-sm-4">
-                            <input class="form-control" type="text" name="InternationalShipping[{{$i}}][ShipToLocation]">
+                            <select class="form-control select_select0 col-sm-1 international_ship"
+                                    name="InternationalShipping[{{$i}}][ShipToLocation][]" multiple>
+                                @foreach(config('ebaysite.ebay_country') as $key=> $v)
+                                    <option value="{{$key}}" @if(in_array($v,array())){{'selected="selected"'}}  @endif  >{{$v}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
@@ -886,7 +977,12 @@
                     <label for="subject" class="right">不运输国家：</label>
                 </div>
                 <div class="form-group col-sm-8">
-                    <input class="form-control" type="text" name="un_ship" id="un_ship">
+                    <select class="form-control select_select0 col-sm-1"
+                            name="un_ship[]" id="un_ship" multiple>
+                        @foreach(config('ebaysite.ebay_country') as $key=> $v)
+                            <option value="{{$key}}" @if(in_array($v,array())){{'selected="selected"'}}  @endif  >{{$v}}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -900,7 +996,9 @@
 @section('formButton')
     <div class="text-center">
         <button type="submit" name="save" class="btn btn-success submit_btn ">保存为草稿</button>
-        <button type="submit" name="editAndPost" class="btn btn-primary  submit_btn ">保存并且发布</button>
+        <button type="submit" name="verify" class="btn btn-warning submit_btn ">检测刊登费用</button>
+        <button type="submit" name="prePost" class="btn btn-info  submit_btn ">加入预刊登队列</button>
+        <button type="submit" name="editAndPost" class="btn btn-danger  submit_btn ">保存并且发布</button>
     </div>
 
 @show{{-- 表单按钮 --}}
@@ -910,6 +1008,7 @@
     <script src="{{ asset('plugins/ueditor/umeditor.min.js') }}"></script>
     <script src="{{ asset('plugins/ueditor/lang/zh-cn/zh-cn.js') }}"></script>
     <link href="{{ asset('plugins/ueditor/themes/default/css/umeditor.css') }}" rel="stylesheet">
+
     <script type="text/javascript">
         var content = UM.getEditor('description', {
             initialFrameHeight: 500
@@ -929,8 +1028,6 @@
             },                   //执行之后的回调函数
             placeHolderTemplate: "<li class='placeHolder'><div></div></li>"     //拖动列表的HTML部分
         });
-
-
 
 
         $('.submit_btn').click(function () {
@@ -965,10 +1062,32 @@
             $(this).closest('li').remove();
         });
         $(document).on('click', '.bt-right', function () {
-            // $(this).parent().next().remove();
             $(this).parent().remove();
 
         });
+        $(document).on('click', '.mul-account', function () {
+            //listing_type
+
+            var listing_type = $(' input[name="listing_type"]:checked ').val();
+            if(listing_type==2){
+                var sku = $("#ebay_sku").val();
+                var price = $("#start_price2").val();
+                if(price==''||sku==''){
+                    alert("先设置初始价格或sku");
+                    return false;
+                }
+            }
+            if(listing_type==3){
+                var sku = $(this).parent().children().children().eq(0).val();
+                var price = $(this).parent().children().eq(1).children().eq(0).val();
+                if(price==''||sku==''){
+                    alert("先设置初始价格或sku");
+                    return false;
+                }
+            }
+            mulAccount(sku);
+        });
+
         $(document).on('click', '.show-sub', function () {
 
             if ($(this).parent().parent().next().hasClass('hidden')) {
@@ -1024,14 +1143,13 @@
             $('#' + hasChooseText).text(hasChoose);
             if (category_num == 'primary_category') {
                 addSpecifics();
-                addCondition();
             }
 
         });
         $(".listing-type").click(function () {
             var check_value = $(this).val();
             var value = $(this).attr('data-content');
-            if (!$("#" + value).hasClass("has-add")) {
+          //  if (!$("#" + value).hasClass("has-add")) {
                 $.ajax({
                     url: "{{ route('ebayPublish.ajaxInitErpData') }}",
                     data: {
@@ -1054,8 +1172,8 @@
                         }
                     }
                 });
-            }
-            $("#" + value).removeClass("hidden").addClass("has-add");
+           // }
+            $("#" + value).removeClass("hidden");
             $(".listing-type").each(function () {
                 if ($(this).attr('data-content') != value) {
                     if (!$('#' + $(this).attr('data-content')).hasClass('hidden')) {
@@ -1086,28 +1204,57 @@
 
                 var add_tittle = '<div id="' + id_name + '"><div class="row"><div class="form-group col-sm-1"><label for="subject" class="right">' + text_name + '：</label></div>' +
                         '<div class="form-group col-sm-8">' +
-                        '<input class="form-control" type="text" placeholder="标题" name="title[' + value + ']"></div>' +
+                        '<input class="form-control" type="text" placeholder="标题" name="title[' + value + ']"  maxlength=80></div>' +
                         '<div class="form-group col-sm-1">' +
-                        '<button type="button" class="btn btn-success show-sub"  title="填写子标题"><i class="glyphicon glyphicon-plus"></i></button></div></div>' +
+                        '<button type="button" class="btn btn-success show-sub"  title="填写副标题"><i class="glyphicon glyphicon-plus"></i></button></div></div>' +
                         '<div class="row hidden">' +
                         '<div class="form-group col-sm-1">' +
                         '<label for="subject" class="right"></label>' +
                         '</div>' +
                         '<div class="form-group col-sm-6" name="sub_title[' + value + ']">' +
-                        '<input class="form-control" type="text" placeholder="子标题">' +
+                        '<input class="form-control" type="text" placeholder="副标题" maxlength=80>' +
                         '</div></div></div>';
                 $('#account_tittle').append(add_tittle);
+                mulAccountType3();
             } else { //取消
                 $("#account_tittle_" + value).remove();
+                mulAccountType4();
 
             }
         });
 
+        function suggestCategory(){
+            var key_word = $("#key_word").val();
+            var site = $("#site").val();
+            $.ajax({
+                url: "{{ route('ebayPublish.ajaxSuggestCategory') }}",
+                data: {
+                    site: site,
+                    key_word: key_word
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    if(result){
+                        var html = '<div class="form-group text-left col-lg-10"><select  size="12" class="form-control category_list" multiple> ';
+                        $.each(result, function (index, el) {
+                            html += '<option value="' + el.category_id + '" lang="true" data-content="1">' + el.category_full_name + '('+el.percent+'%)</option>';
+                        });
+                        html = html + ' </select></div>';
+                        $('#category-set').empty().append(html);
+                    }else{
+                        alert("未找到对应分类");
+                    }
+
+                }
+            });
+
+        }
 
         function addItem(sku) {
             var html = '<div class="row">' +
                     '<div class="form-group col-sm-1 ">' +
-                    '<input type="text" value="' + sku + '"  name="sku[]"  class="form-control text-center " >' +
+                    '<input type="text" value="' + sku + '"  name="sku[]"  class="form-control text-center  sku-sku" >' +
                     '</div>' +
                     '<div class="form-group col-sm-1 do-change">' +
                     '<input type="text" value="" name="start_price[]" class="form-control text-center sku-price"  onblur="batchUpdatePrice(this)" style="background-color:#fa3658"></div>' +
@@ -1121,8 +1268,11 @@
                     '<input type="text" value="" name="variation2[]" class="form-control text-center"></div>' +
                     '<div class="form-group col-sm-1">' +
                     '<input type="text" value="Does not apply" name="variation3[]" class="form-control text-center"></div>' +
-                    '<button type="button" class="btn btn-danger bt-right" title="删除该SKU"><i class="glyphicon glyphicon-trash"></i></button></div>';
+                    '<button type="button" class="btn btn-danger bt-right" title="删除该SKU"><i class="glyphicon glyphicon-trash"></i></button>' +
+                    '<button type="button" class="btn btn-info mul-account " title="设置不用账号价格"><i class="glyphicon glyphicon-cog"></i></button></div>';
             $("#variation_sku").append(html);
+            if(sku!=''){
+                mulAccountType1(sku);            }
         }
         function initSite() {
             var site = $("#site").val();
@@ -1141,20 +1291,40 @@
                         $('.shipping').select2({
                             placeholder: "Select a shipping",
                             allowClear: true
-                        }).empty().append(result.ship_text);
+                        }).empty().append(result.ship_text).val('').trigger("change");
                         $('.international').select2({
                             placeholder: "Select a international shipping",
                             allowClear: true
-                        }).empty().append(result.international_text);
+                        }).empty().append(result.international_text).val('').trigger("change");
 
-                        $("#returns_with_in").empty().append(result.returns_with_in);
-                        $("#shipping_costpaid_by").empty().append(result.shipping_costpaid_by);
-                        $("#refund").empty().append(result.refund);
+                        $("#returns_with_in").empty().append(result.returns_with_in).val('').trigger("change");
+                        $("#shipping_costpaid_by").empty().append(result.shipping_costpaid_by).val('').trigger("change");
+                        $("#refund").empty().append(result.refund).val('').trigger("change");
+                        $("[name = refund_description ]").val('');
+                        $("[name = extended_holiday]:checkbox").attr("checked", false);
+
+                        $(".shipping_cost ").each(function(){
+                            $(this).val(0.00);
+                        });
+                        $(".shipping_addcost ").each(function(){
+                            $(this).val(0.00);
+                        });
+                        $(".international_cost ").each(function(){
+                            $(this).val(0.00);
+                        });
+                        $(".international_addcost ").each(function(){
+                            $(this).val(0.00);
+                        });
+                        $(".international_ship ").each(function(){
+                            $(this).val('').trigger("change");
+                        });
+                        $("#un_ship").val('').trigger("change");
+
+
                     }
 
                 }
             });
-
         }
         function initCategory(category_parent_id, level) {
             var site = $("#site").val();
@@ -1206,6 +1376,7 @@
                                 tags: true
                             });
                         }
+                        addCondition();
                     }
                 }
             });
@@ -1226,12 +1397,27 @@
                         $("#condition_id").select2({
                             allowClear: true
                         }).empty().append(result.text);
+
+                        if(result.is_upc=='Required'){
+                            addUserSpecifics(2,'UPC');
+                        }
+                        if(result.is_ean=='Required'){
+                            addUserSpecifics(2,'EAN');
+                        }
+                        if(result.is_isbn=='Required'){
+                            addUserSpecifics(2,'ISNB');
+                        }
+
                     }
                 }
             });
         }
-        function addUserSpecifics() {
-            var str = prompt("新增属性名称");
+        function addUserSpecifics(type,value) {
+            if(type==1){
+                var str = prompt("新增属性名称");
+            }else{
+                var str = value;
+            }
             if (str) {
                 var html = '<div class=" col-sm-6"><label onclick="deleteSpecifics(this)"class=" text-right col-sm-3">' + str + ':</label><select class="select_select_tags col-sm-3"   name="item_specifics[' + str + ']"></select></div>';
                 $("#addSpecifics").append(html);
@@ -1271,12 +1457,22 @@
         }
         function batchUpdatePrice(e) {
             var value = $(e).val();//background-color   #25fa69
+            var sku =  $(e).parent().parent().children().children().eq(0).val();
+            mulAccountType2(sku,value,1);
             $(e).css("background-color", '#25fa69');
+            var i =0;
             $(".sku-price").each(function () {
+                if(i==0){
+                    setData(3);
+                }
                 if ($(this).css("background-color") == 'rgb(250, 54, 88)') {
                     $(this).val(value);
+                    var sku =  $(this).parent().parent().children().children().eq(0).val();
+                    mulAccountType2(sku,value,1);
                 }
+                i++;
             });
+
         }
         function variationPicture(e) {
             $(".variation_picture").each(function () {
@@ -1294,7 +1490,7 @@
                                 '<label onclick="setMulSkuPicture(this)">' + value + ':</label>' +
                                 '</div>' +
                                 '<div class="form-group col-sm-2 ">' +
-                                '<input type="text" class="hidden" value="http://etiger.info/upload/E3112/E3112-8.jpg">' +
+                                '<input type="text" class="hidden" name="variation_picture[' + value + ']" value="">' +
                                 '</div></div>';
                         $("#variation_picture").append(html);
                     }
@@ -1334,7 +1530,6 @@
                     '</li>';
             $("#ebay_picture").next().append(html);
         }
-
         function add_pic_in_description(type, value) {
             if (type == 'add') {
                 var str = prompt("图片外链地址");
@@ -1353,11 +1548,291 @@
                     '</li>';
             $("#description_picture").next().append(html);
         }
+        function setData(type){
+            var site = $("#site").val();
+            var warehouse = $("#warehouse").val();
+            var ebay_sku = $('#ebay_sku').val();
+            var price = '';
+            if(type==1){
+              price=$("#start_price1").val();
+            }
+            if(type==2){
+                price=$("#start_price2").val();
+                mulAccountType2(ebay_sku,price,1)
+            }
+            if(type==3){
+                var i=0;
+                $(".sku-price").each(function () {
+                    if(i==0){
+                        price = $(this).val();
+                    }
+                    i++;
+                });
+            }
 
+         //   var price = 2;
+            $.ajax({
+                url: "{{ route('ebayPublish.ajaxSetDataTemplate') }}",
+                data: {
+                    site: site,
+                    warehouse: warehouse,
+                    ebay_sku:ebay_sku,
+                    price:price
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (result) {
+                    if (result.status) {
+                        $("#location").val(result.data.location);
+                        $("#country").val(result.data.country).trigger("change");
+                        $("#postal_code").val(result.data.postal_code);
+                        $("#dispatch_time_max").val(result.data.dispatch_time_max).trigger("change");
+                        if(result.data.buyer_requirement.LinkedPayPalAccount){
+                            $("[name = no_paypal]:checkbox").attr("checked", !$(this).attr("checked"));
+                        }
+                        if(result.data.buyer_requirement.ShipToRegistrationCountry){
+                            $("[name = no_ship]:checkbox").attr("checked", !$(this).attr("checked"));
+                        }
+                        if(result.data.buyer_requirement.unpaid_on){
+                            $("[name = unpaid_on]:checkbox").attr("checked", !$(this).attr("checked"));
+                            $("[name = unpaid]").val(result.data.buyer_requirement.MaximumUnpaidItemStrikesInfo.Count).trigger("change");
+                            $("[name = unpaid_day]").val(result.data.buyer_requirement.MaximumUnpaidItemStrikesInfo.Period).trigger("change");
+                        }
+                        if(result.data.buyer_requirement.policy_on){
+                            $("[name = policy_on]:checkbox").attr("checked", !$(this).attr("checked"));
+                            $("[name = policy]").val(result.data.buyer_requirement.MaximumBuyerPolicyViolations.Count).trigger("change");
+                            $("[name = policy_day]").val(result.data.buyer_requirement.MaximumBuyerPolicyViolations.Period).trigger("change");
+                        }
+                        if(result.data.buyer_requirement.feedback_on){
+                            $("[name = feedback_on]:checkbox").attr("checked", !$(this).attr("checked"));
+                            $("[name = feedback]").val(result.data.buyer_requirement.MinimumFeedbackScore).trigger("change");
+                        }
+                        if(result.data.buyer_requirement.item_count_on){
+                            $("[name = item_count_on]:checkbox").attr("checked", !$(this).attr("checked"));
+
+                            $("[name = item_count]").val(result.data.buyer_requirement.MaximumItemRequirements.MaximumItemCount).trigger("change");
+                            $("[name = item_count_feedback]").val(result.data.buyer_requirement.MaximumItemRequirements.MinimumFeedbackScore).trigger("change");
+                        }
+                        var i=0;
+                        $(".shipping").each(function(){
+                            i++;
+                           $(this).val(result.data.shipping_details.Shipping[i]['ShippingService']).trigger("change")
+
+                        });
+                        var i=0;
+                        $(".international ").each(function(){
+                            i++;
+                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingService']).trigger("change")
+                        });
+                        var i=0;
+                        $(".shipping_cost ").each(function(){
+                            i++;
+                            $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceCost']);
+                        });
+                        var i=0;
+                        $(".shipping_addcost ").each(function(){
+                            i++;
+                            $(this).val(result.data.shipping_details.Shipping[i]['ShippingServiceAdditionalCost']);
+                        });
+                        var i=0;
+                        $(".international_cost ").each(function(){
+                            i++;
+                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceCost']);
+                        });
+                        var i=0;
+                        $(".international_addcost ").each(function(){
+                            i++;
+                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShippingServiceAdditionalCost']);
+                        });
+
+                        var i=0;
+                        $(".international_ship ").each(function(){
+                            i++;
+                            $(this).val(result.data.shipping_details.InternationalShipping[i]['ShipToLocation']).trigger("change");
+                        });
+
+                        $("#un_ship").val(result.data.shipping_details.ExcludeShipToLocation).trigger("change");
+
+
+
+                        // 退货政策
+                        $("#returns_with_in").val(result.data.return_policy.ReturnsWithinOption).trigger("change");
+                        $("#refund").val(result.data.return_policy.RefundOption).trigger("change");
+                        $("#shipping_costpaid_by").val(result.data.return_policy.ShippingCostPaidByOption).trigger("change");
+                        $("[name = refund_description ]").val(result.data.return_policy.Description);
+                        if(result.data.return_policy.ExtendedHolidayReturns){
+                            $("[name = extended_holiday]:checkbox").attr("checked", !$(this).attr("checked"));
+                        }
+                      //  $(".select_select0").trigger("change")
+                    }else{
+                        alert(result.info)
+                    }
+                }
+            });
+        }
         function getSkuPicture() {
 
         }
 
+        function previewDescription(){
+            content.execCommand( 'preview',12312323156 );
+        }
+
+        /**
+         * type = 1;加sku
+         * type = 2 设置价格
+         * type  = 3 加账号
+         * type  = 4 减账号
+         * type = 5 查看
+         * random = 1 不变
+         * random = 2 随机值
+         */
+        function mulAccount(sku){
+
+            $(".mul-account-set").each(function(){
+                if($(this).attr('data-target')==sku){
+                    if($(this).hasClass("hidden")){
+                        $(this).removeClass("hidden");
+                    }
+                }else{
+                    if(!$(this).hasClass("hidden")){
+                        $(this).addClass("hidden");
+                    }
+                }
+            });
+            $('#mulAccount').modal('show');
+        }
+
+
+        function mulAccountType1(sku){
+            var is_not_exist = true;
+            $(".mul-account-set").each(function(){
+                if($(this).attr('data-target')==sku){
+                    is_not_exist = false;
+                }
+            });
+            if(is_not_exist){
+                var last_html = '<div class="row mul-account-set"  data-target="'+sku+'"></div>';
+                $("#mulAccountName").text(sku);
+                $('#mulAccountSet').append(last_html)
+            }
+        }
+        function mulAccountType2(sku,price,random){
+
+            var is_not_exist = true;
+            $(".mul-account-set").each(function(){
+                if($(this).attr('data-target')==sku){
+                    is_not_exist = false;
+                }
+            });
+            if(is_not_exist){
+                mulAccountType1(sku)
+            }
+            var priceArr = new Array();
+            $(".mul-account-set").each(function(){
+                var i = 0;
+                var html = '';
+                if($(this).attr('data-target')==sku){
+                    var mark  =  $(this);
+                        $(".choose_account").each(function(){
+                            var new_price = price;
+                            if($(this).is(':checked')) {// 选中
+                                var text_name = $(this).parent().text();
+                                var account_id = $(this).val();
+                                var new_target = sku+'_'+account_id; //undefined
+                                if(typeof(priceArr[i]) == "undefined"){ //
+                                    priceArr = getRandArray(price,priceArr);
+                                }
+
+                                new_price = priceArr[i];
+                                mark.children().each(function(){
+                                    if(new_target==$(this).attr("data-target")){
+                                        if(random==2){ //原来的值
+                                            new_price = $(this).children().eq(1).val();
+                                        }
+                                    }
+                                });
+                                 html = html+'<div class="form-group col-sm-3" data-target="'+new_target+'" >' +
+                                '<label class="right">'+text_name+'：</label>' +
+                                '<input type="text"  class="form-control " placeholder="价格" value="'+new_price+'" name=mulAccount['+sku+']['+account_id+']>' +
+                                '</div>';
+                                i++;
+                            }
+                        });
+                    mark.empty().append(html);
+                    $("#mulAccountName").text(sku);
+                }
+            });
+        }
+        function mulAccountType3(){
+            var type  = $('input[name="listing_type"]:checked ').val();
+            if(type==3){
+                $(".sku-sku").each(function(){
+                    var sku = $(this).val();
+                    var price = $(this).parent().next().children().eq(0).val();
+                    mulAccountType2(sku,price,2);
+                });
+            }
+            if(type==2){
+                var sku = $("#ebay_sku").val();
+                var price = $("#start_price2").val();
+                mulAccountType2(sku,price,2);
+
+            }
+        }
+        function mulAccountType4() {
+            $(".choose_account").each(function () {
+                if (!$(this).is(':checked')) {// 选中
+                    var account_id = $(this).val();
+                    $(".mul-account-set").each(function () {
+                        var sku = $(this).attr('data-target');
+                        $(this).children().each(function () {
+                            var new_target = sku + '_' + account_id;
+                            if ($(this).attr('data-target') == new_target) {
+                                $(this).remove();
+                            }
+                        })
+                    });
+                }
+            });
+        }
+        function getRandArray(price,priceArr){
+            if(typeof(priceArr[0]) == "undefined"){ //
+               var price_new = parseFloat(price)+0.01;
+                 priceArr[0] = price_new.toFixed(2);
+                return priceArr;
+            }else{
+
+               var price_new = priceArr[priceArr.length-1];
+               // price_new = parseFloat(price_new)+0.01;
+                price_new = getNewPirce(priceArr);
+                priceArr[priceArr.length] = price_new;
+                return priceArr;
+            }
+        }
+
+        function getNewPirce(priceArr){
+            var price = priceArr[priceArr.length-1];
+
+            for(var k=0;k<100;k++){
+                var rand = Math.random();
+                if(rand>0.75){
+                    var type  = 1;
+                }
+                if(type==1){
+                    price =  parseFloat(price)+0.01;
+                }else{
+                    price =  parseFloat(price)-0.01;
+                }
+                price =  price.toFixed(2);
+                if((price>0.99)&&(priceArr.indexOf(price)==-1)){
+                    break;
+                }
+            }
+            return price;
+        }
+
+
     </script>
-@section('childJs')@show
 @stop
+@section('childJs')@show

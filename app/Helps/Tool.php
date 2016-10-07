@@ -306,4 +306,25 @@ class Tool
 
 
     }
+
+    /** 设置新的后缀
+     * @param $sku
+     * @param $suffix
+     * @return string
+     */
+    public function getNewEbaySku($sku,$suffix=''){
+        $tmpSku = explode('+', $sku);
+        $returnSku = array();
+        foreach ($tmpSku as $k => $sku) {
+            if (stripos($sku, '[') !== false) {
+                $sku = preg_replace('/\[.*\]/', '', $sku);
+            }
+            if($suffix !=''){
+                $returnSku[] = $sku.'['.$suffix.']';
+            }else{
+                $returnSku[] = $sku;
+            }
+        }
+        return implode('+', $returnSku);
+    }
 }

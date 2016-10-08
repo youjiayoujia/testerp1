@@ -27,7 +27,7 @@
     break;   
     case 'small':
 ?>
-<body>
+<body onLoad="printpage_zzjs()">
     <div style="width:100%;height:29mm;margin-bottom:2px;">
         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
@@ -111,3 +111,7 @@
     </body>
     <?php break;} ?>   
 </html>
+
+<script type="text/javascript">
+    window.onload = function(){window.print();}
+</script>

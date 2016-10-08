@@ -190,6 +190,19 @@ class AccountModel extends BaseModel
                     'cd_expires_in' => $this->cd_expires_in,
                 ];
                 break;
+			case 'joom':
+                $config = [
+                    'publish_code' => $this->joom_publish_code,
+                    'client_id' => $this->joom_client_id,
+                    'client_secret' => $this->joom_client_secret,
+                    'redirect_uri' => $this->joom_redirect_uri,
+                    'refresh_token' => $this->joom_refresh_token,
+                    'access_token' => $this->joom_access_token,
+                    'expiry_time' => $this->joom_expiry_time,
+                    'proxy_address' => $this->joom_proxy_address,
+                    'sku_resolve' => $this->joom_sku_resolve,
+                ];
+                break;
         }
         return $config;
     }

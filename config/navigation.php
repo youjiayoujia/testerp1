@@ -533,6 +533,11 @@ return [
                     'url' => 'lazada.index',
                     'icon' => '',
                 ],
+				[
+                'name' => 'Joom数量监控',
+                'url' => 'joomonline.index',
+                'icon' => '',
+            ],
             ]
         ]
     ],

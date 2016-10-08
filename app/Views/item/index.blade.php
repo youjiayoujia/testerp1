@@ -44,6 +44,7 @@
 @section('tableBody')
 
     @foreach($data as $item)
+    <?php //print_r($item->product->shape);exit; ?>
         <tr>
             <td><input type="checkbox" name="tribute_id" value="{{$item->id}}"></td>
             <td>{{ $item->id }}</td>
@@ -230,14 +231,16 @@
             </td>
         </tr>
 
-        <!-- 图片模态框（Modal）转采购负责人 -->
+        <!-- 图片模态框（Modal -->
             <div class="modal fade" id="imgModal_{{$item->id}}"  role="dialog" 
                aria-labelledby="myModalLabel" aria-hidden="true">
                <div class="modal-dialog" style="width:800px">
                   <div class="modal-content">
                      
                      <div class="modal-body">
-                         <a href="{{ asset($item->product->dimage) }}" target='_blank' ><img src="{{ asset($item->product->dimage) }}" width="244px" ></a>
+                        @foreach($item->product->shape as $image)
+                         <a href="{{ asset($image) }}" target='_blank' ><img src="{{ asset($image) }}" width="244px" ></a>
+                        @endforeach
                      </div>
                      
                   </div>

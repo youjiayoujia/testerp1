@@ -248,6 +248,23 @@ class ProductModel extends BaseModel
         return '/default.jpg';
     }
 
+    public function getShapeAttribute()
+    {
+        $arr = LabelModel::where('name',['外观图'])->first();
+        $img = [];
+        if (count($this->imageAll)) {
+            foreach ($this->imageAll as $key => $image) {
+                foreach ($image->labels as  $label) {
+                    if($label->pivot->label_id==$arr->id){
+                        $img[] = $image->path . $image->name;
+                    }    
+                }
+            }   
+        }
+
+        return $img;
+    }
+
     /**
      * 创建产品
      * 2016-1-11 14:00:41 YJ

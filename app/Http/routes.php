@@ -687,7 +687,8 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::resource('wishSellerCode','Publish\Wish\WishSellerCodeController');
 
 
-
+    Route::get('ebayDetail/ajaxUpdate', ['uses' => 'Publish\Ebay\EbayDetailController@ajaxUpdate', 'as' => 'ebayDetail.ajaxUpdate']);
+    Route::get('ebayDetail/ajaxIsUse', ['uses' => 'Publish\Ebay\EbayDetailController@ajaxIsUse', 'as' => 'ebayDetail.ajaxIsUse']);
     Route::get('ebayDetail/getEbayShipping', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayShipping', 'as' => 'ebayDetail.getEbayShipping']);
     Route::get('ebayDetail/getEbayReturnPolicy', ['uses' => 'Publish\Ebay\EbayDetailController@getEbayReturnPolicy', 'as' => 'ebayDetail.getEbayReturnPolicy']);
     Route::get('ebayDetail/getEbaySite', ['uses' => 'Publish\Ebay\EbayDetailController@getEbaySite', 'as' => 'ebayDetail.getEbaySite']);
@@ -696,6 +697,33 @@ Route::group(['middleware' => 'roleCheck'], function () {
     Route::any('ebay/productBatchEdit', ['uses' => 'Publish\Ebay\EbayDataMonitorController@productBatchEdit', 'as' => 'ebay.productBatchEdit']);
     Route::resource('ebayProduct','Publish\Ebay\EbayDataMonitorController');
 
+
+    Route::resource('ebaySellerCode','Publish\ebay\EbaySellerCodeController');
+    Route::resource('ebayTiming','Publish\ebay\EbayTimingSetController');
+
+    Route::any('ebayOnline/batchUpdate', ['uses' => 'Publish\Ebay\EbayOnlineController@batchUpdate', 'as' => 'ebayOnline.batchUpdate']);
+    Route::any('ebayOnline/productBatchEdit', ['uses' => 'Publish\Ebay\EbayOnlineController@productBatchEdit', 'as' => 'ebayOnline.productBatchEdit']);
+    Route::any('ebayOnline/singleUpdate', ['uses' => 'Publish\Ebay\EbayOnlineController@singleUpdate', 'as' => 'ebayOnline.singleUpdate']);
+    Route::any('ebayOnline/productSingleEdit', ['uses' => 'Publish\Ebay\EbayOnlineController@productSingleEdit', 'as' => 'ebayOnline.productSingleEdit']);
+
+    Route::resource('ebayOnline','Publish\Ebay\EbayOnlineController');
+
+
+    Route::get('ebayPublish/ajaxuggestCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSuggestCategory', 'as' => 'ebayPublish.ajaxSuggestCategory']);
+    Route::get('ebayPublish/ajaxSetDataTemplate', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxSetDataTemplate', 'as' => 'ebayPublish.ajaxSetDataTemplate']);
+    Route::get('ebayPublish/ajaxInitErpData', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitErpData', 'as' => 'ebayPublish.ajaxInitErpData']);
+    Route::get('ebayPublish/ajaxInitCategory', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCategory', 'as' => 'ebayPublish.ajaxInitCategory']);
+    Route::get('ebayPublish/ajaxInitSpecifics', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitSpecifics', 'as' => 'ebayPublish.ajaxInitSpecifics']);
+    Route::get('ebayPublish/ajaxInitCondition', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitCondition', 'as' => 'ebayPublish.ajaxInitCondition']);
+    Route::get('ebayPublish/ajaxInitSite', ['uses' => 'Publish\Ebay\EbayPublishController@ajaxInitSite', 'as' => 'ebayPublish.ajaxInitSite']);
+    Route::get('ebayPublish/returnDraft', ['uses' => 'Publish\Ebay\EbayPublishController@returnDraft', 'as' => 'ebayPublish.returnDraft']);
+    Route::resource('ebayPublish','Publish\Ebay\EbayPublishController');
+
+    Route::get('ebayStoreCategory/ajaxUpdateStoreCategory', ['uses' => 'Publish\Ebay\EbayStoreCategoryController@ajaxUpdateStoreCategory', 'as' => 'ebayStoreCategory.ajaxUpdateStoreCategory']);
+    Route::resource('ebayStoreCategory','Publish\Ebay\EbayStoreCategoryController');
+    Route::resource('ebayAccountSet','Publish\Ebay\EbayAccountSetController');
+    Route::resource('ebayDescription','Publish\Ebay\EbayDescriptionTemplateController');
+    Route::resource('ebayDataTemplate','Publish\Ebay\EbayDataTemplateController');
 
     Route::post('wish/editOnlineProductStore',
         ['uses' => 'Publish\Wish\WishPublishController@editOnlineProductStore', 'as' => 'wish.editOnlineProductStore']);

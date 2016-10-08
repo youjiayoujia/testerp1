@@ -65,6 +65,8 @@ class ItemModel extends BaseModel
         'purchase_adminer',
         'remark',
         'cost',
+        'package_weight',
+        'competition_url',
     ];
 
     public function product()
@@ -268,6 +270,17 @@ class ItemModel extends BaseModel
     {
         $config = config('item.status');
         return $config[$this->status];
+    }
+
+    public function getMixedSearchAttribute()
+    {
+        return [
+            'relatedSearchFields' => ['supplier' => ['name'], 'catalog' => ['name'],'warehouse' => ['name'] ],
+            'filterFields' => [],
+            'filterSelects' => ['status' => config('item.status'),],
+            'selectRelatedSearchs' => [],
+            'sectionSelect' => [],
+        ];
     }
 
     //获得sku销量 period参数格式为 -7 day

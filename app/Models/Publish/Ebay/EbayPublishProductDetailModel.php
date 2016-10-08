@@ -57,7 +57,10 @@ class EbayPublishProductDetailModel extends BaseModel
     {
         return $this->belongsTo('App\Models\Publish\Ebay\EbayPublishProductModel', 'publish_id');
     }
-
+    public function erpProduct()
+    {
+        return $this->belongsTo('App\Models\ItemModel', 'product_id');
+    }
 
     public function getEbayStatusAttribute()
     {

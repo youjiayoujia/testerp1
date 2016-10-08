@@ -70,7 +70,7 @@ class TestController extends Controller
 
     public function test2()
     {
-        $package = OrderModel::find(154);
+        $package = OrderModel::find(184);
         var_dump($package->calculateProfitProcess());
     }
 
@@ -667,6 +667,10 @@ class TestController extends Controller
      * 同步ebay信息
      */
     public function getEbayProduct(){
+
+        $specificsModel = new EbaySpecificsModel();
+        $result = $specificsModel->getSiteCategorySpecifics(116743,0);
+        var_dump($result);exit;
         $account = AccountModel::find(378);
         if ($account) {
             $channel = Channel::driver($account->channel->driver, $account->api_config);
@@ -674,7 +678,6 @@ class TestController extends Controller
             $i=1;
             while($is_do) {
                 $productList = $channel->getSellerEvents($i);
-                exit;
                 if ($productList) {
                     foreach($productList as $key=> $itemId){
                         $channel->getProductDetail($itemId);

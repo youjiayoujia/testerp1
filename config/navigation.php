@@ -22,6 +22,11 @@ return [
         'subnavigations' => [
             '产品管理' => [
                 [
+                    'name' => '品类一级分类',
+                    'url' => 'CatalogCategory.index',
+                    'icon' => '',
+                ],
+                [
                     'name' => '品类Category',
                     'url' => 'catalog.index',
                     'icon' => '',

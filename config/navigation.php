@@ -22,7 +22,7 @@ return [
         'subnavigations' => [
             '产品管理' => [
                 [
-                    'name' => '一级品类分类',
+                    'name' => '品类一级分类',
                     'url' => 'CatalogCategory.index',
                     'icon' => '',
                 ],

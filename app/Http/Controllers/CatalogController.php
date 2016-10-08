@@ -277,13 +277,35 @@ class CatalogController extends Controller
         $this->exportExcel($rows, '批量添加产品品类csv格式');
     }
     public function addLotsOfCatalogs(){
-        $file = request()->file('excel');
+        if(!isset($_FILES['excel']['tmp_name'])) {
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请上传表格!'));
+        }
+        $CSV = Excel::load($_FILES['excel']['tmp_name'],'gb2312')->noHeading()->toArray();
+        unset($CSV[0]); //删除表头
+        if($CSV[1][2] == 'toy and hobby') //删除实例行
+            unset($CSV[1]);
+        
+        foreach($CSV as $key => $value){
+            if(empty($value[1]) || empty($value[2]) || empty($value[3]) || empty($value[3])){
+                return redirect($this->mainIndex)->with('alert', $this->alert('danger', '必填字段不能为空，请核修改重新填写!'));
+            }
+        }
+        
+        if(count($CSV) < 1){
+            return redirect($this->mainIndex)->with('alert', $this->alert('danger', '请先填写数据'));
+        }
+        
+        $result = $this->model->csvInsertCatalogs($CSV);
 
+
+
+/*        $file = request()->file('excel');
         $path = config('setting.excelPath');
         !file_exists($path.'excelProcess.xls') or unlink($path.'excelProcess.xls');
         $file->move($path, 'excelProcess.xls');
         $data_array = '';
         $result = false;
+
         Excel::load($path.'excelProcess.xls', function($reader) use (&$result) {
             $reader->noHeading();
             $data_array = $reader->all()->toArray();
@@ -433,18 +455,12 @@ class CatalogController extends Controller
                 }
                 $result = $this->model->createLotsCatalogs($insert_array);
         },'gb2312');
-
+*/
 
         if($result){
             return redirect(route('catalog.index'))->with('alert', $this->alert('success', '批量插入成功!'));
         }else{
-            if($result != false && isset($result['id']) && isset($result['info'])){
-                $error_info = '操作失败,错误位置：<第'.$result['id'].'行>-<'.$result['info'].'>';
-            }else{
-                $error_info = '表格填写有误，请检查';
-            }
-            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', $error_info));
-
+            return redirect(route('catalog.index'))->with('alert', $this->alert('danger', '批量导入失败'));
         }
 
 

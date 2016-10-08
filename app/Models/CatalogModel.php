@@ -65,7 +65,7 @@ class CatalogModel extends BaseModel
     }
 
     public function catalogCategory(){
-        return $this->belongsTo('App\Models\product\CatalogCategoryModel','catalog_category_id','id');
+        return $this->belongsTo('App\Models\Product\CatalogCategoryModel','catalog_category_id','id');
     }
 
     public function getCatalogCategoryNameAttribute(){

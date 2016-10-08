@@ -19,7 +19,7 @@ class EbaySellerCodeModel extends BaseModel
         'user_id',
     ];
 
-    protected $searchFields = [];
+    public $searchFields = ['seller_code' => '销售代码'];
 
     protected $rules = [
         'create' => [

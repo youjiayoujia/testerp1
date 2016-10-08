@@ -6,7 +6,7 @@ use App\Base\BaseModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\ChannelModel;
 use Tool;
-use App\Models\product\CatalogCategoryModel;
+use App\Models\Product\CatalogCategoryModel;
 use App\Models\Channel\CatalogRatesModel;
 
 class CatalogModel extends BaseModel

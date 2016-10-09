@@ -48,7 +48,7 @@
 @section('tableHeader')
     <th><input type='checkbox' name='select_all' class='select_all'> 全选</th>
     <th class="sort" data-field="id">ID</th>
-    <th>所属分类</th>
+    <th>分类</th>
     <th>名称</th>
     @foreach($channels as $channel)
         <th>{{$channel->name}}</th>

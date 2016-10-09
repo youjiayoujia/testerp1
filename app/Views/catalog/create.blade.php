@@ -16,7 +16,7 @@
                 <input class="form-control" id="code" placeholder="前缀" name='code' value="{{old('code')}}">
             </div>
             <div class="col-lg-6">
-                <label for="name">所属分类</label>
+                <label for="name">分类</label>
                 <select class="form-control" name="catalog_category_id">
                     @foreach($catalogCategory as $item)
                         <option value="{{$item->id}}">{{$item->cn_name}}</option>
